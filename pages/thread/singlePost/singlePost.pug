@@ -25,6 +25,7 @@
     @param {String} uid 用户ID 匿名时此字段为null
     @param {String} username 用户名
     @param {String} avatar 用户头像链接
+    @param {String} userHome 用户主页链接
     @param {String} gradeId 用户等级 匿名时此字段为null
     @param {String} gradeName 用户等级名称 匿名时此字段为null
     @param {Boolean} banned 是否已被开除学籍
@@ -72,8 +73,8 @@ if !isIncluded('singlePost')
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
   mixin singlePost(props)
-    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft} = props;
-    -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp} = props;
+    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url} = props;
+    -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp, disableAutoHideContent} = props;
     -var {digest, type, tid, highlight, hide} = props;
     -var {cancelTopped, hidePostBottom, cRead, hideComment} = props;
     .single-post-container(
@@ -82,12 +83,12 @@ if !isIncluded('singlePost')
       data-return=!!draft
       data-highlight=highlight === pid
       data-pid=pid
-      data-hide=isAuthor? 'not': hide
+      data-hide=isAuthor || disableAutoHideContent? 'not': hide
       id=highlight === pid? 'highlight': undefined
       )
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
 
-      +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
+      +singlePostTop(Object.assign({}, user, {pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
         +singlePostBottom({vote, voteUp, pid, count, tid, cRead, hideComment})

@@ -384,11 +384,12 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
   } else {
     threads = await ThreadModel.find(findObj).sort(sortObj);
   }
-  threads = await ThreadModel.extendThreads(threads, {
+  /*threads = await ThreadModel.extendThreads(threads, {
     category: true,
     htmlToText: true,
     removeLink: true,
-  });
+  });*/
+  threads = await ThreadModel.extendArticlesPanelData(threads);
   return threads;
 }
 
@@ -412,7 +413,8 @@ schema.statics.getHomeBlockData = async (props) => {
   const homeBlocks = await HomeBlockModel.find(match).sort({order: 1});
   // 置顶专栏
   const defaultData = {
-    toppedThreads: await ThreadModel.getHomeToppedThreads(fidOfCanGetThreads),
+    // toppedThreads: await ThreadModel.getHomeToppedThreads(fidOfCanGetThreads),
+    toppedThreads: await ThreadModel.getHomeToppedArticles(fidOfCanGetThreads),
     toppedColumns: await ColumnModel.getHomeToppedColumns(),
     hotColumns: await ColumnModel.getHomeHotColumns(),
     recommendThreadsMovable: movable,

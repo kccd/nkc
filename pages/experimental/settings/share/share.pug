@@ -2,27 +2,10 @@ extends ../../experimental
 block eTitle
   title 分享设置
 block eContent
-  #data.hidden=objToStr({shareSettings: data.shareSettings})
+  #data.hidden=objToStr({shares: data.shares})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12#app(v-cloak)
-
-        mixin form(type)
-          -var name = data.shareTypes[type];
-          tr
-            th=name
-            th
-              input.form-control(type='text' v-model.number=`shareSettings.${type}.countLimit`)
-            th
-              input.form-control(type='text' v-model.number=`shareSettings.${type}.timeLimit`)
-            th
-              .radio
-                label.m-r-1
-                  input(type='radio' :value='true' v-model=`shareSettings.${type}.status`)
-                  span 开启
-                label
-                  input(type='radio' :value='false' v-model=`shareSettings.${type}.status`)
-                  span 关闭
         h4 分享设置
         .table-responsive
           table.table.table-bordered.nkc-table
@@ -34,8 +17,20 @@ block eContent
                 th 状态
 
             tbody
-              for type, index in data.shareSettings
-                +form(index)
+              tr(v-for='share in shares')
+                th {{share.name}}
+                th
+                  input.form-control(type='text' v-model.number=`share.countLimit`)
+                th
+                  input.form-control(type='text' v-model.number=`share.timeLimit`)
+                th
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model=`share.status`)
+                      span 开启
+                    label
+                      input(type='radio' :value='false' v-model=`share.status`)
+                      span 关闭
         div
           button.btn.btn-primary(@click='submit') 保存
 block scripts

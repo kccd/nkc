@@ -14,8 +14,8 @@
             input(type="checkbox" checked="checked" data-type="protocol" v-model="protocol")
             span 我已阅读并同意遵守与本次发表相关的全部协议。
             a(href="/protocol" target="_blank") 查看协议
-        .btn.btn-primary.btn-sm.m-r-05(@click="publishComment") 提交
-        .btn.btn-default.btn-sm.m-r-05(@click="saveComment") 存草稿
+        .btn.btn-primary.btn-sm.m-r-05(@click="publishComment" :disabled="lockPost") 提交
+        .btn.btn-default.btn-sm.m-r-05(@click="saveComment" :disabled="lockPost") 存草稿
         .btn.btn-default.btn-sm(@click="close") 取消
 </template>
 
@@ -56,7 +56,7 @@ import {nkcAPI} from "../../js/netAPI";
 import {debounce} from "../../js/execution";
 import Editor from "../Editor";
 export default {
-  props: ['cid'],
+  props: ['cid', 'aid'],
   data: () => ({
     editorPlugs: {
       resourceSelector: true,
@@ -77,6 +77,7 @@ export default {
     //是否勾选协议
     protocol: true,
     commentContent: '',
+    setTimeout: null,
   }),
   components: {
     'editor': Editor,
@@ -114,13 +115,14 @@ export default {
       .catch(err => {
         sweetError(err);
       })
-      this.show = true;
-      this.loading = false;
+      self.show = true;
+      self.loading = false;
     },
     //关闭评论编辑器
     close() {
       this.show = false;
-      this.$emit('close-editor', this.comment._id);
+      window.location.reload();
+      // this.$emit('close-editor', this.comment._id);
     },
     //当编辑器中的内容变化时
     editorContentChange: debounce(function() {
@@ -131,9 +133,16 @@ export default {
       const data = this.$refs[`commentEditor_${this.comment._id}`].getContent();
       if(data) {
         this.commentContent = data;
-        this.post(this.type);
+        this.modifyPost();
       }
     }, 1000),
+    modifyPost() {
+      const self = this;
+      clearTimeout(self.setTimeout);
+      self.setTimeout = setTimeout(function () {
+        self.post(self.type);
+      }, 2000);
+    },
     //设置编辑器保存状态 succeeded failed saving
     setSavedStatus(type) {
       this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
@@ -142,6 +151,7 @@ export default {
     post(type) {
       if(!this.protocol) sweetWarning('请勾选协议！');
       if(!type) return;
+      if(type === 'publish') clearTimeout(this.setTimeout);
       if(this.lockPost) return;
       this.lockPost = true;
       const self = this;
@@ -150,9 +160,8 @@ export default {
         content: self.commentContent,
         type,
         source: self.comment.source,
-        sid: self.comment.sid,
+        aid: self.aid,
         commentId: self.comment._id,
-        commentType: 'comment',
       })
         .then(res => {
           self.commentId = res.commentId;

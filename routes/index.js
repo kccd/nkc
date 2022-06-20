@@ -3,6 +3,7 @@ const router = new Router();
 const routers = require('../requireFolder')(__dirname);
 const userRouter = routers.user;
 const documentRouter = routers.document;
+const draftRouter = routers.draft;
 const watermarkRouter = routers.watermark;
 const meRouter = routers.me;
 const threadRouter = routers.thread;
@@ -85,6 +86,10 @@ const subscribeRouter = routers.subscribe;
 const articleRouter = routers.article;
 //动态
 const momentRouter = routers.moment;
+// 后台设置
+const settingsRouter = routers.settings;
+// 最新页
+const latestRouter = routers.latest;
 
 const path = require('path');
 
@@ -198,10 +203,13 @@ router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
 router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
 router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
 router.use('/document', documentRouter.routes(), documentRouter.allowedMethods());
+router.use('/draft', draftRouter.routes(), draftRouter.allowedMethods());
 router.use('/rc', resourceCategoryRouter.routes(), resourceCategoryRouter.allowedMethods());
 router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
 router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
+router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
+router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 module.exports = router;

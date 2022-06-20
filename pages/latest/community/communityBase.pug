@@ -1,0 +1,10 @@
+extends ../latestBase
+block latestTitle
+  block communityTitle
+block latestContent
+  div
+    include ../latestNav
+    +renderLatestNav('community')
+    block communityContent
+block latestScripts
+  block communityScripts

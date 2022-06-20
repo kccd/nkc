@@ -6,6 +6,17 @@
       a.option(v-if="options.editor" @click="editor()")
         .fa.fa-edit
         span 编辑
+      .option(v-if='options.digest !== null' @click='commentDigest')
+        .fa.fa-star-o(v-if='options.digest === false')
+        .fa.fa-star(v-else)
+        span(v-if='options.digest === false') 设为精选
+        span(v-else) 取消精选
+      .option(v-if='options.xsf !== null' @click='addXSF')
+        .fa.fa-graduation-cap
+        span 评学术分
+      .option(v-if='options.kcb !== null' @click='creditKcbPanel')
+        .fa.fa-cny.credit-kcb
+        span 鼓励
       .option(v-if="options.reviewed === 'unknown'" @click="passReview()")
         .fa.fa-check-circle-o
         span 通过审核
@@ -90,6 +101,8 @@
 <script>
 import {timeFormat} from "../lib/js/tools";
 import {nkcAPI} from "../lib/js/netAPI";
+import {screenTopAlert} from "../lib/js/topAlert";
+import {creditTypes, contentTypes} from "../lib/vue/Credit";
 export default {
   data: () => ({
     show: false,
@@ -97,10 +110,12 @@ export default {
     jqDOM: null,
     domHeight: 0,
     domWidth: 0,
+    comment: null,
     direction: '',
     commentId: null,
     options: {},
-    toc: null
+    toc: null,
+    digestData: null,
   }),
   computed: {
     position() {
@@ -150,6 +165,10 @@ export default {
         self.options = res.options;
         self.toc = res.toc;
         self.loading = false;
+        self.digestData = {
+          digestRewardScore: res.digestRewardScore,
+          redEnvelopeSettings: res.redEnvelopeSettings,
+        };
       })
       .catch(err => {
         sweetError(err);
@@ -292,6 +311,70 @@ export default {
           return data;
         })
         .catch(sweetError);
+    },
+    //评论加精
+    digestComment(kcb) {
+      const self = this;
+      const {_id} = self.comment;
+      return nkcAPI(`/comment/${_id}/digest`, 'POST', {
+        kcb
+      })
+        .then(() => {
+          screenTopAlert('操作成功');
+          self.options.digest = true;
+        })
+        .catch(console.error)
+    },
+    unDigestComment() {
+      const self = this;
+      const {_id} = self.comment;
+      return nkcAPI(`/comment/${_id}/digest`, 'DELETE')
+        .then(() => {
+          screenTopAlert('已取消精选');
+          self.options.digest = false;
+        })
+        .catch(console.error)
+    },
+    //评论加精控制
+    commentDigest() {
+      const {digest} = this.options;
+      const self = this;
+      if(!digest) {
+        window.RootApp.openDigest((kcb) => {
+          self.digestComment(kcb)
+            .then(() => {
+              window.RootApp.closeDigest();
+            });
+        }, {
+          digestData: self.digestData,
+        })
+      } else {
+        self.unDigestComment();
+      }
+    },
+    //评学术分
+    addXSF() {
+      const {_id} = this.comment;
+      window.RootApp.openCredit(creditTypes.xsf, contentTypes.comment, _id);
+    },
+    //撤销学术分
+    cancelXsf() {
+      const {_id} = this.comment;
+      const reason = prompt('请输入原因：');
+      if(reason === null) return;
+      if(reason === '') return screenTopWarning('撤销原因不能为空');
+      nkcAPI(`/comment/${_id}/credit/xsf`)
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((data) => {
+          screenTopWarning(data.error || data);
+        });
+    },
+    //鼓励
+    creditKcbPanel() {
+      const {_id} = this.comment;
+      window.RootApp.openCredit(creditTypes.kcb, contentTypes.comment, _id);
     }
   }
 }

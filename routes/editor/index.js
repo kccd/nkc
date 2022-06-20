@@ -310,14 +310,16 @@ router
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
     ctx.template = "editor/editor.pug";
-    const {id, type} = query;
+    const {id, type, o} = query;
 
     data.reqUrl = {
      type,
-     id 
+     id,
+     o 
     }
     await next();
   })
+  // 获取指定草稿内容
   .get('/data', async (ctx, next)=>{
     const {db, data, query, state} = ctx;
     const {type} = query;
@@ -356,7 +358,9 @@ router
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
-        url: `/t/${thread.tid}`
+        url: `/t/${thread.tid}`,
+        oc: thread.oc, // 文章
+        lm: thread.lm
       };
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "post") { // 修改文章或者修改回复
@@ -375,17 +379,25 @@ router
       if(data.post.parentPostId) {
         parentPostCount = await db.PostModel.countDocuments({pid: data.post.parentPostId});
       }
-
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
         url: `/t/${thread.tid}`,
-        comment: !!parentPostCount
+        comment: !!parentPostCount,
+        oc: thread.oc, // 所属文章
+        pid: data.post.pid, // 当前回复
+        parentPostId: data.post.parentPostId // 父级postID
       };
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "redit") { // 从草稿箱来
-      let {id, o} = query;
-      let draft = await db.DraftModel.findOne({did: id, uid: user.uid});
+      let {id, o, _id} = query;
+      // 社区的草稿只能使用_id 才能具体查找到一篇文章
+      let draft
+      if(_id){
+        draft = await db.DraftModel.findOne({_id, uid: user.uid});
+      }else{
+        draft = await db.DraftModel.findOne({did: id, uid: user.uid});
+      }
       if(!draft) ctx.throw(400, "草稿不存在或已被删除");
       draft = draft.toObject();
       if(!['copy', 'update'].includes(o)) {
@@ -394,7 +406,6 @@ router
       const {
         mainForumsId, categoriesId, desType, desTypeId, parentPostId
       } = draft;
-
       // 更新原有内容
       if(o === 'update') {
         data.draftId = draft.did;
@@ -451,14 +462,14 @@ router
           comment: !!parentPost
         };
         selectedForumsId = thread.mainForumsId;
-      } else if(desType === "forumDeclare") { // 专业说明
-        data.type = "modifyForumDeclare";
-        const forum = await db.ForumModel.findOnly({fid: desTypeId});
-        data.forum = {
-          fid: forum.fid,
-          title: forum.displayName,
-          url: `/f/${forum.fid}`
-        };
+      // } else if(desType === "forumDeclare") { // 专业说明
+      //   data.type = "modifyForumDeclare";
+      //   const forum = await db.ForumModel.findOnly({fid: desTypeId});
+      //   data.forum = {
+      //     fid: forum.fid,
+      //     title: forum.displayName,
+      //     url: `/f/${forum.fid}`
+      //   };
       } else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }

@@ -1,8 +1,11 @@
 <template lang="pug">
   .user-moment.p-t-1
-    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .paging-button
+      a.button(@click="toType('moment')" :class="t === 'moment'?'active':''") 动态
+      a.button(@click="toType('thread')" :class="t === 'thread'?'active':''") 文章
     .user-list-warning(v-if="!momentsData && loading") 加载中~
     .moment-list(v-else)
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       blank(v-if="momentsData && momentsData.length === 0 && !loading")
       moments(
         ref="moments"
@@ -10,11 +13,16 @@
         @complaint="complaint"
         @violation-record="violationRecord"
         :permissions="permissions"
-        v-else
+        v-else-if="momentsData && momentsData.length !== 0 && t === 'moment'"
+      )
+      article-list(
+        ref="articleList"
+        :articles="momentsData"
+        v-else-if="momentsData && momentsData.length !== 0 && t === 'thread'"
       )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
-    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <style lang="less" scoped>
 @import "../../../../../publicModules/base";
@@ -32,8 +40,9 @@ import Moments from "../../../../../lib/vue/zone/Moments";
 import Complaint from "../../../../../lib/vue/Complaint";
 import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
-import {nkcAPI} from "../../../../../lib/js/netAPI";
 import Blank from "../../../../components/Blank";
+import ArticleList from "../../../../../lib/vue/article/ArticleList";
+import {nkcAPI} from "../../../../../lib/js/netAPI";
 
 export default {
   data: () => ({
@@ -42,13 +51,15 @@ export default {
     uid: null,
     loading: false,
     permissions: '',
+    t: 'moment',
   }),
   components: {
     "moments": Moments,
     "complaint": Complaint,
     "violation-record": ViolationRecord,
     "paging": Paging,
-    "blank": Blank
+    "blank": Blank,
+    "article-list": ArticleList
   },
   computed: {
     pageButtons() {
@@ -63,10 +74,10 @@ export default {
   },
   methods: {
     //获取用户卡片信息
-    getUserCardInfo(page) {
+    getUserCardInfo(page, type = 'moment') {
       const {uid} = this;
       const self= this;
-      let url = `/u/${uid}/profile/momentData`;
+      let url = `/u/${uid}/profile/momentData?t=${type}`;
       if(page) {
         const index = url .indexOf('?');
         if(index === -1) {
@@ -99,6 +110,10 @@ export default {
     //点击分页
     clickButton(num) {
       this.getUserCardInfo(num);
+    },
+    //跳转到动态指定类型
+    toType(type) {
+      this.getUserCardInfo(0, type);
     }
   }
 }

@@ -18,6 +18,9 @@
 import Editor from "./vueComponents/Editor.vue";
 new Vue({
   el: "#app-publish-article",
+  data: {
+    reqUrl: NKC.methods.getDataById("data")
+  },
   components: {
     editor: Editor
   },

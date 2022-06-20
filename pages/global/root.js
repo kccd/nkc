@@ -7,6 +7,9 @@ import UserFloatPanel from "../lib/vue/UserFloatPanel";
 import SubscribeTypes from "../lib/vue/SubscribeTypes";
 import FloatForumPanel from "../lib/vue/forum/FloatForumPanel";
 import Sticker from '../lib/vue/Sticker';
+import Digest from "../lib/vue/Digest";
+import Credit from '../lib/vue/Credit';
+import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -32,6 +35,9 @@ window.RootApp = new Vue({
     "float-forum-panel": FloatForumPanel,
     "subscribe-types": SubscribeTypes,
     "sticker-panel": Sticker,
+    'digest': Digest,
+    'credit': Credit,
+    'share-float-panel': ShareFloatPanel
   },
   computed: {
     hasLogged() {
@@ -80,6 +86,16 @@ window.RootApp = new Vue({
     //关闭抽屉
     closeDraw(type) {
       this.$refs.userDraw.colseDraw(type);
+    },
+    // 打开加精弹窗
+    openDigest(callback, options) {
+      this.$refs.digest.open(callback, options);
+    },
+    closeDigest() {
+      this.$refs.digest.close();
+    },
+    openCredit(creditType, contentType, contentId) {
+      return this.$refs.credit.open(creditType, contentType, contentId);
     },
     //关注取关用户
     subscribe(options) {

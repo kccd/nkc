@@ -103,11 +103,20 @@ schema.statics.getArticlePostInfo = async function(articlePosts) {
 * */
 schema.statics.updateOrder = async function(order, aid) {
   const ArticlePostModel = mongoose.model('articlePosts');
+  const ArticleModel = mongoose.model('articles');
   const articlePost = await ArticlePostModel.findOnly({sid: aid});
+  const article = await ArticleModel.findOnly({_id: aid});
   articlePost.count = order;
+  //更新评论盒子评论数
   await articlePost.updateOne({
     $set: {
       count: articlePost.count,
+    }
+  });
+  //更新独立文章评论数
+  await article.updateOne({
+    $set: {
+      comment: order,
     }
   });
 };

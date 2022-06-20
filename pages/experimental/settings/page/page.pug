@@ -62,38 +62,49 @@ block eContent
             label.col-sm-3.control-label 文章页/回复详细页的评论列表
             .col-sm-3
               input.form-control(type='text' v-model.number="pageSettings.threadPostCommentList")
-          .col-xs-12.col-md-12
-            h4 文章列表样式设置
-          .form-group
-            label.col-sm-3.control-label 显示模式
-            .col-sm-9
+      .col-xs-12.col-md-12
+        h4 文章列表风格设置
+        mixin radio(name, listStyle)
+          tr
+            th=name
+            th
               .radio
                 label.m-r-1
-                  input(type='radio' value='abstract' v-model='pageSettings.threadListStyle.type')
+                  input(type='radio' value='abstract' v-model=`pageSettings.${listStyle}.type`)
                   span 摘要模式
                 label.m-r-1
-                  input(type='radio' value='brief' v-model='pageSettings.threadListStyle.type')
+                  input(type='radio' value='brief' v-model=`pageSettings.${listStyle}.type`)
                   span 简要模式
                 label
-                  input(type='radio' value='minimalist' v-model='pageSettings.threadListStyle.type')
+                  input(type='radio' value='minimalist' v-model=`pageSettings.${listStyle}.type`)
                   span 极简模式
-          .form-group
-            label.col-sm-3.control-label 封面图
-            .col-sm-9
+            th
               .radio
                 label.m-r-1
-                  input(type='radio' value='left' v-model='pageSettings.threadListStyle.cover')
+                  input(type='radio' value='left' v-model=`pageSettings.${listStyle}.cover`)
                   span 左侧
                 label.m-r-1
-                  input(type='radio' value='right' v-model='pageSettings.threadListStyle.cover')
+                  input(type='radio' value='right' v-model=`pageSettings.${listStyle}.cover`)
                   span 右侧
                 label
-                  input(type='radio' value='null' v-model='pageSettings.threadListStyle.cover')
+                  input(type='radio' value='null' v-model=`pageSettings.${listStyle}.cover`)
                   span 不显示
-          .form-group
-            label.col-sm-3.control-label
-            .col-sm-3
-              button.btn.btn-primary(@click='save') 保存
+
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 类型
+                th 显示模式
+                th 封面图
+            tbody
+              +radio('默认', 'threadListStyle')
+              +radio('最新页社区文章', 'articlePanelStyle.latestCommunity')
+              +radio('最新页社区置顶文章', 'articlePanelStyle.latestCommunityTopped')
+              +radio('最新页空间文章', 'articlePanelStyle.latestZone')
+              +radio('最新页专栏文章', 'articlePanelStyle.latestColumn')
+      .col-xs-12.col-md-12
+        button.btn.btn-primary(@click='save') 保存
 block scripts
 
   +includeJS("/experimental/settings/page/page.js")

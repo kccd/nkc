@@ -58,7 +58,22 @@ export default {
     //验证动态码
     checkUserCode() {
       if(this.targetUser) {
-        checkUserCode(this.targetUser.uid);
+        return sweetPrompt('请输入动态码')
+          .then(code => {
+            if(code && code.length > 0){
+              return nkcAPI(`/u/${this.targetUser.uid}/code`, 'POST', {code})
+            }else {
+              return new Promise((resolve,reject)=>{
+                reject('动态码不能为空')
+              })
+            }
+          })
+          .then(() => {
+            sweetSuccess('验证通过');
+          })
+          .catch(err => {
+            sweetError(err);
+          });
       }
     },
     //查看违规信息

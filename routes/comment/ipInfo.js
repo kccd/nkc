@@ -1,6 +1,7 @@
 module.exports = async (ctx, next) => {
-  const {db, data, params, query, address} = ctx;
+  const {db, data, params, query, address, permission} = ctx;
   const {_id} = params;
+  if(!permission('ipinfo')) return ctx.throw(401, '权限不足');
   let comment = await db.CommentModel.findOnly({_id});
   if(!comment) ctx.throw(404, '未找到评论,请刷新后重试')
   const {stable: stableType} = await db.DocumentModel.getDocumentTypes();

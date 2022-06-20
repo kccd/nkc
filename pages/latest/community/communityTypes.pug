@@ -1,0 +1,12 @@
+if !isIncluded('latest/community/communityTypes')
+  mixin renderLatestCommunityTypes(activeType, types)
+    -activeType = activeType || types.post;
+    .paging-button
+      a.button.radius-left(
+        href=`/n/community?t=post`
+        class=activeType === types.post ? 'active' : ''
+      ) 全部
+      a.button.radius-right(
+        href=`/n/community?t=thread`
+        class=activeType === types.thread ? 'active' : ''
+      ) 文章

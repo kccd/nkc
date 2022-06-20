@@ -1,6 +1,67 @@
 const router = require("koa-router")();
 const home = require("./home");
+const reply = require('./reply');
+const thread = require('./thread');
+const column = require('./column');
 router
+  // 更新用户日常登录记录
+  .get('/', async (ctx, next) => {
+    const {data, state, nkcModules, db} = ctx;
+    const {user} = data;
+    if(state.uid) {
+      const lock = await nkcModules.redLock.lock(`dailyLogin:${state.uid}`, 5000);
+      try{
+        await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', user, ctx);
+        const {today} = nkcModules.apiFunction;
+        const time = today();
+        const dailyLogin = await db.UsersScoreLogModel.findOne({
+          uid: user.uid,
+          type: 'score',
+          operationId: 'dailyLogin',
+          toc: {
+            $gte: time
+          }
+        });
+        if(!dailyLogin) {
+          await db.UserModel.updateUserKcb(user.uid);
+          await db.UsersScoreLogModel.insertLog({
+            user,
+            type: 'score',
+            typeIdOfScoreChange: 'dailyLogin',
+            port: ctx.port,
+            ip: ctx.address,
+            key: 'dailyLoginCount'
+          });
+          await user.updateUserMessage();
+        }
+      } catch(err) {}
+      await lock.unlock();
+    }
+    await next();
+  })
+  .get('/cp', async (ctx, next) => {
+    const {query, data, db, internalData} = ctx;
+    const {t = 'home'} = query;
+    let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+      data.userRoles,
+      data.userGrade,
+      data.user
+    );
+    // 筛选出没有开启流控的专业
+    let forumInReduceVisits = await db.ForumModel.find({openReduceVisits: true}, {fid: 1});
+    forumInReduceVisits = forumInReduceVisits.map(forum => forum.fid);
+    fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !forumInReduceVisits.includes(fid));
+    internalData.fidOfCanGetThreads = fidOfCanGetThreads;
+    if(t === 'reply') {
+      return reply(ctx, next);
+    } else if(t === 'thread') {
+      return thread(ctx, next);
+    } else if(t === 'column') {
+      return column(ctx, next);
+    } else {
+      return home(ctx, next);
+    }
+  })
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;
     const {pageSettings} = state;
@@ -10,38 +71,6 @@ router
     data.d = d;
     data.latestToppedThreads = [];
     if(s) data.s = s;
-    if(user) {
-      // 日常登陆
-      const lock = await nkcModules.redLock.lock(`dailyLogin:${user.uid}`, 10000);
-      await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
-      const {today} = nkcModules.apiFunction;
-      const time = today();
-      const dailyLogin = await db.UsersScoreLogModel.findOne({
-        uid: user.uid,
-        type: 'score',
-        operationId: 'dailyLogin',
-        toc: {
-          $gte: time
-        }
-      });
-      if(!dailyLogin) {
-        await db.UserModel.updateUserKcb(user.uid);
-        await db.UsersScoreLogModel.insertLog({
-          user,
-          type: 'score',
-          typeIdOfScoreChange: 'dailyLogin',
-          port: ctx.port,
-          ip: ctx.address,
-          key: 'dailyLoginCount'
-        });
-        await user.updateUserMessage();
-      }
-      try{
-        await lock.unlock();
-      } catch(err) {
-        console.log(err.message.red);
-      }
-    }
     const homeSettings = await db.SettingModel.getSettings("home");
     const latestFirst = homeSettings.latestFirst;
     data.latestFirst = latestFirst;
@@ -704,6 +733,7 @@ router
       }
     }
     data.appsData = await db.SettingModel.getAppsData();
+    data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     ctx.template = "home/home.pug";
     await next();
   });

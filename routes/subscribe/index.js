@@ -36,6 +36,8 @@ router
     data.articleThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     // 推荐文章
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+    // 用户资料补全提示
+    data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     await next();
   })
   .get(['/user', '/forum', '/column', '/thread'], async (ctx, next) => {

@@ -7,7 +7,8 @@ const Schema = mongoose.Schema;
 const voteSources = {
   post: 'post',
   article: 'article',
-  moment: 'moment'
+  moment: 'moment',
+  comment: 'comment',
 };
 
 
@@ -253,6 +254,22 @@ postsVoteSchema.statics.getVotesTypeBySource = async (source, sourcesId = [], ui
     results[sid] = votesObj[sid] || '';
   }
   return results;
+}
+
+/*
+*  获取用户的点赞信息
+* */
+postsVoteSchema.statics.getVoteByUid = async (options) => {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {uid, type, id} = options;
+  const {comment, article} = voteSources;
+  let vote;
+  if(type === "article") {
+    vote = await PostsVoteModel.findOne({source: article, uid, sid: id}).sort({toc: -1});
+  } else if(type === "comment") {
+    vote = await PostsVoteModel.findOne({source: comment, uid, sid: id}).sort({toc: -1});
+  }
+  return vote ? vote.type : null;
 }
 
 module.exports = mongoose.model('postsVotes', postsVoteSchema);

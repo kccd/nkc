@@ -1,5 +1,9 @@
-mixin renderHome(homeBlock)
-  -var hasPermission = permission('nkcManagementHome');
+mixin renderHome(homeBlock, options)
+  include ../publicModules/articlePanel/articlePanel
+  -options = options || {}
+  -var permissions = options.permissions || {};
+  -var defaultThreadListStyle = options.defaultThreadListStyle;
+  -var hasPermission = !!permissions.nkcManagementHome;
   -var disabled = homeBlock.disabled? 'disabled': '';
   mixin homeBlockHeader(hideHeader, showOptions)
     -var {_id, blockStyle, name} = homeBlock;
@@ -57,7 +61,8 @@ mixin renderHome(homeBlock)
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         .home-threads
-          for thread in homeBlock.data
+          +ArticlesPanel(homeBlock.data)
+          //-for thread in homeBlock.data
             include ../publicModules/thread_panel/thread_panel
   else if homeBlock._id === 'goods'
     //热销商品
@@ -208,7 +213,8 @@ mixin renderHome(homeBlock)
         .m-b-1.bg-danger.text-danger.p-a-1.bg-border 当前列表已被屏蔽
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', false)`)='恢复'
       .home-threads
-        for thread in homeBlock.data
+        +ArticlesPanel(homeBlock.data, {type: homeBlock.threadStyle, cover: homeBlock.coverPosition})
+        //-for thread in homeBlock.data
           -var defaultThreadListStyle = {type: homeBlock.threadStyle, cover: homeBlock.coverPosition}
           -var threadPanelATarget = '_blank';
           include ../publicModules/thread_panel/thread_panel

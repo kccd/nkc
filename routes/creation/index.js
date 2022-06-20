@@ -12,7 +12,9 @@ const communityRouter = require('./community');
 const columnRouter = require('./column');
 const editorRouter = require('./editor');
 const zoneRouter = require('./zone');
-const detailsRouter = require('./details');
+const collectionRouter = require('./collections');
+const homeRouter = require('./home');
+const blackListRouter = require('./blackList');
 router
   .use('/', async (ctx, next) => {
     const {data, state, db} = ctx;
@@ -35,7 +37,7 @@ router
   .get('/', async (ctx, next) => {
     await next();
   })
-  .use('/:uid', detailsRouter.routes(), detailsRouter.allowedMethods())
+  .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
   .use('/materials', materialsRouter.routes(), materialsRouter.allowedMethods())
   .use('/material', materialRouter.routes(), materialRouter.allowedMethods())
   .use('/categories', categoriesRouter.routes(), categoriesRouter.allowedMethods())
@@ -49,4 +51,6 @@ router
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods())
+  .use('/collections', collectionRouter.routes(), collectionRouter.allowedMethods())
+  .use('/blackLists', blackListRouter.routes(), blackListRouter.allowedMethods())
 module.exports = router;

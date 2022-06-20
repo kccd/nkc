@@ -1,0 +1,16 @@
+{
+  "moleculer": {
+    "namespace": "NKC_MESH_PRODUCTION",
+    "nodeID": "nkc_main",
+    "transporter": "redis://127.0.0.1:6379",
+    "registry": {
+      "strategy": "Random",
+      "discoverer": "Local"
+    },
+    "web": {
+      "enabled": false,
+      "port": 20394,
+      "host": "0.0.0.0"
+    }
+  }
+}

@@ -20,6 +20,17 @@ if !isIncluded('articleOptions')
         //  .fa.fa-bookmark-o
         //  span(v-if='optionStatus.subscribe === false') 加入关注
         //  span(v-else) 取消关注
+        .option(v-if='optionStatus.digest !== null' @click='articleDigest')
+          .fa.fa-star-o(v-if='optionStatus.digest === false')
+          .fa.fa-star(v-else)
+          span(v-if='optionStatus.digest === false') 设为精选
+          span(v-else) 取消精选
+        .option(v-if='optionStatus.xsf !== null' @click='addXSF')
+          .fa.fa-graduation-cap
+          span 评学术分
+        .option(v-if='optionStatus.kcb !== null' @click='addKCB')
+          .fa.fa-cny.credit-kcb
+          span 鼓励
         a.option(v-if='optionStatus.edit !== null' @click='editArticle')
           .fa.fa-edit
           span 编辑

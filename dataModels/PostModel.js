@@ -2,6 +2,7 @@ const settings = require('../settings');
 const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
+const tools = require("../nkcModules/tools");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -282,7 +283,6 @@ const postSchema = new Schema({
   getters: true,
   virtuals: true
 }});
-
 // 标志 表示是否禁止划词选区的更新 默认为false
 postSchema.virtual('disableNoteUpdate')
   .get(function() {
@@ -380,7 +380,12 @@ postSchema.virtual('usersVote')
     this._usersVote = t
   });
 
-
+postSchema.statics.getType = async function () {
+  return {
+    thread: "thread",
+    post: "post"
+  }
+}
 postSchema.methods.extendThread = async function() {
   const ThreadModel = mongoose.model('threads');
   return this.thread = await ThreadModel.findOnly({tid: this.tid})
@@ -882,6 +887,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const SettingModel = mongoose.model('settings');
   const HistoryModel = mongoose.model('histories');
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
@@ -938,7 +944,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
       kcbsRecordsObj[r.pid].push(r);
     }
-    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false}).sort({toc: 1});
+    const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false, type: xsfsRecordTypes.post}).sort({toc: 1});
     for(const r of xsfsRecords) {
       uid.add(r.operatorId);
       r.uid = "";
@@ -950,6 +956,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
     let users = await UserModel.find({uid: {$in: [...uid]}});
     if(o.userGrade) {
       grades = await UsersGradeModel.find().sort({score: -1});
+      for(const g of grades) {
+        g.iconUrl = await UsersGradeModel.getIconUrl(g._id);
+      }
     }
     users.map(user => {
       usersObj[user.uid] = user;
@@ -1121,6 +1130,8 @@ postSchema.statics.extendPosts = async (posts, options) => {
   return results;
 };
 
+
+//更新post的点赞
 postSchema.methods.updatePostsVote = async function() {
   const PostModel = mongoose.model('posts');
   const PostsVoteModel = mongoose.model('postsVotes');
@@ -1495,7 +1506,9 @@ postSchema.statics.filterPostsInfo = async (posts) => {
         username: anonymousUser.username,
         avatar: anonymousUser.avatarUrl,
         gradeId: null,
+        gradeIconUrl: null,
         gradeName: null,
+        userHome: null,
         banned: false,
       }
     } else {
@@ -1504,6 +1517,8 @@ postSchema.statics.filterPostsInfo = async (posts) => {
         username: post.user.username,
         avatar: tools.getUrl('userAvatar', post.user.avatar),
         gradeId: post.user.grade._id,
+        gradeIconUrl: post.user.grade.iconUrl,
+        userHome: tools.getUrl('userHome', post.user.uid),
         gradeName: post.user.grade.displayName,
         banned: post.user.certs.includes('banned'),
       }
@@ -1514,9 +1529,11 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       quote = {
         uid: post.quotePost.uid || null,
         username: post.quotePost.uid? post.quotePost.username: anonymousUser.username,
+        userHome: post.quotePost.uid? tools.getUrl('userHome', post.quotePost.uid): '',
         floor: post.quotePost.step,
         content: post.quotePost.c,
         pid: post.quotePost.pid,
+        postUrl: tools.getUrl('post', post.quotePost.pid, true),
       };
     }
 
@@ -1528,6 +1545,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
           _id,
           uid: fromUser.uid,
           username: fromUser.username,
+          userHome: tools.getUrl('userHome', fromUser.uid),
           avatar: tools.getUrl('userAvatar', fromUser.avatar),
           description,
           toc,
@@ -1566,6 +1584,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       digest: post.digest,
       hide: post.hidePost || post.hide,
       cRead: ['r', 'rw'].includes(post.comment),
+      url: tools.getUrl('post', post.pid),
       user,
       quote,
       kcb,
@@ -1831,7 +1850,8 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       uid,
       avatar: tools.getUrl('userAvatar', avatar),
       username,
-      banned: certs.includes("banned")
+      banned: certs.includes("banned"),
+      homeUrl: tools.getUrl('userHome', uid),
     };
   }
   const results = [];
@@ -2133,7 +2153,7 @@ postSchema.methods.noticeAuthorReply = async function() {
                 pid: quotePost.pid,
               }
             });
-    
+
             await message.save();
             return await socket.sendMessageToUser(message._id);
           }
@@ -2198,6 +2218,175 @@ postSchema.methods.noticeAuthorReply = async function() {
       .catch(err => {
         console.log(err);
       })
+  }
+}
+
+// 定时屏蔽退修超时未修改的回复
+postSchema.statics.disableToDraftPosts = async function() {
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const nkcModules = require("../nkcModules");
+  const onLogs = await DelPostLogModel.find({
+    delType: 'toDraft',
+    postType: 'post',
+    modifyType: false,
+    toc: {
+      $lte: Date.now() - 4 * 24 * 60 * 60 * 1000
+    }
+  }).limit(1000);
+  for(const log of onLogs) {
+    const {postId} = log;
+    const post = await PostModel.findOne({pid: postId, type: 'post'});
+    await log.updateOne({
+      $set: {
+        modifyType: true,
+        delType: 'toRecycle'
+      }
+    });
+    if(post && post.toDraft) {
+      await post.updateOne({
+        $set: {
+          toDraft: false,
+          reviewed: true,
+        }
+      });
+      const user = await UserModel.findOnly({uid: post.uid});
+      //扣除用户科创币
+      await KcbsRecordModel.insertSystemRecord('postBlocked', user, {
+        state: {
+          _scoreOperationForumsId: post.mainForumsId,
+        },
+        data: {
+          user: {},
+          post
+        },
+        nkcModules,
+        db: require('./index')
+      });
+    }
+  }
+};
+
+/*
+* post执行科创币加减,加精时根据传入的科创币数量直接加上，取消精选时去查找加精的科创币数量去扣除相应的数量
+* @params {string} type 精选类型 digestPost/unDigestPost
+* @params {object} user 需要加减科创币的用户
+* @params {object} ctx 中间键
+* @params {number} additionalReward 加减的科创币数量
+* */
+postSchema.statics.insertSystemRecord = async (type, user, ctx, additionalReward) => {
+  const SettingModel = mongoose.model('settings');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model('users');
+  const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
+  const {address: ip, port, data, state = {}} = ctx;
+  if(!user) return;
+  let fid;
+  // 多专业情况下 所有有关积分的数据仅从第一个专业上读取, 获取第一个专业
+  if(state._scoreOperationForumsId && state._scoreOperationForumsId.length) {
+    fid = state._scoreOperationForumsId[0];
+  }
+  // 获取积分策略对象
+  const operation = await SettingModel.getScoreOperationsByType(type, fid); // 专业ID待传\
+  if(!operation) return;
+  if(operation.from === 'default') fid = '';
+  const enabledScores = await SettingModel.getEnabledScores();
+  const scores = {};
+  // 获取当天此人当前操作执行的次数
+  const operationLogCount = await ScoreOperationLogModel.getOperationLogCount(user, type, fid);
+  // 如果用户当天操作次数超过当前专业设置的次数就返回
+  // if(operation.count < operationLogCount) return ctx.throw(400, `超过专业积分策略最大设置值: ${operation.count}`);
+  //执行科创币加减
+  for(const e of enabledScores) {
+    const scoreType = e.type;
+    scores[scoreType] = operation[scoreType];
+  }
+  let recordsId = [];
+  for(const enabledScore of enabledScores) {
+    const scoreType = enabledScore.type;
+    let num;
+    if(type === 'digestPost' || type === 'digestThread') {
+      if(additionalReward === undefined) return;
+      if(additionalReward === 0) return;
+      num = Math.abs(additionalReward);
+    } else if(type === 'unDigestPost' || type === 'unDigestThread') {
+      const digestType = type === 'unDigestPost' ? 'digestPost' : 'digestThread';
+      const match = {
+        type: digestType,
+        to: user.uid,
+        pid: data.post.pid,
+      };
+      //扣除科创币
+      // 查找出内容的科创币加减记录
+      const record = await KcbsRecordModel.findOne(match);
+      if(record) {
+        num =  0 - Math.abs(record.num);
+      } else {
+        num = 0 - Math.abs(scores[scoreType]);
+      }
+    }
+    // 加科创币
+    const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+    const newRecords = KcbsRecordModel({
+      _id: kcbsRecordId,
+      from: 'bank',
+      to: user.uid,
+      num,
+      scoreType,
+      type,
+      ip,
+      port,
+    });
+    if(data.targetUser && data.user) {
+      if(data.user !== user) {
+        newRecords.tUid = data.user.uid;
+      } else {
+        newRecords.tUid = data.targetUser.uid;
+      }
+    }
+    let thread, post;
+    if(data.thread) {
+      thread = data.thread;
+    } else if (data.targetThread) {
+      thread = data.targetThread;
+    }
+    if(data.post) {
+      post = data.post
+    } else if(data.targetPost) {
+      post = data.targetPost;
+    }
+    if(thread) {
+      newRecords.tid = thread.tid;
+      newRecords.fid = thread.fid;
+    }
+    if(post) {
+      newRecords.pid = post.pid;
+      newRecords.fid = post.fid;
+      newRecords.tid = post.tid;
+    }
+    // 操作涉及到的资源的资源id
+    if(data.rid) {
+      newRecords.rid = data.rid;
+    }
+    if(data.problem) newRecords.problemId = data.problem._id;
+    await newRecords.save();
+    recordsId.push(kcbsRecordId);
+  }
+  // 已创建积分账单记录
+  if(recordsId.length) {
+    const scoreOperationLog = ScoreOperationLogModel({
+      _id: await SettingModel.operateSystemID('scoreOperationLogs', 1),
+      uid: user.uid,
+      type,
+      ip,
+      port,
+      fid,
+      recordsId
+    });
+    await scoreOperationLog.save();
+    await UserModel.updateUserScores(user.uid);
   }
 }
 

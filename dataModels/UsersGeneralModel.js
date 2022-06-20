@@ -262,10 +262,107 @@ const usersGeneralSchema = new Schema({
   visitedForumsId: {
 	  type: [String],
     default: []
+  },
+  // 我访问过主页的用户
+  visitedUsers: {
+    type: [
+      {
+        _id: String,
+        time: Date,
+      }
+    ],
+    default: []
+  },
+  // 我访问过的文章
+  visitedThreads: {
+    type: [
+      {
+        _id: String,
+        time: Date,
+      }
+    ],
+    default: []
+  },
+  // 访问我主页的用户
+  accessedUsers: {
+    type: [
+      {
+        _id: String,
+        time: Date,
+      }
+    ],
+    default: []
   }
 }, {
 	collection: 'usersGeneral'
 });
+
+usersGeneralSchema.statics.replaceItem = async (arr, _id) => {
+  for(let i = 0; i < arr.length; i++) {
+    if(arr[i]._id !== _id) continue;
+    arr.splice(i, 1);
+    break;
+  }
+  if(arr.length >= 12) {
+    arr.shift();
+  }
+  arr.push({
+    _id,
+    time: new Date()
+  });
+  return arr;
+}
+
+usersGeneralSchema.statics.updateThreadAccessLogs = async (uid, tid) => {
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const userGeneral = await UsersGeneralModel.findOne({uid}, {
+    visitedThreads: 1,
+  });
+  const visitedThreads = await UsersGeneralModel.replaceItem(userGeneral.visitedThreads, tid);
+  await userGeneral.updateOne({
+    $set: {
+      visitedThreads
+    }
+  });
+};
+
+usersGeneralSchema.statics.updateUserAccessLogs = async (uid, tUid) => {
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const usersGeneral = await UsersGeneralModel.find({
+    uid: {
+      $in: [uid, tUid]
+    }
+  },
+  {
+    uid: 1,
+    visitedUsers: 1,
+    accessedUsers: 1
+  });
+  if(usersGeneral.length !== 2) return;
+  let visitor;
+  let target;
+  if(usersGeneral[0].uid === uid) {
+    visitor = usersGeneral[0];
+    target = usersGeneral[1];
+  } else {
+    visitor = usersGeneral[1];
+    target = usersGeneral[0];
+  }
+
+  const visitorVisitedUsers = await UsersGeneralModel.replaceItem(visitor.visitedUsers, tUid);
+  const targetAccessedUsers = await UsersGeneralModel.replaceItem(target.accessedUsers, uid);
+
+  await visitor.updateOne({
+    $set: {
+      visitedUsers: visitorVisitedUsers
+    }
+  });
+  await target.updateOne({
+    $set: {
+      accessedUsers: targetAccessedUsers
+    }
+  });
+}
 
 
 /*

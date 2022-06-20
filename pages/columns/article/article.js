@@ -99,6 +99,36 @@ function collectThread() {
     .catch(sweetError);
 }
 
+//首页顶置
+function homeTop(type) {
+  const {_id} = article;
+  nkcAPI(`/article/${_id}/homeTop`, 'POST' , {
+    type
+  })
+    .then(() => {
+      window.location.reload();
+    })
+    .catch((data) => {
+      screenTopWarning(data.error || data);
+    })
+}
+
+//取消首页顶置
+function unHomeTop(type) {
+  const {_id} = article;
+  let url = `/article/${_id}/homeTop`;
+  if(type) {
+    url += `?type=${type}`;
+  }
+  nkcAPI(url, 'DELETE', {})
+    .then(() => {
+      window.location.reload();
+    })
+    .catch((data) => {
+      screenTopWarning(data.error || data);
+    })
+}
+
 function toUrl(url) {
   window.location.href = url;
 }
@@ -110,5 +140,7 @@ Object.assign(window, {
   unblock,
   collectArticle,
   collectThread,
-  toUrl
+  toUrl,
+  homeTop,
+  unHomeTop,
 })

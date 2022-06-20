@@ -1,4 +1,13 @@
 const router = require('koa-router')();
+const {renderMarkdown} = require('../../nkcModules/markdown');
+
+function isIncludes(arr, id, type) {
+  for(const a of arr) {
+    if(a.id === id && a.type === type)  return true;
+  }
+  return false;
+}
+
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
@@ -7,17 +16,41 @@ router
     const { aid } = params;
     const {pageSettings, uid} = state;
     const {user} = data;
-    const {page = 0, last_pages, highlight, t, did, redirect} = query;
+    const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
+    data.targetUser = await article.extendUser();
+    data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
+    data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
+    await data.targetUser.extendGrade();
+    await db.UserModel.extendUserInfo(data.targetUser);
+    // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
+    // if(data.targetColumn) {
+    //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
+    // }
+    if(state.userColumn) {
+      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: aid})) > 0;
+    }
+    data.columnInfo = {
+      userColumn: state.userColumn,
+      columnPermission: state.columnPermission,
+      column: state.userColumn,
+    };
+    if(token) {
+      //如果存在token就验证token是否合法
+      await db.ShareModel.hasPermission(token, article._id)
+    }
     //查找文章的评论盒子
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(article._id);
+    const homeSettings = await db.SettingModel.getSettings("home");
     //点击楼层高亮需要url和highlight值
     data.originUrl = state.url
     data.highlight = highlight;
     data.columnPost = articleRelatedContent;
+    data.columnPost.article.vote = await db.PostsVoteModel.getVoteByUid({uid: user.uid, id: data.columnPost.article._id, type: 'article'});
+    data.homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: article._id, type: 'article'});
     const isModerator = await article.isModerator(state.uid);
     //获取当前文章信息
     // const _article = (await db.ArticleModel.extendDocumentsOfArticles([article], 'stable', [
@@ -43,6 +76,8 @@ router
       match.uid = _article.uid;
     }
     const permissions = {
+      cancelXsf: ctx.permission('cancelXsf'),
+      modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
@@ -102,20 +137,6 @@ router
     data.isModerator =  isModerator;
     data.comments = comments || [];
     data.article = _article;
-    //楼层高亮显示跳转实现的从定向
-    /*var url = null
-    if(did){
-      const commentDid = comments.map(comment => comment.did);
-      const step = commentDid.indexOf(did);
-      if(step === -1) {
-        url = state.url;
-      }else {
-        url = `${state.url}?page=${page}&highlight=${did}#highlight`;
-      }
-      if(redirect === 'true'){
-        return ctx.redirect(url);
-      }
-    }*/
     //文章浏览数加一
     await article.addArticleHits();
     await next();

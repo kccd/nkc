@@ -80,6 +80,7 @@ draftsRouter
     }
     await next();
   })
+  // 保存草稿
   .post("/", async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     let body, files;
@@ -94,6 +95,7 @@ draftsRouter
       desType, // 草稿类型
       desTypeId, // 草稿类型对应的ID
       draftId, // 草稿ID
+      saveType
     } = body;
     let {
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
@@ -103,12 +105,16 @@ draftsRouter
     } = post;
     const {user} = data;
     const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
-    if(draftCount >= 100) ctx.throw(400, "草稿箱已满");
+    if(draftCount >= 5000) ctx.throw(400, "草稿箱已满");
     let draft;
     let contentLength;
     if(draftId) {
       draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
     }
+    if (parentPostId) {
+      const parentPost = await db.PostModel.findOnly({pid: parentPostId});
+      if (! parentPost) ctx.throw(400, 'parentPostId不存在'); 
+    };
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
       tcId,
@@ -116,11 +122,15 @@ draftsRouter
       categoriesId: cids,
       cover,
       authorInfos, originState, anonymous,
-      parentPostId
+      parentPostId,
+      tlm: Date.now()
     };
     if(draft) { // 存在草稿
-      draftObj.tlm = Date.now();
+      // 更新草稿
       await draft.updateOne(draftObj);
+      if (saveType !== 'automatic') {
+        await draft.checkContentAndCopyToBetaHistory();
+      }
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
           survey._id = draft.surveyId;
@@ -135,14 +145,16 @@ draftsRouter
         await db.SurveyModel.deleteOne({uid: user.uid, _id: draft.surveyId});
       }
     } else {
-      if(!["forum", "thread", "post", "forumDeclare", 'forumLatestNotice'].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
+      // "forumDeclare", 'forumLatestNotice'
+      if(!["forum", "thread", "post"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
       if(desType === "thread") {
         await db.ThreadModel.findOnly({tid: desTypeId});
       } else if(desType === "post") {
         await db.PostModel.findOnly({pid: desTypeId});
-      } else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
-        await db.ForumModel.findOnly({fid: desTypeId});
-      }
+      } 
+      // else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
+      //   await db.ForumModel.findOnly({fid: desTypeId});
+      // }
       draftObj.desTypeId = desTypeId;
       draftObj.desType = desType;
       draftObj.uid = user.uid;

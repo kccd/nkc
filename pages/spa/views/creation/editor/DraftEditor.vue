@@ -110,9 +110,16 @@ export default {
   mounted() {
     const self = this;
     self.initId();
-    self.setInterval = setInterval(function() {
+    self.setInterval = setTimeout(function () {
       self.autoSaveToDraft()
-    }, 60000);
+        .then(() => {
+          self.autoSaveToDraft();
+        })
+        .catch((data) => {
+          sweetError('草稿保存失败：' + (data.error || data));
+          self.autoSaveToDraft();
+        })
+    }, 60000)
   },
   destroyed() {
     clearInterval(this.setInterval);
@@ -155,12 +162,12 @@ export default {
   },
   methods: {
     preview(){
-      const url = getUrl('preview', "draft", this.draftId);
+      const url = getUrl('documentPreview', "draft", this.draftId);
       window.open(url);
     },
     history(){
       // if(!this.draftId) return
-      const url = getUrl('history', "draft", this.draftId);
+      const url = getUrl('documentHistory', "draft", this.draftId);
       window.open(url);
     },
     back() {

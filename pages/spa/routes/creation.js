@@ -13,8 +13,7 @@ import Drafts from '../views/creation/drafts/drafts';
 import Articles from '../views/creation/articles/Articles';
 import ArticlesColumn from '../views/creation/articles/Column';
 import Community from '../views/creation/community/Community';
-import CommunityThread from '../views/creation/community/Thread';
-import CommunityPost from '../views/creation/community/Post';
+import CreationPostList from "../views/creation/community/CreationPostList";
 import CommunityDraft from '../views/creation/community/Draft';
 import CommunityNote from '../views/creation/community/Note';
 import Column from '../views/creation/column/Column';
@@ -31,6 +30,10 @@ import ZoneArticle from '../views/creation/zone/Article';
 import ZoneMoment from '../views/creation/zone/Moment';
 import ZoneDraft from '../views/creation/zone/Draft';
 import DraftEditor from '../views/creation/editor/DraftEditor';
+
+import Collections from '../views/creation/collections/Collections';
+
+import BlackLists from "../views/creation/collections/BlackLists";
 
 export const routesName = {
   creation: 'creation',
@@ -63,7 +66,9 @@ export const routesName = {
   creationZone: 'creationZone',
   creationZoneMoment: 'creationZoneMoment',
   creationZoneArticle: 'creationZoneArticle',
-  creationZoneDraft: 'creationZoneDraft'
+  creationZoneDraft: 'creationZoneDraft',
+  creationCollections: 'creationCollections',
+  creationBlackLists: 'creationBlackLists'
 }
 
 export default [
@@ -73,6 +78,8 @@ export default [
     component: Creation,
     children: [
       // {name: 'home', path: '/creation', component: Home},
+      {name: routesName.creationCollections, path: '/creation/collections', component: Collections},
+      {name: routesName.creationBlackLists, path: '/creation/blackLists', component: BlackLists},
       {name: routesName.creationMaterials, path: '/creation/materials', component: Materials},
       {name: routesName.creationMaterial, path: '/creation/material/:id', component: Material},
       {name: routesName.creationBooks, path: '/creation/books', component: Books},
@@ -108,8 +115,8 @@ export default [
         path: '/creation/community',
         component: Community,
         children: [
-          {name: routesName.creationCommunityThread, path: 'thread', component: CommunityThread},
-          {name: routesName.creationCommunityPost, path: 'post', component: CommunityPost},
+          {name: routesName.creationCommunityThread, path: 'thread', component: CreationPostList},
+          {name: routesName.creationCommunityPost, path: 'post', component: CreationPostList},
           {name: routesName.creationCommunityDraft, path: 'draft', component: CommunityDraft},
           {name: routesName.creationCommunityNote, path: 'note', component: CommunityNote},
         ]

@@ -96,6 +96,8 @@ router
     data.managementData = await db.SettingModel.getManagementData(data.user);
     // 应用列表
     data.appsData = await db.SettingModel.getAppsData();
+    // 用户资料补全提示
+    data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     data.navbar_highlight = 'community';
     ctx.template = 'community/community.pug';
     await next();

@@ -25,7 +25,7 @@
               span 标记为违规
       .modal-footer
         .display-i-b(v-if="submitting") 处理中，请稍候...
-        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+        button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
         button(v-if="submitting" type="button" class="btn btn-primary btn-sm" disabled) 确定
         button(v-else type="button" class="btn btn-primary btn-sm" @click="submit") 确定
 </template>

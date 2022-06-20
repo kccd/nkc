@@ -15,14 +15,20 @@
     .m-b-05#container
       editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" )
     .m-b-05
+      column(
+        ref="column"
+        :data="{addedToColumn: added}"
+        :state="columnInfo"
+        o="o"
+        )
       .checkbox
         label
           input(type="checkbox" value="true" v-model="checkProtocol")
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
     .m-b-05
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent || lockPost" v-if="!publishing") 发布
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentContent || lockPost" v-if="publishing") 发布中...
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentId || lockPost" v-if="!publishing") 发布
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentId || lockPost" v-if="publishing") 发布中...
         span.fa.fa-spinner.fa-spin
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="!saving") 暂存
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="saving") 暂存中...
@@ -65,12 +71,13 @@
 
 <script>
   import Editor from '../Editor';
-  import {getCommentEditorConfigs} from '../../js/editor';
+  import Column from "../../../editor/vueComponents/Column";
   const commentEditorConfigs = getCommentEditorConfigs();
+  import {getCommentEditorConfigs} from '../../js/editor';
   import {debounce} from "../../js/execution";
   import {nkcAPI} from "../../js/netAPI";
   export default {
-    props: ['source', 'sid', 'comment'],
+    props: ['source', 'aid', 'comment', 'column-info', 'to-column', 'added'],
     data: () => ({
       editorConfigs: commentEditorConfigs,
       quote: '',
@@ -82,9 +89,12 @@
       contentChangeEventFlag: false,
       publishing: false,
       saving: false,
+      setTimeout: null,
+      commentId: null,
     }),
     components: {
-      'editor': Editor
+      'editor': Editor,
+      'column': Column
     },
     computed: {
     },
@@ -110,8 +120,19 @@
           return;
         }
         this.commentContent = this.$refs.editor.getContent();
-        this.post(this.type);
-      }, 1000),
+        this.modifyComment();
+      }, 200),
+      modifyComment() {
+        const self = this;
+        clearTimeout(self.setTimeout);
+        if(self.commentId) {
+          self.post(self.type);
+        } else {
+          self.setTimeout = setTimeout(function () {
+            self.post(self.type);
+          }, 2000);
+        }
+      },
       //点击引用获取该楼层的引用信息
       changeQuote(docId, source) {
         if(!docId) return;
@@ -137,7 +158,9 @@
       //提交修改评论内容
       post(type) {
         if(type === 'publish') {
+          if(!this.commentId) return;
           this.publishing = true;
+          clearTimeout(this.setTimeout);
         } else if(type === 'save') {
           this.saving = true;
         }
@@ -147,15 +170,20 @@
         this.lockPost = true;
         const self = this;
         self.setSavedStatus('saving');
-        return nkcAPI('/comment', 'POST', {
+        const data = {
           content: self.commentContent,
           type,
           source: self.source,
-          sid: self.comment?self.comment.sid:self.sid,
-          commentType: self.comment?'comment':'article',
+          aid: self.aid,
           quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
-        })
+          toColumn: null,
+        };
+        const toColumn = self.$refs.column.getStatus();
+        if(toColumn.checkbox) {
+          data.toColumn = toColumn;
+        }
+        return nkcAPI('/comment', 'POST', data)
         .then(res => {
           self.commentId = res.commentId;
           if(type !== 'publish') {
@@ -164,20 +192,24 @@
             }
             self.type = 'modify';
           } else {
-            sweetSuccess('发布成功！');
+            screenTopAlert('发布成功');
             self.contentChangeEventFlag = false;
+            if(res.renderedComment) {
+              window.insertRenderedComment(res.renderedComment);
+            }
             //发布成功后通知上层将content清空
             self.clearContent();
             self.type = 'create';
             self.quote = null;
             self.publishing = false;
+            self.commentId = null;
           }
-          self.setSavedStatus('succeeded');
           self.lockPost = false;
+          self.setSavedStatus('succeeded');
         })
         .catch(err => {
-          self.setSavedStatus('failed');
           self.lockPost = false;
+          self.setSavedStatus('failed');
           self.publishing = false;
           sweetError(err);
         })

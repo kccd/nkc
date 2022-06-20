@@ -534,6 +534,13 @@ forumSchema.virtual('threadTypes')
     this._threadTypes = threadTypes;
   });
 
+forumSchema.virtual('url')
+  .get(function() {
+    return this._url;
+  })
+  .set(function(url) {
+    this._url = url;
+  });
 
 
 /*  缓存主页需要的属性   */
@@ -2475,6 +2482,11 @@ forumSchema.methods.getVoteUpPostSettings = async function() {
   } else {
     return this.voteUpPost;
   }
+}
+
+forumSchema.statics.getUrl = async function(fid, cid) {
+  const tools = require('../nkcModules/tools');
+  return tools.getUrl('forumHome', fid) + (cid? `?cat=${cid}`: '');
 }
 
 module.exports = mongoose.model('forums', forumSchema);

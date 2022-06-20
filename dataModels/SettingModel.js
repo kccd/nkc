@@ -625,7 +625,8 @@ settingSchema.statics.getScoreOperationsByType = async (type, fid = '') => {
   if(!scoreOperation) {
     scoreOperation = await SettingModel.getDefaultScoreOperationByType(type);
   }
-  if(scoreOperation.count !== 0) return scoreOperation;
+  // if(scoreOperation.count !== 0) return scoreOperation;
+  return scoreOperation;
 };
 /*
 * 获取所有默认积分策略操作对象
@@ -908,12 +909,17 @@ settingSchema.statics.restrictAccess = async (props) => {
  */
 settingSchema.statics.getHomeBigLogo = async () => {
   const SettingModel = mongoose.model('settings');
+  const {getUrl} = require('../nkcModules/tools');
   const homeSettings = await SettingModel.getSettings('home');
+  const urls = [];
   if(!homeSettings.homeBigLogo || !(homeSettings.homeBigLogo.length)) {
-    return [];
+    urls.push(getUrl('siteFile', 'kclogo_misaka1.png'));
   } else {
-    return homeSettings.homeBigLogo;
+    for(const logo of homeSettings.homeBigLogo) {
+      urls.push(getUrl('homeBigLogo', logo));
+    }
   }
+  return urls;
 }
 
 
@@ -1108,4 +1114,51 @@ settingSchema.statics.getAppsData = async () => {
   return results;
 };
 
+/*
+* 判断字段内容是否存在对象数组中
+* */
+settingSchema.statics.isIncludesOfArr = function(arr, field, value) {
+  for(let i = 0; i < arr.length; i ++) {
+    const a = arr[i];
+    if(a[field] === value) {
+      return {
+        included: true,
+        index: i,
+      };
+    }
+  }
+  return {
+    included: false,
+    index: -1,
+  }
+};
+
+/*
+* 判断对象中是否全部字段都满足条件
+* @params {object} obj 需要对比的对象
+* @params {object} options 用户传入需要对比的对象
+* @return {boolean} true/false
+* */
+settingSchema.statics.isEqualOfObj = function(obj, options) {
+  for(const i in options) {
+    if(options[i] !== obj[i]) return false;
+  }
+  return true;
+}
+
+/*
+* 判断对象数组中是否有一项全部满足条件
+* @params {array} arr 需要对比的对象数组
+* @params {object} options 用户传入需要对比的对象
+* @return {boolean} true/false
+* */
+settingSchema.statics.isEqualOfArr = function (arr, options) {
+  const SettingModel = mongoose.model('settings');
+  for(const a of arr) {
+    //判断是否满足条件,满足条件就返回true,直到最后不满足返回false
+    const flag = SettingModel.isEqualOfObj(a, options);
+    if(flag) return true;
+  }
+  return false;
+};
 module.exports = mongoose.model('settings', settingSchema);

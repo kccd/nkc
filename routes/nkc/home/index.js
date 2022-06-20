@@ -62,7 +62,28 @@ router
     });
     // 主页是否显示热销商品板块
     data.showShopGoods = homeSettings.showShopGoods;
-    let threads = await db.ThreadModel.find({tid: {$in: homeSettings.toppedThreadsId.concat(homeSettings.latestToppedThreadsId)}});
+    const threadsId = [];
+    const articlesId = [];
+    for(const t of homeSettings.toppedThreadsId) {
+      if(t.type === 'thread') {
+        threadsId.push(t.id);
+      } else if(t.type === 'article') {
+        articlesId.push(t.id);
+      }
+    }
+    for(const t of homeSettings.latestToppedThreadsId) {
+      if(t.type === 'thread') {
+        threadsId.push(t.id);
+      } else if(t.type === 'article') {
+        articlesId.push(t.id);
+      }
+    }
+    const articlesObj = {};
+    const {normal} = await db.ArticleModel.getArticleStatus();
+    let articles = await db.ArticleModel.find({_id: {$in: articlesId}, status: normal});
+    articles = await db.ArticleModel.getArticlesInfo(articles);
+    articles.map(article => articlesObj[article._id] = article);
+    let threads = await db.ThreadModel.find({tid: {$in: threadsId}});
     threads = await db.ThreadModel.extendThreads(threads, {
       forum: false,
       category: false,
@@ -76,12 +97,24 @@ router
     threads.map(thread => threadsObj[thread.tid] = thread);
     data.toppedThreads = [];
     data.latestToppedThreads = [];
-    homeSettings.toppedThreadsId.map(tid => {
-      const thread = threadsObj[tid];
+    homeSettings.toppedThreadsId.map(t => {
+      const {type, id} = t;
+      let thread;
+      if(type === 'thread') {
+        thread = threadsObj[id];
+      } else if(type === 'article') {
+        thread = articlesObj[id];
+      }
       if(thread) data.toppedThreads.push(thread);
     });
-    homeSettings.latestToppedThreadsId.map(tid => {
-      const thread = threadsObj[tid];
+    homeSettings.latestToppedThreadsId.map(t => {
+      const {type, id} = t;
+      let thread;
+      if(type === 'thread') {
+        thread = threadsObj[id];
+      } else if(type === 'article') {
+        thread = articlesObj[id];
+      }
       if(thread) data.latestToppedThreads.push(thread);
     });
     // 首页上 “最新原创” 板块文章条目显示模式 “simple”或空 - 简略， “full” - 完整
@@ -314,8 +347,13 @@ router
       });
     } else if(operation === "saveToppedThreads") {
       const {toppedThreadsId, latestToppedThreadsId} = body;
-      for(const tid of toppedThreadsId.concat(latestToppedThreadsId)) {
-        const thread = await db.ThreadModel.findOne({tid});
+      for(const t of toppedThreadsId.concat(latestToppedThreadsId)) {
+        let thread;
+        if(t.type === 'thread') {
+          thread = await db.ThreadModel.findOne({tid: t.id});
+        } else if(t.type === 'article') {
+          thread = await db.ArticleModel.findOnly({_id: t.id});
+        }
         if(!thread) ctx.throw(400, `未找到ID为${tid}的文章`);
       }
       await db.SettingModel.updateOne({_id: "home"}, {

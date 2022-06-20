@@ -1,0 +1,21 @@
+extends ./columnBase
+block columnTitle
+  title=data.pageTitle
+block columnContent
+  //- 管理
+  if data.permissions.reviewed
+    include ../latestManagement
+    +renderLatestArticleManagement()
+  //include ./columnTypes
+  //+renderLatestColumnTypes(data.t, data.columnTypes)
+  include ../../publicModules/paging/paging
+  if data.articlesPanelData && data.articlesPanelData.length > 0
+    include ../../publicModules/articlePanel/articlePanel
+    +ArticlesPanel(data.articlesPanelData, data.latestColumnArticlePanelStyle)
+  else
+    .p-t-5.p-b-5.text-center 空空如也~
+  if data.paging && data.paging.buttonValue.length > 0
+    .m-t-1
+      include ../../publicModules/paging/paging_input
+
+block columnScripts

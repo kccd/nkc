@@ -25,13 +25,12 @@ if !isIncluded('comment')
       //- 回复批量管理
       +manageComments
   .p-a-0.comment-container.m-b-1
-    if data.comments && data.comments.length !== 0
-      .comment-list.m-t-1
-        include ./singleComment/singleComment
-        for comment in data.comments
-          +singleComment(comment)
-    else
-      .null.p-t-1 还没有人评论哦~~
+    .comment-list.m-t-1
+      include ./singleComment/singleComment
+      for comment in data.comments
+        +singleComment(comment)
+    if !data.comments || data.comments.length === 0
+      .null.p-t-1#nullComments 还没有人评论哦~~
   .m-b--05
     include ../../publicModules/paging/paging
     +articleNav
@@ -41,7 +40,13 @@ if !isIncluded('comment')
   if (data.columnPost.type === 'article' && data.columnPost.article.status && data.columnPost.article.status === 'normal') || (data.columnPost.thread && data.columnPost.thread.status && data.columnPost.thread.status === 'normal')
     if data.user
       #commentEditor.m-t-1(v-cloak)
-        comment-editor(ref="commentEditor" source="comment" :sid="articleId" :comment="comment")
+        comment-editor(
+          ref="commentEditor"
+          source="comment"
+          :aid="articleId"
+          :column-info="columnInfo"
+          :added="addedToColumn"
+          :comment="comment")
     else
       //- 游客
       p.text-center.p-t-1 想参与大家的讨论？现在就&nbsp;
@@ -62,3 +67,5 @@ if !isIncluded('comment')
       -statusInfo = '删除'
     .h4.text-center(style='color: #666;')=`文章状态【${statusInfo}】，暂不可评论`
   +includeDeferJS('/publicModules/commentCenter/comment.js')
+  include ../../publicModules/bulletComments/bulletComments
+

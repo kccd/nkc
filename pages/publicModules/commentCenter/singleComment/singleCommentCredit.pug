@@ -1,0 +1,27 @@
+if !isIncluded('singleCommentCredit')
+  mixin singleCommentCredit(cid, credits)
+    if credits && credits.length
+      .single-post-credit-container
+        for c, index in credits
+          -var {uid, type, name, username, description, toc, number, _id, hide, userHome, permissions} = c;
+          .single-post-credit
+            .number=number > 0? `+${number}`: number
+            .name=name
+            a(
+              href=userHome target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid})
+            )
+              img(src=avatar)
+              span=username
+            .time=format(`YYYY-MM-DD`, toc)
+            .description=description
+            if type === 'xsf' && data.permissions.cancelXsf
+              a(onclick=`cancelCommentXsf("${cid}", ${_id})`) 撤销
+            if type === 'kcb' && data.permissions.modifyKcbRecordReason
+              if !hide
+                a(onclick=`hideCommentKcbRecord("${cid}", ${_id}, true)`) 屏蔽
+              else
+                a(onclick=`hideCommentKcbRecord("${cid}", ${_id}, false)`) 取消屏蔽
+

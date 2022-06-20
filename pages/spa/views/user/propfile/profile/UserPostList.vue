@@ -1,29 +1,13 @@
 <template lang="pug">
   .user-post
     .paging-button
-      a.button(@click="toRoute('post')" :class="t === 'post'?'active':''") 回复
-      a.button(@click="toRoute('thread')" :class="t === 'thread'?'active':''") 文章
-    to-column(ref="toColumn")
+      a.button(@click="toRoute(postRouteName)" :class="t === 'post'?'active':''") 回复
+      a.button(@click="toRoute(threadRouteName)" :class="t === 'thread'?'active':''") 文章
     .user-post-list
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-      .paging-button(v-if="routeName === 'thread' && permissions.reviewed" )
-        a.pointer.button.radius-left.radius-right(@click="managementPosts()") 管理
-        span.post-management-button
-          a.pointer.button(@click="selectAll()") 全选
-          a.pointer.button.radius-right(@click="toColumn()") 推送到专栏
       blank(v-if="(!posts || posts.length === 0) && !loading")
       .user-list-warning(v-if="loading") 加载中~
-      .post-item(v-for="(post, index) in posts")
-        hr(v-if="index")
-        review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
-        .thread-draft-info(v-else-if="post.toDraft") 退修中，仅自己可见，修改后对所有人可见
-          .reason 理由: {{post.reviewReason}}
-        .thread-disabled-info(v-else-if="post.disabled" ) 已屏蔽，仅自己可见
-          .reason 理由: {{post.reviewReason}}
-        .checkbox(v-if="managementBtn" )
-          label
-            input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
-        single-post(ref="singlePost" :post="post")
+      post-list(ref="postList" :posts="posts" :permissions="permissions")
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <style lang="less" scoped>
@@ -47,15 +31,18 @@
 }
 </style>
 <script>
+import PostList from "../../../../../lib/vue/post/PostList";
 import Review from "../../../../../lib/vue/publicVue/postReview/Review";
-import SinglePost from "../../../../../lib/vue/publicVue/postModel/SinglePost";
 import Paging from "../../../../../lib/vue/Paging";
 import ToColumn from "../../../../../lib/vue/publicVue/toColumn/ToColumn";
+import Blank from '../../../../components/Blank';
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {getState} from "../../../../../lib/js/state";
-import Blank from '../../../../components/Blank';
+import { routerName } from "../../../../routes/user"
 export default {
   data: () => ({
+    postRouteName: routerName.post,
+    threadRouteName: routerName.thread,
     posts: [],
     paging: {},
     loading: true,
@@ -69,9 +56,9 @@ export default {
   components: {
     "blank": Blank,
     "review": Review,
-    "single-post": SinglePost,
     "paging": Paging,
-    "to-column": ToColumn
+    "to-column": ToColumn,
+    'post-list': PostList
   },
   computed: {
     pageButtons() {
@@ -90,12 +77,7 @@ export default {
     initData() {
       const {params, path, name} = this.$route;
       const {uid: stateUid} = getState();
-      const index = path.indexOf('thread');
-      if(index === -1) {
-        this.routeName = 'post';
-      } else {
-        this.routeName = 'thread';
-      }
+      this.routeName = name;
       const {uid} = params;
       this.t = name;
       this.uid = uid || stateUid;
@@ -130,46 +112,6 @@ export default {
     refreshPage() {
       const {page} = this.paging;
       this.getPostList(page);
-    },
-    //post管理开关
-    managementPosts() {
-      this.managementBtn = !this.managementBtn;
-    },
-    //全选
-    selectAll() {
-      const {posts, checkboxPosts} = this;
-      const postIds = [];
-      for(const post of posts) {
-        postIds.push(post.pid);
-      }
-      if(checkboxPosts.length === postIds.length) {
-        this.checkboxPosts = [];
-      } else {
-        this.checkboxPosts = postIds;
-      }
-    },
-    //推送到专栏
-    toColumn() {
-      const self = this;
-      this.$refs.toColumn.open(function (data){
-        const categoriesId = data.categoriesId;
-        const columnId = data.columnId;
-        nkcAPI('/m/' + columnId + '/post', 'POST', {
-          categoriesId,
-          type: 'addToColumnsId',
-          postsId: self.checkboxPosts,
-        })
-          .then(() => {
-            sweetSuccess("操作成功");
-            self.checkboxPosts = [];
-            self.$refs.toColumn.close();
-          })
-          .catch(err => {
-            sweetError(err);
-          })
-      }, {
-        selectMul :true,
-      } );
     },
     //点击分页
     clickButton(num) {

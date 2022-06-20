@@ -1,4 +1,6 @@
 import {getSocket} from "../lib/js/socket";
+import Share from '../lib/vue/Share';
+
 const socket = getSocket();
 
 function disabledThreadPost (pid){
@@ -47,7 +49,11 @@ $(function () {
     window.bulletComments = new NKC.modules.BulletComments({
       offsetTop: NKC.configs.isApp ? 20 : 60
     });
-    socket.on('connect', joinPostRoom)
+    if (socket.connected) {
+      joinPostRoom();
+    } else {
+      socket.on('connect', joinPostRoom)
+    }
     socket.on('commentMessage', function (data) {
       if (NKC.configs.uid !== data.comment.uid) {
         bulletComments.add(data.comment);
@@ -58,11 +64,7 @@ $(function () {
         data.html
       );
     });
-    if (socket.connected) {
-      joinPostRoom();
-    }
   }
-
 });
 
 function joinPostRoom() {
@@ -77,6 +79,17 @@ function joinPostRoom() {
 if (NKC.configs.platform === 'reactNative') {
   window._userSelect = true;
 }
+
+const postShareElement = document.getElementById('postShare');
+if(postShareElement) {
+  const app = new Vue({
+    el: postShareElement,
+    components: {
+      share: Share
+    }
+  })
+}
+
 
 Object.assign(window, {
   joinPostRoom,

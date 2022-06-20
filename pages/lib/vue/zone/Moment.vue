@@ -373,7 +373,9 @@
         }
 
         setTimeout(() => {
-          this.$refs.momentComments.init();
+          if(this.$refs.momentComments) {
+            this.$refs.momentComments.init();
+          }
         })
 
         /*if(this.showPanelType === this.panelTypes.comment) {

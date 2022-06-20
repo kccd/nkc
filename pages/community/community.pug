@@ -28,7 +28,9 @@ block content
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         .m-b-1
           include ../publicModules/canvas_logo
+          +renderCanvasLogo(data.homeBigLogo)
         include ../publicModules/improveUserInfo
+        +improveUserInfo(data.improveUserInfo)
         if data.notices && data.notices.length
           .home-forums-other.m-b-1
             .panel-header 公告通知
@@ -80,7 +82,7 @@ block content
               -const defaultThreadListStyle = {type: 'brief'}
               for thread in data.originalThreads
                 include ../publicModules/thread_panel/thread_panel
-              a.home-threads-more-link(href=`/?t=latest`) 查看全部新讨论
+              a.home-threads-more-link(href=`/n/community`) 查看全部新讨论
         .home-forums-other.m-b-1
           .panel-header 最新回复
           .home-posts

@@ -1,0 +1,28 @@
+extends ./zoneBase
+block zoneTitle
+  title=data.pageTitle
+block zoneContent
+  -
+    var dataString = objToStr({
+      momentsData: data.momentsData,
+      permissions: data.permissions
+    });
+
+
+  #latestZoneMoments(v-cloak)
+
+    include ./zoneTypes
+    +renderLatestZoneTypes(data.t, data.zoneTypes)
+
+    .m-b-1.p-t-05
+      moment-editor(@published='published')
+
+    include ../../publicModules/paging/paging
+    moments(:moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
+    .p-t-5.p-b-5.text-center(v-else) 空空如也~
+  if data.paging && data.paging.buttonValue.length > 0
+    .m-t-1
+      include ../../publicModules/paging/paging_input
+  .hidden#data=dataString
+block zoneScripts
+  +includeJS('/latest/zone/moment.js')

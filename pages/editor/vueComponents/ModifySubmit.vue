@@ -27,16 +27,19 @@
     .btn-area
       button.btn.btn-theme(
         @click="readyData",
-        :disabled="disabledSubmit || !checkProtocol"
+        :disabled="submitStatus || (disabledSubmit || !checkProtocol)"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
+      button.btn.btn-default(@click="saveToDraftBase('manual')" :disabled="submitStatus") 存草稿
+      button.btn.btn-default(@click="history" :disabled="submitStatus") 历史
 </template>
 
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
-import { timeFormat } from "../../lib/js/tools";
+import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
+import {debounce} from '../../lib/js/execution';
 // import { screenTopWarning } from "../../lib/js/topAlert";
+// import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
 export default {
   props: {
@@ -47,8 +50,12 @@ export default {
       type: Object,
       required: true,
     },
+    o: {
+      type: String,
+    }
   },
   data: () => ({
+    saveToDraftBaseDebounce: '',
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
@@ -66,6 +73,9 @@ export default {
     saveDraftTimeout: 60000,
     saveData: '',
     setInterval: '',
+    draft: '',
+    // 判断是否有草稿ID
+    submitStatus: true
   }),
   watch: {
     data : {
@@ -80,7 +90,19 @@ export default {
         if (n?.thread) this.thread = n.thread;
         if (n?.post?.pid) this.pid = n.post.pid;
       }
+    },
+    o: {
+      immediate: true,
+      handler(n) {
+        if (n && n === 'copy') {
+          // 考虑有回复 有文章
+          this.type = "newThread"
+        }
+      }
     }
+  },
+  created(){
+    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 2000)
   },
   computed: {
     selectedForumsId() {
@@ -94,15 +116,34 @@ export default {
     },
   },
   mounted() {
-    this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout);
+    this.setInterval = setInterval(this.timingSaveToDraft, this.saveDraftTimeout);
   },
   destroyed(){
     clearInterval(this.setInterval)
   },
   methods: {
+    addUrlParam,
+    // boolean
+    setSubmitStatus(v) {
+      this.submitStatus = v
+    },
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    history() {
+      const desTypeMap = {
+        newThread: 'forum',
+        newPost: "thread",
+        modifyThread: 'post', 
+        modifyPost: 'post', 
+      }
+      // const aid = this.$route.query.aid;
+      const destype = desTypeMap[this.data.type] || this.draft.desType;
+      const did = this.data.draftId || this.draft.did;
+      if (!destype || !did) return sweetError("未选择草稿");
+      const url = getUrl('draftHistory', destype,  did);
+      window.open(url)
+    },
     checkAnonymous(selectedForumsId) {
       // let selectedForumsId = window.PostInfo.selectedForumsId;
       let havePermission = false;
@@ -124,9 +165,8 @@ export default {
     saveToDraftSuccess() {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
-
     },
-    autoSaveToDraft() {
+    timingSaveToDraft() {
       this.readyDataForSave();
       let type = this.type;
       const { saveData } = this;
@@ -138,7 +178,7 @@ export default {
             saveData.t ||
             saveData.c ||
             !saveData.tcId ||
-            this.tcId.length ||
+            saveData.tcId.length ||
             saveData.cids.length ||
             saveData.fids.length ||
             saveData.cover ||
@@ -154,39 +194,38 @@ export default {
       } else if (type === "newPost") {
         if (!saveData.title && !saveData.content) return;
       }
-      // setTimeout(() => {
-        this.saveToDraftBase("automatic")
-          // .then(() => {
-          //   this.autoSaveToDraft();
-          // })
-          .catch((data) => {
-            sweetError("草稿保存失败：" + (data.error || data));
-            // this.autoSaveToDraft();
-          });
-      // }, this.saveDraftTimeout);
+      this.saveToDraftBase("timing")
+        .catch((data) => {
+          sweetError("草稿保存失败：" + (data.error || data));
+        });
     },
-    saveToDraftBase(savetType = "manual") {
-      if (savetType === "manual") this.readyDataForSave();
+    saveToDraftBase(saveType = "manual") {
+      this.readyDataForSave();
       const { saveData } = this;
-      if (!saveData.c) return sweetError("请先输入内容");
+      if (!saveData.c){
+        if(saveType === 'manual') {
+          return sweetError("请先输入内容")
+        }
+      };
+      // 如果没有内容不更新
+      // 主要问题是watch引起
+      if (
+          !(
+            saveData.t ||
+            saveData.c ||
+            saveData.tcId?.length ||
+            saveData.cids?.length ||
+            saveData.fids?.length ||
+            saveData.cover ||
+            saveData.keyWordsCn?.length ||
+            saveData.keyWordsEn?.length  ||
+            saveData.authorInfos?.length ||
+            saveData.survey
+          )
+        ) return
       let type = this.type;
-
       return Promise.resolve()
-        // .then(() => {
-        //   // 获取本次编辑器内容的全部长度
-        //   // const allContentLength = editor.getContent();
-        //   if (saveData.c.length < this.oldContent.length) {
-        //     clearInterval(this.setInterval);
-        //     this.setInterval = '';
-        //     return sweetQuestion2(`您输入的内容发生了变化，是否还要继续保存？`)
-        //       .finally( ()=>{
-        //         this.setInterval = setInterval(this.autoSaveToDraft, this.saveDraftTimeout)
-        //       } )
-        //   } else {
-        //     return;
-        //   }
-        // })
-        .then((res) => {
+        .then(() => {
           // let post = this.getPost();
           let desType, desTypeId;
           if (type === "newThread") {
@@ -200,23 +239,30 @@ export default {
           } else if (type === "modifyThread") {
             desType = "post";
             desTypeId = this.pid;
-          } else if (type === "modifyForumDeclare") {
-            desType = "forumDeclare";
-            desTypeId = this.forum.fid;
-          } else if (type === "modifyForumLatestNotice") {
-            desType = "forumLatestNotice";
-            desTypeId = this.forum.fid;
-          } else {
+          } 
+          // else if (type === "modifyForumDeclare") {
+          //   desType = "forumDeclare";
+          //   desTypeId = this.forum.fid;
+          // } else if (type === "modifyForumLatestNotice") {
+          //   desType = "forumLatestNotice";
+          //   desTypeId = this.forum.fid;
+          // } 
+          else {
             throw "未知的草稿类型";
           }
           let formData = new FormData();
+          if(saveData.cover) {
+            saveData.coverData = ''
+            saveData.coverUrl = ''
+          }
           formData.append(
             "body",
             JSON.stringify({
               post: saveData,
-              draftId: this.draftId,
+              draftId: saveData?.did || this.draftId,
               desType: desType,
               desTypeId: desTypeId,
+              saveType
             })
           );
           if (saveData.coverData) {
@@ -235,31 +281,29 @@ export default {
           );
         })
         .then((data) => {
+          this.draft = data.draft;
           //保存草稿的全部内容长度
           if (data.contentLength) {
             this.oldContentLength = data.draft?.c?.length;
             this.oldContent = data.draft?.c;
           }
-          this.draftId = data.draft.did;
-          if (data.draft.cover) {
-            this.coverData = "";
-            this.coverUrl = "";
-            this.cover = data.draft.cover;
+          this.draftId = data.draft?.did;
+          if (data.draft?.cover) {
+            this.$emit('cover-change',  data.draft.cover);
           }
-          return Promise.resolve();
-        })
-        .then((res) => {
-          // const postButton = getPostButton();
-          if (type === "manual") {
+          if(!new URLSearchParams(location.search).get('aid')) {
+            this.addUrlParam("aid", data.draft._id);
+          } 
+          this.setSubmitStatus(false);
+          this.$emit('save-draft-success', data.draft.desType);
+          // 解锁提交按钮
+          if (saveType === "manual") {
             sweetSuccess("草稿已保存");
+            this.saveToDraftSuccess();
           }
-          this.saveToDraftSuccess();
         })
+
         .catch((data) => {
-          // if(data === '用户取消保存'){
-          //   screenTopWarning(data)
-          //   return
-          // }
           sweetError("草稿保存失败：" + (data.error || data));
         })
     },
@@ -381,6 +425,7 @@ export default {
         })
         .then(() => {
           if (type === "newThread") {
+            
             // 发新帖：从专业点发表、首页点发表、草稿箱
             this.checkTitle(submitData.t);
             this.checkContent(submitData.c);
@@ -452,7 +497,6 @@ export default {
           } else if (NKC.configs.platform === "apiCloud") {
             this.visitUrl(data.redirect || "/");
             setTimeout(function () {
-              //  api ？？？
               api.closeWin();
             }, 1000);
           } else {
@@ -484,6 +528,16 @@ export default {
 .col-xs-12{
   width: 100%;
 }
+@media screen and (max-width: 1311px) {
+  .modifySubmit {
+    max-width: 19rem
+  }
+}
+@media screen and (min-width: 1311px) {
+  .modifySubmit {
+    max-width: 25rem
+  }
+}
 @media screen and (max-width: 992px) {
   .col-xs-12 {
     width: 100%;
@@ -500,7 +554,13 @@ export default {
 // @media (min-width: 992px){
 // }
 .btn-area{
+  .btn {
+    margin-bottom: 10px;
+  }
   .btn:nth-child(1){
+    margin-right: 10px;
+  }
+  .btn:nth-child(2){
     margin-right: 10px;
   }
 }
@@ -509,6 +569,7 @@ export default {
   padding: 0.5rem 0;
   color: #9baec8;
 }
+
 .modifySubmit {
   // background-color: transparent!important;
   button{
@@ -516,10 +577,11 @@ export default {
     min-width: 6rem;
     @media (max-width: 1100px) {
       min-width: 0;
+
     }
   }
   @media (min-width: 992px) {
-    max-width: 25rem;
+    // max-width: 25rem;
     position: fixed;
   }
 }

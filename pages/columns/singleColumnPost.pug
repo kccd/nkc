@@ -2,6 +2,22 @@
 if thread
   -var {firstPost} = thread;
 .column-posts-post
+  if type === 'thread'
+    if thread.disabled
+      .thread-disabled-info 文章已被封禁
+    else if thread.recycleMark
+      .thread-draft-info 文章已被退修
+    else if !thread.reviewed
+      .thread-review-info 文章未审核
+  else if type === 'article'
+    if article.status === 'unknown'
+      .thread-review-info 文章未审核
+    else if article.status === 'disabled'
+      .thread-disabled-info 文章已被封禁
+    else if article.status === 'faulty'
+      .thread-draft-info 文章已被退修
+    else if article.status === 'deleted'
+      .thread-deleted-info 文章已被删除
   .column-post-body(class=(thread && thread.firstPost.cover) || (article && article.document.cover)?"cover":"")
     .column-post-cover
       if thread && thread.firstPost.cover
@@ -33,20 +49,28 @@ if thread
       if type === "article"
         .column-post-content= article.document.content
       .column-post-info
-        if post
-          if !data.column || data.column.uid !== post.uid
-            if !thread.firstPost.anonymous
-              a(href=`/u/${thread.firstPost.uid}` target="_blank"
-                data-global-mouseover="showUserPanel"
-                data-global-mouseout="hideUserPanel"
-                data-global-data=objToStr({uid: thread.firstPost.uid})
-              ).column-post-author
-                img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
-                span=thread.firstPost.user.username
-            else
-              span.column-post-author
-                img(src=anonymousInfo.avatar)
-                span.anonymous-name=anonymousInfo.username
+        if type === 'thread'
+          //if !data.column || data.column.uid !== post.uid
+          if !thread.firstPost.anonymous
+            a(href=`/u/${thread.firstPost.uid}` target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: thread.firstPost.uid})
+            ).column-post-author
+              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
+              span=thread.firstPost.user.username
+          else
+            span.column-post-author
+              img(src=anonymousInfo.avatar)
+              span.anonymous-name=anonymousInfo.username
+        else if type === 'article'
+          a(href=`/u/${article.user.uid}` target="_blank"
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({uid: article.user.uid})
+          ).column-post-author
+            img(src=tools.getUrl('userAvatar', article.avatar, 'sm'))
+            span=article.user.username
         .column-post-time
           span.m-r-05
             //-=fromNow(toc)
@@ -55,6 +79,8 @@ if thread
             span 来自投稿
           else if type === 'thread' || type === 'post'
             span 引用自社区
+          else if type === 'article' && article.source === 'zone'
+            span 来自空间
         .column-post-forums
           if data.column
             -var category = "";

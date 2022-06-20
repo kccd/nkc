@@ -240,14 +240,26 @@ var Tools = function() {
       case 'downloadApp': {
         return '/app/' + id + '/' + size
       }
-      case 'preview': {
+      case 'draftHistory': {
+        return '/draft/history?source=' + id + '&did=' + size
+      }
+      case 'draftPreview': {
+        return '/draft/preview?source=' + id + '&aid=' + size
+      }
+      case 'documentPreview': {
         return '/document/preview?source=' + id + '&sid=' + size
       }
-      case 'history': {
+      case 'documentHistory': {
         return '/document/history?source=' + id + '&sid=' + size
       }
       case 'draftEditor': {
         return '/creation/editor/draft?id=' + id;
+      }
+      case 'comment': {
+        return '/comment/' + id
+      }
+      case 'activity': {
+        return '/activity/single/' + id
       }
     }
   };
@@ -324,8 +336,8 @@ var Tools = function() {
   self.objToStr = function(obj) {
     return encodeURIComponent(JSON.stringify(obj));
   }
-  
-  
+
+
 
   self.getSize = function(size, digits) {
     size = Number(size);
@@ -441,6 +453,14 @@ var Tools = function() {
     var reg = /(https?:\/\/)?([-0-9a-zA-Z]{1,256}\.)+[a-zA-Z]{2,6}/ig
     return content.replace(reg, '');
   };
+
+  //通过指定字符将字符串分割成两部分
+  self.segmentation = function (str, char) {
+    var index = str.indexOf(char);
+    var result1 = str.substr(0,index+1);
+    var result2 = str.substr(index + 1,str.length-index-1);
+    return [result1, result2];
+  }
 };
 
 var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

@@ -6,7 +6,7 @@
         .m-a-1
         .navbar-link
           .col-xs-3
-            a(href='/?t=latest') 最新
+            a(href='/n') 最新
           .col-xs-3
             a(href='/g/moment' v-if="logged" ) 关注
             a(onclick="RootApp.openLoginPanel()" v-else) 关注

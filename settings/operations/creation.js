@@ -140,9 +140,9 @@ module.exports = {
     },
     moment: {
       GET: 'creationCenter',
-      POST: 'creationCenter',
+      POST: 'publishMoment',
       PARAMETER: {
-        POST: 'creationCenter'
+        POST: 'publishMomentComment'
       }
     }
   },
@@ -183,5 +183,14 @@ module.exports = {
     draft: {
       GET: 'creationCenter'
     }
+  },
+  collections: {
+    GET: 'creationCenter',
+    data: {
+      GET: 'creationCenter'
+    }
+  },
+  blackLists: {
+    GET: 'creationCenter',
   }
 }

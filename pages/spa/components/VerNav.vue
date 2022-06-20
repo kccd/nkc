@@ -280,11 +280,26 @@ import { routesName } from "../routes/creation"
           icon: 'fa-image',
           url: '/creation/categories',
         },
-        /*{
-          type: 'drafts',
-          title: '草稿管理',
-          icon: 'fa-file-text-o'
-        }*/
+        {
+          type: 'manageContent',
+          title: '常用功能',
+          icon: 'fa-cubes',
+          hidden: false,
+          children: [
+            {
+              type: routesName.creationCollections,
+              title: '文章收藏',
+              url: '/creation/collections',
+              icon: 'fa fa-folder-open-o'
+            },
+            {
+              type: routesName.creationBlackLists,
+              title: '黑名单',
+              url: '/creation/blacklists',
+              icon: 'fa fa-file-text-o'
+            }
+          ]
+        }
       ]
     }),
     watch: {
@@ -297,10 +312,8 @@ import { routesName } from "../routes/creation"
       const { isApp } = getState();
       this.isApp = isApp;
       this.setNavActive()
-
     },
     methods: {
-
       openMenu(){
         // console.dir(this.$refs.CNC.clientHeight)
         this.$refs.creationNav.style.height = !this.showMenu ? this.$refs.CNC.clientHeight + 'px' : 0;

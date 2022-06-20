@@ -1,3 +1,6 @@
+import {openCreditPanel} from "../../global/methods";
+import {creditTypes, contentTypes} from '../../lib/vue/Credit'
+
 window.PostOption = new Vue({
   el: '#modulePostOptions',
   data: {
@@ -219,13 +222,13 @@ window.PostOption = new Vue({
           sweetError(data);
         });
     },
-    addXSF() {
-      const {pid} = this;
-      credit(pid, 'xsf');
-    },
     addKCB() {
       const {pid} = this;
-      credit(pid, 'kcb');
+      openCreditPanel(creditTypes.kcb, contentTypes.post, pid);
+    },
+    addXSF() {
+      const {pid} = this;
+      openCreditPanel(creditTypes.xsf, contentTypes.post, pid);
     },
     postDigest() {
       const {pid, digest} = this;

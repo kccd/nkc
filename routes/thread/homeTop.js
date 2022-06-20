@@ -1,5 +1,13 @@
 const Router = require('koa-router');
 const homeTopRouter = new Router();
+
+function isIncludes(arr, id) {
+	for(const a of arr) {
+		if(a.id === id) return true;
+	}
+	return false;
+}
+
 homeTopRouter
 	.use('/', async (ctx, next) => {
 		const {body, query, data} = ctx;
@@ -14,14 +22,24 @@ homeTopRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
+		//文章首页顶置
 		const {params, db, data} = ctx;
 		const {tid} = params;
 		const {valueName} = data;
 		const obj = {};
 		const homeSettings = await db.SettingModel.getSettings('home');
-		const threadsId = homeSettings[valueName];
-		if(!threadsId.includes(tid)) threadsId.unshift(tid);
-		obj[`c.${valueName}`] = threadsId;
+		const threads = homeSettings[valueName];
+		//获取id是否存在对象数组中
+		const {included, index} = await db.SettingModel.isIncludesOfArr(threads, 'id', tid);
+		//如果存在就删除该索引
+		if(included) {
+			 threads.splice(index, 1);
+		}
+		threads.unshift({
+			type: 'thread',
+			id: tid,
+		});
+		obj[`c.${valueName}`] = threads;
 		await db.SettingModel.updateOne({_id: "home"}, {
 			$set: obj
 		});
@@ -29,11 +47,15 @@ homeTopRouter
 		await next();
 	})
 	.del('/', async (ctx, next) => {
+		//取消文章首页顶置
 		const {params, db, data} = ctx;
 		const {tid} = params;
 		const {valueName} = data;
 		const obj = {};
-		obj[`c.${valueName}`] = tid;
+		obj[`c.${valueName}`] = {
+			type: 'thread',
+			id: tid,
+		};
 		await db.SettingModel.updateOne({_id: "home"}, {
 			$pull: obj
 		});

@@ -8,9 +8,9 @@
   @param {Number}} collectedCount 文章收藏数
 extends ../bootstrap_base
 block title
-  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
+  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected, vote} = data.columnPost
   -var {_id, name} = column
-  -var {hits, count, oc, url} = thread
+  -var {hits, comment: count, oc, url} = thread
   -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
   title=t
   -var showManagement = data.user && permissionsOr(['review']);
@@ -34,27 +34,13 @@ block content
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ../columns/article/content
       +content(c)
+      include ../publicModules/articleCenter/articleCredits
+      +articleCredits(article.kcb.concat(article.xsf), article._id, data.permissions)
       include ../columns/article/articleEditTime
       +articleEditTime(tlm, dt, toc)
-      //- 文章用户其他操作
-      .single-post-bottom#articleOption
-        if data.user
-          if type === 'article'
-            a.single-comment-bottom-item(href="#container")
-              .fa.fa-comment-o.reply-icon
-              span 回复
-            .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
-              .fa.fa-sliders.option-icon
-          else
-            .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
-              .fa.fa-sliders.option-icon
-        else
-          a.single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
-            .fa.fa-comment-o.reply-icon
-            span 回复
-          .single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')" title="其他操作")
-            .fa.fa-sliders.option-icon
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
+      include ../columns/article/articleOptions
+      +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, vote, voteDown: article.voteDown, replyCount: count || 0, vote: article.vote})
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-9.article-common.box-shadow-panel#comment-content
@@ -85,6 +71,11 @@ block content
         .m-b-1
           include ../publicModules/commentCenter/comment
       .col-xs-12.col-md-3.box-shadow-panel#rightDom
+        if data.targetUser
+          .m-b-1
+            //- .panel-header 作者
+            -const author = data.targetUser;
+            include ../thread/authorInfo
         //- 滚动到页头页脚
         include ../module_scrollTo.pug
   include ../publicModules/floatForumNav
@@ -94,6 +85,7 @@ block content
   //- 下拉后左边显示的所属专业 上级专业 同级专业
   //- +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 block scripts
+  +includeJS("/columns/article.js")
   +includeDeferJS('/columns/article/article.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/articleCenter/articleOption/articleOptions

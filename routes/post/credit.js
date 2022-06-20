@@ -34,6 +34,7 @@ router
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 500) ctx.throw(400, '理由不能超过500个字');
 		const _id = await db.SettingModel.operateSystemID('xsfsRecords', 1);
+    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
 		const newRecord = db.XsfsRecordModel({
       _id,
       uid: targetUser.uid,
@@ -42,7 +43,8 @@ router
       description,
       ip: ctx.address,
       port: ctx.port,
-      pid
+      pid,
+      type: xsfsRecordTypes.post
     });
     targetUser.xsf += num;
     await newRecord.save();
@@ -61,9 +63,7 @@ router
       ip: ctx.address,
       c: {
         type: 'xsf',
-        pid,
-        num,
-        description
+        recordId: _id,
       }
     });
 		await message.save();
@@ -75,7 +75,8 @@ router
     const {reason} = query;
     const {user} = data;
     const {recordId, pid} = params;
-    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid});
+    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
+    const record = await db.XsfsRecordModel.findOnly({_id: recordId, pid, type: xsfsRecordTypes.post});
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     const targetUser = await db.UserModel.findOnly({uid: post.uid});
@@ -152,17 +153,6 @@ router
 		await fromUser.calculateScore();
 		await toUser.calculateScore();
 
-		const updateObjForPost = {
-			username: user.username,
-			uid: user.uid,
-			pid: post.pid,
-			toc: Date.now(),
-			source: 'nkc',
-			reason: description,
-			type: 'kcb',
-			q: num
-		};
-		await post.updateOne({$push: {credits: updateObjForPost}});
     await thread.updateThreadEncourage();
     // 发消息
     const message = db.MessageModel({

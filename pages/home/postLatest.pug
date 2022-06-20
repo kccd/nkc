@@ -25,7 +25,7 @@ if !isIncluded('postActivity')
         .post-activity-user
           if headerData.user.uid
             a(
-              href=tools.getUrl('userHome', user.uid) target="_blank"
+              href=user.homeUrl target="_blank"
               data-global-mouseover="showUserPanel"
               data-global-mouseout="hideUserPanel"
               data-global-data=objToStr({uid: headerData.user.uid || undefined})

@@ -21,7 +21,7 @@ if !isIncluded('applicant')
         .col-xs-12.col-sm-6.col-md-6
           .h5 申请人ID：
             a(
-              href=tools.getUrl('userHome', applicant.uid)
+              href=applicant.userHome
               target='_blank'
               data-global-mouseover="showUserPanel"
               data-global-mouseout="hideUserPanel"
@@ -47,7 +47,7 @@ if !isIncluded('applicant')
                 if index !== 0
                   span ，
                 a(
-                  href=tools.getUrl('userHome', m.uid)
+                  href=m.userHome
                   target='_blank'
                   data-global-mouseover="showUserPanel"
                   data-global-mouseout="hideUserPanel"
@@ -59,7 +59,7 @@ if !isIncluded('applicant')
           .h5 申请人照片
           .form-life-photos
             for p in applicant.lifePhotos
-              img(src=tools.getUrl('lifePhoto', p._id))
+              img(src=p.url)
         .col-xs-12.col-md-12
           .h5 申请人曾经发表的技术文章：
           .form-threads

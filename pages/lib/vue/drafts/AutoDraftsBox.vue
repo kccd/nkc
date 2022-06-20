@@ -171,7 +171,7 @@ export default {
     callback: null,
   }),
   mounted() {
-    this.getDrafts(0);
+    // this.getDrafts(0);
   },
   destroyed() {
   },

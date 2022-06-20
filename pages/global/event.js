@@ -6,7 +6,9 @@ import {
   closeUserFloatPanel,
   openForumFloatPanel,
   closeForumFloatPanel,
-  openStickerPanel
+  openStickerPanel,
+  openShareFloatPanel,
+  openCreditPanel,
 } from "./methods";
 import {getState} from "../lib/js/state";
 import {
@@ -14,7 +16,6 @@ import {
   RNOpenNewPageThrottle, RNSaveImage,
   RNUrlPathEval
 } from "../lib/js/reactNative";
-import {throttle} from "../lib/js/execution";
 
 const state = getState();
 const isReactNative = state.isApp && state.platform === 'reactNative';
@@ -105,6 +106,16 @@ function viewSticker(data) {
   openStickerPanel(data.rid, data.management || false);
 }
 
+function showSharePanel(data) {
+  const {type, id} = data;
+  openShareFloatPanel(type, id);
+}
+
+function showCreditPanel(data) {
+  const {creditType, contentType, contentId} = data;
+  openCreditPanel(creditType, contentType, contentId);
+}
+
 /*
 * data-global-click 和 data-global-long-press 合法的操作
 * */
@@ -118,6 +129,8 @@ const eventFunctions = {
   showForumPanel,
   hideForumPanel,
   viewSticker,
+  showSharePanel,
+  showCreditPanel,
 }
 
 /*

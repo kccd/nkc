@@ -1,6 +1,27 @@
 @import "../base";
 .null {
-  margin-top: 5rem;
+  margin-top: 3rem;
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 3rem;
+}
+.single-post-credit-container{
+  //display:inline-block;
+  border: 1px solid #d8d8d8;
+  background-color: #fff;
+  word-break: break-all;
+  border-radius: 5px;
+  display: table;
+  padding: 0.5rem 0.8rem;
+  box-shadow: rgba(0, 0, 0, 0.14) 3px 3px 10px;
+  .single-post-credit{
+    &>*{
+      display: inline-block;
+      font-size: 1rem;
+      margin-right: 0.3rem;
+    }
+    .number{
+      color: #CC0000;
+
+    }
+  }
 }

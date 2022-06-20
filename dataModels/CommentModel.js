@@ -1,7 +1,7 @@
 const mongoose = require('../settings/database');
 const commentSource = {
         article: 'article',
-        book: 'book'
+
       };
 const commentStatus = {
         normal: 'normal',
@@ -29,6 +29,29 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
     index: 1
+  },
+  //是否加精
+  digest: {
+    type: Boolean,
+    default: false,
+    index:1,
+  },
+  //加精时间
+  digestTime: {
+    type: Date,
+    default: null,
+    index: 1,
+  },
+  //支持数
+  voteUp: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  //反对数
+  voteDown: {
+    type: Number,
+    index:1,
   },
   // disabled: 被禁用的（已发布但被管理员禁用了）
   // faulty: 被退修的 （已发布但被管理员退修了）
@@ -155,14 +178,14 @@ schema.statics.checkCommentSource = async (source) => {
 *  @params {string} source 评论的内容的来源
 * */
 schema.statics.createComment = async (options) => {
-  const {uid, content, sid, ip, port, quoteDid, source} = options;
+  const {uid, content, aid, ip, port, quoteDid, source} = options;
   const toc = new Date();
   const DocumentModel = mongoose.model('documents');
-  const SettingModel = mongoose.model('settings');
   const CommentModel = mongoose.model('comments');
   const ArticlePostModel = mongoose.model('articlePosts');
   const {comment: commentDocumentSource}  = await DocumentModel.getDocumentSources();
-  const cid = await SettingModel.getNewId();
+  //获取新的comment id
+  const cid = await CommentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
     uid,
     content,
@@ -174,7 +197,7 @@ schema.statics.createComment = async (options) => {
   });
   // 获取文章引用并将comment绑定到引用上
   const articlePost = await ArticlePostModel.getArticlePostByArticleId({
-    sid,
+    sid: aid,
     source,
     uid
   });
@@ -196,10 +219,12 @@ schema.statics.createComment = async (options) => {
 /*
 * 发布comment, 检测评论的发表权限，不需要审核，即comment的状态为正常时，为评论生成一条新的动态并且通知作者文章文章被评论了
 * */
-schema.methods.publishComment = async function () {
+schema.methods.publishComment = async function (article, toColumn) {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const socket = require('../nkcModules/socket');
   const {did} = this;
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
   const {comment: commentQuoteType} = await MomentModel.getMomentQuoteTypes();
@@ -207,19 +232,43 @@ schema.methods.publishComment = async function () {
   await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
   await DocumentModel.publishDocumentByDid(did);
   const newComment = await CommentModel.findOnly({_id: this._id});
+  //将文章推送到专栏
+  if(toColumn) {
+    try{
+      await ColumnPostModel.createColumnPost(article, toColumn);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  let renderedComment;
   //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
   //不需要审核的文章状态不为默认状态
+  // 如果不需要
   if(newComment.status === normalStatus) {
-    //生成一条新动态
-    MomentModel.createQuoteMomentAndPublish({
-      uid: this.uid,
-      quoteType: commentQuoteType,
-      quoteId: this._id,
-    })
-      .catch(console.error);
-    //通知作者文章被评论了
-    this.noticeAuthorComment();
+    try {
+      //生成一条新动态
+      MomentModel.createQuoteMomentAndPublish({
+        uid: this.uid,
+        quoteType: commentQuoteType,
+        quoteId: this._id,
+      })
+        .catch(console.error);
+      await socket.sendCommentMessage(this._id);
+      //通知作者文章被评论了
+      this.noticeAuthorComment();
+    } catch(err) {
+      console.log(err);
+    }
+  } else {
+    // 如果需要审核就将渲染好的内容返回
+    const singleCommentData = await CommentModel.getSocketSingleCommentData(this._id);
+    renderedComment = {
+      articleId: article._id,
+      commentId: this._id,
+      ...singleCommentData
+    };
   }
+  return renderedComment;
 }
 
 /*
@@ -269,18 +318,16 @@ schema.methods.modifyComment = async function (props) {
   const DocumentModel = mongoose.model('documents');
   const {content, quoteDid} = props;
   const {did} = this;
-  const tlm = new Date();
   //通过id去更新document的内容
   await DocumentModel.updateDocumentByDid(did, {
     quoteDid,
     content,
-    tlm
   });
-  await this.updateOne({
-    $set: {
-      tlm,
-    }
-  });
+  // await this.updateOne({
+  //   $set: {
+  //     tlm,
+  //   }
+  // });
 }
 /*
 * 拓展展示的comment评论数据
@@ -288,13 +335,20 @@ schema.methods.modifyComment = async function (props) {
 * props: {
 *   comments {object} 需要拓展的评论
 *   uid {string} 当前用户的uid
+*   isModerator {boolean}
 * }
 * */
 schema.statics.extendPostComments = async (props) => {
   const ReviewModel = mongoose.model('reviews');
-  const {comments, uid, isModerator = '', permissions = {}} = props;
+  const {comments, uid, isModerator = '', permissions = {}, authorUid} = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const SettingModel = mongoose.model('settings');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
@@ -302,11 +356,31 @@ schema.statics.extendPostComments = async (props) => {
   const uidArr = [];
   const quoteIdArr = [];
   const documentObj = {};
+  const commentsId = [];
   const usersObj = {};
   const quoteObj = {};
   for(const c of comments) {
     didArr.push(c.did);
     uidArr.push(c.uid);
+    commentsId.push(c._id);
+  }
+  const kcbsRecordsObj = {};
+  const xsfsRecordsObj = {};
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: commentsId}, canceled: false, type: xsfsRecordTypes.comment}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({commentId: {$in: commentsId}, type: 'creditKcb'}).sort({toc: 1});
+  await KcbsRecordModel.hideSecretInfo(kcbsRecords);
+  for(const r of kcbsRecords) {
+    uidArr.push(r.from);
+    r.to = "";
+    if(!kcbsRecordsObj[r.commentId]) kcbsRecordsObj[r.commentId] = [];
+    kcbsRecordsObj[r.commentId].push(r);
+  }
+  for(const r of xsfsRecords) {
+    uidArr.push(r.operatorId);
+    r.uid = "";
+    if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+    xsfsRecordsObj[r.pid].push(r);
   }
   const users = await UserModel.find({uid: {$in: uidArr}});
   for(const user of users) {
@@ -314,7 +388,7 @@ schema.statics.extendPostComments = async (props) => {
   }
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
-  const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+  const {normal: normalStatus, unknown: unknownStatus, disabled: disabledStatus, faulty: faultyStatus} = await DocumentModel.getDocumentStatus();
   const documents = await DocumentModel.find({did: {$in: didArr}, source: commentSource, type: stableType});
   for(const d of documents) {
     //用户是否具有审核权限
@@ -323,9 +397,18 @@ schema.statics.extendPostComments = async (props) => {
         if((d.status !== normalStatus || d.type !== stableType) && !isModerator) continue;
       }
     }
-    let review;
-    if(d.status === 'faulty' || d.status === 'unknown') {
-      review = await ReviewModel.findOne({docId: d._id}).sort({toc: -1}).limit(1);
+    let delLog;
+    let reason;
+    //获取评论状态不正常的审核原因
+    if(d.status === unknownStatus) {
+      delLog = await ReviewModel.findOne({docId: d._id}).sort({toc: -1});
+    } else if(d.status === disabledStatus) {
+      delLog = await DelPostLogModel.findOne({postType: d.source, delType: disabledStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
+    } else if(d.status === faultyStatus) {
+      delLog = await DelPostLogModel.findOne({postType: d.source, delType: faultyStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
+    }
+    if(delLog) {
+      reason = delLog.reason;
     }
     if(d.quoteDid) quoteIdArr.push(d.quoteDid);
     const {content, _id, type, status} = d;
@@ -334,7 +417,7 @@ schema.statics.extendPostComments = async (props) => {
       _id,
       type,
       status,
-      reason: review?review.reason:'',
+      reason: reason?reason : '',
     };
   }
   //获取引用评论
@@ -344,6 +427,7 @@ schema.statics.extendPostComments = async (props) => {
     const comment = await CommentModel.findOne({did});
     const user = await UserModel.findOne({uid});
     const {username, avatar} = user;
+    const commentInfo = await comment.getLocationUrl();
     quoteObj[document._id] = {
       cid: comment._id,
       uid,
@@ -354,7 +438,7 @@ schema.statics.extendPostComments = async (props) => {
       sid,
       did,
       order: comment.order,
-      commentUrl: await comment.getLocationUrl(),
+      commentUrl: commentInfo.url,
       username,
       avatar: getUrl('userAvatar', avatar),
       userHome: `/u/${user.uid}`
@@ -369,15 +453,29 @@ schema.statics.extendPostComments = async (props) => {
     const user = usersObj[c.uid];
     const userGrade = await user.extendGrade();
     if(!documentObj[c.did]) continue;
+    let credits = xsfsRecordsObj[c._id] || [];
+    credits = credits.concat(...kcbsRecordsObj[c._id] || []);
+    for(const r of credits) {
+      if(r.from) {
+        r.fromUser = usersObj[r.from];
+        r.creditName = creditScore.name;
+      } else {
+        r.fromUser = usersObj[r.operatorId];
+        r.type = 'xsf';
+      }
+    }
+    const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     const m = c.toObject();
+    const commentInfo = await c.getLocationUrl();
     _comments.push({
       ...m,
       content: await CommentModel.renderComment(documentObj[c.did]._id),
       docId: documentObj[c.did]._id,
       status: documentObj[c.did].status,
       type: documentObj[c.did].type,
-      reason: documentObj[c.did]?documentObj[c.did].reason:null, //审核原因
+      reason: documentObj[c.did]?documentObj[c.did].reason : null, //审核原因
       tlm: documentObj[c.did].tlm,
+      vote: await PostsVoteModel.getVoteByUid({uid, type: 'comment', id: c._id}),
       user: {
         uid: user.uid,
         username: user.username,
@@ -386,13 +484,95 @@ schema.statics.extendPostComments = async (props) => {
         gradeId: userGrade._id,
         gradeName: userGrade.displayName,
       },
-      commentUrl: await c.getLocationUrl(),
-      isAuthor: m.uid === uid?true:false,
+      xsf,
+      kcb,
+      articleId: commentInfo.articleId,
+      commentUrl: commentInfo.url,
+      isAuthor: authorUid === m.uid ? true : false,
       quote: documentObj[c.did].quote || null,
     });
   }
   return _comments;
 }
+
+/*
+* 拓展实时显示的回复信息
+* */
+schema.statics.extendSingleComment = async (comment) => {
+  const ReviewModel = mongoose.model('reviews');
+  const DocumentModel = mongoose.model('documents');
+  const UserModel = mongoose.model('users');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const {htmlToPlain} = require("../nkcModules/nkcRender");
+  const CommentModel = mongoose.model('comments');
+  const {getUrl} = require('../nkcModules/tools');
+  const user = await UserModel.findOnly({uid: comment.uid});
+  const {comment: commentSource} = await DocumentModel.getDocumentSources();
+  const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const {normal: normalStatus, unknown: unknownStatus, disabled: disabledStatus, faulty: faultyStatus} = await DocumentModel.getDocumentStatus();
+  const commentInfo = await CommentModel.getCommentInfo(comment);
+  const document = await DocumentModel.findOnly({did: comment.did, source: commentSource, type: stableType});
+  let delLog;
+  let reason;
+  //获取评论状态不正常的审核原因
+  if(document.status === unknownStatus) {
+    delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+  } else if(document.status === disabledStatus) {
+    delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+  } else if(document.status === faultyStatus) {
+    delLog = await DelPostLogModel.findOne({postType: document.source, delType: faultyStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+  }
+  if(delLog) {
+    reason = delLog.reason;
+  }
+  let quoteDocument;
+  if(document.quoteDid) {
+    quoteDocument = await DocumentModel.findOnly({_id: comment.quoteDid});
+    const {uid, toc, content, _id, sid, did, tlm} = quoteDocument;
+    let quoteComment = await CommentModel.findeOnly({did});
+    const user = await UserModel.findOnly({uid});
+    const {username, avatar} = user;
+    quoteDocument = {
+      cid: quoteComment._id,
+      uid,
+      toc,
+      tlm,
+      content: htmlToPlain(content, 100),
+      docId: _id,
+      sid,
+      did,
+      order: quoteComment.order,
+      commentUrl: (await quoteComment.getLocationUrl()).url,
+      username,
+      avatar: getUrl('userAvatar', avatar),
+      userHome: `/u/${user.uid}`
+    };
+  }
+  const userGrade = await user.extendGrade();
+  const m = comment.toObject()
+  return {
+    ...m,
+    content: await CommentModel.renderComment(document._id),
+    docId: document._id,
+    status: document.status,
+    type: document.type,
+    reason,
+    tlm: document.tlm,
+    xsf: [],
+    kcb: [],
+    user: {
+      uid: user.uid,
+      username: user.username,
+      avatar: getUrl('userAvatar', user.avatar),
+      userHome: `/u/${user.uid}`,
+      gradeId: userGrade._id,
+      gradeName: userGrade.displayName,
+    },
+    commentUrl: (await comment.getLocationUrl()).url,
+    isAuthor: commentInfo.isAuthor,
+    quote: quoteDocument,
+  };
+};
 
 
 /*
@@ -482,7 +662,7 @@ schema.statics.extendReviewComments = async function(comments) {
     const document = stableComment || betaComment;
     const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
-    const url = await comment.getLocationUrl();
+    const url = (await comment.getLocationUrl()).url;
     const result = {
       _id,
       uid,
@@ -615,7 +795,7 @@ schema.statics.extendComments = async function(comments) {
   const articlesId = [];
   const documentObj = {};
   const userObj = {};
-  const _comments = await CommentModel.getCommentInfo(comments);
+  const _comments = await CommentModel.getCommentsInfo(comments);
   for(const c of _comments) {
     didArr.push(c.did);
     uidArr.push(c.uid);
@@ -738,28 +918,66 @@ schema.statics.getCommentsByArticleId = async function(props) {
   return comments;
 }
 
+/*
+* 获取单个评论的信息
+* */
+schema.statics.getCommentInfo = async (comment) => {
+  const CommentModel = mongoose.model('comments');
+  return (await CommentModel.getCommentsInfo([comment]))[0];
+}
 
 /*
 * 通过comments获取评论所属文章链接以及评论信息
 * @param {object} comments 需要拓展文章链接的评论comment
 * */
-schema.statics.getCommentInfo = async function(comments) {
+schema.statics.getCommentsInfo = async function(comments) {
   const ArticleModel = mongoose.model('articles');
   const ArticlePostModel = mongoose.model('articlePosts');
   const ColumnPostModel = mongoose.model('columnPosts');
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const commentsSid = [];
   const commentDid = [];
   const commentsId = [];
+  const uidArr = [];
   for(const comment of comments) {
     commentsSid.push(comment.sid);
     commentDid.push(comment.did);
     commentsId.push(comment._id);
+    uidArr.push(comment.uid);
   }
+  const kcbsRecordsObj = {};
+  const xsfsRecordsObj = {};
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: commentsId}, canceled: false, type: 'comment'}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({commentId: {$in: commentsId}, type: 'creditKcb'}).sort({toc: 1});
+  await KcbsRecordModel.hideSecretInfo(kcbsRecords);
+  for(const r of kcbsRecords) {
+    uidArr.push(r.from);
+    r.to = "";
+    if(!kcbsRecordsObj[r.commentId]) kcbsRecordsObj[r.commentId] = [];
+    kcbsRecordsObj[r.commentId].push(r);
+  }
+  for(const r of xsfsRecords) {
+    uidArr.push(r.operatorId);
+    r.uid = "";
+    if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+    xsfsRecordsObj[r.pid].push(r);
+  }
+  let users = await UserModel.find({uid: {$in: uidArr}});
+  users = await UserModel.extendUsersInfo(users);
+  const userObj = {};
+  users.map(user => {
+    userObj[user.uid] = user;
+  })
   const _comments = await CommentModel.find({_id: {$in: commentsId}});
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
-  const documents = await DocumentModel.find({did: commentDid, type: stableType});
+  const {comment} = await DocumentModel.getDocumentSources();
+  const documents = await DocumentModel.find({did: commentDid, type: stableType, source: comment});
   const commentDocumentsObj = {};
   for(const d of documents) {
     commentDocumentsObj[d.did] = d;
@@ -774,9 +992,11 @@ schema.statics.getCommentInfo = async function(comments) {
   const articles = await ArticleModel.find({_id: {$in: articlePostsSid}});
   const articlesId = [];
   const articlesDid = [];
+  const articleObj = {};
   for(const article of articles) {
     articlesDid.push(article.did);
     articlesId.push(article._id);
+    articleObj[article._id] = article;
   }
   const articleDocumentObj = {};
   const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, type: stableType});
@@ -807,20 +1027,34 @@ schema.statics.getCommentInfo = async function(comments) {
     } else if (articlePost.source === zoneSource){
       url =  `/zone/a/${articlePost.sid}`;
     }
+    let credits = xsfsRecordsObj[_id] || [];
+    credits = credits.concat(kcbsRecordsObj[_id] || []);
+    for(const r of credits) {
+      if(r.from) {
+        r.fromUser = userObj[r.from];
+        r.creditName = creditScore.name;
+      } else {
+        r.fromUser = userObj[r.operatorId];
+        r.type = 'xsf';
+      }
+    }
     let page = Math.floor(comment.order/30);
     if(comment.order % 30 === 0) page = page -1;
     const commentUrl = `${url}?page=${page}&highlight=${comment._id}#highlight`;
     results.push({
       ...comment.toObject(),
+      article: articleObj[articlePost.sid],
       commentDocument,
       articleDocument,
+      user: userObj[comment.uid],
       url,
+      isAuthor: commentDocument.uid === articleDocument.uid,
       commentUrl,
+      credits,
     });
   }
   return results;
 }
-
 
 /*
 * 指定动态ID，获取动态对象
@@ -837,11 +1071,11 @@ schema.statics.getCommentsObjectByCommentsId = async function(commentsId) {
   return commentsObj;
 }
 
-/*
+/* -------------------------------------------------------暂定-------------------------------------------应当修改为通过comments去获取，而不需要再查询一遍
 * 通过commentId获取comment
 * @params {Array} commentId 需要获取的评论的Id
 * */
-schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
+schema.statics.getCommentsByCommentsId = async function (commentsId) {
   const CommentModel = mongoose.model('comments');
   const ArticleModel = mongoose.model('articles');
   const UserModel = mongoose.model('users');
@@ -853,7 +1087,7 @@ schema.statics.getCommentsByCommentsId = async function (commentsId, uid) {
     _id: {$in: commentsId},
   });
   //获取评论信息
-  comments = await CommentModel.getCommentInfo(comments);
+  comments = await CommentModel.getCommentsInfo(comments);
   const usersId = [];
   const articlesId = [];
   const articlePostsId = [];
@@ -924,7 +1158,7 @@ schema.methods.noticeAuthorComment = async function() {
   const SettingModel = mongoose.model('settings');
   const DocumentModel = mongoose.model('documents');
   const socket = require('../nkcModules/socket');
-  const commentInfo = await CommentModel.getCommentInfo([this]);
+  const commentInfo = await CommentModel.getCommentsInfo([this]);
   const {status, commentDocument, articleDocument} = commentInfo[0];
   const {normal: normalStatus} = await CommentModel.getCommentStatus();
   Promise.resolve()
@@ -965,7 +1199,7 @@ schema.methods.noticeAuthorComment = async function() {
         if (!quoteDocument) return console.log('未找到评论引用信息document');
         const quoteComment = await CommentModel.findOnly({_id: quoteDocument.sid});
         if (!quoteComment) return console.log('未找到评论引用信息comment');
-        const quoteInfo = (await CommentModel.getCommentInfo([quoteComment]))[0];
+        const quoteInfo = (await CommentModel.getCommentsInfo([quoteComment]))[0];
         if (!quoteInfo) return console.log('未找到评论引用信息');
         //查找数据库中是否已经由统治过改内容的消息，如果已经存在就不用通知作者
         const oldMessage = await MessageModel.find({
@@ -1001,9 +1235,126 @@ schema.methods.noticeAuthorComment = async function() {
 * */
 schema.methods.getLocationUrl = async function() {
   const CommentModel = mongoose.model('comments');
-  const comment = (await CommentModel.getCommentInfo([this]))[0];
+  const comment = await CommentModel.getCommentInfo(this);
   if(!comment) return;
-  return comment.commentUrl;
+  return {
+    url: comment.commentUrl,
+    articleId: comment.article._id,
+  };
 }
+
+/*
+* 更新独立文章评论的点赞详情
+* */
+schema.methods.updateCommentsVote = async function() {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {comment: commentSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: commentSource, sid: this._id});
+  let upNum = 0;
+  let downNum = 0;
+  for(const vote of votes) {
+    if(vote.type === 'up') {
+      if(vote.sid === this._id) {
+        upNum += vote.num;
+      }
+    } else {
+      if(vote.sid === this._id) {
+        downNum += vote.num;
+      }
+    }
+  }
+  this.voteUp = upNum;
+  this.voteDown = downNum;
+  const b = await this.updateOne({
+    voteUp: upNum,
+    voteDown: downNum,
+  });
+}
+
+
+/*
+* 获取新的 comment id
+* @return {String}
+* */
+schema.statics.getNewId = async () => {
+  const CommentModel = mongoose.model('comments');
+  const redLock = require('../nkcModules/redLock');
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const {getRandomString} = require('../nkcModules/apiFunction');
+  const key = getRedisKeys('newArticleId');
+  let newId = '';
+  let n = 10;
+  const lock = await redLock.lock(key, 10000);
+  try{
+    while(true) {
+      n -= 1;
+      const _id = getRandomString('a0', 6);
+      const comment = await CommentModel.findOne({
+        _id
+      }, {_id: 1});
+      if(!comment) {
+        newId = _id;
+        break;
+      }
+      if(n === 0) {
+        break
+      }
+    }
+  }catch(err) {}
+  await lock.unlock();
+  if(!newId) {
+    throwErr(500, 'comment id error');
+  }
+  return newId;
+}
+
+/*
+* 获取待推送的回复
+* */
+schema.statics.getSocketCommentByPid = async function(cid) {
+  const CommentModel = mongoose.model('comments');
+  const tools = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
+  let comment = await CommentModel.findOnly({_id: cid});
+  comment = await CommentModel.getCommentInfo(comment);
+  return comment;
+}
+
+/*
+* 渲染comment用于socket推送
+* */
+schema.statics.renderSingleCommentToHtml = async (cid) => {
+  const render = require('../nkcModules/render');
+  const UserModel = mongoose.model('users');
+  const PATH = require('path');
+  const CommentModel = mongoose.model('comments');
+  let comment = await CommentModel.findOnly({_id: cid});
+  let user = await UserModel.findOnly({uid: comment.uid});
+  user = await UserModel.extendUserInfo(user);
+  const commentData = await CommentModel.extendSingleComment(comment);
+  const html = render(PATH.resolve(__dirname, '../pages/publicModules/commentCenter/singleComment/singleCommentPage.pug'), {commentData, user}, {}, {startTime: global.NKC.startTime});
+  return html;
+};
+
+/*
+* 获取单条comment动态渲染推送的数据
+* */
+schema.statics.getSocketSingleCommentData = async (cid) => {
+  const CommentModel = mongoose.model('comments');
+  const comment = await CommentModel.getSocketCommentByPid(cid);
+  const html = await CommentModel.renderSingleCommentToHtml(cid);
+  return {
+    comment,
+    html,
+  };
+};
+
+/*
+* 获取推送comment的事件名称
+* */
+schema.statics.getSocketEventName = async () => {
+  return 'articleCommentMessage';
+}
+
 
 module.exports = mongoose.model('comments', schema);

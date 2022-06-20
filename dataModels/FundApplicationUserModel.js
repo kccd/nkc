@@ -110,10 +110,15 @@ fundApplicationUserSchema.methods.extendUser = async function() {
 
 fundApplicationUserSchema.methods.extendLifePhotos = async function() {
 	const PhotoModel = require('./PhotoModel');
+  const tools = require('../nkcModules/tools');
 	const lifePhotos = [];
 	await Promise.all(this.lifePhotosId.map(async _id => {
 		const photo = await PhotoModel.findOne({_id, status: {$nin: ['disabled', 'deleted']}});
-		if(photo) lifePhotos.push(photo);
+		if(photo) {
+      const _photo = photo.toObject();
+      _photo.url = tools.getUrl('lifePhoto', photo._id);
+      lifePhotos.push(_photo);
+    }
 	}));
 	return this.lifePhotos = lifePhotos;
 };

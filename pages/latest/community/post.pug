@@ -1,0 +1,18 @@
+extends ./communityBase
+block communityTitle
+  title=data.pageTitle
+block communityContent
+  include ./communityTypes
+  +renderLatestCommunityTypes(data.t, data.communityTypes)
+
+  include ../../publicModules/paging/paging
+  if !data.posts || data.posts.length === 0
+    .p-t-5.p-b-5.text-center 空空如也~
+  else
+    include ../../home/postlatest
+      for a in data.posts
+        +postlatest(a)
+
+  if data.paging && data.paging.buttonValue.length > 0
+    .m-t-1
+      include ../../publicModules/paging/paging_input

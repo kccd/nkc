@@ -34,24 +34,29 @@ mixin nav(data)
           if auxiliaryCategory.length !== i+1
             span.m-a-0.nav-common 、
 
-    p.info-list
+    .info-list
       if oc
         span.m-r-1
           span 文号
           span=oc
 
-      span.m-r-1.fa.fa-eye(title="浏览数")=hits || 0
-      span.m-r-1.fa.fa-comment(title='回复数' onclick="window.location.href='#container'")=count || 0
-      if data.user
-        if type === 'article'
-          span.m-r-1(titlt='收藏数' onclick='collectArticle()')
-            span=`${collected ? '已收藏' : '收藏'}${collectedCount ? `(${collectedCount})` : ''}`
+      span(title="浏览数")
+        .fa.fa-eye
+        span=hits || 0
+      span.pointer(title='回复数' onclick="window.location.href='#container'")
+        .fa.fa-comment
+        span=count || 0
+      span.pointer
+        if data.user
+          if type === 'article'
+            span(titlt='收藏数' onclick='collectArticle()')
+              span=`${collected ? '已收藏' : '收藏'}${collectedCount ? `(${collectedCount})` : ''}`
+          else
+            span(titlt='收藏数' onclick='collectThread()')
+              span=`${collected?'已收藏': '收藏'}${collectedCount ? `(${collectedCount})` : ''}`
         else
-          span.m-r-1(titlt='收藏数' onclick='collectThread()')
-            span=`${collected?'已收藏': '收藏'}${collectedCount ? `(${collectedCount})` : ''}`
-      else
-        span.m-r-1(titlt='收藏数' onclick="RootApp.openLoginPanel('login')")
-          span=`收藏${collectedCount ? `(${collectedCount})` : ''}`
+          span(titlt='收藏数' onclick="RootApp.openLoginPanel('login')")
+            span=`收藏${collectedCount ? `(${collectedCount})` : ''}`
       if showManagement
-        span.fa.fa-cog.m-r-1(onclick="showSetUp()")
+        span.fa.fa-cog.pointer(onclick="showSetUp()")
 

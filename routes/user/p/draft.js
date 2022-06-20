@@ -1,11 +1,71 @@
+// 两个要比较的草稿
+// function getLatestDrafts () {
+
+// }
+
+//获取用户的草稿
 module.exports = async (ctx, next) => {
-  //获取用户的草稿
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
-  const {page = 0, perpage = 30} = query;
-  const count = await db.DraftModel.countDocuments({uid: targetUser.uid});
-  const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-  const drafts = await db.DraftModel.find({uid: targetUser.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  const {page = 0, perpage = 30, type } = query;
+  let count, paging, drafts;
+  const thread = (await db.DraftModel.getDesType()).thread;
+  const beta = (await db.DraftModel.getType()).beta;
+  const forum = (await db.DraftModel.getDesType()).forum;  
+  const post = (await db.DraftModel.getDesType()).post;  
+  // 如果是社区内容草稿
+  if(type === 'community') {
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid, type: beta});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid, type: beta})
+      // .sort({toc: -1})
+      .sort({tlm: -1})
+      .skip(paging.start).limit(paging.perpage);
+  } else if (type === 'newThread') {
+    // 如果打开编辑器文章，显示文章
+    // 文章有两种类型
+      // forum  新文章
+      // post 可能是修改文章
+    // newThread 等于 forum
+    const threadData = await db.DraftModel.getLatestThread(targetUser.uid, nkcModules);
+    drafts = threadData ? [threadData] : [];
+  } else if (type === 'newPost') {
+    // 需要显示当前文章下的回复草稿
+    //回复有两种类型
+      // thread  新回复
+      // post 可能是修改的回复
+    const { desTypeId } = query;
+    if(!desTypeId) ctx.throw(400, 'desTypeId不存在');
+    const postData = await db.DraftModel.getLatestPost(desTypeId, targetUser.uid, nkcModules);
+
+    drafts = postData ? [postData] : [];
+    
+  } else if (type === 'modifyThread') {
+    // 修改回复或修改文章
+    const threadData = await db.DraftModel.getLatestThread(targetUser.uid, nkcModules);
+    drafts = threadData ? [threadData] : [];
+  } else if (type === 'modifyPost') {
+    const { desTypeId, comment } = query;
+    if(!desTypeId) ctx.throw(400, 'desTypeId不存在');
+    // 获取文章评论
+    if (comment) {
+      count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: {$in: [thread]}});
+      paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+      const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: post, type: beta, parentPostId: desTypeId }).sort({tlm: -1});
+      drafts = draftData;
+    } else {
+      const postData = await db.DraftModel.getLatestPost(desTypeId, targetUser.uid, nkcModules);
+      drafts = postData ? [postData] : [];
+    }     
+  } else {
+    count = await db.DraftModel.countDocuments({uid: targetUser.uid});
+    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    drafts = await db.DraftModel.find({uid: targetUser.uid})
+      // .sort({toc: -1})
+      .sort({tlm: -1})
+      .skip(paging.start)
+      .limit(paging.perpage);
+  }
   data.paging = paging;
   data.drafts = [];
   for(const draft of drafts) {

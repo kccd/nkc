@@ -1,0 +1,27 @@
+@import '../publicModules/base';
+.community-nav {
+  font-size: 0;
+  .community-nav-item {
+    height: 4rem;
+    line-height: 4rem;
+    width: 33.3%;
+    border-radius: 3px;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    &.active{
+      background-color: @primary;
+      a{
+        color: #fff;
+      }
+    }
+    &:hover{
+      opacity: 0.7;
+    }
+    a {
+      font-size: 1.3rem;
+      color: #333;
+      text-decoration: none;
+    }
+  }
+}

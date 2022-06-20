@@ -40,7 +40,7 @@ block eContent
               a.btn.btn-default(type='submit' href='/e/log/kcb') 全部
             .text-danger= data.info
         .col-xs-12.col-md-12.table-responsive
-          include ../../interface_navigation_paging
+          include ../../publicModules/paging/paging
           table.table.table-bordered(style='font-size:1rem;')
             thead
               tr
@@ -52,7 +52,7 @@ block eContent
                 th 收入者
                 th 数目
                 th 说明
-                th 文号
+                th 链接
                 th IP
                 th 验证
             tbody
@@ -80,13 +80,13 @@ block eContent
                 th {{record.description}}
                   span.text-danger {{record.hideDescription?"【已屏蔽】":""}}
                 th
-                  a(v-if="record.pid" :href="record.post.url") {{record.pid}}
+                  a(v-if="record.url" :href="record.url" target="_blank") 查看详情
                 th
                   a(:href="ipUrl(record.ip)" target="_blank") {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}
-          include ../../interface_navigation_paging
+          include ../../publicModules/paging/paging_input
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../../publicModules/moment
-  script(src=`/experimental/log/kcb.js?v=${global.NKC.startTime}`)
+  +includeJS('/experimental/log/kcb.js')

@@ -36,6 +36,18 @@ module.exports = [
     count: 0
   },
   {
+    _id: 'articleBlocked',
+    description: '文章被屏蔽',
+    num: -10,
+    count: 0
+  },
+  {
+    _id: 'commentBlocked',
+    description: '回复被屏蔽',
+    num: -5,
+    count: 0
+  },
+  {
     _id: 'subscribeForum',
     description: '关注专业',
     num: 1,
@@ -100,6 +112,30 @@ module.exports = [
     description: '文章被取消加精',
     num: -5,
     count: 0
+  },
+  {
+    _id: 'digestArticle',
+    description: '独立文章被加精',
+    num: -5,
+    count: 0
+  },
+  {
+    _id: 'unDigestArticle',
+    description: '独立文章被取消加精',
+    num: -5,
+    count: 0
+  },
+  {
+    _id: 'digestComment',
+    description: '回复被加精',
+    num: -5,
+    count: 0
+  },
+  {
+    _id: 'unDigestComment',
+    description: '取消回复加精',
+    num: -5,
+    count: 0,
   },
   {
     _id: 'waterPay',

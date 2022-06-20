@@ -88,7 +88,7 @@
             | &nbsp楼的内容
           .quote-content {{comment.quote.content}}
         .comment-item-content(v-html="comment.content")
-        comment-post-editor(:ref="`editorContainer_${comment._id}`" :cid="comment._id" @close-editor="closeCommentEditor")
+        comment-post-editor(:ref="`editorContainer_${comment._id}`" :cid="comment._id" :aid="sid" @close-editor="closeCommentEditor")
         .comment-item-do
           .do-item(@click="quote(comment)")
             .fa.fa-comment-o

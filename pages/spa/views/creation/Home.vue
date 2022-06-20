@@ -10,15 +10,17 @@
               option(:key="year", :value="year") {{ year }}
       .pie.overflow-x
         #pie.min-h(ref="renderPie")
-      .account-logs
+      .account-logs.m-b-2
         .account-header 最近阅读
         .account-description
         div
+          div(v-if="!visitThreadLogs.length")
+            .null 空空如也~
           .account-logs-thread(v-for="(vt, i) in visitThreadLogs", :key="i")
-            span {{ setTime(vt.timeStamp) }}
+            span {{ vt.time }}
             span 看过
-            a.article-title(:title="vt.thread.firstPost.t" :href="'/t/' + vt.tid") {{ vt.thread.firstPost.t }}
-      .account-logs
+            a.article-title(:title="vt.thread.firstPost.t" :href="'/t/' + vt.thread.tid") {{ vt.thread.firstPost.t }}
+      .account-logs.m-b-1
         .account-header 看过的用户
         .account-description
         div
@@ -27,10 +29,10 @@
           .account-logs-user(v-for="(log, i) in visitUserLogs", :key="i")
             .account-logs-user-avatar
               //- img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
-              img(:src="log.targetUser.avatar")
+              img(:src="log.avatarUrl")
             .account-logs-user-info
-              a.account-logs-user-name(:href="'/u/' + log.toUid") {{ log.targetUser.username }}
-              .account-logs-user-time {{ setTime(log.timeStamp) }}
+              a.account-logs-user-name(:href="log.userHome") {{ log.username }}
+              .account-logs-user-time {{ log.time }}
 
       .account-logs
         .account-header 我的读者排名
@@ -41,10 +43,10 @@
           .account-logs-user(v-for="(log, i) in visitSelfLogs")
             .account-logs-user-avatar
               //- img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
-              img(:src="log.user.avatar")
+              img(:src="log.avatarUrl")
             .account-logs-user-info
-              a.account-logs-user-name(:href="'/u/' + log.uid") {{ log.user.username }}
-              .account-logs-user-time {{ setTime(log.timeStamp) }}
+              a.account-logs-user-name(:href="log.userHome") {{ log.username }}
+              .account-logs-user-time {{ log.time }}
 </template>
 
 <script>
@@ -113,6 +115,9 @@ export default {
         });
       }
       // console.log(this.$refs.render-pie)
+      if(!this.$refs.renderPie){
+        return
+      }
       var myChart = echarts.init(this.$refs.renderPie);
       var option = {
         title: {
@@ -381,7 +386,7 @@ export default {
   @media screen and (max-width: @max-width) {
     overflow-x: scroll;
     width: 100%;
-    
+
   }
 
 }

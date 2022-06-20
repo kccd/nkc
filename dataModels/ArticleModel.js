@@ -43,6 +43,18 @@ const schema = new mongoose.Schema({
     default: null,
     index: 1
   },
+  //是否加精
+  digest: {
+    type: Boolean,
+    default: false,
+    index:1,
+  },
+  //加精时间
+  digestTime: {
+    type: Date,
+    default: null,
+    index: 1,
+  },
   // 文章状态
   // normal: 正常的（已发布，未被删除）
   // default: 未发布的（正在编辑，待发布）
@@ -482,9 +494,9 @@ schema.methods.deleteArticle = async function() {
   const {normal: normalStatus, deleted: deletedStatus} = await ArticleModel.getArticleStatus();
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
   const {status, source, _id} = this;
-  if(status !== normalStatus) {
-    throwErr(500, `文章状态异常 status=${this.status}`);
-  }
+  // if(status !== normalStatus) {
+  //   throwErr(500, `文章状态异常 status=${this.status}`);
+  // }
   // 删除草稿
   await this.deleteDraft();
   //根据文章id删除引用
@@ -885,6 +897,7 @@ schema.statics.extendArticlesList = async (articles) => {
       }
     }
     articlesList.push({
+      status,
       articleSource: source,
       articleSourceId: sid,
       articleId,
@@ -1105,6 +1118,11 @@ schema.statics.getArticlesInfo = async function(articles) {
   const DocumentModel = mongoose.model('documents');
   const ReviewModel = mongoose.model('reviews');
   const ArticlePostModel = mongoose.model('articlePosts');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const SettingModel = mongoose.model('settings');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1122,6 +1140,26 @@ schema.statics.getArticlesInfo = async function(articles) {
     articlesDid.push(article.did);
     uidArr.push(article.uid);
   }
+  //查找文章鼓励和学术分信息
+  const kcbsRecordsObj = {};
+  const xsfsRecordsObj = {};
+  const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
+  const xsfsRecords = await XsfsRecordModel.find({pid: {$in: articleId}, canceled: false, type: xsfsRecordTypes.article}).sort({toc: 1});
+  const kcbsRecords = await KcbsRecordModel.find({articleId: {$in: articleId}, type: 'creditKcb'}).sort({toc: 1});
+  await KcbsRecordModel.hideSecretInfo(kcbsRecords);
+  for(const r of kcbsRecords) {
+    uidArr.push(r.from);
+    r.to = "";
+    if(!kcbsRecordsObj[r.articleId]) kcbsRecordsObj[r.articleId] = [];
+    kcbsRecordsObj[r.articleId].push(r);
+  }
+  for(const r of xsfsRecords) {
+    uidArr.push(r.operatorId);
+    r.uid = "";
+    if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
+    xsfsRecordsObj[r.pid].push(r);
+  }
+  //查找用户信息
   let users = await UserModel.find({uid: {$in: uidArr}});
   users = await UserModel.extendUsersInfo(users);
   for(const user of users) {
@@ -1129,6 +1167,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   }
   const {article: articleSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
+  const {unknown: unknownStatus, faulty: faultyStatus, disabled: disabledStatus} = await DocumentModel.getDocumentStatus();
   const articleDocuments = await DocumentModel.find({did: {$in: articlesDid}, source: articleSource, type: stableType});
   for(const d of articleDocuments) {
     articleDocumentsObj[d.did] = d;
@@ -1141,7 +1180,6 @@ schema.statics.getArticlesInfo = async function(articles) {
     columnsId.push(columnPost.columnId);
     columnPostsObj[columnPost.pid] =columnPost;
   }
-
   const columns = await ColumnModel.find({_id: {$in: columnsId}});
   for(const column of columns) {
     columnObj[column._id] = {
@@ -1163,9 +1201,22 @@ schema.statics.getArticlesInfo = async function(articles) {
     let url;
     let editorUrl;
     const document = articleDocumentsObj[article.did];
-    let review
+    let reason;
+    let documentResourceId;
     if(document) {
-      review = (await ReviewModel.find({docId: document._id}).sort({toc: -1}).limit(1))[0];
+      const {status} = document;
+      let delLog;
+      if(status === unknownStatus) {
+        delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+      } else if(status === disabledStatus) {
+        delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+      } else if(status === faultyStatus) {
+        delLog = await DelPostLogModel.findOne({postType: document.source, delType: faultyStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
+      }
+      if(delLog) {
+        reason = delLog.reason;
+      }
+      documentResourceId = await document.getResourceReferenceId()
     }
     const columnPost = columnPostsObj[article._id];
     if(article.source === columnSource) {
@@ -1178,14 +1229,26 @@ schema.statics.getArticlesInfo = async function(articles) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/zone/a/${article._id}`;
     }
-    const documentResourceId = await document.getResourceReferenceId()
+    let credits = xsfsRecordsObj[article._id] || [];
+    credits = credits.concat(...kcbsRecordsObj[article._id] || []);
+    for(const r of credits) {
+      if(r.from) {
+        r.fromUser = userObj[r.from];
+        r.creditName = creditScore.name;
+      } else {
+        r.fromUser = userObj[r.operatorId];
+        r.type = 'xsf';
+      }
+    }
+    const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
     const info = {
       ...article.toObject(),
-      reason: review?review.reason:'',
+      xsf,
+      kcb,
+      reason: reason || '',
       document,
-      documentResourceId,
       editorUrl,
       user: userObj[article.uid],
       count: articlePostsObj[article._id]?articlePostsObj[article._id].count : 0,
@@ -1194,9 +1257,20 @@ schema.statics.getArticlesInfo = async function(articles) {
     if(article.source === 'column') {
       info.column = columnObj[columnPost.columnId];
     }
+    if(documentResourceId) {
+    info.documentResourceId = documentResourceId;
+    }
     results.push(info);
   }
   return results;
+}
+
+/*
+* 获取单个article的信息
+* */
+schema.statics.getArticleInfo = async (article) => {
+  const ArticleModel = mongoose.model('articles');
+  return (await ArticleModel.getArticlesInfo(article))[0];
 }
 
 /*
@@ -1375,5 +1449,135 @@ schema.statics.getArticlesObjectByArticlesId = async (articlesId) => {
   }
   return articlesObj;
 };
+
+/*
+*更新文章点赞数据
+* */
+schema.methods.updateArticlesVote = async function () {
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const {article: articleSource} = await PostsVoteModel.getVoteSources();
+  const votes = await PostsVoteModel.find({source: articleSource, sid: this._id});
+  let upNum = 0;
+  let downNum = 0;
+  for(const vote of votes) {
+    if(vote.type === 'up') {
+      if(vote.sid === this._id) {
+        upNum += vote.num;
+      }
+    } else {
+      if(vote.sid === this._id) {
+        downNum += vote.num;
+      }
+    }
+  }
+  this.voteUp = upNum;
+  this.voteDown = downNum;
+  await this.updateOne({
+    voteUp: upNum,
+    voteDown: downNum,
+  });
+};
+
+/*
+* 拓展文章作者信息
+* */
+schema.methods.extendUser = async function() {
+  const UserModel = mongoose.model('users');
+  return this.user = await UserModel.findOnly({uid: this.uid});
+}
+
+/*
+* 拓展文章信息
+* */
+schema.statics.extendArticlesPanelData = async function(articles) {
+  const ArticleModel = mongoose.model('articles');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const tools = require('../nkcModules/tools');
+  const CommentModel = mongoose.model('comments');
+  const ArticlePostModel = mongoose.model('articlePosts');
+  articles = await ArticleModel.getArticlesInfo(articles);
+  const contentStatusTypes = {
+    normal: 'normal',
+    warning: 'warning',
+    danger: 'danger',
+    disabled: 'disabled',
+  };
+  const {unknown, disabled, faulty, normal} = articleStatus;
+  const _articles = [];
+  for(const article of articles) {
+    const articlePost = await ArticlePostModel.findOne({sid: article._id});
+    //查找文章最后一条评论
+    let comment = null;
+    if(articlePost) {
+      comment = await CommentModel.findOne({sid: articlePost._id, status: normal}).sort({order: -1});
+      if(comment) {
+        comment = await CommentModel.getCommentInfo(comment);
+      }
+    }
+    const {document, user: articleUser} = article;
+    const user = {
+      uid: articleUser.uid,
+      username: articleUser.username,
+      avatarUrl: tools.getUrl('userAvatar', articleUser.avatar),
+      homeUrl: tools.getUrl('userHome', articleUser.uid)
+    };
+    const content = {
+      time: article.tlm,
+      coverUrl: tools.getUrl('documentCover', document.cover),
+      title: document.title,
+      url: article.url,
+      digest: article.digest,
+      abstract: nkcRender.htmlToPlain(document.content, 200),
+      readCount: article.hits,
+      voteUpCount: article.voteUp,
+      replyCount: article.count
+    };
+    const result = {
+      type: 'document',
+      id: article._id,
+      pid: document._id,
+      user,
+      pages: [],
+      categories: [],
+      content,
+      status: {
+        type: contentStatusTypes.normal,
+        desc: ''
+      },
+      reply: null
+    };
+    if(article.status === unknown) {
+      result.status.type = contentStatusTypes.danger;
+      result.status.desc = '审核中';
+    } else if(article.status === disabled) {
+      result.status.type = contentStatusTypes.disabled;
+      result.status.desc = '已屏蔽，仅自己可见';
+    } else if(article.status === faulty) {
+      result.status.type = contentStatusTypes.warning;
+      result.status.desc = '退修中，仅自己可见，修改后对所有人可见';
+    }
+    if(comment) {
+      //拓展reply
+      const {user, commentDocument, commentUrl} = comment;
+      const {uid, username, avatar} = user;
+      const rUser = {
+        uid,
+        username,
+        avatarUrl: tools.getUrl('userAvatar', avatar),
+        homeUrl: tools.getUrl('userHome', uid),
+      };
+      result.reply = {
+        user: rUser,
+        content: {
+          time: commentDocument.toc,
+          url: commentUrl,
+          abstract: nkcRender.htmlToPlain(commentDocument.content, 200),
+        },
+      };
+    }
+    _articles.push(result);
+  }
+  return _articles;
+}
 
 module.exports = mongoose.model('articles', schema);

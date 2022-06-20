@@ -1,10 +1,20 @@
-const getRoomName = require('../socket/util/getRoomName');
-const communication = require("./communication");
-const communicationConfig = require('../config/communication');
 const PATH = require('path');
-const db = require('../dataModels');
+const {
+  BrokerCall,
+  ServiceActionNames,
+  GetSocketServiceRoomName,
+} = require('../comm/modules/comm');
 
-const socketServiceName = communicationConfig.servicesName.socket;
+function SendMessageToWebsocketServiceRoom(roomName, eventName, data) {
+  BrokerCall(ServiceActionNames.v1_websocket_send_message_to_room, {
+    room: roomName,
+    event: eventName,
+    data
+  })
+    .catch(err => {
+      console.log(err.message)
+    });
+}
 
 // 媒体管理，分组信息
 async function sendGroupMessage(uid) {
@@ -16,14 +26,8 @@ async function sendResourcesMessage(uid) {
 }
 
 async function sendConsoleMessage(data) {
-  const roomName = getRoomName('console');
-  const socketClient = await communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'consoleMessage',
-    roomName,
-    data
-  })
-  // global.NKC.io.to(roomName).emit('consoleMessage', data);
+  const roomName = GetSocketServiceRoomName('console');
+  return SendMessageToWebsocketServiceRoom(roomName, 'consoleMessage', data);
 }
 
 async function sendUserMessage(channel, messageObject) {
@@ -35,20 +39,13 @@ async function sendDataMessage(uid, options) {
     event = "dataMessage",
     data = {}
   } = options;
-  const roomName = getRoomName('user', uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    roomName,
-    eventName: event,
-    data
-  });
-  // global.NKC.io.to(roomName).emit(event, data);
+  const roomName = GetSocketServiceRoomName('user', uid);
+  return SendMessageToWebsocketServiceRoom(roomName, event, data);
 }
 
 async function sendForumMessage(data) {
   const ThreadModel = require('../dataModels/ThreadModel');
   const ForumModel = require('../dataModels/ForumModel');
-  const socketClient = communication.getCommunicationClient();
   const render = require('./render');
   const {tid, state, pid} = data;
   let thread = await ThreadModel.findOne({tid});
@@ -65,34 +62,44 @@ async function sendForumMessage(data) {
     for(const forum of forums) {
       if(usedForumsId.includes(forum.fid)) continue;
       const html = render(template, {singleThread: thread}, {...state, threadListStyle: forum.threadListStyle});
-      const roomName = getRoomName('forum', forum.fid);
-      socketClient.sendMessage(socketServiceName, {
-        eventName: 'forumMessage',
-        roomName,
-        data: {
-          html,
-          pid,
-          tid,
-          digest: thread.digest,
-          contentType,
-        }
-      });
-      /*global.NKC.io.to(roomName).emit('forumMessage', {
+      const roomName = GetSocketServiceRoomName('forum', forum.fid);
+      await SendMessageToWebsocketServiceRoom(roomName, 'forumMessage', {
         html,
         pid,
         tid,
         digest: thread.digest,
         contentType,
-      });*/
+      });
       usedForumsId.push(forum.fid);
     }
   }
 }
 
+// 推送回复给当前文章房间的用户(独立文章)
+async function sendCommentMessage(cid) {
+  const CommentModel = require('../dataModels/CommentModel');
+  // 获取单条评论动态渲染推送的数据
+  const singleCommentData = await CommentModel.getSocketSingleCommentData(cid);
+  const {
+    comment,
+    html,
+  } = singleCommentData;
+  const {article} = comment;
+  const eventName = await CommentModel.getSocketEventName(cid);
+  const rooName = GetSocketServiceRoomName('article', article._id);
+  await SendMessageToWebsocketServiceRoom(rooName, eventName, {
+    articleId: article._id,
+    commentId: comment._id,
+    comment,
+    html,
+  });
+}
+
+// 推送回复给当前文章房间的用户(社区文章)
 async function sendPostMessage(pid) {
   const PostModel = require('../dataModels/PostModel');
   const ThreadModel = require('../dataModels/ThreadModel');
-  const socketClient = communication.getCommunicationClient();
+  // 获取单条post动态渲染推送的数据
   const singlePostData = await PostModel.getSocketSinglePostData(pid);
   const {
     parentCommentId,
@@ -103,271 +110,39 @@ async function sendPostMessage(pid) {
   } = singlePostData;
   const eventName = await PostModel.getSocketEventName(pid);
   const thread = await ThreadModel.findOnly({tid: post.tid});
-  const roomName = getRoomName('post', thread.oc);
-  socketClient.sendMessage(socketServiceName, {
-    roomName,
-    eventName,
-    data: {
-      postId: post.pid,
-      comment,
-      parentPostId,
-      parentCommentId,
-      html
-    }
-  });
-  /*global.NKC.io.to(roomName).emit(eventName, {
+  const roomName = GetSocketServiceRoomName('post', thread.oc);
+  await SendMessageToWebsocketServiceRoom(roomName, eventName, {
     postId: post.pid,
     comment,
     parentPostId,
     parentCommentId,
     html
-  });*/
+  });
 }
-
-
-// 发送消息到用户
-/*async function sendMessageToUser(channel, message) {
-  const MessageModel = require('../dataModels/MessageModel');
-  const UserModel = require('../dataModels/UserModel');
-  const socketClient = communication.getCommunicationClient();
-  // let {io} = global.NKC;
-  //获取用户房间名
-  let userRoom = uid => getRoomName("user", uid);
-  let userMessage = "message";
-
-  // message.socketId = io.id;
-  message.socektId = '';
-
-  try{
-    message = JSON.parse(message);
-    //判断消息类型
-    const _message = await MessageModel.extendMessage(undefined, message);
-    message._message = _message;
-
-
-    if(channel === 'withdrawn') {                         // 撤回信息
-      const {r, s, _id} = message;
-      const sc = {
-        eventName: 'withdrawn',
-        roomName: [userRoom(r), userRoom(s)],
-        data: {
-          uid: s,
-          messageId: _id
-        }
-      };
-      socketClient.sendMessage(socketServiceName, sc);
-      /!*io
-        .to(userRoom(r))
-        .to(userRoom(s))
-        .emit(userMessage, {
-          uid: s,
-          messageId: _id
-        });*!/
-    } else if(channel === 'message') {
-      const {ty, s, r} = message;
-      if(ty === 'STE') {                                  // 系统通知，通知给所有人
-        const sc = {
-          eventName: userMessage,
-          roomName: null,
-          data: {
-            message
-          }
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .emit(userMessage, {
-            message
-          });*!/
-      } else if(ty === 'STU') {                           // 系统提醒，提醒某一个用户
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(r),
-          data: {
-            message
-          }
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(r))
-          .emit(userMessage, {
-            message
-          });*!/
-      } else if(ty === 'UTU') {                            // 用户间的私信
-        const sUser = await UserModel.findOne({uid: s});
-        const rUser = await UserModel.findOne({uid: r});
-        if(!sUser || !rUser) return;
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(r),
-          data: {
-            user: sUser,
-            targetUser: rUser,
-            myUid: r,
-            message
-          }
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(r))
-          .emit(userMessage, {
-            user: sUser,
-            targetUser: rUser,
-            myUid: r,
-            message
-          });*!/
-        message._message.position = 'right';
-        const sc_s = {
-          eventName: userMessage,
-          roomName: userRoom(s),
-          data: {
-            user: sUser,
-            targetUser: rUser,
-            myUid: s,
-            message
-          }
-        };
-        socketClient.sendMessage(socketServiceName, sc_s);
-        /!*io
-          .to(userRoom(s))
-          .emit(userMessage, {
-            user: sUser,
-            targetUser: rUser,
-            myUid: s,
-            message
-          });*!/
-      } else if(ty === 'friendsApplication') {           // 好友申请
-        const {respondentId, applicantId} = message;
-        const respondent = await UserModel.findOne({uid: respondentId});
-        const applicant = await UserModel.findOne({uid: applicantId});
-        if(!respondent || !applicant) return;
-        const data = {
-          message: {
-            ty: 'friendsApplication',
-            _id: message._id,
-            username: applicant.username,
-            description: message.description,
-            uid: applicant.uid,
-            toc: message.toc,
-            agree: message.agree
-          }
-        };
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(respondentId),
-          data
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(respondentId))
-          .emit(userMessage, data);*!/
-        if(message.c === 'agree') {
-          const sc = {
-            eventName: userMessage,
-            roomName: userRoom(applicantId),
-            data
-          };
-          socketClient.sendMessage(socketServiceName, sc);
-          /!*io
-            .to(userRoom(applicantId))
-            .emit(userMessage, data);*!/
-        }
-      } else if(ty === 'deleteFriend') {         // 删除好友
-        const {deleterId, deletedId} = message;
-        const sc = {
-          eventName: userMessage,
-          roomName: [userRoom(deleterId), userRoom(deletedId)],
-          data: {message}
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(deleterId))
-          .to(userRoom(deletedId))
-          .emit(userMessage, {message});*!/
-      } else if(ty === 'modifyFriend') {         // 修改好友设置
-        const {friend} = message;
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(friend.uid),
-          data: {message}
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(friend.uid))
-          .emit(userMessage, {message});*!/
-      } else if(ty === 'removeChat') {           // 删除与好友的聊天
-        const {deleterId} = message;
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(deleterId),
-          data: {message}
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(deleterId))
-          .emit(userMessage, {message});*!/
-      } else if(ty === 'markAsRead') {           // 多终端同步信息，标记为已读
-        const {uid} = message;
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(uid),
-          data: {message}
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(uid))
-          .emit(userMessage, {message});*!/
-      } else if(ty === 'editFriendCategory') {   // 编辑好友分组
-        const {uid} = message.category;
-        const sc = {
-          eventName: userMessage,
-          roomName: userRoom(uid),
-          data: {message}
-        };
-        socketClient.sendMessage(socketServiceName, sc);
-        /!*io
-          .to(userRoom(uid))
-          .emit(userMessage, {message});*!/
-      }
-    }
-  } catch(err) {
-    console.log(err);
-  }
-}*/
 
 /*
 * 移除对话
 * */
 async function sendEventRemoveChat(type, uid, tUid) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeChat',
-    roomName: getRoomName('user', uid),
-    data: {
-      type,
-      uid: tUid
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'removeChat', {
+    type,
+    uid: tUid
   });
 }
 /*
 * 移除好友
 * */
 async function sendEventRemoveFriend(uid, tUid) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeFriend',
-    roomName: getRoomName('user', uid),
-    data: {
-      type: 'UTU',
-      uid: tUid
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  const tRoomName = GetSocketServiceRoomName('user', tUid)
+  await SendMessageToWebsocketServiceRoom(roomName, 'removeFriend', {
+    type: 'UTU',
+    uid: tUid
   });
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeFriend',
-    roomName: getRoomName('user', tUid),
-    data: {
-      type: 'UTU',
-      uid: uid
-    }
+  await SendMessageToWebsocketServiceRoom(tRoomName, 'removeFriend', {
+    type: 'UTU',
+    uid: uid
   });
 }
 
@@ -375,13 +150,9 @@ async function sendEventRemoveFriend(uid, tUid) {
 * 移除分组
 * */
 async function sendEventRemoveCategory(uid, cid) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'removeCategory',
-    roomName: getRoomName('user', uid),
-    data: {
-      cid
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'removeCategory', {
+    cid
   });
 }
 
@@ -391,13 +162,9 @@ async function sendEventRemoveCategory(uid, cid) {
 async function sendEventUpdateCategoryList(uid) {
   const FriendsCategoryModel = require('../dataModels/FriendsCategoryModel');
   const categoryList = await FriendsCategoryModel.getCategories(uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateCategoryList',
-    roomName: getRoomName('user', uid),
-    data: {
-      categoryList
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateCategoryList', {
+    categoryList
   });
 }
 /*
@@ -406,13 +173,9 @@ async function sendEventUpdateCategoryList(uid) {
 async function sendEventUpdateUserList(uid) {
   const FriendModel = require('../dataModels/FriendModel');
   const userList = await FriendModel.getFriends(uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateUserList',
-    roomName: getRoomName('user', uid),
-    data: {
-      userList
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateUserList', {
+    userList
   });
 }
 
@@ -422,13 +185,9 @@ async function sendEventUpdateUserList(uid) {
 async function sendEventUpdateChatList(uid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chatList = await CreatedChatModel.getCreatedChat(uid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateChatList',
-    roomName: getRoomName('user', uid),
-    data: {
-      chatList
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateChatList', {
+    chatList
   });
 }
 
@@ -436,22 +195,15 @@ async function sendEventUpdateChatList(uid) {
 * 撤回消息
 * */
 async function sendEventWithdrawn(uid, tUid, messageId) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'withdrawn',
-    roomName: getRoomName('user', uid),
-    data: {
-      messageId,
-      reEdit: true,
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  const tRoomName = GetSocketServiceRoomName('user', tUid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'withdrawn', {
+    messageId,
+    reEdit: true,
   });
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'withdrawn',
-    roomName: getRoomName('user', tUid),
-    data: {
-      messageId,
-      reEdit: false
-    }
+  await SendMessageToWebsocketServiceRoom(tRoomName, 'withdrawn', {
+    messageId,
+    reEdit: false
   });
 }
 
@@ -459,14 +211,10 @@ async function sendEventWithdrawn(uid, tUid, messageId) {
 * 标记为已读
 * */
 async function sendEventMarkAsRead(type, uid, tUid) {
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'markAsRead',
-    roomName: getRoomName('user', uid),
-    data: {
-      type,
-      uid: tUid
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'markAsRead', {
+    type,
+    uid: tUid
   });
 }
 
@@ -479,13 +227,9 @@ async function sendEventMarkAsRead(type, uid, tUid) {
 async function sendEventUpdateChat(type, uid, tUid) {
   const CreatedChatModel = require('../dataModels/CreatedChatModel');
   const chat = await CreatedChatModel.getSingleChat(type, uid, tUid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'updateChat',
-    roomName: getRoomName('user', uid),
-    data: {
-      chat
-    }
+  const roomName = GetSocketServiceRoomName('user', uid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'updateChat', {
+    chat
   });
 }
 
@@ -500,18 +244,14 @@ async function sendMessageToUser(messageId, localId) {
   if(!message) return;
   const {ty, s, r} = message;
   message = await MessageModel.extendMessage(message);
-  const socketClient = communication.getCommunicationClient();
   const rChat = await CreatedChatModel.getSingleChat(ty, r, s);
   if(ty === 'UTU') {
     const sChat = await CreatedChatModel.getSingleChat(ty, s, r);
-    socketClient.sendMessage(socketServiceName, {
-      eventName: 'receiveMessage',
-      roomName: getRoomName('user', s),
-      data: {
-        localId,
-        message,
-        chat: sChat
-      }
+    const sRoomName = GetSocketServiceRoomName('user', s);
+    await SendMessageToWebsocketServiceRoom(sRoomName, 'receiveMessage', {
+      localId,
+      message,
+      chat: sChat
     });
   } else {
     const messageTypes = {
@@ -521,14 +261,11 @@ async function sendMessageToUser(messageId, localId) {
     };
     await CreatedChatModel.createDefaultChat(messageTypes[ty], r);
   }
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'receiveMessage',
-    roomName: getRoomName('user', r),
-    data: {
-      message,
-      chat: rChat,
-      beep: await UserModel.getMessageBeep(r, 'UTU'),
-    }
+  const rRoomName = GetSocketServiceRoomName('user', r);
+  await SendMessageToWebsocketServiceRoom(rRoomName, 'receiveMessage', {
+    message,
+    chat: rChat,
+    beep: await UserModel.getMessageBeep(r, 'UTU')
   });
 }
 
@@ -544,18 +281,14 @@ async function sendSystemInfoToUser(messageId) {
   message = await MessageModel.extendMessage(message);
   // 获取能够接收此消息的用户
   const users = await UserModel.find({online: {$ne: ''}}, {uid: 1}).sort({toc: 1});
-  const socketClient = communication.getCommunicationClient();
   for(const u of users) {
     const rChat = await CreatedChatModel.getSingleChat('STE', u.uid);
-    socketClient.sendMessage(socketServiceName, {
-      eventName: 'receiveMessage',
-      roomName: getRoomName('user', u.uid),
-      data: {
-        message,
-        chat: rChat,
-        beep: await UserModel.getMessageBeep(u.uid, 'STE'),
-      }
-    })
+    const roomName = GetSocketServiceRoomName('user', u.uid);
+    await SendMessageToWebsocketServiceRoom(roomName, 'receiveMessage', {
+      message,
+      chat: rChat,
+      beep: await UserModel.getMessageBeep(u.uid, 'STE'),
+    });
   }
 }
 
@@ -570,25 +303,24 @@ async function sendNewFriendApplication(applicationId) {
   const applicationMessage = await FriendsApplicationModel.getApplicationMessage(applicationId);
   const message = await MessageModel.extendMessage(applicationMessage);
   const chat = await CreatedChatModel.getSingleChat('newFriends', applicationMessage.tUid);
-  const socketClient = communication.getCommunicationClient();
-  socketClient.sendMessage(socketServiceName, {
-    eventName: 'receiveMessage',
-    roomName: getRoomName('user', applicationMessage.tUid),
-    data: {
-      localId: applicationId,
-      message,
-      chat,
-      beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
-    }
-  })
+  const roomName = GetSocketServiceRoomName('user', applicationMessage.tUid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'receiveMessage', {
+    localId: applicationId,
+    message,
+    chat,
+    beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
+  });
 }
 
 /*
 * 获取媒体文件处理服务的信息
 * */
 async function getMediaServiceInfo() {
-  const socketClient = communication.getCommunicationClient();
-  return await socketClient.getServiceInfoPromise(communicationConfig.servicesName.media);
+  const mediaServerInfo = await BrokerCall(ServiceActionNames.v1_media_get_server_info, {});
+  return {
+    host: mediaServerInfo.host,
+    port: mediaServerInfo.port
+  };
 }
 
 /*
@@ -596,16 +328,15 @@ async function getMediaServiceInfo() {
 * */
 async function getMediaServiceUrl() {
   const mediaServiceInfo = await getMediaServiceInfo();
-  return `http://${mediaServiceInfo.serviceAddress}:${mediaServiceInfo.servicePort}`;
+  return `http://${mediaServiceInfo.host}:${mediaServiceInfo.port}`;
 }
 
 /*
 * 调用 render 服务渲染 pug
 * */
 async function getPageFromRenderService(templatePath, state, data) {
-  const communicationClient = communication.getCommunicationClient();
-  return await communicationClient.sendMessagePromise(communicationConfig.servicesName.render, {
-    templatePath,
+  return BrokerCall(ServiceActionNames.v1_render_render_pug_file, {
+    file: templatePath,
     state,
     data
   });
@@ -618,6 +349,7 @@ module.exports = {
   sendUserMessage,
   sendDataMessage,
   sendForumMessage,
+  sendCommentMessage,
   sendPostMessage,
   sendMessageToUser,
   sendEventRemoveChat,

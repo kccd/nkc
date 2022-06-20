@@ -26,8 +26,8 @@
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
     .m-b-1
-      button.btn.btn-primary.m-r-05(@click="publish") 发布
-      button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId") 保存
+      button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId") 发布
+      button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId || lockPost") 保存
       button.btn.btn-default.m-r-05(@click="preview" :disabled="!articleId") 预览
       button.btn.btn-default.m-r-05(@click="history" :disabled="!articleId") 历史
       .checkbox
@@ -161,6 +161,7 @@ export default {
     contentChangeEventFlag: false,
     articles: [], //当前专栏正在编辑的文章
     setInterval: null,
+    setTimeout: null,
   }),
   components: {
     "document-editor": DocumentEditor,
@@ -185,9 +186,16 @@ export default {
   mounted() {
     const self = this;
     this.getColumn();
-    self.setInterval = setInterval(function() {
+    self.setInterval = setTimeout(function () {
       self.autoSaveToDraft()
-    }, 60000);
+        .then(() => {
+          self.autoSaveToDraft();
+        })
+        .catch((data) => {
+          sweetError('草稿保存失败：' + (data.error || data));
+          self.autoSaveToDraft();
+        })
+    }, 60000)
   },
   destroyed() {
     clearInterval(this.setInterval);
@@ -199,11 +207,11 @@ export default {
     checkString: checkString,
     getLength: getLength,
     preview(){
-      const url = getUrl('preview', "article", this.articleId);
+      const url = getUrl('documentPreview', "article", this.articleId);
       visitUrl(url,true)
     },
     history(){
-      const url = getUrl('history', "article", this.articleId);
+      const url = getUrl('documentHistory', "article", this.articleId);
       visitUrl(url,true)
     },
     getColumn() {
@@ -408,7 +416,10 @@ export default {
     },
     //发布文章
     post(type) {
+      //未传入类型时返回
       if(!type) return;
+      //床发布时清除当前修改的定时修改任务
+      if(type === 'publish') clearTimeout(this.setTimeout);
       if(this.lockPost && type !== 'publish') return;
       this.lockPost = true;
       this.$refs.documentEditor.setSavedStatus('saving');
@@ -488,6 +499,7 @@ export default {
             if(res.articleUrl) {
               window.location.href = res.articleUrl;
             }
+            self.articleId = null;
           } else if(type === 'save') {
             //草稿保存成功显示报讯成功信息
             const time = new Date();
@@ -619,9 +631,13 @@ export default {
         sweetSuccess('保存成功');
       });
     },
+    //修改文章内容，在没有内容变化两秒后再提交内容
     modifyArticle() {
       const self = this;
-      this.post(self.type)
+      clearTimeout(this.setTimeout);
+      this.setTimeout = setTimeout(function () {
+        self.post(self.type);
+      }, 2000);
     },
     //当编辑器中的内容发生变化时
     watchContentChange(data) {

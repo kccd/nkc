@@ -1,5 +1,8 @@
 import {getDataById} from "../../lib/js/dataConversion";
+import {getSocket} from "../../lib/js/socket";
+const socket = getSocket();
 const data = getDataById('data');
+const {article} = data;
 import CommentEditor from "../../lib/vue/comment/CommentEditor";
 if(data.type === 'article' && $("#commentEditor").length !== 0) {
   window.commentEditor = new Vue({
@@ -7,6 +10,8 @@ if(data.type === 'article' && $("#commentEditor").length !== 0) {
     data: {
       comment: data.comment || null,
       articleId: data.article._id || '',
+      columnInfo: data.columnInfo,
+      addedToColumn: data.addedToColumn,
     },
     components: {
       "comment-editor": CommentEditor
@@ -32,7 +37,9 @@ import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
 import CommentPostEditor from "../../lib/vue/comment/CommentPostEditor";
 import {nkcAPI} from "../../lib/js/netAPI";
-import {screenTopAlert} from "../../lib/js/topAlert";
+import {screenTopAlert, screenTopWarning} from "../../lib/js/topAlert";
+import CommentHit from "../../lib/vue/comment/CommentHit";
+import {contentTypes, creditTypes} from "../../lib/vue/Credit";
 const singleBottomDom = $('.single-post-bottom');
 const singleCommentBottom = {};
 for(let i = 0;i < singleBottomDom.length;i++) {
@@ -40,6 +47,10 @@ for(let i = 0;i < singleBottomDom.length;i++) {
   if(!dom) continue;
   const cid = dom.attr('cid');
   if(!cid) continue;
+  initSingleCommentBottom(cid);
+}
+
+function initSingleCommentBottom(cid) {
   singleCommentBottom[cid] = new Vue({
     el: `#singleCommentBottom_${cid}`,
     data: {
@@ -49,7 +60,8 @@ for(let i = 0;i < singleBottomDom.length;i++) {
       "disabled-comment": DisabledComment,
       complaint: Complaint,
       "violation-record": ViolationRecord,
-      "comment-post-editor": CommentPostEditor
+      "comment-post-editor": CommentPostEditor,
+      "comment-hit": CommentHit
     },
     mounted() {
     },
@@ -187,11 +199,122 @@ function disabledArticleComment(commentsDocId) {
   NKC.methods.disabledDocuments(commentsDocId);
 }
 
+var nkchl = [];
+
+// 回复发表成功后将后台返回的内容动态插入最后一页评论页
+function insertRenderedComment(renderedComment) {
+  if(!renderedComment) return;
+  //排除自己的发表
+  if(renderedComment.comment && NKC.configs.uid !== renderedComment.comment.uid) {
+    bulletComments.add(renderedComment.comment);
+  }
+  //仅在最后一页时才动态插入内容
+  if(!data.isLastPage) return;
+  var JQDOM = $(renderedComment.html).find('.single-post-container');
+  JQDOM = JQDOM[0];
+  // 公式渲染
+  try{
+    MathJax.typesetPromise([JQDOM]);
+  } catch(err) {
+    console.log(err);
+  }
+  JQDOM = $(JQDOM);
+  var parentDom = $('.comment-list');
+  parentDom.append(JQDOM);
+  $('#nullComments').remove();
+  // 视频音频组件渲染
+  NKC.methods.initVideo();
+  // 操作
+  initSingleCommentBottom(renderedComment.commentId);
+  // 外链复原
+  NKC.methods.replaceNKCUrl();
+  // 划词笔记
+  // const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${renderedComment.articleId}"]`);
+  // for(let i = 0; i < elements.length; i++) {
+  //   const element = elements[i];
+  //   nkchl.push(new NKC.modules.NKCHL({
+  //     type: 'comment',
+  //     targetId: renderedComment.commentId,
+  //     notes: [],
+  //     rootElement: element
+  //   }));
+  // }
+}
+
+$(function () {
+  if(NKC.configs.uid && socket) {
+    window.bulletComments = new NKC.modules.BulletComments({
+      offsetTop: NKC.configs.isApp? 20: 60
+    });
+    if(socket.connected) {
+      joinCommentRoom();
+    } else {
+      socket.on('connect', function () {
+        joinCommentRoom();
+      });
+    }
+    socket.on('articleCommentMessage', function (data) {
+      insertRenderedComment(data);
+    });
+  }
+});
+
+function joinCommentRoom() {
+  socket.emit('joinRoom', {
+    type: 'article',
+    data: {
+      articleId: article._id,
+    }
+  })
+}
+
+//屏蔽鼓励原因
+function hideCommentKcbRecord(cid, recordId, hide) {
+  nkcAPI("/comment/" + cid + "/credit/kcb/" + recordId, "PUT", {
+    hide: !!hide
+  })
+    .then(function() {
+      if(hide) {
+        screenTopAlert("屏蔽成功");
+      } else {
+        screenTopAlert("已取消屏蔽");
+      }
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
+
+//撤销学术分
+function cancelCommentXsf(cid, id) {
+  var reason = prompt('请输入撤销原因：');
+  if(reason === null) return;
+  if(reason === '') return screenTopWarning('撤销原因不能为空！');
+  nkcAPI('/comment/' + cid + '/credit/xsf/' + id + '?reason=' + reason, 'DELETE', {})
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+}
+
+//鼓励回复
+function creditKcbPanel(cid) {
+  window.RootApp.openCredit(creditTypes.kcb, contentTypes.comment, cid);
+}
+
 window.singleCommentBottom = singleCommentBottom;
 
 Object.assign(window, {
   getPostsDom,
   resetCheckbox,
+  insertRenderedComment,
+  creditKcbPanel,
+  hideCommentKcbRecord,
+  cancelCommentXsf,
+  initSingleCommentBottom,
+  joinCommentRoom,
   manageComments,
   getMarkedCommentDocId,
   markAllComments,

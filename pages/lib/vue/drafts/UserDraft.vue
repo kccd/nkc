@@ -31,7 +31,7 @@
       a.account-post-content {{draft.c || "未填写内容"}}
       .text-right.m-t-05.draft-button
         button(@click="removeDraftSingle(draft.did)") 删除
-        span.dropdown(v-if="draft.desType === 'post'")
+        span.dropdown(v-if="draft.desType === 'post' && draft.type !== 'modifyPost'")
           button.p-a-0.m-a-0(style='color: #2b90d9' :id="`dLabel_${draft.did}`" type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') 继续创作
             span.caret
           ul.dropdown-menu.dropdown-menu-right(:aria-labelledby="`dLabel_${draft.did}`")
@@ -43,7 +43,7 @@
               a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
                 .fa.fa-refresh
                 span &nbsp;更新已发布的文章
-        a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank' v-else) 继续创作
+        a(:href="`/editor?aid=${draft._id}`" target='_blank' v-else) 继续创作
     paging(:pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
@@ -265,6 +265,8 @@ import {getState} from "../../js/state";
 import {nkcAPI} from "../../js/netAPI";
 import {fromNow} from "../../js/tools";
 export default {
+  // 用来判断是社区内容草稿还是其他的草稿
+  props: ['type'],
   data: () => ({
     uid: '',
     paging: null,
@@ -302,6 +304,10 @@ export default {
       const self = this;
       if(!self.uid) return;
       let url = `/u/${self.uid}/profile/draftData?page=${page}`;
+      // 如果是社区内容草稿只显示编辑版草稿
+      if(this.type === 'community') {
+        url = `/u/${self.uid}/profile/draftData?page=${page}&type=${this.type}`
+      }
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;

@@ -271,6 +271,15 @@ threadSchema.virtual('forums')
   .set(function(f) {
     this._forums = f
   });
+
+threadSchema.virtual('reason')
+  .get(function() {
+    return this._reason;
+  })
+  .set(function(reason) {
+    this._reason = reason;
+  });
+
 threadSchema.virtual('columns')
   .get(function() {
     return this._columns
@@ -829,7 +838,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       threadCategoryObj[nodeId] = threadCategories[i];
     }
   }
-  
+
   if(o.firstPost || o.lastPost) {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
       pid: 1,
@@ -846,6 +855,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       voteUp: 1,
       reviewed: 1,
       voteDown: 1,
+      digest: 1,
       cover: 1,
       abstractCn: 1,
       disabled: 1,
@@ -864,7 +874,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         post.abstractCn = nkcRender.replaceLink(post.abstractCn);
         post.abstractEn = nkcRender.replaceLink(post.abstractEn);
       }
-  
+
       postsObj[post.pid] = post;
     });
 
@@ -955,7 +965,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         }
         firstPost.user = user;
       }
-      thread.firstPost = firstPost;
+      thread.firstPost = firstPost.toObject();
     }
     if(o.lastPost) {
       if(!thread.lm || thread.lm === thread.oc) {
@@ -972,7 +982,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
           }
           lastPost.user = user;
         }
-        thread.lastPost = lastPost;
+        thread.lastPost = lastPost.toObject();
       }
 
     }
@@ -1155,6 +1165,8 @@ threadSchema.statics.publishArticle = async (options) => {
 threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
+  const ArticleModel = mongoose.model('articles');
+  const {htmlToPlain} = require("../nkcModules/nkcRender");
   let toppedThreadsId;
   if(type === 'latest') {
     toppedThreadsId = homeSettings.latestToppedThreadsId;
@@ -1163,13 +1175,31 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   } else {
     toppedThreadsId = homeSettings.toppedThreadsId;
   }
+  const threadsId = [];
+  const articlesId = [];
+  for(const t of toppedThreadsId) {
+    const {type , id} = t;
+    if(type === 'thread') {
+      threadsId.push(id);
+    } else if(type === 'article') {
+      articlesId.push(id);
+    }
+  }
   let threads = await ThreadModel.find({
-    tid: {$in: toppedThreadsId},
+    tid: {$in: threadsId},
     mainForumsId: {$in: fid},
     disabled: false,
     recycleMark: {$ne: true},
     reviewed: true
   });
+  const {normal} = await ArticleModel.getArticleStatus();
+  let articles = await ArticleModel.find({
+    _id: {$in: articlesId},
+    status: normal,
+  });
+  const articlesObj = {};
+  articles = await ArticleModel.getArticlesInfo(articles);
+  articles.map(article => articlesObj[article._id] = article);
   threads = await ThreadModel.extendThreads(threads, {
     forum: true,
     category: false,
@@ -1180,12 +1210,222 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   const threadsObj = {};
   threads.map(thread => threadsObj[thread.tid] = thread);
   const results = [];
-  toppedThreadsId.map(tid => {
-    const thread = threadsObj[tid];
+  toppedThreadsId.map(t => {
+    const {type, id} = t;
+    let thread;
+    if(type === 'thread') {
+      thread = threadsObj[id];
+    } else if(type === 'article') {
+      thread = articlesObj[id];
+      thread.type = 'newArticle';
+      thread.document.content = htmlToPlain(thread.document.content, 200);
+      if(thread.column) thread.columns = [thread.column];
+    }
     if(thread) results.push(thread);
   });
   return results;
 };
+
+/*
+* 获取首页置顶文章 适配 articlesPanel 组件
+* */
+threadSchema.statics.getHomeToppedArticles = async (fid = []) => {
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  const ThreadModel = mongoose.model('threads');
+  const ArticleModel = mongoose.model('articles');
+  const {normal} = await ArticleModel.getArticleStatus();
+  const {toppedThreadsId} = homeSettings;
+  const articlesId = [];
+  const threadsId = [];
+  for(const t of toppedThreadsId) {
+    if(t.type === 'article') {
+      articlesId.push(t.id);
+    } else if(t.type === 'thread') {
+      threadsId.push(t.id);
+    }
+  }
+  let threads = await ThreadModel.find({
+    tid: {$in: threadsId},
+    mainForumsId: {$in: fid},
+    disabled: false,
+    recycleMark: {
+      $ne: true
+    },
+    reviewed: true
+  });
+  threads = await ThreadModel.extendArticlesPanelData(threads);
+  const threadsObj = {};
+  for(const thread of threads) {
+    threadsObj[thread.id] = thread;
+  }
+  let articles = await ArticleModel.find({
+    _id: {
+      $in: articlesId
+    },
+    status: normal
+  });
+  articles = await ArticleModel.extendArticlesPanelData(articles);
+  const articlesObj = {};
+  for(const article of articles) {
+    articlesObj[article.id] = article;
+  }
+  const results = [];
+  for(const t of toppedThreadsId) {
+    if(t.type === 'article') {
+      const article = articlesObj[t.id];
+      if(article) {
+        results.push(article);
+      }
+    } else if(t.type === 'thread') {
+      const thread = threadsObj[t.id];
+      if(thread) {
+        results.push(thread);
+      }
+    }
+  }
+  return results;
+}
+
+threadSchema.statics.extendArticlesPanelData = async function(threads) {
+  const ThreadModel = mongoose.model('threads');
+  const SettingModel = mongoose.model('settings');
+  const pageSettings = await SettingModel.getSettings('page');
+  const tools = require('../nkcModules/tools');
+  const anonymousUser = tools.getAnonymousInfo();
+  const contentStatusTypes = {
+    normal: 'normal',
+    warning: 'warning',
+    danger: 'danger',
+    disabled: 'disabled',
+  };
+  threads = await ThreadModel.extendThreads(threads, {
+    forum: true,
+    category: true,
+    lastPost: true,
+    lastPostUser: true,
+    htmlToText: true,
+    removeLink: true,
+  });
+  const _threads = [];
+  for(const thread of threads) {
+    const {firstPost, lastPost} = thread;
+    if(!firstPost) continue;
+    let user;
+    if(thread.anonymous) {
+      user = {
+        uid: '',
+        username: anonymousUser.username,
+        avatarUrl: anonymousUser.avatarUrl,
+        homeUrl: ''
+      }
+    } else {
+      user = {
+        uid: thread.uid,
+        username: firstPost.user.username,
+        avatarUrl: tools.getUrl('userAvatar', firstPost.user.avatar),
+        homeUrl: tools.getUrl('userHome', thread.uid)
+      }
+    }
+    const content = {
+      time: thread.toc,
+      coverUrl: tools.getUrl('postCover', firstPost.cover),
+      title: firstPost.t,
+      digest: firstPost.digest,
+      url: tools.getUrl('thread', thread.tid),
+      abstract: firstPost.c,
+      readCount: thread.hits,
+      voteUpCount: firstPost.voteUp,
+      replyCount: thread.count
+    };
+    const categories = [{
+      type: 'forum',
+      id: thread.forums[0].fid,
+      name: thread.forums[0].displayName,
+      url: tools.getUrl('forumHome', thread.forums[0].fid)
+    }];
+    let reply = null;
+    if(lastPost) {
+      let rUser;
+      if(lastPost.anonymous) {
+        rUser = {
+          uid: '',
+          username: anonymousUser.username,
+          avatarUrl: anonymousUser.avatarUrl,
+          homeUrl: ''
+        }
+      } else {
+        rUser = {
+          uid: lastPost.uid,
+          username: lastPost.user.username,
+          avatarUrl: tools.getUrl('userAvatar', lastPost.user.avatar),
+          homeUrl: tools.getUrl('userHome', lastPost.uid)
+        }
+      }
+      reply = {
+        user: rUser,
+        content: {
+          time: lastPost.toc,
+          url: tools.getUrl('post', lastPost.pid),
+          abstract: lastPost.c
+        }
+      };
+    }
+    let pages = [];
+    const {threadPostList = 30} = pageSettings;
+    for(let i = 0; i < thread.count; i += threadPostList) {
+      const page = i / threadPostList;
+      if(page === 0) {
+        continue;
+      }
+      pages.push({
+        name: page + 1,
+        url: tools.getUrl('thread', thread.tid) + `?page=${page}`
+      });
+    }
+    const pagesLength = pages.length;
+    if(pagesLength >= 6) {
+      pages = [
+        pages[0],
+        pages[1],
+        {
+          name: '...',
+          url: ''
+        },
+        pages[pagesLength - 2],
+        pages[pagesLength - 1]
+      ];
+    }
+    const status = {
+      type: contentStatusTypes.normal,
+      desc: ''
+    };
+    if(!thread.reviewed) {
+      status.type = contentStatusTypes.danger;
+      status.desc = '审核中';
+    } else if(thread.disabled) {
+      status.type = contentStatusTypes.disabled;
+      status.desc = '已屏蔽，仅自己可见';
+    } else if(thread.recycleMark) {
+      status.type = contentStatusTypes.warning;
+      status.desc = '退修中，仅自己可见，修改后对所有人可见';
+    }
+    _threads.push({
+      type: 'post',
+      oc: thread.oc,
+      id: thread.tid,
+      pid: thread.oc,
+      user,
+      pages,
+      content,
+      categories,
+      reply,
+      status,
+    });
+  }
+  return _threads;
+}
+
 /*
 * 获取最新页置顶的文章
 * */
@@ -1712,9 +1952,10 @@ threadSchema.statics.postNewThread = async (options) => {
   // 发贴自动关注专业
   // await SubscribeModel.autoAttentionForum(options);
   // 发表文章删除草稿
-  if(options.did) {
-    await DraftModel.removeDraftById(options.did, options.uid);
-  }
+  // 取消删除草稿
+  // if(options.did) {
+  //   await DraftModel.removeDraftById(options.did, options.uid);
+  // }
   return _post;
 };
 
@@ -2264,4 +2505,100 @@ threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
   };
 }
 
+
+threadSchema.statics.extendShopInfo = async function(praps) {
+  const ShopGoodsModel = mongoose.model('shopGoods');
+  // const ShopCartModel = mongoose.model('shopCarts');
+  const IPModel = mongoose.model('ips');
+  // const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const {tid, oc, uid, authLevel, address} = praps;
+
+  let product = null;
+  let vipDiscount = false;
+  let vipDisNum = 0;
+  let userAddress = "";
+  let closeSaleDescription = '';
+
+  const products = await ShopGoodsModel.find({tid: tid, oc: oc});
+  let productArr = await ShopGoodsModel.extendProductsInfo(products);
+  product = productArr[0];
+  // 判断是否使用会员价
+  let vipNum = 100;
+  if(product.vipDiscount) {
+    vipDiscount = true;
+    for(let v = 0; v < product.vipDisGroup.length; v ++) {
+      if(uid && Number(authLevel) === Number(product.vipDisGroup[v].vipLevel)) {
+        vipNum = product.vipDisGroup[v].vipNum;
+      }
+    }
+    vipDisNum = vipNum;
+  }else{
+    vipDiscount = false;
+    vipDisNum = vipNum;
+  }
+  /*// 选定规格
+  let paId = 0;
+  for(let a = 0; a < product.productParams.length; a ++){
+    if(paraId === product.productParams[a]._id){
+      paId = a;
+    }
+  }
+  data.paId = paId;
+  data.paraId = paraId;*/
+
+  /*if(uid) {
+    data.shopInfo = {
+      cartProductCount: await ShopCartModel.getProductCount(uid)
+    }
+  }*/
+  // 获取用户地址信息
+  if(uid){
+    try{
+      const ipInfo = await IPModel.getIPInfoByIP(address);
+      userAddress = ipInfo.location;
+    } catch(err) {}
+  }
+  try{
+    await SettingModel.checkShopSellerByUid(product.uid);
+  } catch(err) {
+    closeSaleDescription = err.message || err.stack || err.toString();
+  }
+  return {
+    closeSaleDescription,
+    userAddress,
+    product,
+    vipDiscount,
+    vipDisNum,
+    paId: 0,
+  }
+}
+
+threadSchema.statics.extendFundInfo = async function(props) {
+  const {tid, uid, accessForumsId, displayFundApplicationFormSecretInfoPermission = false} = props;
+  const FundApplicationFormModel = mongoose.model('fundApplicationForms');
+  const SettingModel = mongoose.model('settings');
+  const FundBlacklistModel = mongoose.model('fundBlacklist')
+  const applicationForm = await FundApplicationFormModel.findOnly({tid});
+  await applicationForm.extendApplicationFormBaseInfo(uid);
+  await applicationForm.extendApplicationFormInfo(uid, accessForumsId);
+  const fundSettings = await SettingModel.getSettings('fund');
+  const fund = applicationForm.fund;
+  const fundName = fundSettings.fundName;
+  const userFundRoles = await fund.getUserFundRoles(uid);
+  const targetUserInFundBlacklist = await FundBlacklistModel.inBlacklist(applicationForm.uid);
+  await applicationForm.hideApplicationFormInfoByUserId(uid, displayFundApplicationFormSecretInfoPermission);
+  const auditComments = applicationForm.auditComments;
+  const _applicationForm = applicationForm.toObject();
+  _applicationForm.auditComments = auditComments;
+  return {
+    applicationForm: _applicationForm,
+    fund,
+    fundName,
+    userFundRoles,
+    targetUserInFundBlacklist,
+  }
+}
+
 module.exports = mongoose.model('threads', threadSchema);
+

@@ -25,14 +25,35 @@ block baseColumnContent
       include ./article/content
       +content(c)
       include ./article/articleEditTime
+      include ../publicModules/articleCenter/articleCredits
+      +articleCredits(article.kcb.concat(article.xsf), article._id, data.permissions)
       +articleEditTime(tlm, dt, toc)
+      include ../columns/article/articleOptions
+      +articleOptions({
+        logged: !!data.user,
+        type,
+        _id: article._id,
+        tid: article.tid,
+        collected,
+        digest: article.digest,
+        voteUp: article.voteUp,
+        voteDown: article.voteDown,
+        replyCount: count || 0,
+        vote: article.vote,
+      })
       //- 文章用户其他操作
-      .single-post-bottom#articleOption
+      //-.single-post-bottom
         if data.user
           if type === 'article'
             span.single-comment-bottom-item(onclick="window.location.href='#container'")
               .fa.fa-comment-o.reply-icon
               span 回复
+            if article.digest
+              span.fa.fa-star.m-r-05(style='color: #ffbf16;font-size: 1.2rem' title='精选')
+            .single-comment-bottom-item#CommentHitBox
+              comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
+            .single-comment-bottom-item(data-type='share' data-share-type='article' data-share-id=article._id title='分享')
+              .fa.fa-share-square-o.new-share-icon
             .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
               .fa.fa-sliders.option-icon
           else
@@ -44,17 +65,18 @@ block baseColumnContent
             span 回复
           .single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
             .fa.fa-sliders.option-icon
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected})
-  .article-common.m-b-1.box-shadow-panel
-    .row
+  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  .article-common.m-b-1
+    div
       if type === 'article' && article.status !== 'normal' && article.status !== undefined
         if article.status === 'faulty'
-          .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
+          div(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
             .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
             p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${article.reason}`
+            if permission('review')
             +thread
         else if article.status === 'disabled'
-          .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
+          div(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
             .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
             if permission('review')
               .text-center
@@ -69,9 +91,16 @@ block baseColumnContent
         else if article.status === 'deleted'
           .h4.text-center(style='color: #666;') 文章已被删除，不可查看
       else
+        if type === 'thread'
+          if thread.disabled
+            .thread-disabled-info 文章已被封禁
+          else if thread.recycleMark
+            .thread-draft-info 文章已被退修
+          else if !thread.reviewed
+            .thread-review-info 文章未审核
         +thread
-  .article-common.m-b-1.box-shadow-panel(style="position: relative")#comment-content
-    .row
+  .article-common.m-b-1(style="position: relative")#comment-content
+    div
       if type === 'article'
         include ../publicModules/commentCenter/comment
       else
@@ -93,6 +122,10 @@ block baseColumnContent
   +authorInfo()
   include ../publicModules/floatForumNav
   include ../publicModules/nkcSource
+  style.
+    .single-post-container {
+      padding: 0.9rem 0 0.9rem 0!important;
+    }
 block scripts
   include ../publicModules/nkcSource
   include ../publicModules/commonModal/commonModal
@@ -102,6 +135,7 @@ block scripts
   +includeJS("/columns/settings/page.js")
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
+  +includeJS("/columns/article.js")
   +mixinColumnNavLinkScript()
   +includeDeferJS('/columns/article/article.js', false)
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug

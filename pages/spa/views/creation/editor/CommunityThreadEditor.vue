@@ -1,7 +1,14 @@
 <template lang="pug">
 .standard-fluid-max-container
   //- v-if="!err",
-  editor( @noPermission="noPermission")
+  .article-box(v-if="drafts.length > 0")
+    .article-box-header 草稿
+    .article-box-text {{drafts[0].t || '未命名'}}
+    .article-box-option
+      button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
+      button.btn.btn-xs.btn-default(@click="more") 查看更多
+      .fa.fa-remove(@click="close")
+  editor(ref="editor" @noPermission="noPermission" :req-url="reqUrl")
   .errInfo(v-if="err")
     .error-icon= `403 Forbidden`
     .error-list.b-s-10
@@ -17,6 +24,9 @@
 
 <script>
 import Editor from "../../../../editor/vueComponents/Editor";
+// import {getState} from "../../../../lib/js/state";
+// import {getRequest, timeFormat, addUrlParam} from "../../../../lib/js/tools";
+
 const map = {
   username: "设置用户名",
   avatar: "上传头像",
@@ -28,6 +38,8 @@ const map = {
 };
 export default {
   data: () => ({
+    reqUrl: NKC.methods.getDataById("data"),
+    drafts: [],
     err: "",
     errInfo: [],
     user: "",
@@ -37,7 +49,7 @@ export default {
   },
   methods: {
     noPermission(err) {
-      this.err = err;
+      this.err = err.status === 403;
       const error = err.error;
       for (let key in error) {
         if (error.hasOwnProperty(key)) {
@@ -50,7 +62,55 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang='less'>
+@import "../../../../publicModules/base";
+
+.article-box {
+  @height: 3rem;
+  @padding: 1rem;
+  @boxHeaderWidth: 4rem;
+  @boxOptionWidth: 14rem;
+  height: @height;
+  line-height: @height;
+  padding-left: @boxHeaderWidth;
+  padding-right: @boxOptionWidth + 0.5rem;
+  width: 100%;
+  background-color: #d9edf7;
+  position: relative;
+  border: 1px solid #c6e5ff;
+  .article-box-header{
+    color: @primary;
+    font-size: 1.2rem;
+    font-weight: 700;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @height;
+    line-height: @height;
+    width: @boxHeaderWidth;
+    text-align: center;
+  }
+  .article-box-text{
+    font-size: 1.3rem;
+    .hideText(@line: 1);
+  }
+  .article-box-option{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: @height;
+    line-height: @height;
+    width: @boxOptionWidth;
+    text-align: right;
+    .fa{
+      height: @height;
+      cursor: pointer;
+      line-height: @height;
+      width: @height;
+      text-align: center;
+    }
+  }
+}
 .error-content {
   min-height: 38rem;
   padding-top: 6rem;

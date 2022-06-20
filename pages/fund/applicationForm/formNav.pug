@@ -12,8 +12,8 @@ if !isIncluded('formNav')
   mixin formNav(form, fundName)
     -var {fund, code, _id} = form;
     .fund-form-nav.text-center
-      a(href=tools.getUrl('fundHome'))=fundName || '基金'
+      a(href='/fund')=fundName || '基金'
       | /
-      a(href=tools.getUrl('singleFundHome', fund._id))=fund.name
+      a(href=`/fund/list/${fund._id}`)=fund.name
       | /
-      a(href=tools.getUrl('fundApplicationForm', _id))=code
+      a(href=`/fund/a/${_id}`)=code

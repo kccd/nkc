@@ -259,6 +259,7 @@
 import { nkcAPI } from "../../lib/js/netAPI";
 import SelectUser from "./SelectUser"
 import ResourceSelector from "../../lib/vue/ResourceSelector";
+import { debounce } from '../../lib/js/execution';
 
 export default {
   data: () => ({
@@ -290,7 +291,8 @@ export default {
     error: "",
     createSurveyPermission: '',
     type: '',
-    post: ''
+    post: '',
+    changeContentDebounce: ''
   }),
   props: {
     data: {
@@ -311,17 +313,28 @@ export default {
         this.post = n.post;
         this.initPostSurvey();
       }
+    },
+    changeData: {
+      deep: true,
+      handler() {
+        this.changeContentDebounce()
+      }
     }
   },
   computed: {
     selectedUsers: function() {
-      var uid = this.survey.permission.uid || [];
+      var uid = this.survey?.permission?.uid || [];
       var arr = [];
       for (var i = 0; i < uid.length; i++) {
         var u = this.getUserById(uid[i]);
         if (u) arr.push(u);
       }
       return arr;
+    },
+    changeData() {
+      const { survey, selectedUsers, timeStart, timeEnd } = this;
+      return { survey, selectedUsers, timeStart, timeEnd }
+      // return { survey: this.survey, timeStart: this.timeStart, timeEnd: this.timeEnd }
     },
     rewardKcbTotal: function() {
       var survey = this.survey;
@@ -331,7 +344,7 @@ export default {
       return "";
     },
     rewardWarning: function() {
-      var targetUser = this.targetUser;
+      // var targetUser = this.targetUser;
       var survey = this.survey;
       var surveyRewardScore = this.surveyRewardScore;
       var targetUserSurveyRewardScore = this.targetUserSurveyRewardScore;
@@ -372,6 +385,7 @@ export default {
   },
   created() {
     this.requestData();
+    this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   mounted() {
     this.$nextTick(() => {
@@ -380,6 +394,9 @@ export default {
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    changeContent() {
+      this.$emit('info-change');
+    },
     init(options) {
       options = options || {};
       if (options.pid) this.newSurvey.pid = options.pid;

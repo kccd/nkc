@@ -1,3 +1,6 @@
+import {nkcAPI} from "../lib/js/netAPI";
+import {screenTopAlert, screenTopWarning} from "../lib/js/topAlert";
+
 var editor = {};
 var draftsId = {};
 var timeout = {};
@@ -260,7 +263,7 @@ function hidePostComments(pid, restorePagePosition) {
 // 新生成的dom，注册事件
 function initUserPanel() {
   // if(window.floatUserPanel) floatUserPanel.initPanel();
-  if(NKC.methods.initSharePanel) NKC.methods.initSharePanel();
+  // if(NKC.methods.initSharePanel) NKC.methods.initSharePanel();
 }
 
 Object.assign(window, {

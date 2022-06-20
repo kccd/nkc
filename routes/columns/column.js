@@ -14,10 +14,12 @@ const pageRouter = require("./page");
 const articleRouter = require("./article");
 router
   .use("/", async (ctx, next) => {
-    const {db, params, data, nkcModules} = ctx;
+    const {db, params, data, nkcModules, state} = ctx;
     const {_id} = params;
     const {user} = data;
     const column = await db.ColumnModel.findById(_id);
+    //获取当前用户是否能查看所有状态的文章
+    data.isModerator = ctx.permissionsOr(['review', 'movePostsToDraft', 'movePostsToRecycle']) || (user && user.uid === column.uid);
     if(!column) {
       const u = await db.UserModel.findOne({uid: _id});
       if(u) {
@@ -57,7 +59,8 @@ router
     await next()
   })
   .get("/", async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
+    const {data, db, query, nkcModules, state} = ctx;
+    const {isModerator} = data;
     let {page = 0, c: categoriesIdString = ''} = query;
     page = Number(page);
     const categoriesId = categoriesIdString.split('-');
@@ -71,6 +74,7 @@ router
     const q = {
       columnId: column._id
     };
+
     //当前用户能查看的文章
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
@@ -106,11 +110,11 @@ router
         await data.minorCategory.renderDescription();
       }
       q.cid = {$in: childCategoryId};
-      data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread, cid);
+      data.topped = await db.ColumnPostModel.getToppedColumnPosts({columnId: column._id, fidOfCanGetThread, cid, isModerator});
       data.toppedId = data.category.topped;
       sort[`order.cid_${category._id}`] = -1;
     } else {
-      data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread);
+      data.topped = await db.ColumnPostModel.getToppedColumnPosts({columnId: column._id, fidOfCanGetThread, isModerator});
       data.toppedId = data.column.topped;
       sort[`order.cid_default`] = -1;
     }
@@ -122,7 +126,7 @@ router
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
     //获取专栏文章
-    data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
+    data.columnPosts = await db.ColumnPostModel.extendColumnPosts({columnPosts, fidOfCanGetThread, isModerator});
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.timeline = await db.ColumnModel.getTimeline(column._id);

@@ -23,13 +23,13 @@ if !isIncluded('report')
           span 系统
         else
           img(
-            src=tools.getUrl('userAvatar', applicant.user.avatar)
+            src=applicant.userAvatar
             data-global-mouseover="showUserPanel"
             data-global-mouseout="hideUserPanel"
             data-global-data=objToStr({uid: applicant.uid})
             )
           a(
-            href=tools.getUrl('userHome', applicant.user.uid)
+            href=applicant.userHome
             target="_blank"
             data-global-mouseover="showUserPanel"
             data-global-mouseout="hideUserPanel"

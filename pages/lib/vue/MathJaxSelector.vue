@@ -14,7 +14,7 @@
         textarea.form-control(rows="3" v-model="content")
       .math-jax-page
         label 渲染结果：
-        iframe.math-jax-view(src="/mathJax" name="mathJaxView")
+        iframe.math-jax-view(src="/mathJax" name="mathJaxView" v-if="show")
       .m-t-1.text-right.m-b-05
         button.btn.btn-default.btn-sm(@click="close").m-r-05 取消
         button.btn.btn-primary.btn-sm(v-if="content" @click="insert") 确定
@@ -78,6 +78,7 @@
   import {debounce} from '../js/execution';
   export default {
     data: () => ({
+      show: false,
       draggableElement: null,
       callback: null,
       content: '',
@@ -110,9 +111,11 @@
       },
       open(callback) {
         this.callback = callback;
+        this.show = true;
         this.draggableElement.show();
       },
       close() {
+        this.show = false;
         this.draggableElement.hide();
       }
     }

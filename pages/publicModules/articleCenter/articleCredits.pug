@@ -1,0 +1,28 @@
+mixin articleCredits(kcb, aid, permissions)
+  if kcb && kcb.length !== 0
+    .nkcpanel.ThreadPostCredits
+      if kcb && kcb.length > 0
+        for k in kcb
+          .ThreadPostCreditItem
+            span.TPCQ!= `${(k.number > 0 ? '+' : '')}${k.number} &nbsp;`
+            span.TPCType=`${k.name} `
+              | &nbsp;&nbsp;
+            span.TPCIA
+              a(href=k.userHome style='text-decoration: none;'
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: k.uid})
+              )
+                img.TPCIAI(src=k.avatar)
+                span.TPCIssuer &nbsp;#{k.username} &nbsp;&nbsp;
+            span.TPCDate=` ${format(`YYYY/MM/DD`, k.toc)} `
+            span.TPCReason #{k.description}
+
+
+            if k.type === 'xsf' && permissions.cancelXsf
+              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelArticleXsf("${aid}", ${k._id})`) 撤销
+            if k.type === 'kcb' && permissions.modifyKcbRecordReason
+              if !k.hide
+                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideArticleKcbRecordReason("${aid}", ${k._id}, true)`) 屏蔽
+              else
+                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideArticleKcbRecordReason("${aid}", ${k._id}, false)`) 取消屏蔽

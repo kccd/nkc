@@ -21,6 +21,7 @@ import {
   jalert,
   jwarning
 } from "./lib/js/topAlert";
+import Credit from "./lib/vue/Credit.vue"
 
 // 定义最后光标对象
 window.lastEditRange = undefined;
@@ -31,6 +32,7 @@ function hset(id,content){geid(id).innerHTML=content;}
 function display(id){geid(id).style = 'display:inherit;'}
 
 Object.assign(window, { geid, gv, ga, hset, display })
+var app;
 
 // 兼容代码，部分浏览器canvas对象没有toBlob方法
 if (!HTMLCanvasElement.prototype.toBlob) {
@@ -269,7 +271,7 @@ $("document").ready(function(){
   $("#text-elem").on("keyup",function(){
     var selection = document.getSelection();
     window.lastEditRange = selection.getRangeAt(0)
-  })
+  });
 });
 /***********************************************************************************************/
 
@@ -330,7 +332,7 @@ function deleteForum(fid) {
 }
 
 
-var digestDom;
+// var digestDom;
 var creditDom;
 var postWarningDom;
 var creditScoreName = '';
@@ -341,12 +343,12 @@ $(function () {
 	}
 
 	// 精选弹窗
-  digestDom = $('#digestModel');
-  if(digestDom.length !== 0) {
-    digestDom.modal({
-      show: false
-    });
-  }
+  // digestDom = $('#digestModel');
+  // if(digestDom.length !== 0) {
+  //   digestDom.modal({
+  //     show: false
+  //   });
+  // }
   creditDom = $('#creditModel');
   if(creditDom.length !== 0) {
     creditDom.modal({
@@ -461,75 +463,6 @@ function cancelXsf(pid, id) {
 
 }
 
-function credit(pid, type, kcb) {
-  var title = {
-    xsf: '评学术分',
-    kcb: '鼓励'
-  }[type];
-  creditDom.one('show.bs.modal', function(event) {
-    var button = event.currentTarget.getElementsByClassName('btn');
-    var t = event.currentTarget.getElementsByClassName('modal-title');
-    var kcbInfo = event.currentTarget.getElementsByClassName('kcb-info');
-    var xsfInfo = event.currentTarget.getElementsByClassName('xsf-info');
-    var num = event.currentTarget.getElementsByClassName('num')[0];
-    var description = event.currentTarget.getElementsByClassName('description')[0];
-    if(type === 'kcb') {
-      for(var i = 0 ; i < xsfInfo.length; i++) {
-        xsfInfo[i].style.display = 'none';
-      }
-      for(var i = 0 ; i < kcbInfo.length; i++) {
-        kcbInfo[i].style.display = 'inline-block';
-      }
-      num.value = '';
-    } else {
-      num.value = '';
-      for(var i = 0 ; i < kcbInfo.length; i++) {
-        kcbInfo[i].style.display = 'none';
-      }
-      for(var i = 0 ; i < xsfInfo.length; i++) {
-        xsfInfo[i].style.display = 'inline-block';
-      }
-    }
-    description.value = '';
-    t[0].innerText = title;
-    button[1].onclick = function() {
-      button[1].setAttribute("disabled", "disabled");
-      if(type === 'xsf') {
-        var obj = {
-          num: num.value,
-          description: description.value
-        };
-        return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',obj)
-          .then(function(){
-            creditDom.modal('hide');
-            window.location.reload();
-          })
-          .catch(function(data) {
-            screenTopWarning(data.error)
-            button[1].removeAttribute("disabled");
-          })
-      } else if(type === 'kcb') {
-
-        if(num.value*100 > kcb) return screenTopWarning('你的'+creditScoreName+'不足');
-        var obj = {
-          num: num.value*100,
-          description: description.value
-        };
-        nkcAPI('/p/'+pid+'/credit/kcb', 'POST', obj)
-          .then(function() {
-            creditDom.modal('hide');
-            window.location.reload();
-          })
-          .catch(function(data) {
-            screenTopWarning(data.error || data);
-            button[1].removeAttribute("disabled");
-          });
-      }
-    }
-  });
-  creditDom.modal('show');
-}
-
 /*if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]').minicolors) {
 	$('input[data-control="hue"]').minicolors({
 
@@ -642,32 +575,36 @@ function digestPost(pid) {
     nkcAPI('/p/'+pid+'/digest', 'POST', obj)
       .then(function() {
         screenTopAlert('设置成功');
-        if(digestDom.length > 0) {
-          digestDom.modal('hide');
-        }
+        // if(digestDom.length > 0) {
+        //   digestDom.modal('hide');
+        // }
+        window.RootApp.closeDigest();
         window.location.reload();
       })
       .catch(function(data) {
         screenTopWarning(data.error||data);
       })
   };
-  if(digestDom.length === 0) {
-    return post({});
-  }
-  digestDom.one('show.bs.modal', function(event) {
-    var button = event.currentTarget.getElementsByTagName('button');
-    if(!button[2]) return;
-    button[2].onclick = function() {
-      var input = event.currentTarget.getElementsByTagName('input');
-      var num = input[0].value;
-      num = Number(num);
-      num = num*100;
-      if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
-      var obj = {kcb: num};
-      post(obj);
-    }
+  window.RootApp.openDigest((kcb) => {
+    post({kcb});
   });
-  digestDom.modal('show');
+  // if(digestDom.length === 0) {
+  //   return post({});
+  // }
+  // digestDom.one('show.bs.modal', function(event) {
+  //   var button = event.currentTarget.getElementsByTagName('button');
+  //   if(!button[2]) return;
+  //   button[2].onclick = function() {
+  //     var input = event.currentTarget.getElementsByTagName('input');
+  //     var num = input[0].value;
+  //     num = Number(num);
+  //     num = num*100;
+  //     if(typeof num !== "number" || num%1 !== 0) return screenTopWarning("请输入正确的数额");
+  //     var obj = {kcb: num};
+  //     post(obj);
+  //   }
+  // });
+  // digestDom.modal('show');
 }
 // 取消回复精选
 function unDigestPost(pid) {
@@ -1245,7 +1182,6 @@ Object.assign(window, {
   openPostWarningDom,
   submitPostWarning,
   cancelXsf,
-  credit,
   homeTop,
   unHomeTop,
   latestTop,

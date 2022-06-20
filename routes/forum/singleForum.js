@@ -12,6 +12,7 @@ const router = new Router();
 const nkcRender = require("../../nkcModules/nkcRender");
 const childRouter = require('./child');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+const { ObjectId } = require('mongodb');
 router
 	.post('/', async (ctx, next) => {
 		const {data, params, db, address: ip, fs, query, nkcModules, state} = ctx;
@@ -34,7 +35,8 @@ router
       columnMinorCategoriesId = [],
       anonymous = false,
       survey,
-      tcId = []
+      tcId = [],
+			_id
     } = post;
 		if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
 		if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
@@ -43,7 +45,7 @@ router
 		if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
     await db.ThreadCategoryModel.checkCategoriesId(tcId);
     nkcModules.checkData.checkString(c, {
-      name: "内容",
+			name: "内容",
       minLength: 1,
       maxLength: 2000000
     });
@@ -57,11 +59,11 @@ router
 		options.type = "article";
 		options.ip = ip;
 		if(anonymous && !await db.UserModel.havePermissionToSendAnonymousPost("postToForum", user.uid, fids)) {
-      ctx.throw(400, "您没有权限或已选专业不允许发表匿名文章");
+			ctx.throw(400, "您没有权限或已选专业不允许发表匿名文章");
     }
     let surveyDB;
     if(survey) {
-      const havePermission = await db.SurveyModel.ensureCreatePermission("postToForum", user.uid);
+			const havePermission = await db.SurveyModel.ensureCreatePermission("postToForum", user.uid);
       if(!havePermission) ctx.throw(403, "你没有权限发起调查，请刷新");
       survey.uid = data.user.uid;
       survey.postType = "thread";
@@ -70,7 +72,7 @@ router
     }
 		const _post = await db.ThreadModel.postNewThread(options);
     if(surveyDB) await surveyDB.updateOne({pid: _post.pid});
-
+		
 		// 根据thread生成封面图
     const thread = await db.ThreadModel.findOne({tid: _post.tid});
     if(files.postCover) {
@@ -120,7 +122,16 @@ router
           console.error(err);
         });
     }
-
+		if(_id) {
+			const beta = (await db.DraftModel.getType()).beta;
+			const stableHistory = (await db.DraftModel.getType()).stableHistory;
+			await db.DraftModel.updateOne({_id: ObjectId(_id), uid: state.uid, type: beta}, {
+				$set: {
+					type: stableHistory,
+					tlm: Date.now()
+				}
+			})
+		}
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
@@ -131,7 +142,6 @@ router
 		data.redirect = await db.PostModel.getUrl(_post.pid, true);
 
 		// data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
-
     await next();
   })
   .del('/', async (ctx, next) => {

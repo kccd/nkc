@@ -108,6 +108,14 @@ const usersGradeSchema = new Schema({
   }
 });
 
+usersGradeSchema.virtual('iconUrl')
+  .get(function() {
+    return this._iconUrl;
+  })
+  .set(function(iconUrl) {
+    this._iconUrl = iconUrl;
+  });
+
 usersGradeSchema.statics.getGradeList = async (blacklist = []) => {
   const GM = mongoose.model("usersGrades");
   const grades = await GM.find({_id: {$nin: blacklist}}, {_id: 1, displayName: 1}).sort({_id: 1});
@@ -120,6 +128,11 @@ usersGradeSchema.statics.getGradeList = async (blacklist = []) => {
   }
   return data;
 };
+
+usersGradeSchema.statics.getIconUrl = async (id) => {
+  const tools = require('../nkcModules/tools');
+  return tools.getUrl('gradeIcon', id);
+}
 
 const UsersGradeModel = mongoose.model('usersGrades', usersGradeSchema);
 module.exports = UsersGradeModel;
