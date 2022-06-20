@@ -27,13 +27,6 @@ module.exports = async (ctx, next) => {
       // forum  新文章
       // post 可能是修改文章
     // newThread 等于 forum
-    /* count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: forum});
-    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-    const draftData = await db.DraftModel.find({uid: targetUser.uid, desType: forum, type: beta})
-      // .sort({toc: -1})
-      .sort({tlm: -1})
-      .skip(paging.start)
-      .limit(paging.perpage); */
     const threadData = await db.DraftModel.getLatestThread(targetUser.uid, nkcModules);
     drafts = threadData ? [threadData] : [];
   } else if (type === 'newPost') {
@@ -43,41 +36,12 @@ module.exports = async (ctx, next) => {
       // post 可能是修改的回复
     const { desTypeId } = query;
     if(!desTypeId) ctx.throw(400, 'desTypeId不存在');
-    // 把desTypeId拿去thread表中查询    
-    // count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: {$in: [thread]}});
-    // paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-    // const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: thread, type: beta, desTypeId, parentPostId: "" })
-    //   // .sort({toc: -1})
-    //   .sort({tlm: -1})
-    //   .skip(paging.start)
-    //   .limit(paging.perpage);
     const postData = await db.DraftModel.getLatestPost(desTypeId, targetUser.uid, nkcModules);
 
     drafts = postData ? [postData] : [];
     
-    // 从post 和 thread中各取一个最近修改时间进行对比，找出最近修改回复
-    // if(!postData) {
-    //   drafts = draftData;
-    // } else if (!draftData[0]) {
-    //   drafts = [postData];
-    // } else if (postData && draftData[0]) {
-    //   if (postData.tlm.getTime() >  draftData[0].tlm.getTime()) {
-    //     drafts = [postData];
-    //   } else {
-    //     drafts = draftData
-    //   } 
-    // } else {
-    //   drafts = []
-    // }
   } else if (type === 'modifyThread') {
     // 修改回复或修改文章
-    // count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: forum});
-    // paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-    // const draftData = await db.DraftModel.find({uid: targetUser.uid, desType: forum, type: beta})
-    // // .sort({toc: -1})
-    //   .sort({tlm: -1})
-    //   .skip(paging.start)
-    //   .limit(paging.perpage);
     const threadData = await db.DraftModel.getLatestThread(targetUser.uid, nkcModules);
     drafts = threadData ? [threadData] : [];
   } else if (type === 'modifyPost') {
@@ -87,34 +51,11 @@ module.exports = async (ctx, next) => {
     if (comment) {
       count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: {$in: [thread]}});
       paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-      const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: {$in: [thread, post]}, type: beta, parentPostId: desTypeId }).sort({tlm: -1});
+      const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: post, type: beta, parentPostId: desTypeId }).sort({tlm: -1});
       drafts = draftData;
     } else {
-      
-      // count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: {$in: [thread]}});
-      // paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
-      // const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: thread, type: beta, desTypeId, parentPostId: ""  })
-      //   // .sort({toc: -1})
-      //   .sort({tlm: -1})
-      //   .skip(paging.start)
-      //   .limit(paging.perpage);
       const postData = await db.DraftModel.getLatestPost(desTypeId, targetUser.uid, nkcModules);
       drafts = postData ? [postData] : [];
-
-      // 从post 和 thread中各取一个最近修改时间进行对比，找出最近修改回复
-      // if(!postData) {
-      //   drafts = draftData;
-      // } else if (!draftData[0]) {
-      //   drafts = [postData];
-      // } else if (postData && draftData[0]) {
-      //   if (postData.tlm.getTime() >  draftData[0].tlm.getTime()) {
-      //     drafts = [postData];
-      //   } else {
-      //     drafts = draftData
-      //   } 
-      // } else {
-      //   drafts = []
-      // }
     }     
   } else {
     count = await db.DraftModel.countDocuments({uid: targetUser.uid});
