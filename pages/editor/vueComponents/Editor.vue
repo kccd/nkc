@@ -6,11 +6,10 @@
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
         .article-box(v-if="drafts.length")
-          //- 字段含义来源 editor/index.js
-          .article-box-header.des-type {{ getTitle }}
-          //- .article-box-header 草稿
-          .article-box-text {{drafts[0].t  || '未填写'}}
-          .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
+          .article-box-title
+            .article-box-header.des-type {{ getTitle }}
+            .article-box-text.prompt-content {{drafts[0].t  || '未填写'}}
+            .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
           .article-box-option
             button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
             button.btn.btn-xs.btn-default(@click="more") 查看更多
@@ -381,21 +380,15 @@ export default {
 @import "../../publicModules/base";
 .prompt-content {
   display: inline-block;
-  // @media  (max-width: 1700px) {
-  //   width: 69%;
-  // };
-  // @media  (max-width: 1300px) {
-  //   width: 70%;
-  // };
   @media  (max-width: 1700px) {
-    width: 40%;
+    width: 43%;
   };
-   @media  (max-width: 570px) {
-    width: 30%;
-  };
-  @media  (max-width: 500px) {
-    width: 20%;
-  };
+  //  @media  (max-width: 570px) {
+  //   width: 30%;
+  // };
+  // @media  (max-width: 500px) {
+  //   width: 20%;
+  // };
   overflow: hidden; 
   text-overflow: ellipsis; 
   white-space: nowrap;
@@ -415,6 +408,12 @@ export default {
   background-color: #d9edf7;
   position: relative;
   border: 1px solid #c6e5ff;
+  .article-box-title {
+    width: 100%;
+    // overflow: hidden;
+    white-space: nowrap;
+    // text-overflow: ellipsis; 
+  }
   .article-box-header{
     color: @primary;
     font-size: 1.2rem;
