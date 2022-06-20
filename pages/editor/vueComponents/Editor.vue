@@ -14,7 +14,7 @@
           .article-box-option
             button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
             button.btn.btn-xs.btn-default(@click="more") 查看更多
-            .fa.fa-remove(@click="close")
+            .fa.fa-remove(@click="closeDraft")
         article-title(
           :o="reqUrl.o",
           ref="title",
@@ -112,7 +112,7 @@ import Investigation from "./Investigation.vue";
 import Column from "./Column.vue";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
-import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
+import {getRequest, timeFormat, addUrlParam, delUrlParam} from "../../lib/js/tools";
 import { debounce } from '../../lib/js/execution';
 
 export default {
@@ -148,6 +148,9 @@ export default {
     mainForums: [],
     infoSubmitDebounce: ''
   }),
+  customOptions: {
+    saveDraftIndex: 0
+  },
   created() {
     this.getData()
     // this.getUserDraft();
@@ -166,6 +169,7 @@ export default {
     this.pageState = {};
   },
   methods: {
+    delUrlParam,
     addUrlParam,
     setContent(c) {
       return c || "未填写"
@@ -183,17 +187,30 @@ export default {
       const {uid: stateUid} = getState();
       this.uid = stateUid;
       const self = this;
-      // if(this.$route.query.aid) return;
       if(!self.uid ) return;
       let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
-      // if(this.pageData.type)
       // 编辑器类型 newpost modifyPost modifyThread  newThread
-      if (this.pageData.type) {
-        url += '&type=' + this.pageData.type
+      const editType = this.pageData.type;
+      if (editType) {
+        url += '&type=' + editType
       }
-      // 如果是 newpost(newpost === thread)
-      if(this.pageData.type === "newPost") 
-        url += "&desTypeId=" + this.pageData.thread.tid
+      // 如果是 newpost(newpost === thread)带上文章id
+      // 显示当前文章的回复 考虑的业务，回复都是依据文章显示的
+      if (editType === "newPost") {
+        url += "&desTypeId=" + this.pageData.thread.tid;
+
+      // } else if ("modifyThread" === editType) {
+      //   url += "&desTypeId=" + this.pageData.thread.oc;
+
+      } else if ("modifyPost" === editType) {
+        if (this.pageData.thread.comment) {
+          url += "&comment=true";
+          url += "&desTypeId=" + this.pageData.thread.parentPostId;
+        } else {
+          url += "&desTypeId=" + this.pageData.thread.tid;
+        }
+      }
+
       nkcAPI(url, 'GET')
       .then(res => {
         self.drafts = res.drafts;
@@ -207,12 +224,13 @@ export default {
       const self = this;
       if(!aid) {sweetError("id不存在"); return};
       //改变地址栏参数
+      if (new URLSearchParams(location.search).get('aid')) {
+        // console.log(self.delUrlParam('aid'))
+        history.replaceState({}, '', self.delUrlParam('aid'));
+      }
       self.addUrlParam('aid', aid);
       this.getData()
       self.drafts = [];
-    },
-    close() {
-      if (this.drafts.length) this.drafts = [];
     },
     more() {
       location.href = '/creation/community/draft'
@@ -239,6 +257,7 @@ export default {
         }
       }
       if(search.get('aid')){
+        this.lockRequest = true;
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
       nkcAPI(url, "get")
@@ -250,9 +269,9 @@ export default {
               location.href = location.pathname
             }, 2000) 
           }
-          if(resData.post) {
-            this.lockRequest = true;
-          }
+          // if(resData.post) {
+          //   this.lockRequest = true;
+          // }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
             this.mainForums = resData.mainForums;  
@@ -298,14 +317,9 @@ export default {
     contentChange(length) {
       !this.hideType.includes(this.pageData.type) &&
         this.$refs.original.contentChange(length);
-      this.$refs.submit.saveToDraftBaseDebounce("automatic");
-      this.drafts = [];
+      // this.$refs.submit.saveToDraftBaseDebounce("automatic");
+      this.infoChange();
     },
-    // coverUrlChange() {
-    //   // 此时上传数据应该是最新的coverData
-    //   this.$refs.submit.saveToDraftBase("automatic");
-
-    // },
     // 编辑器其他部分内容改变
     infoChange() {
       this.infoSubmitDebounce();
@@ -314,9 +328,23 @@ export default {
       this.$refs.submit.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
-    saveDraftSuccess() {
-      this.close();
+    saveDraftSuccess(desType) {
+      this.closeDraft(desType);
       this.$refs.submit.setSubmitStatus(false);
+    },
+    closeDraft(desType) {
+      if (this.drafts.length) {
+        const { saveDraftIndex } = this.$options.customOptions;
+        // 如果是编辑文字、编辑回复第一次进入编辑器，保存后不关闭草稿提示
+        if (desType === 'post' && saveDraftIndex < 2) {
+          if (++this.$options.customOptions.saveDraftIndex === 2)
+            this.drafts = [];
+        } else if (desType !== 'post') {
+          this.drafts = [];
+        } else {
+          this.drafts = [];
+        }
+      }
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
@@ -353,14 +381,17 @@ export default {
 @import "../../publicModules/base";
 .prompt-content {
   display: inline-block;
+  // @media  (max-width: 1700px) {
+  //   width: 69%;
+  // };
+  // @media  (max-width: 1300px) {
+  //   width: 70%;
+  // };
   @media  (max-width: 1700px) {
-    width: 84%;
+    width: 40%;
   };
-  @media  (max-width: 1300px) {
-    width: 70%;
-  };
-  @media  (max-width: 630px) {
-    width: 60%;
+   @media  (max-width: 570px) {
+    width: 30%;
   };
   @media  (max-width: 500px) {
     width: 20%;

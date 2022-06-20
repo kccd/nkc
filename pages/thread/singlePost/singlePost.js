@@ -2,6 +2,7 @@ import {getCommentEditorConfigs} from '../../lib/js/editor';
 import Editor from '../../lib/vue/Editor';
 import {toLogin} from "../../lib/js/account";
 
+var _id;
 class SinglePostModule {
   constructor() {
     this.editors = {};
@@ -508,7 +509,8 @@ class SinglePostModule {
             c: content,
             l: "html",
             anonymous: isAnonymous,
-            parentPostId: pid
+            parentPostId: pid,
+            _id
           }
         });
       })
@@ -550,16 +552,19 @@ class SinglePostModule {
         return nkcAPI(`/u/${NKC.configs.uid}/drafts`, "POST", {
           post: {
             c: content,
-            l: "html"
+            l: "html",
+            parentPostId: pid
           },
           draftId: editorApp.draftId,
           desType: "thread",
-          desTypeId: self.tid
+          desTypeId: self.tid,
         });
       })
       .then(data => {
         if (!data) return { saved: false, error: "草稿内容不能为空" };
         editorApp.draftId = data.draft.did;
+        // 草稿唯一ID
+        _id = data.draft._id;
         return { saved: true };
       });
   }

@@ -358,7 +358,9 @@ router
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
-        url: `/t/${thread.tid}`
+        url: `/t/${thread.tid}`,
+        oc: thread.oc, // 文章
+        lm: thread.lm
       };
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "post") { // 修改文章或者修改回复
@@ -381,7 +383,10 @@ router
         tid: thread.tid,
         title: firstPost.t,
         url: `/t/${thread.tid}`,
-        comment: !!parentPostCount
+        comment: !!parentPostCount,
+        oc: thread.oc, // 所属文章
+        pid: data.post.pid, // 当前回复
+        parentPostId: data.post.parentPostId // 父级postID
       };
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "redit") { // 从草稿箱来

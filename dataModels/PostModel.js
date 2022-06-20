@@ -283,7 +283,6 @@ const postSchema = new Schema({
   getters: true,
   virtuals: true
 }});
-
 // 标志 表示是否禁止划词选区的更新 默认为false
 postSchema.virtual('disableNoteUpdate')
   .get(function() {
@@ -381,7 +380,12 @@ postSchema.virtual('usersVote')
     this._usersVote = t
   });
 
-
+postSchema.statics.getType = async function () {
+  return {
+    thread: "thread",
+    post: "post"
+  }
+}
 postSchema.methods.extendThread = async function() {
   const ThreadModel = mongoose.model('threads');
   return this.thread = await ThreadModel.findOnly({tid: this.tid})
