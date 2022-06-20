@@ -1612,15 +1612,9 @@ threadRouter
     // if(did) {
     //   await db.DraftModel.removeDraftById(did, data.user.uid);
     // }
+    // 发布后编辑版改为发布历史版
     if(post._id) {
-      const beta = (await db.DraftModel.getType()).beta;
-			const stableHistory = (await db.DraftModel.getType()).stableHistory;
-			await db.DraftModel.updateOne({_id: ObjectId(post._id), uid: state.uid, type: beta}, {
-				$set: {
-					type: stableHistory,
-					tlm: Date.now()
-				}
-			})
+      db.DraftModel.updateToStableHistoryById(post._id, state.uid);
     }
 		// 回复自动关注文章
     const subQuery = {

@@ -157,6 +157,174 @@ draftSchema.statics.getType = async () => draftType;
 * @return {Object}
 */
 draftSchema.statics.getDesType = async () => desType;
+
+/*  
+* 通过ID 更改草稿为发布历史版
+* @param {String} _id 草稿唯一id
+* @param {String} uid 访问的用户id
+*/
+draftSchema.statics.updateToStableHistoryById = async (_id, uid) => {
+  if (!_id || !uid) throw new Error('id 或 uid 不存在');
+  const DraftModel = mongoose.model("drafts");
+  const beta = (await DraftModel.getType()).beta;
+  const stableHistory = (await DraftModel.getType()).stableHistory;
+  await DraftModel.updateOne({_id: ObjectId(_id), uid, type: beta}, {
+    $set: {
+      type: stableHistory,
+      tlm: Date.now()
+    }
+  })
+}
+/* 
+* 查找最近的回复
+* @param {String} uid 用户ID
+* @param {Object} nkcModules
+* @return {Object} 查找到的最近修改、新建的回复
+*/
+draftSchema.statics.getLatestPost = async function (desTypeId, uid, nkcModules) {
+  let page = 0;
+  let perpage = 100;
+  const DraftModel = mongoose.model("drafts");
+  const PostsModel = mongoose.model("posts");
+  const beta = (await DraftModel.getType()).beta; 
+  const post = (await DraftModel.getDesType()).post;
+  const thread = (await DraftModel.getDesType()).thread;
+
+  const draftData = await DraftModel.findOne({ uid: uid, desType: thread, type: beta, desTypeId, parentPostId: ""  }).sort({tlm: -1});
+  const count = await DraftModel.countDocuments({ uid: uid, desType: post });
+  // 这部分根据条件要递归
+  async function findLatestPost () {
+    const paging = nkcModules.apiFunction.paging(page, count, Number(perpage)); 
+    const posts = await DraftModel.find({type: beta, uid, desType: post, parentPostId: "" }).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
+    if (posts.length) {
+      // 在draft表中为post的desTypeId
+      let pids = new Set();
+      // id为key，表数据为value
+      let pidMap = new Map();
+      posts.forEach(element => {
+        pids.add(element.desTypeId);
+        if (!pidMap.has(element.desTypeId)) pidMap.set(element.desTypeId, element);
+      });
+ 
+      // 然后分别去匹配查post表中此id对应的type， 如果为post那么就是回复
+      let postData; 
+      const post = (await PostsModel.getType()).post;
+      for (const [, pid] of [...pids].entries()) {
+        postData = await PostsModel.findOne({ pid, type: post });
+        if (draftData && postData) {
+          if (draftData.tlm.getTime() >= pidMap.get(pid).tlm.getTime()) {
+            return draftData;
+          } else {
+            return pidMap.get(pid);
+          }
+        } else if (!draftData && postData) {
+          return pidMap.get(pid);
+        }
+      };
+      if (!postData) {
+        if (draftData) {
+          for (const [, post] of [...posts].entries()) {
+            // 如果posts表中没有一条数据是post,那么draftData对比posts中数据的修改时间
+            // 如果draftData的时间都大于他们证明 draftData是最近的修改
+            if (draftData.tlm.getTime() >= post.tlm.getTime()) {
+              return draftData
+            } else {
+              page++;
+              // 设置最多递归次数
+              if (page === 5) {
+                return 
+              }
+              return await findLatestPost();
+            }
+          }
+          // 如果draftData 不存在 并且 没有在post查找到为post的类型
+        } else {
+          return await findLatestPost();
+        }
+      }
+    } else {
+      return draftData
+    }
+  }
+  return await findLatestPost();
+}
+/* 
+* 查找最近文章
+* @param {String} uid 用户ID
+* @param {Object} nkcModules
+* @return {Object} 查找到的最近修改、新建的文章
+*/
+draftSchema.statics.getLatestThread = async (uid, nkcModules) => {
+  let page = 0;
+  let perpage = 100;
+  const DraftModel = mongoose.model("drafts");
+  const PostsModel = mongoose.model("posts");
+  
+  const beta = (await DraftModel.getType()).beta; 
+  // const forum = (await DraftModel.getType()).forum; 
+  const post = (await DraftModel.getDesType()).post;
+  const forum = (await DraftModel.getDesType()).forum;
+  // forum 类型一定是文章(新文章)
+  const draftData = await DraftModel.findOne({uid, desType: forum, type: beta}).sort({tlm: -1});
+
+  const count = await DraftModel.countDocuments({ uid, desType: post });
+  async function findLatestThread () {
+    const paging = nkcModules.apiFunction.paging(page, count, Number(perpage)); 
+    // post 类型可能是修改文章，因此需要在post表中比较
+    const posts = await DraftModel.find({type: beta, uid, desType: post }).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
+    if (posts.length) {
+      // 在draft表中为post的desTypeId
+      let pids = new Set();
+      // id为key，表数据为value
+      let pidMap = new Map();
+      posts.forEach(element => {
+        pids.add(element.desTypeId);
+        if (!pidMap.has(element.desTypeId)) pidMap.set(element.desTypeId, element)
+      });
+      // 然后分别去匹配查post表中此id对应的type， 如果为post那么就是回复
+      const thread = (await PostsModel.getType()).thread;
+      let threadData;
+      for (const [, pid] of [...pids].entries()) {
+        threadData = (await PostsModel.findOne({ pid, type: thread  }));
+        // 比较修改时间
+        // if (threadData) return res = pidMap.get(pid)
+        if (draftData && threadData) {
+          if (draftData.tlm.getTime() >= pidMap.get(pid).tlm.getTime()) {
+            return draftData;
+          } else {
+            return pidMap.get(pid);
+          }
+        }else if (!draftData && threadData) {
+          return pidMap.get(pid);
+        }
+
+      }
+      // 如果未找到继续查找
+      if (!threadData) {
+        if (draftData) {
+          for (const [, post] of [...posts].entries()) {
+            // 如果posts中没有一条数据是post,那么draftData对比posts中数据的修改时间
+            if (draftData.tlm.getTime() >= post.tlm.getTime()) {
+              return draftData
+            } else {
+              page++;
+              // 设置最多递归次数
+              if (page === 5) {
+                return 
+              }
+              return await findLatestThread();
+            }
+          }
+        } else {
+          return await findLatestThread();
+        }
+      }
+    } else {
+      return draftData
+    }
+  }
+  return await findLatestThread();
+}
 /* 获取最近的历史版本 
 *  @param {String} did 草稿did
 */

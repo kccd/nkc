@@ -105,12 +105,16 @@ draftsRouter
     } = post;
     const {user} = data;
     const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
-    if(draftCount >= 100) ctx.throw(400, "草稿箱已满");
+    if(draftCount >= 5000) ctx.throw(400, "草稿箱已满");
     let draft;
     let contentLength;
     if(draftId) {
       draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
     }
+    if (parentPostId) {
+      const parentPost = await db.PostModel.findOnly({pid: parentPostId});
+      if (! parentPost) ctx.throw(400, 'parentPostId不存在'); 
+    };
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
       tcId,

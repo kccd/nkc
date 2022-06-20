@@ -29,8 +29,8 @@
         @click="readyData",
         :disabled="submitStatus || (disabledSubmit || !checkProtocol)"
       ) {{ disabledSubmit ? '提交中...' : '提交' }}
-      button.btn.btn-default(@click="saveToDraftBase('manual')") 存草稿
-      button.btn.btn-default(@click="history") 历史
+      button.btn.btn-default(@click="saveToDraftBase('manual')" :disabled="submitStatus") 存草稿
+      button.btn.btn-default(@click="history" :disabled="submitStatus") 历史
 </template>
 
 <script>
@@ -291,18 +291,18 @@ export default {
           if (data.draft?.cover) {
             this.$emit('cover-change',  data.draft.cover);
           }
-          return Promise.resolve(data);
-        })
-        .then((res) => {
-          if(!location.search.includes("aid")) this.addUrlParam("aid", res.draft._id);
-          // 解锁提交按钮
-          // this.$emit('save-draft-success');
+          if(!new URLSearchParams(location.search).get('aid')) {
+            this.addUrlParam("aid", data.draft._id);
+          } 
           this.setSubmitStatus(false);
+          this.$emit('save-draft-success', data.draft.desType);
+          // 解锁提交按钮
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");
             this.saveToDraftSuccess();
           }
         })
+
         .catch((data) => {
           sweetError("草稿保存失败：" + (data.error || data));
         })
