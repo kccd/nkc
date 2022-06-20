@@ -2,7 +2,9 @@ import {getDataById} from "../../lib/js/dataConversion";
 import Moments from '../../lib/vue/zone/Moments';
 import MomentEditor from "../../lib/vue/zone/MomentEditor";
 import {visitUrl} from "../../lib/js/pageSwitch";
+import {getState} from "../../lib/js/state";
 
+const {uid} = getState();
 const momentElementId = 'latestZoneMoments';
 
 $(function() {
@@ -24,6 +26,7 @@ function initMomentVueApp() {
     data: {
       momentsData,
       permissions,
+      logged: !!uid,
     },
     methods: {
       published() {
