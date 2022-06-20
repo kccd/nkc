@@ -14,7 +14,7 @@ block zoneContent
     include ./zoneTypes
     +renderLatestZoneTypes(data.t, data.zoneTypes)
 
-    .m-b-1.p-t-05
+    .m-b-1.p-t-05(v-if='logged')
       moment-editor(@published='published')
 
     include ../../publicModules/paging/paging
