@@ -79,12 +79,12 @@ function initVueApp() {
             .then(function() {
               screenTopAlert("操作成功");
               MoveThread.close();
+              CancelSelectAllArticlePanelCheckBox();
             })
             .catch(function(data) {
               screenTopWarning(data);
               MoveThread.unlock();
             })
-          
         }, options);
       },
       // 退修或删除

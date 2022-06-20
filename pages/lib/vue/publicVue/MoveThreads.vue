@@ -423,6 +423,7 @@ export default {
         })
       this.draggableElement.show();
       this.show = true;
+      return;
     },
     close() {
       this.draggableElement.hide();
