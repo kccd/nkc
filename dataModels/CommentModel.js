@@ -178,10 +178,9 @@ schema.statics.checkCommentSource = async (source) => {
 *  @params {string} source 评论的内容的来源
 * */
 schema.statics.createComment = async (options) => {
-  const {uid, content, sid, ip, port, quoteDid, source} = options;
+  const {uid, content, aid, ip, port, quoteDid, source} = options;
   const toc = new Date();
   const DocumentModel = mongoose.model('documents');
-  const SettingModel = mongoose.model('settings');
   const CommentModel = mongoose.model('comments');
   const ArticlePostModel = mongoose.model('articlePosts');
   const {comment: commentDocumentSource}  = await DocumentModel.getDocumentSources();
@@ -198,7 +197,7 @@ schema.statics.createComment = async (options) => {
   });
   // 获取文章引用并将comment绑定到引用上
   const articlePost = await ArticlePostModel.getArticlePostByArticleId({
-    sid,
+    sid: aid,
     source,
     uid
   });
@@ -428,6 +427,7 @@ schema.statics.extendPostComments = async (props) => {
     const comment = await CommentModel.findOne({did});
     const user = await UserModel.findOne({uid});
     const {username, avatar} = user;
+    const commentInfo = await comment.getLocationUrl();
     quoteObj[document._id] = {
       cid: comment._id,
       uid,
@@ -438,7 +438,7 @@ schema.statics.extendPostComments = async (props) => {
       sid,
       did,
       order: comment.order,
-      commentUrl: await comment.getLocationUrl(),
+      commentUrl: commentInfo.url,
       username,
       avatar: getUrl('userAvatar', avatar),
       userHome: `/u/${user.uid}`
@@ -466,6 +466,7 @@ schema.statics.extendPostComments = async (props) => {
     }
     const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     const m = c.toObject();
+    const commentInfo = await c.getLocationUrl();
     _comments.push({
       ...m,
       content: await CommentModel.renderComment(documentObj[c.did]._id),
@@ -485,7 +486,8 @@ schema.statics.extendPostComments = async (props) => {
       },
       xsf,
       kcb,
-      commentUrl: await c.getLocationUrl(),
+      articleId: commentInfo.articleId,
+      commentUrl: commentInfo.url,
       isAuthor: authorUid === m.uid ? true : false,
       quote: documentObj[c.did].quote || null,
     });
@@ -540,7 +542,7 @@ schema.statics.extendSingleComment = async (comment) => {
       sid,
       did,
       order: quoteComment.order,
-      commentUrl: await quoteComment.getLocationUrl(),
+      commentUrl: (await quoteComment.getLocationUrl()).url,
       username,
       avatar: getUrl('userAvatar', avatar),
       userHome: `/u/${user.uid}`
@@ -566,7 +568,7 @@ schema.statics.extendSingleComment = async (comment) => {
       gradeId: userGrade._id,
       gradeName: userGrade.displayName,
     },
-    commentUrl: await comment.getLocationUrl(),
+    commentUrl: (await comment.getLocationUrl()).url,
     isAuthor: commentInfo.isAuthor,
     quote: quoteDocument,
   };
@@ -660,7 +662,7 @@ schema.statics.extendReviewComments = async function(comments) {
     const document = stableComment || betaComment;
     const articleDocument = stableArticleDocument || betaArticleDocument;
     const {did} = document;
-    const url = await comment.getLocationUrl();
+    const url = (await comment.getLocationUrl()).url;
     const result = {
       _id,
       uid,
@@ -1233,9 +1235,12 @@ schema.methods.noticeAuthorComment = async function() {
 * */
 schema.methods.getLocationUrl = async function() {
   const CommentModel = mongoose.model('comments');
-  const comment = (await CommentModel.getCommentsInfo([this]))[0];
+  const comment = await CommentModel.getCommentInfo(this);
   if(!comment) return;
-  return comment.commentUrl;
+  return {
+    url: comment.commentUrl,
+    articleId: comment.article._id,
+  };
 }
 
 /*

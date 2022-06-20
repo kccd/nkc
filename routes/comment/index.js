@@ -58,7 +58,7 @@ router
     const {db, body, data, state, nkcModules} = ctx;
     const {
       source,
-      sid,
+      aid,
       content,
       quoteDid,
       type,
@@ -66,14 +66,14 @@ router
       commentType, //用于判断当前提交的数据的sid是articleId还是articlePostId
       toColumn
     } = body;
-    let articlePost;
-    //当sid为comment的sid时
-    if(commentType === 'comment') {
-      //获取引用id
-      articlePost = await db.ArticlePostModel.findOnly({_id: sid});
-      if(!articlePost) ctx.throw(400, '未找到引用，请刷新');
-    }
-    let article = await db.ArticleModel.findOnly({_id: articlePost?articlePost.sid : sid});
+    // let articlePost;
+    // //当sid为comment的sid时
+    // if(commentType === 'comment') {
+    //   //获取引用id
+    //   articlePost = await db.ArticlePostModel.findOnly({_id: sid});
+    //   if(!articlePost) ctx.throw(400, '未找到引用，请刷新');
+    // }
+    let article = await db.ArticleModel.findOnly({_id: aid});
     if(!article) ctx.throw(400, '未找到文章，请刷新后重试');
     const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     if(article.status !== normalStatus) {
@@ -97,7 +97,7 @@ router
         content,
         quoteDid,
         source: article.source,
-        sid,
+        aid,
         ip: ctx.address,
         port: ctx.port
       });
@@ -147,7 +147,7 @@ router
     const {_id} = params;
     let comment = await db.CommentModel.findOnly({_id});
     //如果存在comment并且存在token就重定向到评论页面
-    let url = await comment.getLocationUrl();
+    let url = (await comment.getLocationUrl()).url;
     // const arr = nkcModules.tools.segmentation(url, '?');
     // url = `${arr[0]}token=${token}&${arr[1]}`;
     return ctx.redirect(url);

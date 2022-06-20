@@ -2,7 +2,7 @@
 if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
-    -var {cid, docId, props: comment, voteDown, voteUp, vote} = props;
+    -var {cid, docId, props: comment, voteDown, voteUp, vote, articleId} = props;
     .single-post-bottom(id=`singleCommentBottom_${cid}` cid=cid)
       violation-record(ref="violationRecord")
       complaint(ref="complaint")
@@ -58,4 +58,4 @@ if !isIncluded('singlePostBottom')
           span 引用
         .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')" title='其他操作')
           .fa.fa-sliders.option-icon
-      comment-post-editor(:ref=`"editorContainer"` cid=cid @close-editor="closePostCommentEditor")
+      comment-post-editor(:ref=`"editorContainer"` cid=cid aid=articleId @close-editor="closePostCommentEditor")

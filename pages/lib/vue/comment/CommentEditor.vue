@@ -77,7 +77,7 @@
   import {debounce} from "../../js/execution";
   import {nkcAPI} from "../../js/netAPI";
   export default {
-    props: ['source', 'sid', 'comment', 'column-info', 'to-column', 'added'],
+    props: ['source', 'aid', 'comment', 'column-info', 'to-column', 'added'],
     data: () => ({
       editorConfigs: commentEditorConfigs,
       quote: '',
@@ -174,8 +174,7 @@
           content: self.commentContent,
           type,
           source: self.source,
-          sid: self.comment?self.comment.sid:self.sid,
-          commentType: self.comment?'comment':'article',
+          aid: self.aid,
           quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
           toColumn: null,
