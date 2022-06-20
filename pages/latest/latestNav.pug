@@ -1,9 +1,10 @@
 if !isIncluded('latest/community/nav.pug')
++includeCSS('/latest/latestNav.css')
 mixin renderLatestNav(activeType)
-  ul.community-nav.nav.nav-tabs.m-b-1
-    li(role="presentation" class=activeType === 'community'? 'active': '')
+  .community-nav.nav.nav-tabs.m-b-1
+    .button(role="presentation" class=activeType === 'community'? 'active': '')
       a(href=`/n/community`) 社区
-    li(role="presentation" class=activeType === 'zone'? 'active': '')
+    .button(role="presentation" class=activeType === 'zone'? 'active': '')
       a(href=`/n/zone`) 空间
-    li(role="presentation" class=activeType === 'column'? 'active': '')
+    .button(role="presentation" class=activeType === 'column'? 'active': '')
       a(href=`/n/column`) 专栏
