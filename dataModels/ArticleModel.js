@@ -51,12 +51,12 @@ const schema = new mongoose.Schema({
   },
   //加精时间
   digestTime: {
-    type: Number,
+    type: Date,
     default: null,
     index: 1,
   },
   // 文章状态
-  // normal: 正常的（已发布，未被删除）this
+  // normal: 正常的（已发布，未被删除）
   // default: 未发布的（正在编辑，待发布）
   // deleted: 被删除的（已发布，但被删除了）
   // cancelled: 被取消发表的（未发布过，在草稿箱被删除）

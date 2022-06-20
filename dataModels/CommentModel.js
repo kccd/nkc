@@ -1,7 +1,7 @@
 const mongoose = require('../settings/database');
 const commentSource = {
         article: 'article',
-  
+
       };
 const commentStatus = {
         normal: 'normal',
@@ -38,7 +38,7 @@ const schema = new mongoose.Schema({
   },
   //加精时间
   digestTime: {
-    type: Number,
+    type: Date,
     default: null,
     index: 1,
   },
