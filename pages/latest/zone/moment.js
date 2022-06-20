@@ -1,6 +1,8 @@
 import {getDataById} from "../../lib/js/dataConversion";
 import Moments from '../../lib/vue/zone/Moments';
 import MomentEditor from "../../lib/vue/zone/MomentEditor";
+import {visitUrl} from "../../lib/js/pageSwitch";
+
 const momentElementId = 'latestZoneMoments';
 
 $(function() {
@@ -25,7 +27,7 @@ function initMomentVueApp() {
     },
     methods: {
       published() {
-        window.location.reload();
+        visitUrl(`/n/zone`);
       }
     }
   });

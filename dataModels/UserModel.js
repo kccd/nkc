@@ -2748,5 +2748,36 @@ userSchema.statics.getUsersObjectByUsersId = async (usersId) => {
   return usersObj;
 }
 
+userSchema.statics.getImproveUserInfoByMiddlewareUser = async function(user) {
+  if(!user) return null;
+  const UsersPersonalModel = mongoose.model("usersPersonal");
+  const SettingModel = mongoose.model('settings');
+  const serverSettings = await SettingModel.getSettings('server');
+  const {
+    uid,
+    username,
+    setPassword,
+    boundEmail,
+    boundMobile,
+    avatar,
+    banner,
+    description
+  } = user;
+  const reg = new RegExp(`^${serverSettings.websiteCode}-`);
+  const setUsername =  username && !reg.test(username);
+  const needVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
+  return {
+    uid,
+    setUsername: !!setUsername,
+    setPassword: !!setPassword,
+    boundEmail: !!boundEmail,
+    boundMobile: !!boundMobile,
+    setAvatar: !!avatar,
+    setBanner: !!banner,
+    setDescription: !!description,
+    verifyPhoneNumber: !needVerifyPhoneNumber,
+  };
+}
+
 module.exports = mongoose.model('users', userSchema);
 

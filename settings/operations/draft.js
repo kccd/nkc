@@ -1,6 +1,6 @@
 module.exports = {
   preview:{
-    GET:'previewDraftt'
+    GET:'previewDraft'
   },
   history:{
     GET:'viewHistoryDraft',

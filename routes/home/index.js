@@ -733,6 +733,7 @@ router
       }
     }
     data.appsData = await db.SettingModel.getAppsData();
+    data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     ctx.template = "home/home.pug";
     await next();
   });

@@ -30,6 +30,7 @@ block content
           include ../publicModules/canvas_logo
           +renderCanvasLogo(data.homeBigLogo)
         include ../publicModules/improveUserInfo
+        +improveUserInfo(data.improveUserInfo)
         if data.notices && data.notices.length
           .home-forums-other.m-b-1
             .panel-header 公告通知

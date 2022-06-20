@@ -36,6 +36,7 @@ router
     data.visitedForums = visitedForums;
     data.categoryForums = state.categoryForums;
     data.subscribeForums = state.subForums;
+    data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     data.permissions = {
       isSuperModerator: ctx.permission("superModerator")
     };
