@@ -75,7 +75,8 @@ export function GetSelectedArticlesInfo(container) {
     if(item.length === 0) continue;
     articlesInfo.push({
       type: item.attr('data-article-type'),
-      id: item.attr('data-article-id')
+      id: item.attr('data-article-id'),
+      tid: item.attr('data-article-tid')
     });
   }
   return articlesInfo;

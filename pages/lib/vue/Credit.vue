@@ -165,6 +165,11 @@ export default {
     },
     close(){
       this.dialog.hide();
+      setTimeout(function () {
+        this.reason = '';
+        this.kcbNumber = 1;
+          this.xsfNumber = 1
+      }, 500);
     },
     show() {
       this.dialog.show();

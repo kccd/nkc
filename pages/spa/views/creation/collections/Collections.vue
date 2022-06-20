@@ -1,16 +1,19 @@
 <template lang="pug">
-  .creation-collections
-    span 收藏
+  .creation-collections.col-xs-12.col-md-9.m-b-1
+    collections(ref="collections")
 </template>
+<style lang="less" scoped>
+.creation-collections {
 
-<style lang="less">
-
+}
 </style>
-
 <script>
-  export default {
-    data: () => ({
-
-    })
-  }
+import SubscribeCollection from "../../user/subscribe/SubscribeCollection";
+export default {
+  data: () => ({
+  }),
+  components: {
+    "collections": SubscribeCollection
+  },
+}
 </script>

@@ -292,12 +292,12 @@ import { routesName } from "../routes/creation"
               url: '/creation/collections',
               icon: 'fa fa-folder-open-o'
             },
-            /*{
-              type: routesName.creationDrafts,
+            {
+              type: routesName.creationBlackLists,
               title: '黑名单',
-              url: '/creation/blacklist',
+              url: '/creation/blacklists',
               icon: 'fa fa-file-text-o'
-            }*/
+            }
           ]
         }
       ]
@@ -312,10 +312,8 @@ import { routesName } from "../routes/creation"
       const { isApp } = getState();
       this.isApp = isApp;
       this.setNavActive()
-
     },
     methods: {
-
       openMenu(){
         // console.dir(this.$refs.CNC.clientHeight)
         this.$refs.creationNav.style.height = !this.showMenu ? this.$refs.CNC.clientHeight + 'px' : 0;

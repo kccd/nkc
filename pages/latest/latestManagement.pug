@@ -1,6 +1,7 @@
 if !isIncluded('latest/management.pug')
   mixin renderLatestManagement(move, remove)
     span#latestManagement(v-cloak)
+      disabled-draft(ref='disabledDraft')
       .paging-button
         a.button.radius-left.radius-right(@click='switchStatus') 管理
       .paging-button.latest-management-buttons(v-if='status === statusList.display')

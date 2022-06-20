@@ -1,7 +1,7 @@
 <template lang="pug">
   .visitor-operate
     complaint(ref="complaint")
-    button.m-b-05.m-r-05.btn-sm.btn-default.btn(@click="blackListOperation") {{usersBlUidList.indexOf(targetUser.uid,1) === -1 ? '加入黑名单' : '移出黑名单'}}
+    button.m-b-05.m-r-05.btn-sm.btn-default.btn(@click="blackListOperation") {{usersBlUidList.includes(targetUser.uid)? '移出黑名单' : '加入黑名单'}}
     button.m-b-05.m-r-05.btn-sm.btn-default.btn(@click="userComplaint") 举报
 </template>
 <style lang="less" scoped>
@@ -38,9 +38,9 @@ export default {
     //拉黑按钮操作
     blackListOperation(){
       if(!getState().uid) return window.RootApp.openLoginPanel('login');
-      const bool = this.usersBlUidList.indexOf(this.targetUser.uid,1) === -1;
-      if(bool) this.addUserToBlackList(this.targetUser.uid,"userHome")
-      else this.removeUserToBlackList(this.targetUser.uid)
+      const bool = this.usersBlUidList.includes(this.targetUser.uid);
+      if(bool) this.removeUserToBlackList(this.targetUser.uid)
+      else this.addUserToBlackList(this.targetUser.uid,"userHome")
     },
     //用户移除黑名单 tUid 被拉黑的用户
     removeUserToBlackList(uid) {
