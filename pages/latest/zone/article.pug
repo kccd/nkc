@@ -2,8 +2,9 @@ extends ./zoneBase
 block zoneTitle
   title=data.pageTitle
 block zoneContent
-  include ./zoneTypes
-  +renderLatestZoneTypes(data.t, data.zoneTypes)
+  .m-b-1
+    include ./zoneTypes
+    +renderLatestZoneTypes(data.t, data.zoneTypes)
   include ../../publicModules/paging/paging
   if data.articlesPanelData && data.articlesPanelData.length > 0
     include ../../publicModules/articlePanel/articlePanel
