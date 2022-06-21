@@ -283,6 +283,14 @@ userSchema.virtual('zoneThreadCount')
     this._zoneThreadCount = zoneThreadCount;
   });
 
+userSchema.virtual('timelineCount')
+  .get(function() {
+    return this._timelineCount;
+  })
+  .set(function(timelineCount) {
+    this._timelineCount = timelineCount;
+  })
+
 userSchema.virtual('disabledZoneThreadCount')
   .get(function() {
     return this._disabledZoneThreadCount;
@@ -858,9 +866,23 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function() {
   const {column, zone} = await ArticleModel.getArticleSources();
   const {normal, disabled} = await ArticleModel.getArticleStatus();
   const momentStatus = await MomentModel.getMomentStatus();
+  const momentQuoteType = await MomentModel.getMomentQuoteTypes();
   this.momentCount = await MomentModel.countDocuments({
     uid: this.uid,
     status: momentStatus.normal,
+    parent: '',
+    quoteType: {
+      $in: [
+        '',
+        momentQuoteType.article,
+        momentQuoteType.moment
+      ]
+    },
+  });
+  this.timelineCount = await MomentModel.countDocuments({
+    uid: this.uid,
+    status: momentStatus.normal,
+    parent: ''
   });
   this.columnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: normal});
   this.disabledColumnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: disabled});

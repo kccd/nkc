@@ -31,9 +31,17 @@ router
     }
     const {page = 0} = query;
     const momentStatus = await db.MomentModel.getMomentStatus();
+    const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     const match = {
       parent: '',
-      status: momentStatus.normal
+      status: momentStatus.normal,
+      quoteType: {
+        $in: [
+          '',
+          momentQuoteTypes.article,
+          momentQuoteTypes.moment,
+        ]
+      }
     };
     //获取当前用户对动态的审核权限
     const permissions = {
@@ -73,8 +81,10 @@ router
     }
     const {page = 0} = query;
     const articleStatus = await db.ArticleModel.getArticleStatus();
+    const articleSources = await db.ArticleModel.getArticleSources();
     const match = {
       status: articleStatus.normal,
+      source: articleSources.zone,
     };
     const count = await db.ArticleModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);

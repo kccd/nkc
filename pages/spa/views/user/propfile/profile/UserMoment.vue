@@ -1,11 +1,11 @@
 <template lang="pug">
   .user-moment.p-t-1
-    .paging-button
-      a.button(@click="toType('moment')" :class="t === 'moment'?'active':''") 动态
-      a.button(@click="toType('thread')" :class="t === 'thread'?'active':''") 文章
+    .paging-button.m-r-05
+      a.button.radius-left(@click="toType('moment')" :class="t === 'moment'?'active':''") 电文
+      a.button.radius-right(@click="toType('thread')" :class="t === 'thread'?'active':''") 长电文
+    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
     .user-list-warning(v-if="!momentsData && loading") 加载中~
-    .moment-list(v-else)
-      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .moment-list(v-else).m-t-05
       blank(v-if="momentsData && momentsData.length === 0 && !loading")
       moments(
         ref="moments"

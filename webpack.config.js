@@ -149,7 +149,15 @@ module.exports = {
               plugins: [
                 [require.resolve("@babel/plugin-transform-modules-commonjs")],
                 [require.resolve("@babel/plugin-transform-runtime")],
-                [require.resolve("babel-plugin-preval")]
+                [require.resolve("babel-plugin-preval")],
+                [
+                  "import",
+                  {
+                    "libraryName": "@icon-park/vue",
+                    "libraryDirectory": "es/icons",
+                    "camel2DashComponentName": false
+                  }
+                ]
               ],
               compact: false
             }
@@ -174,7 +182,7 @@ module.exports = {
         const basename = path.basename(file, ext);
         return `${dir}/${basename}.css`;
       }
-    }),
+    })
   ],
   externals: {
     vue: "Vue"

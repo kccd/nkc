@@ -13,6 +13,7 @@ import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
 import Finance from "../views/user/propfile/profile/Finance";
 import UserColumnThread from "../views/user/propfile/profile/UserColumnThread";
 import AppProfileView from "../views/app/profile/AppProfileView";
+import UserTimeline from '../views/user/propfile/profile/UserTimeline';
 export const routerName = {
   user: 'userHome',
   follower: 'follower',
@@ -39,14 +40,15 @@ export const routerName = {
   appFan: 'fan',
   appFollower: 'follower',
   appScore: 'appScore',
-  appBlacklist: 'appBlacklist'
+  appBlacklist: 'appBlacklist',
+  timeline: 'timeline'
 }
 
 export default [
   {
     name: routerName.user,
     path: '/u/:uid',
-    redirect: '/u/:uid/profile/moment',
+    redirect: '/u/:uid/profile/timeline',
     component: User,
     children: [
       {
@@ -58,9 +60,14 @@ export default [
           {
             name: routerName.profile,
             path: '/',
-            redirect: '/u/:uid/profile/moment',
+            redirect: '/u/:uid/profile/timeline',
             component: Profile,
             children: [
+              {
+                name: routerName.timeline,
+                path: '/u/:uid/profile/timeline',
+                component: UserTimeline
+              },
               {
                 name: routerName.moment,
                 path: '/u/:uid/profile/moment',

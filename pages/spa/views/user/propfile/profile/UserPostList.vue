@@ -1,10 +1,10 @@
 <template lang="pug">
   .user-post
-    .paging-button
-      a.button(@click="toRoute(postRouteName)" :class="t === 'post'?'active':''") 回复
-      a.button(@click="toRoute(threadRouteName)" :class="t === 'thread'?'active':''") 文章
-    .user-post-list
-      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .paging-button.m-r-05
+      a.button.radius-left(@click="toRoute(postRouteName)" :class="t === 'post'?'active':''") 回复
+      a.button.radius-right(@click="toRoute(threadRouteName)" :class="t === 'thread'?'active':''") 文章
+    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .user-post-list.m-t-05
       blank(v-if="(!posts || posts.length === 0) && !loading")
       .user-list-warning(v-if="loading") 加载中~
       post-list(ref="postList" :posts="posts" :permissions="permissions")

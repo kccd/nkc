@@ -16,21 +16,59 @@
               .fa.fa-trash-o
             video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
     .buttons-container
-      .button-icon(@click="selectPicture" :class="{'disabled': !allowedToSelectPicture}")
-        .icon.fa.fa-image
-        span 图片
-      .button-icon(@click="selectVideo" :class="{'disabled': !allowedToSelectVideo}")
-        .icon.fa.fa-file-video-o
-        span 视频
-      .button-icon(@click="selectEmoji")
-        .icon.fa.fa-smile-o.icon-face
-        span 表情
+      .button-icon(
+        @click="selectPicture"
+        :class="{'disabled': !allowedToSelectPicture}"
+        @mouseover="iconMouseOver(icons.image)"
+        @mouseleave="iconMouseLeave(icons.image)"
+        title="图片"
+        )
+        add-picture(
+          :theme="icons.image.theme"
+          :size="icons.image.size"
+          :fill="icons.image.fill"
+          )
+      .button-icon(
+        @click="selectVideo"
+        :class="{'disabled': !allowedToSelectVideo}"
+        @mouseover="iconMouseOver(icons.video)"
+        @mouseleave="iconMouseLeave(icons.video)"
+        title="视频"
+        )
+        //.icon.fa.fa-file-video-o
+        video-two(
+          :theme="icons.video.theme"
+          :size="icons.video.size"
+          :fill="icons.video.fill"
+          )
+      .button-icon(
+        @click="selectEmoji"
+        @mouseover="iconMouseOver(icons.face)"
+        @mouseleave="iconMouseLeave(icons.face)"
+        title="表情"
+        )
+        winking-face(
+          :theme="icons.face.theme"
+          :size="icons.face.size"
+          :fill="icons.face.fill"
+          )
+      .button-icon(
+        @click="visitZoneArticleEditor"
+        @mouseover="iconMouseOver(icons.article)"
+        @mouseleave="iconMouseLeave(icons.article)"
+        title="发长电文"
+        )
+        newspaper-folding(
+          :theme="icons.article.theme"
+          :size="icons.article.size"
+          :fill="icons.article.fill"
+          )
       .button-pull
         span.number(:class="{'warning': remainingWords < 0}") {{remainingWords}}
-        button.publish(:class="{'disabled': disablePublish}" v-if="submitting" title="发表中，请稍候")
+        button.publish(:class="{'disabled': disablePublish}" v-if="submitting" title="发射中，请稍候")
           .fa.fa-spinner.fa-spin
-        button.publish(:class="{'disabled': disablePublish}" v-else-if="disablePublish") 发动态
-        button.publish(@click="publishContent" v-else) 发动态
+        button.publish(:class="{'disabled': disablePublish}" v-else-if="disablePublish") 发射
+        button.publish(@click="publishContent" v-else) 发射
 </template>
 
 <style lang="less" scoped>
@@ -202,12 +240,31 @@
   import {nkcAPI} from '../../js/netAPI';
   import EmojiSelector from '../EmojiSelector';
   import TextareaEditor from '../TextareaEditor';
+  import {visitUrl} from "../../js/pageSwitch";
+  import {
+    Home as HomeIcon,
+    AddPicture,
+    VideoTwo,
+    WinkingFace,
+    NewspaperFolding,
+  } from '@icon-park/vue';
+
+  const iconFill = {
+    normal: '#555',
+    active: '#000'
+  };
+
   export default {
     props: ['published'],
     components: {
       'resource-selector': ResourceSelector,
       'emoji-selector': EmojiSelector,
-      'textarea-editor': TextareaEditor
+      'textarea-editor': TextareaEditor,
+      'home-icon': HomeIcon,
+      'add-picture': AddPicture,
+      'video-two': VideoTwo,
+      'winking-face': WinkingFace,
+      'newspaper-folding': NewspaperFolding
     },
     data: () => ({
       submitting: false,
@@ -219,6 +276,29 @@
       content: '',
       picturesId: [],
       videosId: [],
+
+      icons: {
+        image: {
+          fill: iconFill.normal,
+          size: 22,
+          theme: 'outline'
+        },
+        video: {
+          fill: iconFill.normal,
+          size: 22,
+          theme: 'outline'
+        },
+        face: {
+          fill: iconFill.normal,
+          size: 22,
+          theme: 'outline'
+        },
+        article: {
+          fill: iconFill.normal,
+          size: 22,
+          theme: 'outline'
+        }
+      }
     }),
     mounted() {
       this.initData();
@@ -274,6 +354,15 @@
       'content': 'onContentChange'
     },
     methods: {
+      visitZoneArticleEditor() {
+        visitUrl(`/creation/editor/zone/article`, true);
+      },
+      iconMouseOver(e) {
+        e.fill = iconFill.active;
+      },
+      iconMouseLeave(e) {
+        e.fill = iconFill.normal;
+      },
       reset() {
         this.momentId = '';
         this.setTextareaEditorContent('');
@@ -399,7 +488,7 @@
           if(type === 'create') {
             self.momentId = res.momentId;
           }
-          console.log(`动态已自动保存`);
+          console.log(`电文已自动保存`);
         })
         .catch(err => {
           screenTopWarning(`实时保存失败：${err.error || err.message || err}`);

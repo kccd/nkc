@@ -8,14 +8,9 @@ block zoneContent
       permissions: data.permissions
     });
 
-
   #latestZoneMoments(v-cloak)
-
     include ./zoneTypes
     +renderLatestZoneTypes(data.t, data.zoneTypes)
-
-    .m-b-1.p-t-05(v-if='logged')
-      moment-editor(@published='published')
 
     include ../../publicModules/paging/paging
     moments(:moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
@@ -26,3 +21,4 @@ block zoneContent
   .hidden#data=dataString
 block zoneScripts
   +includeJS('/latest/zone/moment.js')
+
