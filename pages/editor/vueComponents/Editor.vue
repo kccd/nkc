@@ -187,7 +187,7 @@ export default {
       this.uid = stateUid;
       const self = this;
       if(!self.uid ) return;
-      let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=2`;
+      let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
       // 编辑器类型 newpost modifyPost modifyThread  newThread
       const editType = this.pageData.type;
       // if (editType) {
