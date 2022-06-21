@@ -1,5 +1,6 @@
 <template lang="pug">
   .user-moment.p-t-1
+    moment-editor(ref="momentEditor" @published="onPublished")
     .paging-button
       a.button(@click="toType('moment')" :class="t === 'moment'?'active':''") 动态
       a.button(@click="toType('thread')" :class="t === 'thread'?'active':''") 文章
@@ -42,6 +43,7 @@ import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
 import Blank from "../../../../components/Blank";
 import ArticleList from "../../../../../lib/vue/article/ArticleList";
+import MomentEditor from "../../../../../lib/vue/zone/MomentEditor";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 
 export default {
@@ -59,7 +61,8 @@ export default {
     "violation-record": ViolationRecord,
     "paging": Paging,
     "blank": Blank,
-    "article-list": ArticleList
+    "article-list": ArticleList,
+    "moment-editor": MomentEditor
   },
   computed: {
     pageButtons() {
@@ -114,6 +117,10 @@ export default {
     //跳转到动态指定类型
     toType(type) {
       this.getUserCardInfo(0, type);
+    },
+    onPublished() {
+      this.$refs.momentEditor.reset();
+      this.getUserCardInfo();
     }
   }
 }
