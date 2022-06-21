@@ -37,15 +37,11 @@ mixin nav(data)
     .info-list
       if oc
         span.m-r-1
-          span 文号
-          span=oc
-
+          span=`文号 ${oc}`
       span(title="浏览数")
-        .fa.fa-eye
-        span=hits || 0
+        .fa.fa-eye=` ${hits || 0}`
       span.pointer(title='回复数' onclick="window.location.href='#container'")
-        .fa.fa-comment
-        span=count || 0
+        .fa.fa-comment=` ${count || 0}`
       span.pointer
         if data.user
           if type === 'article'

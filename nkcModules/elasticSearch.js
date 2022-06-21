@@ -262,7 +262,7 @@ func.search = async (t, c, options) => {
   const threadConditions = [
     createMatch("title", c, 5, relation),
     createMatch("content", c, 2, relation),
-    createMatch("pid", c, 100, relation),
+    createMatch("pid", c.toLowerCase(), 100, relation),
     createMatch("aid", c, 100, relation),
     createMatch("authors", c, 80, relation),
     createMatch("abstractEN", c, 50, relation),
@@ -310,7 +310,7 @@ func.search = async (t, c, options) => {
                         should: [
                           createMatch("title", c, 5, relation),
                           createMatch("content", c, 2, relation),
-                          createMatch("pid", c, 100, relation),
+                          createMatch("pid", c.toLowerCase(), 100, relation),
                           createMatch("authors", c, 80, relation),
                           createMatch("abstractEN", c, 50, relation),
                           createMatch("abstractCN", c, 50, relation),
