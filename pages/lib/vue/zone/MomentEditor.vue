@@ -366,6 +366,8 @@
       reset() {
         this.momentId = '';
         this.setTextareaEditorContent('');
+        this.picturesId = [];
+        this.videosId = [];
       },
       initData() {
         const self = this;

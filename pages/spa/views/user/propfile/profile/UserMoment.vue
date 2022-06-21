@@ -1,6 +1,6 @@
 <template lang="pug">
   .user-moment.p-t-1
-    .m-b-05(v-if="logged")
+    .m-b-05(v-if="isTargetUser")
       moment-editor(ref="momentEditor" @published="onPublished")
     .paging-button.m-r-05
       a.button.radius-left(@click="toType('moment')" :class="t === 'moment'?'active':''") 电文
@@ -50,7 +50,6 @@ import {getState} from "../../../../../lib/js/state";
 const {uid} = getState();
 export default {
   data: () => ({
-    logged: !!uid,
     momentsData: null,
     paging: {},
     uid: null,
@@ -68,6 +67,9 @@ export default {
     "moment-editor": MomentEditor
   },
   computed: {
+    isTargetUser() {
+      return uid && uid === this.uid;
+    },
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
