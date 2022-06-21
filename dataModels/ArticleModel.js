@@ -1523,7 +1523,7 @@ schema.statics.extendArticlesPanelData = async function(articles) {
     };
     const content = {
       time: article.tlm,
-      coverUrl: tools.getUrl('documentCover', document.cover),
+      coverUrl: document.cover ? tools.getUrl('documentCover', document.cover) : '',
       title: document.title,
       url: article.url,
       digest: article.digest,
