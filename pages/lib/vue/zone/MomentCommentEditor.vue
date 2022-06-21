@@ -229,9 +229,6 @@
         this.publish();
       },
       async publish() {
-        if(!this.momentCommentId) {
-          await this.saveContent('create');
-        }
         const self = this;
         const {postType, alsoPost, content, momentId, momentCommentId} = this;
         this.lockPost();
@@ -239,7 +236,7 @@
           .then(() => {
             // if(content.length === 0) throw new Error(`请输入内容`);
             return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
-              type: 'publish',
+              type: momentCommentId ? 'publish' : 'forward',
               content,
               postType,
               alsoPost,
