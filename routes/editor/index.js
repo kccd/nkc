@@ -334,10 +334,12 @@ router
     // 取网站代号
     let serverSetting = await db.SettingModel.getSettings("server");
     data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
-    // data.pageType = type;
-    if(!type) { // 直接进编辑器
+    // data.type 用于请求草稿提示，用于获取draft表中指定类型的数据
+    // 直接进编辑器
+    if(!type) {
       data.type = "newThread";
-    } else if(type === "forum") { // 在专业进编辑器，需要预制当前专业
+    } else if(type === "forum") { 
+      // 在专业进编辑器，需要预制当前专业
       const {id} = query;
       data.type = "newThread";
       // 判断用户是否用有制定专业的发表权限
@@ -362,6 +364,8 @@ router
         oc: thread.oc, // 文章
         lm: thread.lm
       };
+      // type === thread
+      // 新回复
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "post") { // 修改文章或者修改回复
       const {id} = query;
@@ -388,6 +392,12 @@ router
         pid: data.post.pid, // 当前回复
         parentPostId: data.post.parentPostId // 父级postID
       };
+      // post.type === post && post.parentPostId === "" && post.type === thread
+      // 修改文章
+      // post.type === post && post.parentPostId
+      // 修改评论
+      // post.type === post && post.parentPostId === ""
+      // 修改回复
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "redit") { // 从草稿箱来
       let {id, o, _id} = query;
