@@ -243,6 +243,8 @@ import {nkcAPI} from "../../js/netAPI";
 import {debounce} from "../../js/execution";
 import {timeFormat, fromNow} from "../../js/tools";
 import {sweetQuestion} from "../../js/sweetAlert";
+import {visitUrl} from "../../js/pageSwitch";
+
 export default {
   props: ['type'],
   data: () => ({
@@ -313,14 +315,17 @@ export default {
     }, 300),
     //创建，编辑草稿
     editDraft(item) {
+      const url = `/creation/editor/draft?id=${item.draftId}`;
       if(this.type) {
         sweetQuestion(`继续创作将会覆盖编辑器中全部内容，确定继续？`)
           .then(() => {
-            window.location.href = `/creation/drafts/editor?draftId=${item.draftId}`;
+            visitUrl(url);
+            // window.location.href = `/creation/editor/draft?draftId=${item.draftId}`;
           })
           .catch(sweetError);
       } else {
-        window.location.href = `/creation/drafts/editor?draftId=${item.draftId}`;
+        visitUrl(url);
+        // window.location.href = `/creation/drafts/editor?draftId=${item.draftId}`;
       }
     },
     fastSelectedDraft(id) {
