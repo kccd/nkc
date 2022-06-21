@@ -5,15 +5,16 @@
       div
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
-        .article-box(v-if="drafts.length")
-          .article-box-title
-            .article-box-header.des-type {{ getTitle }}
-            .article-box-text {{drafts[0].t  || '未填写'}} {{ setContent(drafts[0].c) }}
-            //- .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
-          .article-box-option
-            button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
-            button.btn.btn-xs.btn-default(@click="more") 查看更多
-            .fa.fa-remove(@click="closeDraft")
+        template(v-if="drafts.length")
+          .article-box( v-for = "draft in drafts")
+            .article-box-title
+              .article-box-header.des-type 草稿
+              .article-box-text {{draft.t  || '未填写'}} {{ setContent(draft.c) }}
+              //- .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
+            .article-box-option
+              button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(draft._id)") 继续编辑
+              button.btn.btn-xs.btn-default(@click="more") 查看更多
+              .fa.fa-remove(@click="closeDraft")
         article-title(
           :o="reqUrl.o",
           ref="title",
@@ -190,11 +191,7 @@ export default {
       let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
       // 编辑器类型 newpost modifyPost modifyThread  newThread
       const editType = this.pageData.type;
-      // if (editType) {
-      //   url += '&type=' + editType
-      // }
-      // 如果是 newpost(newpost === thread)带上文章id
-      // 显示当前文章的回复 考虑的业务，回复都是依据文章显示的
+      // 回复都是依据文章显示的
       if (editType === "newPost") {
         url += '&type=' + editType;
         url += "&desTypeId=" + this.pageData.thread.tid;

@@ -200,15 +200,17 @@ draftSchema.statics.updateToStableHistoryById = async (_id, uid) => {
 * 查找一篇文章最近的新回复草稿
 * @param {String} desTypeId 文章id
 * @param {String} uid 用户ID
-* @return {Object} 返回desTypeId指定文章最近新建的回复草稿
+* @param {Number} limit 返回草稿的数量
+* @return {Array} 返回desTypeId指定文章最近新建的回复草稿
 */
-draftSchema.statics.getLatestNewPost = async function (desTypeId, uid) {
+draftSchema.statics.getLatestNewPost = async function (desTypeId, uid, limit = 1) {
 
   const DraftModel = mongoose.model("drafts");
   const beta = (await DraftModel.getType()).beta; 
   const thread = (await DraftModel.getDesType()).thread;
-  return await DraftModel.findOne({ uid, desType: thread, type: beta, desTypeId, parentPostId: ""  })
-    .sort({tlm: -1});
+  return await DraftModel.find({ uid, desType: thread, type: beta, desTypeId, parentPostId: ""  })
+    .sort({tlm: -1})
+    .limit(Number(limit));
 
 }
 
@@ -217,9 +219,10 @@ draftSchema.statics.getLatestNewPost = async function (desTypeId, uid) {
 * @param {String} desTypeId 文章id
 * @param {String} uid 用户id
 * @param {Object} nkcModules
-* @return {Object} 返回desTypeId指定的文章最近新建的回复草稿
+* @param {Number} limit 返回草稿的数量
+* @return {Array} 返回desTypeId指定的文章最近新建的回复草稿
 */
-draftSchema.statics.getLatestModifyPost = async (desTypeId, uid, nkcModules) => {
+draftSchema.statics.getLatestModifyPost = async (desTypeId, uid, nkcModules, limit = 1) => {
   const DraftModel = mongoose.model("drafts");
   const PostsModel = mongoose.model("posts");
   const beta = (await DraftModel.getType()).beta; 
@@ -228,6 +231,8 @@ draftSchema.statics.getLatestModifyPost = async (desTypeId, uid, nkcModules) => 
    let page = 0;
    let perpage = 100;
    const count = await DraftModel.countDocuments({ uid: uid, desType: post });
+   const verifiedData = [];
+   
    // 这部分根据条件要递归
    async function findLatestModifyPost () {
      const paging = nkcModules.apiFunction.paging(page, count, Number(perpage)); 
@@ -236,70 +241,53 @@ draftSchema.statics.getLatestModifyPost = async (desTypeId, uid, nkcModules) => 
       .sort({tlm: -1})
       .skip(paging.start)
       .limit(paging.perpage);
+
      if (posts.length) {
        // 在draft表中为post的desTypeId
        let pids = new Set();
        // id为key，表数据为value
-       let pidMap = new Map();
+      //  let pidMap = new Map();
        posts.forEach(element => {
          pids.add(element.desTypeId);
-         if (!pidMap.has(element.desTypeId)) pidMap.set(element.desTypeId, element);
+        //  if (!pidMap.has(element.desTypeId)) pidMap.set(element.desTypeId, element);
        });
   
        // 然后分别去匹配查post表中此id对应的type， 如果为post那么就是回复
        let modifyPostData; 
        const post = (await PostsModel.getType()).post;
        for (const [, pid] of [...pids].entries()) {
-         modifyPostData = await PostsModel.findOne({ pid, type: post });
-        //  if (draftData && postData) {
-        //    if (draftData.tlm.getTime() >= pidMap.get(pid).tlm.getTime()) {
-        //      return draftData;
-        //    } else {
-        //      return pidMap.get(pid);
-        //    }
-        //  } else if (!draftData && postData) {
-        //    return pidMap.get(pid);
-        //  }
-        if (modifyPostData) {
-          return pidMap.get(pid);
+        modifyPostData = await PostsModel.findOne({ pid, type: post });
+        // 如果存在，就去posts中把相同id全部放进verifiedData，证明他们全部都是最近的修改回复
+         if (modifyPostData) {
+          for (const post of posts) {
+            if (verifiedData.length < limit) {
+              if (String(post.desTypeId) === String(pid)) {
+                verifiedData.push(post);
+              }
+            };
+            if (verifiedData.length >= limit) return verifiedData;
+          }
+          // return pidMap.get(pid);
         }
        };
-       if (!modifyPostData) {
-        //  if (draftData) {
-        //    for (const [, post] of [...posts].entries()) {
-        //      // 如果posts表中没有一条数据是post,那么draftData对比posts中数据的修改时间
-        //      // 如果draftData的时间都大于他们证明 draftData是最近的修改
-        //      if (draftData.tlm.getTime() >= post.tlm.getTime()) {
-        //        return draftData
-        //      } else {
-        //        page++;
-        //        // 设置最多递归次数
-        //        if (page === 5) {
-        //          return 
-        //        }
-        //        return await findLatestPost();
-        //      }
-        //    }
-        //    // 如果draftData 不存在 并且 没有在post查找到为post的类型
-        //  } else {
-        //    return await findLatestPost();
-        //  }
-        page++;
+       if (verifiedData.length < limit) {
         // 设置最多递归次数
-        if (page === 5) return
+        if (page === 5) return verifiedData;
+        page++;
         return await findLatestModifyPost();
        }
-     }
+     } else return verifiedData;
    }
    return await findLatestModifyPost();
 }
 /* 
 * 查找用户最近文章草稿
 * @param {String} uid 用户ID
-* @return {Object} 查找到的最近新建的文章草稿
+* @param {Number} limit 返回草稿的数量
+* @return {Array} 查找到的最近新建的文章草稿
 */
 
-draftSchema.statics.getLatestNewThread = async (uid) => {
+draftSchema.statics.getLatestNewThread = async (uid, limit = 1) => {
 
   const DraftModel = mongoose.model("drafts");
   
@@ -307,16 +295,19 @@ draftSchema.statics.getLatestNewThread = async (uid) => {
   // const forum = (await DraftModel.getType()).forum; 
   const forum = (await DraftModel.getDesType()).forum;
   // forum 类型一定是文章(获取新文章)
-  return await DraftModel.findOne({uid, desType: forum, type: beta}).sort({tlm: -1});
+  return await DraftModel.findOne({uid, desType: forum, type: beta})
+    .sort({tlm: -1})
+    .limit(Number(limit));
 }
 /* 
 * 获取一篇文章最近的修改草稿
 * @param {String} desTypeId 文章id
 * @param {String} uid 用户id
 * @param {Object} nkcModules
-* @return {Object} 返回desTypeId指定的文章最近新建的文章草稿
+* @param {Number} limit 返回草稿的数量
+* @return {Array} 返回desTypeId指定的文章最近新建的文章草稿
 */
-draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, nkcModules) => {
+draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, nkcModules, limit = 1) => {
   const PostsModel = mongoose.model("posts");
   const DraftModel = mongoose.model("drafts");
   const post = (await DraftModel.getDesType()).post;
@@ -326,6 +317,7 @@ draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, nkcModules) =
   let page = 0;
   let perpage = 100;
   const count = await DraftModel.countDocuments({ uid, desType: post });
+  let verifiedData = [];
   async function findLatestModifyThread () {
     const paging = nkcModules.apiFunction.paging(page, count, Number(perpage)); 
     // post 类型可能是修改文章，因此需要在post表中比较
@@ -337,57 +329,37 @@ draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, nkcModules) =
       // 在draft表中为post的desTypeId
       let pids = new Set();
       // id为key，表数据为value
-      let pidMap = new Map();
+      // let pidMap = new Map();
       posts.forEach(element => {
         pids.add(element.desTypeId);
-        if (!pidMap.has(element.desTypeId)) pidMap.set(element.desTypeId, element)
+        // if (!pidMap.has(element.desTypeId)) pidMap.set(element.desTypeId, element)
       });
       // 然后分别去匹配查post表中此id对应的type， 如果为post那么就是回复
       const thread = (await PostsModel.getType()).thread;
       let modifyThreadData;
       for (const [, pid] of [...pids].entries()) {
         modifyThreadData = await PostsModel.findOne({ pid, type: thread  });
-        // 比较修改时间
-        // if (threadData) return res = pidMap.get(pid)
-        // if (draftData && threadData) {
-        //   if (draftData.tlm.getTime() >= pidMap.get(pid).tlm.getTime()) {
-        //     return draftData;
-        //   } else {
-        //     return pidMap.get(pid);
-        //   }
-        // }else if (!draftData && threadData) {
-        //   return pidMap.get(pid);
-        // }
+        // 如果存在，就去posts中把相同id全部放进verifiedData，证明他们全部都是最近的修改文章
         if (modifyThreadData) {
-          return pidMap.get(pid);
+          for (const post of posts) {
+            if (verifiedData.length < limit) {
+              if (String(post.desTypeId) === String(pid)) {
+                verifiedData.push(post);
+              }
+            } 
+            if (verifiedData.length >= limit) return verifiedData
+          }
+          // return pidMap.get(pid);
         }
       }
       // 如果未找到继续查找
-      if (!modifyThreadData) {
-        // if (draftData) {
-        //   for (const [, post] of [...posts].entries()) {
-        //     // 如果posts中没有一条数据是post,那么draftData对比posts中数据的修改时间
-        //     if (draftData.tlm.getTime() >= post.tlm.getTime()) {
-        //       return draftData
-        //     } else {
-        //       page++;
-        //       // 设置最多递归次数
-        //       if (page === 5) {
-        //         return 
-        //       }
-        //       return await findLatestThread();
-        //     }
-        //   }
-        // } else {
-        //   return await findLatestThread();
-        // }
-        page++;
+      if (verifiedData.length < limit) {
         // 设置最多递归次数
-        if (page === 5) return; 
+        if (page === 5) return verifiedData; 
+        page++;
         return await findLatestModifyThread();
-        // 
       }
-    }
+    } else return verifiedData
   }
   return await findLatestModifyThread();
 }
