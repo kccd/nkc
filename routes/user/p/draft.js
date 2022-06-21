@@ -8,6 +8,7 @@ module.exports = async (ctx, next) => {
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
   let {page = 0, perpage = 30, type } = query;
+  perpage = Number(perpage);
   let count, paging, drafts;
   const thread = (await db.DraftModel.getDesType()).thread;
   const beta = (await db.DraftModel.getType()).beta;
@@ -16,7 +17,7 @@ module.exports = async (ctx, next) => {
   // 如果是社区内容草稿
   if(type === 'community') {
     count = await db.DraftModel.countDocuments({uid: targetUser.uid, type: beta});
-    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    paging = nkcModules.apiFunction.paging(page, count, perpage);
     drafts = await db.DraftModel.find({uid: targetUser.uid, type: beta})
       // .sort({toc: -1})
       .sort({tlm: -1})
@@ -62,7 +63,7 @@ module.exports = async (ctx, next) => {
     if(!desTypeId) ctx.throw(400, 'desTypeId不存在');   
     if (perpage > 1) perpage = 1;
     count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: {$in: [thread]}});
-    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    paging = nkcModules.apiFunction.paging(page, count, perpage);
     const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: post, type: beta, desTypeId, parentPostId: { $ne: "" } })
       .sort({tlm: -1})
       .skip(paging.start)
@@ -71,7 +72,7 @@ module.exports = async (ctx, next) => {
 
   } else {
     count = await db.DraftModel.countDocuments({uid: targetUser.uid});
-    paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
+    paging = nkcModules.apiFunction.paging(page, count, perpage);
     drafts = await db.DraftModel.find({uid: targetUser.uid})
       // .sort({toc: -1})
       .sort({tlm: -1})
