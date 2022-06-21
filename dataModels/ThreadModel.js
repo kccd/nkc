@@ -1329,7 +1329,7 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
     }
     const content = {
       time: thread.toc,
-      coverUrl: tools.getUrl('postCover', firstPost.cover),
+      coverUrl: firstPost.cover? tools.getUrl('postCover', firstPost.cover): '',
       title: firstPost.t,
       digest: firstPost.digest,
       url: tools.getUrl('thread', thread.tid),
