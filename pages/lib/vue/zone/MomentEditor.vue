@@ -449,10 +449,11 @@
         })
           .then(() => {
             self.sendPublishedEvent();
+            self.unlockButton();
           })
           .catch(err => {
-            self.unlockButton();
             sweetError(err);
+            self.unlockButton();
           });
       },
       sendPublishedEvent() {

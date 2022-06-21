@@ -1,5 +1,7 @@
 <template lang="pug">
   .user-moment.p-t-1
+    .m-b-05(v-if="logged")
+      moment-editor(ref="momentEditor" @published="onPublished")
     .paging-button.m-r-05
       a.button.radius-left(@click="toType('moment')" :class="t === 'moment'?'active':''") 电文
       a.button.radius-right(@click="toType('thread')" :class="t === 'thread'?'active':''") 长电文
@@ -42,10 +44,13 @@ import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
 import Blank from "../../../../components/Blank";
 import ArticleList from "../../../../../lib/vue/article/ArticleList";
+import MomentEditor from "../../../../../lib/vue/zone/MomentEditor";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
-
+import {getState} from "../../../../../lib/js/state";
+const {uid} = getState();
 export default {
   data: () => ({
+    logged: !!uid,
     momentsData: null,
     paging: {},
     uid: null,
@@ -59,7 +64,8 @@ export default {
     "violation-record": ViolationRecord,
     "paging": Paging,
     "blank": Blank,
-    "article-list": ArticleList
+    "article-list": ArticleList,
+    "moment-editor": MomentEditor
   },
   computed: {
     pageButtons() {
@@ -114,6 +120,10 @@ export default {
     //跳转到动态指定类型
     toType(type) {
       this.getUserCardInfo(0, type);
+    },
+    onPublished() {
+      this.$refs.momentEditor.reset();
+      this.getUserCardInfo();
     }
   }
 }

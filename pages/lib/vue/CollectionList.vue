@@ -1,5 +1,7 @@
 <template lang="pug">
   div
+    subscribe-types(ref="subscribeTypes")
+    nav-types(ref="navTypes")
     .account-thread(v-for="subscribe in subscribes")
       .account-thread(:class="threadType(subscribe.thread)" v-if="subscribe.type === 'collection'")
         .account-reason(v-if="subscribe.thread.disabled") 已屏蔽，仅自己可见。
@@ -73,15 +75,309 @@
 </template>
 <style lang="less" scoped>
 @import "../../publicModules/base";
+@media (max-width: 768px) {
+  .account-thread-avatar{
+    &>div{
+      width: 9rem!important;
+      height: 6rem!important;
+    }
+  }
+}
+.account-thread:last-child{
+  margin-bottom: 0;
+}
+.account-follower-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 1rem;
+
+  @buttonHeight: 2rem;
+  @buttonWidth: 4rem;
+
+  button{
+    &:focus{
+      outline: none;
+    }
+    height: @buttonHeight;
+    width: @buttonWidth;
+    //line-height: @buttonHeight;
+    border-radius: 2px;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+  }
+  .category{
+    background-color: #fff;
+    display: none;
+    color: @dark;
+    border: 1px solid #ccc;
+    &:hover{
+      background-color: #eee;
+    }
+  }
+  .subscribe{
+    background-color: @primary;
+    border: 1px solid @primary;
+    color: #fff;
+    &:after{
+      content: "关注";
+    }
+    &.collection-button:after{
+      content: "收藏";
+    }
+    &:hover{
+      background-color: #2777b1;
+    }
+  }
+  &.active{
+    .subscribe{
+      background-color: @accent;
+      border: 1px solid @accent;
+      &:hover{
+        background-color: #cb4c61;
+      }
+      &:after{
+        content: "取关";
+      }
+      &.collection-button:after{
+        content: "取藏"
+      }
+    }
+    .category{
+      display: inline-block;
+    }
+  }
+}
+.subscribe-thread {
+  .account-thread{
+    margin-bottom: 1.5rem;
+    //padding-bottom: 1rem;
+    &.draft-list{
+      .checkbox{
+        display: inline;
+        cursor: pointer;
+        label{
+          padding: 4px 0 0 20px;
+        }
+      }
+      .draft-button{
+        .dropdown-menu{
+          a{
+            color: #333;
+            .fa{
+              color: #444;
+            }
+
+          }
+        }
+        a{
+          color: @primary;
+        }
+        button{
+          background-color: rgba(0, 0, 0, 0);
+          color: @accent;
+          margin-right: 0.3rem;
+          border: none;
+          &:focus{
+            outline: none;
+          }
+        }
+      }
+    }
+    .account-post-thread-user{
+      .time{
+        color: @accent;
+        display: inline;
+        margin-right: 0.3rem;
+      }
+      img{
+        height: 1.5rem;
+        width: 1.5rem;
+        border-radius: 50%;
+        margin-left: 0.3rem;
+        margin-top: -2px;
+        margin-right: 0.2rem;
+      }
+      a{
+        color: @primary;
+      }
+    }
+    .account-post-thread{
+      padding: 1rem;
+      background-color: #f6f2ee;
+      border-radius: 3px;
+      .account-post-thread-warning{
+        text-align: center;
+        color: #bbab9c;
+        //font-weight: 700;
+        .fa{
+          margin-right: 0.3rem;
+        }
+      }
+    }
+    .account-post-content{
+      margin: 0.4rem 0 0.6rem 0;
+      text-decoration: none;
+      color: @dark;
+      max-height: 5rem;
+      .hideText(@line: 3)
+    }
+    &.draft{
+      @warningColor: rgba(255, 255, 0, 0.2);
+      background-color: @warningColor;
+      .account-reason{
+        text-align: center;
+        color: @accent;
+        padding: 0.5rem;
+        font-weight: 700;
+        //background-color: @warningColor;
+      }
+    }
+    &.disabled{
+      @disabledColor: rgba(0, 0, 0, 0.07);
+      background-color: @disabledColor;
+      .account-reason{
+        text-align: center;
+        color: @accent;
+        padding: 0.5rem;
+        font-weight: 700;
+        //background-color: @warningColor;
+      }
+    }
+    &.review{
+      @disabledColor: rgba(255, 0, 0, 0.07);
+      background-color: @disabledColor;
+      .account-reason{
+        text-align: center;
+        color: @accent;
+        padding: 0.5rem;
+        font-weight: 700;
+        //background-color: @warningColor;
+      }
+    }
+    .account-thread-avatar{
+      display: table-cell;
+      vertical-align: top;
+      &>div{
+        width: 12rem;
+        height: 8rem;
+        margin-right: 1rem;
+        overflow: hidden;
+        border-radius: 3px;
+        background-size: cover;
+      }
+    }
+    .account-thread-content{
+      display: table-cell;
+      vertical-align: top;
+      overflow: hidden;
+      width: 100%;
+      .account-thread-title{
+        font-size: 1.3rem;
+        display: -webkit-box;
+        font-weight: 700;
+        height: 1.8rem;
+        color: @dark;
+        .hideText(@line: 1);
+        &.digest a{
+          color: @accent;
+          &:hover, &:focus{
+            color: @accent;
+          }
+          &:hover{
+            border-color: @accent;
+          }
+        }
+        a{
+          color: @dark;
+          transition: border-bottom-color 200ms;
+          border-bottom: 1px solid rgba(0, 0, 0, 0);
+          padding-bottom: 0.1rem;
+          &:hover, &:focus{
+            text-decoration: none;
+            color: @dark;
+          }
+          &:hover{
+            border-color: @dark;
+          }
+        }
+      }
+      .account-thread-abstract{
+        margin: 0.6rem 0;
+        max-height: 3.5rem;
+        .hideText(@line: 2);
+      }
+      .account-thread-info{
+        position: relative;
+        height: 1.8rem;
+        display: block;
+        width: 100%;
+        padding-right: 7rem;
+        .hideText(@line: 1);
+        &>div{
+          display: inline;
+          margin-right: 0.3rem;
+        }
+        .thread-forum-link{
+          margin-right: 0.5rem;
+          color: #888;
+        }
+        .thread-time{
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+        .thread-user{
+          margin-right: 0.3rem;
+          &:hover, &:focus{
+            color: #555;
+            text-decoration: none;
+          }
+          img{
+            height: 1.4rem;
+            width: 1.4rem;
+            margin-top: -2px;
+            margin-right: 0.3rem;
+            border-radius: 50%;
+          }
+          span{
+
+          }
+        }
+        .fa{
+          color: #aaa;
+          margin-right: 0.3rem;
+        }
+        span{
+          color: #888;
+        }
+      }
+    }
+  }
+}
+.subscribe-thread{
+  .account-thread-title{
+    padding-right: 9rem;
+    position: relative;
+    padding-top: 0.1rem;
+    height: 2.1rem!important;
+    box-sizing: border-box;
+  }
+}
 </style>
 <script>
+import SubscribeTypes from "./SubscribeTypes";
+import NavTypes from "../../spa/views/user/subscribe/NavTypes";
 import {fromNow, getUrl, objToStr} from "../js/tools";
 import {collectionArticle, collectionThread} from "../js/subscribe";
 import {nkcAPI} from "../js/netAPI";
 export default {
-  props: ['subscribes', 'collection-Threads-id'],
+  props: ['subscribes', 'collection-threads-id'],
   data: () => ({
   }),
+  components: {
+    'subscribe-types': SubscribeTypes,
+    'nav-types': NavTypes,
+  },
   methods: {
     objToStr: objToStr,
     getUrl: getUrl,
