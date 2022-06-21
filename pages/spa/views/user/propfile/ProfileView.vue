@@ -53,7 +53,7 @@ export default {
     const {params} = this.$route;
     const {uid: targetUid} = params;
     const {uid} = getState();
-    if(targetUid === uid) {
+    if(targetUid && targetUid === uid) {
       this.$router.push({
         name: routerName.moment,
       });
