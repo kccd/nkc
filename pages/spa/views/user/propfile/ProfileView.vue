@@ -38,8 +38,6 @@
 }
 </style>
 <script>
-import {getState} from "../../../../lib/js/state";
-import {routerName} from "../../../routes/user";
 export default {
   data:() => ({
     uid: '',
@@ -49,20 +47,6 @@ export default {
     users: [],
     paging: null,
   }),
-  created() {
-    const {params} = this.$route;
-    const {uid: targetUid} = params;
-    const {uid} = getState();
-    if(targetUid === uid) {
-      this.$router.push({
-        name: routerName.moment,
-      });
-    } else {
-      this.$router.push({
-        name: routerName.timeline,
-      });
-    }
-    },
   mounted() {
     const {params, name} = this.$route;
     const {uid} = params;
