@@ -1,7 +1,7 @@
 import {getSocket} from "../lib/js/socket";
 
 const socket = getSocket();
-var surveyForms = [], draftId = "", author = {};
+var surveyForms = [], draftId = "", author = {}, _id;
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
@@ -437,6 +437,7 @@ function autoSaveDraft() {
 			})
 			.then(function(data) {
 				draftId = data.draft.did;
+				_id = data.draft._id;
 				autoSaveDraft();
 			})
 			.catch(function(err) {
@@ -465,6 +466,7 @@ function saveDraft(threadId,userId){
     })
     .then(function(data) {
       draftId = data.draft.did;
+			_id = data.draft._id;
       sweetSuccess("保存成功");
     })
     .catch(function(data) {
@@ -495,6 +497,7 @@ function submit(tid) {
       if(draftId) {
         post.did = draftId;
       }
+			if (_id) post._id = _id;
       return nkcAPI('/t/' + tid, 'POST', {
         post: post,
       })
