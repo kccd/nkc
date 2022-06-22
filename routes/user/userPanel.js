@@ -1,7 +1,7 @@
 const Router = require("koa-router");
 const router = new Router();
 router
-    .get('/userPanel', async (ctx, next) => {
+    .get('/', async (ctx, next) => {
       const {data, db, state, query, params, permission} = ctx;
       const {targetUser, user} = data;
       const panelPermission = {
@@ -19,8 +19,6 @@ router
           if(permission(key)) panelPermission[key] = true;
       })
       data.panelPermission = panelPermission;
-
-
       await next();
     })
 module.exports = router;
