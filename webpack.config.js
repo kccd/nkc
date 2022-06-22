@@ -150,14 +150,6 @@ module.exports = {
                 [require.resolve("@babel/plugin-transform-modules-commonjs")],
                 [require.resolve("@babel/plugin-transform-runtime")],
                 [require.resolve("babel-plugin-preval")],
-                [
-                  "import",
-                  {
-                    "libraryName": "@icon-park/vue",
-                    "libraryDirectory": "es/icons",
-                    "camel2DashComponentName": false
-                  }
-                ]
               ],
               compact: false
             }
