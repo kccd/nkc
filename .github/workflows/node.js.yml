@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [16.14.0]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -29,7 +29,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm i
+    - run: npm ci
     - run: npm run build --if-present
     # - run: npm test
     - run: npm run build-pages-p # dev
