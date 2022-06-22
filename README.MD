@@ -21,9 +21,10 @@
 
 1. install all the requirements
 2. clone this repo
-3. run `npm install` in your console
+3. run `npm build` in your console
 4. run `npm run init` to initialize data
-5. npm start and you are able to access via localhost:1086
+5. run `npm run build-pages-p` to compile the page
+6. npm start and you are able to access via localhost:1086
 
 ## How to call an API
 - In browser

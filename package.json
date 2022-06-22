@@ -5,8 +5,8 @@
   "homepage": "https://kechuang.org",
   "private": true,
   "scripts": {
-    "install": "node install.js",
-    "reinstall": "node install.js -r",
+    "build": "node install.js",
+    "rebuild": "node install.js -r",
     "start": "cross-env NODE_ENV=production node server.js ",
     "serve": "npm run init && node ./server.js",
     "test": "mocha -t 10000",
@@ -98,6 +98,7 @@
     "ioredis": "^4.0.0",
     "jquery-pjax": "^2.0.1",
     "jscrollpane": "^2.2.0",
+    "keygrip": "^1.1.0",
     "koa": "^2.4.1",
     "koa-body": "^2.5.0",
     "koa-compress": "^2.0.0",
