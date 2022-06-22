@@ -15,7 +15,7 @@
         a.username( :title="userData.username" :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
       .grade( :title="userData.info?userData.info.certsName:''" ) {{ userData.info?userData.info.certsName:'' }}
       .introduce( :title="userData.description" ) {{ userData.description || "暂未填写个人简介"}}
-    .follow-button( title="取消关注" @click="subscribe( userData.uid )" v-if="subUid" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
+    .follow-button(:title=`subUid.includes(userData.uid) ? "取关" : "关注" ` :class="{'active': !subUid.includes(userData.uid)}" @click="subscribe( userData.uid )" v-if="subUid" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
 </template>
 <script>
 import {getUrl} from "../../../js/tools";
@@ -72,7 +72,12 @@ export default {
       nkcAPI("/u/" + uid + "/subscribe", method, { cid: [] })
         .then(() => {
           sweetSuccess('操作成功');
-          self.$parent.getUserCardInfo()
+          // self.$parent.getUserCardInfo();
+          if(method === 'DELETE') {
+            self.$emit('delete', uid);
+          } else {
+            self.$emit('add', uid);
+          }
         })
         .catch(err => {
           sweetError(err);
@@ -170,5 +175,8 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+}
+.active {
+  background-color: #2b90d9!important;
 }
 </style>

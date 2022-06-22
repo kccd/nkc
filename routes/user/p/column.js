@@ -10,7 +10,8 @@ module.exports = async (ctx, next) => {
   if(column) {
     const match = {
       columnId: column._id,
-      hidden: false
+      hidden: false,
+      tUid: targetUser.uid,
     };
     const count = await db.ColumnPostModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count, 20);
