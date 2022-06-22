@@ -47,10 +47,6 @@ export default {
     users: [],
     paging: null,
   }),
-  components: {
-  },
-  computed: {
-  },
   mounted() {
     const {params, name} = this.$route;
     const {uid} = params;

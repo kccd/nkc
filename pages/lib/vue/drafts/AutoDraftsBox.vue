@@ -17,7 +17,7 @@
     .module-draft-info(v-if="loading") 加载中...
     .module-draft(v-for="d in drafts")
       .module-info
-        .module-time {{fromNow(d.toc)}}
+        .module-time {{fromNow(d.tlm)}}
         .module-from {{getDraftInfo(d)}}
       .module-article-title 标题：
         span {{d.t}}
@@ -224,7 +224,7 @@ export default {
     },
     getDrafts(page = 0) {
       const self = this;
-      nkcAPI(`/u/${this.uid}/profile/draftData?page=${page}&perpage=${this.perpage}`, "GET")
+      nkcAPI(`/u/${this.uid}/profile/draftData?page=${page}&perpage=${this.perpage}&type=community`, "GET")
         .then(data => {
           if(data.drafts) {
             data.drafts.map(d => {
@@ -243,7 +243,8 @@ export default {
           if(window.PostInfo && window.PostInfo.showCloseInfo) {
             window.PostInfo.showCloseInfo = false;
           }
-          window.location.href = `/editor?type=redit&id=${d.did}`;
+          // window.location.href = `/editor?type=redit&id=${d.did}`;
+          window.location.href = `/editor?aid=${d._id}`
         })
         .catch(sweetError);
     },

@@ -5,6 +5,10 @@ block latestContent
   div
     include ../latestNav
     +renderLatestNav('zone')
+    #latestZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
+      moment-editor(@published='published')
     block zoneContent
 block latestScripts
+  +includeJS('/latest/zone/zone.js')
   block zoneScripts
+

@@ -21,7 +21,7 @@
             span 同时转发
         .checkbox(v-if="postType === types.repost")
           label
-            input(type="checkbox" :value="true" v-model="alsoPost")
+            input(type="checkbox" :value="true" :disabled="disablePostChecked" v-model="alsoPost")
             span 同时评论
       .option-box-right
         span {{remainingWords}}
@@ -133,7 +133,10 @@
         return maxContentLength - contentLength;
       },
       disablePostButton() {
-        return this.submitting || this.content.length === 0 || !this.momentCommentId;
+        return this.submitting;
+      },
+      disablePostChecked() {
+        return this.content.length === 0;
       }
     },
     methods: {
@@ -183,7 +186,7 @@
       onContentChange: debounce(function() {
         this.saveContent();
       }, 500),
-      saveContent() {
+      saveContent(t) {
         const {
           content,
           momentId,
@@ -195,7 +198,12 @@
           this.disableSavingCount --;
           return;
         }
-        const type = momentCommentId? 'modify': 'create';
+        let type;
+        if(t) {
+          type = t;
+        } else {
+          type = momentCommentId? 'modify': 'create';
+        }
         return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
           type,
           content,
@@ -220,15 +228,15 @@
       onClickEnter() {
         this.publish();
       },
-      publish() {
+      async publish() {
         const self = this;
         const {postType, alsoPost, content, momentId, momentCommentId} = this;
         this.lockPost();
         return Promise.resolve()
           .then(() => {
-            if(content.length === 0) throw new Error(`请输入内容`);
+            // if(content.length === 0) throw new Error(`请输入内容`);
             return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
-              type: 'publish',
+              type: momentCommentId ? 'publish' : 'forward',
               content,
               postType,
               alsoPost,

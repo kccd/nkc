@@ -7,6 +7,7 @@ const subCollectionRouter = require('./subscribe/collection');
 const blacklistRouter = require('./subscribe/blackList');
 const subThreadRouter = require('./subscribe/thread');
 const momentRouter = require('./moment');
+const timelineRouter = require('./timeline');
 const postRouter = require('./post');
 const threadRouter = require('./thread');
 const followerRouter = require('./follower');
@@ -148,7 +149,7 @@ router
       data.code = await db.UserModel.getCode(targetUser.uid);
       data.code = data.code.pop();
     }
-    
+
     //用户的黑名单
     const match = {
     };
@@ -231,6 +232,8 @@ router
   .get('/subscribe/blacklistData', blacklistRouter)
   .get('/subscribe/thread', async (ctx, next) => await next())
   .get('/subscribe/threadData', subThreadRouter)
+  .get('/timeline', async (ctx, next) => await next())
+  .get('/timelineData', timelineRouter)
   .get('/moment', async (ctx , next) => await next())
   .get('/momentData', momentRouter)
   .get('/post', async (ctx, next) => await next())

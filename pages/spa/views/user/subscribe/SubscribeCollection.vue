@@ -6,76 +6,77 @@
     .account-threads.subscribe-thread
       .null(v-if="!subscribes.length") 空空如也~
       .subscribe-thread-list(v-else)
-        .account-thread(v-for="subscribe in subscribes")
-          .account-thread(:class="threadType(subscribe.thread)" v-if="subscribe.type === 'collection'")
-            .account-reason(v-if="subscribe.thread.disabled") 已屏蔽，仅自己可见。
-            .account-reason(v-else-if="subscribe.thread.recycleMark") 退修中，仅自己可见，修改后对所有人可见。
-            .account-reason(v-else-if="!subscribe.thread.reviewed") 审核中，仅自己可见，通过后对所有人可见。
-            .account-thread-avatar
-              div(:style="`background-image: url(${getUrl('postCover', subscribe.thread.firstPost.cover)})`" v-if="subscribe.thread.firstPost.cover")
-            .account-thread-content(:style="!subscribe.thread.firstPost.cover?'display: block':''")
-              .account-thread-title(:class="subscribe.thread.digest?'digest':''")
-                .account-follower-buttons(:data-thread="subscribe.tid" :class="collectionThreadsId.includes(subscribe.tid) ? 'active' : ''")
-                  button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
-                  button.subscribe.collection-button(@click="subThread(subscribe.tid, 'collection')")
-                a(:href="`/t/${subscribe.thread.tid}`" :title="subscribe.thread.firstPost.t" target="_blank") {{subscribe.thread.firstPost.t}}
-              .account-thread-abstract {{subscribe.thread.firstPost.abstractCN || subscribe.thread.firstPost.c}}
-              .account-thread-info
-                .thread-time
-                  span {{fromNow(subscribe.thread.toc)}}
-                a.thread-forum-link(:href="`/f/${subscribe.thread.forums[0].fid}`" target="_blank") {{subscribe.thread.forums[0].displayName}}
-                span(v-if="subscribe.thread.firstPost.anonymous") 匿名
-                a.thread-user(:href="`/u/${subscribe.thread.uid}`" v-else)
-                  img(:src="getUrl('userAvatar', subscribe.thread.firstPost.user.avatar)"
-                    data-global-mouseover="showUserPanel"
-                    data-global-mouseout="hideUserPanel"
-                    :data-global-data="objToStr({uid: subscribe.thread.uid})"
-                  )
-                  span {{subscribe.thread.firstPost.user.username}}
-                .thread-thumbup(v-if="subscribe.thread.firstPost.voteUp")
-                  .fa.fa-thumbs-up
-                  span {{subscribe.thread.firstPost.voteUp}}
-                .thread-hits(v-if="subscribe.thread.hits")
-                  .fa.fa-eye
-                  span {{subscribe.thread.hits}}
-                .thread-comment(v-if="subscribe.thread.count")
-                  .fa.fa-comment
-                  span {{subscribe.thread.count}}
-          .account-thread(:class="subscribe.article.status" v-if="subscribe.type === 'article'")
-            .account-reason(v-if="subscribe.article.statue === 'disabled'") 已屏蔽，仅自己可见。
-            .account-reason(v-else-if="subscribe.article.status === 'faulty'") 退修中，仅自己可见，修改后对所有人可见。
-            .account-reason(v-else-if="subscribe.article.status === 'default'") 审核中，仅自己可见，通过后对所有人可见。
-            .account-thread-avatar
-              div(:style="`background-image: url(${getUrl('postCover', subscribe.article.cover)})`" v-if="subscribe.article.cover")
-            .account-thread-content(:style="!subscribe.article.cover?'display: block':''")
-              .account-thread-title(:class="subscribe.article.digest?'digest':''")
-                .account-follower-buttons(:data-thread="subscribe.tid" :class="collectionThreadsId.includes(subscribe.tid) ? 'active' : ''")
-                  button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
-                  button.subscribe.collection-button(@click="subArticle(subscribe.tid, 'article')")
-                a(:href="subscribe.article.url" :title="subscribe.article.title" target="_blank") {{subscribe.article.title}}
-              .account-thread-abstract {{subscribe.article.abstract || subscribe.article.content}}
-              .account-thread-info
-                .thread-time
-                  span {{fromNow(subscribe.article.toc)}}
-                a.thread-forum-link(:href="subscribe.article.column.homeUrl" target="_blank" v-if="subscribe.article.source === 'column'") {{subscribe.article.column.name}}
-                span.thread-forum-link(v-else) 空间文章
-                span(v-if="subscribe.article.anonymous") 匿名
-                a.thread-user(:href="`/u/${subscribe.article.uid}`" target="_blank" v-else)
-                  img(:src="getUrl('userAvatar', subscribe.article.user.avatar)"
-                    data-global-mouseover="showUserPanel"
-                    data-global-mouseout="hideUserPanel"
-                    :data-global-data="objToStr({uid: subscribe.article.uid})"
-                  )
-                  span {{subscribe.article.user.username}}
-                .thread-thumbup(v-if="subscribe.article.voteUp && subscribe.article.voteUp > 0")
-                  .fa.fa-thumbs-up
-                  span {{subscribe.article.voteUp}}
-                .thread-hits(v-if="subscribe.article.hits")
-                  .fa.fa-eye
-                  span {{subscribe.article.hits}}
-                .thread-comment(v-if="subscribe.article.count")
-                  .fa.fa-comment
-                  span {{subscribe.article.count}}
+        //.account-thread(v-for="subscribe in subscribes")
+        //  .account-thread(:class="threadType(subscribe.thread)" v-if="subscribe.type === 'collection'")
+        //    .account-reason(v-if="subscribe.thread.disabled") 已屏蔽，仅自己可见。
+        //    .account-reason(v-else-if="subscribe.thread.recycleMark") 退修中，仅自己可见，修改后对所有人可见。
+        //    .account-reason(v-else-if="!subscribe.thread.reviewed") 审核中，仅自己可见，通过后对所有人可见。
+        //    .account-thread-avatar
+        //      div(:style="`background-image: url(${getUrl('postCover', subscribe.thread.firstPost.cover)})`" v-if="subscribe.thread.firstPost.cover")
+        //    .account-thread-content(:style="!subscribe.thread.firstPost.cover?'display: block':''")
+        //      .account-thread-title(:class="subscribe.thread.digest?'digest':''")
+        //        .account-follower-buttons(:data-thread="subscribe.tid" :class="collectionThreadsId.includes(subscribe.tid) ? 'active' : ''")
+        //          button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
+        //          button.subscribe.collection-button(@click="subThread(subscribe.tid, 'collection')")
+        //        a(:href="`/t/${subscribe.thread.tid}`" :title="subscribe.thread.firstPost.t" target="_blank") {{subscribe.thread.firstPost.t}}
+        //      .account-thread-abstract {{subscribe.thread.firstPost.abstractCN || subscribe.thread.firstPost.c}}
+        //      .account-thread-info
+        //        .thread-time
+        //          span {{fromNow(subscribe.thread.toc)}}
+        //        a.thread-forum-link(:href="`/f/${subscribe.thread.forums[0].fid}`" target="_blank") {{subscribe.thread.forums[0].displayName}}
+        //        span(v-if="subscribe.thread.firstPost.anonymous") 匿名
+        //        a.thread-user(:href="`/u/${subscribe.thread.uid}`" v-else)
+        //          img(:src="getUrl('userAvatar', subscribe.thread.firstPost.user.avatar)"
+        //            data-global-mouseover="showUserPanel"
+        //            data-global-mouseout="hideUserPanel"
+        //            :data-global-data="objToStr({uid: subscribe.thread.uid})"
+        //          )
+        //          span {{subscribe.thread.firstPost.user.username}}
+        //        .thread-thumbup(v-if="subscribe.thread.firstPost.voteUp")
+        //          .fa.fa-thumbs-up
+        //          span {{subscribe.thread.firstPost.voteUp}}
+        //        .thread-hits(v-if="subscribe.thread.hits")
+        //          .fa.fa-eye
+        //          span {{subscribe.thread.hits}}
+        //        .thread-comment(v-if="subscribe.thread.count")
+        //          .fa.fa-comment
+        //          span {{subscribe.thread.count}}
+        //  .account-thread(:class="subscribe.article.status" v-if="subscribe.type === 'article'")
+        //    .account-reason(v-if="subscribe.article.statue === 'disabled'") 已屏蔽，仅自己可见。
+        //    .account-reason(v-else-if="subscribe.article.status === 'faulty'") 退修中，仅自己可见，修改后对所有人可见。
+        //    .account-reason(v-else-if="subscribe.article.status === 'default'") 审核中，仅自己可见，通过后对所有人可见。
+        //    .account-thread-avatar
+        //      div(:style="`background-image: url(${getUrl('postCover', subscribe.article.cover)})`" v-if="subscribe.article.cover")
+        //    .account-thread-content(:style="!subscribe.article.cover?'display: block':''")
+        //      .account-thread-title(:class="subscribe.article.digest?'digest':''")
+        //        .account-follower-buttons(:data-thread="subscribe.tid" :class="collectionThreadsId.includes(subscribe.tid) ? 'active' : ''")
+        //          button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
+        //          button.subscribe.collection-button(@click="subArticle(subscribe.tid, 'article')")
+        //        a(:href="subscribe.article.url" :title="subscribe.article.title" target="_blank") {{subscribe.article.title}}
+        //      .account-thread-abstract {{subscribe.article.abstract || subscribe.article.content}}
+        //      .account-thread-info
+        //        .thread-time
+        //          span {{fromNow(subscribe.article.toc)}}
+        //        a.thread-forum-link(:href="subscribe.article.column.homeUrl" target="_blank" v-if="subscribe.article.source === 'column'") {{subscribe.article.column.name}}
+        //        span.thread-forum-link(v-else) 空间文章
+        //        span(v-if="subscribe.article.anonymous") 匿名
+        //        a.thread-user(:href="`/u/${subscribe.article.uid}`" target="_blank" v-else)
+        //          img(:src="getUrl('userAvatar', subscribe.article.user.avatar)"
+        //            data-global-mouseover="showUserPanel"
+        //            data-global-mouseout="hideUserPanel"
+        //            :data-global-data="objToStr({uid: subscribe.article.uid})"
+        //          )
+        //          span {{subscribe.article.user.username}}
+        //        .thread-thumbup(v-if="subscribe.article.voteUp && subscribe.article.voteUp > 0")
+        //          .fa.fa-thumbs-up
+        //          span {{subscribe.article.voteUp}}
+        //        .thread-hits(v-if="subscribe.article.hits")
+        //          .fa.fa-eye
+        //          span {{subscribe.article.hits}}
+        //        .thread-comment(v-if="subscribe.article.count")
+        //          .fa.fa-comment
+        //          span {{subscribe.article.count}}
+        collection-list(ref="collectionList" :subscribes="subscribes" :collection-threads-id="collectionThreadsId")
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -87,76 +88,18 @@
     }
   }
 }
+
 .null {
   text-align: center;
   margin: 5rem 0;
 }
+
 .account-threads, .account-followers{
   .account-thread:last-child{
     margin-bottom: 0;
   }
 }
-.account-follower-buttons{
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 1rem;
 
-  @buttonHeight: 2rem;
-  @buttonWidth: 4rem;
-
-  button{
-    &:focus{
-      outline: none;
-    }
-    height: @buttonHeight;
-    width: @buttonWidth;
-    //line-height: @buttonHeight;
-    border-radius: 2px;
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
-  }
-  .category{
-    background-color: #fff;
-    display: none;
-    color: @dark;
-    border: 1px solid #ccc;
-    &:hover{
-      background-color: #eee;
-    }
-  }
-  .subscribe{
-    background-color: @primary;
-    border: 1px solid @primary;
-    color: #fff;
-    &:after{
-      content: "关注";
-    }
-    &.collection-button:after{
-      content: "收藏";
-    }
-    &:hover{
-      background-color: #2777b1;
-    }
-  }
-  &.active{
-    .subscribe{
-      background-color: @accent;
-      border: 1px solid @accent;
-      &:hover{
-        background-color: #cb4c61;
-      }
-      &:after{
-        content: "取关";
-      }
-      &.collection-button:after{
-        content: "取藏"
-      }
-    }
-    .category{
-      display: inline-block;
-    }
-  }
-}
 .subscribe-thread {
   .account-thread{
     margin-bottom: 1.5rem;
@@ -378,6 +321,7 @@
 import NavTypes from "./NavTypes";
 import Paging from "../../../../lib/vue/Paging";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
+import CollectionList from "../../../../lib/vue/CollectionList";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {getUrl, fromNow} from "../../../../lib/js/tools";
 import {collectionThread, collectionArticle} from "../../../../lib/js/subscribe";
@@ -398,7 +342,8 @@ export default {
   components: {
     "subscribe-types": SubscribeTypes,
     'nav-types': NavTypes,
-    'paging': Paging
+    'paging': Paging,
+    'collection-list': CollectionList
   },
   computed: {
     pageButtons() {

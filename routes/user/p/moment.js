@@ -3,21 +3,25 @@ module.exports = async (ctx, next) => {
   const {page = 0, t = 'moment'} = query;
   const {targetUser, user} = data;
   data.t = t;
-  const {
-    normal: normalMoment,
-    faulty: faultyMoment,
-    unknown: unknownMoment,
-  } = await db.MomentModel.getMomentStatus();
-  const {normal: normalArticle} = await db.ArticleModel.getArticleStatus();
-  const {zone: zoneSource} = await db.ArticleModel.getArticleSources();
-  
-  // const {moment: momentType, article: articleType} = await db.MomentModel.getMomentQuoteTypes();
   let paging;
   if(t === 'moment') {
+    const {
+      normal: normalMoment,
+      faulty: faultyMoment,
+      unknown: unknownMoment,
+    } = await db.MomentModel.getMomentStatus();
+    const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     //获取用户动态列表
     const match = {
       uid: targetUser.uid,
       parent: '',
+      quoteType: {
+        $in: [
+          momentQuoteTypes.moment,
+          momentQuoteTypes.article,
+          ''
+        ]
+      },
       $or: [
         {
           status: normalMoment
@@ -39,6 +43,8 @@ module.exports = async (ctx, next) => {
     const moments = await db.MomentModel.find(match).sort({top: -1}).skip(paging.start).limit(paging.perpage);
     data.momentsData = await db.MomentModel.extendMomentsListData(moments, state.uid);
   } else if(t === 'thread') {
+    const {normal: normalArticle} = await db.ArticleModel.getArticleStatus();
+    const {zone: zoneSource} = await db.ArticleModel.getArticleSources();
     //查找空间文章
     const match = {
       source: zoneSource,
@@ -74,7 +80,7 @@ module.exports = async (ctx, next) => {
       permissions.reviewed = true;
     }
   }
-  
+
   data.paging = paging;
   data.permissions = permissions;
   await next();

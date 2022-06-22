@@ -1,7 +1,7 @@
 # nkc
 
 ## Requirements
-- Base: [Node.js](https://nodejs.org) v12.14.0
+- Base: [Node.js](https://nodejs.org) v16.14.0
       
 - Database: 
     1. **[mongoDB](https://www.mongodb.com)** v4.4.5
@@ -21,9 +21,10 @@
 
 1. install all the requirements
 2. clone this repo
-3. run `npm install` in your console
+3. run `npm build` in your console
 4. run `npm run init` to initialize data
-5. npm start and you are able to access via localhost:1086
+5. run `npm run build-pages-p` to compile the page
+6. npm start and you are able to access via localhost:1086
 
 ## How to call an API
 - In browser

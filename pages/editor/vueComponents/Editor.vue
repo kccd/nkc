@@ -5,15 +5,16 @@
       div
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
-        .article-box(v-if="drafts.length")
-          .article-box-title
-            .article-box-header.des-type {{ getTitle }}
-            .article-box-text.prompt-title {{drafts[0].t  || '未填写'}} {{ setContent(drafts[0].c) }}
-            //- .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
-          .article-box-option
-            button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(drafts[0]._id)") 继续编辑
-            button.btn.btn-xs.btn-default(@click="more") 查看更多
-            .fa.fa-remove(@click="closeDraft")
+        template(v-if="drafts.length")
+          .article-box( v-for = "draft in drafts")
+            .article-box-title
+              .article-box-header.des-type 草稿
+              .article-box-text {{draft.t  || '未填写'}} {{ setContent(draft.c) }}
+              //- .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
+            .article-box-option
+              button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(draft._id)") 继续编辑
+              button.btn.btn-xs.btn-default(@click="more") 查看更多
+              .fa.fa-remove(@click="closeDraft")
         article-title(
           :o="reqUrl.o",
           ref="title",
@@ -190,24 +191,30 @@ export default {
       let url = `/u/${self.uid}/profile/draftData?page=${page}&perpage=1`;
       // 编辑器类型 newpost modifyPost modifyThread  newThread
       const editType = this.pageData.type;
-      if (editType) {
-        url += '&type=' + editType
-      }
-      // 如果是 newpost(newpost === thread)带上文章id
-      // 显示当前文章的回复 考虑的业务，回复都是依据文章显示的
+      // 回复都是依据文章显示的
       if (editType === "newPost") {
+        url += '&type=' + editType;
         url += "&desTypeId=" + this.pageData.thread.tid;
 
-      // } else if ("modifyThread" === editType) {
-      //   url += "&desTypeId=" + this.pageData.thread.oc;
-
       } else if ("modifyPost" === editType) {
+
         if (this.pageData.thread.comment) {
-          url += "&comment=true";
-          url += "&desTypeId=" + this.pageData.thread.parentPostId;
+          url += '&type=modifyComment';
+          url += "&desTypeId=" + this.pageData.thread.pid;
         } else {
-          url += "&desTypeId=" + this.pageData.thread.tid;
+          // 修改回复 在draft表中type = post
+          url += '&type=' + editType;
+          url += "&desTypeId=" + this.pageData.thread.pid;
+
         }
+      } else if (editType === "modifyThread") {
+        // 修改文章存草稿类型为post
+        // desTypeId为post表的pid
+        url += '&type=' + editType;
+        url += "&desTypeId=" + this.pageData.thread.pid;
+
+      } else if (editType === "newThread") {
+        url += '&type=' + editType;
       }
 
       nkcAPI(url, 'GET')
