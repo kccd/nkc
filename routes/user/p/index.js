@@ -19,10 +19,23 @@ const columnRouter = require('./column');
 const draftRouter  = require('./draft');
 const noteRouter  = require('./note');
 router
-  .get('/', async (ctx, next) => {
-    //获取主页导航等信息
-    const {db, state, data, params, nkcModules } = ctx;
+  // .get('/', async (ctx, next) => {
+  //   await next();
+  // })
+  .use('/', async (ctx, next) => {
+    const {db, data, permission, state} = ctx;
     const {user, targetUser} = data;
+    const permissions = {
+      reviewed: null,
+      disabled: null,
+    };
+    if(user) {
+      if(permission('review')) permissions.reviewed = true;
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true;
+      }
+    }
+  
     // 验证权限
     // if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
     //   ctx.throw(403, "权限不足");
@@ -149,7 +162,7 @@ router
       data.code = await db.UserModel.getCode(targetUser.uid);
       data.code = data.code.pop();
     }
-
+  
     //用户的黑名单
     const match = {
     };
@@ -165,24 +178,20 @@ router
       return b.uid
     });
     data.usersBlUid = usersBlUid;
+    data.permissions = permissions;
+    
     await next();
   })
-  .use('/', async (ctx, next) => {
-    const {db, data, permission, state} = ctx;
-    const {uid} = state;
-    const {user} = data;
-    const permissions = {
-      reviewed: null,
-      disabled: null,
-    };
-    if(user) {
-      if(permission('review')) permissions.reviewed = true;
-      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
-        permissions.disabled = true;
+  .get('/', async (ctx, next) => {
+    const {data, state} = ctx;
+    const {user, targetUser} = data;
+    if((state.url.split('/')).pop() === 'profile') {
+      if(user.uid === targetUser.uid) {
+        ctx.redirect(`/u/${targetUser.uid}/profile/moment`);
+      } else {
+        ctx.redirect(`/u/${targetUser.uid}/profile/timeline`);
       }
     }
-    data.permissions = permissions;
-    await next();
   })
   .use('/subscribe', async (ctx, next) => {
     const { query, data, db, state } = ctx;
