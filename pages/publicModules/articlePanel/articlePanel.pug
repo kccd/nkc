@@ -127,12 +127,14 @@ if !isIncluded('publicModules/articlePanel')
       +ArticlePanelSM(article)
 
   mixin ArticlePanelMD(article, coverPosition)
-    -coverPosition = coverPosition || ArticlePanelStyleCover.right;
     -var {user, categories, content, reply, pages} = article;
 
     -var coverClass = '';
     if content.coverUrl
       -coverClass = `cover-${coverPosition}`;
+      -coverPosition = coverPosition || ArticlePanelStyleCover.right;
+    else
+       -coverPosition = ArticlePanelStyleCover.none;
     .article-panel-md(class=coverClass)
       if coverPosition === ArticlePanelStyleCover.left
         .article-panel-left
