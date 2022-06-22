@@ -2,7 +2,7 @@
 
 ## 运行环境
 
-- 基于：**[NodeJS](https://nodejs.org)** v12.14.0 
+- 基于：**[NodeJS](https://nodejs.org)** v16.14.0 
 - 数据库：
     1. **[MongoDB](https://www.mongodb.com)** v4.4.5
     2. **[Redis](https://redis.io/)** v3.2.100
@@ -22,12 +22,14 @@
 ### 从源代码安装
 1. 拉取当前仓库到本地
 2. 执行 `npm i` 安装依赖
-3. 执行 `npm run build-pages-p` 使用生产环境编译前端文件\
+3. 执行 `npm run build` 初始化目录
+4. 执行 `npm run init` 初始化缓存
+5. 执行 `npm run build-pages-p` 使用生产环境编译前端文件\
    （`npm run build-pages` 开发环境）
-4. 根据需要调整项目根目录 `config` 文件夹下的配置文件
-5. 执行 `pm2 start pm2.config.js` 启动项目\
+6. 根据需要调整项目根目录 `config` 文件夹下的配置文件
+7. 执行 `pm2 start pm2.config.js` 启动项目\
    （如果遇到启动错误或无限弹框，请在另一个控制台中运行 `pm2 log` 查看输出）
-6. 浏览器访问 `localhost:9000`
+8. 浏览器访问 `localhost:9000`
 
 ### 从 Docker 安装
 1. 咕咕咕。
