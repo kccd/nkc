@@ -66,7 +66,7 @@
                 .account-nav-item.m-r-2f5(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}")
                   .account-nav-item-name 社区
                   .account-nav-item-value {{targetUser.postCount + targetUser.threadCount - targetUser.disabledThreadsCount - targetUser.disabledPostsCount}}
-                .account-nav-item.m-r-2f5(@click="containerChange('column')" :class="{'active': $route.name === 'column'}")
+                .account-nav-item.m-r-2f5(@click="containerChange('column')" :class="{'active': $route.name === 'column'}" v-if="targetUser.column")
                   .account-nav-item-name 专栏
                   .account-nav-item-value {{targetUser.columnThreadCount - targetUser.disabledColumnThreadCount}}
                 .account-nav-item.m-r-2f5.hidden-md.hidden-sm.hidden-lg(@click="containerChange('follower')" :class="{'active': $route.name === 'follower'}")
