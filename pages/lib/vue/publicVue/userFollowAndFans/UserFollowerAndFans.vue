@@ -7,7 +7,7 @@
     //- user-info 数组中的一个用户对象
     .col-xs-12.col-md-6(v-for="user in users" v-else)
       .row
-        user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid")
+        user-info( :key="user.uid" :user="user" :page-type="t" :sub-uid="userSubUid" @delete="deleteSubUid" @add="addSubUid")
 </template>
 
 <script>
@@ -66,6 +66,13 @@ export default {
     },
     clickButton(num) {
       this.getUserCardInfo( num );
+    },
+    deleteSubUid(uid) {
+      const index = this.userSubUid.indexOf(uid);
+      this.userSubUid.splice(index, 1);
+    },
+    addSubUid(uid) {
+      this.userSubUid.push(uid);
     },
     getUserCardInfo(page) {
       this.loading = true;

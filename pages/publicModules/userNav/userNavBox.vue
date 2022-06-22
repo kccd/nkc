@@ -16,7 +16,7 @@
         .user-nav-count
           user-score(:scores="user.userInfo.scores" :xsf="user.userInfo.xsf" :sicon="true" :xsficon="user.xsfIcon")
       .user-nav-links
-        a(:href="'/u/' + user.uid + '/profile'" target='_blank').col-xs-6.nav-user-link
+        a(:href="'/u/' + user.uid" target='_blank').col-xs-6.nav-user-link
           .fa.fa-user-circle
           | 我的主页
         a(:href="'/m/' + user.userInfo.columnId" target='_blank' v-if="user.userInfo.columnId").col-xs-6.nav-user-link

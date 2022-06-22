@@ -15,11 +15,13 @@
         .time {{fromNow(draft.tlm || draft.toc)}}
         span(v-if="draft.type === 'newThread'") 发表文章
         span(v-else-if="draft.type === 'newPost'") 在文章《
-          a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》下发表
+          a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》
+          span 下发表
           span(v-if="draft.parentPostId") 评论
           span(v-else) 回复
         span(v-else-if="draft.type ==='modifyPost'") 修改文章《
-          a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》下的
+          a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》
+          span 下的
           span(v-if="draft.parentPostId") 评论
           span(v-else) 回复
         span(v-else-if="draft.type === 'modifyThread'")

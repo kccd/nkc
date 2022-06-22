@@ -863,7 +863,8 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function() {
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
-  const {column, zone} = await ArticleModel.getArticleSources();
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const {zone: zoneSource} = await ArticleModel.getArticleSources();
   const {normal, disabled} = await ArticleModel.getArticleStatus();
   const momentStatus = await MomentModel.getMomentStatus();
   const momentQuoteType = await MomentModel.getMomentQuoteTypes();
@@ -882,12 +883,17 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function() {
   this.timelineCount = await MomentModel.countDocuments({
     uid: this.uid,
     status: momentStatus.normal,
-    parent: ''
+    parent: '',
   });
-  this.columnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: normal});
-  this.disabledColumnThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: column, status: disabled});
-  this.zoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zone, status: normal});
-  this.disabledZoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zone, status: disabled});
+  this.columnThreadCount = 0;
+  this.disabledColumnThreadCount = 0;
+  //查找用户专栏信息
+  if(this.column) {
+    this.columnThreadCount = await ColumnPostModel.countDocuments({tUid: this.uid, hidden: false, columnId: this.column._id});
+    this.disabledColumnThreadCount = await ColumnPostModel.countDocuments({tUid: this.uid, hidden: true, columnId: this.column._id});
+  }
+  this.zoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zoneSource, status: normal});
+  this.disabledZoneThreadCount = await ArticleModel.countDocuments({uid: this.uid, source: zoneSource, status: disabled});
   this.commentCount = await CommentModel.countDocuments({uid: this.uid, status: normal});
 }
 

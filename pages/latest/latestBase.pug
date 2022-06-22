@@ -13,8 +13,9 @@ block content
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         block latestContent
       .col-xs-12.col-md-3.hidden-xs.hidden-sm.box-shadow-panel
-        include ../publicModules/canvas_logo
-        +renderCanvasLogo(data.homeBigLogo)
+        .m-b-1
+          include ../publicModules/canvas_logo
+          +renderCanvasLogo(data.homeBigLogo)
         include ../publicModules/improveUserInfo
         +improveUserInfo(data.improveUserInfo)
         include ../publicModules/management/management
