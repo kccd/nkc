@@ -2,7 +2,7 @@
 
 ## 运行环境
 
-- 基于：**[NodeJS](https://nodejs.org)** v12.14.0 
+- 基于：**[NodeJS](https://nodejs.org)** v16.14.0 
 - 数据库：
     1. **[MongoDB](https://www.mongodb.com)** v4.4.5
     2. **[Redis](https://redis.io/)** v3.2.100

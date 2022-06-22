@@ -1,7 +1,7 @@
 # nkc
 
 ## Requirements
-- Base: [Node.js](https://nodejs.org) v12.14.0
+- Base: [Node.js](https://nodejs.org) v16.14.0
       
 - Database: 
     1. **[mongoDB](https://www.mongodb.com)** v4.4.5
