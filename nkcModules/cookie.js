@@ -1,14 +1,21 @@
 const Cookies = require('cookies-string-parse');
 const cookieConfig = require('../config/cookie');
+const KeyGrip = require("keygrip");
+
+const cookieKeys = new KeyGrip([cookieConfig.secret], 'sha256');
+
+function getCookieKeys() {
+  return cookieKeys;
+}
+
 function getCookieInfo(cookie = '', key) {
   let keyInfo = null;
   try{
     const cookies = new Cookies(cookie, {
-      keys: [cookieConfig.secret]
+      keys: getCookieKeys()
     });
     let result = cookies.get(key, {
       signed: true,
-
     });
     if(result) {
       keyInfo = result;
@@ -40,5 +47,6 @@ function getUserInfo(cookie) {
 
 module.exports = {
   getCookieInfo,
+  getCookieKeys,
   getUserInfo
 }

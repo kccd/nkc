@@ -6,7 +6,7 @@ const koaBody = require('koa-body');
 const koaCompress = require('koa-compress');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
-const KeyGrip = require('keygrip');
+const {getCookieKeys} = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
 const staticServe = path => {
   return require('koa-static')(path, {
@@ -48,7 +48,7 @@ const uploadConfig = require('./config/upload');
 
 const koaBodySetting = settings.upload.koaBodySetting;
 koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
-app.keys = new KeyGrip([cookieConfig.secret], 'sha256')
+app.keys = getCookieKeys();
 app
   .use(rateLimit.total)
   // gzip
