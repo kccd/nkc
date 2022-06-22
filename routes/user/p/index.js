@@ -19,23 +19,10 @@ const columnRouter = require('./column');
 const draftRouter  = require('./draft');
 const noteRouter  = require('./note');
 router
-  // .get('/', async (ctx, next) => {
-  //   await next();
-  // })
-  .use('/', async (ctx, next) => {
-    const {db, data, permission, state} = ctx;
+  .get('/', async (ctx, next) => {
+    //获取主页导航等信息
+    const {db, state, data, params, nkcModules } = ctx;
     const {user, targetUser} = data;
-    const permissions = {
-      reviewed: null,
-      disabled: null,
-    };
-    if(user) {
-      if(permission('review')) permissions.reviewed = true;
-      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
-        permissions.disabled = true;
-      }
-    }
-  
     // 验证权限
     // if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
     //   ctx.throw(403, "权限不足");
@@ -126,72 +113,70 @@ router
       });
     }
     //获取用户个人主页的粉丝和关注
-    const sub = await db.SubscribeModel.find({
-      type: "user",
-      cancel: false,
-      uid: targetUser.uid
-    }, {tUid: 1}).sort({toc: -1}).limit(9);
-    const targetUserFollowers = await db.UserModel.find({
-      uid: {
-        $in: sub.map(s => s.tUid)
-      }
-    });
-    const fans = await db.SubscribeModel.find({
-      type: "user",
-      cancel: false,
-      tUid: targetUser.uid,
-    }, {uid: 1}).sort({toc: -1}).limit(9);
-    const targetUserFans = await db.UserModel.find({
-      uid: {
-        $in: fans.map(s => s.uid)
-      }
-    });
-    data.fansCount = await db.SubscribeModel.countDocuments({
-      type: "user",
-      cancel: false,
-      tUid: targetUser.uid,
-    });
-    data.followersCount = await db.SubscribeModel.countDocuments({
-      type: "user",
-      cancel: false,
-      uid: targetUser.uid
-    });
-    data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
-    data.targetUserFollowers = await db.UserModel.extendUsersInfo(targetUserFollowers);
+    const fansUsersId = await db.SubscribeModel.getUserFansId(targetUser.uid);
+
+    const latestFansUsersId = fansUsersId.slice(-8);
+    const latestSubUsersId = subUsersId.slice(-8);
+    const usersId = latestFansUsersId.concat(latestSubUsersId);
+    let users = await db.UserModel.find({uid: {$in: usersId}});
+    users = await db.UserModel.extendUsersInfo(users);
+    const usersObj = {};
+    for(const u of users) {
+      usersObj[u.uid] = u;
+    }
+
+    const targetUserFans = [];
+    const targetUserFollowers = [];
+    for(const uid of latestFansUsersId) {
+      const u = usersObj[uid];
+      if(!u) continue;
+      targetUserFans.push(u);
+    }
+    for(const uid of latestSubUsersId) {
+      const u = usersObj[uid];
+      if(!u) continue;
+      targetUserFollowers.push(u);
+    }
+
+    data.fansCount = fansUsersId.length;
+    data.followersCount = subUsersId.length;
+    data.fansUsersId = fansUsersId;
+    data.subUsersId = subUsersId;
+
+    data.targetUserFans = targetUserFans;
+    data.targetUserFollowers = targetUserFollowers;
+
     if(state.uid === targetUser.uid) {
       data.code = await db.UserModel.getCode(targetUser.uid);
       data.code = data.code.pop();
     }
-  
+
     //用户的黑名单
-    const match = {
-    };
+    const match = {};
     if(user) {
       match.uid = user.uid;
     }
-    const bl = await db.BlacklistModel.find(match).sort({toc: -1});
-    const usersId = bl.map(b => {
+    const bl = await db.BlacklistModel.find(match, {tUid: 1}).sort({toc: -1});
+    data.usersBlUid = bl.map(b => {
       return b.tUid
     });
-    const users = await db.UserModel.find({uid: usersId});
-    const usersBlUid = users.map(b => {
-      return b.uid
-    });
-    data.usersBlUid = usersBlUid;
-    data.permissions = permissions;
-    
     await next();
   })
-  .get('/', async (ctx, next) => {
-    const {data, state} = ctx;
-    const {user, targetUser} = data;
-    if((state.url.split('/')).pop() === 'profile') {
-      if(user.uid === targetUser.uid) {
-        ctx.redirect(`/u/${targetUser.uid}/profile/moment`);
-      } else {
-        ctx.redirect(`/u/${targetUser.uid}/profile/timeline`);
+  .use('/', async (ctx, next) => {
+    const {data, permission, state} = ctx;
+    const {user} = data;
+    const permissions = {
+      reviewed: null,
+      disabled: null,
+    };
+    if(user) {
+      if(permission('review')) permissions.reviewed = true;
+      if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true;
       }
     }
+    data.permissions = permissions;
+    await next();
   })
   .use('/subscribe', async (ctx, next) => {
     const { query, data, db, state } = ctx;
