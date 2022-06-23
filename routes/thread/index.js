@@ -292,7 +292,6 @@ threadRouter
     };
     firstPost.t = nkcModules.nkcRender.replaceLink(firstPost.t);
     thread.firstPost = firstPost;
-
     // 加载文章待审原因
     if(!firstPost.reviewed) {
       const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});

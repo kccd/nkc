@@ -130,6 +130,7 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    // 改
     history() {
       const desTypeMap = {
         newThread: 'forum',
@@ -226,20 +227,24 @@ export default {
       let type = this.type;
       return Promise.resolve()
         .then(() => {
-          // let post = this.getPost();
+          // 设置草稿表的desTypeId
           let desType, desTypeId;
           if (type === "newThread") {
-            desType = "forum";
+            // desType = "forum";
           } else if (type === "newPost") {
-            desType = "thread";
+            // desType = "thread";
             desTypeId = this.thread?.tid;
           } else if (type === "modifyPost") {
-            desType = "post";
+            // desType = "post";
             desTypeId = this.pid;
           } else if (type === "modifyThread") {
-            desType = "post";
+            // desType = "post";
             desTypeId = this.pid;
-          } 
+          } else if (type === "modifyComment") {
+            desTypeId = this.pid;
+          } else if (type === "newComment") {
+            desTypeId = this.tid;
+          }
           // else if (type === "modifyForumDeclare") {
           //   desType = "forumDeclare";
           //   desTypeId = this.forum.fid;
@@ -260,7 +265,7 @@ export default {
             JSON.stringify({
               post: saveData,
               draftId: saveData?.did || this.draftId,
-              desType: desType,
+              desType: type,
               desTypeId: desTypeId,
               saveType
             })

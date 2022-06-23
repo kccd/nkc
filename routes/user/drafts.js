@@ -1,10 +1,12 @@
 const Router = require('koa-router');
 const draftsRouter = new Router();
+// 返回页面数据
 draftsRouter
   .get('/', async(ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {user} = data;
-    const {page = 0} = query;
+    const {page = 0, id} = query;
+    const draftDesType = await db.DraftModel.getDesType();
     const count = await db.DraftModel.countDocuments({uid: user.uid});
     const paging = nkcModules.apiFunction.paging(page, count);
     const drafts = await db.DraftModel.find({uid: user.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -13,9 +15,10 @@ draftsRouter
     for(const draft of drafts) {
       const {desType, desTypeId} = draft;
       const d = draft.toObject();
-      if(desType === "forum") {
+      // if(desType === "forum") {
+      if(desType === draftDesType.newThread) {
         d.type = "newThread";
-      } else if(desType === "thread") {
+      } else if(desType === draftDesType.newPost) {
         d.type = "newPost";
         const thread = await db.ThreadModel.findOne({tid: desTypeId});
         if(!thread) continue;
@@ -24,7 +27,29 @@ draftsRouter
           url: `/t/${thread.tid}`,
           title: firstPost.t
         };
-      } else if(desType === "post") {
+      } 
+      else if (desType === draftDesType.modifyThread) {
+        const thread = await db.ThreadModel.findOne({tid: post.tid});
+        if (!thread) continue;
+        d.thread = {
+          url: `/t/${thread.tid}`,
+          title: post.t
+        };
+        d.type = "modifyThread";
+      } else if (desType === draftDesType.modifyPost) {
+        const post = await db.PostModel.findOne({pid: desTypeId});
+        if (!post) continue;
+        const thread = await db.ThreadModel.findOne({tid: post.tid});
+        if (!thread) continue;
+        const firstPost = await db.PostModel.findOne({pid: thread.oc});
+        const url = await db.PostModel.getUrl(post.pid);
+        d.thread = {
+          url,
+          title: firstPost.t
+        };
+        d.type = "modifyPost";
+      }
+      /* else if(desType === "post") {
         const post = await db.PostModel.findOne({pid: desTypeId});
         if (!post) continue;
         const thread = await db.ThreadModel.findOne({tid: post.tid});
@@ -44,7 +69,8 @@ draftsRouter
           };
           d.type = "modifyPost";
         }
-      } else {
+      } */ 
+      /* else {
         if(desType === 'forumDeclare') {
           d.type = 'modifyForumDeclare';
         } else {
@@ -56,7 +82,7 @@ draftsRouter
           title: forum.displayName,
           url: `/f/${forum.fid}`
         };
-      }
+      } */
       d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
       data.drafts.push(d);
     }
@@ -82,7 +108,11 @@ draftsRouter
   })
   // 保存草稿
   .post("/", async (ctx, next) => {
-    const {data, db, nkcModules} = ctx;
+    const {data, db} = ctx;
+    const {user} = data;
+    const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
+    if(draftCount >= 5000) ctx.throw(400, "草稿箱已满");
+    const draftDesType = await db.DraftModel.getDesType();
     let body, files;
     if(ctx.body.fields) {
       body = JSON.parse(ctx.body.fields.body);
@@ -97,24 +127,23 @@ draftsRouter
       draftId, // 草稿ID
       saveType
     } = body;
+    if (!['newThread', 'modifyThread', 'newPost', 'modifyPost', 'newComment', 'modifyComment'].includes(desType)) 
+      ctx.throw(500, '草稿类型错误');
     let {
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
       keyWordsEn = [], keyWordsCn = [], fids = [], cids = [],
       authorInfos = [], originState = 0, anonymous = false, cover = "",
       survey, parentPostId = "", tcId = []
     } = post;
-    const {user} = data;
-    const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
-    if(draftCount >= 5000) ctx.throw(400, "草稿箱已满");
     let draft;
     let contentLength;
+    if (parentPostId) {
+      const parentPost = await db.PostModel.findOnly({pid: parentPostId});
+      if (!parentPost) ctx.throw(400, 'parentPostId不存在'); 
+    };
     if(draftId) {
       draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
     }
-    if (parentPostId) {
-      const parentPost = await db.PostModel.findOnly({pid: parentPostId});
-      if (! parentPost) ctx.throw(400, 'parentPostId不存在'); 
-    };
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
       tcId,
@@ -140,18 +169,22 @@ draftsRouter
           const surveyDB = await db.SurveyModel.createSurvey(survey, false);
           await draft.updateOne({surveyId: surveyDB._id});
         }
-      } else if(desType === "forum" && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
+      } 
+      // else if(desType === "forum" && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
+        else if(desType === draftDesType.newThread && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
         await draft.updateOne({surveyId: null});
         await db.SurveyModel.deleteOne({uid: user.uid, _id: draft.surveyId});
       }
     } else {
       // "forumDeclare", 'forumLatestNotice'
-      if(!["forum", "thread", "post"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
-      if(desType === "thread") {
-        await db.ThreadModel.findOnly({tid: desTypeId});
-      } else if(desType === "post") {
-        await db.PostModel.findOnly({pid: desTypeId});
-      } 
+      // if(!["forum", "thread", "post"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
+      if(!Object.values(draftDesType).includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
+      
+      // if(desType === "thread") {
+      //   await db.ThreadModel.findOnly({tid: desTypeId});
+      // } else if(desType === "post") {
+      //   await db.PostModel.findOnly({pid: desTypeId});
+      // } 
       // else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
       //   await db.ForumModel.findOnly({fid: desTypeId});
       // }

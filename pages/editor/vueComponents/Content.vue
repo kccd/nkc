@@ -33,19 +33,20 @@ export default {
   }),
   props: {
     c: {
-      type: String,
+      type: Object,
     },
   },
   watch: {
     c: {
+      deep: true,
       immediate: true,
       handler(n) {
         let reg = /<blockquote cite.+?blockquote>/;
-        let quoteHtml = n?.match(reg);
+        let quoteHtml = n.post.c?.match(reg);
         if (quoteHtml && quoteHtml[0]) {
           this.quoteHtml = quoteHtml[0];
         }
-        this.content = n?.replace(reg, "") || "";
+        this.content = n.post.c?.replace(reg, "") || "";
         this.editorStatus && this.setContent(this.content)
       },
     },
@@ -60,7 +61,8 @@ export default {
   },
   methods: {
     setContent(v) {
-      this.content && this.$refs.threadEditor.setContent(v || this.content);
+      if (v === undefined || v === null) v = '';
+      this.$refs.threadEditor.setContent(v);
     },
     getRef() {
       return this.$refs.threadEditor;
@@ -84,7 +86,7 @@ export default {
     editorReady() {
       //编辑器准备就绪
       this.editorStatus = true;
-      this.setContent();
+      this.setContent(this.content);
       // this.resetBodyPaddingTop();
     },
     removeEditor() {

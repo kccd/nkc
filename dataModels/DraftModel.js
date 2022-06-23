@@ -164,9 +164,15 @@ const draftType = {
   stableHistory: 'stableHistory'
 };
 const desType = {
-  forum: 'forum',
-  post: 'post',
-  thread: 'thread'
+  // forum: 'forum',
+  // post: 'post',
+  // thread: 'thread'
+  newThread: "newThread",
+  modifyThread: "modifyThread",
+  newPost: "newPost",
+  modifyPost: "modifyPost",
+  newComment: "newComment",
+  modifyComment: "modifyComment"
 };
 /* 
 * 获取草稿的type
@@ -207,8 +213,8 @@ draftSchema.statics.getLatestNewPost = async function (desTypeId, uid, limit = 1
 
   const DraftModel = mongoose.model("drafts");
   const beta = (await DraftModel.getType()).beta; 
-  const thread = (await DraftModel.getDesType()).thread;
-  return await DraftModel.find({ uid, desType: thread, type: beta, desTypeId, parentPostId: ""  })
+  const newPost = (await DraftModel.getDesType()).newPost;
+  return await DraftModel.find({ uid, desType: newPost, type: beta, desTypeId, parentPostId: ""  })
     .sort({tlm: -1})
     .limit(limit);
 
@@ -224,17 +230,22 @@ draftSchema.statics.getLatestNewPost = async function (desTypeId, uid, limit = 1
 */
 draftSchema.statics.getLatestModifyPost = async (desTypeId, uid, nkcModules, limit = 1) => {
   const DraftModel = mongoose.model("drafts");
-  const PostsModel = mongoose.model("posts");
+  // const PostsModel = mongoose.model("posts");
   const beta = (await DraftModel.getType()).beta; 
-  const post = (await DraftModel.getDesType()).post;
+  const modifyPost = (await DraftModel.getDesType()).modifyPost;
+  return await DraftModel.find({ type: beta, uid, desType: modifyPost, desTypeId, parentPostId: "" })
+  .sort({tlm: -1})
+  // .skip(paging.start)
+  .limit(limit);
+
    // 修改回复
-   let page = 0;
+  /*  let page = 0;
    let perpage = 100;
    const count = await DraftModel.countDocuments({ uid: uid, desType: post });
-   const verifiedData = [];
+   const verifiedData = []; */
    
    // 这部分根据条件要递归
-   async function findLatestModifyPost () {
+   /* async function findLatestModifyPost () {
      const paging = nkcModules.apiFunction.paging(page, count, perpage); 
     //  获取类型为post的草稿，但post不一定就是修改回复所以需要去post表对比
      const posts = await DraftModel.find({ type: beta, uid, desType: post, desTypeId, parentPostId: "" })
@@ -278,7 +289,7 @@ draftSchema.statics.getLatestModifyPost = async (desTypeId, uid, nkcModules, lim
        }
      } else return verifiedData;
    }
-   return await findLatestModifyPost();
+   return await findLatestModifyPost(); */
 }
 /* 
 * 查找用户最近文章草稿
@@ -293,9 +304,9 @@ draftSchema.statics.getLatestNewThread = async (uid, limit = 1) => {
   
   const beta = (await DraftModel.getType()).beta; 
   // const forum = (await DraftModel.getType()).forum; 
-  const forum = (await DraftModel.getDesType()).forum;
+  const newThread = (await DraftModel.getDesType()).newThread;
   // forum 类型一定是文章(获取新文章)
-  return await DraftModel.find({uid, desType: forum, type: beta})
+  return DraftModel.find({uid, desType: newThread, type: beta})
     .sort({tlm: -1})
     .limit(limit);
 }
@@ -303,22 +314,25 @@ draftSchema.statics.getLatestNewThread = async (uid, limit = 1) => {
 * 获取一篇文章最近的修改草稿
 * @param {String} desTypeId 文章id
 * @param {String} uid 用户id
-* @param {Object} nkcModules
 * @param {Number} limit 返回草稿的数量
 * @return {Array} 返回desTypeId指定的文章最近新建的文章草稿
 */
-draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, nkcModules, limit = 1) => {
-  const PostsModel = mongoose.model("posts");
+draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, limit = 1) => {
+  // const PostsModel = mongoose.model("posts");
   const DraftModel = mongoose.model("drafts");
-  const post = (await DraftModel.getDesType()).post;
+  const modifyThread = (await DraftModel.getDesType()).modifyThread;
   const beta = (await DraftModel.getType()).beta; 
+  return DraftModel.find({type: beta, uid, desType: modifyThread, desTypeId })
+      .sort({tlm: -1})
+      // .skip(paging.start)
+      .limit(limit);
 
   // 获取修改文章
-  let page = 0;
-  let perpage = 100;
-  const count = await DraftModel.countDocuments({ uid, desType: post });
-  let verifiedData = [];
-  async function findLatestModifyThread () {
+  // let page = 0;
+  // let perpage = 100;
+  // const count = await DraftModel.countDocuments({ uid, desType: modifyThread });
+  // let verifiedData = [];
+ /*  async function findLatestModifyThread () {
     const paging = nkcModules.apiFunction.paging(page, count, perpage); 
     // post 类型可能是修改文章，因此需要在post表中比较
     const posts = await DraftModel.find({type: beta, uid, desType: post, desTypeId })
@@ -361,7 +375,7 @@ draftSchema.statics.getLatestModifyThread = async (desTypeId, uid, nkcModules, l
       }
     } else return verifiedData
   }
-  return await findLatestModifyThread();
+  return await findLatestModifyThread(); */
 }
 
 /* 获取最近的历史版本 

@@ -60,7 +60,8 @@ if !isIncluded('options')
       .option(v-if='warningPost !== null' @click='postWarning')
         .fa.fa-ambulance
         span 建议修改
-      a.option(v-if='edit !== null' @click='visitUrl("/editor?ver=ue&type=post&id=" + pid, true)')
+      //- a.option(v-if='edit !== null' @click='visitUrl("/editor?ver=ue&type=post&id=" + pid, true)')
+      a.option(v-if='edit !== null' @click='visitUrl(`/editor?ver=ue&type=${editType}&id=` + pid, true)')
         .fa.fa-edit
         span 编辑
       .option(v-if='reviewed === false' @click='reviewPost')
