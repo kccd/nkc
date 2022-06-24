@@ -152,10 +152,12 @@ export default {
     saveDraftIndex: 0
   },
   created() {
-    this.getData()
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
     this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
+  },
+  mounted() {
+    this.getData()
   },
   computed: {
     getTitle(){
@@ -183,7 +185,7 @@ export default {
       // , "modifyForumDeclare", "modifyForumLatestNotice"
       // if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
       
-      if(this.lockRequest) return
+      if(this.lockRequest) return;
       const {uid: stateUid} = getState();
       this.uid = stateUid;
       const self = this;
@@ -238,8 +240,12 @@ export default {
         history.replaceState({}, '', self.delUrlParam('aid'));
       }
       self.addUrlParam('aid', aid);
-      this.getData()
+      this.getData().
+        then(() => {
+          this.$refs.submit.setSubmitStatus(false);
+        })
       self.drafts = [];
+      
     },
     more() {
       location.href = '/creation/community/draft'
@@ -274,7 +280,7 @@ export default {
         this.lockRequest = true;
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
-      nkcAPI(url, "get")
+      return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版 
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
@@ -352,10 +358,10 @@ export default {
         if (['modifyPost', 'modifyThread', 'modifyComment'].includes(desType)) {
           if (++this.$options.customOptions.saveDraftIndex === 2)
             this.drafts = [];
-        } else if (!['modifyPost', 'modifyThread', 'modifyComment'].includes(desType)) {
+        } else if (['newPost', 'newThread', 'newComment'].includes(desType)) {
           this.drafts = [];
         } else {
-          this.drafts = [];
+          sweetError('desType类型不正确')
         }
       }
     },

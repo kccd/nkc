@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const draftsRouter = new Router();
-// 返回页面数据
 draftsRouter
   .get('/', async(ctx, next) => {
     const {data, db, query, nkcModules} = ctx;

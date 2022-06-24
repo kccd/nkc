@@ -26,33 +26,14 @@ const draftSchema = new Schema({
     index: 1
   },
   // 草稿类型 
-  // 如果 destype === forum 代表是新文章（newThread）
-  /*destype === forum 
-    新文章
-    destype === thread
-    post.parentPostId === ""
-    新回复
-    post.parentPostId
-    新评论
-    新评论暂时没有入口显示新评论 
-    destype === post
-    post.pid === thread.oc? "modifyThread": "modifyPost"; */
-     
-    // post.desTypeId 对应的 post.type === thread
-    // 修改文章
-    // post.desTypeId 对应的 post.type === post
-    // 修改回复
-    // post.desTypeId 对应的 post.type === post && post.parentPostId
-    // 修改评论
-    // 目前就四种会被显示
   /* 
   * 草稿类型划分
-  * 1 newThread
-  * 2 modifyThread
-  * 3 newPost
-  * 4 modifyPost
-  * 5 newComment
-  * 6 modifyComment
+  * 1 newThread desTypeId 无
+  * 2 modifyThread  desTypeId是pid
+  * 3 newPost desTypeId是tid
+  * 4 modifyPost desTypeId是pid
+  * 5 newComment desTypeId是tid
+  * 6 modifyComment desTypeId是pid
   */
   desType: {
     type: String,

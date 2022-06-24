@@ -317,18 +317,20 @@ router
       'newPost': '新回复', 
       'modifyPost': '修改回复', 
       'newComment': '新评论', 
-      'modifyComment': '修改评论'
+      'modifyComment': '修改评论',
+      'redit': o === 'update' ? '更新已发布的文章' : 
+        o === 'copy' ? '复制为新文章' : ''
     }
     if (!typeMap[type]) ctx.throw(400, '编辑器类型错误');
     data.reqUrl = {
      type,
-     typeCn: typeMap[type] + '编辑器',
+     typeCn: typeMap[type],
      id,
      o 
     }
     await next();
   })
-  // 获取指定草稿内容
+  // 获取不同编辑器基本内容
   .get('/data', async (ctx, next)=>{
     const {db, data, query, state} = ctx;
     const {type, id} = query;
@@ -615,7 +617,7 @@ router
       else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }
-    } 
+    }
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {
@@ -702,6 +704,7 @@ router
       data.postPermission = await db.UserModel.getPostPermission(state.uid, 'thread', []);
     }
 
+    data.post = data.post || {}; 
     state.editorSettings = await db.SettingModel.getSettings("editor");
     data.state = state;
     // 多维分类

@@ -23,10 +23,6 @@ module.exports = async (ctx, next) => {
       .skip(paging.start)
       .limit(paging.perpage);
   } else if (type === 'newThread') {
-    // 文章有两种类型
-      // forum  新文章
-      // post 可能是修改文章
-    // newThread 等于 forum
     if (perpage > 1) perpage = 1;
     const threadData = await db.DraftModel.getLatestNewThread(targetUser.uid, perpage);
     // drafts = threadData ? [threadData] : [];
@@ -84,10 +80,18 @@ module.exports = async (ctx, next) => {
   for(const draft of drafts) {
     const {desType, desTypeId, mainForumsId, categoriesId} = draft;
     const d = draft.toObject();
-    if(desType === draftDesType.newThread) {
+    /* if(desType === draftDesType.newThread) {
+      const thread = await db.ThreadModel.findOne({tid: desTypeId});
+      if(!thread) continue;
+      const firstPost = await db.PostModel.findOne({pid: thread.oc});
+      d.thread = {
+        url: `/t`,
+        title: 1231
+      };
       d.type = "newThread";
-
-    } else if(desType === draftDesType.newPost) {
+    } else */ 
+    // 在草稿显示时提示此草稿属于那片文章并且返回url
+    if(desType === draftDesType.newPost) {
       const thread = await db.ThreadModel.findOne({tid: desTypeId});
       if(!thread) continue;
       const firstPost = await db.PostModel.findOne({pid: thread.oc});
@@ -95,18 +99,19 @@ module.exports = async (ctx, next) => {
         url: `/t/${thread.tid}`,
         title: firstPost.t
       };
-      d.type = "newPost";
+      // d.type = "newPost";
 
     } else if (desType === draftDesType.modifyThread) {
       const post = await db.PostModel.findOne({pid: desTypeId});
       if(!post) continue;
       const thread = await db.ThreadModel.findOne({tid: post.tid});
       if(!thread) continue;
+      // 草稿提示使用
       d.thread = {
         url: `/t/${thread.tid}`,
         title: post.t
       };
-      d.type = "modifyThread";
+      // d.type = "modifyThread";
 
     } else if (desType === draftDesType.modifyComment) {
       const post = await db.PostModel.findOne({pid: desTypeId});
@@ -115,12 +120,11 @@ module.exports = async (ctx, next) => {
       if(!thread) continue;
       const firstPost = await db.PostModel.findOne({pid: thread.oc});
       const url = await db.PostModel.getUrl(post.pid);
-      
       d.thread = {
         url,
         title: firstPost.t
       };
-      d.type = "modifyComment";
+      // d.type = "modifyComment";
 
     } else if (desType === draftDesType.modifyPost) {
       const post = await db.PostModel.findOne({pid: desTypeId});
@@ -129,12 +133,19 @@ module.exports = async (ctx, next) => {
       if(!thread) continue;
       const firstPost = await db.PostModel.findOne({pid: thread.oc});
       const url = await db.PostModel.getUrl(post.pid);
-
       d.thread = {
         url,
         title: firstPost.t
       };
-      d.type = "modifyPost";
+      // d.type = "modifyPost";
+    } else if (desType === draftDesType.newComment) {
+      const thread = await db.ThreadModel.findOne({tid: desTypeId});
+      if(!thread) continue;
+      const firstPost = await db.PostModel.findOne({pid: thread.oc});
+      d.thread = {
+        url: `/t/${thread.tid}`,
+        title: firstPost.t
+      };
     }
     
     /* else if(desType === "post") {

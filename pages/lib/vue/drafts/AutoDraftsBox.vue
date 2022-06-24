@@ -188,11 +188,12 @@ export default {
         info = `修改文章《${thread.title}》下的回复`;
       } else if(type === "modifyThread") {
         info = `修改文章《${thread.title}》`;
-      } else if(type === 'modifyForumLatestNotice') {
-        info = `修改专业《${forum.title}》最新页板块公告`;
-      } else {
-        info = `修改专业《${forum.title}》的专业说明`;
-      }
+      } 
+      // else if(type === 'modifyForumLatestNotice') {
+      //   info = `修改专业《${forum.title}》最新页板块公告`;
+      // } else {
+      //   info = `修改专业《${forum.title}》的专业说明`;
+      // }
       return info;
     },
     insert(data) {
@@ -244,7 +245,7 @@ export default {
             window.PostInfo.showCloseInfo = false;
           }
           // window.location.href = `/editor?type=redit&id=${d.did}`;
-          window.location.href = `/editor?aid=${d._id}`
+          window.location.href = `/editor?type=${d.desType}&aid=${d._id}`
         })
         .catch(sweetError);
     },

@@ -132,14 +132,7 @@ export default {
     visitUrl: NKC.methods.visitUrl,
     // 改
     history() {
-      const desTypeMap = {
-        newThread: 'forum',
-        newPost: "thread",
-        modifyThread: 'post', 
-        modifyPost: 'post', 
-      }
-      // const aid = this.$route.query.aid;
-      const destype = desTypeMap[this.data.type] || this.draft.desType;
+      const destype = this.data.type || this.draft.desType;
       const did = this.data.draftId || this.draft.did;
       if (!destype || !did) return sweetError("未选择草稿");
       const url = getUrl('draftHistory', destype,  did);
@@ -300,7 +293,7 @@ export default {
             this.addUrlParam("aid", data.draft._id);
           } 
           this.setSubmitStatus(false);
-          this.$emit('save-draft-success', data.draft.desType);
+          this.$emit('save-draft-success', data.draft?.desType);
           // 解锁提交按钮
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");

@@ -459,7 +459,8 @@ function saveDraft(threadId,userId){
       var data = {
         post: post,
         draftId: draftId,
-        desType: "thread",
+        // desType: "thread",
+        desType: "newPost",
         desTypeId: threadId
       };
       return nkcAPI(url, method, data)
