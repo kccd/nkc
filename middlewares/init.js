@@ -123,7 +123,7 @@ module.exports = async (ctx, next) => {
         ctx.state.platform = 'reactNative';
       }
     }
-	  // 权限判断
+	  /*// 权限判断
     // @param {String} o 操作名
 	  ctx.permission = (o) => {
 	    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
@@ -137,13 +137,13 @@ module.exports = async (ctx, next) => {
         }
       }
       return false;
-    }
+    }*/
 
 	  // 设置cookie
     // @param {String} key cookie名
     // @param {Object} value cookie值
     // @param {Object} o 自定义参数
-	  ctx.setCookie = (key, value, o) => {
+	  /*ctx.setCookie = (key, value, o) => {
 	    let options = {
         signed: true,
         httpOnly: true,
@@ -196,7 +196,7 @@ module.exports = async (ctx, next) => {
       } catch(err) {
         return valueStr;
       }
-    };
+    };*/
 
 		const reqType = ctx.request.get('REQTYPE');
 		if(reqType === 'app') {

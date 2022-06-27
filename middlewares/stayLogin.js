@@ -64,7 +64,8 @@ module.exports = async (ctx, next) => {
       user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
       user.boundEmail = userPersonal.email;
-      user.draftCount = await db.DraftModel.countDocuments({uid: user.uid});
+      const draftTypes = await db.DraftModel.getType();
+      user.draftCount = await db.DraftModel.countDocuments({uid: user.uid, type: draftTypes.beta});
       //  需要更改为 socket 获取状态然后返回
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;

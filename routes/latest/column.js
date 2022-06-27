@@ -43,6 +43,10 @@ router
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     //查找文章专栏引用
     const columnPosts = await db.ColumnPostModel.find({type: {$in: [threadType, articleType]}, hidden: false}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
+    const columnPostsObj = {};
+    columnPosts.map(c => {
+      columnPostsObj[c.pid] = c;
+    })
     for(const c of columnPosts) {
       if(c.type === threadType) {
         tidArr.push(c.pid);
@@ -127,9 +131,15 @@ router
       return true;
     });
     columnThreads = await db.ThreadModel.extendArticlesPanelData(columnThreads);
+    
     const threadObj = {};
     for(const thread of columnThreads) {
-      threadObj[thread.oc] = thread;
+      const columnPost = columnPostsObj[thread.oc];
+      if(columnPostsObj) {
+        thread.content.url = nkcModules.tools.getUrl('columnThread', columnPost.columnId, columnPost._id);
+        threadObj[columnPost.pid] = thread;
+      }
+      
     }
     //查找最新专栏文章的独立文章
     let columnArticles = await db.ArticleModel.find(match);

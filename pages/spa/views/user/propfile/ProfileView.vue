@@ -38,6 +38,8 @@
 }
 </style>
 <script>
+import {getState} from "../../../../lib/js/state";
+import {routerName} from "../../../routes/user";
 export default {
   data:() => ({
     uid: '',
@@ -47,10 +49,6 @@ export default {
     users: [],
     paging: null,
   }),
-  components: {
-  },
-  computed: {
-  },
   mounted() {
     const {params, name} = this.$route;
     const {uid} = params;

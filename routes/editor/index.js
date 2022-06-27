@@ -534,25 +534,30 @@ router
         const thread = await db.ThreadModel.findOnly({tid: desTypeId});
         // 验证用户是否有权限查看文章
         const firstPost = await thread.extendFirstPost();
-        let parentPost;
-        if(parentPostId) {
-          parentPost = await db.PostModel.findOne({pid: parentPostId});
-        }
         data.thread = {
           tid: thread.tid,
           title: firstPost.t,
           url: `/t/${thread.tid}`,
-          comment: !!parentPost
         };
         selectedForumsId = thread.mainForumsId;
       } 
       else if (desType === draftDesType.newComment) {
-        // 没有入口
+        const thread = await db.ThreadModel.findOnly({tid: desTypeId});
+        // 验证用户是否有权限查看文章
+        const firstPost = await thread.extendFirstPost();
+        data.thread = {
+          tid: thread.tid,
+          title: firstPost.t,
+          url: `/t/${thread.tid}`,
+          comment: true
+        };
+        data.type = "newComment";
+
       }
       else if (desType === draftDesType.modifyThread) {
         const post = await db.PostModel.findOnly({pid: desTypeId});
         const thread = await db.ThreadModel.findOnly({tid: post.tid});
-        data.type = post.pid === thread.oc? "modifyThread": "modifyPost";
+        // data.type = post.pid === thread.oc? "modifyThread": "modifyPost";
         const firstPost = await thread.extendFirstPost();
         data.post.pid = post.pid;
         data.thread = {
@@ -560,6 +565,7 @@ router
           title: firstPost.t,
           url: `/t/${thread.tid}`,
         };
+        data.type = 'modifyThread'
       }
       else if (desType === draftDesType.modifyPost) {
         const post = await db.PostModel.findOnly({pid: desTypeId});
@@ -571,22 +577,22 @@ router
           title: firstPost.t,
           url: `/t/${thread.tid}`,
         };
+        data.type = 'modifyPost'
+
       }
       else if (desType === draftDesType.modifyComment) {
         const post = await db.PostModel.findOnly({pid: desTypeId});
         const thread = await db.ThreadModel.findOnly({tid: post.tid});
         const firstPost = await thread.extendFirstPost();
-        let parentPost;
-        if(parentPostId) {
-          parentPost = await db.PostModel.findOne({pid: parentPostId});
-        }
         data.post.pid = post.pid;
         data.thread = {
           tid: thread.tid,
           title: firstPost.t,
           url: `/t/${thread.tid}`,
-          comment: !!parentPost
+          comment: true
         };
+        data.type = 'modifyComment'
+
       }
       // else if(desType === "post") { // 编辑文章或编辑回复
       //   const post = await db.PostModel.findOnly({pid: desTypeId});

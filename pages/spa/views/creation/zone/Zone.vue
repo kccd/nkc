@@ -12,11 +12,11 @@ export default {
     navList: [
       {
         type: routesName.creationZoneMoment,
-        title: '动态'
+        title: '电文'
       },
       {
         type: routesName.creationZoneArticle,
-        title: '文章'
+        title: '长电文'
       },
       {
         type: routesName.creationZoneDraft,

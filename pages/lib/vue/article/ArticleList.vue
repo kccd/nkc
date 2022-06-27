@@ -87,7 +87,7 @@
         }
       }
       .user-column-content-cover{
-        background: #00a0e9;
+        //background: #00a0e9;
         position: absolute;
         top: -2.5rem;
         right: 0;

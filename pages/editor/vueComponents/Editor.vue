@@ -42,7 +42,7 @@
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.value 封面图值
           cover(ref="cover", :value="pageData.post && pageData.post.cover" @info-change="infoChange")
-          
+
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1 abstract 中英文摘要
           abstract(
@@ -114,6 +114,7 @@ import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam, delUrlParam} from "../../lib/js/tools";
 import { debounce } from '../../lib/js/execution';
+import 'url-search-params-polyfill';
 
 export default {
   components: {
@@ -282,19 +283,19 @@ export default {
       }
       return nkcAPI(url, "get")
         .then((resData) => {
-          // 如果文章已经变为历史版 
+          // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
             sweetError("已经发布");
             return setTimeout(() => {
               location.href = location.pathname
-            }, 2000) 
+            }, 2000)
           }
           // if(resData.post) {
           //   this.lockRequest = true;
           // }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
-            this.mainForums = resData.mainForums;  
+            this.mainForums = resData.mainForums;
           }
           resData.mainForums = this.mainForums;
           this.pageData = resData;
@@ -308,7 +309,7 @@ export default {
             this.$emit('noPermission', err);
             return sweetError(err.error);
           }
-          
+
         });
     },
     // 设置编辑器标题、内容
@@ -367,7 +368,7 @@ export default {
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
-      if (!submitFn) 
+      if (!submitFn)
         throw("callback is is undefined");
       // 每个组件下都有一个getData返回数据
       const refs = this.$refs;
@@ -378,11 +379,11 @@ export default {
           Object.assign(submitData, vue && vue.getData());
         }
       }
-      // this.pageData.post?._id 
+      // this.pageData.post?._id
         // 请求前一截url
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
-      submitData["_id"] = new URLSearchParams(location.search).get('aid') 
+      submitData["_id"] = new URLSearchParams(location.search).get('aid')
         || this.pageData.post?._id;
       submitData["parentPostId"] = this.pageData.post?.parentPostId;
       submitFn(submitData);
@@ -399,16 +400,16 @@ export default {
 <style scoped lang="less">
 @import "../../publicModules/base";
 // .prompt-title {
-//   overflow: hidden; 
-//   text-overflow: ellipsis; 
+//   overflow: hidden;
+//   text-overflow: ellipsis;
 //   white-space: nowrap;
 //   vertical-align: bottom;
 // }
 // .prompt-content {
 //   display: inline-block;
 //   width: 66%;
-//   overflow: hidden; 
-//   text-overflow: ellipsis; 
+//   overflow: hidden;
+//   text-overflow: ellipsis;
 //   white-space: nowrap;
 //   vertical-align: bottom;
 // }

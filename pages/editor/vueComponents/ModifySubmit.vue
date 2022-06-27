@@ -38,6 +38,7 @@ import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
 import {debounce} from '../../lib/js/execution';
+import 'url-search-params-polyfill';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
 
@@ -131,7 +132,7 @@ export default {
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
     // 改
-    history() {
+    history() { 
       const destype = this.data.type || this.draft.desType;
       const did = this.data.draftId || this.draft.did;
       if (!destype || !did) return sweetError("未选择草稿");
@@ -244,7 +245,7 @@ export default {
           // } else if (type === "modifyForumLatestNotice") {
           //   desType = "forumLatestNotice";
           //   desTypeId = this.forum.fid;
-          // } 
+          // }
           else {
             throw "未知的草稿类型";
           }
@@ -291,7 +292,7 @@ export default {
           }
           if(!new URLSearchParams(location.search).get('aid')) {
             this.addUrlParam("aid", data.draft._id);
-          } 
+          }
           this.setSubmitStatus(false);
           this.$emit('save-draft-success', data.draft?.desType);
           // 解锁提交按钮
@@ -423,7 +424,7 @@ export default {
         })
         .then(() => {
           if (type === "newThread") {
-            
+
             // 发新帖：从专业点发表、首页点发表、草稿箱
             this.checkTitle(submitData.t);
             this.checkContent(submitData.c);

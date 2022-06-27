@@ -1,11 +1,13 @@
 <template lang="pug">
   .user-moment.p-t-1
-    .paging-button
-      a.button(@click="toType('moment')" :class="t === 'moment'?'active':''") 动态
-      a.button(@click="toType('thread')" :class="t === 'thread'?'active':''") 文章
+    .m-b-05(v-if="isTargetUser")
+      moment-editor(ref="momentEditor" @published="onPublished")
+    .paging-button.m-r-05
+      a.button.radius-left(@click="toType('moment')" :class="t === 'moment'?'active':''") 电文
+      a.button.radius-right(@click="toType('thread')" :class="t === 'thread'?'active':''") 长电文
+    paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
     .user-list-warning(v-if="!momentsData && loading") 加载中~
-    .moment-list(v-else)
-      paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+    .moment-list(v-else).m-t-05
       blank(v-if="momentsData && momentsData.length === 0 && !loading")
       moments(
         ref="moments"
@@ -42,8 +44,10 @@ import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
 import Blank from "../../../../components/Blank";
 import ArticleList from "../../../../../lib/vue/article/ArticleList";
+import MomentEditor from "../../../../../lib/vue/zone/MomentEditor";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
-
+import {getState} from "../../../../../lib/js/state";
+const {uid} = getState();
 export default {
   data: () => ({
     momentsData: null,
@@ -59,9 +63,13 @@ export default {
     "violation-record": ViolationRecord,
     "paging": Paging,
     "blank": Blank,
-    "article-list": ArticleList
+    "article-list": ArticleList,
+    "moment-editor": MomentEditor
   },
   computed: {
+    isTargetUser() {
+      return uid && uid === this.uid;
+    },
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
@@ -114,6 +122,10 @@ export default {
     //跳转到动态指定类型
     toType(type) {
       this.getUserCardInfo(0, type);
+    },
+    onPublished() {
+      this.$refs.momentEditor.reset();
+      this.getUserCardInfo();
     }
   }
 }

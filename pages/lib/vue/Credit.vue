@@ -164,11 +164,12 @@ export default {
         });
     },
     close(){
-      this.dialog.hide();
+      const self = this
+      self.dialog.hide();
       setTimeout(function () {
-        this.reason = '';
-        this.kcbNumber = 1;
-          this.xsfNumber = 1
+        self.reason = '';
+        self.kcbNumber = 1;
+          self.xsfNumber = 1
       }, 500);
     },
     show() {

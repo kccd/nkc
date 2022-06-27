@@ -57,13 +57,16 @@
             .account-nav-box.row
               .account-nav-left.col-xs-12.col-sm-2.col-md-2.hidden-xs.p-a-0
               .account-nav-center.col-xs-12.col-sm-10.col-md-10
+                .account-nav-item.m-r-2f5(@click="containerChange('timeline')" :class="{'active': $route.name === 'timeline'}")
+                  .account-nav-item-name 动态
+                  .account-nav-item-value {{targetUser.timelineCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}")
                   .account-nav-item-name 空间
                   .account-nav-item-value {{targetUser.momentCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}")
                   .account-nav-item-name 社区
                   .account-nav-item-value {{targetUser.postCount + targetUser.threadCount - targetUser.disabledThreadsCount - targetUser.disabledPostsCount}}
-                .account-nav-item.m-r-2f5(@click="containerChange('column')" :class="{'active': $route.name === 'column'}")
+                .account-nav-item.m-r-2f5(@click="containerChange('column')" :class="{'active': $route.name === 'column'}" v-if="targetUser.column")
                   .account-nav-item-name 专栏
                   .account-nav-item-value {{targetUser.columnThreadCount - targetUser.disabledColumnThreadCount}}
                 .account-nav-item.m-r-2f5.hidden-md.hidden-sm.hidden-lg(@click="containerChange('follower')" :class="{'active': $route.name === 'follower'}")

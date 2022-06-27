@@ -15,6 +15,12 @@ module.exports = {
 			columnData: {
 				GET: "getUserHomeCard",
 			},
+      timeline: {
+        GET: 'getUserHomeCard',
+      },
+      timelineData: {
+        GET: 'getUserHomeCard',
+      },
 			moment: {
 				GET: "getUserHomeCard"
 			},
@@ -110,7 +116,7 @@ module.exports = {
 		userHomeCard: {
 			GET: "getUserHomeCard"
 		},
-		
+
 		verifiedAssets: {
 			PARAMETER: {
 				GET: "visitVerifiedUpload"

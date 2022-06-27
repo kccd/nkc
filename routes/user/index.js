@@ -186,6 +186,10 @@ userRouter
       }
       ctx.template = 'message/appUserDetail/appUserDetail.pug';
       return await next();
+    } else {
+      if(state.uid && state.uid === targetUser.uid) {
+        ctx.redirect(`/u/${targetUser.uid}/profile/moment`);
+      }
     }
     await next();
   })
@@ -195,7 +199,7 @@ userRouter
     await next();
   })
 	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
-    .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
+  .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	// .use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
@@ -220,5 +224,5 @@ userRouter
   .use("/:uid/navLinks", navLinksRouter.routes(), navLinksRouter.allowedMethods())
   .use("/:uid/content", contentRouter.routes(), contentRouter.allowedMethods())
   .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
-  .use("/:uid", userPanelRouter.routes(), userPanelRouter.allowedMethods())
+  .use("/:uid/userPanel", userPanelRouter.routes(), userPanelRouter.allowedMethods())
 module.exports = userRouter;

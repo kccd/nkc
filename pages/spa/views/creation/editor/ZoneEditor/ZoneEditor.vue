@@ -16,11 +16,11 @@
       navList: [
         {
           type: routesName.creationZoneMomentEditor,
-          title: '动态创作'
+          title: '发电文'
         },
         {
           type: routesName.creationZoneArticleEditor,
-          title: '文章创作'
+          title: '发长电文'
         }
       ]
     }),

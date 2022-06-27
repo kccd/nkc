@@ -13,7 +13,8 @@ router
         moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
       }
       if(moment) {
-        const {momentId, videosId, picturesId, content} = moment;
+        const {momentId, videosId, picturesId, content, momentCommentId} = moment;
+        data.momentCommentId = momentCommentId;
         data.momentId = momentId;
         data.videosId = videosId;
         data.picturesId = picturesId;
@@ -31,11 +32,18 @@ router
       }
     }
     const {normal: normalStatus} = await db.MomentModel.getMomentStatus();
+    const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     // 获取动态列表
     const match = {
       uid: state.uid,
       parent: '',
       status: normalStatus,
+      quoteType: {
+        $in: [
+          '',
+          momentQuoteTypes.moment,
+        ]
+      }
     };
     const count = await db.MomentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -97,16 +105,16 @@ router
       alsoPost,
       momentCommentId,
     } = body;
-    if(!['create', 'modify', 'publish'].includes(type)) {
+    if(!['create', 'modify', 'publish', 'forward'].includes(type)) {
       ctx.throw(403, `类型指定错误 type=${type}`);
     }
-
-    if(type === 'create') {
-      let momentComment = await db.MomentModel.getUnPublishedMomentCommentById(state.uid, momentId);
+    let momentComment;
+    if(type === 'create' || type === 'forward') {
+      momentComment = await db.MomentModel.getUnPublishedMomentCommentById(state.uid, momentId);
       if(momentComment) {
         await momentComment.modifyMoment({
           content,
-          resourcesId: []
+          resourcesId: [],
         });
       } else {
         momentComment = await db.MomentModel.createMomentComment({
@@ -116,19 +124,19 @@ router
         });
       }
       data.momentCommentId = momentComment._id;
-    } else if(type === 'modify') {
-      const momentComment = await db.MomentModel.getUnPublishedMomentCommentByCommentId(momentCommentId, state.uid, momentId);
-      if(momentComment) {
-        await momentComment.modifyMoment({
-          content,
-          resourcesId: []
-        });
-      }
-    } else {
-      const momentComment = await db.MomentModel.getUnPublishedMomentCommentByCommentId(momentCommentId, state.uid, momentId);
+    }
+
+    if(type !== 'create'){
+      momentComment = await db.MomentModel.getUnPublishedMomentCommentByCommentId(momentCommentId?momentCommentId: momentComment._id, state.uid, momentId);
       if(!momentComment) ctx.throw(400, `数据异常 momentCommentId=${momentCommentId}`);
-      await momentComment.publishMomentComment(postType, alsoPost);
-      data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
+      await momentComment.modifyMoment({
+        content,
+        resourcesId: []
+      });
+      if(type === 'publish' || type === 'forward') {
+        await momentComment.publishMomentComment(postType, alsoPost);
+        data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
+      }
     }
     await next();
   })
