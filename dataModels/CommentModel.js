@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const {getUrl} = require("../nkcModules/tools");
 const commentSource = {
         article: 'article',
 
@@ -467,7 +468,7 @@ schema.statics.extendPostComments = async (props) => {
     const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     const m = c.toObject();
     const commentInfo = await c.getLocationUrl();
-    _comments.push({
+    const result = {
       ...m,
       content: await CommentModel.renderComment(documentObj[c.did]._id),
       docId: documentObj[c.did]._id,
@@ -475,7 +476,6 @@ schema.statics.extendPostComments = async (props) => {
       type: documentObj[c.did].type,
       reason: documentObj[c.did]?documentObj[c.did].reason : null, //审核原因
       tlm: documentObj[c.did].tlm,
-      vote: await PostsVoteModel.getVoteByUid({uid, type: 'comment', id: c._id}),
       user: {
         uid: user.uid,
         username: user.username,
@@ -490,7 +490,13 @@ schema.statics.extendPostComments = async (props) => {
       commentUrl: commentInfo.url,
       isAuthor: authorUid === m.uid ? true : false,
       quote: documentObj[c.did].quote || null,
-    });
+    };
+    if(uid) {
+      result.vote = await PostsVoteModel.getVoteByUid({uid, type: 'comment', id: c._id});
+    } else {
+      result.vote = null;
+    }
+    _comments.push(result);
   }
   return _comments;
 }

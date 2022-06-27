@@ -61,7 +61,7 @@ userRouter
     await next();
   })
   .use("/:uid", async (ctx, next) => {
-    const {data, db, params} = ctx;
+    const {data, db, params, state} = ctx;
     data.targetUser = await db.UserModel.findOne({uid: params.uid});
     if(!data.targetUser) ctx.throw(404, `不存在ID为${params.uid}的用户`);
     //拓展用户权限
