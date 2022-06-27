@@ -120,11 +120,13 @@ block content
                       | &nbsp;发表文章
                   else if state.isApp
                     //button.forum-post-button.btn.btn-default.btn-xs(onclick=`openEditSite()`)
-                    a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                    //- a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                    a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=newThread&id=${data.forum.fid}` target="_blank")
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else
-                    a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                    //- a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                    a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=newThread&id=${data.forum.fid}` target="_blank")
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                 else

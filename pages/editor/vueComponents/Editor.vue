@@ -26,7 +26,7 @@
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
         article-content(
           ref="content",
-          :c="pageData.post && pageData.post.c",
+          :c="pageData",
           @content-change="contentChange"
         )
         .m-b-2(
@@ -153,10 +153,12 @@ export default {
     saveDraftIndex: 0
   },
   created() {
-    this.getData()
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
     this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
+  },
+  mounted() {
+    this.getData()
   },
   computed: {
     getTitle(){
@@ -184,7 +186,7 @@ export default {
       // , "modifyForumDeclare", "modifyForumLatestNotice"
       // if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
 
-      if(this.lockRequest) return
+      if(this.lockRequest) return;
       const {uid: stateUid} = getState();
       this.uid = stateUid;
       const self = this;
@@ -199,23 +201,26 @@ export default {
 
       } else if ("modifyPost" === editType) {
 
-        if (this.pageData.thread.comment) {
-          url += '&type=modifyComment';
-          url += "&desTypeId=" + this.pageData.thread.pid;
-        } else {
+        // if (this.pageData.thread.comment) {
+        //   url += '&type=modifyComment';
+        //   url += "&desTypeId=" + this.pageData.thread.pid;
+        // } else {
           // 修改回复 在draft表中type = post
-          url += '&type=' + editType;
-          url += "&desTypeId=" + this.pageData.thread.pid;
+        url += '&type=' + editType;
+        url += "&desTypeId=" + this.pageData.thread.pid;
 
-        }
+        // }
       } else if (editType === "modifyThread") {
         // 修改文章存草稿类型为post
         // desTypeId为post表的pid
         url += '&type=' + editType;
-        url += "&desTypeId=" + this.pageData.thread.pid;
+        url += "&desTypeId=" + this.pageData.thread.oc;
 
       } else if (editType === "newThread") {
         url += '&type=' + editType;
+      } else if (editType === "modifyComment") {
+        url += '&type=modifyComment';
+        url += "&desTypeId=" + this.pageData.thread.pid;
       }
 
       nkcAPI(url, 'GET')
@@ -236,8 +241,12 @@ export default {
         history.replaceState({}, '', self.delUrlParam('aid'));
       }
       self.addUrlParam('aid', aid);
-      this.getData()
+      this.getData().
+        then(() => {
+          this.$refs.submit.setSubmitStatus(false);
+        })
       self.drafts = [];
+
     },
     more() {
       location.href = '/creation/community/draft'
@@ -246,10 +255,13 @@ export default {
       if(!search) search = new URLSearchParams(location.search);
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
-      let type, id, o, aid;
+      let type, id, o;
       // 链接跳转过来
       if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
-        url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}&o=${this.reqUrl.o}`;
+        url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}`;
+        if (this.reqUrl.o) {
+          url += `&o=${this.reqUrl.o}`;
+        }
       }
       // 继续编辑后拿草稿数据
       else if (search) {
@@ -260,19 +272,22 @@ export default {
           o = search.get('o')
         }
         if(type && id) {
-          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
+          url = `/editor/data?type=${type}&id=${id}`;
+          if (o) {
+            url += `&o=${this.reqUrl.o}`;
+          }
         }
       }
       if(search.get('aid')){
         this.lockRequest = true;
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
-      nkcAPI(url, "get")
+      return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
-            sweetError(err);
-            setTimeout(() => {
+            sweetError("已经发布");
+            return setTimeout(() => {
               location.href = location.pathname
             }, 2000)
           }
@@ -341,15 +356,14 @@ export default {
     },
     closeDraft(desType) {
       if (this.drafts.length) {
-        const { saveDraftIndex } = this.$options.customOptions;
-        // 如果是编辑文字、编辑回复第一次进入编辑器，保存后不关闭草稿提示
-        if (desType === 'post' && saveDraftIndex < 2) {
+        // 如果是编辑文章、编辑回复、编辑评论第一次进入编辑器，保存后不关闭草稿提示
+        if (['modifyPost', 'modifyThread', 'modifyComment'].includes(desType)) {
           if (++this.$options.customOptions.saveDraftIndex === 2)
             this.drafts = [];
-        } else if (desType !== 'post') {
+        } else if (['newPost', 'newThread', 'newComment'].includes(desType)) {
           this.drafts = [];
         } else {
-          this.drafts = [];
+          sweetError('desType类型不正确')
         }
       }
     },

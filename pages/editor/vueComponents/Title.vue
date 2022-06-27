@@ -3,7 +3,7 @@
     .input-title(v-if="o !== 'copy'")
       mixin threadLink
         a(:href="data.thread.url" target="_blank") {{data.thread.title}}
-      .editor-type-info(v-if="data.type === 'newPost'")
+      .editor-type-info(v-if="['newPost', 'newComment'].includes(data.type)")
         div(v-if="data.thread.comment")
           .fa.fa-lightbulb-o
           span 正在评论文章《
@@ -24,7 +24,7 @@
             a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ? "收起":"展开"}}
           .on-edit-note-content(v-if="openOnEditNotes" ) {{notice}}
         //- .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
-      .editor-type-info(v-else-if="data.type === 'modifyPost'")
+      .editor-type-info(v-else-if="['modifyPost', 'modifyComment'].includes(data.type)")
         .fa.fa-lightbulb-o
         span 正在编辑文章《
         +threadLink

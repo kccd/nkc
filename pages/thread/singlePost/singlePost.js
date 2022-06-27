@@ -556,7 +556,8 @@ class SinglePostModule {
             parentPostId: pid
           },
           draftId: editorApp.draftId,
-          desType: "thread",
+          // desType: "thread",
+          desType: "newComment",
           desTypeId: self.tid,
         });
       })

@@ -1,7 +1,7 @@
 import {getSocket} from "../lib/js/socket";
 
 const socket = getSocket();
-var surveyForms = [], draftId = "", author = {};
+var surveyForms = [], draftId = "", author = {}, _id;
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
@@ -437,6 +437,7 @@ function autoSaveDraft() {
 			})
 			.then(function(data) {
 				draftId = data.draft.did;
+				_id = data.draft._id;
 				autoSaveDraft();
 			})
 			.catch(function(err) {
@@ -458,13 +459,15 @@ function saveDraft(threadId,userId){
       var data = {
         post: post,
         draftId: draftId,
-        desType: "thread",
+        // desType: "thread",
+        desType: "newPost",
         desTypeId: threadId
       };
       return nkcAPI(url, method, data)
     })
     .then(function(data) {
       draftId = data.draft.did;
+			_id = data.draft._id;
       sweetSuccess("保存成功");
     })
     .catch(function(data) {
@@ -495,6 +498,7 @@ function submit(tid) {
       if(draftId) {
         post.did = draftId;
       }
+			if (_id) post._id = _id;
       return nkcAPI('/t/' + tid, 'POST', {
         post: post,
       })
@@ -578,7 +582,9 @@ function goEditor(){
 	//return console.log(window.localStorage)
 	// window.location = '/editor?type=thread&id='+replyTarget.trim().split('/')[1];
 	// openToNewLocation('/editor?type=thread&id='+replyTarget.trim().split('/')[1])
-	NKC.methods.visitUrl('/editor?type=thread&id='+replyTarget.trim().split('/')[1], true);
+
+	// NKC.methods.visitUrl('/editor?type=thread&id='+replyTarget.trim().split('/')[1], true);
+	NKC.methods.visitUrl('/editor?type=newPost&id='+replyTarget.trim().split('/')[1], true);
 }
 
 

@@ -311,22 +311,33 @@ router
     await db.UserModel.checkUserBaseInfo(user);
     ctx.template = "editor/editor.pug";
     const {id, type, o} = query;
-
+    const typeMap = {
+      'newThread': '新文章', 
+      'modifyThread': '修改文章', 
+      'newPost': '新回复', 
+      'modifyPost': '修改回复', 
+      'newComment': '新评论', 
+      'modifyComment': '修改评论',
+      'redit': o === 'update' ? '更新已发布的文章' : 
+        o === 'copy' ? '复制为新文章' : ''
+    }
+    if (!typeMap[type]) ctx.throw(400, '编辑器类型错误');
     data.reqUrl = {
      type,
+     typeCn: typeMap[type],
      id,
      o 
     }
     await next();
   })
-  // 获取指定草稿内容
+  // 获取不同编辑器基本内容
   .get('/data', async (ctx, next)=>{
     const {db, data, query, state} = ctx;
-    const {type} = query;
+    const {type, id} = query;
     const {user} = data;
+    const draftDesType = await db.DraftModel.getDesType();
     await db.UserModel.checkUserBaseInfo(user);
     data.notice = '';
-
     // 需要预制的专业和文章分类
     let selectedForumsId = [];
     let selectedCategoriesId = [];
@@ -338,7 +349,7 @@ router
     // 直接进编辑器
     if(!type) {
       data.type = "newThread";
-    } else if(type === "forum") { 
+    } else if(type === draftDesType.newThread) { 
       // 在专业进编辑器，需要预制当前专业
       const {id} = query;
       data.type = "newThread";
@@ -349,7 +360,9 @@ router
       } catch(err) {
         data.permissionInfo = err.message;
       }
-    } else if(type === "thread") {
+    } 
+    // else if(type === "thread") {
+    else if(type === draftDesType.newPost) {
       data.type = "newPost";
       const {id} = query;
       // 回复的文章
@@ -367,7 +380,8 @@ router
       // type === thread
       // 新回复
       selectedForumsId = thread.mainForumsId || [];
-    } else if(type === "post") { // 修改文章或者修改回复
+    } 
+    /* else if(type === "post") { // 修改文章或者修改回复
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
       // -> 把笔记标记在文中
@@ -399,7 +413,81 @@ router
       // post.type === post && post.parentPostId === ""
       // 修改回复
       selectedForumsId = thread.mainForumsId || [];
-    } else if(type === "redit") { // 从草稿箱来
+    }  */
+    else if (type === draftDesType.newComment) {
+      data.post = await db.PostModel.findOnly({pid: id});
+      let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
+      data.post.c = markNotes.setMark(data.post.c, notes.map(note => note.toObject()));
+      // <- 把笔记标记在文中
+      const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
+      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+      const firstPost = await thread.extendFirstPost();
+      data.thread = {
+        tid: thread.tid,
+        title: firstPost.t,
+        url: `/t/${thread.tid}`,
+        comment: true,
+        oc: thread.oc, // 所属文章
+        pid: data.post.pid, // 当前回复
+        // parentPostId: data.post.parentPostId // 父级postID
+      };
+      data.type = 'newComment';
+    }
+    else if (type === draftDesType.modifyPost) {
+      data.post = await db.PostModel.findOnly({pid: id});
+      let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
+      data.post.c = markNotes.setMark(data.post.c, notes.map(note => note.toObject()));
+      // <- 把笔记标记在文中
+      const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
+      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+      const firstPost = await thread.extendFirstPost();
+      data.thread = {
+        tid: thread.tid,
+        title: firstPost.t,
+        url: `/t/${thread.tid}`,
+        // comment: !!parentPostCount,
+        oc: thread.oc, // 所属文章
+        pid: data.post.pid, // 当前回复
+        // parentPostId: data.post.parentPostId // 父级postID
+      };
+      data.type = 'modifyPost';
+    } else if (type === draftDesType.modifyThread) {
+      data.post = await db.PostModel.findOnly({pid: id});
+      let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
+      data.post.c = markNotes.setMark(data.post.c, notes.map(note => note.toObject()));
+      // <- 把笔记标记在文中
+      const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
+      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+      const firstPost = await thread.extendFirstPost();
+      data.thread = {
+        tid: thread.tid,
+        title: firstPost.t,
+        url: `/t/${thread.tid}`,
+        oc: thread.oc, // 所属文章
+        // pid: data.post.pid, // 当前回复
+        // parentPostId: data.post.parentPostId // 父级postID
+      };
+      data.type = 'modifyThread';
+    } else if (type === draftDesType.modifyComment) {
+      data.post = await db.PostModel.findOnly({pid: id});
+      let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
+      data.post.c = markNotes.setMark(data.post.c, notes.map(note => note.toObject()));
+      // <- 把笔记标记在文中
+      const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
+      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+      const firstPost = await thread.extendFirstPost();
+      data.thread = {
+        title: firstPost.t,
+        url: `/t/${thread.tid}`,
+        tid: thread.tid,
+        oc: thread.oc, // 所属文章
+        pid: data.post.pid, // 当前回复
+        comment: true,
+        parentPostId: data.post.parentPostId // 父级postID
+      };
+      data.type = 'modifyComment';
+    }
+    else if(type === "redit") { // 从草稿箱来
       let {id, o, _id} = query;
       // 社区的草稿只能使用_id 才能具体查找到一篇文章
       let draft
@@ -437,9 +525,11 @@ router
           categoriesId: []
         }
       }
-      if(desType === "forum" || o === 'copy') { // 发表新帖
+      // if(desType === "forum" || o === 'copy') { // 发表新帖
+      if(desType === draftDesType.newThread || o === 'copy') { // 发表新帖
         data.type = "newThread";
-      } else if(desType === "thread") { // 发表新回复
+      // } else if(desType === "thread") { // 发表新回复
+      } else if(desType === draftDesType.newPost) { // 发表新回复
         data.type = "newPost";
         const thread = await db.ThreadModel.findOnly({tid: desTypeId});
         // 验证用户是否有权限查看文章
@@ -455,10 +545,36 @@ router
           comment: !!parentPost
         };
         selectedForumsId = thread.mainForumsId;
-      } else if(desType === "post") { // 编辑文章或编辑回复
+      } 
+      else if (desType === draftDesType.newComment) {
+        // 没有入口
+      }
+      else if (desType === draftDesType.modifyThread) {
         const post = await db.PostModel.findOnly({pid: desTypeId});
         const thread = await db.ThreadModel.findOnly({tid: post.tid});
         data.type = post.pid === thread.oc? "modifyThread": "modifyPost";
+        const firstPost = await thread.extendFirstPost();
+        data.post.pid = post.pid;
+        data.thread = {
+          tid: thread.tid,
+          title: firstPost.t,
+          url: `/t/${thread.tid}`,
+        };
+      }
+      else if (desType === draftDesType.modifyPost) {
+        const post = await db.PostModel.findOnly({pid: desTypeId});
+        const thread = await db.ThreadModel.findOnly({tid: post.tid});
+        const firstPost = await thread.extendFirstPost();
+        data.post.pid = post.pid;
+        data.thread = {
+          tid: thread.tid,
+          title: firstPost.t,
+          url: `/t/${thread.tid}`,
+        };
+      }
+      else if (desType === draftDesType.modifyComment) {
+        const post = await db.PostModel.findOnly({pid: desTypeId});
+        const thread = await db.ThreadModel.findOnly({tid: post.tid});
         const firstPost = await thread.extendFirstPost();
         let parentPost;
         if(parentPostId) {
@@ -471,19 +587,37 @@ router
           url: `/t/${thread.tid}`,
           comment: !!parentPost
         };
-        selectedForumsId = thread.mainForumsId;
-      // } else if(desType === "forumDeclare") { // 专业说明
-      //   data.type = "modifyForumDeclare";
-      //   const forum = await db.ForumModel.findOnly({fid: desTypeId});
-      //   data.forum = {
-      //     fid: forum.fid,
-      //     title: forum.displayName,
-      //     url: `/f/${forum.fid}`
+      }
+      // else if(desType === "post") { // 编辑文章或编辑回复
+      //   const post = await db.PostModel.findOnly({pid: desTypeId});
+      //   const thread = await db.ThreadModel.findOnly({tid: post.tid});
+      //   data.type = post.pid === thread.oc? "modifyThread": "modifyPost";
+      //   const firstPost = await thread.extendFirstPost();
+      //   let parentPost;
+      //   if(parentPostId) {
+      //     parentPost = await db.PostModel.findOne({pid: parentPostId});
+      //   }
+      //   data.post.pid = post.pid;
+      //   data.thread = {
+      //     tid: thread.tid,
+      //     title: firstPost.t,
+      //     url: `/t/${thread.tid}`,
+      //     comment: !!parentPost
       //   };
-      } else {
+      //   selectedForumsId = thread.mainForumsId;
+      // // } else if(desType === "forumDeclare") { // 专业说明
+      // //   data.type = "modifyForumDeclare";
+      // //   const forum = await db.ForumModel.findOnly({fid: desTypeId});
+      // //   data.forum = {
+      // //     fid: forum.fid,
+      // //     title: forum.displayName,
+      // //     url: `/f/${forum.fid}`
+      // //   };
+      // } 
+      else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }
-    } 
+    }
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {
@@ -570,6 +704,7 @@ router
       data.postPermission = await db.UserModel.getPostPermission(state.uid, 'thread', []);
     }
 
+    data.post = data.post || {}; 
     state.editorSettings = await db.SettingModel.getSettings("editor");
     data.state = state;
     // 多维分类

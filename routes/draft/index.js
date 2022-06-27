@@ -1,13 +1,19 @@
 const router = require('koa-router')();
-const { ObjectId } = require('mongodb');
+// const { ObjectId } = require('mongodb');
 const nkcRender = require('../../nkcModules/nkcRender');
-const desTypeMap = {
-  newThread: 'forum',
-  newPost: "thread",
-  modifyThread: 'post', 
-  modifyPost: 'post', 
-}
+// const desTypeMap = {
+//   newThread: 'forum',
+//   newPost: "thread",
+//   modifyThread: 'post', 
+//   modifyPost: 'post', 
+// }
+const allowedDesTypes = ['newThread', 'modifyThread', 'newPost', 'modifyPost', 'newComment', 'modifyComment'];
 router
+.use('/', async (ctx, next) => {
+  const {source} = ctx.query;
+  if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确");
+  await next();
+})
 .get('/preview', async (ctx, next) => {
   //获取文档预览信息
   ctx.template='draft/preview/document.pug'
@@ -43,7 +49,6 @@ router
   ctx.template = 'draft/history/document.pug'
   const {db, data, state, query, permission, nkcModules} = ctx;
   const {did, source, page=0} = query;
-  if (!Object.values(desTypeMap).includes(source)) ctx.throw(400, "source参数不正确")
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
   const queryCriteria = { did, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
@@ -86,7 +91,7 @@ router
   const {db, data, params, state, query, permission, nkcModules} = ctx;
   const { did, source, page=0 } = query;
   const { _id } = params;
-  if (!Object.values(desTypeMap).includes(source)) ctx.throw(400, "source参数不正确")
+  // if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确")
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
   const queryCriteria = {did, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
@@ -136,7 +141,7 @@ router
   const {db, params, query, state} = ctx;
   //  正在编辑的改为历史版
   const { did, source } = query;
-  if (!Object.values(desTypeMap).includes(source)) ctx.throw(400, "source参数不正确")
+  // if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确")
   // 当前历史记录改为编辑版，并且复制了一份为历史版
   const { _id } = params;
   const DraftModel = db.DraftModel;

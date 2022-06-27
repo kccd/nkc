@@ -131,6 +131,7 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    // 改
     history() {
       const desTypeMap = {
         newThread: 'forum',
@@ -139,7 +140,7 @@ export default {
         modifyPost: 'post',
       }
       // const aid = this.$route.query.aid;
-      const destype = desTypeMap[this.data.type] || this.draft.desType;
+      const destype = this.data.type || this.draft.desType;
       const did = this.data.draftId || this.draft.did;
       if (!destype || !did) return sweetError("未选择草稿");
       const url = getUrl('draftHistory', destype,  did);
@@ -227,19 +228,23 @@ export default {
       let type = this.type;
       return Promise.resolve()
         .then(() => {
-          // let post = this.getPost();
+          // 设置草稿表的desTypeId
           let desType, desTypeId;
           if (type === "newThread") {
-            desType = "forum";
+            // desType = "forum";
           } else if (type === "newPost") {
-            desType = "thread";
+            // desType = "thread";
             desTypeId = this.thread?.tid;
           } else if (type === "modifyPost") {
-            desType = "post";
+            // desType = "post";
             desTypeId = this.pid;
           } else if (type === "modifyThread") {
-            desType = "post";
+            // desType = "post";
             desTypeId = this.pid;
+          } else if (type === "modifyComment") {
+            desTypeId = this.pid;
+          } else if (type === "newComment") {
+            desTypeId = this.tid;
           }
           // else if (type === "modifyForumDeclare") {
           //   desType = "forumDeclare";
@@ -261,7 +266,7 @@ export default {
             JSON.stringify({
               post: saveData,
               draftId: saveData?.did || this.draftId,
-              desType: desType,
+              desType: type,
               desTypeId: desTypeId,
               saveType
             })
@@ -296,7 +301,7 @@ export default {
             this.addUrlParam("aid", data.draft._id);
           }
           this.setSubmitStatus(false);
-          this.$emit('save-draft-success', data.draft.desType);
+          this.$emit('save-draft-success', data.draft?.desType);
           // 解锁提交按钮
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");

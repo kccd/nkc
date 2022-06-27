@@ -9,7 +9,6 @@ const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
 const Path = require("path");
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
-const { ObjectId } = require('mongodb') 
 function isIncludes(arr, id, type) {
   for(const a of arr) {
     if(a.id === id && a.type === type) return true;
@@ -292,7 +291,6 @@ threadRouter
     };
     firstPost.t = nkcModules.nkcRender.replaceLink(firstPost.t);
     thread.firstPost = firstPost;
-
     // 加载文章待审原因
     if(!firstPost.reviewed) {
       const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});

@@ -8,12 +8,11 @@ module.exports = async (ctx, next) => {
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
   let {page = 0, perpage = 30, type } = query;
+  page = Number(page);
   perpage = Number(perpage);
   let count, paging, drafts;
-  const thread = (await db.DraftModel.getDesType()).thread;
+  const draftDesType = await db.DraftModel.getDesType();
   const beta = (await db.DraftModel.getType()).beta;
-  // const forum = (await db.DraftModel.getDesType()).forum;  
-  const post = (await db.DraftModel.getDesType()).post;  
   // 如果是社区内容草稿
   if(type === 'community') {
     count = await db.DraftModel.countDocuments({uid: targetUser.uid, type: beta});
@@ -24,10 +23,6 @@ module.exports = async (ctx, next) => {
       .skip(paging.start)
       .limit(paging.perpage);
   } else if (type === 'newThread') {
-    // 文章有两种类型
-      // forum  新文章
-      // post 可能是修改文章
-    // newThread 等于 forum
     if (perpage > 1) perpage = 1;
     const threadData = await db.DraftModel.getLatestNewThread(targetUser.uid, perpage);
     // drafts = threadData ? [threadData] : [];
@@ -45,7 +40,7 @@ module.exports = async (ctx, next) => {
     const { desTypeId } = query;
     if(!desTypeId) ctx.throw(400, 'desTypeId不存在');
     if (perpage > 1) perpage = 1;
-    const threadData = await db.DraftModel.getLatestModifyThread(desTypeId, targetUser.uid, nkcModules, perpage);
+    const threadData = await db.DraftModel.getLatestModifyThread(desTypeId, targetUser.uid, perpage);
     // drafts = threadData ? [threadData] : [];
     drafts = threadData || [];
 
@@ -53,8 +48,7 @@ module.exports = async (ctx, next) => {
     const { desTypeId } = query;
     if(!desTypeId) ctx.throw(400, 'desTypeId不存在');
     if (perpage > 1) perpage = 1;
-    const postData = await db.DraftModel.getLatestModifyPost(desTypeId, targetUser.uid, nkcModules, perpage);
-    // console.log(postData,'postData')
+    const postData = await db.DraftModel.getLatestModifyPost(desTypeId, targetUser.uid, perpage);
     // drafts = postData ? [postData] : [];
     drafts = postData || [];
 
@@ -62,12 +56,14 @@ module.exports = async (ctx, next) => {
     const { desTypeId } = query;
     if(!desTypeId) ctx.throw(400, 'desTypeId不存在');   
     if (perpage > 1) perpage = 1;
-    count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: {$in: [thread]}});
-    paging = nkcModules.apiFunction.paging(page, count, perpage);
-    const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: post, type: beta, desTypeId, parentPostId: { $ne: "" } })
+
+    const modifyComment = (await db.DraftModel.getDesType()).modifyComment;
+    // count = await db.DraftModel.countDocuments({uid: targetUser.uid, desType: modifyComment});
+    // paging = nkcModules.apiFunction.paging(page, count, perpage);
+    const draftData = await db.DraftModel.find({ uid: targetUser.uid, desType: modifyComment, type: beta, desTypeId, parentPostId: { $ne: "" } })
       .sort({tlm: -1})
-      .skip(paging.start)
-      .limit(paging.perpage);
+      .skip(page)
+      .limit(perpage);
     drafts = draftData;
 
   } else {
@@ -84,10 +80,18 @@ module.exports = async (ctx, next) => {
   for(const draft of drafts) {
     const {desType, desTypeId, mainForumsId, categoriesId} = draft;
     const d = draft.toObject();
-    if(desType === "forum") {
+    /* if(desType === draftDesType.newThread) {
+      const thread = await db.ThreadModel.findOne({tid: desTypeId});
+      if(!thread) continue;
+      const firstPost = await db.PostModel.findOne({pid: thread.oc});
+      d.thread = {
+        url: `/t`,
+        title: 1231
+      };
       d.type = "newThread";
-    } else if(desType === "thread") {
-      d.type = "newPost";
+    } else */ 
+    // 在草稿显示时提示此草稿属于那片文章并且返回url
+    if(desType === draftDesType.newPost) {
       const thread = await db.ThreadModel.findOne({tid: desTypeId});
       if(!thread) continue;
       const firstPost = await db.PostModel.findOne({pid: thread.oc});
@@ -95,7 +99,56 @@ module.exports = async (ctx, next) => {
         url: `/t/${thread.tid}`,
         title: firstPost.t
       };
-    } else if(desType === "post") {
+      // d.type = "newPost";
+
+    } else if (desType === draftDesType.modifyThread) {
+      const post = await db.PostModel.findOne({pid: desTypeId});
+      if(!post) continue;
+      const thread = await db.ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      // 草稿提示使用
+      d.thread = {
+        url: `/t/${thread.tid}`,
+        title: post.t
+      };
+      // d.type = "modifyThread";
+
+    } else if (desType === draftDesType.modifyComment) {
+      const post = await db.PostModel.findOne({pid: desTypeId});
+      if(!post) continue;
+      const thread = await db.ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const firstPost = await db.PostModel.findOne({pid: thread.oc});
+      const url = await db.PostModel.getUrl(post.pid);
+      d.thread = {
+        url,
+        title: firstPost.t
+      };
+      // d.type = "modifyComment";
+
+    } else if (desType === draftDesType.modifyPost) {
+      const post = await db.PostModel.findOne({pid: desTypeId});
+      if(!post) continue;
+      const thread = await db.ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      const firstPost = await db.PostModel.findOne({pid: thread.oc});
+      const url = await db.PostModel.getUrl(post.pid);
+      d.thread = {
+        url,
+        title: firstPost.t
+      };
+      // d.type = "modifyPost";
+    } else if (desType === draftDesType.newComment) {
+      const thread = await db.ThreadModel.findOne({tid: desTypeId});
+      if(!thread) continue;
+      const firstPost = await db.PostModel.findOne({pid: thread.oc});
+      d.thread = {
+        url: `/t/${thread.tid}`,
+        title: firstPost.t
+      };
+    }
+    
+    /* else if(desType === "post") {
       const post = await db.PostModel.findOne({pid: desTypeId});
       if(!post) continue;
       const thread = await db.ThreadModel.findOne({tid: post.tid});
@@ -115,7 +168,8 @@ module.exports = async (ctx, next) => {
         };
         d.type = "modifyPost";
       }
-    } else {
+    } */ 
+    /* else {
       if(desType === 'forumDeclare') {
         d.type = "modifyForumDeclare";
       } else {
@@ -127,7 +181,7 @@ module.exports = async (ctx, next) => {
         title: forum.displayName,
         url: `/f/${forum.fid}`
       };
-    }
+    } */
     // 拓展专业信息
     d.mainForums = [];
     if(mainForumsId.length) {
