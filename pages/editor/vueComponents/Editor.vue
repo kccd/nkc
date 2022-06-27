@@ -261,6 +261,7 @@ export default {
         url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}`;
         if (this.reqUrl.o) {
           url += `&o=${this.reqUrl.o}`;
+          if (this.reqUrl.type === 'redit') this.lockRequest = true;
         }
       }
       else if (search) {
