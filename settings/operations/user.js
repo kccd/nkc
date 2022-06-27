@@ -100,7 +100,13 @@ module.exports = {
 				},
 				blacklistData: {
 					GET: "getUserHomeCard",
-				}
+				},
+				thread: {
+					GET: "getUserHomeCard",
+				},
+				threadData: {
+					GET: "getUserHomeCard",
+				},
 			},
 		},
 		userPanel: {
