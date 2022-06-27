@@ -1,6 +1,6 @@
 if !isIncluded('latest/community/nav.pug')
   //+includeCSS('/latest/latestNav.css')
-  mixin renderLatestNav(activeType)
+  mixin renderLatestNav(activeType, isApp)
     //-.community-nav.m-b-1
       .community-nav-item(class=activeType === 'community'? 'active': '')
         a(href=`/n/community`) 社区
@@ -8,19 +8,21 @@ if !isIncluded('latest/community/nav.pug')
         a(href=`/n/zone`) 空间
       .community-nav-item(class=activeType === 'column'? 'active': '')
         a(href=`/n/column`) 专栏
-    .btn-group.btn-group-justified.m-b-1
-      .btn-group(role="group")
-        a.btn(
-          href=`/n/community`
-          class=activeType === 'community'? 'btn-primary': 'btn-default'
-          ) 社区
-      .btn-group(role="group")
-        a.btn.btn-default(
-          href=`/n/zone`
-          class=activeType === 'zone' ? 'btn-primary': 'btn-default'
-          ) 空间
-      .btn-group(role="group")
-        a.btn.btn-default(
-          href=`/n/column`
-          class=activeType === 'column' ? 'btn-primary': 'btn-default'
-          ) 专栏
+    if !isApp
+      .btn-group.btn-group-justified.m-b-1
+        .btn-group(role="group")
+          a.btn(
+            href=`/n/community`
+            class=activeType === 'community'? 'btn-primary': 'btn-default'
+            ) 社区
+        .btn-group(role="group")
+          a.btn.btn-default(
+            href=`/n/zone`
+            class=activeType === 'zone' ? 'btn-primary': 'btn-default'
+            ) 空间
+        .btn-group(role="group")
+          a.btn.btn-default(
+            href=`/n/column`
+            class=activeType === 'column' ? 'btn-primary': 'btn-default'
+            ) 专栏
+
