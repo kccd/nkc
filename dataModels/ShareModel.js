@@ -527,7 +527,7 @@ shareSchema.statics.getShareContent = async function(props) {
       desc: targetUser.description
     };
   } else if(type === shareTypes.fund) {
-    const fund = await FundModel.findOnly({fundId: id});
+    const fund = await FundModel.findOnly({_id: id});
     const fundSettings = await SettingModel.getSettings('fund');
     shareContent = {
       title: `「${fundSettings.fundName}」${fund.name}`,

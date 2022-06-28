@@ -409,8 +409,10 @@ export function RNSetPageTitle(title) {
 /*
 * thread系列触发分享显示
 * */
-export function RNSetSharePanelStatus(show = true) {
+export function RNSetSharePanelStatus(show = true,type,id) {
   RNEmit('setSharePanelStatus', {
     show,
+    type,
+    id
   });
 }
