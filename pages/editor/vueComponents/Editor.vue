@@ -30,7 +30,7 @@
           @content-change="contentChange"
         )
         .m-b-2(
-          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || reqUrl.o === 'copy'"
+          v-if="!['newPost', 'modifyThread', 'modifyPost', 'modifyComment'].includes(pageData.type) || reqUrl.o === 'copy'"
         )
           //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums
           classification(
@@ -74,7 +74,7 @@
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.data包含 createSurveyPermission type post.surveyId
           investigation(ref="investigation", :data="pageData" @info-change="infoChange")
-        .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
+        .m-b-2(v-if= "!['modifyPost', 'modifyComment'].includes(pageData.type)")
           //- 1.state
           column(
             ref="column",
@@ -93,9 +93,11 @@
         :o="reqUrl.o",
         @ready-data="readyData",
         @remove-editor="removeEditor",
-        @cover-change="coverChange"
-        @save-draft-success="saveDraftSuccess"
+        @cover-change="coverChange",
+        :allow-save="allowSave"
       )
+        //- @save-draft-success="saveDraftSuccess"
+      
 </template>
 
 <script>
@@ -140,17 +142,19 @@ export default {
     drafts: [],
     // 社区内容点击继续创作传递的参数o（复制为新文章或更新已发布文章）
     // o: this.reqUrl.o,
-    hideType: ["newPost", "modifyPost"],
+    hideType: ["newPost", "modifyPost", 'modifyComment'],
     pageData: {},
     pageState: {},
     err: '',
     show: false,
     lockRequest: false,
     mainForums: [],
-    infoSubmitDebounce: ''
+    infoSubmitDebounce: '',
+    allowSave: true
   }),
   customOptions: {
-    saveDraftIndex: 0
+    saveDraftIndex: 0,
+    time: 0
   },
   created() {
     // this.getUserDraft();
@@ -158,7 +162,7 @@ export default {
     this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
   },
   mounted() {
-    this.getData()
+    this.getData();
   },
   computed: {
     getTitle(){
@@ -181,11 +185,6 @@ export default {
       this.$refs.cover.setCover(v)
     },
     getUserDraft(page=0) {
-
-      // 如果是修改评论文章或者回复 不获取草稿数据
-      // , "modifyForumDeclare", "modifyForumLatestNotice"
-      // if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
-      
       if(this.lockRequest) return;
       const {uid: stateUid} = getState();
       this.uid = stateUid;
@@ -246,7 +245,7 @@ export default {
           this.$refs.submit.setSubmitStatus(false);
         })
       self.drafts = [];
-      
+      this.allowSave = true;
     },
     more() {
       location.href = '/creation/community/draft'
@@ -258,6 +257,7 @@ export default {
       let type, id, o;
       // 链接跳转过来
       if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
+        this.allowSave = false;
         url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}`;
         if (this.reqUrl.o) {
           url += `&o=${this.reqUrl.o}`;
@@ -272,10 +272,11 @@ export default {
           o = search.get('o')
         }
         if(type && id) {
+          this.allowSave = false;
           url = `/editor/data?type=${type}&id=${id}`;
-          if (o) {
-            url += `&o=${this.reqUrl.o}`;
-          }
+        }
+        if (o) {
+          url += `&o=${this.reqUrl.o}`;
         }
       }
       if(search.get('aid')){
@@ -287,13 +288,7 @@ export default {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
             sweetError("已经发布");
-            return setTimeout(() => {
-              location.href = location.pathname
-            }, 2000)
           }
-          // if(resData.post) {
-          //   this.lockRequest = true;
-          // }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
             this.mainForums = resData.mainForums;
@@ -303,6 +298,9 @@ export default {
           this.pageState = resData.state;
           this.show = true;
           this.getUserDraft();
+          if (!this.allowSave) {
+            this.$options.customOptions.time = Date.now()
+          }
         })
         .catch((err) => {
           if(err.error){
@@ -342,20 +340,35 @@ export default {
       // this.$refs.submit.saveToDraftBaseDebounce("automatic");
       this.infoChange();
     },
-    // 编辑器其他部分内容改变
-    infoChange() {
-      this.infoSubmitDebounce();
+    // 编辑器内容改变
+    infoChange(boolean = true) {
+      if (this.allowSave) {
+        this.closeDraft()
+        this.infoSubmitDebounce();
+      } else {
+        // 当打开后，有内容存在时，不保存
+        if (Date.now() - this.$options.customOptions.time > 3000) {
+          this.allowSave = true;
+          // 调查组件打开就走这了，为了防止需要参数。
+          if (!boolean) {
+              return
+          }
+          this.closeDraft()
+          this.infoSubmitDebounce();
+        }
+      }
     },
     infoSubmit(){
       this.$refs.submit.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
-    saveDraftSuccess() {
-      this.closeDraft();
-      this.$refs.submit.setSubmitStatus(false);
-    },
+    // saveDraftSuccess() {
+    //   this.closeDraft();
+    //   this.$refs.submit.setSubmitStatus(false);
+    // },
     closeDraft() {
       this.drafts = [];
+      this.allowSave = true;
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {

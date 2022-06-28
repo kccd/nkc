@@ -112,7 +112,6 @@ export default {
     keywords: {
       type: Object,
       require: true,
-      default: () => ({}),
     },
   },
   watch: {
@@ -122,7 +121,8 @@ export default {
         if (typeof n !== "undefined") {
           this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
           this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
-          this.submit();
+          this.keyWordsCn = n.cn || []
+          this.keyWordsEn = n.en || []
         }
       },
     },
@@ -134,6 +134,7 @@ export default {
     },
   },
   created(){
+    // this.submit();
     this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   mounted(){
@@ -196,8 +197,8 @@ export default {
     },
     removeKeyword(index, arr) {
       arr.splice(index, 1);
-      this.$set(this.data[index], "value", "");
-      },
+      // this.$set(this.data[index], "value", "");
+    },
     addKeyword() {
       this.open();
     },
