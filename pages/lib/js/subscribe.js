@@ -58,14 +58,14 @@ export function collectionThread(id, collection, cid) {
 }
 
 //关注社区文章
-export function subscribeThread(id, collection, cid) {
+export function subscribeThread(id, cid) {
   return nkcAPI('/t/' + id + '/subscribe', 'POST', {
     cid: cid || []
   })
 }
 
 //取关文章
-export function unSubscribeThread(id, collection, cid) {
+export function unSubscribeThread(id) {
   return nkcAPI('/t/' + id + '/subscribe', 'DELETE', )
 }
 
