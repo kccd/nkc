@@ -18,6 +18,8 @@ import Panel from "./userPanel/Panel";
 import AccountUser from "./AccountUser";
 import Footer from "../../../lib/vue/publicVue/footer/Footer"
 import {setPageTitle} from "../../../lib/js/pageSwitch";
+import {RNSetSharePanelStatus} from "../../../lib/js/reactNative";
+import {shareTypes} from "../../../lib/js/shareTypes";
 export default {
   data:() => ({
     targetUser: null,
@@ -46,6 +48,7 @@ export default {
     const {uid} = this.$route.params;
     this.uid = uid;
     this.getUserInfo();
+    RNSetSharePanelStatus(true, shareTypes.user, uid)
   },
   methods: {
     getUrl: getUrl,

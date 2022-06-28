@@ -29,7 +29,11 @@ block content
             .post-header
               .time
                 if !post.anonymous
-                  a(href=`/u/${post.uid}` target='_blank' onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
+                  a(href=`/u/${post.uid}` target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: post.uid})
+                  )
                     img.user-avatar(src=tools.getUrl('userAvatar', post.user.avatar))
                     .username= post.user.username
                 else

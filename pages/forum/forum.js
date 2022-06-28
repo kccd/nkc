@@ -1,13 +1,14 @@
 import {getState} from '../lib/js/state';
 import {RNOpenEditorPage, RNSetSharePanelStatus} from "../lib/js/reactNative";
 import {getSocket} from '../lib/js/socket';
+import {shareTypes} from "../lib/js/shareTypes";
 const socket = getSocket();
 const {isApp} = getState();
 const forumInfo = NKC.methods.getDataById('forumInfo');
 const {fid, page, digest, sort} = forumInfo;
 
 $(function() {
-  RNSetSharePanelStatus(true);
+  RNSetSharePanelStatus(true, shareTypes.forum, fid);
 });
 
 $(function() {
