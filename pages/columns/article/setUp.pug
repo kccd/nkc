@@ -45,6 +45,3 @@ mixin setUp()
         button.btn-sm.btn.btn-danger(onclick="deleteArticle()") 退修/删除
       else if data.columnPost.type === 'thread'
         button.btn-sm.btn.btn-default(onclick=`toUrl('${url}')`) 去社区文章
-
-  block scripts
-    +includeJS('/columns/article/setUp.js')

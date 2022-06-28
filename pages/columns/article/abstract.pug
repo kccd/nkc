@@ -9,24 +9,22 @@ mixin abstract(data)
   if abstractCn
     p.abstract-title.line-title 中文摘要
         p.cn-abstract.abstract-content
-          //- for abstract,i in data.abstractCn 
+          //- for abstract,i in data.abstractCn
           span=abstractCn
   if abstractEn
     p.en-abstract.line-title Abstract
       p.en-abstract.abstract-content
-        //- for abstract,i in data.abstractEn 
+        //- for abstract,i in data.abstractEn
         span=abstractEn
   if keyWordsCn.length || keyWordsEn.length
-    p.line-title 关键词 
+    p.line-title 关键词
   if keyWordsCn
     p.cn-key-word.key-word-conmon
       for keyWord,i in keyWordsCn
-        //- span.key-word-contaior  
+        //- span.key-word-contaior
         span.t(onclick=`turnSearch("${keyWord}")`)=keyWord
   if keyWordsEn
     p.en-key-word.key-word-conmon
-      for keyWord,i in keyWordsEn 
-        //- span.key-word-contaior 
+      for keyWord,i in keyWordsEn
+        //- span.key-word-contaior
         span.t(onclick=`turnSearch("${keyWord}")`)=keyWord
-  block scripts
-    +includeJS('/columns/article/abstract.js')

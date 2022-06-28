@@ -115,7 +115,7 @@ router
     if(userScore < num) ctx.throw(400, `你的${creditScore.name}不足`);
     if(description.length < 2) ctx.throw(400, '理由写的太少了');
     if(description.length > 60) ctx.throw(400, '理由不能超过60个字符');
-    await db.KcbsRecordModel.insertUsersRecord({
+    const record = await db.KcbsRecordModel.insertUsersRecord({
       fromUser,
       toUser,
       article,
@@ -147,15 +147,16 @@ router
       ip: ctx.address,
       c: {
         type: 'scoreTransfer',
-        aid,
-        // userName: user.username,
-        uid: user.uid,
-        // kcb: num,
-        number: num,
-        // scoreName: creditScore.name,
-        scoreType: creditScore.type,
-        // threadTitle: post.t,
-        description,
+        // aid,
+        // // userName: user.username,
+        // uid: user.uid,
+        // // kcb: num,
+        // number: num,
+        // // scoreName: creditScore.name,
+        // scoreType: creditScore.type,
+        // // threadTitle: post.t,
+        // description,
+        recordId: record._id,
       }
     });
     await message.save();

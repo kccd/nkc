@@ -413,6 +413,7 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   await record.save();
   await UserModel.updateUserScores(fromUser.uid);
   await UserModel.updateUserScores(toUser.uid);
+  return record;
   // fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
   // toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
 };
