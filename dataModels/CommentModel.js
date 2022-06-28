@@ -533,9 +533,9 @@ schema.statics.extendSingleComment = async (comment) => {
   }
   let quoteDocument;
   if(document.quoteDid) {
-    quoteDocument = await DocumentModel.findOnly({_id: comment.quoteDid});
+    quoteDocument = await DocumentModel.findOne({_id: document.quoteDid});
     const {uid, toc, content, _id, sid, did, tlm} = quoteDocument;
-    let quoteComment = await CommentModel.findeOnly({did});
+    let quoteComment = await CommentModel.findOnly({did});
     const user = await UserModel.findOnly({uid});
     const {username, avatar} = user;
     quoteDocument = {
