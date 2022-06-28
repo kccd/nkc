@@ -313,8 +313,8 @@ shareRouter
     }
     data.shareContent = shareContent;
     // 适配 APP
-    data.newUrl = data.shareContent.url;
-    data.logoUrl = data.shareContent.cover;
+    // data.newUrl = data.shareContent.url;
+    // data.logoUrl = data.shareContent.cover;
     await next();
   });
 module.exports = shareRouter;
