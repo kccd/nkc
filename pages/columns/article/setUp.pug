@@ -7,44 +7,10 @@ mixin setUp()
       if data.columnPost.type === 'article'
         if data.article && data.article.editorUrl
           a.btn.btn-default.btn-sm(href=data.article.editorUrl) 编辑文章
-        //
-        //button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('')`) 专业置顶
-        //
-        //button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('')`) 取消专业置顶
-        //
-        //button.btn.btn-default.btn-sm(onclick=`unHomeAd('')`) 取消首页推荐
-        //
-        //a.btn.btn-default.btn-sm(href=`/t//ad`).m-l-05 首页推荐
-        //
-        //
         if data.homeTopped
           button.btn.btn-default.btn-sm(onclick=`unHomeTop('')`) 取消首页置顶
         else
           button.btn.btn-default.btn-sm(onclick=`homeTop('')`) 首页置顶
-
-        //button.btn.btn-default.btn-sm(onclick=`communityTop('', false)`) 取消社区置顶
-        //
-        //button.btn.btn-default.btn-sm(onclick=`communityTop('', true)`) 社区置顶
-        //
-        //button.btn.btn-default.btn-sm(onclick=`unLatestTop('')`) 取消最新页置顶
-        //
-        //button.btn.btn-default.btn-sm(onclick=`latestTop('')`) 最新页置顶
-        //
-        //
-        //button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('', 'unPush')`) 取消热销
-        //
-        //button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('', 'push')`) 设为热销
-        //
-        //
-        //button.btn.btn-default.btn-sm(onclick=`closeThread('')`) 关闭主题
-        //
-        //button.btn.btn-default.btn-sm(onclick=`openThread('')`) 开放主题
-        //
-        //button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
-
         button.btn-sm.btn.btn-danger(onclick="deleteArticle()") 退修/删除
       else if data.columnPost.type === 'thread'
         button.btn-sm.btn.btn-default(onclick=`toUrl('${url}')`) 去社区文章
-
-  block scripts
-    +includeJS('/columns/article/setUp.js')

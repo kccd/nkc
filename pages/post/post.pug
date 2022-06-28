@@ -21,7 +21,7 @@ block content
     include ../module_credit
     .row
       .col-xs-12.col-md-9.box-shadow-panel
-        .fullwidthpanel.ThreadBox.post
+        .ThreadBox.post
           if !post.reviewed
             -let reviewData = {reviewPid: post.pid, reviewType: "post"}
             include ../publicModules/module_review
@@ -29,7 +29,11 @@ block content
             .post-header
               .time
                 if !post.anonymous
-                  a(href=`/u/${post.uid}` target='_blank' onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
+                  a(href=`/u/${post.uid}` target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({uid: post.uid})
+                  )
                     img.user-avatar(src=tools.getUrl('userAvatar', post.user.avatar))
                     .username= post.user.username
                 else
@@ -112,7 +116,7 @@ block content
           -var user = post.user
           include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0
-          .vote-user.fullwidthpanel.m-b-1
+          .vote-user.m-b-1
             h4 点赞的用户
             for u, index in data.voteUpUsers
               if index < 30

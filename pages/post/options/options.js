@@ -51,6 +51,7 @@ window.PostOption = new Vue({
     ipInfo: null,
     reviewed: null,
     commentControl: null,
+    editType: ''
   },
   computed: {
     position() {
@@ -105,6 +106,16 @@ window.PostOption = new Vue({
       nkcAPI(`/p/${pid}/option`, 'GET')
         .then(data => {
           const {tid, pid, toc, options, userColumnId, postType, postUserId, isComment} = data;
+          if (postType === 'thread') {
+            // console.log('修改文章')
+            this.editType = 'modifyThread'
+          } else if (postType === 'post' && isComment) {
+            // console.log('修改评论')
+            this.editType = 'modifyComment'
+          } else if (postType === 'post' && !isComment) {
+            // console.log('修改回复')
+            this.editType = 'modifyPost'
+          }
           self.isComment = isComment;
           self.anonymous = options.anonymous;
           self.anonymousUser = options.anonymousUser;

@@ -395,7 +395,7 @@ export default {
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     changeContent() {
-      this.$emit('info-change');
+      this.$emit('info-change', false);
     },
     init(options) {
       options = options || {};

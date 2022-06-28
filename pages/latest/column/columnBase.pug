@@ -4,7 +4,7 @@ block latestTitle
 block latestContent
   div
     include ../latestNav
-    +renderLatestNav('column')
+    +renderLatestNav('column', remoteState.isApp)
     block columnContent
 block latestScripts
   block columnScripts

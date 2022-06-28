@@ -1,5 +1,12 @@
 import {getSocket} from "../lib/js/socket";
 import Share from '../lib/vue/Share';
+import {RNSetSharePanelStatus} from "../lib/js/reactNative";
+import {shareTypes} from "../lib/js/shareTypes";
+var data = NKC.methods.getDataById("data");
+
+$(function() {
+  RNSetSharePanelStatus(true, shareTypes.post, data.pid);
+});
 
 const socket = getSocket();
 
@@ -25,7 +32,6 @@ function getPostAuthor(pid) {
     pid: pid
   });
 }
-var data = NKC.methods.getDataById("data");
 
 $(function () {
 

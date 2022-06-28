@@ -118,6 +118,7 @@ router
     const newMessageCount = newSystemInfoCount + newApplicationsCount + newReminderCount + newUsersMessagesCount;
     const userScores = await db.UserModel.getUserScores(data.user.uid);
     const userColumn = await db.UserModel.getUserColumn(data.user.uid);
+    const beta = (await db.DraftModel.getType()).beta;
     const userInfo = {
       banner: nkcModules.tools.getUrl('userBanner', data.user.banner),
       avatar: nkcModules.tools.getUrl('userAvatar', data.user.avatar),
@@ -131,7 +132,7 @@ router
       }): [],
       xsf: data.user.xsf,
       columnId: userColumn? userColumn._id: null,
-      draftCount: await db.DraftModel.countDocuments({uid: data.user.uid}),
+      draftCount: await db.DraftModel.countDocuments({uid: data.user.uid, type: beta}),
       gradeIcon: nkcModules.tools.getUrl("gradeIcon", data.user.grade._id),
     };
     data.anvState = {

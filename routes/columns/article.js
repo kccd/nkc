@@ -37,7 +37,7 @@ router.get('/:aid', async (ctx, next)=>{
       columnPermission: state.columnPermission,
       column: state.userColumn,
     };
-    data.columnPost.article.vote = await db.PostsVoteModel.getVoteByUid({uid: user.uid, id: data.columnPost.article._id, type: 'article'});
+    data.columnPost.article.vote = await db.PostsVoteModel.getVoteByUid({uid: state.uid, id: data.columnPost.article._id, type: 'article'});
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});
     isModerator = await article.isModerator(state.uid);
     data.homeTopped = await db.SettingModel.isEqualOfArr(homeSettings.toppedThreadsId, {id: article._id, type: 'article'});

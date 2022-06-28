@@ -18,6 +18,7 @@ block fundContent
   include ./formProtocol
   -var form = data.applicationForm;
   -var applicationForm = form;
+  .hidden#data=objToStr({_id: form._id})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8.box-shadow-panel

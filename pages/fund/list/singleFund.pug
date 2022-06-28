@@ -4,6 +4,7 @@ block fundTitle
   title=`${data.fundSettings.fundName} - ${data.fund.name}`
 block fundContent
   include ../applicationFormItem
+  #data.hidden=objToStr({_id: data.fund._id})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12.m-b-1

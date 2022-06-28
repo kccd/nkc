@@ -1,12 +1,24 @@
 import {toLogin} from "../lib/js/account";
 import {getState} from "../lib/js/state";
+import {RNSetSharePanelStatus} from "../lib/js/reactNative";
+import {shareTypes} from "../lib/js/shareTypes";
 
 const state = getState();
 const logged = !!state.uid;
 
 var data = NKC.methods.getDataById("data");
 var SubscribeTypes = window.SubscribeTypes;
-
+$(function() {
+  if(data.columnId){
+    RNSetSharePanelStatus(true, shareTypes.column, data.columnId);
+  }else {
+    if(data.type === 'article'){
+      RNSetSharePanelStatus(true, shareTypes.article, data.article.id);
+    }else {
+      RNSetSharePanelStatus(true, shareTypes.thread, data.article.tid);
+    }
+  }
+});
 $(function() {
   if(!window.CommonModal) {
     window.CommonModal = new NKC.modules.CommonModal();

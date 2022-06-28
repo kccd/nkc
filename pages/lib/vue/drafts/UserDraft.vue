@@ -13,27 +13,31 @@
           label
             input(type="checkbox" :data-did="draft.did" :value="draft.did" v-model="selectedDraftId")
         .time {{fromNow(draft.tlm || draft.toc)}}
-        span(v-if="draft.type === 'newThread'") 发表文章
-        span(v-else-if="draft.type === 'newPost'") 在文章《
-          a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》
-          span 下发表
-          span(v-if="draft.parentPostId") 评论
-          span(v-else) 回复
-        span(v-else-if="draft.type ==='modifyPost'") 修改文章《
-          a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》
-          span 下的
-          span(v-if="draft.parentPostId") 评论
-          span(v-else) 回复
-        span(v-else-if="draft.type === 'modifyThread'")
-          span 修改文章《
-            a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》
-        span(v-else)
-          span 修改
-            a(:href="draft.forum.url" target="_blank") {{draft.forum.title}}的专业说明
+        //- 草稿相关信息
+        span {{draftTitle(draft.desType)}}
+          a(:href="draft.thread && draft.thread.url" target="_blank") {{draft.thread && draft.thread.title}}
+          | {{draftTitle2(draft.desType)}}
+          span {{draftTitle3(draft.desType)}}
+
+        //- span(v-if="draft.desType === 'newThread'") 发表文章
+        //- span(v-else-if="draft.desType === 'newPost'") 在文章《
+        //-   a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》下发表
+        //-   span(v-if="draft.parentPostId") 评论
+        //-   span(v-else) 回复
+        //- span(v-else-if="draft.desType ==='modifyPost'") 修改文章《
+        //-   a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》下的
+        //-   span(v-if="draft.parentPostId") 评论
+        //-   span(v-else) 回复
+        //- span(v-else-if="draft.desType === 'modifyThread'")
+        //-   span 修改文章《
+        //-     a(:href="draft.thread.url" target="_blank") {{draft.thread.title}}》
+        //- span(v-else)
+        //-   span 修改
+        //-     a(:href="draft.forum.url" target="_blank") {{draft.forum.title}}的专业说明
       a.account-post-content {{draft.c || "未填写内容"}}
       .text-right.m-t-05.draft-button
         button(@click="removeDraftSingle(draft.did)") 删除
-        span.dropdown(v-if="draft.desType === 'post' && draft.type !== 'modifyPost'")
+        span.dropdown(v-if="draft.desType === 'modifyThread'")
           button.p-a-0.m-a-0(style='color: #2b90d9' :id="`dLabel_${draft.did}`" type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') 继续创作
             span.caret
           ul.dropdown-menu.dropdown-menu-right(:aria-labelledby="`dLabel_${draft.did}`")
@@ -45,7 +49,7 @@
               a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
                 .fa.fa-refresh
                 span &nbsp;更新已发布的文章
-        a(:href="`/editor?aid=${draft._id}`" target='_blank' v-else) 继续创作
+        a(:href="`/editor?type=${draft.desType}&aid=${draft._id}`" target='_blank' v-else) 继续创作
     paging(:pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
@@ -262,6 +266,7 @@
 }
 </style>
 <script>
+
 import Paging from "../Paging";
 import {getState} from "../../js/state";
 import {nkcAPI} from "../../js/netAPI";
@@ -276,6 +281,32 @@ export default {
     loading: false,
     selectedDraftId: [],//选中的草稿
   }),
+  customData: {
+    title1: {
+      newPost: '在文章《',
+      newThread: '发表文章',
+      newComment: '在文章《',
+      modifyComment: '修改文章《',
+      modifyPost: '修改文章《',
+      modifyThread: '修改文章《'
+    },
+    title3: {
+      newPost: '回复',
+      newThread: '',
+      newComment: '评论',
+      modifyComment: '评论',
+      modifyPost: '回复',
+      modifyThread: ''
+    },
+    title2: {
+      newPost: '》下发表',
+      newThread: '',
+      newComment: '》下的',
+      modifyComment: '》下的',
+      modifyPost: '》下的',
+      modifyThread: '》'
+    },
+  },
   components: {
     "paging": Paging
   },
@@ -295,6 +326,15 @@ export default {
   },
   methods: {
     fromNow: fromNow,
+    draftTitle(v) {
+      return this.$options.customData.title1[v];
+    },
+    draftTitle2(v) {
+        return this.$options.customData.title2[v];
+    },
+    draftTitle3(v) {
+        return this.$options.customData.title3[v];
+    },
     initData() {
       const {uid} = this.$route.params;
       const {uid: stateUid} = getState();

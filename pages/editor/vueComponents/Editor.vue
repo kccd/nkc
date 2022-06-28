@@ -26,11 +26,11 @@
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
         article-content(
           ref="content",
-          :c="pageData.post && pageData.post.c",
+          :c="pageData",
           @content-change="contentChange"
         )
         .m-b-2(
-          v-if="!['newPost', 'modifyThread', 'modifyPost'].includes(pageData.type) || reqUrl.o === 'copy'"
+          v-if="!['newPost', 'modifyThread', 'modifyPost', 'modifyComment'].includes(pageData.type) || reqUrl.o === 'copy'"
         )
           //- 1. @selected-forumids 选择的主分类后id给提交组件 2. data 包含 threadCategories minorForumCount mainForums
           classification(
@@ -74,7 +74,7 @@
         .m-b-2(v-if="!hideType.includes(pageData.type)")
           //- 1.data包含 createSurveyPermission type post.surveyId
           investigation(ref="investigation", :data="pageData" @info-change="infoChange")
-        .m-b-2(v-if= "!['modifyPost'].includes(pageData.type)")
+        .m-b-2(v-if= "!['modifyPost', 'modifyComment'].includes(pageData.type)")
           //- 1.state
           column(
             ref="column",
@@ -93,9 +93,11 @@
         :o="reqUrl.o",
         @ready-data="readyData",
         @remove-editor="removeEditor",
-        @cover-change="coverChange"
-        @save-draft-success="saveDraftSuccess"
+        @cover-change="coverChange",
+        :allow-save="allowSave"
       )
+        //- @save-draft-success="saveDraftSuccess"
+
 </template>
 
 <script>
@@ -140,23 +142,27 @@ export default {
     drafts: [],
     // 社区内容点击继续创作传递的参数o（复制为新文章或更新已发布文章）
     // o: this.reqUrl.o,
-    hideType: ["newPost", "modifyPost"],
+    hideType: ["newPost", "modifyPost", 'modifyComment'],
     pageData: {},
     pageState: {},
     err: '',
     show: false,
     lockRequest: false,
     mainForums: [],
-    infoSubmitDebounce: ''
+    infoSubmitDebounce: '',
+    allowSave: true
   }),
   customOptions: {
-    saveDraftIndex: 0
+    saveDraftIndex: 0,
+    time: 0
   },
   created() {
-    this.getData()
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
     this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
+  },
+  mounted() {
+    this.getData();
   },
   computed: {
     getTitle(){
@@ -179,12 +185,7 @@ export default {
       this.$refs.cover.setCover(v)
     },
     getUserDraft(page=0) {
-
-      // 如果是修改评论文章或者回复 不获取草稿数据
-      // , "modifyForumDeclare", "modifyForumLatestNotice"
-      // if (["newPost", "modifyThread", "modifyPost"].includes(this.pageData.type)) return
-
-      if(this.lockRequest) return
+      if(this.lockRequest) return;
       const {uid: stateUid} = getState();
       this.uid = stateUid;
       const self = this;
@@ -199,23 +200,26 @@ export default {
 
       } else if ("modifyPost" === editType) {
 
-        if (this.pageData.thread.comment) {
-          url += '&type=modifyComment';
-          url += "&desTypeId=" + this.pageData.thread.pid;
-        } else {
+        // if (this.pageData.thread.comment) {
+        //   url += '&type=modifyComment';
+        //   url += "&desTypeId=" + this.pageData.thread.pid;
+        // } else {
           // 修改回复 在draft表中type = post
-          url += '&type=' + editType;
-          url += "&desTypeId=" + this.pageData.thread.pid;
+        url += '&type=' + editType;
+        url += "&desTypeId=" + this.pageData.thread.pid;
 
-        }
+        // }
       } else if (editType === "modifyThread") {
         // 修改文章存草稿类型为post
         // desTypeId为post表的pid
         url += '&type=' + editType;
-        url += "&desTypeId=" + this.pageData.thread.pid;
+        url += "&desTypeId=" + this.pageData.thread.oc;
 
       } else if (editType === "newThread") {
         url += '&type=' + editType;
+      } else if (editType === "modifyComment") {
+        url += '&type=modifyComment';
+        url += "&desTypeId=" + this.pageData.thread.pid;
       }
 
       nkcAPI(url, 'GET')
@@ -236,8 +240,12 @@ export default {
         history.replaceState({}, '', self.delUrlParam('aid'));
       }
       self.addUrlParam('aid', aid);
-      this.getData()
+      this.getData().
+        then(() => {
+          this.$refs.submit.setSubmitStatus(false);
+        })
       self.drafts = [];
+      this.allowSave = true;
     },
     more() {
       location.href = '/creation/community/draft'
@@ -246,12 +254,16 @@ export default {
       if(!search) search = new URLSearchParams(location.search);
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
-      let type, id, o, aid;
+      let type, id, o;
       // 链接跳转过来
       if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
-        url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}&o=${this.reqUrl.o}`;
+        this.allowSave = false;
+        url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}`;
+        if (this.reqUrl.o) {
+          url += `&o=${this.reqUrl.o}`;
+          if (this.reqUrl.type === 'redit') this.lockRequest = true;
+        }
       }
-      // 继续编辑后拿草稿数据
       else if (search) {
         // 读取浏览器地址栏参数
         if(search.constructor.name === 'URLSearchParams'){
@@ -260,25 +272,23 @@ export default {
           o = search.get('o')
         }
         if(type && id) {
-          url = `/editor/data?type=${type}&id=${id}&o=${o}`;
+          this.allowSave = false;
+          url = `/editor/data?type=${type}&id=${id}`;
+        }
+        if (o) {
+          url += `&o=${this.reqUrl.o}`;
         }
       }
       if(search.get('aid')){
         this.lockRequest = true;
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
-      nkcAPI(url, "get")
+      return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
-            sweetError(err);
-            setTimeout(() => {
-              location.href = location.pathname
-            }, 2000)
+            sweetError("已经发布");
           }
-          // if(resData.post) {
-          //   this.lockRequest = true;
-          // }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
             this.mainForums = resData.mainForums;
@@ -288,6 +298,9 @@ export default {
           this.pageState = resData.state;
           this.show = true;
           this.getUserDraft();
+          if (!this.allowSave) {
+            this.$options.customOptions.time = Date.now()
+          }
         })
         .catch((err) => {
           if(err.error){
@@ -327,31 +340,35 @@ export default {
       // this.$refs.submit.saveToDraftBaseDebounce("automatic");
       this.infoChange();
     },
-    // 编辑器其他部分内容改变
-    infoChange() {
-      this.infoSubmitDebounce();
+    // 编辑器内容改变
+    infoChange(boolean = true) {
+      if (this.allowSave) {
+        this.closeDraft()
+        this.infoSubmitDebounce();
+      } else {
+        // 当打开后，有内容存在时，不保存
+        if (Date.now() - this.$options.customOptions.time > 3000) {
+          this.allowSave = true;
+          // 调查组件打开就走这了，为了防止需要参数。
+          if (!boolean) {
+              return
+          }
+          this.closeDraft()
+          this.infoSubmitDebounce();
+        }
+      }
     },
     infoSubmit(){
       this.$refs.submit.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
-    saveDraftSuccess(desType) {
-      this.closeDraft(desType);
-      this.$refs.submit.setSubmitStatus(false);
-    },
-    closeDraft(desType) {
-      if (this.drafts.length) {
-        const { saveDraftIndex } = this.$options.customOptions;
-        // 如果是编辑文字、编辑回复第一次进入编辑器，保存后不关闭草稿提示
-        if (desType === 'post' && saveDraftIndex < 2) {
-          if (++this.$options.customOptions.saveDraftIndex === 2)
-            this.drafts = [];
-        } else if (desType !== 'post') {
-          this.drafts = [];
-        } else {
-          this.drafts = [];
-        }
-      }
+    // saveDraftSuccess() {
+    //   this.closeDraft();
+    //   this.$refs.submit.setSubmitStatus(false);
+    // },
+    closeDraft() {
+      this.drafts = [];
+      this.allowSave = true;
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
@@ -429,7 +446,7 @@ export default {
     line-height: @height;
     width: @boxHeaderWidth;
     text-align: center;
-    margin-right: 10px;
+    //margin-right: 10px;
   }
   .article-box-text{
     font-size: 1.3rem;

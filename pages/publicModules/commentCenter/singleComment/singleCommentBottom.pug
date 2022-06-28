@@ -20,42 +20,28 @@ if !isIncluded('singlePostBottom')
         .single-post-bottom-item(onclick=`window.commentEditor.quoteComment('${docId}')`)
           .fa.fa-comment-o.reply-icon
           span 引用
-        //.single-post-bottom-item
-        //  if 1
-        //    span.single-post-comment-button(
-        //      onclick=`NKC.methods.switchComment("${cid}")`
-        //      data-show-number='true'
-        //      data-type='singleCommentButton'
-        //      data-pid=cid
-        //      data-number=count
-        //    )=`评论${count>0? `(${count})`:``}`
-        //  else
-        //    span.single-post-comment-button.disabled(title='当前回复不允许评论') 评论
         .single-post-bottom-item
           .post-vote-container
             comment-hit(cid=cid, vote-down=voteDown vote-up=voteUp vote=vote)
-            //+singleCommentVote(cid, vote, voteUp)
-        //if permission('creditKcb')
-        //  .single-post-bottom-item(onclick=`credit('${cid}', 'kcb')` title='鼓励')
-        //    .fa.fa-cny.credit-kcb
-        if permission('creditKcb')
+        if data.user
+          if permission('creditKcb')
+            .single-post-bottom-item(
+              data-global-click=`showCreditPanel`
+              data-global-data=objToStr({creditType: 'kcb', contentType: 'comment', contentId: cid})
+              title='鼓励'
+            )
+              .fa.fa-cny.credit-kcb &nbsp;鼓励
           .single-post-bottom-item(
-            data-global-click=`showCreditPanel`
-            data-global-data=objToStr({creditType: 'kcb', contentType: 'comment', contentId: cid})
-            title='鼓励'
-          )
-            .fa.fa-cny.credit-kcb &nbsp;鼓励
-        .single-post-bottom-item(
-          data-global-click='showSharePanel'
-          data-global-data=objToStr({type: 'comment', id: cid})
-          title='分享')
-          .fa.fa-share-square-o.new-share-icon
-        .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom['${cid}'].openOptions(this)` title='其他操作')
-          .fa.fa-sliders.option-icon
-      else
-        .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')")
-          .fa.fa-comment-o.reply-icon
-          span 引用
-        .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')" title='其他操作')
-          .fa.fa-sliders.option-icon
+            data-global-click='showSharePanel'
+            data-global-data=objToStr({type: 'comment', id: cid})
+            title='分享')
+            .fa.fa-share-square-o.new-share-icon
+          .single-post-bottom-item(data-type='CommentOption' data-cid=cid onclick=`window.singleCommentBottom['${cid}'].openOptions(this)` title='其他操作')
+            .fa.fa-sliders.option-icon
+        else
+          .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')")
+            .fa.fa-comment-o.reply-icon
+            span 引用
+          .single-post-bottom-item(onclick="RootApp.openLoginPanel('login')" title='其他操作')
+            .fa.fa-sliders.option-icon
       comment-post-editor(:ref=`"editorContainer"` cid=cid aid=articleId @close-editor="closePostCommentEditor")

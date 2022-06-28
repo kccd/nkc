@@ -53,6 +53,9 @@ export default {
     },
     o: {
       type: String,
+    },
+    allowSave: {
+      type: Boolean 
     }
   },
   data: () => ({
@@ -96,9 +99,14 @@ export default {
       immediate: true,
       handler(n) {
         if (n && n === 'copy') {
-          // 考虑有回复 有文章
           this.type = "newThread"
         }
+      }
+    },
+    allowSave: {
+      immediate: true,
+      handler(n) {
+          this.allowSave2 = n
       }
     }
   },
@@ -131,15 +139,9 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    // 改
     history() {
-      const desTypeMap = {
-        newThread: 'forum',
-        newPost: "thread",
-        modifyThread: 'post',
-        modifyPost: 'post',
-      }
-      // const aid = this.$route.query.aid;
-      const destype = desTypeMap[this.data.type] || this.draft.desType;
+      const destype = this.data.type || this.draft.desType;
       const did = this.data.draftId || this.draft.did;
       if (!destype || !did) return sweetError("未选择草稿");
       const url = getUrl('draftHistory', destype,  did);
@@ -168,6 +170,7 @@ export default {
       this.autoSaveInfo = "草稿已保存 " + this.format(time);
     },
     timingSaveToDraft() {
+      if (!this.allowSave2) return
       this.readyDataForSave();
       let type = this.type;
       const { saveData } = this;
@@ -209,7 +212,6 @@ export default {
         }
       };
       // 如果没有内容不更新
-      // 主要问题是watch引起
       if (
           !(
             saveData.t ||
@@ -227,19 +229,23 @@ export default {
       let type = this.type;
       return Promise.resolve()
         .then(() => {
-          // let post = this.getPost();
+          // 设置草稿表的desTypeId
           let desType, desTypeId;
           if (type === "newThread") {
-            desType = "forum";
+            // desType = "forum";
           } else if (type === "newPost") {
-            desType = "thread";
+            // desType = "thread";
             desTypeId = this.thread?.tid;
           } else if (type === "modifyPost") {
-            desType = "post";
+            // desType = "post";
             desTypeId = this.pid;
           } else if (type === "modifyThread") {
-            desType = "post";
+            // desType = "post";
             desTypeId = this.pid;
+          } else if (type === "modifyComment") {
+            desTypeId = this.pid;
+          } else if (type === "newComment") {
+            desTypeId = this.tid;
           }
           // else if (type === "modifyForumDeclare") {
           //   desType = "forumDeclare";
@@ -261,7 +267,7 @@ export default {
             JSON.stringify({
               post: saveData,
               draftId: saveData?.did || this.draftId,
-              desType: desType,
+              desType: type,
               desTypeId: desTypeId,
               saveType
             })
@@ -296,8 +302,6 @@ export default {
             this.addUrlParam("aid", data.draft._id);
           }
           this.setSubmitStatus(false);
-          this.$emit('save-draft-success', data.draft.desType);
-          // 解锁提交按钮
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");
             this.saveToDraftSuccess();
@@ -443,7 +447,7 @@ export default {
               );
             }
             return nkcUploadFile("/f/" + submitData.fids[0], "POST", formData);
-          } else if (type === "newPost") {
+          } else if (type === "newPost" || type === "newComment") {
             // 发表回复：从文章页点"去编辑器"、草稿箱
             this.checkString(submitData.t, {
               name: "标题",
@@ -454,7 +458,7 @@ export default {
             return nkcAPI("/t/" + this.data?.thread?.tid, "POST", {
               post: submitData,
             });
-          } else if (type === "modifyPost") {
+          } else if (type === "modifyPost" || type === "modifyComment") {
             // 修改post
             this.checkString(submitData.t, {
               name: "标题",
@@ -546,7 +550,7 @@ export default {
   .modifySubmit {
     margin: auto;
     position: static;
-    width: 100%;
+    max-width: 100%;
   }
   .btn-area{
     text-align: left;

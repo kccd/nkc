@@ -1,5 +1,6 @@
 <template lang="pug">
   .subscribe-types-list(v-if="targetUser")
+    subscribe-types(ref="subscribeTypes")
     .subscribe-types
       .subscribe-type-edit(@click="editType()") 管理分类
       div 主分类：
@@ -55,11 +56,15 @@
 }
 </style>
 <script>
+import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 export default {
   props: ['target-user', 'type', 'parent-type', 'subscribe-types'],
   data: () => ({
 
   }),
+  components: {
+    'subscribe-types': SubscribeTypes
+  },
   mounted() {
   },
   methods: {
@@ -68,7 +73,10 @@ export default {
       this.$emit('click-type', id);
     },
     editType() {
-      this.$emit('edit-type');
+      this.$refs.subscribeTypes.open(() => {
+      },{
+        editType: true
+      })
     }
   }
 }

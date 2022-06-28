@@ -1,10 +1,16 @@
 import {nkcAPI} from "../lib/js/netAPI";
 import {screenTopAlert, screenTopWarning} from "../lib/js/topAlert";
+import {RNSetSharePanelStatus} from "../lib/js/reactNative";
+import {shareTypes} from "../lib/js/shareTypes";
 
 var editor = {};
 var draftsId = {};
 var timeout = {};
 var disableButton = {};
+var data = NKC.methods.getDataById("data");
+$(function() {
+  RNSetSharePanelStatus(true, shareTypes.comment, data.pid);
+});
 function closeSaveCommentDraft(pid) {
   clearTimeout(timeout[pid]);
 }

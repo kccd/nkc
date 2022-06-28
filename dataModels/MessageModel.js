@@ -337,6 +337,8 @@ messageSchema.statics.getParametersData = async (message) => {
   const PreparationForumModel = mongoose.model('pForum');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
   const apiFunction = require("../nkcModules/apiFunction");
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
@@ -400,19 +402,23 @@ messageSchema.statics.getParametersData = async (message) => {
       title: comment[0].articleDocument.title,
     };
   } else if(type === 'xsf') {
-    const {pid, num, cid, aid} = message.c;
+    const {recordId} = message.c;
     let url;
-    if(pid) {
+    const xsfRecord = await XsfsRecordModel.findOne({_id: recordId});
+    const {post, comment, article} = await XsfsRecordModel.getXsfsRecordTypes();
+    if(!xsfRecord) return null;
+    const {type, pid, num} = xsfRecord;
+    if(type === post) {
       const post = await PostModel.findOne({pid});
       if(!post) return null;
       url = await PostModel.getUrl(post);
-    } else if(cid) {
-      let comment = await CommentModel.findOnly({_id: cid});
+    } else if(type === comment) {
+      let comment = await CommentModel.findOnly({_id: pid});
       if(!comment) return null;
       comment = (await CommentModel.getCommentsInfo([comment]))[0];
       url = comment.commentUrl;
-    } else if(aid) {
-      let article = await ArticleModel.findOnly({_id: aid});
+    } else if(type === article) {
+      let article = await ArticleModel.findOnly({_id: pid});
       if(!article) return null;
       article = (await ArticleModel.getArticlesInfo([article]))[0];
       url = article.url;
@@ -422,21 +428,43 @@ messageSchema.statics.getParametersData = async (message) => {
       xsfCount: num,
     };
   } else if(type === 'scoreTransfer') {
-    const {pid, uid, scoreType, number} = message.c;
-    const post = await PostModel.findOne({pid});
-    if(!post) return null;
-    const thread = await ThreadModel.findOne({tid: post.tid});
-    if(!thread) return null;
-    const firstPost = await thread.extendFirstPost();
-    const user = await UserModel.findOne({uid});
+    let threadTitle, postURL, scoreNumber, scoreName;
+    const {recordId} = message.c;
+    const record = await KcbsRecordModel.findOne({_id: recordId});
+    if(!record) return null;
+    const {commentId, articleId, pid, from, num: number, scoreType} = record;
+    const user = await UserModel.findOne({uid: from});
+    const scoreConfig = await SettingModel.getScoreByScoreType(scoreType);
+    scoreName = scoreConfig.name;
+    scoreNumber = number / 100;
     if(!user) return null;
-    let scoreConfig = await SettingModel.getScoreByScoreType(scoreType);
-    const scoreName = scoreConfig.name;
-    const scoreNumber = number / 100;
+    if(pid) {
+      const post = await PostModel.findOne({pid});
+      if(!post) return null;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) return null;
+      const firstPost = await thread.extendFirstPost();
+      threadTitle = firstPost.t;
+      postURL = await PostModel.getUrl(post);
+    } else if(commentId) {
+      let comment = await CommentModel.findOne({_id: commentId});
+      if(!comment) return null;
+      comment = await CommentModel.getCommentInfo(comment);
+      postURL = comment.commentUrl;
+      threadTitle = comment.articleDocument.title;
+    } else {
+      let article = await ArticleModel.findOne({_id: articleId});
+      if(!article) return null;
+      article = await ArticleModel.getArticleInfo(article);
+      if(!article) return null;
+      postURL = article.url;
+      threadTitle = article.document.title;
+    }
+    
     parameters = {
       username: user.username,
-      postURL: await PostModel.getUrl(post),
-      threadTitle: firstPost.t,
+      postURL,
+      threadTitle,
       scoreNumber,
       scoreName,
     };

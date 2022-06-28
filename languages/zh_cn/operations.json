@@ -878,5 +878,6 @@
   "digestComment": "将独立文章回复设置为精选",
   "unDigestComment": "取消将独立文章回复为精选",
   "getDigestSettings": "获取加精设置",
-  "getCreditSettings": "获取评学术分、鼓励设置"
+  "getCreditSettings": "获取评学术分、鼓励设置",
+  "publishArticle": "发表独立文章（长电文、专栏文章）"
 }

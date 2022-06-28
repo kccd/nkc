@@ -264,6 +264,7 @@ postsVoteSchema.statics.getVoteByUid = async (options) => {
   const {uid, type, id} = options;
   const {comment, article} = voteSources;
   let vote;
+  if(!uid) return null;
   if(type === "article") {
     vote = await PostsVoteModel.findOne({source: article, uid, sid: id}).sort({toc: -1});
   } else if(type === "comment") {

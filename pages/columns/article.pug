@@ -42,31 +42,7 @@ block baseColumnContent
         replyCount: count || 0,
         vote: article.vote,
       })
-      //- 文章用户其他操作
-      //-.single-post-bottom
-        if data.user
-          if type === 'article'
-            span.single-comment-bottom-item(onclick="window.location.href='#container'")
-              .fa.fa-comment-o.reply-icon
-              span 回复
-            if article.digest
-              span.fa.fa-star.m-r-05(style='color: #ffbf16;font-size: 1.2rem' title='精选')
-            .single-comment-bottom-item#CommentHitBox
-              comment-hit(cid=article._id article='article' vote-up=article.voteUp vote-down=article.voteDown)
-            .single-comment-bottom-item(data-type='share' data-share-type='article' data-share-id=article._id title='分享')
-              .fa.fa-share-square-o.new-share-icon
-            .single-comment-bottom-item(data-type="articleOption" data-aid=article._id title="其他操作" data-direction="down")
-              .fa.fa-sliders.option-icon
-          else
-            .single-comment-bottom-item(data-type="articleOption" data-tid=article.tid data-collected=`${collected}` title="其他操作" data-direction="up")
-              .fa.fa-sliders.option-icon
-        else
-          a.single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
-            .fa.fa-comment-o.reply-icon
-            span 回复
-          .single-comment-bottom-item(onclick="RootApp.openLoginPanel('login')")
-            .fa.fa-sliders.option-icon
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  .hidden#data=objToStr({type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   .article-common.m-b-1
     div
       if type === 'article' && article.status !== 'normal' && article.status !== undefined
@@ -122,7 +98,6 @@ block baseColumnContent
   include ./article/authorInfo.pug
   +authorInfo()
   include ../publicModules/floatForumNav
-  include ../publicModules/nkcSource
   style.
     .single-post-container {
       padding: 0.9rem 0 0.9rem 0!important;
@@ -131,14 +106,16 @@ block scripts
   include ../publicModules/nkcSource
   include ../publicModules/commonModal/commonModal
   include ../publicModules/selectColor
-  include ../publicModules/subscribeTypes/subscribeTypes
-
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/disabledPost/disabledPost
+  include ../publicModules/articleCenter/articleOption/articleOptions
   +includeJS("/columns/settings/page.js")
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
   +includeJS("/columns/article.js")
+  +includeJS('/columns/article/abstract.js')
+  +includeJS('/columns/article/authorInfo.js')
+  +includeJS('/columns/article/setUp.js')
+  +includeJS('/columns/article/title.js')
   +mixinColumnNavLinkScript()
   +includeDeferJS('/columns/article/article.js', false)
-  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-  include ../publicModules/disabledPost/disabledPost
-  include ../publicModules/articleCenter/articleOption/articleOptions

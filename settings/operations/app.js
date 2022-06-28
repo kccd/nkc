@@ -49,6 +49,9 @@ module.exports = {
 			follower: {
 				GET: "appVisitProfile",
 			},
+			collection: {
+				GET: "appVisitProfile",
+			},
 		},
 	},
 	scoreChange: {

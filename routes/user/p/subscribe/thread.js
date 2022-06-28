@@ -13,7 +13,10 @@ module.exports = async (ctx, next) => {
   const subscribes = await db.SubscribeModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   const subscribesObj = {};
   subscribes.map(s => subscribesObj[s.tid] = s);
+  //获取关注的文章id
+  data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
   data.subscribesObj = subscribesObj;
   data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);
+  data.paging = paging;
   await next();
 };

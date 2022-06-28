@@ -10,6 +10,7 @@ import SubscribeBlacklist from "../views/user/subscribe/SubscribeBlacklist";
 import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
 import SubscribeForums from "../views/user/subscribe/SubscribeForums";
 import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
+import SubscribeThreads from "../views/user/subscribe/SubscribeThreads";
 import Finance from "../views/user/propfile/profile/Finance";
 import UserColumnThread from "../views/user/propfile/profile/UserColumnThread";
 import AppProfileView from "../views/app/profile/AppProfileView";
@@ -37,6 +38,7 @@ export const routerName = {
   appSubForum: 'subForum',
   appSubColumn: 'subColumn',
   appSubThread: 'subThread',
+  appCollection: 'collection',
   appFan: 'fan',
   appFollower: 'follower',
   appScore: 'appScore',
@@ -131,6 +133,11 @@ export default [
                 name: routerName.subCollection,
                 path: '/u/:uid/profile/subscribe/collection',
                 component: SubscribeCollection,
+              },
+              {
+                name: routerName.subThreads,
+                path: '/u/:uid/profile/subscribe/thread',
+                component: SubscribeThreads,
               }
             ]
           }
@@ -165,9 +172,14 @@ export default [
         component: SubscribeColumns
       },
       {
+        name: routerName.appCollection,
+        path: '/app/profile/sub/collection',
+        component: SubscribeCollection
+      },
+      {
         name: routerName.appSubThread,
         path: '/app/profile/sub/thread',
-        component: SubscribeCollection
+        component: SubscribeThreads
       },
       {
         name: routerName.appFollower,
