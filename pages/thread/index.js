@@ -1,5 +1,5 @@
 import {getSocket} from "../lib/js/socket";
-import {RNSetThreadShareShow} from "../lib/js/reactNative";
+import {RNSetSharePanelStatus} from "../lib/js/reactNative";
 
 const socket = getSocket();
 var surveyForms = [], draftId = "", author = {}, _id;
@@ -10,7 +10,7 @@ $(document).ready(function(){
 	new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
-				RNSetThreadShareShow()
+				RNSetSharePanelStatus()
 				resolve();
 		  }, 300)
 	  } else {

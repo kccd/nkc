@@ -21,7 +21,7 @@ block content
     include ../module_credit
     .row
       .col-xs-12.col-md-9.box-shadow-panel
-        .fullwidthpanel.ThreadBox.post
+        .ThreadBox.post
           if !post.reviewed
             -let reviewData = {reviewPid: post.pid, reviewType: "post"}
             include ../publicModules/module_review
@@ -112,7 +112,7 @@ block content
           -var user = post.user
           include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0
-          .vote-user.fullwidthpanel.m-b-1
+          .vote-user.m-b-1
             h4 点赞的用户
             for u, index in data.voteUpUsers
               if index < 30

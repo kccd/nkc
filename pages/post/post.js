@@ -1,5 +1,10 @@
 import {getSocket} from "../lib/js/socket";
 import Share from '../lib/vue/Share';
+import {RNSetSharePanelStatus} from "../lib/js/reactNative";
+
+$(function() {
+  RNSetSharePanelStatus(true);
+});
 
 const socket = getSocket();
 
