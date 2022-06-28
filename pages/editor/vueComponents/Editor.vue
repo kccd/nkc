@@ -20,7 +20,7 @@
           ref="title",
           :data="pageData",
           :notice="(pageState.editorSettings && pageState.editorSettings.onEditNotes) || ''"
-          @info-change="infoChange"
+          @info-change="titleContentChange"
         )
         //- @content-change="contentChange"
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
@@ -150,7 +150,8 @@ export default {
     lockRequest: false,
     mainForums: [],
     infoSubmitDebounce: '',
-    allowSave: true
+    allowSave: true,
+    initEditorContent: false,
   }),
   customOptions: {
     saveDraftIndex: 0,
@@ -338,12 +339,20 @@ export default {
       !this.hideType.includes(this.pageData.type) &&
         this.$refs.original.contentChange(length);
       // this.$refs.submit.saveToDraftBaseDebounce("automatic");
+      if(!this.initEditorContent) {
+        this.initEditorContent = true;
+      } else {
+        this.closeDraft();
+      }
+      this.infoChange();
+    },
+    titleContentChange() {
+      this.closeDraft();
       this.infoChange();
     },
     // 编辑器内容改变
     infoChange(boolean = true) {
       if (this.allowSave) {
-        this.closeDraft()
         this.infoSubmitDebounce();
       } else {
         // 当打开后，有内容存在时，不保存
@@ -353,7 +362,6 @@ export default {
           if (!boolean) {
               return
           }
-          this.closeDraft()
           this.infoSubmitDebounce();
         }
       }
