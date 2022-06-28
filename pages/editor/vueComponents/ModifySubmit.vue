@@ -294,7 +294,7 @@ export default {
             this.addUrlParam("aid", data.draft._id);
           }
           this.setSubmitStatus(false);
-          this.$emit('save-draft-success', data.draft?.desType);
+          this.$emit('save-draft-success');
           // 解锁提交按钮
           if (saveType === "manual") {
             sweetSuccess("草稿已保存");

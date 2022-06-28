@@ -350,22 +350,12 @@ export default {
       this.$refs.submit.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
-    saveDraftSuccess(desType) {
-      this.closeDraft(desType);
+    saveDraftSuccess() {
+      this.closeDraft();
       this.$refs.submit.setSubmitStatus(false);
     },
-    closeDraft(desType) {
-      if (this.drafts.length) {
-        // 如果是编辑文章、编辑回复、编辑评论第一次进入编辑器，保存后不关闭草稿提示
-        if (['modifyPost', 'modifyThread', 'modifyComment'].includes(desType)) {
-          if (++this.$options.customOptions.saveDraftIndex === 2)
-            this.drafts = [];
-        } else if (['newPost', 'newThread', 'newComment'].includes(desType)) {
-          this.drafts = [];
-        } else {
-          sweetError('desType类型不正确')
-        }
-      }
+    closeDraft() {
+      this.drafts = [];
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
