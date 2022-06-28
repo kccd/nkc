@@ -11,5 +11,5 @@ const donationApp = new Vue({
 });
 var data = NKC.methods.getDataById("data");
 $(function() {
-  RNSetSharePanelStatus(true, shareTypes.fund, data.fund._id);
+  RNSetSharePanelStatus(true, shareTypes.fund, data._id);
 });

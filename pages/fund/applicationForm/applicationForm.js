@@ -12,5 +12,5 @@ if(element) {
 }
 var data = NKC.methods.getDataById("data");
 $(function() {
-  RNSetSharePanelStatus(true, shareTypes.fundForm, data.form._id);
+  RNSetSharePanelStatus(true, shareTypes.fundForm, data._id);
 });
