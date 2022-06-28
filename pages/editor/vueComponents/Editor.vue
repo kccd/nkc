@@ -443,7 +443,7 @@ export default {
     line-height: @height;
     width: @boxHeaderWidth;
     text-align: center;
-    margin-right: 10px;
+    //margin-right: 10px;
   }
   .article-box-text{
     font-size: 1.3rem;
