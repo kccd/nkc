@@ -97,7 +97,7 @@ module.exports = {
     GET: 'creationCenter',
     editor: {
       GET: 'creationCenter',
-      POST: 'creationCenter'
+      POST: 'publishArticle'
     },
     column: {
       GET: 'creationCenter',
