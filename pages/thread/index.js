@@ -7,11 +7,11 @@ const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function(){
-	RNSetThreadShareShow()
 	new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
-  		  resolve();
+				RNSetThreadShareShow()
+				resolve();
 		  }, 300)
 	  } else {
   		resolve();
