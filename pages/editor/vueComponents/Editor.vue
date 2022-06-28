@@ -261,9 +261,9 @@ export default {
         url = `/editor/data?type=${this.reqUrl.type}&id=${this.reqUrl.id}`;
         if (this.reqUrl.o) {
           url += `&o=${this.reqUrl.o}`;
+          if (this.reqUrl.type === 'redit') this.lockRequest = true;
         }
       }
-      // 继续编辑后拿草稿数据
       else if (search) {
         // 读取浏览器地址栏参数
         if(search.constructor.name === 'URLSearchParams'){

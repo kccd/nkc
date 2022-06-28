@@ -133,13 +133,6 @@ export default {
     visitUrl: NKC.methods.visitUrl,
     // 改
     history() {
-      const desTypeMap = {
-        newThread: 'forum',
-        newPost: "thread",
-        modifyThread: 'post',
-        modifyPost: 'post',
-      }
-      // const aid = this.$route.query.aid;
       const destype = this.data.type || this.draft.desType;
       const did = this.data.draftId || this.draft.did;
       if (!destype || !did) return sweetError("未选择草稿");
