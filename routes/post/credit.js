@@ -23,7 +23,7 @@ router
     }
     if(!isModerator) ctx.throw(400, '权限不足');
     data.isModerator = isModerator;
-		if(thread.disabled || thread.disabled) {
+		if(thread.disabled || post.disabled) {
 			ctx.throw(403,'无法给禁用的文章或回复评学术分');
 		}
 		const xsfSettings = await db.SettingModel.findOnly({_id: 'xsf'});
