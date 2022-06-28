@@ -4,8 +4,8 @@ const subUserRouter = require('./subscribe/user');
 const subForumRouter = require('./subscribe/forum');
 const subColumnRouter = require('./subscribe/column');
 const subCollectionRouter = require('./subscribe/collection');
-const blacklistRouter = require('./subscribe/blackList');
 const subThreadRouter = require('./subscribe/thread');
+const blacklistRouter = require('./subscribe/blackList');
 const momentRouter = require('./moment');
 const timelineRouter = require('./timeline');
 const postRouter = require('./post');
@@ -222,6 +222,8 @@ router
   .get('/subscribe/columnData', subColumnRouter)
   .get('/subscribe/collection', async (ctx, next) => await next())
   .get('/subscribe/collectionData', subCollectionRouter)
+  .get('/subscribe/thread', async (ctx, next) => await next())
+  .get('/subscribe/threadDate', subThreadRouter)
   .get('/subscribe/blacklist', async (ctx, next) => await next())
   .get('/subscribe/blacklistData', blacklistRouter)
   .get('/subscribe/thread', async (ctx, next) => await next())

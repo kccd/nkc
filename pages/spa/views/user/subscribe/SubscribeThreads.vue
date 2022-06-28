@@ -1,12 +1,12 @@
 <template lang="pug">
   .subscribe-thread(v-if="targetUser")
-    subscribe-types(ref="subscribeTypes")
-    nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType")
+    subscribe-types(res="subscribeTypes")
+    nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" :subscribe-types="subscribeTypes" @click-type="clickType")
     paging(ref="paging" :pages="pageButtons" @click-button="clickPage")
     .account-threads.subscribe-thread
       .null(v-if="!subscribes.length") 空空如也~
       .subscribe-thread-list(v-else)
-        collection-list(ref="collectionList" :subscribes="subscribes" :threads-id="collectionThreadsId" type='collection')
+        thread-list(ref="threadList" :subscribes="subscribes" :threads-id="subscribeThreadsId" type="subscribe")
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
@@ -251,13 +251,13 @@
 import NavTypes from "./NavTypes";
 import Paging from "../../../../lib/vue/Paging";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
-import CollectionList from "../../../../lib/vue/ThreadList";
+import ThreadList from "../../../../lib/vue/ThreadList";
 import {nkcAPI} from "../../../../lib/js/netAPI";
-import {getUrl, fromNow} from "../../../../lib/js/tools";
-import {collectionThread, collectionArticle} from "../../../../lib/js/subscribe";
-import {objToStr} from "../../../../lib/js/tools";
+import {getUrl, fromNow, objToStr} from "../../../../lib/js/tools";
+import {subscribeThread, unSubscribeThread} from "../../../../lib/js/subscribe";
 import {getState} from "../../../../lib/js/state";
 import {setPageTitle} from "../../../../lib/js/pageSwitch";
+
 export default {
   data: () => ({
     uid: null,
@@ -266,14 +266,14 @@ export default {
     paging: null,
     t: 'null',
     parentType: null,
-    collectionThreadsId: [],
+    subscribeThreadsId: [],
     subscribeTypes: [],
   }),
   components: {
-    "subscribe-types": SubscribeTypes,
+    'subscribe-types': SubscribeTypes,
     'nav-types': NavTypes,
     'paging': Paging,
-    'collection-list': CollectionList
+    'thread-list': ThreadList,
   },
   computed: {
     pageButtons() {
@@ -281,7 +281,7 @@ export default {
     },
   },
   mounted() {
-    setPageTitle('收藏的文章');
+    setPageTitle('关注的文章');
     this.initData();
     this.getThreads();
   },
@@ -293,11 +293,11 @@ export default {
       const {disabled, recycleMark, reviewed} = thread;
       let klass = '';
       if(disabled) {
-        klass = 'disabled'
+        klass = 'disabled';
       } else if(recycleMark) {
-        klass = 'draft';
-      } else if(!reviewed) {
-        klass = 'review'
+        klass = 'recycleMark';
+      } else {
+        klass = 'review';
       }
       return klass;
     },
@@ -306,10 +306,9 @@ export default {
       const {uid: stateUid} = getState();
       this.uid = uid || stateUid;
     },
-    //获取用户收藏的文章
     getThreads(page) {
       const self = this;
-      let url = `/u/${self.uid}/profile/subscribe/collectionData`;
+      let url = `/u/${self.uid}/profile/subscribe/threadData`;
       if(self.t) url = url + `?t=${self.t}`;
       if(page) {
         if(url.indexOf('?') === -1) {
@@ -319,119 +318,18 @@ export default {
         }
       }
       nkcAPI(url, 'GET')
-      .then(res => {
-        self.targetUser = res.targetUser;
-        self.subscribes = res.subscribes;
-        self.paging = res.paging;
-        self.parentType = res.parentType;
-        self.t = res.t;
-        self.collectionThreadsId = res.collectionThreadsId;
-        self.subscribeTypes = res.subscribeTypes;
-      })
-      .catch(err => {
-        sweetError(err);
-      })
-    },
-    //转移分类
-    moveSub(subsId = []) {
-      const subscribes = [];
-      const _subscribesObj = {};
-      const self = this;
-      const _subscribes = self.subscribes;
-      _subscribes.map(s => {
-        _subscribesObj[s.tid] = s;
-      })
-      subsId.map(id => {
-        const s = _subscribesObj[id];
-        if(s) subscribes.push(s);
-      })
-      let selectedTypesId = [];
-      if(subscribes.length === 1) {
-        selectedTypesId = subscribes[0].cid;
-      } else if(subscribes.length === 0) {
-        return;
-      }
-      subsId = subscribes.map(s => s._id);
-      self.$refs.subscribeTypes.open((typesId) => {
-        nkcAPI("/account/subscribes", "PUT", {
-          type: "modifyType",
-          typesId: typesId,
-          subscribesId: subsId
+        .then(res => {
+          self.targetUser = res.targetUser;
+          self.subscribes = res.subscribes;
+          self.paging = res.paging;
+          self.parentType = res.parentType;
+          self.t = res.t;
+          self.subscribeThreadsId = res.subThreadsId;
+          self.subscribeTypes = res.subscribeTypes;
         })
-          .then(function() {
-            self.$refs.subscribeTypes.close();
-            subscribes.map(s => {
-              s.cid = typesId
-            });
-            sweetSuccess("执行成功");
-          })
-          .catch(function(data) {
-            sweetError(data);
-          })
-      }, {
-        selectedTypesId: selectedTypesId,
-        hideInfo: true,
-        selectTypesWhenSubscribe: true
-      });
-    },
-    subArticle(id, ) {
-      const self = this;
-      const sub = !self.collectionThreadsId.includes(id);
-      if(sub) {
-        self.$refs.subscribeTypes.open((cid) => {
-          collectionArticle(id, sub, cid)
-            .then(() => {
-              const index = self.collectionThreadsId.indexOf(id);
-              if(index === -1) self.collectionThreadsId.push(id);
-              sweetSuccess('收藏成功');
-              self.$refs.subscribeTypes.close();
-            })
-            .catch(err => {
-              sweetError(err);
-            })
-        }, {
+        .catch(err => {
+          sweetError(err);
         })
-      } else {
-        collectionArticle(id, sub)
-          .then(() => {
-            const index = self.collectionThreadsId.indexOf(id);
-            if(index !== -1) self.collectionThreadsId.splice(index, 1);
-            sweetSuccess('收藏已取消');
-          })
-          .catch(err => {
-            sweetError(err);
-          })
-      }
-    },
-    //收藏和取消收藏文章
-    subThread(id) {
-      const self = this;
-      const sub = !self.collectionThreadsId.includes(id);
-      if(sub) {
-        self.$refs.subscribeTypes.open((cid) => {
-          collectionThread(id, sub, cid)
-          .then(() => {
-            const index = self.collectionThreadsId.indexOf(id);
-            if(index === -1) self.collectionThreadsId.push(id);
-            sweetSuccess('收藏成功');
-            self.$refs.subscribeTypes.close();
-          })
-          .catch(err => {
-            sweetError(err);
-          })
-        }, {
-        })
-      } else {
-        collectionThread(id, sub)
-          .then(() => {
-            const index = self.collectionThreadsId.indexOf(id);
-            if(index !== -1) self.collectionThreadsId.splice(index, 1);
-            sweetSuccess('收藏已取消');
-          })
-          .catch(err => {
-            sweetError(err);
-          })
-      }
     },
     //点击文章分类时
     clickType(t){

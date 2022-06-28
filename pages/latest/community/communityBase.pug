@@ -4,7 +4,7 @@ block latestTitle
 block latestContent
   div
     include ../latestNav
-    +renderLatestNav('community')
+    +renderLatestNav('community', remoteState.isApp)
     block communityContent
 block latestScripts
   block communityScripts

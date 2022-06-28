@@ -1,4 +1,5 @@
 import {getSocket} from "../lib/js/socket";
+import {RNSetThreadShareShow} from "../lib/js/reactNative";
 
 const socket = getSocket();
 var surveyForms = [], draftId = "", author = {}, _id;
@@ -6,10 +7,11 @@ const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function(){
-  new Promise(function(resolve, reject) {
+	new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
-  		  resolve();
+				RNSetThreadShareShow()
+				resolve();
 		  }, 300)
 	  } else {
   		resolve();

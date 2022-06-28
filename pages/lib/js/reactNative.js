@@ -406,3 +406,11 @@ export function RNSetPageTitle(title) {
     title
   });
 }
+/*
+* thread系列触发分享显示
+* */
+export function RNSetThreadShareShow() {
+  RNEmit('openShareShow', {
+    show: true,
+  });
+}

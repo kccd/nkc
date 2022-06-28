@@ -34,6 +34,7 @@ router
     await next();
   })
   .del("/", async (ctx, next) => {
+    //取关文章
     const {params, db, data} = ctx;
     const {tid} = params;
     const {user} = data;

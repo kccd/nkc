@@ -18,5 +18,7 @@ router
   .get('/follower', async (ctx, next) => {
     await next();
   })
-
+  .get('/collection', async (ctx, next) => {
+    await next();
+  })
 module.exports = router;

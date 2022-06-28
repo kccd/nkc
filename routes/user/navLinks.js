@@ -16,7 +16,6 @@ router
     uid: targetUser.uid,
     deleted: false,
   });
-  console.log('noteCount', noteCount);
   const {uid: targetUid} = state;
   if(uid !== targetUid) ctx.throw(401, '权限不足');
   if(state.isApp) {

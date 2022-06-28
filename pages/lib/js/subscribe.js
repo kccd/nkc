@@ -51,10 +51,22 @@ export function subColumn(id, sub, cid) {
 
 //收藏社区文章
 export function collectionThread(id, collection, cid) {
-  return nkcAPI('/t/' + id + '/collection', 'POSt', {
+  return nkcAPI('/t/' + id + '/collection', 'POST', {
     type: !!collection,
     cid: cid || []
   })
+}
+
+//关注社区文章
+export function subscribeThread(id, cid) {
+  return nkcAPI('/t/' + id + '/subscribe', 'POST', {
+    cid: cid || []
+  })
+}
+
+//取关文章
+export function unSubscribeThread(id) {
+  return nkcAPI('/t/' + id + '/subscribe', 'DELETE', )
 }
 
 //收藏独立文章
