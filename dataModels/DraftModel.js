@@ -444,7 +444,7 @@ draftSchema.statics.getBeta = async (desTypeId, desType, uid) => {
   if(!desTypeId || !desType || !uid) throw "参数不正确"
   const DraftModel = mongoose.model("drafts");
   const beta = (await DraftModel.getType()).beta;
-  const newThread = (await DraftModel.getType()).getDesType;
+  const {newThread} = (await DraftModel.getDesType());
   if (desType === newThread) {
     return await DraftModel.findOne({did: desTypeId, desType, uid, type: beta});
   } else {

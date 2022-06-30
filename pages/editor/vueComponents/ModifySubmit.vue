@@ -154,7 +154,6 @@ export default {
         const desTypeId =  new URLSearchParams(location.search).get('id');
         if (!destype || !desTypeId) return sweetError("未选择草稿");
         url = getUrl('draftHistory', destype,  desTypeId);
-
       }
       window.open(url)
     },
