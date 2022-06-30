@@ -114,6 +114,7 @@ activeUserSchema.statics.saveNewUsersToCache = async () => {
 * 2021-09-14 调整为取最新注册的 12 个用户
 * */
 activeUserSchema.statics.getActiveUsersFromCache = async () => {
+  const {getUrl} = require('../nkcModules/tools');
   let activeUsers = await redisClient.getAsync("activeUsers");
   try{
     activeUsers = JSON.parse(activeUsers);
@@ -123,7 +124,16 @@ activeUserSchema.statics.getActiveUsersFromCache = async () => {
       activeUsers = [];
     }
   }
-  return activeUsers || [];
+  activeUsers = activeUsers || [];
+  return activeUsers.map(u => {
+    const {uid, username, avatar} = u;
+    return {
+      username,
+      uid,
+      avatarUrl: getUrl('userAvatar', avatar),
+      homeUrl: getUrl('userHome', uid)
+    };
+  });
 };
 /*
 * 从缓存中取最新注册的用户
