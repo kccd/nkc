@@ -52,6 +52,12 @@ router
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
   const queryCriteria = { desTypeId, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
+  const {newThread} = await db.DraftModel.getDesType();
+  
+  if (source === newThread) {
+    queryCriteria.did = desTypeId;
+    delete queryCriteria.desTypeId;
+  }
   //  获取列表
   // 返回分页信息
   const count =  await db.DraftModel.countDocuments(queryCriteria);
@@ -95,8 +101,15 @@ router
   // if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确")
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
+  const {newThread} = await db.DraftModel.getDesType();
+
   // 查询其他历史
   const queryCriteria = {desTypeId, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
+  // 如果时新文章只能通过did查找历史
+  if (source === newThread) {
+    queryCriteria.did = desTypeId;
+    delete queryCriteria.desTypeId
+  }
   const count =  await db.DraftModel.countDocuments(queryCriteria);
   const paging = nkcModules.apiFunction.paging(page, count, 10);
   data.paging = paging;

@@ -284,7 +284,7 @@ export default {
         .then((resData) => {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
-            sweetError("已经发布");
+            sweetError("文章已经发布或已经为历史版");
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
