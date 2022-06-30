@@ -440,11 +440,11 @@ draftSchema.statics.updateToBeta = async (_id, desType, uid) => {
 * @param {String} uid 访问的用户id
 * @param {String} desType 草稿类型
 */
-draftSchema.statics.getBeta = async (did, desType, uid) => {
-  if(!did || !desType || !uid) throw "参数不正确"
+draftSchema.statics.getBeta = async (desTypeId, desType, uid) => {
+  if(!desTypeId || !desType || !uid) throw "参数不正确"
   const DraftModel = mongoose.model("drafts");
   const beta = (await DraftModel.getType()).beta;
-  return await DraftModel.findOne({did, desType, uid, type: beta});
+  return await DraftModel.findOne({desTypeId, desType, uid, type: beta});
   
 }
 /* 

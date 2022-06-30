@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { debounce } from '../../lib/js/execution';
+import { debounce, immediateDebounce } from '../../lib/js/execution';
 
 export default {
   data: () => ({
@@ -51,7 +51,7 @@ export default {
     }
   },
   created(){
-    this.changeContentDebounce = debounce(this.changeContent, 2000);
+    this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
   },
   methods: {
     changeContent() {

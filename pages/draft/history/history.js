@@ -15,7 +15,7 @@ function saveArticle(data){
   })
 }
 function post(type, obj) {
-  const url = `/draft/history/${obj._id}/${type}?source=${obj.source}&did=${obj.did}`
+  const url = `/draft/history/${obj._id}/${type}?source=${obj.source}&desTypeId=${obj.desTypeId}`
   nkcAPI(url, 'POST')
     .then(() => {
       location.href=`/creation/editor/community?aid=${obj._id}`;

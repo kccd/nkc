@@ -38,7 +38,7 @@
     input.editor-title(placeholder="请输入标题..." v-model="titleValue" )
 </template>
 <script>
-import { debounce } from '../../lib/js/execution';
+import { immediateDebounce ,debounce } from '../../lib/js/execution';
 
 export default {
   props: {
@@ -60,7 +60,7 @@ export default {
     titleChangeDebounce: ''
   }),
   mounted() {
-    this.titleChangeDebounce = debounce(this.titleChange, 2000);
+    this.titleChangeDebounce = immediateDebounce(this.titleChange, 2000);
 
   },
   watch: {

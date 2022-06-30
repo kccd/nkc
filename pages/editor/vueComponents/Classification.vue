@@ -121,7 +121,7 @@
 import { getUrl, objToStr } from "../../lib/js/tools";
 // import { nkcAPI } from "../../lib/js/netAPI";
 import ForumSelector from "./ForumSelector.vue";
-import { debounce } from '../../lib/js/execution';
+import { debounce, immediateDebounce } from '../../lib/js/execution';
 
 
 export default {
@@ -143,7 +143,7 @@ export default {
     }
   },
   created(){
-    this.changeContentDebounce = debounce(this.changeContent, 2000);
+    this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
   },
   watch: {
     // 点击继续编辑需要更新数据

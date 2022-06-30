@@ -48,10 +48,10 @@ router
   //获取文档历史版本
   ctx.template = 'draft/history/document.pug'
   const {db, data, state, query, permission, nkcModules} = ctx;
-  const {did, source, page=0} = query;
+  const {desTypeId, source, page=0} = query;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
-  const queryCriteria = { did, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
+  const queryCriteria = { desTypeId, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
   //  获取列表
   // 返回分页信息
   const count =  await db.DraftModel.countDocuments(queryCriteria);
@@ -78,7 +78,7 @@ router
       },
     });
     // 包含了将此版本改为编辑版的url 组成
-    data.urlComponent = {_id: data.document._id, did: data.document.did, source, page};
+    data.urlComponent = {_id: data.document._id, did: data.document.did, source, page, desTypeId};
   }else{
     data.document = '';
     // data.bookId = ''
@@ -89,12 +89,14 @@ router
 .get('/history/:_id',async (ctx, next)=>{
   ctx.template = 'draft/history/document.pug'
   const {db, data, params, state, query, permission, nkcModules} = ctx;
-  const { did, source, page=0 } = query;
+  const { desTypeId, source, page=0 } = query;
+  // _id 被选中文章
   const { _id } = params;
   // if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确")
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
-  const queryCriteria = {did, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
+  // 查询其他历史
+  const queryCriteria = {desTypeId, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
   const count =  await db.DraftModel.countDocuments(queryCriteria);
   const paging = nkcModules.apiFunction.paging(page, count, 10);
   data.paging = paging;
@@ -134,18 +136,18 @@ router
     },
   });
   // let editorUrl = {_id: data.document._id}
-  data.urlComponent = {_id: data.document._id, source, did: data.document.did, page};
+  data.urlComponent = {_id: data.document._id, source, did: data.document.did, page, desTypeId};
   await next()
 })
 .post('/history/:_id/edit', async (ctx, next)=>{
   const {db, params, query, state} = ctx;
   //  正在编辑的改为历史版
-  const { did, source } = query;
+  const { desTypeId, source } = query;
   // if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确")
   // 当前历史记录改为编辑版，并且复制了一份为历史版
   const { _id } = params;
   const DraftModel = db.DraftModel;
-  const betaDraft = await DraftModel.getBeta(did, source, state.uid);
+  const betaDraft = await DraftModel.getBeta(desTypeId, source, state.uid);
   if(betaDraft) {
     await DraftModel.updateToBeta(_id, source, state.uid);
     await DraftModel.createToBetaHistory(_id, source, state.uid);
