@@ -146,6 +146,7 @@ export default {
     this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   watch: {
+    // 点击继续编辑需要更新数据
     data: {
       immediate: true,
       handler(n) {

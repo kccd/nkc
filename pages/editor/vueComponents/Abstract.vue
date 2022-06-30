@@ -51,6 +51,9 @@ export default {
     abstract: {
       immediate: true,
       handler(n) {
+        // console.log(n.cn)
+        // console.log(n.en)
+        // if (this.cn === n.cn && this.en === n.en) return
         this.cn = n.cn || "";
         this.en = n.en || "";
       },

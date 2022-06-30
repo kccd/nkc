@@ -134,7 +134,6 @@ export default {
     },
   },
   created(){
-    // this.submit();
     this.changeContentDebounce = debounce(this.changeContent, 2000);
   },
   mounted(){
@@ -197,7 +196,8 @@ export default {
     },
     removeKeyword(index, arr) {
       arr.splice(index, 1);
-      // this.$set(this.data[index], "value", "");
+      // 添加对话框中内容删除
+      this.$set(this.data[index], "value", "");
     },
     addKeyword() {
       this.open();
