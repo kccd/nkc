@@ -10,7 +10,7 @@ onload = ()=>{
 
 function saveArticle(data){
   const newdata = JSON.parse(data)
-  sweetQuestion('确定要将当前项添加到创作中心进行编辑吗？').then(()=>{
+  sweetQuestion('确定要基于当前版本继续创作吗？').then(()=>{
     post('edit', newdata)
   })
 }
