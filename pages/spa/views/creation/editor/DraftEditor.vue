@@ -104,7 +104,7 @@ export default {
       ],
       editorInitOk: false,
       autoSaveInfo: null,
-      setInterval: '',//自动保存草稿计时器
+      setInterval: null,//自动保存草稿计时器
       types: {
         modify: 'modify',
         create: 'create',
@@ -236,9 +236,12 @@ export default {
     },
     initAuthSaveDraftTimeout() {
       const self = this;
-      setTimeout(() => {
+      self.setInterval = setTimeout(() => {
         self.authSaveAsHistory()
           .then(() => {
+            self.initAuthSaveDraftTimeout();
+          })
+          .catch(err =>{
             self.initAuthSaveDraftTimeout();
           })
       }, 60000);
