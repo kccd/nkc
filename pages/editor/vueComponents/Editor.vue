@@ -26,7 +26,7 @@
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
         article-content(
           ref="content",
-          :c="pageData",
+          :c="pageData.post.c",
           @content-change="contentChange"
         )
         .m-b-2(
@@ -200,12 +200,6 @@ export default {
         url += "&desTypeId=" + this.pageData.thread.tid;
 
       } else if ("modifyPost" === editType) {
-
-        // if (this.pageData.thread.comment) {
-        //   url += '&type=modifyComment';
-        //   url += "&desTypeId=" + this.pageData.thread.pid;
-        // } else {
-          // 修改回复 在draft表中type = post
         url += '&type=' + editType;
         url += "&desTypeId=" + this.pageData.thread.pid;
 
@@ -375,7 +369,9 @@ export default {
     //   this.$refs.submit.setSubmitStatus(false);
     // },
     closeDraft() {
-      this.drafts = [];
+      if (this.drafts.length) {
+        this.drafts = [];
+      }
       this.allowSave = true;
     },
     // 提交和保存时获取各组件数据

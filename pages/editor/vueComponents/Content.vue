@@ -33,7 +33,7 @@ export default {
   }),
   props: {
     c: {
-      type: Object,
+      type: String,
     },
   },
   watch: {
@@ -42,11 +42,11 @@ export default {
       immediate: true,
       handler(n) {
         let reg = /<blockquote cite.+?blockquote>/;
-        let quoteHtml = n.post.c?.match(reg);
+        let quoteHtml = n?.match(reg);
         if (quoteHtml && quoteHtml[0]) {
           this.quoteHtml = quoteHtml[0];
         }
-        this.content = n.post.c?.replace(reg, "") || "";
+        this.content = n?.replace(reg, "") || "";
         this.editorStatus && this.setContent(this.content)
       },
     },
