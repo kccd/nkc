@@ -79,7 +79,7 @@ export default {
     },
     getData() {
       return {
-        c: this.$refs.threadEditor?.getContentTxt && this.$refs.threadEditor.getContentTxt() || '',
+        c: this.$refs.threadEditor?.getContent && this.$refs.threadEditor.getContent() || '',
         contentLength: this.contentLength,
       };
     },
