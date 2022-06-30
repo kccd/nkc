@@ -156,8 +156,13 @@ draftsRouter
     if(draft) { // 存在草稿
       // 更新草稿
       await draft.updateOne(draftObj);
-      if (saveType !== 'automatic') {
+      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
+      if (saveType === 'timing') {
+        // 定时保存
         await draft.checkContentAndCopyToBetaHistory();
+      } else if (saveType === 'manual') {
+        // 手动保存
+        await draft.copyToBetaHistory();
       }
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。

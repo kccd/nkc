@@ -83,7 +83,7 @@
 
 <script>
 import { DraggableElement } from "../../lib/js/draggable";
-import { debounce } from '../../lib/js/execution';
+import { debounce, immediateDebounce } from '../../lib/js/execution';
 
 export default {
   data: () => ({
@@ -134,8 +134,7 @@ export default {
     },
   },
   created(){
-    // this.submit();
-    this.changeContentDebounce = debounce(this.changeContent, 2000);
+    this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
   },
   mounted(){
     this.draggableElement = new DraggableElement(
@@ -197,7 +196,8 @@ export default {
     },
     removeKeyword(index, arr) {
       arr.splice(index, 1);
-      // this.$set(this.data[index], "value", "");
+      // 添加对话框中内容删除
+      this.$set(this.data[index], "value", "");
     },
     addKeyword() {
       this.open();

@@ -664,11 +664,17 @@ schema.methods.getNote = async function() {
 * 保存 article
 * 将测试版变为测试历史版 betaHistory
 * */
-schema.methods.saveArticle = async function() {
+schema.methods.autoSaveArticle = async function() {
   const DocumentModel = mongoose.model('documents');
   const {article: documentSource} = await DocumentModel.getDocumentSources();
   //将测试版变为测试历史版
   await DocumentModel.checkContentAndCopyBetaToHistoryBySource(documentSource, this._id);
+}
+schema.methods.saveArticle = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {article: documentSource} = await DocumentModel.getDocumentSources();
+  //将测试版变为测试历史版
+  await DocumentModel.copyBetaToHistoryBySource(documentSource, this._id);
 }
 schema.statics.checkArticleInfo = async (article) => {
   const {title, content} = article;

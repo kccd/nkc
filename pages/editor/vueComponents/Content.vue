@@ -27,13 +27,13 @@ export default {
     // 是否允许触发contentChange
     // contentChangeEventFlag: true,
     content: "",
-    quoteHtml: "",
+    // quoteHtml: "",
     contentLength: "",
     editorStatus: false,
   }),
   props: {
     c: {
-      type: Object,
+      type: String,
     },
   },
   watch: {
@@ -41,12 +41,12 @@ export default {
       deep: true,
       immediate: true,
       handler(n) {
-        let reg = /<blockquote cite.+?blockquote>/;
-        let quoteHtml = n.post.c?.match(reg);
-        if (quoteHtml && quoteHtml[0]) {
-          this.quoteHtml = quoteHtml[0];
-        }
-        this.content = n.post.c?.replace(reg, "") || "";
+        // let reg = /<blockquote cite.+?blockquote>/;
+        // let quoteHtml = n?.match(reg);
+        // if (quoteHtml && quoteHtml[0]) {
+        //   this.quoteHtml = quoteHtml[0];
+        // }
+        this.content = n;
         this.editorStatus && this.setContent(this.content)
       },
     },
@@ -79,7 +79,7 @@ export default {
     },
     getData() {
       return {
-        c: this.content + (this.quoteHtml || ""),
+        c: this.$refs.threadEditor?.getContent && this.$refs.threadEditor.getContent() || '',
         contentLength: this.contentLength,
       };
     },

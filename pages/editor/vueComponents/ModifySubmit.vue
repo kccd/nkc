@@ -37,7 +37,7 @@
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
-import {debounce} from '../../lib/js/execution';
+// import {debounce} from '../../lib/js/execution';
 import 'url-search-params-polyfill';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
@@ -59,7 +59,6 @@ export default {
     }
   },
   data: () => ({
-    saveToDraftBaseDebounce: '',
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
@@ -77,9 +76,10 @@ export default {
     saveDraftTimeout: 60000,
     saveData: '',
     setInterval: '',
+    // 保存草稿后的数据
     draft: '',
     // 判断是否有草稿ID
-    submitStatus: true
+    submitStatus: false
   }),
   watch: {
     data : {
@@ -110,9 +110,7 @@ export default {
       }
     }
   },
-  created(){
-    this.saveToDraftBaseDebounce = debounce((saveType)=>{this.saveToDraftBase(saveType)}, 2000)
-  },
+
   computed: {
     selectedForumsId() {
       let arr = [];
@@ -123,6 +121,11 @@ export default {
       }
       return arr;
     },
+  },
+  created() {
+    if (this.data.type === 'newThread') {
+      if (!this.data.post.did || !this.draft.did) this.setSubmitStatus(true);
+    }
   },
   mounted() {
     this.setInterval = setInterval(this.timingSaveToDraft, this.saveDraftTimeout);
@@ -139,12 +142,19 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
-    // 改
     history() {
-      const destype = this.data.type || this.draft.desType;
-      const did = this.data.draftId || this.draft.did;
-      if (!destype || !did) return sweetError("未选择草稿");
-      const url = getUrl('draftHistory', destype,  did);
+      let url;
+      if (this.data.type === 'newThread') {
+        // 点击继续编辑后点击历史 this.data.post.did
+        // 直接输入内容点击历史只能用 this.draft.did
+        if (!this.data.post.did && !this.draft.did) return sweetError("未选择草稿");
+        url = getUrl('draftHistory', 'newThread',  this.data.post.did || this.draft.did);
+      } else {
+        const destype = this.data.type || this.draft.desType;
+        const desTypeId =  new URLSearchParams(location.search).get('id');
+        if (!destype || !desTypeId) return sweetError("未选择草稿");
+        url = getUrl('draftHistory', destype,  desTypeId);
+      }
       window.open(url)
     },
     checkAnonymous(selectedForumsId) {
@@ -289,6 +299,9 @@ export default {
         })
         .then((data) => {
           this.draft = data.draft;
+          if (this.draft.desType === 'newThread' && this.draft.did) {
+            this.setSubmitStatus(false);
+          }
           //保存草稿的全部内容长度
           if (data.contentLength) {
             this.oldContentLength = data.draft?.c?.length;
@@ -370,7 +383,9 @@ export default {
     },
     // 检测内容
     checkContent(v) {
-      let contentText = $(v).text();
+      const div = $('<div></div>');
+      div.html(v);
+      let contentText = div.text();
       if (contentText.length > 100000) {
         throw new Error("内容不能超过10万字");
       }

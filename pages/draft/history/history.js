@@ -10,15 +10,15 @@ onload = ()=>{
 
 function saveArticle(data){
   const newdata = JSON.parse(data)
-  sweetQuestion('确定要将当前项添加到创作中心进行编辑吗？').then(()=>{
+  sweetQuestion('确定要基于当前版本继续创作吗？').then(()=>{
     post('edit', newdata)
   })
 }
 function post(type, obj) {
-  const url = `/draft/history/${obj._id}/${type}?source=${obj.source}&did=${obj.did}`
+  const url = `/draft/history/${obj._id}/${type}?source=${obj.source}&desTypeId=${obj.desTypeId}`
   nkcAPI(url, 'POST')
     .then(() => {
-      location.href=`/creation/editor/community?aid=${obj._id}`;
+      location.href=`/editor?type=newThread&aid=${obj._id}`;
     })
     .catch(err => {
       sweetError(err)

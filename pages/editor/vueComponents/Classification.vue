@@ -121,7 +121,7 @@
 import { getUrl, objToStr } from "../../lib/js/tools";
 // import { nkcAPI } from "../../lib/js/netAPI";
 import ForumSelector from "./ForumSelector.vue";
-import { debounce } from '../../lib/js/execution';
+import { debounce, immediateDebounce } from '../../lib/js/execution';
 
 
 export default {
@@ -143,16 +143,17 @@ export default {
     }
   },
   created(){
-    this.changeContentDebounce = debounce(this.changeContent, 2000);
+    this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
   },
   watch: {
+    // 点击继续编辑需要更新数据
     data: {
       immediate: true,
       handler(n) {
         // this.threadCategories = n.threadCategories || [];
         this.threadCategories = this.selectionStatus(n.post?.tcId, n.threadCategories) || [];
-        this.minorForumCount = n.minorForumCount || [];
-        this.selectedForums = n.mainForums || [];
+        this.minorForumCount = JSON.parse(JSON.stringify(n.minorForumCount)) || {};
+        this.selectedForums = JSON.parse(JSON.stringify(n.mainForums)) || [];
       }
     },
     mainForum: {
@@ -206,7 +207,8 @@ export default {
     selectionStatus(tcId, threadCategories) {
       if(!tcId && threadCategories) return threadCategories
       if(!threadCategories && !threadCategories.length) return
-      for( let obj of threadCategories) {
+      const newThreadCategories = JSON.parse(JSON.stringify(threadCategories))
+      for( let obj of newThreadCategories) {
           obj.selectedNode = ''    
           for (let node of obj.nodes) {
             if(tcId.includes(node._id)) {
@@ -214,7 +216,7 @@ export default {
             }
           }
       }
-      return threadCategories;
+      return newThreadCategories;
     },
     changeContent() {
       this.$emit('info-change');

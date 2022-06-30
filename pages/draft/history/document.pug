@@ -17,7 +17,7 @@ block content
             for list in data.history
               p.title-list()
                 //- page 代表当前是第几页
-                a.book-list-item(href=`/draft/history/${list._id}?source=${list.desType}&page=${data.urlComponent.page}&did=${list.did}` )=`${list.t || "未填写标题"}`
+                a.book-list-item(href=`/draft/history/${list._id}?source=${list.desType}&page=${data.urlComponent.page}&desTypeId=${data.urlComponent.desTypeId}` )=`${list.t || "未填写标题"}`
                 span.history=`${list.type==='stableHistory'? '已发布' : '未发布' } `
                 span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
           //- 分页
@@ -69,7 +69,7 @@ block content
               //- .book-content-content!=data.document.content
             .book-content-content!=data.document.content
             .btns
-              button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.urlComponent)}')`) 编辑
+              button.btn.btn-default.m-r-05(onclick=`saveArticle('${JSON.stringify(data.urlComponent)}')`) 基于此版本继续创作
       else
         h3 该文章还没有历史记录
     include ../../columns/article/authorInfo.pug

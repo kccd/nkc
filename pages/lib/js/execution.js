@@ -14,6 +14,30 @@ export function debounce(callback, time) {
     }, time);
   }
 }
+/*
+* 立即执行 防抖 控制执行间隔时间
+* @param {Function} callback 需要执行的函数
+* @param {Number} time 延迟ms
+* */
+export function immediateDebounce(callback, time) {
+  let timeout = null;
+  let runTime = 0;
+  return function() {
+    const _this = this;
+    const props = arguments;
+    const now = Date.now();
+    if (now - runTime >= time) {
+      callback.bind(_this)(...props);
+      runTime = Date.now();
+    } else {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        callback.bind(_this)(...props);
+        runTime = Date.now();
+      }, time - (now - runTime));
+    }
+  }
+}
 
 /*
 * 限流

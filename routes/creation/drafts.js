@@ -29,7 +29,7 @@ router
     //创建，删除，编辑草稿
     const {data, db, state, body} = ctx;
     const {type, title, content, draftId} = body;
-    if(!['create', 'modify', 'save'].includes(type)) ctx.throw(400, `未知 ${type}类型`)
+    if(!['create', 'modify', 'save', 'autoSave'].includes(type)) ctx.throw(400, `未知 ${type}类型`)
     let draft;
     if(type === 'create') {
       //创建草稿和文档
@@ -49,6 +49,8 @@ router
       }
       if(type === 'save') {
         await draft.saveDraft();
+      } else if (type === 'autoSave') {
+        await draft.autoSaveDraft();
       }
     }
     data.draftId = draft._id;

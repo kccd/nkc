@@ -174,10 +174,16 @@ schema.statics.checkDraftInfo = async (draft) => {
 /*
 * 提交草稿
 * */
-schema.methods.saveDraft = async function() {
+schema.methods.autoSaveDraft = async function() {
   const DocumentModel = mongoose.model('documents');
   const {draft: documentSource} = await DocumentModel.getDocumentSources();
   await DocumentModel.checkContentAndCopyBetaToHistoryBySource(documentSource, this._id);
+}
+
+schema.methods.saveDraft = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const {draft: documentSource} = await DocumentModel.getDocumentSources();
+  await DocumentModel.copyBetaToHistoryBySource(documentSource, this._id);
 }
 
 

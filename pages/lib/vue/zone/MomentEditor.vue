@@ -236,7 +236,7 @@
   import {getLength} from '../../js/checkData';
   import {getUrl} from '../../js/tools';
   import {screenTopWarning} from "../../js/topAlert";
-  import {debounce} from '../../js/execution';
+  import {immediateDebounce} from '../../js/execution';
   import {nkcAPI} from '../../js/netAPI';
   import EmojiSelector from '../EmojiSelector';
   import TextareaEditor from '../TextareaEditor';
@@ -473,7 +473,7 @@
       onClickEnter() {
         this.publishContent();
       },
-      onContentChange: debounce(function() {
+      onContentChange: immediateDebounce(function() {
         this.saveContent();
       }, 2000),
       saveContent() {

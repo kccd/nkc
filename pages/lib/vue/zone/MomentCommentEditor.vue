@@ -81,7 +81,7 @@
 <script>
   import TextareaEditor from '../TextareaEditor';
   import {sweetError} from '../../js/sweetAlert';
-  import {debounce} from "../../js/execution";
+  import {immediateDebounce} from "../../js/execution";
   import {getLength} from "../../js/checkData";
   import EmojiSelector from '../EmojiSelector';
   export default {
@@ -133,7 +133,7 @@
         return maxContentLength - contentLength;
       },
       disablePostButton() {
-        return this.submitting;
+        return this.submitting || (this.type === this.types.comment && this.disablePostChecked);
       },
       disablePostChecked() {
         return this.content.length === 0;
@@ -183,7 +183,7 @@
       onTextareaEditorContentChange(content) {
         this.content = content;
       },
-      onContentChange: debounce(function() {
+      onContentChange: immediateDebounce(function() {
         this.saveContent();
       }, 500),
       saveContent(t) {

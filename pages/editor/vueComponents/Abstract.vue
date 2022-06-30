@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { debounce } from '../../lib/js/execution';
+import { debounce, immediateDebounce } from '../../lib/js/execution';
 
 export default {
   data: () => ({
@@ -36,7 +36,7 @@ export default {
     },
   },
   created() {
-    this.changeContentDebounce = debounce(this.changeContent, 2000);
+    this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
   },
   computed: {
     abstractCnLength() {
@@ -51,6 +51,9 @@ export default {
     abstract: {
       immediate: true,
       handler(n) {
+        // console.log(n.cn)
+        // console.log(n.en)
+        // if (this.cn === n.cn && this.en === n.en) return
         this.cn = n.cn || "";
         this.en = n.en || "";
       },

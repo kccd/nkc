@@ -26,7 +26,7 @@
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
         article-content(
           ref="content",
-          :c="pageData",
+          :c="pageData.post.c",
           @content-change="contentChange"
         )
         .m-b-2(
@@ -115,7 +115,8 @@ import Column from "./Column.vue";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam, delUrlParam} from "../../lib/js/tools";
-import { debounce } from '../../lib/js/execution';
+import { immediateDebounce ,debounce } from '../../lib/js/execution';
+
 import 'url-search-params-polyfill';
 
 export default {
@@ -160,7 +161,7 @@ export default {
   created() {
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
-    this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
+    this.infoSubmitDebounce = immediateDebounce(this.infoSubmit, 2000);
   },
   mounted() {
     this.getData();
@@ -200,12 +201,6 @@ export default {
         url += "&desTypeId=" + this.pageData.thread.tid;
 
       } else if ("modifyPost" === editType) {
-
-        // if (this.pageData.thread.comment) {
-        //   url += '&type=modifyComment';
-        //   url += "&desTypeId=" + this.pageData.thread.pid;
-        // } else {
-          // 修改回复 在draft表中type = post
         url += '&type=' + editType;
         url += "&desTypeId=" + this.pageData.thread.pid;
 
@@ -284,11 +279,12 @@ export default {
         this.lockRequest = true;
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
+      if (url === `/editor/data`) this.allowSave = false;
       return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
-            sweetError("已经发布");
+            sweetError("文章已经发布或已经为历史版");
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
@@ -375,7 +371,9 @@ export default {
     //   this.$refs.submit.setSubmitStatus(false);
     // },
     closeDraft() {
-      this.drafts = [];
+      if (this.drafts.length) {
+        this.drafts = [];
+      }
       this.allowSave = true;
     },
     // 提交和保存时获取各组件数据

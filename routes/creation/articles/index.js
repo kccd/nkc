@@ -76,7 +76,7 @@ router
     const {type, articleId, source, sid} = fields;
     const {normal: normalStatus, default: defaultStatus} = await db.ArticleModel.getArticleStatus();
     const {column: columnSource, zone: zoneSource} = await db.ArticleModel.getArticleSources();
-    if(!['modify', 'create', 'publish', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 ${type}`);
+    if(!['modify', 'create', 'publish', 'save', 'autoSave'].includes(type)) ctx.throw(400, `未知的提交类型 ${type}`);
     const {
       title,
       content,
@@ -143,6 +143,8 @@ router
         data.articleUrl = await article.publishArticle({source, selectCategory});
       } else if(type === 'save') {
         await article.saveArticle();
+      } else if(type === 'autoSave') {
+        await article.autoSaveArticle();
       }
       //改变article的hasDraft状态
       await article.changeHasDraftStatus();

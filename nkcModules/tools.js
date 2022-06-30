@@ -241,7 +241,7 @@ var Tools = function() {
         return '/app/' + id + '/' + size
       }
       case 'draftHistory': {
-        return '/draft/history?source=' + id + '&did=' + size
+        return '/draft/history?source=' + id + '&desTypeId=' + size
       }
       case 'draftPreview': {
         return '/draft/preview?source=' + id + '&aid=' + size

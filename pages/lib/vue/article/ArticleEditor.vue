@@ -131,6 +131,7 @@ import {getColumnInfo} from "../../js/column";
 import {getState} from "../../js/state";
 import { getUrl } from '../../js/tools'
 import {visitUrl} from "../../js/pageSwitch";
+import {immediateDebounce} from "../../js/execution";
 
 export default {
   props:['time', 'source', 'configs'],
@@ -162,6 +163,13 @@ export default {
     articles: [], //当前专栏正在编辑的文章
     setInterval: null,
     setTimeout: null,
+    types: {
+      create: 'create',
+      modify: 'modify',
+      publish: 'publish',
+      save: 'save',
+      autoSave: 'autoSave'
+    }
   }),
   components: {
     "document-editor": DocumentEditor,
@@ -169,7 +177,7 @@ export default {
   },
   computed: {
     type() {
-      return this.articleId?'modify':'create';
+      return this.articleId? this.types.modify: this.types.create;
     },
     // 关键词字数
     keywordsLength() {
@@ -184,18 +192,8 @@ export default {
     },
   },
   mounted() {
-    const self = this;
     this.getColumn();
-    self.setInterval = setTimeout(function () {
-      self.autoSaveToDraft()
-        .then(() => {
-          self.autoSaveToDraft();
-        })
-        .catch((data) => {
-          sweetError('草稿保存失败：' + (data.error || data));
-          self.autoSaveToDraft();
-        })
-    }, 60000)
+    this.initAutoSaveToDraft();
   },
   destroyed() {
     clearInterval(this.setInterval);
@@ -359,20 +357,31 @@ export default {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + timeFormat(time);
     },
+    initAutoSaveToDraft() {
+      const self = this;
+      self.setInterval = setTimeout(() => {
+        self.autoSaveToDraft()
+          .then(() => {
+            self.initAutoSaveToDraft();
+          })
+          .catch(err => {
+            self.initAutoSaveToDraft();
+          })
+
+      }, 60000)
+    },
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
       const self = this;
-      if(self.articleId) {
-        self.post('save')
-          .then(() => {
-            self.saveToDraftSuccess();
-          })
-      }
-    },
-    //草稿保存成功
-    saveDraftInfo(info) {
-      if(!info) return;
-      this.autoSaveInfo = info;
+      return Promise.resolve()
+        .then(() => {
+          if(self.articleId) {
+            return self.post(self.types.autoSave)
+              .then(() => {
+                self.saveToDraftSuccess();
+              })
+          }
+        })
     },
     //关闭草稿列表
     close() {
@@ -419,8 +428,8 @@ export default {
       //未传入类型时返回
       if(!type) return;
       //床发布时清除当前修改的定时修改任务
-      if(type === 'publish') clearTimeout(this.setTimeout);
-      if(this.lockPost && type !== 'publish') return;
+      if(type === this.types.publish) clearTimeout(this.setTimeout);
+      if(this.lockPost && type !== this.types.publish) return;
       this.lockPost = true;
       this.$refs.documentEditor.setSavedStatus('saving');
       const formData = new FormData();
@@ -493,17 +502,16 @@ export default {
           return data;
         })
         .then(res => {
-          if(type === 'publish') {
+          if(type === self.types.publish) {
             //移除编辑器默认事件
             self.$refs.documentEditor.removeNoticeEvent();
             if(res.articleUrl) {
               window.location.href = res.articleUrl;
             }
             self.articleId = null;
-          } else if(type === 'save') {
+          } else if(type === self.types.save || type === self.types.autoSave) {
             //草稿保存成功显示报讯成功信息
-            const time = new Date();
-            self.saveDraftInfo('草稿已保存 ' + self.timeFormat(time));
+            self.saveToDraftSuccess();
           }
           self.lockPost = false;
           return;
@@ -512,7 +520,7 @@ export default {
           self.$refs.documentEditor.setSavedStatus('filed');
           self.lockPost = false;
           let info = '';
-          if(type === 'save') {
+          if(type === self.types.save || type === self.types.autoSave) {
             info = '草稿保存失败： ';
           }
           sweetError(info + (err.error || err));
@@ -622,23 +630,19 @@ export default {
       if(this.articleStatus === 'default' && this.source === 'column' && !this.selectCategory
         || (this.selectCategory && this.selectCategory.selectedMainCategoriesId
           && this.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
-      this.post('publish');
+      this.post(this.types.publish);
     },
     //保存文章 有提示保存成功
     saveArticle() {
-      this.post('save')
+      this.post(this.types.save)
       .then(() => {
         sweetSuccess('保存成功');
       });
     },
     //修改文章内容，在没有内容变化两秒后再提交内容
-    modifyArticle() {
-      const self = this;
-      clearTimeout(this.setTimeout);
-      this.setTimeout = setTimeout(function () {
-        self.post(self.type);
-      }, 2000);
-    },
+    modifyArticle: immediateDebounce(function () {
+      this.post(this.type);
+    }, 2000),
     //当编辑器中的内容发生变化时
     watchContentChange(data) {
       if(!this.contentChangeEventFlag) {
