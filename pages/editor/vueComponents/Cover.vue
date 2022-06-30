@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { debounce } from '../../lib/js/execution';
+import { debounce, immediateDebounce } from '../../lib/js/execution';
 
 import ResourceSelector from "../../lib/vue/ResourceSelector";
 import ImageSelector from "../../lib/vue/ImageSelector";
@@ -46,7 +46,7 @@ export default {
     }
   },
   created() {
-    this.changeContentDebounce = debounce(this.changeContent, 2000);
+    this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
   },
   watch: {
     value: {

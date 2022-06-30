@@ -115,7 +115,8 @@ import Column from "./Column.vue";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam, delUrlParam} from "../../lib/js/tools";
-import { debounce } from '../../lib/js/execution';
+import { immediateDebounce ,debounce } from '../../lib/js/execution';
+
 import 'url-search-params-polyfill';
 
 export default {
@@ -160,7 +161,7 @@ export default {
   created() {
     // this.getUserDraft();
     window.addEventListener("pageshow", this.clearCache);
-    this.infoSubmitDebounce = debounce(this.infoSubmit, 2000);
+    this.infoSubmitDebounce = immediateDebounce(this.infoSubmit, 2000);
   },
   mounted() {
     this.getData();
@@ -278,6 +279,7 @@ export default {
         this.lockRequest = true;
         url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
       }
+      if (url === `/editor/data`) this.allowSave = false;
       return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版
