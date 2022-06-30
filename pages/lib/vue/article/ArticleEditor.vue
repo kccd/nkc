@@ -131,6 +131,7 @@ import {getColumnInfo} from "../../js/column";
 import {getState} from "../../js/state";
 import { getUrl } from '../../js/tools'
 import {visitUrl} from "../../js/pageSwitch";
+import {immediateDebounce} from "../../js/execution";
 
 export default {
   props:['time', 'source', 'configs'],
@@ -639,13 +640,9 @@ export default {
       });
     },
     //修改文章内容，在没有内容变化两秒后再提交内容
-    modifyArticle() {
-      const self = this;
-      clearTimeout(this.setTimeout);
-      this.setTimeout = setTimeout(function () {
-        self.post(self.type);
-      }, 2000);
-    },
+    modifyArticle: immediateDebounce(function () {
+      this.post(this.type);
+    }, 2000),
     //当编辑器中的内容发生变化时
     watchContentChange(data) {
       if(!this.contentChangeEventFlag) {
