@@ -433,23 +433,19 @@ schema.statics.checkContentAndCopyBetaToHistoryBySource = async (source, sid) =>
 
   if(!needHistory) {
 
-    const {
-      title: betaTitle = '',
-      wordCount: betaWordCount = 0,
-      keywordsEN: betaKeywordsEN = [],
-      keywords: betaKeywords = [],
-      abstractEN: betaAbstractEN = '',
-      abstract: betaAbstract = '',
-    } = betaDocument;
+    const betaTitle = betaDocument.title || '';
+    const betaWordCount = betaDocument.wordCount || 0;
+    const betaAbstractEN = betaDocument.abstractEN || '';
+    const betaAbstract = betaDocument.abstract || '';
+    const betaKeywordsEN = betaDocument.keywordsEN || [];
+    const betaKeywords = betaDocument.keywords || [];
 
-    const {
-      title: latestHistoryTitle = '',
-      wordCount: latestHistoryWordCount = 0,
-      keywordsEN: latestHistoryKeywordsEN = [],
-      keywords: latestHistoryKeywords = [],
-      abstractEN: latestHistoryAbstractEN = '',
-      abstract: latestHistoryAbstract = '',
-    } = latestHistoryDocument;
+    const latestHistoryTitle = latestHistoryDocument.title || '';
+    const latestHistoryWordCount = latestHistoryDocument.wordCount || 0;
+    const latestHistoryAbstractEN = latestHistoryDocument.abstractEN || '';
+    const latestHistoryAbstract = latestHistoryDocument.abstract || '';
+    const latestHistoryKeywordsEN = latestHistoryDocument.keywordsEN || [];
+    const latestHistoryKeywords = latestHistoryDocument.keywords || [];
 
     // 统计内容字数变动
     let count = 0;

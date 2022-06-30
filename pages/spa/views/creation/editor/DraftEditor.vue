@@ -14,7 +14,7 @@
           @ready="editorReady"
           )
       .m-b-1
-        button.btn.btn-primary.m-r-05(@click="submit") 提交
+        button.btn.btn-primary.m-r-05(@click="submit" :disabled="!draftId") 提交
         button.btn.btn-default.m-r-05(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
         button.btn.btn-default.m-r-05(@click="preview" :disabled="!draftId") 预览
         button.btn.btn-default.m-r-05(@click="history" :disabled="!draftId") 历史
@@ -105,21 +105,18 @@ export default {
       editorInitOk: false,
       autoSaveInfo: null,
       setInterval: '',//自动保存草稿计时器
+      types: {
+        modify: 'modify',
+        create: 'create',
+        save: 'save',
+        autoSave: 'autoSave'
+      }
     }
   },
   mounted() {
     const self = this;
     self.initId();
-    self.setInterval = setTimeout(function () {
-      self.autoSaveToDraft()
-        .then(() => {
-          self.autoSaveToDraft();
-        })
-        .catch((data) => {
-          sweetError('草稿保存失败：' + (data.error || data));
-          self.autoSaveToDraft();
-        })
-    }, 60000)
+    self.initAuthSaveDraftTimeout();
   },
   destroyed() {
     clearInterval(this.setInterval);
@@ -157,7 +154,7 @@ export default {
 
   computed: {
     type() {
-      return this.draftId? 'modify': 'create'
+      return this.draftId? this.types.modify: this.types.create
     },
   },
   methods: {
@@ -229,7 +226,7 @@ export default {
     },
     submit() {
       const self = this;
-      this.post('save')
+      this.post(this.types.modify)
         .then(() => {
           self.$router.push({
             name: 'creationDrafts'
@@ -237,13 +234,19 @@ export default {
         })
         .catch(sweetError);
     },
-    initAuthSave() {
-
+    initAuthSaveDraftTimeout() {
+      const self = this;
+      setTimeout(() => {
+        self.authSaveAsHistory()
+          .then(() => {
+            self.initAuthSaveDraftTimeout();
+          })
+      }, 60000);
     },
     // 手动保存成历史版
     manuallySaveAsHistory() {
       this
-        .saveAsHistory()
+        .saveAsHistory(this.types.save)
         .then(() => {
           sweetSuccess('保存成功');
           this.saveToDraftSuccess();
@@ -252,18 +255,21 @@ export default {
     },
     // 自动定时保存成历史版
     authSaveAsHistory() {
-      this
-        .saveAsHistory()
+      return this
+        .saveAsHistory(this.types.autoSave)
         .catch(err => {
           screenTopWarning(`快照自动保存失败 error: ${err.error || err.message}`);
         });
     },
     // 保存编辑版内容，并根据编辑版内容生成历史版
-    saveAsHistory() {
-      const {draftId} = this;
-      if(!draftId) return;
-      return this
-        .post('save')
+    saveAsHistory(type) {
+      const {draftId, post} = this;
+      return Promise.resolve()
+        .then(() =>{
+          if(draftId) {
+            return post(type)
+          }
+        })
     },
     // 输入框内容变动自动保存，覆盖编辑版内容
     saveChangedDraftContent() {
