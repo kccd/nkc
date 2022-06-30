@@ -151,8 +151,8 @@ export default {
       handler(n) {
         // this.threadCategories = n.threadCategories || [];
         this.threadCategories = this.selectionStatus(n.post?.tcId, n.threadCategories) || [];
-        this.minorForumCount = n.minorForumCount || [];
-        this.selectedForums = n.mainForums || [];
+        this.minorForumCount = JSON.parse(JSON.stringify(n.minorForumCount)) || {};
+        this.selectedForums = JSON.parse(JSON.stringify(n.mainForums)) || [];
       }
     },
     mainForum: {
@@ -206,7 +206,8 @@ export default {
     selectionStatus(tcId, threadCategories) {
       if(!tcId && threadCategories) return threadCategories
       if(!threadCategories && !threadCategories.length) return
-      for( let obj of threadCategories) {
+      const newThreadCategories = JSON.parse(JSON.stringify(threadCategories))
+      for( let obj of newThreadCategories) {
           obj.selectedNode = ''    
           for (let node of obj.nodes) {
             if(tcId.includes(node._id)) {
@@ -214,7 +215,7 @@ export default {
             }
           }
       }
-      return threadCategories;
+      return newThreadCategories;
     },
     changeContent() {
       this.$emit('info-change');
