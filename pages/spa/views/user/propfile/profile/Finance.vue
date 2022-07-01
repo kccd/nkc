@@ -174,6 +174,7 @@ import {timeFormat} from "../../../../../lib/js/time";
 import {getState} from "../../../../../lib/js/state";
 import Paging from "../../../../../lib/vue/Paging";
 import {getUrl} from "../../../../../lib/js/tools";
+const {uid: visitUserId} = getState();
 
 export default {
   props: ['targetUid'],
@@ -193,7 +194,7 @@ export default {
   },
   created() {
     const {uid} = this.$route.params;
-    this.uid = this.targetUid?this.targetUid:uid;
+    this.uid = this.targetUid || uid || visitUserId;
     this.getUserAccountInfo();
   },
   computed: {
