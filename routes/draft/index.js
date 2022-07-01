@@ -14,6 +14,7 @@ router
   if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确");
   await next();
 })
+
 .get('/preview', async (ctx, next) => {
   //获取文档预览信息
   ctx.template='draft/preview/document.pug'
@@ -75,12 +76,12 @@ router
     }
     data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
     // const documentResourceId = await data.document.getResourceReferenceId();
-    // let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
+    const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
     data.document.content = nkcRender.renderHTML({
       type: 'article',
       post: {
         c: data.document.c,
-        // resources
+        resources
       },
     });
     // 包含了将此版本改为编辑版的url 组成
@@ -141,11 +142,13 @@ router
   data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   // const documentResourceId = await data.document.getResourceReferenceId();
   // let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
+  const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
+
   data.document.content = nkcRender.renderHTML({
     type: 'article',
     post: {
       c: data.document.c,
-      // resources
+      resources
     },
   });
   // let editorUrl = {_id: data.document._id}
