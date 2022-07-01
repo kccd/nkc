@@ -255,6 +255,28 @@ resourceSchema.virtual('token')
     return this._token = token;
   });
 
+
+resourceSchema.statics.getResourcesByTags = async (tags = '') => {
+  // 
+  const ResourceModel = mongoose.model('resources');
+  const cheerio = require("cheerio");
+  const $ = cheerio.load(tags);
+  const types = ['picture', 'sticker', 'video', 'audio', 'attachment'];
+  const match = types.map( t => `[data-tag="nkcsource"][data-type='${t}']`);
+  const elements = $(match.join(','));
+  const rids = [];
+  for (let i = 0; i < elements.length; i++) {
+    const ele = elements.eq(i);
+    const rid = ele.attr('data-id');
+    if (rid) rids.push(rid);
+  }
+  const resources = await ResourceModel.find({rid: { $in: rids }});
+  for(const resource of resources) {
+    await resource.setFileExist();
+  }
+  return resources;
+}
+
 /*
  * 拓展附件信息
  * 拓展了以下字段

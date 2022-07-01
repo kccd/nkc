@@ -15,7 +15,6 @@ for(const filename of files) {
   const name = filename.split(".")[0];
   sources[name] = require(filePath + `/${name}`);
 }
-
 const {domainWhitelistReg, urlReg} = require('../../nkcModules/regExp');
 
 
@@ -84,6 +83,7 @@ class NKCRender {
       }
     }
     const sourceMethods = sources[type];
+
     for(const name in sourceMethods) {
       if(!sourceMethods.hasOwnProperty(name)) continue;
       const method = sourceMethods[name];
