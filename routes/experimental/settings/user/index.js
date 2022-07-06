@@ -110,7 +110,7 @@ userRouter
     const {params, db, body, nkcModules} = ctx;
     let {
       username = "", description = "", certs = [], email = "",
-      mobile = "", nationCode = "", password = ""
+      mobile = "", nationCode = "", password = "", lastVerifyPhoneNumberTime = new Date()
     } = body;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
@@ -154,7 +154,8 @@ userRouter
     const userPersonalObj = {
       mobile,
       nationCode,
-      email: email.toLowerCase()
+      email: email.toLowerCase(),
+      lastVerifyPhoneNumberTime
     };
 
     if(password) {

@@ -31,6 +31,15 @@ style.
             label 手机号
             input.form-control(v-model.trim="usersPersonal.mobile" type="text")
           .form-group
+            .row
+              .col-xs-12
+                label 上一次验证手机号的时间
+              .col-xs-6
+                input.form-control(type='text' disabled='true' v-model='verifyDate')
+              .col-xs-6
+                button.btn.btn-default(@click='resetVerifyDate') 重置
+                button.btn.btn-default(@click='setVerifyDate') 设为当前
+          .form-group
             label 新密码
             input.form-control(v-model.trim="password" type="password" autocomplete="new-password" )
           .form-group
@@ -62,7 +71,14 @@ script.
         userGrade: "",
         password: "",
         roles: [],
-        nationCodes: nationCodes
+        nationCodes: nationCodes,
+
+      },
+      computed: {
+        verifyDate() {
+          if(!this.usersPersonal) return ;
+          return new Date(this.usersPersonal.lastVerifyPhoneNumberTime).toLocaleString()
+        }
       },
       methods: {
         init: function() {
@@ -73,6 +89,12 @@ script.
           this.userGrade = "";
           this.roles = [];
           this.password = "";
+        },
+        setVerifyDate() {
+          this.usersPersonal.lastVerifyPhoneNumberTime = new Date();
+        },
+        resetVerifyDate() {
+          this.usersPersonal.lastVerifyPhoneNumberTime = new Date('2000-01-01 00:00:00');
         },
         getUserInfo: function() {
           var uid = this.uid;
@@ -109,7 +131,8 @@ script.
                 mobile: usersPersonal.mobile,
                 nationCode: usersPersonal.nationCode,
                 certs: user.certs || [],
-                password: password
+                password: password,
+                lastVerifyPhoneNumberTime: usersPersonal.lastVerifyPhoneNumberTime
               });
             })
             .then(function() {
