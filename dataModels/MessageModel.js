@@ -460,7 +460,7 @@ messageSchema.statics.getParametersData = async (message) => {
       postURL = article.url;
       threadTitle = article.document.title;
     }
-    
+
     parameters = {
       username: user.username,
       postURL,
@@ -533,7 +533,7 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       threadTitle: firstPost.t,
       threadURL: getUrl('thread', thread.tid),
-      editThreadURL: `/editor?type=post&id=${thread.oc}`,
+      editThreadURL: `/editor?type=modifyThread&id=${thread.oc}`,
       reason: rea,
       deadline: moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss")
     };
@@ -547,7 +547,7 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       threadTitle: firstPost.t,
       threadURL: getUrl('thread', thread.tid),
-      editPostURL: `/editor?type=post&id=${post.pid}`,
+      editPostURL: `/editor?type=modifyPost&id=${post.pid}`,
       reason: rea,
       deadline: moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss")
     };
@@ -801,9 +801,9 @@ messageSchema.statics.getParametersData = async (message) => {
     }
     if(type === 'warningPost') {
       parameters.postURL = await PostModel.getUrl(post);
-      parameters.editPostURL = `/editor?type=post&id=${post.pid}`;
+      parameters.editPostURL = `/editor?type=modifyPost&id=${post.pid}`;
     } else if(type === 'warningThread') {
-      parameters.editThreadURL = `/editor?type=post&id=${thread.oc}`
+      parameters.editThreadURL = `/editor?type=modifyThread&id=${thread.oc}`
     }
   } else if(type === 'activityChangeNotice') {
     const {acid, content, cTitle} = message.c;

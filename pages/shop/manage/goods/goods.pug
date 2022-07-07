@@ -26,7 +26,7 @@ block shopContent
                 -total += param.stocksSurplus
                 -sold += param.sellCount;
             tr.product(data-product-id=product.productId)
-              th.product-name 
+              th.product-name
                 div.order-name-info
                   .order-cover
                     img(src=`/r/${product.imgMaster}`)
@@ -35,27 +35,27 @@ block shopContent
                     .order-param=`上架时间：${format("YYYY/MM/DD HH:mm:ss", product.toc)}`
               th
                 div.stocks-surplus=total
-              th  
+              th
                 div=sold
-              th 
+              th
                 if product.purchaseLimitCount === -1
                   div 不限购
                 else
                   div=`每人限购${product.purchaseLimitCount}件`
-              th 
+              th
                 if product.isFreePost
                   div 包邮
-                else 
+                else
                   div 不包邮
               th
                 if product.productStatus === "insale"
                   div 已上架
                 else if product.productStatus === "stopsale"
                   div 已下架
-                else 
-                  div 待上架  
+                else
+                  div 待上架
               th.order-links
-                a(href=`/editor?type=post&id=${product.oc}` target="_blank") 修改商品信息
+                a(href=`/editor?type=modifyThread&id=${product.oc}` target="_blank") 修改商品信息
                 a(href=`/shop/manage/shelf?productId=${product.productId}`) 修改出售信息
                 if product.productStatus === "insale"
                   a.pointer(onclick=`stopSale('${product.productId}')`) 停售
@@ -79,13 +79,13 @@ block shopContent
                 th.order-price
                   if p.useDiscount
                     .number.price="￥" + numToFloatTwo(p.price)
-                  else 
+                  else
                     .price 无
                 th.stocks-surplus=p.stocksSurplus
                 th=p.sellCount
                 th.order-links
-                  button(onclick=`modifyParam('${product.productId}', '${p._id}')`) 编辑      
-    include ../../../publicModules/paging/paging            
-block shopScripts    
+                  button(onclick=`modifyParam('${product.productId}', '${p._id}')`) 编辑
+    include ../../../publicModules/paging/paging
+block shopScripts
   include ../../../publicModules/commonModal/commonModal
   +includeJS("/shop/manage/goods/goods.js")
