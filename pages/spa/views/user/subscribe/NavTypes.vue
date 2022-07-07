@@ -7,6 +7,7 @@
         a.subscribe-type(@click="toType('')" :class="!parentType?'active':''") 全部
         a.subscribe-type(v-for="t in subscribeTypes" @click="toType(t._id)" :class="parentType && parentType._id === t._id?'active':''") {{t.name}}
       div.m-t-05(v-if="parentType && parentType.childTypes.length" ) 子分类：
+        a.subscribe-type(@click="toType(parentType._id)" :class="!childType?'active':''") 全部
         a.subscribe-type(v-for="t in parentType.childTypes" @click="toType(t._id)" :class="childType && childType._id === t._id?'active':''") {{t.name}}
 </template>
 <style lang="less" scoped>
@@ -58,7 +59,7 @@
 <script>
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 export default {
-  props: ['target-user', 'type', 'parent-type', 'subscribe-types'],
+  props: ['target-user', 'child-type', 'parent-type', 'subscribe-types'],
   data: () => ({
 
   }),

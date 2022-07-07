@@ -1,7 +1,7 @@
 <template lang="pug">
   .subscribe-thread(v-if="targetUser")
     subscribe-types(ref="subscribeTypes")
-    nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="clickType")
+    nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" :child-type="childType" :subscribe-types="subscribeTypes" @click-type="clickType")
     paging(ref="paging" :pages="pageButtons" @click-button="clickPage")
     .account-threads.subscribe-thread
       .null(v-if="!subscribes.length") 空空如也~
@@ -266,6 +266,7 @@ export default {
     paging: null,
     t: 'null',
     parentType: null,
+    childType: null,
     collectionThreadsId: [],
     subscribeTypes: [],
   }),
@@ -307,23 +308,17 @@ export default {
       this.uid = uid || stateUid;
     },
     //获取用户收藏的文章
-    getThreads(page) {
+    getThreads(page = 0) {
       const self = this;
-      let url = `/u/${self.uid}/profile/subscribe/collectionData`;
-      if(self.t) url = url + `?t=${self.t}`;
-      if(page) {
-        if(url.indexOf('?') === -1) {
-          url = url + `?page=${page}`;
-        } else {
-          url = url + `page=${page}`;
-        }
-      }
+      let url = `/u/${self.uid}/profile/subscribe/collectionData?page=${page}`;
+      if(self.t) url = url + `&t=${self.t}`;
       nkcAPI(url, 'GET')
       .then(res => {
         self.targetUser = res.targetUser;
         self.subscribes = res.subscribes;
         self.paging = res.paging;
         self.parentType = res.parentType;
+        self.childType = res.childType;
         self.t = res.t;
         self.collectionThreadsId = res.collectionThreadsId;
         self.subscribeTypes = res.subscribeTypes;
@@ -339,7 +334,7 @@ export default {
     },
     //点击分页
     clickPage(num) {
-      if(!num) return;
+      // if(!num) return;
       this.getThreads(num);
     }
   }
