@@ -117,7 +117,9 @@ import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam, delUrlParam} from "../../lib/js/tools";
 import { immediateDebounce ,debounce } from '../../lib/js/execution';
 
-import 'url-search-params-polyfill';
+// import 'url-search-params-polyfill';
+// import '../../../public/external_pkgs/plyr/plyr.polyfilled.min';
+
 
 export default {
   components: {

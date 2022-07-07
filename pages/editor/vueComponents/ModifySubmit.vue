@@ -38,9 +38,10 @@ import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
 // import {debounce} from '../../lib/js/execution';
-import 'url-search-params-polyfill';
+// import 'url-search-params-polyfill';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
+// import '../../../public/external_pkgs/plyr/plyr.polyfilled.min';
 
 export default {
   props: {
@@ -55,7 +56,7 @@ export default {
       type: String,
     },
     allowSave: {
-      type: Boolean 
+      type: Boolean
     }
   },
   data: () => ({
