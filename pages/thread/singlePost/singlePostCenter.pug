@@ -7,6 +7,6 @@ if !isIncluded('singlePostCenter')
     .single-post-center
       if quote
         +singlePostQuote(quote)
-      .single-post-title=title
+      .single-post-title!=title
       .single-post-content!=content
       +singlePostCredit(pid, xsf.concat(kcb))

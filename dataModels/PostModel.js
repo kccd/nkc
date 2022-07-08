@@ -1112,6 +1112,8 @@ postSchema.statics.extendPosts = async (posts, options) => {
         post,
         user: o.visitor
       });
+
+      post.t = nkcRender.replaceTextLinkToHTML(post.t);
     }
     post.step = postsId.indexOf(post.pid);
     // 退修理由
