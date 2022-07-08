@@ -1,6 +1,6 @@
 export function replaceNKCRender(selector) {
   //解析文本中的外链
-  selector = selector || 'div.render-content span[data-type="nkc-url"]';
+  selector = selector || 'span[data-type="nkc-url"]';
   var elements = document.querySelectorAll(selector);
   for(var i = 0; i < elements.length; i++) {
     var element = elements[i];
