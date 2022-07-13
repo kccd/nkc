@@ -526,7 +526,8 @@ block content
             include ../fund/applicationForm/operationCenter
             -var form = data.applicationForm;
             +applicantOperationCenter(form, data.user? data.user.uid:'')
-            +managerOperationCenter(form, data.userFundRoles)
+            -var fundBlacklistPostPermission = data.permissions && data.permissions.fundBlacklistPost;
+            +managerOperationCenter(form, data.userFundRoles, fundBlacklistPostPermission)
           if data.targetUser
             .m-b-1
               //- .panel-header 作者

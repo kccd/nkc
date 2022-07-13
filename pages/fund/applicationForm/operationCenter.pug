@@ -17,7 +17,7 @@ if !isIncluded('operationCenter')
         if general === 6
           a.btn.btn-default.btn-block(href=`/fund/a/${form._id}/refund`)=`去退款 ${form.refundMoney} 元`
 
-  mixin managerOperationCenter(form, userFundRoles)
+  mixin managerOperationCenter(form, userFundRoles, fundBlacklistPostPermission)
     -var {applicant} = form;
     -var {general, detail} = form.formStatus;
     -var isAdmin = userFundRoles.includes('admin');
@@ -59,7 +59,7 @@ if !isIncluded('operationCenter')
             button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
           if general === 2 && [2, 3].includes(detail)
             button.btn.btn-default.btn-block(onclick=`applicationFormTimeout(${form._id})`) 设为修改超时
-          if (data && data.permissions && data.permissions.fundBlacklistPost) || (permission && permission('fundBlacklistPost'))
+          if fundBlacklistPostPermission
             if applicant.inFundBlacklist
               button.btn.btn-default.btn-block(onclick=`removeUserFromFundBlacklist("${form.uid}")`) 移出黑名单
             else
