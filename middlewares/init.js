@@ -240,6 +240,7 @@ module.exports = async (ctx, next) => {
 		ctx.type = ctx.type || 'application/json';
 		if(ctx.filePath) ctx.filePath = "";
     if(ctx.remoteFile) ctx.remoteFile = null;
+    if(ctx.remoteTemplate) ctx.remoteTemplate = '';
 	  await body(ctx, () => {});
   }
   finally {
