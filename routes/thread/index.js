@@ -747,6 +747,7 @@ threadRouter
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
       review: ctx.permission('review'),
+      fundBlacklistPost: ctx.permission('fundBlacklistPost')
     };
 
     // 学术分 鼓励
@@ -1516,7 +1517,7 @@ threadRouter
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();
-    
+
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
