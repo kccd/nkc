@@ -1345,7 +1345,7 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
       url: tools.getUrl('forumHome', thread.forums[0].fid)
     }];
     let reply = null;
-    if(lastPost) {
+    if(lastPost && lastPost.pid !== firstPost.pid) {
       let rUser;
       if(lastPost.anonymous) {
         rUser = {
