@@ -59,7 +59,7 @@ if !isIncluded('operationCenter')
             button.btn.btn-default.btn-block(onclick=`applicationFormStop(${form._id})`) 强制终止
           if general === 2 && [2, 3].includes(detail)
             button.btn.btn-default.btn-block(onclick=`applicationFormTimeout(${form._id})`) 设为修改超时
-          if permission('fundBlacklistPost')
+          if (data && data.permissions && data.permissions.fundBlacklistPost) || (permission && permission('fundBlacklistPost'))
             if applicant.inFundBlacklist
               button.btn.btn-default.btn-block(onclick=`removeUserFromFundBlacklist("${form.uid}")`) 移出黑名单
             else
