@@ -34,7 +34,8 @@ block fundContent
         +formPost(form)
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         +applicantOperationCenter(form, data.user ? data.user.uid: '')
-        +managerOperationCenter(form, data.userFundRoles)
+        -var fundBlacklistPostPermission = permission && permission('fundBlacklistPost');
+        +managerOperationCenter(form, data.userFundRoles, fundBlacklistPostPermission)
         +formStatus(form)
         +report(form, data.userFundRoles)
         +formVote(form, data.userFundRoles)

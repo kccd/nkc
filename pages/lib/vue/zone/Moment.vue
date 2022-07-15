@@ -282,7 +282,7 @@
     color: #000;
     line-height: 2rem;
     margin-bottom: 0.5rem;
-    word-break: keep-all;
+    word-break: break-word;
     word-wrap: break-word;
     white-space: pre-wrap;
     &/deep/ img{
