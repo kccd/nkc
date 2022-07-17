@@ -321,7 +321,8 @@ threadRouter
       if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
         const $or = [
           {
-            disabled: false
+            disabled: false,
+            toDraft: {$ne: true}
           }
         ];
         // 用户能查看自己被退回的回复
@@ -979,7 +980,8 @@ threadRouter
 			if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 				const $or = [
 					{
-						disabled: false
+						disabled: false,
+            toDraft: {$ne: true}
 					}/* ,
 					{
 						disabled: true,
