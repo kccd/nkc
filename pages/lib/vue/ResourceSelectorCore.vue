@@ -746,7 +746,7 @@ export default {
     if(this.watchType === 'category') {
       this.getResourcesDebounce(0);
     }
-    this.initSocketEvent();    
+    this.initSocketEvent();
     this.initDragUploadEvent();
   },
   destroyed() {
@@ -825,7 +825,7 @@ export default {
       this.cropper = new Cropper(this.$refs.imageElement, {
         viewMode: 0,
         minContainerHeight:this.minContainerHeight,
-        aspectRatio: 1,
+        // aspectRatio: 1,
         crop:(e)=>{
           if(this.$refs.imageElement.height > this.$refs.imageElement.width){
             this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
@@ -1122,7 +1122,7 @@ export default {
         .catch(function(data) {
           sweetError(data);
         });
-    }, 
+    },
     changePage: function(type) {
       var paging = this.paging;
       if(paging.buttonValue.length <= 1) return;
