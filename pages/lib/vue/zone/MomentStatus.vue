@@ -46,7 +46,6 @@ export default {
   methods: {
     //动态审核通过
     reviewMoment() {
-      console.log(this.moment)
       const {docId} = this.moment;
       nkcAPI('/review', 'PUT', {
         pass: true,
