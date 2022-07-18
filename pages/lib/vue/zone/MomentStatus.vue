@@ -1,6 +1,6 @@
 <template lang="pug">
   .moment-status(v-if="moment && moment.status === 'unknown'")
-    div(v-if="permissions && permissions.reviewed")
+    div(v-if="0 && permissions && permissions.reviewed")
       .review 内容未审核
       p 送审理由:{{moment.reason}}
       | 通过审核请点击
