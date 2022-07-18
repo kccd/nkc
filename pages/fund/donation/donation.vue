@@ -19,7 +19,7 @@
       .donation-pay(v-for='p in payment')
         span(:class="{'active': paymentType === p.type}" @click='selectPaymentType(p.type)') {{p.name}}
     .payment-info
-      span 服务商（非本站）将收取 {{fee * 100}}% 的手续费
+      span(v-if="fee !== 0") 服务商（非本站）将收取 {{fee * 100}}% 的手续费
       h4
         span 实际支付金额为
         strong &nbsp;{{totalMoney / 100}}&nbsp;
