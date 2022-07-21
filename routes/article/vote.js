@@ -32,7 +32,7 @@ router
       //如果数据库中不存在消息就生成提示消息
       const message = await db.MessageModel.findOne({'c.votesId': {$in: [vote._id]}, r: user.uid});
       if(!message) {
-        //生成提示消息
+        /*//生成提示消息
         await db.MessageModel({
           _id: await db.SettingModel.operateSystemID('messages', 1),
           r: article.uid,
@@ -44,7 +44,7 @@ router
             votesId: [vote._id],
           }
         }).save();
-        //执行操作后的加减积分
+        //执行操作后的加减积分*/
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
     } else {

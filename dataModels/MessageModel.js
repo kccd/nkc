@@ -939,70 +939,66 @@ messageSchema.statics.getParametersData = async (message) => {
     votesId = votesId.map(v => {
       return mongoose.Types.ObjectId(v);
     });
-    const {post: postSource, article: articleSource, comment: commentSource} = await PostsVoteModel.getVoteSources();
-    const votes = await PostsVoteModel.find({source: {$in: [postSource, articleSource, commentSource]}, _id: {$in: votesId}}, {
+    const voteSources = await PostsVoteModel.getVoteSources();
+    const votes = await PostsVoteModel.find({
+      source: {
+        $in: [voteSources.post, voteSources.comment, voteSources.article, voteSources.moment]
+      },
+      _id: {
+        $in: votesId
+      }
+    }, {
       sid: 1, uid: 1, source: 1,
     });
     if(!votes.length) return null;
     const usersId = [];
-    let pid = '';
-    let aid = '';
-    let cid = '';
     votes.map(v => {
       usersId.push(v.uid);
-      if(v.source === postSource) {
-        pid = v.sid;
-      } else if(v.source === articleSource){
-        aid = v.sid;
-      } else if(v.source === commentSource) {
-        cid = v.sid;
-      }
     });
     const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
     if(!users.length) return null;
     const usernames = users.map(user => user.username);
-    parameters = {
-      LVUsernames: usernames.slice(0, 6).join("、"),
-      LVTotal: usersId.length
-    };
-    // 目标post
-    const post = await PostModel.findOne({pid}, {type: 1, tid: 1, t: 1, pid});
-    // 目标 article
-    let article = await ArticleModel.findOne({_id: aid});
-    if(article) {
-      article = (await ArticleModel.getArticlesInfo([article]))[0];
-    }
-    // 目标 comment
-    let comment = await CommentModel.findOne({_id: cid});
-    if(comment) {
-      comment = (await CommentModel.getCommentsInfo([comment]))[0];
-    }
-    if(!post && !article && !comment) {
-      return null;
-    }
-    let url;
-    let t;
-    if(post) {
+
+    const {sid, source} = votes[0];
+    let url = '';
+    let title = '';
+    if(source === voteSources.post) {
+      const post = await PostModel.findOne({pid: sid}, {type: 1, tid: 1, t: 1, pid: 1, parentPostId: 1});
+      if(!post) return null;
       if(post.type === 'thread') {
         url = getUrl('thread', post.tid);
-        t = `文章《${post.t}》`;
+        title = `文章《${post.t}》`;
       } else {
         url = await PostModel.getUrl(post);
         if(post.parentPostId) {
-          t = `评论（点击查看）`;
+          title = `评论（点击查看）`;
         } else {
-          t = `回复（点击查看）`;
+          title = `回复（点击查看）`;
         }
       }
-    } else if(article) {
+    } else if(source === voteSources.article) {
+      let article = await ArticleModel.findOne({_id: sid});
+      if(!article) return null;
+      article = (await ArticleModel.getArticlesInfo([article]))[0];
       url = article.url;
-      t = `文章《${article.document.title}》`;
-    } else if(comment) {
+      title = `文章《${article.document.title}》`;
+    } else if(source === voteSources.comment) {
+      let comment = await CommentModel.findOne({_id: sid});
+      if(!comment) return null;
+      comment = (await CommentModel.getCommentsInfo([comment]))[0];
       url = comment.commentUrl;
-      t = `回复（点击查看）`;
+      title = `回复（点击查看）`;
+    } else if(source === voteSources.moment) {
+      url = getUrl('zoneMoment', sid);
+      title = `电文（点击查看）`
     }
-    parameters.LVTarget = url;
-    parameters.LVTargetDesc = t;
+
+    parameters = {
+      LVUsernames: usernames.slice(0, 6).join("、"),
+      LVTotal: usersId.length,
+      LVTarget: url,
+      LVTargetDesc: title
+    };
   } else if(type === 'complaintsResolve') {
     // 投诉类型
     const {complaintId} = message.c;
