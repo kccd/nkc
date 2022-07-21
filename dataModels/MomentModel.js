@@ -694,6 +694,25 @@ schema.methods.updateMomentCommentOrder = async function() {
   }
 }
 
+schema.statics.createMessageAndSendMessage = async (type, uid, momentId) => {
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+  const {sendMessageToUser} = require('../nkcModules/socket');
+  const message = new MessageModel({
+    _id: await SettingModel.operateSystemID('messages', 1),
+    r: uid,
+    ty: 'STU',
+    port: '',
+    ip: '',
+    c: {
+      type,
+      momentId
+    }
+  });
+  await message.save();
+  await sendMessageToUser(message._id);
+}
+
 /*
 * 发布一条评论
 * 分为两种情况，发布评论、转发动态
@@ -706,24 +725,42 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
   }
   const MomentModel = mongoose.model('moments');
   const {moment: quoteType} = momentQuoteTypes;
-  const {_id, uid, resourcesId, parent} = this;
+  const {uid, resourcesId, parent} = this;
   const {content} = await this.getBetaDocument();
+  const {uid: parentUid} = await MomentModel.findOne({_id: parent}, {uid: 1});
+  let commentMomentId;
+  let repostMomentId;
 
   if(postType === 'comment' || alsoPost) {
     // 需要创建评论
     await this.updateMomentCommentOrder();
     await this.publish();
+    commentMomentId = this._id;
   }
   if(postType === 'repost' || alsoPost) {
     // 需要转发动态
-    await MomentModel.createQuoteMomentAndPublish({
+    const repostMoment = await MomentModel.createQuoteMomentAndPublish({
       uid,
       content,
       resourcesId,
       quoteType,
       quoteId: parent,
     });
+    repostMomentId = repostMoment._id;
   }
+
+  if(parentUid !== this.uid) {
+    if(postType === 'repost') {
+      if(repostMomentId) {
+        MomentModel.createMessageAndSendMessage('momentRepost', parentUid, repostMomentId).catch(console.log);
+      }
+    } else {
+      if(commentMomentId) {
+        MomentModel.createMessageAndSendMessage('momentComment', parentUid, commentMomentId).catch(console.log);
+      }
+    }
+  }
+
 };
 
 /*

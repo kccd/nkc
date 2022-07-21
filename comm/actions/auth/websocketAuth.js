@@ -8,6 +8,7 @@ const UserModel = require('../../../dataModels/UserModel');
 const MessageModel = require("../../../dataModels/MessageModel");
 const UsersGenerals = require("../../../dataModels/UsersGeneralModel");
 const SettingModel = require("../../../dataModels/SettingModel");
+const PostsVoteModel = require("../../../dataModels/PostsVoteModel");
 
 module.exports = {
   params: {
@@ -42,6 +43,7 @@ module.exports = {
     if (status && !close && !redEnvelopeSettings.random.close) {
       redEnvelopeStatus = true;
     }
+    await PostsVoteModel.createVoteMessages(user.uid);
     return {
       uid: user.uid,
       onlineStatus,
