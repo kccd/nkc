@@ -1163,6 +1163,44 @@ messageSchema.statics.getParametersData = async (message) => {
        threadUrl: getUrl(`thread`, thread.tid),
        reason: rea,
      };
+  } else if(type === 'momentRepost') {
+     const {momentId} = message.c;
+     const momentQuoteTypes = await MomentModel.getMomentQuoteTypes();
+     const moment = await MomentModel.findOne({
+       _id: momentId,
+       quoteType: momentQuoteTypes.moment,
+     }, {
+        uid: 1,
+     });
+     if(!moment) return null;
+     const user = await UserModel.findOne({uid: moment.uid}, {
+       username: 1,
+       uid: 1
+     });
+     if(!user) return null;
+     parameters = {
+       userHomeUrl: getUrl('userHome', user.uid),
+       username: user.username,
+       momentUrl: getUrl('zoneMoment', momentId),
+     };
+  } else if(type === 'momentComment') {
+    const {momentId} = message.c;
+    const moment = await MomentModel.findOne({
+      _id: momentId,
+    }, {
+      uid: 1,
+    });
+    if(!moment) return null;
+    const user = await UserModel.findOne({uid: moment.uid}, {
+      username: 1,
+      uid: 1
+    });
+    if(!user) return null;
+    parameters = {
+      userHomeUrl: getUrl('userHome', user.uid),
+      username: user.username,
+      momentUrl: getUrl('zoneMoment', momentId),
+    };
   }
   return parameters;
 };

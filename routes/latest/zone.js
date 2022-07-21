@@ -32,9 +32,26 @@ router
     const {page = 0} = query;
     const momentStatus = await db.MomentModel.getMomentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
+    const $or = [
+      {
+        status: momentStatus.normal
+      }
+    ];
+    if(state.uid) {
+      $or.push({
+        uid: state.uid,
+        status: {
+          $in: [
+            momentStatus.normal,
+            momentStatus.faulty,
+            momentStatus.unknown
+          ]
+        }
+      })
+    }
     const match = {
       parent: '',
-      status: momentStatus.normal,
+      $or,
       quoteType: {
         $in: [
           '',

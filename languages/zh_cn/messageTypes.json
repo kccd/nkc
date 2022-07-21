@@ -125,5 +125,7 @@
   "momentDelete": "动态被删除",
   "momentPass": "动态审核通过",
   "digestArticle": "文章被列入精选",
-  "digestComment": "回复被列入精选"
+  "digestComment": "回复被列入精选",
+  "momentRepost": "电文被转发",
+  "momentComment": "电文被回复"
 }
