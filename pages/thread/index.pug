@@ -393,7 +393,7 @@ block content
                 | 置顶回复
               div
                 include ./singlePost/singleToppedPost
-                for post in data.toopedPosts
+                for post in data.toppedPosts
                   +singleToppedPost(post)
           //- 高赞回复
           if data.voteUpPosts && data.voteUpPosts.length
