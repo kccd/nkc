@@ -42,6 +42,8 @@
               .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}")
                 .fa.fa-thumbs-o-up
                 span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
+              //-.moment-comment-options
+                .fa.fa-comment-o
               .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData, index)" data-direction="up")
                 moment-option(
                   :ref="`momentOption_${index}`"
@@ -132,7 +134,7 @@
           margin-right: 0.5rem;
           span{
             display: inline-block;
-            margin-right: 0.5rem;
+            //margin-right: 0.5rem;
             font-size: 1.25rem;
             color: @primary;
           }
