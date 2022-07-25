@@ -41,10 +41,10 @@ router
     if(!['aliPay', 'wechatPay'].includes(paymentType)) ctx.throw(400, `支付方式错误`);
     if(!enabled) ctx.throw(400, `赞助功能已关闭`);
     if(fee !== payment[paymentType].fee) ctx.throw(400, `页面数据过期，请刷新`);
-    const totalMoney = Math.ceil(money * (1 + fee));
+    const totalMoney = Math.ceil(money * (1 - fee));
     if(isNaN(totalMoney)) ctx.throw(400, `支付金额错误，请刷新后再试`);
-    if(totalMoney < min) ctx.throw(400, `最小赞助金额不能小于 ${min / 100} 元`);
-    if(totalMoney > max) ctx.throw(400, `最大赞助金额不能大于 ${max / 100} 元`);
+    if(money < min) ctx.throw(400, `最小支付金额不能小于 ${min / 100} 元`);
+    if(money > max) ctx.throw(400, `最大支付金额不能大于 ${max / 100} 元`);
     if(fundId !== 'fundPool') {
       await db.FundModel.findOnly({_id: fundId});
     }
@@ -55,9 +55,9 @@ router
       const wechatPayRecord = await db.WechatPayRecordModel.getPaymentRecord({
         apiType,
         description,
-        money: totalMoney,
+        money: money,
         fee,
-        effectiveMoney: money,
+        effectiveMoney: totalMoney,
         uid: state.uid,
         attach: {},
         from: 'fund',
@@ -73,9 +73,9 @@ router
       if(!payment.aliPay.enabled) ctx.throw(400, `支付宝支付已关闭`);
       const aliPayRecord = await db.AliPayRecordModel.getPaymentRecord({
         title: description,
-        money: totalMoney,
+        money: money,
         fee,
-        effectiveMoney: money,
+        effectiveMoney: totalMoney,
         uid: state.uid,
         from: 'fund',
         clientIp: ctx.address,
