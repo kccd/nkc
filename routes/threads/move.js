@@ -145,6 +145,7 @@ router
         await message.save();
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
+      await db.ThreadModel.clearThreadResourcesForumCache(thread.tid);
     }
 
 

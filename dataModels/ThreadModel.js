@@ -2600,5 +2600,20 @@ threadSchema.statics.extendFundInfo = async function(props) {
   }
 }
 
+/*
+* 清除文章内所有资源的权限缓存
+* */
+threadSchema.statics.clearThreadResourcesForumCache = async function(tid) {
+  const PostModel = mongoose.model('posts');
+  const ResourceModel = mongoose.model('resources');
+  const posts = await PostModel.find({tid}, {pid: 1});
+  const postsId = posts.map(post => post.pid);
+  await ResourceModel.updateMany({references: {$in: postsId}}, {
+    $set: {
+      tou: null
+    }
+  });
+}
+
 module.exports = mongoose.model('threads', threadSchema);
 
