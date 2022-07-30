@@ -593,6 +593,24 @@ module.exports = {
       ],
       content: "用户[url=userURL(username)]邀请您一起创作图书[text=name], 点击[url=reviewLink(这里)]前往查看邀请",
       type: "bookInvitation",
-    }
+    },
+    {
+      parameters: [
+        'userHomeUrl',
+        'username',
+        'momentUrl'
+      ],
+      content: "用户[url=userHomeUrl(username)]转发了你的电文，[url=momentUrl(点击查看)]。",
+      type: 'momentRepost'
+    },
+    {
+      parameters: [
+        'userHomeUrl',
+        'username',
+        'momentUrl'
+      ],
+      content: "收到来自[url=userHomeUrl(username)]的电文回复，[url=momentUrl(点击查看)]。",
+      type: 'momentComment'
+    },
   ]
 };

@@ -179,7 +179,7 @@ threadRouter
     let isModerator = false;
     let collectedCount = 0;
     let anonymous = false;
-    let toopedPosts = [];
+    let toppedPosts = [];
     let voteUpPostInfo = '';
     let voteUpPosts = [];
     let authorColumn = null;
@@ -413,9 +413,9 @@ threadRouter
       }
       for(const toppedPostId of thread.toppedPostsId) {
         const p = _toppedPostsObj[toppedPostId];
-        if(p) toopedPosts.push(p);
+        if(p) toppedPosts.push(p);
       }
-      toopedPosts = await db.PostModel.filterPostsInfo(_toppedPosts);
+      toppedPosts = await db.PostModel.filterPostsInfo(_toppedPosts);
     }
 
     // 获取高赞回复列表
@@ -802,7 +802,7 @@ threadRouter
     data.threadNav = threadNav;
     data.collectedCount = collectedCount;
     data.anonymous = anonymous;
-    data.toopedPosts = toopedPosts;
+    data.toppedPosts = toppedPosts;
     data.collected = collected;
     data.subscribed = subscribed;
     data.sendAnonymousPost = sendAnonymousPost;
@@ -1096,7 +1096,7 @@ threadRouter
         const p = toppedPostsObj[toppedPostId];
         if(p) data.toppedPosts.push(p);
       }
-      data.toopedPosts = await db.PostModel.filterPostsInfo(data.toppedPosts);
+      data.toppedPosts = await db.PostModel.filterPostsInfo(data.toppedPosts);
     }
     if(paging.page === 0) {
       // 获取高赞文章

@@ -19,11 +19,17 @@
       .donation-pay(v-for='p in payment')
         span(:class="{'active': paymentType === p.type}" @click='selectPaymentType(p.type)') {{p.name}}
     .payment-info
-      span 服务商（非本站）将收取 {{fee * 100}}% 的手续费
+      span(v-if="fee !== 0") 服务商（非本站）将收取 {{fee * 100}}% 的手续费
+      h4 支付金额：
+        strong {{realMoney / 100}}
+        | &nbsp;元
+      h4 手续费：
+        strong {{feeMoney / 100}}
+        | &nbsp;元
       h4
-        span 实际支付金额为
+        span 实际到账金额：
         strong &nbsp;{{totalMoney / 100}}&nbsp;
-        | 元
+        | &nbsp;元
     .checkbox.m-t-05
       label
         input(type='checkbox' :value='true' v-model='anonymous')
@@ -166,9 +172,14 @@ export default {
       }
     },
     totalMoney() {
+      const {realMoney, feeMoney} = this;
+      if(feeMoney === null) return null;
+      return Math.ceil(realMoney - feeMoney);
+    },
+    feeMoney() {
       const {realMoney, fee} = this;
       if(fee === null) return null;
-      return Math.ceil(realMoney * (1 + fee));
+      return Math.ceil(realMoney * fee);
     },
     paymentInfo() {
       const {totalMoney, fee} = this;
@@ -176,7 +187,7 @@ export default {
       return `服务商（非本站）将收取 ${fee * 100}% 的手续费，实际支付金额为 <strong>${totalMoney / 100}</strong> 元`;
     },
     exceedsMaxValue() {
-      return this.totalMoney > this.donation.max;
+      return this.realMoney > this.donation.max;
     }
   },
   methods: {
@@ -247,11 +258,11 @@ export default {
       let newWindow = null;
       return Promise.resolve()
         .then(() => {
-          if(totalMoney < donation.min) {
-            throw new Error(`赞助金额不能小于 ${donation.min / 100} 元`);
+          if(realMoney < donation.min) {
+            throw new Error(`支付金额不能小于 ${donation.min / 100} 元`);
           }
-          if(totalMoney > donation.max) {
-            throw new Error(`赞助金额不能大于 ${donation.max / 100} 元`);
+          if(realMoney > donation.max) {
+            throw new Error(`支付金额不能大于 ${donation.max / 100} 元`);
           }
           if(
             NKC.methods.isPcBrowser() ||

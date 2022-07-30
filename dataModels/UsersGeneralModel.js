@@ -292,6 +292,11 @@ const usersGeneralSchema = new Schema({
       }
     ],
     default: []
+  },
+  // 上次生成点赞消息的时间
+  voteDeadline: {
+    type: Date,
+    default: Date.now()
   }
 }, {
 	collection: 'usersGeneral'

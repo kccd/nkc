@@ -273,4 +273,55 @@ postsVoteSchema.statics.getVoteByUid = async (options) => {
   return vote ? vote.type : null;
 }
 
+postsVoteSchema.statics.createVoteMessages = async (uid) => {
+  const UsersGeneralMode = mongoose.model('usersGeneral');
+  const PostsVoteModel = mongoose.model('postsVotes');
+  const MessageModel = mongoose.model('messages');
+  const SettingModel = mongoose.model('settings');
+
+  const {voteDeadline} = await UsersGeneralMode.findOne({uid}, {voteDeadline: 1});
+  const votes = await PostsVoteModel.find({
+    tUid: uid,
+    toc: {
+      $gte: voteDeadline
+    },
+    type: voteTypes.up
+  }, {
+    _id: 1,
+    source: 1,
+    sid: 1
+  });
+  const time = new Date();
+  await UsersGeneralMode.updateOne({uid}, {
+    $set: {
+      voteDeadline: time
+    }
+  });
+  const groups = {};
+  const votesIdArr = [];
+  for(const vote of votes) {
+    const {_id, source, sid} = vote;
+    if(!groups[`${source}_${sid}`]) {
+      const arr = [];
+      groups[`${source}_${sid}`] = arr;
+      votesIdArr.push(arr);
+    }
+    groups[`${source}_${sid}`].push(_id);
+  }
+  for(const votesId of votesIdArr) {
+    const message = MessageModel({
+      _id: await SettingModel.operateSystemID('messages', 1),
+      r: uid,
+      ty: 'STU',
+      port: '',
+      ip: '',
+      c: {
+        type: 'latestVotes',
+        votesId
+      }
+    });
+    await message.save();
+  }
+}
+
 module.exports = mongoose.model('postsVotes', postsVoteSchema);
