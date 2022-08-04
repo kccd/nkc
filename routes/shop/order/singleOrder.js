@@ -27,7 +27,7 @@ router
     const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber, trackName);
     data.trackNumber = trackNumber;
     data.trackInfo = trackInfo;
-    ctx.template = "/shop/order/logistics.pug";
+    ctx.template = "shop/order/logistics.pug";
     await next();
   })
   // 确认收货
