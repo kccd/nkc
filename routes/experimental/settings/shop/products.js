@@ -5,25 +5,41 @@ productsRouter
 		const {data, db, query, nkcModules} = ctx;
 		const {productType, page = 0} = query;
 		data.productType = productType;
+
 		// 取出全部商品贴
-		let queryMap = {
-			type: "product"
-		}
-		const count = await db.ThreadModel.countDocuments(queryMap);
-		const paging = nkcModules.apiFunction.paging(page, count);
-		data.paging = paging;
-		if(productType && productType == "adminBan") {
+		const queryMap = {
+			productStatus: 'insale'
+		};
+		if(productType === 'adminBan') {
 			queryMap.adminBan = true;
 		}
-		const threads = await db.ThreadModel.find(queryMap).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
+
+		const count = await db.ShopGoodsModel.countDocuments(queryMap);
+		const paging = nkcModules.apiFunction.paging(page, count);
+		data.paging = paging;
+
+		const products = await db.ShopGoodsModel.find(queryMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+
+		data.threads = [];
+
+		const productsObj = {};
+		const threadsId = [];
+		for(const p of products) {
+			if(!p.tid) continue;
+			threadsId.push(p.tid);
+			productsObj[p.tid] = p;
+		}
+
+		const threads = await db.ThreadModel.find({tid: {$in: threadsId}}).sort({toc: -1});
+
 		await Promise.all(threads.map(async thread => {
 			await thread.extendFirstPost();
 			await thread.extendUser();
-			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
+			const products = [productsObj[thread.tid]];
 			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
 			thread.product = productArr[0];
+			data.threads.push(thread);
 		}))
-		data.threads = threads;
 		ctx.template = "experimental/shop/products/products.pug"
 		await next();
 	})

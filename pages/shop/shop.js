@@ -142,9 +142,9 @@ function submitProductToBill() {
   var paraId = $("#paraId").text();
   // window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount;
   if(freightId) {
-    openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount+"&freightId="+freightId);
+    openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount+"&freightId="+freightId, true);
   }else{
-    openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount);
+    openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount, true);
   }
 }
 

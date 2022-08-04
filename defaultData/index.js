@@ -313,6 +313,19 @@ async function initUsersOnlineStatus() {
   });
 }
 
+async function initShopSettings() {
+  const db = require('../dataModels');
+  const defaultSettings = require('./shopSettings');
+  const dbSettings = await db.ShopSettingsModel.find({}, {type: 1});
+  const types = dbSettings.map(s => s.type);
+  for(const setting of defaultSettings) {
+    if(types.includes(setting.type)) continue;
+    const dbSetting = db.ShopSettingsModel(setting);
+    await dbSetting.save();
+    console.log("Insert shop settings \""+ setting.type +"\"");
+  }
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -329,6 +342,7 @@ async function init() {
   await initThreadCategory();
   await initDefaultHomeBlocks();
   await initUsersOnlineStatus();
+  await initShopSettings();
 }
 
 module.exports = {
@@ -346,4 +360,5 @@ module.exports = {
   initThreads,
   initComplaintType,
   initUsersOnlineStatus,
+  initShopSettings,
 };
