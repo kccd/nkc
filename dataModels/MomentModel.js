@@ -233,13 +233,14 @@ schema.statics.createMomentCore = async (props) => {
     parent = '',
     quoteId = '',
     quoteType = '',
+    parents = [],
   } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const {checkString} = require('../nkcModules/checkData');
   checkString(content, {
-    name: '评论内容',
+    name: '内容',
     minLength: 0,
     maxLength: 100000
   });
@@ -256,6 +257,7 @@ schema.statics.createMomentCore = async (props) => {
     _id: momentId,
     uid,
     parent,
+    parents,
     status: momentStatus.default,
     did: document.did,
     quoteId,
@@ -310,6 +312,19 @@ schema.statics.createQuoteMoment = async props => {
     quoteType
   });
 };
+
+schema.statics.createCommentChild = async props => {
+  const {time, uid, content, parent, parents} = props;
+  const MomentModel = mongoose.model('moments');
+  return await MomentModel.createMomentCore({
+    time,
+    publishTime: time,
+    uid,
+    content,
+    parent,
+    parents,
+  });
+}
 
 /*
 * 创建一条未发布的动态评论
@@ -670,11 +685,12 @@ schema.methods.updateMomentCommentOrder = async function() {
   const MomentModel = mongoose.model('moments');
   const redLock = require('../nkcModules/redLock');
   const getRedisKeys = require('../nkcModules/getRedisKeys');
-  const {parent} = this;
-  const key = getRedisKeys('momentOrder', parent);
+  const {parent, parents = []} = this;
+  const targetParent = parents[0] || parent;
+  const key = getRedisKeys('momentOrder', targetParent);
   const lock = await redLock.lock(key, 6000);
   try{
-    const moment = await MomentModel.findOnly({_id: parent});
+    const moment = await MomentModel.findOnly({_id: targetParent});
     const order = moment.order + 1;
     await moment.updateOne({
       $set: {
@@ -810,6 +826,41 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
     await moment.addParentMomentRepostCount();
   }
   return moment;
+};
+
+schema.statics.createMomentCommentChildAndPublish = async (props) => {
+  const {uid, content, parent} = props;
+  const MomentModel = mongoose.model('moments');
+  const DocumentModel = mongoose.model('documents');
+  const parentComment = await MomentModel.findOne({_id: parent});
+  if(!parentComment.parent) throwErr(500, `回复的不是一条动态评论(id=${parent})`);
+  const documentSource = await DocumentModel.getDocumentSources();
+  await DocumentModel.checkGlobalPostPermission(uid, documentSource.moment);
+  const time = new Date();
+  const moment = await MomentModel.createCommentChild({
+    time,
+    uid,
+    content,
+    parent: parentComment._id,
+    parents: [...parentComment.parents, parentComment._id]
+  });
+  const top = time;
+
+  await moment.updateMomentCommentOrder();
+
+  await DocumentModel.publishDocumentByDid(moment.did, {
+    jumpReview: false
+  });
+
+  await moment.updateOne({
+    $set: {
+      top,
+    }
+  });
+  await moment.updateResourceReferences();
+  if(parentComment.uid !== uid) {
+    MomentModel.createMessageAndSendMessage('momentComment', parentComment.uid, moment._id).catch(console.log);
+  }
 };
 
 /*
@@ -1231,6 +1282,10 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
 *   @param {Number} order 评论所在楼层
 *   @param {Number} voteUp 评论点赞数
 *   @param {String} content 评论内容，富文本
+*
+*   @param {String} parentUid
+*   @param {String} parentUsername
+*   @param {String} parentUserHome
 * */
 schema.statics.extendCommentsData = async function (comments, uid) {
   const DocumentModel = mongoose.model('documents');
@@ -1241,6 +1296,9 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const {getUrl, timeFormat} = require('../nkcModules/tools');
   const usersId = [];
   const commentsId = [];
+
+  // 拓展回复的上级评论
+
   for(const comment of comments) {
     const {uid, _id} = comment;
     usersId.push(uid);

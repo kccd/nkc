@@ -20,27 +20,39 @@ router
       unknown: unknownStatus,
     } = await db.MomentModel.getMomentStatus();
     const match = {
-      parent: moment._id,
-      $or: [
+      $and: [
         {
-          status: normalStatus
+          $or: [
+            {
+              parent: moment._id
+            },
+            {
+              parents: moment._id
+            }
+          ]
         },
         {
-          uid: state.uid,
-          status: {
-            $in: [
-              normalStatus,
-              faultyStatus,
-              unknownStatus,
-            ]
-          }
+          $or: [
+            {
+              status: normalStatus
+            },
+            {
+              uid: state.uid,
+              status: {
+                $in: [
+                  normalStatus,
+                  faultyStatus,
+                  unknownStatus,
+                ]
+              }
+            }
+          ]
         }
-      ]
+      ],
     };
     if(user) {
       if(permission('review')) {
-        delete match.status;
-        delete match.$or;
+        delete match.$and[1].$or[1].uid;
       }
     }
     const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: -1};

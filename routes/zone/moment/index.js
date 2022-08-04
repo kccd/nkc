@@ -15,8 +15,8 @@ router
     const {moment} = internalData;
     let targetMoment;
     let commentId;
-    if(moment.parent) {
-      targetMoment = await db.MomentModel.findOnly({_id: moment.parent});
+    if(moment.parents.length > 0) {
+      targetMoment = await db.MomentModel.findOnly({_id: moment.parents[0]});
       commentId = moment._id;
     } else {
       targetMoment = moment;

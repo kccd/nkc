@@ -315,6 +315,10 @@
   import MomentStatus from "./MomentStatus";
   import {visitUrl} from "../../js/pageSwitch";
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
+  import {getState} from "../../js/state";
+  import {toLogin} from "../../js/account";
+
+  const state = getState();
   export default {
     components: {
       'from-now': FromNow,
@@ -330,6 +334,7 @@
     * */
     props: ['data', 'focus', 'permissions'],
     data: () => ({
+      logged: !!state.uid,
       momentData: null,
       showPanelType: '', // comment, repost
       panelTypes: {
@@ -353,6 +358,7 @@
         this.momentData = JSON.parse(JSON.stringify(data));
       },
       vote() {
+        if(!this.logged) return toLogin();
         const {momentId, voteType} = this.momentData;
         const self = this;
         const voteUpType = 'up';

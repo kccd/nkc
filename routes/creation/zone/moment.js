@@ -140,4 +140,21 @@ router
     }
     await next();
   })
+  // 发表评论回复
+  .post('/:parent/comment', async (ctx, next) => {
+    const {body, db, state, params, nkcModules} = ctx;
+    const {content} = body;
+    const {parent} = params;
+    nkcModules.checkData.checkString(content, {
+      name: '内容',
+      minLength: 1,
+      maxLength: 1000,
+    });
+    await db.MomentModel.createMomentCommentChildAndPublish({
+      uid: state.uid,
+      content,
+      parent
+    });
+    await next();
+  })
 module.exports = router;

@@ -1,8 +1,8 @@
 <template lang="pug">
   .moment-commments.p-t-1
+    moment-comment-child-editor(ref="momentCommentChildEditor")
     .m-b-1
       moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
-
     .moment-comment-nav(v-if="postType === 'comment'")
       .post-type 评论列表
       .sort-item(
@@ -39,7 +39,9 @@
             .moment-comment-time
               from-now(:time="commentData.toc")
             .moment-comment-options
-              .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}")
+              .moment-comment-option(title="回复" @click="replyComment(commentData)")
+                .fa.fa-comment-o
+              .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
                 .fa.fa-thumbs-o-up
                 span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
               //-.moment-comment-options
@@ -177,6 +179,8 @@
   import MomentStatus from "./MomentStatus";
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   import {getState} from "../../js/state";
+  import {toLogin} from "../../js/account";
+  import MomentCommentChildrenEditor from './MomentCommentChildEditor';
   const {uid} = getState();
 
   export default {
@@ -186,7 +190,8 @@
       'from-now': FromNow,
       'moment-comment-editor': MomentCommentEditor,
       'moment-status': MomentStatus,
-      'moment-option': MomentOptionFixed
+      'moment-option': MomentOptionFixed,
+      'moment-comment-child-editor': MomentCommentChildrenEditor
     },
     data: () => ({
       logged: !!uid,
@@ -304,6 +309,7 @@
         }
       },
       vote(commentData) {
+        if(!this.logged) return toLogin();
         const voteType = 'up';
         const cancel = voteType === commentData.voteType;
         const momentId = this.postType === 'comment'? commentData.momentCommentId: commentData.momentId;
@@ -327,6 +333,18 @@
       complaint(mid) {
         this.$emit('complaint', mid);
       },
+      replyComment(comment) {
+        if(!this.logged) return toLogin();
+        this.$refs.momentCommentChildEditor.open({
+          uid: comment.uid,
+          time: comment.time,
+          avatarUrl: comment.avatarUrl,
+          username: comment.username,
+          userHome: comment.userHome,
+          momentCommentId: comment.momentCommentId,
+          content: comment.content,
+        });
+      }
     },
   }
 </script>
