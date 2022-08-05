@@ -20,39 +20,26 @@ router
       unknown: unknownStatus,
     } = await db.MomentModel.getMomentStatus();
     const match = {
-      $and: [
+      parent: moment._id,
+      $or: [
         {
-          $or: [
-            {
-              parent: moment._id
-            },
-            {
-              parents: moment._id
-            }
-          ]
+          status: normalStatus
         },
         {
-          $or: [
-            {
-              status: normalStatus
-            },
-            {
-              uid: state.uid,
-              status: {
-                $in: [
-                  normalStatus,
-                  faultyStatus,
-                  unknownStatus,
-                ]
-              }
-            }
-          ]
+          uid: state.uid,
+          status: {
+            $in: [
+              normalStatus,
+              faultyStatus,
+              unknownStatus,
+            ]
+          }
         }
-      ],
+      ]
     };
     if(user) {
       if(permission('review')) {
-        delete match.$and[1].$or[1].uid;
+        delete match.$or[1].uid;
       }
     }
     const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: -1};
@@ -61,7 +48,9 @@ router
     const paging = nkcModules.apiFunction.paging(page, count, perPage);
     const comments = await db.MomentModel.find(match)
       .sort(sortObj).skip(paging.start).limit(paging.perpage);
-    data.commentsData = await db.MomentModel.extendCommentsData(comments, state.uid);
+    let commentsData = await db.MomentModel.extendCommentsData(comments, state.uid);
+    commentsData = await db.MomentModel.extendCommentsDataCommentsData(commentsData, state.uid);
+    data.commentsData = commentsData;
     data.paging = paging;
     await next();
   })

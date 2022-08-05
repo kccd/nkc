@@ -88,6 +88,10 @@ export default {
     },
     show() {
       this.draggableElement.show();
+      setTimeout(() => {
+        this.draggableElement.setPositionCenter();
+      })
+
     },
     close() {
       this.draggableElement.hide();
@@ -119,6 +123,7 @@ export default {
         .then(() => {
           sweetSuccess('提交成功');
           this.$emit('submit');
+          this.hide();
         })
         .catch(sweetError)
     }

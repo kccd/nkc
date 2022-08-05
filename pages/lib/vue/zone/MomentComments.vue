@@ -1,6 +1,5 @@
 <template lang="pug">
   .moment-commments.p-t-1
-    moment-comment-child-editor(ref="momentCommentChildEditor")
     .m-b-1
       moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
     .moment-comment-nav(v-if="postType === 'comment'")
@@ -18,41 +17,52 @@
         span(v-else) 空空如也~
       paging(:pages="pageButtons" @click-button="clickPageButton")
       .moment-comment-list
-        .moment-comment-item(
+        moment-comment(
           v-for="(commentData, index) in listData"
-          :class=`{'active': postType === 'comment' && focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
-          )
-          moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
-          .moment-comment-item-header
-            a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
-              img(
-                :src="commentData.avatarUrl"
-                data-global-mouseover="showUserPanel"
-                data-global-mouseout="hideUserPanel"
-                :data-global-data="objToStr({uid: commentData.uid})"
-                )
-              span(
-                data-global-mouseover="showUserPanel"
-                data-global-mouseout="hideUserPanel"
-                :data-global-data="objToStr({uid: commentData.uid})"
-              ) {{commentData.username}}
-            .moment-comment-time
-              from-now(:time="commentData.toc")
-            .moment-comment-options
-              .moment-comment-option(title="回复" @click="replyComment(commentData)")
-                .fa.fa-comment-o
-              .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
-                .fa.fa-thumbs-o-up
-                span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
-              //-.moment-comment-options
-                .fa.fa-comment-o
-              .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData, index)" data-direction="up")
-                moment-option(
-                  :ref="`momentOption_${index}`"
-                  @complaint="complaint"
-                )
-          .moment-comment-item-content(v-html="commentData.content" v-if="postType === 'comment'")
-          .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
+          :key="commentData._id"
+          :comment="commentData"
+          :type="postType"
+          :focus="focusCommentId === commentData.momentCommentId"
+          :permissions="permissions"
+        )
+        //.moment-comment-item(
+        //  v-for="(commentData, index) in listData"
+        //  :class=`{'active': postType === 'comment' && focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
+        //  )
+        //  moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
+        //  .moment-comment-item-header
+        //    a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
+        //      img(
+        //        :src="commentData.avatarUrl"
+        //        data-global-mouseover="showUserPanel"
+        //        data-global-mouseout="hideUserPanel"
+        //        :data-global-data="objToStr({uid: commentData.uid})"
+        //        )
+        //      span(
+        //        data-global-mouseover="showUserPanel"
+        //        data-global-mouseout="hideUserPanel"
+        //        :data-global-data="objToStr({uid: commentData.uid})"
+        //      ) {{commentData.username}}
+        //    .moment-comment-time
+        //      from-now(:time="commentData.toc")
+        //    .moment-comment-options
+        //      .moment-comment-option(title="回复" @click="replyComment(commentData)")
+        //        .fa.fa-comment-o
+        //      .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
+        //        .fa.fa-thumbs-o-up
+        //        span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
+        //      //-.moment-comment-options
+        //        .fa.fa-comment-o
+        //      .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData, index)" data-direction="up")
+        //        moment-option(
+        //          :ref="`momentOption_${index}`"
+        //          @complaint="complaint"
+        //        )
+        //  .moment-comment-item-content(v-html="commentData.content" v-if="postType === 'comment'")
+        //  .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
+        //  .moment-comment-comments(v-if="commentData.comments && commentData.comments.length > 0")
+        //    span 下级评论
+
       paging(:pages="pageButtons" @click-button="clickPageButton")
 </template>
 
@@ -82,88 +92,7 @@
     }
     .moment-comment-list{
       margin-bottom: 1rem;
-      .moment-comment-item{
-        &:hover{
-          background-color: #f4f4f4;
-        }
-        &.active{
-          background-color: #ffebcf;
-          padding: 0.5rem;
-        }
-        &.unknown {
-          background: #ffd598;
-        }
-        &.deleted {
-          background: #bdbdbd;
-        }
-        padding: 0.5rem 0;
-        margin-bottom: 0;
-        .moment-comment-item-header{
-          margin-bottom: 0.5rem;
-          position: relative;
-        }
-        .moment-comment-options{
-          @height: 2rem;
-          position: absolute;
-          top: 0;
-          right: 0;
-          height: @height;
-          .moment-comment-option{
-            display: inline-block;
-            height: @height;
-            line-height: @height;
-            text-align: center;
-            cursor: pointer;
-            padding: 0 0.2rem;
-            margin-left: 0.5rem;
-            &.active{
-              color: @accent;
-            }
-            span{
-              margin-left: 0.2rem;
-            }
-            #modulePostOptions{
 
-            }
-          }
-        }
-        .moment-comment-time{
-          display: inline-block;
-          font-size: 1rem;
-          color: #555;
-        }
-        .moment-comment-avatar{
-          margin-right: 0.5rem;
-          span{
-            display: inline-block;
-            //margin-right: 0.5rem;
-            font-size: 1.25rem;
-            color: @primary;
-          }
-          img{
-            margin-right: 0.5rem;
-            height: 2rem;
-            width: 2rem;
-            border-radius: 50%;
-            vertical-align: middle;
-          }
-        }
-        .moment-comment-item-content {
-          //margin-bottom: 0.5rem;
-          word-break: keep-all;
-          word-wrap: break-word;
-          white-space: pre-wrap;
-          /deep/img{
-            height: 1.5rem;
-            width: 1.5rem;
-            margin: 0 0.1rem;
-            vertical-align: text-bottom;
-          }
-          /deep/a{
-            color: @primary;
-          }
-        }
-      }
     }
   }
 </style>
@@ -180,6 +109,7 @@
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
+  import MomentComment from "./MomentComment";
   import MomentCommentChildrenEditor from './MomentCommentChildEditor';
   const {uid} = getState();
 
@@ -191,7 +121,8 @@
       'moment-comment-editor': MomentCommentEditor,
       'moment-status': MomentStatus,
       'moment-option': MomentOptionFixed,
-      'moment-comment-child-editor': MomentCommentChildrenEditor
+      'moment-comment-child-editor': MomentCommentChildrenEditor,
+      'moment-comment': MomentComment
     },
     data: () => ({
       logged: !!uid,
