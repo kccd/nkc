@@ -113,6 +113,9 @@
 </template>
 
 <style lang="less" scoped>
+  .module-login{
+    z-index: 2000;
+  }
   @media (min-width: 768px){
     .module-login .modal-dialog{
       width: 370px;

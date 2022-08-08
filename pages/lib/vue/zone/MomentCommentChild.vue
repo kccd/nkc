@@ -37,7 +37,7 @@
             @to-reply-comment="replyComment"
           )
           paging.m-t-05(:pages="pages" @click-button="selectPage")
-      .editor-container(v-if="replyCommentId")
+      .editor-container(v-if="replyCommentId && logged")
         textarea-editor(
           ref='textareaEditor'
           :placeholder="'回复 ' + replyUsername"
@@ -56,6 +56,8 @@ import TextareaEditor from '../TextareaEditor';
 import {nkcAPI} from "../../js/netAPI";
 import Paging from '../../vue/Paging';
 import MomentComment from './MomentComment'
+import {getState} from "../../js/state";
+const state = getState();
 
 export default {
   components: {
@@ -66,6 +68,7 @@ export default {
   data: () => {
     return {
 
+      logged: !!state.uid,
       momentId: '',
       commentId: '',
       replyCommentId: '',

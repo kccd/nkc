@@ -38,7 +38,7 @@
             span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
           //-.moment-comment-options
             .fa.fa-comment-o
-          .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData)" data-direction="up")
+          .moment-comment-option.fa.fa-ellipsis-h(v-if='logged' @click="openOption($event, commentData)" data-direction="up")
             moment-option(
               :ref="`momentOption_${commentData._id}`"
               @complaint="complaint"
@@ -110,6 +110,7 @@ export default {
       this.$emit('complaint', mid);
     },
     replyComment(comment) {
+      if(!this.logged) return toLogin();
       this.$emit('to-reply-comment', comment);
     },
     vote(commentData) {
