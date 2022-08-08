@@ -333,6 +333,7 @@ export default {
   }
   .editor-container{
     padding: 1rem;
+    border-radius: 10px 10px 0 0;
     position: absolute;
     background-color: #fff;
     bottom: 0;
