@@ -6,13 +6,14 @@ router
     const {moment} = internalData;
     const {user} = data;
     let {
-      sort = 'hot',
+      sort = 'time',
       page = 0,
       focus = '', // 需要高亮的评论ID，可为空字符串
     } = query;
 
     if(focus) {
-      page = await db.MomentModel.getPageByMomentCommentId(focus);
+      const _page = await db.MomentModel.getPageByMomentCommentId(moment._id, focus);
+      if(_page !== -1) page = _page;
     }
     const {
       normal: normalStatus,
@@ -42,7 +43,7 @@ router
         delete match.$or[1].uid;
       }
     }
-    const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: -1};
+    const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: 1};
     const count = await db.MomentModel.countDocuments(match);
     const perPage = await db.MomentModel.getMomentCommentPerPage();
     const paging = nkcModules.apiFunction.paging(page, count, perPage);
@@ -54,4 +55,64 @@ router
     data.paging = paging;
     await next();
   })
+  .get('/child', async (ctx, next) => {
+    const {
+      db,
+      state,
+      permission,
+      data,
+      query,
+      internalData,
+      nkcModules,
+    } = ctx;
+    let {
+      page = 0,
+      sort = 'time',
+      focus = '',
+    } = query;
+    const {moment: comment} = internalData;
+    if(focus) {
+      const _page = await db.MomentModel.getPageByMomentCommentId(comment._id, focus);
+      if(_page !== -1) page = _page;
+    }
+    const momentStatus = await db.MomentModel.getMomentStatus();
+    const match = {
+      parents: comment._id,
+      $or: [
+        {
+          status: momentStatus.normal,
+        },
+        {
+          uid: state.uid,
+          status: {
+            $in: [
+              momentStatus.normal,
+              momentStatus.faulty,
+              momentStatus.unknown
+            ]
+          }
+        }
+      ]
+    };
+    if(state.uid && permission('review')) {
+      delete match.$or[1].uid;
+    }
+    const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: 1};
+    const count = await db.MomentModel.countDocuments(match);
+    const perPage = await db.MomentModel.getMomentCommentPerPage();
+    const paging = nkcModules.apiFunction.paging(page, count, perPage);
+    const comments = await db.MomentModel.find(match)
+      .sort(sortObj).skip(paging.start).limit(paging.perpage);
+    comments.push(comment);
+    let commentsData = await db.MomentModel.extendCommentsData(comments, state.uid);
+    const commentData = commentsData.pop();
+    commentsData = await db.MomentModel.extendCommentsDataParentData(commentsData, state.uid);
+    data.commentsData = commentsData;
+    data.commentData = commentData;
+    data.paging = paging;
+    data.permissions = {
+      reviewed: state.uid && (permission('movePostsToRecycle') || permission('movePostsToDraft')),
+    };
+    await next();
+  });
 module.exports = router;

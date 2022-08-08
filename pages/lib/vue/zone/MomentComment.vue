@@ -1,6 +1,5 @@
 <template lang="pug">
-  div
-    moment-comment-child-editor(ref="momentCommentChildEditor")
+  div(:data-id="commentData._id")
     .moment-comment-item(
       :class=`{'active': !!focus, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
     )
@@ -19,20 +18,20 @@
             :data-global-data="objToStr({uid: commentData.uid})"
           ) {{commentData.username}}
 
-        span(v-if="commentData.parentData")
+        span(v-if="commentData.parentData && commentData.parentData._id !== commentData.parentsId[1]")
           .moment-comment-time.m-r-05 回复
-          a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
+          a.moment-comment-avatar(:href="commentData.parentData.userHome" target="_blank")
             span(
               data-global-mouseover="showUserPanel"
               data-global-mouseout="hideUserPanel"
-              :data-global-data="objToStr({uid: commentData.uid})"
-            ) {{commentData.username}}
+              :data-global-data="objToStr({uid: commentData.parentData.uid})"
+            ) {{commentData.parentData.username}}
 
         .moment-comment-time
           from-now(:time="commentData.toc")
 
         .moment-comment-options
-          .moment-comment-option(title="回复" @click="replyComment(commentData)")
+          .moment-comment-option(title="回复" @click="replyComment(commentData)" v-if="type === 'comment'")
             .fa.fa-comment-o
           .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
             .fa.fa-thumbs-o-up
@@ -54,14 +53,14 @@
         :type="type"
         :permissions="permissions"
         :key="_comment._id"
+        @to-reply-comment="replyComment"
       )
-      .more-comment(v-if="commentData.commentCount > 2") 查看更多
+      .more-comment(v-if="commentData.commentCount > 2" @click="visitCommentChild") 查看更多
 </template>
 
 <script>
 import MomentStatus from "./MomentStatus";
 import MomentOptionFixed from "./momentOption/MomentOptionFixed";
-import MomentCommentChildrenEditor from './MomentCommentChildEditor';
 import FromNow from '../FromNow';
 import {toLogin} from "../../js/account";
 import {momentVote} from "../../js/zone/vote";
@@ -94,7 +93,6 @@ export default {
     'moment-status': MomentStatus,
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
-    'moment-comment-child-editor': MomentCommentChildrenEditor,
   },
   data: () => ({
     logged: !!state.uid,
@@ -112,16 +110,7 @@ export default {
       this.$emit('complaint', mid);
     },
     replyComment(comment) {
-      if(!this.logged) return toLogin();
-      this.$refs.momentCommentChildEditor.open({
-        uid: comment.uid,
-        time: comment.time,
-        avatarUrl: comment.avatarUrl,
-        username: comment.username,
-        userHome: comment.userHome,
-        momentCommentId: comment.momentCommentId,
-        content: comment.content,
-      });
+      this.$emit('to-reply-comment', comment);
     },
     vote(commentData) {
       if(!this.logged) return toLogin();
@@ -140,10 +129,12 @@ export default {
       const self = this;
       const target = e.target;
       const name = `momentOption_${moment._id}`;
-      console.log(self.$refs[name], self.$refs[name].length)
       self.$refs[name].open({DOM: $(target), moment});
       e.stopPropagation();
     },
+    visitCommentChild() {
+      this.$emit('visit-comment-child', this.commentData);
+    }
   }
 }
 </script>
@@ -239,6 +230,7 @@ export default {
   margin-bottom: 1rem;
   .more-comment{
     display: inline-block;
+    user-select: none;
     height: 2rem;
     line-height: 2rem;
     padding: 0 1rem;

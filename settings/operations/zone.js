@@ -14,7 +14,10 @@ module.exports = {
         GET: 'getZoneMomentOption'
       },
       comments: {
-        GET: 'getZoneMomentComments'
+        GET: 'getZoneMomentComments',
+        child: {
+          GET: 'getZoneMomentComments',
+        }
       },
       repost: {
         GET: 'getZoneMomentComments'

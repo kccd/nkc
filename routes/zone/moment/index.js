@@ -11,13 +11,17 @@ router
     await next();
   })
   .get('/:mid', async (ctx, next) => {
-    const {data, state, internalData, db} = ctx;
+    const {permission, data, state, internalData, db} = ctx;
     const {moment} = internalData;
     let targetMoment;
     let commentId;
+    let parentCommentId;
     if(moment.parents.length > 0) {
       targetMoment = await db.MomentModel.findOnly({_id: moment.parents[0]});
       commentId = moment._id;
+      if(moment.parents.length > 1) {
+        parentCommentId = moment.parents[1];
+      }
     } else {
       targetMoment = moment;
       commentId = '';
@@ -26,6 +30,10 @@ router
     if(!momentListData) {
       ctx.throw(500, `动态数据错误 momentId=${moment._id}`);
     }
+    data.permissions = {
+      reviewed: state.uid && (permission('movePostsToRecycle') || permission('movePostsToDraft')),
+    };
+    data.parentCommentId = parentCommentId;
     data.commentId = commentId;
     data.momentListData = momentListData;
     ctx.remoteTemplate = 'zone/moment/moment.pug';

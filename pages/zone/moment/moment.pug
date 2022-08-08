@@ -15,14 +15,16 @@ block content
             )
             complaint(ref="complaint")
             violation-record(ref="violationRecord")
+            moment-comment-child(ref='momentCommentChild')
             moment(
               ref='moment'
               :data="momentListData"
               :focus='focusCommentId'
               @open-option="openOption"
               @option-comment-option="openOption"
+              :permissions="permissions"
               )
-  .hidden#data=objToStr({momentListData: data.momentListData, commentId: data.commentId})
+  .hidden#data=objToStr({momentListData: data.momentListData, commentId: data.commentId, permissions: data.permissions, parentCommentId: data.parentCommentId})
 block scripts
   include ../../publicModules/moment/momentSource
   +includeJS('/zone/moment/moment.js')

@@ -1,5 +1,6 @@
 <template lang="pug">
   .moment-commments.p-t-1
+    moment-comment-child-editor(ref="momentCommentChildEditor")
     .m-b-1
       moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
     .moment-comment-nav(v-if="postType === 'comment'")
@@ -22,47 +23,11 @@
           :key="commentData._id"
           :comment="commentData"
           :type="postType"
-          :focus="focusCommentId === commentData.momentCommentId"
+          :focus="focusCommentsId.includes(commentData.momentCommentId)"
           :permissions="permissions"
+          @to-reply-comment="replyComment"
+          @visit-comment-child="visitCommentChild"
         )
-        //.moment-comment-item(
-        //  v-for="(commentData, index) in listData"
-        //  :class=`{'active': postType === 'comment' && focusCommentId === commentData.momentCommentId, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
-        //  )
-        //  moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
-        //  .moment-comment-item-header
-        //    a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
-        //      img(
-        //        :src="commentData.avatarUrl"
-        //        data-global-mouseover="showUserPanel"
-        //        data-global-mouseout="hideUserPanel"
-        //        :data-global-data="objToStr({uid: commentData.uid})"
-        //        )
-        //      span(
-        //        data-global-mouseover="showUserPanel"
-        //        data-global-mouseout="hideUserPanel"
-        //        :data-global-data="objToStr({uid: commentData.uid})"
-        //      ) {{commentData.username}}
-        //    .moment-comment-time
-        //      from-now(:time="commentData.toc")
-        //    .moment-comment-options
-        //      .moment-comment-option(title="回复" @click="replyComment(commentData)")
-        //        .fa.fa-comment-o
-        //      .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
-        //        .fa.fa-thumbs-o-up
-        //        span(v-if="commentData.voteUp > 0") {{commentData.voteUp}}
-        //      //-.moment-comment-options
-        //        .fa.fa-comment-o
-        //      .moment-comment-option.fa.fa-ellipsis-h(@click="openOption($event, commentData, index)" data-direction="up")
-        //        moment-option(
-        //          :ref="`momentOption_${index}`"
-        //          @complaint="complaint"
-        //        )
-        //  .moment-comment-item-content(v-html="commentData.content" v-if="postType === 'comment'")
-        //  .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
-        //  .moment-comment-comments(v-if="commentData.comments && commentData.comments.length > 0")
-        //    span 下级评论
-
       paging(:pages="pageButtons" @click-button="clickPageButton")
 </template>
 
@@ -110,7 +75,7 @@
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
   import MomentComment from "./MomentComment";
-  import MomentCommentChildrenEditor from './MomentCommentChildEditor';
+  import MomentCommentChildrenEditor from './MomentCommentChild';
   const {uid} = getState();
 
   export default {
@@ -129,23 +94,31 @@
       commentsData: [],
       repostData: [],
       paging: null,
-      sort: null,
+      sort: 'time',
       loading: true,
       focusedComment: false,
+      focusCommentId: '',
       nav: [
-        {
-          type: 'hot',
-          name: '按热度',
-        },
         {
           type: 'time',
           name: '按时间',
+        },
+        {
+          type: 'hot',
+          name: '按热度',
         }
       ]
     }),
     computed: {
-      focusCommentId() {
-        return this.focus;
+      focusCommentsId() {
+        const arr = [];
+        if(this.focus) {
+          arr.push(this.focus);
+        }
+        if(this.focusCommentId) {
+          arr.push(this.focusCommentId);
+        }
+        return arr;
       },
       postType() {
         return this.type;
@@ -230,10 +203,11 @@
         this.getList(page);
       },
       onPublished(res) {
-        const {momentCommentPage} = res;
+        const {momentCommentPage, momentCommentId} = res;
         const {postType} = this;
         if(postType === 'comment') {
           this.getList(momentCommentPage);
+          this.focusCommentId = momentCommentId;
           this.$emit('post-comment');
         } else {
           visitUrl(`/g/moment`);
@@ -264,16 +238,15 @@
       complaint(mid) {
         this.$emit('complaint', mid);
       },
-      replyComment(comment) {
-        if(!this.logged) return toLogin();
+      visitCommentChild(comment) {
         this.$refs.momentCommentChildEditor.open({
-          uid: comment.uid,
-          time: comment.time,
-          avatarUrl: comment.avatarUrl,
-          username: comment.username,
-          userHome: comment.userHome,
-          momentCommentId: comment.momentCommentId,
-          content: comment.content,
+          commentId: comment._id,
+        });
+      },
+      replyComment(comment) {
+        this.$refs.momentCommentChildEditor.open({
+          commentId: comment.parentsId[1] || comment._id,
+          replyCommentId: comment._id,
         });
       }
     },

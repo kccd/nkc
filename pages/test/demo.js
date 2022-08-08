@@ -1,5 +1,5 @@
 import Credit, {creditTypes, contentTypes} from '../lib/vue/Credit';
-import MomentCommentChildEditor from '../lib/vue/zone/MomentCommentChildEditor'
+import MomentCommentChildEditor from '../lib/vue/zone/MomentCommentChild'
 const app = new Vue({
   el: '#app',
   components: {

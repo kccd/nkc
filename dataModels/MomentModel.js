@@ -898,12 +898,19 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
     }
   });
   await moment.updateResourceReferences();
-  if(parentMoment.uid !== uid) {
-    MomentModel.createMessageAndSendMessage('momentComment', parentMoment.uid, moment._id).catch(console.log);
+
+  let usersId = new Set();
+
+  if(parentMoment.uid !== uid) usersId.add(parentMoment.uid);
+  if(parentComment.uid !== uid) usersId.add(parentComment.uid);
+
+  usersId = [...usersId];
+
+  for(const targetUid of usersId) {
+    MomentModel.createMessageAndSendMessage('momentComment', targetUid, moment._id).catch(console.log);
   }
-  if(parentComment.uid !== uid) {
-    MomentModel.createMessageAndSendMessage('momentComment', parentComment.uid, moment._id).catch(console.log);
-  }
+
+  return moment;
 };
 
 /*
@@ -1348,7 +1355,6 @@ schema.statics.extendCommentsDataCommentsData = async function(commentsData, uid
   let latestCommentsData = await MomentModel.extendCommentsData(latestComments, uid);
   latestCommentsData = await MomentModel.extendCommentsDataParentData(latestCommentsData, uid);
   for(const latestCommentData of latestCommentsData) {
-    console.log(latestCommentData.parentData)
     latestCommentsDataObj[latestCommentData._id] = latestCommentData;
   }
   for(const commentData of commentsData) {
@@ -1481,6 +1487,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     const data = {
       _id,
       momentId: parents[0],
+      parentsId: parents,
       parentId: parent,
       docId: stableDocument._id,
       momentCommentId: _id,
@@ -1523,9 +1530,15 @@ schema.statics.getPageByOrder = async (order) => {
 * 获取评论所在页数
 * @param {String} MomentCommentId 动态评论ID
 * */
-schema.statics.getPageByMomentCommentId = async (momentCommentId) => {
+schema.statics.getPageByMomentCommentId = async (parentId, momentCommentId) => {
   const MomentModel = mongoose.model('moments');
   const moment = await MomentModel.findOnly({_id: momentCommentId}, {_id: 1, order: 1});
+  // 一级评论
+  if(moment.parents.length > 1) {
+    if(moment.parents[1] !== parentId) return -1;
+  } else {
+    if(moment.parent !== parentId) return -1;
+  }
   return MomentModel.getPageByOrder(moment.order);
 }
 
