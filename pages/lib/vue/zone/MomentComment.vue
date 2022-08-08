@@ -55,7 +55,7 @@
         :key="_comment._id"
         @to-reply-comment="replyComment"
       )
-      .more-comment(v-if="commentData.commentCount > 2" @click="visitCommentChild") 查看更多
+      .more-comment(v-if="commentData.commentCount > 2" @click="visitCommentChild") 共 {{commentData.commentCount}} 条回复
 </template>
 
 <script>
