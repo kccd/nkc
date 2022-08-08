@@ -86,7 +86,8 @@ process.on('unhandledRejection', (e, promise) => {
 
 module.exports = () => {
   return new Promise((resolve, reject) => {
-    mongoose.connect(encodeMongoURI(`mongodb://${account}${address}:${port}/${database}`), options)
+    const url = mongodbConfig.url || `mongodb://${account}${address}:${port}/${database}`;
+    mongoose.connect(encodeMongoURI(url), options)
       .then(() => {
         resolve(mongoose);
       })

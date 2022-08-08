@@ -117,11 +117,21 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // 评论数
+  comment: {
+    type: Number,
+    default: 0,
+  },
   // 转发数
   repost: {
     type: Number,
     default: 0
-  }
+  },
+  // 最新的 2 条下级ID
+  latest: {
+    type: [String],
+    default: []
+  },
 });
 
 /*
@@ -233,13 +243,14 @@ schema.statics.createMomentCore = async (props) => {
     parent = '',
     quoteId = '',
     quoteType = '',
+    parents = [],
   } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const {checkString} = require('../nkcModules/checkData');
   checkString(content, {
-    name: '评论内容',
+    name: '内容',
     minLength: 0,
     maxLength: 100000
   });
@@ -256,6 +267,7 @@ schema.statics.createMomentCore = async (props) => {
     _id: momentId,
     uid,
     parent,
+    parents,
     status: momentStatus.default,
     did: document.did,
     quoteId,
@@ -311,6 +323,19 @@ schema.statics.createQuoteMoment = async props => {
   });
 };
 
+schema.statics.createCommentChild = async props => {
+  const {time, uid, content, parent, parents} = props;
+  const MomentModel = mongoose.model('moments');
+  return await MomentModel.createMomentCore({
+    time,
+    publishTime: time,
+    uid,
+    content,
+    parent,
+    parents,
+  });
+}
+
 /*
 * 创建一条未发布的动态评论
 * @param {Object} props
@@ -327,7 +352,8 @@ schema.statics.createMomentComment = async (props) => {
     uid,
     content,
     resourcesId,
-    parent
+    parent,
+    parents: [parent],
   });
 };
 
@@ -670,18 +696,18 @@ schema.methods.updateMomentCommentOrder = async function() {
   const MomentModel = mongoose.model('moments');
   const redLock = require('../nkcModules/redLock');
   const getRedisKeys = require('../nkcModules/getRedisKeys');
-  const {parent} = this;
+  const {parent, parents} = this;
+  if(!parent) return;
+  const targetId = parents.length >= 2? parents[1]: parent;
   const key = getRedisKeys('momentOrder', parent);
   const lock = await redLock.lock(key, 6000);
-  try{
-    const moment = await MomentModel.findOnly({_id: parent});
-    const order = moment.order + 1;
-    await moment.updateOne({
-      $set: {
-        order,
+  try {
+    const moment = await MomentModel.findOneAndUpdate({_id: targetId}, {
+      $inc: {
+        comment: 1
       }
     });
-    this.order = order;
+    this.order = moment.comment + 1;
     await this.updateOne({
       $set: {
         order: this.order,
@@ -692,6 +718,33 @@ schema.methods.updateMomentCommentOrder = async function() {
     await lock.unlock();
     throwErr(500, err.message);
   }
+}
+
+schema.methods.updateParentLatestId = async function() {
+  // 更新上级和第二级的latest
+  const MomentModel = mongoose.model('moments');
+  const {parent, parents} = this;
+  const targetId = [];
+  if(parent) {
+    targetId.push(parent);
+  }
+
+  if(parents.length >= 2) {
+    targetId.push(parents[1]);
+  }
+
+  if(!targetId.length) return;
+
+  await MomentModel.updateMany({
+    _id: {$in: targetId},
+    'latest.1': {
+      $exists: false
+    }
+  }, {
+    $addToSet: {
+      latest: this._id
+    }
+  });
 }
 
 schema.statics.createMessageAndSendMessage = async (type, uid, momentId) => {
@@ -734,6 +787,7 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
   if(postType === 'comment' || alsoPost) {
     // 需要创建评论
     await this.updateMomentCommentOrder();
+    await this.updateParentLatestId();
     await this.publish();
     commentMomentId = this._id;
   }
@@ -809,6 +863,53 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
     await moment.updateResourceReferences();
     await moment.addParentMomentRepostCount();
   }
+  return moment;
+};
+
+schema.statics.createMomentCommentChildAndPublish = async (props) => {
+  const {uid, content, parent} = props;
+  const MomentModel = mongoose.model('moments');
+  const DocumentModel = mongoose.model('documents');
+  const parentComment = await MomentModel.findOne({_id: parent}, {parent: 1, parents: 1, uid: 1});
+  if(!parentComment.parent) throwErr(500, `回复的不是一条动态评论(id=${parent})`);
+  const parentMoment = await MomentModel.findOne({_id: parentComment.parents[0]}, {uid: 1});
+  const documentSource = await DocumentModel.getDocumentSources();
+  await DocumentModel.checkGlobalPostPermission(uid, documentSource.moment);
+  const time = new Date();
+  const moment = await MomentModel.createCommentChild({
+    time,
+    uid,
+    content,
+    parent: parentComment._id,
+    parents: [...parentComment.parents, parentComment._id]
+  });
+  const top = time;
+
+  await moment.updateMomentCommentOrder();
+  await moment.updateParentLatestId();
+
+  await DocumentModel.publishDocumentByDid(moment.did, {
+    jumpReview: false
+  });
+
+  await moment.updateOne({
+    $set: {
+      top,
+    }
+  });
+  await moment.updateResourceReferences();
+
+  let usersId = new Set();
+
+  if(parentMoment.uid !== uid) usersId.add(parentMoment.uid);
+  if(parentComment.uid !== uid) usersId.add(parentComment.uid);
+
+  usersId = [...usersId];
+
+  for(const targetUid of usersId) {
+    MomentModel.createMessageAndSendMessage('momentComment', targetUid, moment._id).catch(console.log);
+  }
+
   return moment;
 };
 
@@ -1034,6 +1135,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       _id,
       voteUp,
       order,
+      comment,
       repost,
       quoteType,
       status,
@@ -1125,7 +1227,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       status,
       statusInfo: '',
       voteType: votesType[_id],
-      commentCount: order,
+      commentCount: comment,
       repostCount: repost,
       source: 'moment',
       files: filesData,
@@ -1216,6 +1318,101 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
   return results;
 };
 
+schema.statics.extendLatestChildCommentsData = async (comments) => {
+  const MomentModel = mongoose.model('moments');
+
+}
+
+schema.statics.extendCommentsDataCommentsData = async function(commentsData, uid) {
+  const MomentModel = mongoose.model('moments');
+  const momentStatus = await MomentModel.getMomentStatus();
+  const latestId = [];
+  for(const commentData of commentsData) {
+    const {latest} = commentData;
+    latestId.push(...latest.slice(0, 2));
+  }
+  const latestComments = await MomentModel.find({
+    _id: {
+      $in: latestId,
+    },
+    $or: [
+      {
+        status: momentStatus.normal
+      },
+      {
+        uid,
+        status: {
+          $in: [
+            momentStatus.normal,
+            momentStatus.faulty,
+            momentStatus.unknown,
+          ]
+        }
+      }
+    ]
+  });
+  const latestCommentsDataObj = {};
+  let latestCommentsData = await MomentModel.extendCommentsData(latestComments, uid);
+  latestCommentsData = await MomentModel.extendCommentsDataParentData(latestCommentsData, uid);
+  for(const latestCommentData of latestCommentsData) {
+    latestCommentsDataObj[latestCommentData._id] = latestCommentData;
+  }
+  for(const commentData of commentsData) {
+    const {latest} = commentData;
+    const targetId = [...latest.slice(0, 2)];
+    const comments = [];
+    for(const id of targetId) {
+      const comment = latestCommentsDataObj[id];
+      if(!comment) continue;
+      comments.push(comment);
+    }
+    commentData.commentsData = comments;
+  }
+  return commentsData;
+}
+
+schema.statics.extendCommentsDataParentData = async function(commentsData, uid) {
+  const MomentModel = mongoose.model('moments');
+  const momentStatus = await MomentModel.getMomentStatus();
+  const parentsId = [];
+  for(const commentData of commentsData) {
+    const {parentId} = commentData;
+    parentsId.push(parentId);
+  }
+  const parentComments = await MomentModel.find({
+    _id: {
+      $in: parentsId,
+    },
+    $or: [
+      {
+        status: momentStatus.normal
+      },
+      {
+        uid,
+        status: {
+          $in: [
+            momentStatus.normal,
+            momentStatus.faulty,
+            momentStatus.unknown,
+          ]
+        }
+      }
+    ]
+  });
+  const parentCommentsDataObj = {};
+  const parentCommentsData = await MomentModel.extendCommentsData(parentComments, uid);
+  for(const parentCommentData of parentCommentsData) {
+    parentCommentsDataObj[parentCommentData._id] = parentCommentData;
+  }
+  for(const commentData of commentsData) {
+    const {parentId} = commentData;
+    const comment = parentCommentsDataObj[parentId];
+    if(!comment) continue;
+    commentData.parentData = comment;
+  }
+  return commentsData;
+}
+
 /*
 * @param {[schema moment]} comments 动态评论对象组成的数组
 * @param {String} uid 访问者
@@ -1231,6 +1428,10 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
 *   @param {Number} order 评论所在楼层
 *   @param {Number} voteUp 评论点赞数
 *   @param {String} content 评论内容，富文本
+*
+*   @param {String} parentUid
+*   @param {String} parentUsername
+*   @param {String} parentUserHome
 * */
 schema.statics.extendCommentsData = async function (comments, uid) {
   const DocumentModel = mongoose.model('documents');
@@ -1238,14 +1439,19 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const UserModel = mongoose.model('users');
   const PostsVoteModel = mongoose.model('postsVotes');
   const ReviewModel = mongoose.model('reviews');
+  const momentStatus = await MomentModel.getMomentStatus();
   const {getUrl, timeFormat} = require('../nkcModules/tools');
   const usersId = [];
   const commentsId = [];
+  // 拓展回复的上级评论
+
   for(const comment of comments) {
     const {uid, _id} = comment;
     usersId.push(uid);
     commentsId.push(_id);
   }
+
+
   const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const stableDocuments = await DocumentModel.getStableDocumentsBySource(momentSource, commentsId, 'object');
@@ -1257,23 +1463,32 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     uid
   );
   const commentsData = [];
+
+
   for(const comment of comments) {
     const {
       uid,
       _id,
       order,
+      comment: commentCount,
       top,
       parent,
+      parents,
       voteUp,
       status,
-      did
+      did,
+      latest = []
     } = comment;
     const user = usersObj[uid];
     if(!user) continue;
     const stableDocument = stableDocuments[_id];
     if(!stableDocument) continue;
+
     const data = {
-      momentId: parent,
+      _id,
+      momentId: parents[0],
+      parentsId: parents,
+      parentId: parent,
       docId: stableDocument._id,
       momentCommentId: _id,
       uid: user.uid,
@@ -1287,6 +1502,10 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       userHome: getUrl('userHome', user.uid),
       time: timeFormat(top),
       toc: top,
+      commentCount,
+      latest,
+      commentsData: [],
+      parentData: null,
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if(status === unknown) {
@@ -1311,9 +1530,15 @@ schema.statics.getPageByOrder = async (order) => {
 * 获取评论所在页数
 * @param {String} MomentCommentId 动态评论ID
 * */
-schema.statics.getPageByMomentCommentId = async (momentCommentId) => {
+schema.statics.getPageByMomentCommentId = async (parentId, momentCommentId) => {
   const MomentModel = mongoose.model('moments');
   const moment = await MomentModel.findOnly({_id: momentCommentId}, {_id: 1, order: 1});
+  // 一级评论
+  if(moment.parents.length > 1) {
+    if(moment.parents[1] !== parentId) return -1;
+  } else {
+    if(moment.parent !== parentId) return -1;
+  }
   return MomentModel.getPageByOrder(moment.order);
 }
 
