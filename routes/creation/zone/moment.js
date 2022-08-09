@@ -135,7 +135,7 @@ router
       });
       if(type === 'publish' || type === 'forward') {
         await momentComment.publishMomentComment(postType, alsoPost);
-        data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
+        // data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
       }
       data.momentCommentId = momentComment._id;
     }

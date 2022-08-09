@@ -73,6 +73,7 @@
             @post-comment="onPostComment"
             :focus="focus"
             :permissions="permissions"
+            :mode="mode"
             )
 </template>
 
@@ -332,7 +333,7 @@
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
     * prop {String} focus 高亮的评论ID
     * */
-    props: ['data', 'focus', 'permissions'],
+    props: ['data', 'focus', 'permissions', 'mode'],
     data: () => ({
       logged: !!state.uid,
       momentData: null,

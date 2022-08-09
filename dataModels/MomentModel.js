@@ -22,7 +22,15 @@ const momentQuoteTypes = {
   comment: 'comment',
 };
 
-const momentCommentPerPage = 10;
+const momentCommentModes = {
+  simple: 'simple',
+  complete: 'complete',
+};
+
+const momentCommentPerPage = {
+  simple: 10,
+  complete: 50,
+};
 
 const schema = new mongoose.Schema({
   _id: String,
@@ -152,9 +160,13 @@ schema.statics.getMomentQuoteTypes = async () => {
 * 获取动态评论每页条数
 * @return {Number}
 * */
-schema.statics.getMomentCommentPerPage = async () => {
-  return momentCommentPerPage;
+schema.statics.getMomentCommentPerPage = async (mode = 'simple') => {
+  return momentCommentPerPage[mode];
 };
+
+schema.statics.getMomentCommentModes = async () => {
+  return momentCommentModes;
+}
 
 /*
 * 检测引用类型是否合法
@@ -1318,23 +1330,22 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
   return results;
 };
 
-schema.statics.extendLatestChildCommentsData = async (comments) => {
-  const MomentModel = mongoose.model('moments');
 
-}
-
-schema.statics.extendCommentsDataCommentsData = async function(commentsData, uid) {
+schema.statics.extendCommentsDataCommentsData = async function(commentsData, uid, mode = momentCommentModes.simple) {
   const MomentModel = mongoose.model('moments');
   const momentStatus = await MomentModel.getMomentStatus();
+  const momentCommentModes = await MomentModel.getMomentCommentModes();
   const latestId = [];
   for(const commentData of commentsData) {
-    const {latest} = commentData;
-    latestId.push(...latest.slice(0, 2));
+    const {latest, _id} = commentData;
+    if(mode === momentCommentModes.simple) {
+      latestId.push(...latest.slice(0, 2));
+    } else {
+      latestId.push(_id);
+    }
   }
-  const latestComments = await MomentModel.find({
-    _id: {
-      $in: latestId,
-    },
+
+  const match = {
     $or: [
       {
         status: momentStatus.normal
@@ -1350,23 +1361,32 @@ schema.statics.extendCommentsDataCommentsData = async function(commentsData, uid
         }
       }
     ]
-  });
+  };
+
+  if(mode === momentCommentModes.simple) {
+    match._id = {
+      $in: latestId
+    };
+  } else {
+    match.parents = {
+      $in: latestId
+    }
+  }
+
+  const latestComments = await MomentModel.find(match);
   const latestCommentsDataObj = {};
   let latestCommentsData = await MomentModel.extendCommentsData(latestComments, uid);
   latestCommentsData = await MomentModel.extendCommentsDataParentData(latestCommentsData, uid);
   for(const latestCommentData of latestCommentsData) {
-    latestCommentsDataObj[latestCommentData._id] = latestCommentData;
+    const {parentsId} = latestCommentData;
+    for(const parentId of parentsId) {
+      if(!latestCommentsDataObj[parentId]) latestCommentsDataObj[parentId] = [];
+      latestCommentsDataObj[parentId].push(latestCommentData);
+    }
   }
   for(const commentData of commentsData) {
-    const {latest} = commentData;
-    const targetId = [...latest.slice(0, 2)];
-    const comments = [];
-    for(const id of targetId) {
-      const comment = latestCommentsDataObj[id];
-      if(!comment) continue;
-      comments.push(comment);
-    }
-    commentData.commentsData = comments;
+    const {_id} = commentData;
+    commentData.commentsData = latestCommentsDataObj[_id] || [];
   }
   return commentsData;
 }
@@ -1522,24 +1542,29 @@ schema.statics.extendCommentsData = async function (comments, uid) {
 * @param {Number} order 楼层
 * @return {Number}
 * */
-schema.statics.getPageByOrder = async (order) => {
-  return Math.ceil(order / momentCommentPerPage) - 1;
+schema.statics.getPageByOrder = async (mode, order) => {
+  const MomentModel = mongoose.model('moments');
+  const perPage = await MomentModel.getMomentCommentPerPage(mode);
+  return Math.ceil(order / perPage) - 1;
 }
 
 /*
 * 获取评论所在页数
 * @param {String} MomentCommentId 动态评论ID
 * */
-schema.statics.getPageByMomentCommentId = async (parentId, momentCommentId) => {
+schema.statics.getPageByMomentCommentId = async (mode, momentCommentId) => {
   const MomentModel = mongoose.model('moments');
-  const moment = await MomentModel.findOnly({_id: momentCommentId}, {_id: 1, order: 1});
-  // 一级评论
-  if(moment.parents.length > 1) {
-    if(moment.parents[1] !== parentId) return -1;
+  const comment = await MomentModel.findOne({_id: momentCommentId}, {order: 1, parents: 1});
+  let order;
+  if(comment.parents.length === 1) {
+    // 一级评论
+    order = comment.order;
   } else {
-    if(moment.parent !== parentId) return -1;
+    // 多级评论
+    const parentComment = await MomentModel.findOne({_id: comment.parents[1]}, {order: 1});
+    order = parentComment.order;
   }
-  return MomentModel.getPageByOrder(moment.order);
+  return MomentModel.getPageByOrder(mode, order);
 }
 
 /*

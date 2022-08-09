@@ -1,7 +1,7 @@
 <template lang="pug">
   div(:data-id="commentData._id")
     .moment-comment-item(
-      :class=`{'active': !!focus, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted'}`
+      :class=`{'active': focus === commentData._id, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted', 'disable-hover': replyEditorStatus}`
     )
       moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
       .moment-comment-item-header
@@ -31,7 +31,7 @@
           from-now(:time="commentData.toc")
 
         .moment-comment-options
-          .moment-comment-option(title="回复" @click="replyComment(commentData)" v-if="type === 'comment'")
+          .moment-comment-option(title="回复" @click="switchEditor" v-if="type === 'comment'")
             .fa.fa-comment-o
           .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
             .fa.fa-thumbs-o-up
@@ -45,17 +45,32 @@
             )
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
+      .moment-comment-reply-editor(v-if="replyEditorStatus")
+        textarea-editor(
+          ref="replyEditor"
+          :placeholder="editorPlaceholder"
+          max-height="20rem"
+          height="2rem"
+          @content-change="onReplyEditorContentChange"
+          @click-ctrl-enter="submitReplyContent"
+        )
+        .text-right
+          button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
+          button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 提交
+          button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled) 提交中
+          button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 提交
+
     .moment-comment-comments(v-if="commentData.commentsData && commentData.commentsData.length > 0")
       moment-comment(
         v-for="_comment in commentData.commentsData"
         :comment="_comment"
-        :focus="false"
+        :focus="focus"
         :type="type"
         :permissions="permissions"
         :key="_comment._id"
-        @to-reply-comment="replyComment"
+        @on-reply-comment="onReplyComment"
       )
-      .more-comment(v-if="commentData.commentCount > 2" @click="visitCommentChild") 共 {{commentData.commentCount}} 条回复
+      .more-comment(v-if="mode === 'simple' && commentData.commentCount > 2" @click="visitCommentChild") 共 {{commentData.commentCount}} 条回复
 </template>
 
 <script>
@@ -68,6 +83,8 @@ import {visitUrl} from "../../js/pageSwitch";
 import {sweetError} from "../../js/sweetAlert";
 import {getState} from "../../js/state";
 import {objToStr} from "../../js/tools";
+import TextareaEditor from '../../vue/TextareaEditor';
+import {nkcAPI} from "../../js/netAPI";
 const state = getState();
 export default {
   name: 'moment-comment',
@@ -81,37 +98,82 @@ export default {
       required: true
     },
     focus: {
-      type: Boolean,
-      default: false
+      type: String,
+      default: ''
     },
     type: {
       type: String,
       required: true
+    },
+    mode: {
+      type: String,
+      default: 'simple'
     }
   },
   components: {
     'moment-status': MomentStatus,
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
+    'textarea-editor': TextareaEditor,
   },
   data: () => ({
     logged: !!state.uid,
+    replyEditorStatus: false,
+    replyContent: '',
+    submitting: false,
   }),
   computed: {
     commentData() {
       return this.comment;
+    },
+    editorPlaceholder() {
+      return `回复 ${this.commentData.username}`
     }
   },
   methods: {
     objToStr,
     visitUrl,
+    onReplyEditorContentChange(content) {
+      this.replyContent = content;
+    },
+    submitReplyContent() {
+      const {replyContent, commentData} = this;
+      const self = this;
+      return Promise.resolve()
+        .then(() => {
+          if(!replyContent) throw new Error('请输入评论内容');
+          return nkcAPI(`/creation/zone/moment/${commentData._id}/comment`, 'POST', {
+            content: replyContent
+          });
+        })
+        .then((res) => {
+          self.hideReplyEditor();
+          self.clearReplyContent();
+          self.onReplyComment(res.commentId);
+          sweetSuccess('提交成功');
+        })
+        .catch(sweetError)
+
+    },
+    onReplyComment(commentId) {
+      this.$emit('on-reply-comment', commentId);
+    },
+    clearReplyContent() {
+      this.replyContent = '';
+    },
+    hideReplyEditor() {
+      this.replyEditorStatus = false;
+    },
+    showReplyEditor() {
+      this.replyEditorStatus = true;
+    },
+    switchEditor() {
+      if(!this.logged) return toLogin();
+      this.replyEditorStatus = !this.replyEditorStatus;
+    },
     //投诉或举报
     complaint(mid) {
       this.$emit('complaint', mid);
-    },
-    replyComment(comment) {
-      if(!this.logged) return toLogin();
-      this.$emit('to-reply-comment', comment);
     },
     vote(commentData) {
       if(!this.logged) return toLogin();
@@ -134,7 +196,8 @@ export default {
       e.stopPropagation();
     },
     visitCommentChild() {
-      this.$emit('visit-comment-child', this.commentData);
+      // this.$emit('visit-comment-child', this.commentData);
+      visitUrl(`/zone/m/${this.commentData._id}`, true);
     }
   }
 }
@@ -146,6 +209,9 @@ export default {
 .moment-comment-item{
   &:hover{
     background-color: #f4f4f4;
+  }
+  &.disable-hover:hover{
+    background-color: inherit;
   }
   &.active{
     background-color: #ffebcf;
@@ -224,6 +290,9 @@ export default {
       color: @primary;
     }
   }
+}
+.moment-comment-reply-editor{
+  margin-top: 0.5rem;
 }
 .moment-comment-comments{
   padding-left: 2rem;
