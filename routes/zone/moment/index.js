@@ -14,17 +14,13 @@ router
     const {permission, data, state, internalData, db} = ctx;
     const {moment} = internalData;
     let targetMoment;
-    let commentId;
-    let parentCommentId;
+    let focusCommentId;
     if(moment.parents.length > 0) {
       targetMoment = await db.MomentModel.findOnly({_id: moment.parents[0]});
-      commentId = moment._id;
-      if(moment.parents.length > 1) {
-        parentCommentId = moment.parents[1];
-      }
+      focusCommentId = moment._id;
     } else {
       targetMoment = moment;
-      commentId = '';
+      focusCommentId = '';
     }
     const [momentListData] = await db.MomentModel.extendMomentsListData([targetMoment], state.uid);
     if(!momentListData) {
@@ -33,8 +29,7 @@ router
     data.permissions = {
       reviewed: state.uid && (permission('movePostsToRecycle') || permission('movePostsToDraft')),
     };
-    data.parentCommentId = parentCommentId;
-    data.commentId = commentId;
+    data.focusCommentId = focusCommentId;
     data.momentListData = momentListData;
     ctx.remoteTemplate = 'zone/moment/moment.pug';
     await next();

@@ -131,6 +131,9 @@
       },
       onContentChange: function() {
         this.$emit('content-change', this.content);
+      },
+      focus() {
+        this.$refs.textarea.focus();
       }
     }
   }

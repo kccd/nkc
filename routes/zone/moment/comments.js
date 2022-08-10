@@ -5,15 +5,16 @@ router
     const {db, data, internalData, query, nkcModules, state, permission} = ctx;
     const {moment} = internalData;
     const {user} = data;
+    const momentCommentModes = await db.MomentModel.getMomentCommentModes();
     let {
       sort = 'time',
       page = 0,
       focus = '', // 需要高亮的评论ID，可为空字符串
+      mode = momentCommentModes.simple,
     } = query;
 
     if(focus) {
-      const _page = await db.MomentModel.getPageByMomentCommentId(moment._id, focus);
-      if(_page !== -1) page = _page;
+      page = await db.MomentModel.getPageByMomentCommentId(mode, focus);
     }
     const {
       normal: normalStatus,
@@ -45,12 +46,12 @@ router
     }
     const sortObj = sort === 'hot'? {voteUp: -1, top: 1}: {top: 1};
     const count = await db.MomentModel.countDocuments(match);
-    const perPage = await db.MomentModel.getMomentCommentPerPage();
+    const perPage = await db.MomentModel.getMomentCommentPerPage(mode);
     const paging = nkcModules.apiFunction.paging(page, count, perPage);
     const comments = await db.MomentModel.find(match)
       .sort(sortObj).skip(paging.start).limit(paging.perpage);
     let commentsData = await db.MomentModel.extendCommentsData(comments, state.uid);
-    commentsData = await db.MomentModel.extendCommentsDataCommentsData(commentsData, state.uid);
+    commentsData = await db.MomentModel.extendCommentsDataCommentsData(commentsData, state.uid, mode);
     data.commentsData = commentsData;
     data.paging = paging;
     await next();

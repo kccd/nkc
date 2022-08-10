@@ -23,10 +23,11 @@
           :key="commentData._id"
           :comment="commentData"
           :type="postType"
-          :focus="focusCommentsId.includes(commentData.momentCommentId)"
+          :focus="focusCommentId"
           :permissions="permissions"
-          @to-reply-comment="replyComment"
           @visit-comment-child="visitCommentChild"
+          @on-reply-comment="onReplyComment"
+          :mode="mode"
         )
       paging(:pages="pageButtons" @click-button="clickPageButton")
 </template>
@@ -65,7 +66,7 @@
 <script>
   import {sweetError} from "../../js/sweetAlert";
   import {momentVote} from "../../js/zone/vote";
-  import {visitUrl} from "../../js/pageSwitch";
+  import {scrollPageToElement, visitUrl} from "../../js/pageSwitch";
   import {objToStr} from "../../js/tools";
   import Paging from '../Paging';
   import FromNow from '../FromNow';
@@ -79,7 +80,8 @@
   const {uid} = getState();
 
   export default {
-    props: ['mid', 'type', 'focus', 'permissions'],
+    // mode: simple, complete,
+    props: ['mid', 'type', 'focus', 'permissions', 'mode'],
     components: {
       'paging': Paging,
       'from-now': FromNow,
@@ -96,8 +98,8 @@
       paging: null,
       sort: 'time',
       loading: true,
-      focusedComment: false,
       focusCommentId: '',
+      loadFocusComment: false,
       nav: [
         {
           type: 'time',
@@ -107,18 +109,17 @@
           type: 'hot',
           name: '按热度',
         }
-      ]
+      ],
+      timer: null,
+      timerCounter: 0,
     }),
+    mounted() {
+      this.setFocusCommentId(this.focus);
+      this.setTimerToScrollPage();
+    },
     computed: {
-      focusCommentsId() {
-        const arr = [];
-        if(this.focus) {
-          arr.push(this.focus);
-        }
-        if(this.focusCommentId) {
-          arr.push(this.focusCommentId);
-        }
-        return arr;
+      listMode() {
+        return this.mode || 'simple'
       },
       postType() {
         return this.type;
@@ -138,17 +139,46 @@
         }
       }
     },
+    destroyed() {
+      this.clearTimer();
+    },
     methods: {
       visitUrl,
       objToStr: objToStr,
+      clearTimer() {
+        clearTimeout(this.timer);
+      },
+      setFocusCommentId(commentId) {
+        this.loadFocusComment = false;
+        this.focusCommentId = commentId;
+      },
+      setTimerToScrollPage() {
+        const self = this;
+        const {focusCommentId, timerCounter} = this;
+        if(!focusCommentId || timerCounter >= 5) {
+          return this.timerCounter = 0;
+        }
+        this.clearTimer();
+        this.timer = setTimeout(() => {
+          const element = $(`[data-id="${focusCommentId}"]`);
+          if(element.length) {
+            this.timerCounter = 0;
+            scrollPageToElement(element);
+          } else {
+            this.timerCounter ++;
+            self.setTimerToScrollPage();
+          }
+        }, 1000);
+
+      },
       init() {
         this.setActiveNav(this.nav[0].type);
-        /*if(this.postType === 'comment') {
-          this.setActiveNav(this.nav[0].type);
-        }*/
+      },
+      setSort(type) {
+        this.sort = type;
       },
       setActiveNav(type) {
-        this.sort = type;
+        this.setSort(type);
         this.getList();
       },
       getComments(page = 0) {
@@ -157,23 +187,22 @@
           postType,
           momentId,
           focusCommentId,
-          focusedComment
+          loadFocusComment,
+          listMode,
         } = this;
         if(postType !== 'comment') return;
         let focus = '';
-        if(!focusedComment) {
-          this.focusedComment = true;
-          if(focusCommentId) {
-            this.setActiveNav(this.nav[1].type);
-            focus = focusCommentId;
-          }
+        if(focusCommentId && !loadFocusComment) {
+          this.setSort(this.nav[0].type);
+          focus = focusCommentId;
         }
-        const url = `/zone/m/${momentId}/comments?sort=${this.sort}&page=${page}&focus=${focus}`;
+        const url = `/zone/m/${momentId}/comments?sort=${this.sort}&page=${page}&focus=${focus}&mode=${listMode}`;
         nkcAPI(url, 'GET')
           .then(res => {
             self.commentsData = res.commentsData;
             self.paging = res.paging;
             self.loading = false;
+            self.loadFocusComment = true;
           })
           .catch(sweetError)
       },
@@ -203,12 +232,13 @@
         this.getList(page);
       },
       onPublished(res) {
-        const {momentCommentPage, momentCommentId} = res;
+        const {momentCommentId} = res;
         const {postType} = this;
         if(postType === 'comment') {
-          this.getList(momentCommentPage);
-          this.focusCommentId = momentCommentId;
+          this.setFocusCommentId(momentCommentId);
+          this.setActiveNav(this.nav[0].type);
           this.$emit('post-comment');
+          this.setTimerToScrollPage();
         } else {
           visitUrl(`/g/moment`);
         }
@@ -248,6 +278,11 @@
           commentId: comment.parentsId[1] || comment._id,
           replyCommentId: comment._id,
         });
+      },
+      onReplyComment(commentId) {
+        this.setFocusCommentId(commentId);
+        this.setActiveNav(this.nav[0].type);
+        this.setTimerToScrollPage();
       }
     },
   }

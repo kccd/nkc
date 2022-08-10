@@ -23,8 +23,9 @@ block content
               @open-option="openOption"
               @option-comment-option="openOption"
               :permissions="permissions"
+              mode='complete'
               )
-  .hidden#data=objToStr({momentListData: data.momentListData, commentId: data.commentId, permissions: data.permissions, parentCommentId: data.parentCommentId})
+  .hidden#data=objToStr({momentListData: data.momentListData, focusCommentId: data.focusCommentId, permissions: data.permissions})
 block scripts
   include ../../publicModules/moment/momentSource
   +includeJS('/zone/moment/moment.js')

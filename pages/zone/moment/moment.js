@@ -16,10 +16,10 @@ const app = new Vue({
     'moment-comment-child': MomentCommentChild,
   },
   data: {
-    focusCommentId: data.commentId,
+    focusCommentId: data.focusCommentId,
     momentListData: data.momentListData,
     permissions: data.permissions,
-    parentCommentId: data.parentCommentId,
+
   },
   mounted() {
     const self = this;
@@ -28,13 +28,9 @@ const app = new Vue({
     EventBus.$on('violation-record', function (uid) {
       self.$refs.violationRecord.open({uid});
     });
-
-    if(this.parentCommentId) {
-      this.showCommentChild();
-    }
-
   },
   methods: {
+
     showCommentPanel() {
       this.$refs.moment.showCommentPanel();
     },
@@ -54,3 +50,4 @@ const app = new Vue({
     }
   }
 });
+
