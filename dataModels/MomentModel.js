@@ -125,8 +125,13 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // 评论数
+  // 评论数 仅包含下一级
   comment: {
+    type: Number,
+    default: 0,
+  },
+  // 所有评论数 包含所有子级
+  commentAll: {
     type: Number,
     default: 0,
   },
@@ -711,14 +716,30 @@ schema.methods.updateMomentCommentOrder = async function() {
   const {parent, parents} = this;
   if(!parent) return;
   const targetId = parents.length >= 2? parents[1]: parent;
+  const momentId = parents[0];
   const key = getRedisKeys('momentOrder', parent);
   const lock = await redLock.lock(key, 6000);
   try {
-    const moment = await MomentModel.findOneAndUpdate({_id: targetId}, {
-      $inc: {
-        comment: 1
-      }
-    });
+    let moment;
+    if(momentId === targetId) {
+      moment = await MomentModel.findOneAndUpdate({_id: targetId}, {
+        $inc: {
+          comment: 1,
+          commentAll: 1,
+        }
+      });
+    } else {
+      moment = await MomentModel.findOneAndUpdate({_id: targetId}, {
+        $inc: {
+          comment: 1,
+        }
+      });
+      await MomentModel.updateOne({_id: momentId}, {
+        $inc: {
+          commentAll: 1,
+        }
+      });
+    }
     this.order = moment.comment + 1;
     await this.updateOne({
       $set: {
@@ -1148,6 +1169,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       voteUp,
       order,
       comment,
+      commentAll,
       repost,
       quoteType,
       status,
@@ -1239,7 +1261,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       status,
       statusInfo: '',
       voteType: votesType[_id],
-      commentCount: comment,
+      commentCount: commentAll,
       repostCount: repost,
       source: 'moment',
       files: filesData,

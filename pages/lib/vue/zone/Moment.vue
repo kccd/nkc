@@ -341,7 +341,8 @@
       panelTypes: {
         comment: 'comment',
         repost: 'repost'
-      }
+      },
+      timer: null,
     }),
     mounted() {
       this.initData();
@@ -351,9 +352,15 @@
         return this.focus;
       }
     },
+    destroyed() {
+      this.clearTimer();
+    },
     methods: {
       objToStr: objToStr,
       visitUrl,
+      clearTimer() {
+        clearTimeout(this.timer);
+      },
       initData() {
         const {data} = this;
         this.momentData = JSON.parse(JSON.stringify(data));
@@ -378,18 +385,18 @@
         } else {
           this.showPanelType = type;
         }
-
-        setTimeout(() => {
-          if(this.$refs.momentComments) {
-            this.$refs.momentComments.init();
+        this.setTimerToInitComments();
+      },
+      setTimerToInitComments() {
+        const self = this;
+        self.clearTimer();
+        this.timer = setTimeout(() => {
+          if(self.$refs.momentComments) {
+            self.$refs.momentComments.init();
+          } else {
+            self.setTimerToInitComments();
           }
-        })
-
-        /*if(this.showPanelType === this.panelTypes.comment) {
-          setTimeout(() => {
-            this.$refs.momentComments.init();
-          })
-        }*/
+        }, 200);
       },
       showCommentPanel() {
         this.showPanel(this.panelTypes.comment);

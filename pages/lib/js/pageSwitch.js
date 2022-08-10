@@ -27,11 +27,11 @@ export function setPageTitle(title) {
   RNSetPageTitle(title);
 }
 
-export function scrollPageToElementById(id, offset = 100) {
+export function scrollPageToElementById(id, offset = $(window).height() / 2 - 100) {
   scrollPageToElement($(`#${id}`), offset);
 }
 
-export function scrollPageToElement(jqElement, offset = 100) {
+export function scrollPageToElement(jqElement, offset = $(window).height() / 2 - 100) {
   $('body, html').animate({
     scrollTop: jqElement.offset().top - offset
   });

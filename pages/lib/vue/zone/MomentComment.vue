@@ -54,10 +54,11 @@
           @content-change="onReplyEditorContentChange"
           @click-ctrl-enter="submitReplyContent"
         )
-        .text-right
+        .submit-button-container.text-right
           button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
           button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 提交
-          button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled) 提交中
+          button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled)
+            .fa.fa-spinner.fa-spin
           button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 提交
 
     .moment-comment-comments(v-if="commentData.commentsData && commentData.commentsData.length > 0")
@@ -69,6 +70,7 @@
         :permissions="permissions"
         :key="_comment._id"
         @on-reply-comment="onReplyComment"
+        :mode="mode"
       )
       .more-comment(v-if="mode === 'simple' && commentData.commentCount > 2" @click="visitCommentChild") 共 {{commentData.commentCount}} 条回复
 </template>
@@ -142,6 +144,7 @@ export default {
       return Promise.resolve()
         .then(() => {
           if(!replyContent) throw new Error('请输入评论内容');
+          self.submitting = true;
           return nkcAPI(`/creation/zone/moment/${commentData._id}/comment`, 'POST', {
             content: replyContent
           });
@@ -150,9 +153,14 @@ export default {
           self.hideReplyEditor();
           self.clearReplyContent();
           self.onReplyComment(res.commentId);
-          sweetSuccess('提交成功');
+          if(self.mode === 'simple') {
+            sweetSuccess('提交成功');
+          }
         })
         .catch(sweetError)
+        .then(() => {
+          self.submitting = false;
+        });
 
     },
     onReplyComment(commentId) {
@@ -166,10 +174,18 @@ export default {
     },
     showReplyEditor() {
       this.replyEditorStatus = true;
+      Vue.nextTick(() => {
+        this.$refs.replyEditor.focus();
+      });
+
     },
     switchEditor() {
       if(!this.logged) return toLogin();
-      this.replyEditorStatus = !this.replyEditorStatus;
+      if(this.replyEditorStatus) {
+        this.hideReplyEditor();
+      } else {
+        this.showReplyEditor();
+      }
     },
     //投诉或举报
     complaint(mid) {
@@ -314,6 +330,11 @@ export default {
     &:hover{
       opacity: 0.7;
     }
+  }
+}
+.submit-button-container{
+  button{
+    width: 4rem;
   }
 }
 </style>

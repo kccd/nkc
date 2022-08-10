@@ -111,6 +111,7 @@
         }
       ],
       timer: null,
+      timerCounter: 0,
     }),
     mounted() {
       this.setFocusCommentId(this.focus);
@@ -138,23 +139,33 @@
         }
       }
     },
+    destroyed() {
+      this.clearTimer();
+    },
     methods: {
       visitUrl,
       objToStr: objToStr,
+      clearTimer() {
+        clearTimeout(this.timer);
+      },
       setFocusCommentId(commentId) {
         this.loadFocusComment = false;
         this.focusCommentId = commentId;
       },
       setTimerToScrollPage() {
         const self = this;
-        const {focusCommentId} = this;
-        if(!focusCommentId) return;
-        clearTimeout(this.timer);
+        const {focusCommentId, timerCounter} = this;
+        if(!focusCommentId || timerCounter >= 5) {
+          return this.timerCounter = 0;
+        }
+        this.clearTimer();
         this.timer = setTimeout(() => {
           const element = $(`[data-id="${focusCommentId}"]`);
           if(element.length) {
+            this.timerCounter = 0;
             scrollPageToElement(element);
           } else {
+            this.timerCounter ++;
             self.setTimerToScrollPage();
           }
         }, 1000);
