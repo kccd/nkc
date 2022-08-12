@@ -1037,7 +1037,7 @@ export default {
     },
     readyPaste: function() {
       var self = this;
-      var dom = $(this.$refs.pasteContent);
+      var dom = $(window);
       dom.off("paste");
       dom.one("paste", function(e) {
         var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
