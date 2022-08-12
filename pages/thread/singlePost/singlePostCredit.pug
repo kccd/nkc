@@ -17,9 +17,9 @@ if !isIncluded('singlePostCredit')
               span=username
             .time=format(`YYYY-MM-DD`, toc)
             .description=description
-            if type === 'xsf' && data.permissions.cancelXsf
+            if type === 'xsf' && data && data.permissions && data.permissions.cancelXsf
               a(onclick=`cancelXsf("${pid}", ${_id})`) 撤销
-            if type === 'kcb' && data.permissions.modifyKcbRecordReason
+            if type === 'kcb' && data && data.permissions && data.permissions.modifyKcbRecordReason
               if !hide
                 a(onclick=`hideKcbRecordReason("${pid}", ${_id}, true)`) 屏蔽
               else
