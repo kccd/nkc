@@ -64,6 +64,7 @@ block eContent
                 h5 身份证背面
                 a.verify2__img(href=srcB target='_blank')
                   img(:src="IDCardB" style='max-width: 100%;').center-block
+
               if (data.verifiedAState === 'inProcess' && data.verifiedBState === 'inProcess')
                 .col-xs-12.col-md-12.text-center
                   span 图片处理中，请稍后再试
@@ -77,7 +78,7 @@ block eContent
                   div
                     span 身份证正面错误信息：
                     span=data.cardBErrorInfo
-              else
+              if 1
                 .col-xs-12.col-md-12.text-center(v-if="authenticate.card.status === 'in_review'")
                   br
                   br
@@ -130,7 +131,17 @@ block eContent
                 .idcard-video
                   if(data.verifiedVideoState === 'usable')
                     video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")
-              if(data.verifiedVideoState === 'usable')
+              if (data.verifiedVideoState === 'inProcess')
+                .col-xs-12.col-md-12.text-center
+                  span 视频处理中，请稍后再试
+              else if (data.verifiedVideoState === 'useless')
+                .col-xs-12.col-md-12.text-center
+                  div
+                    span 视频处理失败
+                  div
+                    span 错误信息：
+                    span=data.videoErrorInfo
+              if(1 || data.verifiedVideoState === 'usable')
                 .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
                   br
                   br
@@ -161,16 +172,5 @@ block eContent
                 .col-xs-12.col-md-12.text-center(v-if="authenticate.video.status === 'in_review'")
                   br
                   button.btn.btn-primary(@click="verify3Submit()") 提交
-              else if (data.verifiedVideoState === 'inProcess')
-                .col-xs-12.col-md-12.text-center
-                  span 视频处理中，请稍后再试
-              else if (data.verifiedVideoState === 'useless')
-                .col-xs-12.col-md-12.text-center
-                  div
-                    span 视频处理失败
-                  div
-                    span 错误信息：
-                    span=data.videoErrorInfo
-
 block scripts
   +includeJS("/experimental/auth/[uid]/index.js")

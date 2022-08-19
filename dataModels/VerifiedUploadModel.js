@@ -215,7 +215,7 @@ schema.statics.updateVerifiedUpdateState = async () => {
 * 修改身份认证文件处理状态
 * */
 schema.statics.updateVerifiedState = async (props) => {
-  const {vid, status, error, fileInfo = {}} = props;
+  const {vid, status, error, filesInfo = {}} = props;
   const VerifiedUploadModel = mongoose.model('verifiedUpload');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const verifiedUpload = await VerifiedUploadModel.findOne({_id: vid}).sort({toc: -1});
@@ -249,7 +249,7 @@ schema.statics.updateVerifiedState = async (props) => {
     $set: {
       errorInfo,
       state: verifiedUploadState,
-      files: fileInfo,
+      files: filesInfo,
     }
   });
 }
