@@ -2,9 +2,9 @@ const VerifiedUploadModel = require("../../../dataModels/VerifiedUploadModel");
 module.exports = {
   params: {
     vid: 'string',
-    status: 'string',
+    status: 'boolean',
     error:'string',
-    filesInfo: 'array'
+    filesInfo: 'object'
   },
   handler(ctx) {
     const {vid, status, error, filesInfo} = ctx.params;
