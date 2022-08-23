@@ -20,6 +20,7 @@ router
     }
     data.zoneTypes = zoneTypes;
     data.t = t;
+    data.pageTitle = `空间 - ${data.pageTitle}`;
     await next();
   })
   // 动态

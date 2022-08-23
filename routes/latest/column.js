@@ -12,6 +12,7 @@ router
     }
     data.columnTypes = columnTypes;
     data.t = t;
+    data.pageTitle = `专栏 - ${data.pageTitle}`;
     await next();
   })
   .get('/', async (ctx, next) => {
@@ -36,7 +37,7 @@ router
     const {thread: threadType, article: articleType} = await db.ColumnPostModel.getColumnPostTypes();
     const tidArr = [];
     const aidArr = [];
-    
+
     const pageSettings = await db.SettingModel.getSettings('page');
     //查找所有专栏引用
     const count = await db.ColumnPostModel.countDocuments().sort({toc: -1});
@@ -131,7 +132,7 @@ router
       return true;
     });
     columnThreads = await db.ThreadModel.extendArticlesPanelData(columnThreads);
-    
+
     const threadObj = {};
     for(const thread of columnThreads) {
       const columnPost = columnPostsObj[thread.oc];
@@ -139,7 +140,7 @@ router
         thread.content.url = nkcModules.tools.getUrl('columnThread', columnPost.columnId, columnPost._id);
         threadObj[columnPost.pid] = thread;
       }
-      
+
     }
     //查找最新专栏文章的独立文章
     let columnArticles = await db.ArticleModel.find(match);
