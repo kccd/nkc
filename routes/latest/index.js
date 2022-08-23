@@ -15,7 +15,7 @@ router
     }
 
     const serverSettings = await db.SettingModel.getSettings('server');
-    const pageTitle = `${serverSettings.websiteName} - ${serverSettings.brief}`;
+    const pageTitle = `${serverSettings.websiteName}`;
 
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
