@@ -12,6 +12,7 @@ class HtmlStore {
 
   saveData(data) {
     const newIndex = this.index + 1;
+    this.index = newIndex;
     this.content[newIndex] = data;
     return newIndex;
   }
