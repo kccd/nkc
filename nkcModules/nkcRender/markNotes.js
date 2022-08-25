@@ -2,6 +2,61 @@ const cheerio = require('cheerio');
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
 
+
+const dataStoreIndexKey = 'data-store-index';
+const dataStoreElement = 'data-store-element';
+
+class HtmlStore {
+  index = 0;
+  content = {};
+
+  saveData(data) {
+    const newIndex = this.index + 1;
+    this.content[newIndex] = data;
+    return newIndex;
+  }
+
+  getData(index) {
+    return this.content[index];
+  }
+}
+
+function hideJQElementHtml(JQElement, htmlStore) {
+  const html = JQElement.html();
+  const index = htmlStore.saveData(html);
+  JQElement.attr(dataStoreIndexKey, index);
+  JQElement.attr(dataStoreElement, 'true');
+  JQElement.html('');
+}
+
+function showJQElementHtml(JQElement, htmlStore) {
+  const storeIndex = JQElement.attr(dataStoreIndexKey);
+  const html = htmlStore.getData(storeIndex);
+  JQElement.html(html);
+  JQElement.removeAttr(dataStoreElement);
+  JQElement.removeAttr(dataStoreIndexKey);
+}
+
+function hideNKCSourceHtml(html, htmlStore) {
+  const $ = cheerio.load(html);
+  const elements = $(`[data-tag="nkcsource"]`);
+  for(let i = 0; i < elements.length; i++) {
+    const element = elements.eq(i);
+    hideJQElementHtml(element, htmlStore);
+  }
+  return $('body').html();
+}
+
+function showHiddenHtml(html, htmlStore) {
+  const $ = cheerio.load(html);
+  const elements = $(`[${dataStoreElement}="true"]`);
+  for(let i = 0; i < elements.length; i++) {
+    const element = elements.eq(i);
+    showJQElementHtml(element, htmlStore);
+  }
+  return $('body').html();
+}
+
 /**
  * 按顺序遍历文本节点,需传入handle
  * @param {Object} node - cheerio dom节点
@@ -29,7 +84,7 @@ function eachTextNode(node, handle, escape) {
 
 /**
  * 节点上是否有某个属性
- * @param {Object} $node - cheerio 被选择器包裹的dom节点 
+ * @param {Object} $node - cheerio 被选择器包裹的dom节点
  * @param {string} attrName  - 属性名
  */
 function hasAttr($node, attrName) {
@@ -55,16 +110,15 @@ function canvertFormulaExpression(html) {
   });
 }
 
-
 /**
  * 把数学公式临时标签换回字符串
- * @param {string} html 
+ * @param {string} html
  */
 function reduFormulaExpression(bodyNode) {
   const $ = cheerio.load(bodyNode);
   $("[this-is-formula]")
     .each((_, el) => {
-      let formula = $(el).attr("data");      
+      let formula = $(el).attr("data");
       $(el).replaceWith(formula);
     });
 }
@@ -90,7 +144,7 @@ function canvertEmojis(html) {
 
 /**
  * 把emoji临时标签换回字符串
- * @param {string} html 
+ * @param {string} html
  */
 function reduEmojis(bodyNode) {
   const $ = cheerio.load(bodyNode);
@@ -105,7 +159,7 @@ function reduEmojis(bodyNode) {
 
 /**
  * 此偏移量是否已经丢失
- * @param {number} offset - 偏移量 
+ * @param {number} offset - 偏移量
  * @description 丢失: 不为0且为假; 存在: 为一个数字;
  */
 function isLost(offset) {
@@ -164,6 +218,16 @@ function createNote(note) {
 function setMark(html, notes = []) {
   // console.log("income html: " + html);
   if(!notes.length) return html;
+
+  // 部分元素（例如 nkcsource）不参与划词笔记位置计算，
+  // 所以需要提前去掉这些元素的HTML内容，存入缓存，
+  // 待划词笔记位置计算完成后再复原
+
+  const htmlStore = new HtmlStore();
+
+  // 隐藏nkcSource中的html
+  html = hideNKCSourceHtml(html, htmlStore);
+
   // 处理数学公式
   html = canvertFormulaExpression(html);
   // 处理emoji
@@ -185,7 +249,7 @@ function setMark(html, notes = []) {
       map[endOffset] = [{ id: note._id, type: "end" }];
     }
   });
-  
+
   // 稍后需要替换的节点和新节点内容
   const replaceMap = new Map();
   // 用于文本处理过程中临时替换 < 和 > 的标识符
@@ -213,7 +277,7 @@ function setMark(html, notes = []) {
     let newNodeData = textFragment[0];
     willMark.forEach((offset, index) => {
       let tags = map[offset];
-      newNodeData += tags.map(tag => 
+      newNodeData += tags.map(tag =>
         `<em note-tag note-id='${tag.id}' tag-type='${tag.type}'></em>`
       ).join("");
       newNodeData += textFragment[index + 1];
@@ -239,6 +303,9 @@ function setMark(html, notes = []) {
     .replace(new RegExp(`\\-\\-\\[${signIndex}\\]`, "g"), "&amp;")
     .replace(new RegExp(`\\-\\-\\[${signIndex}`, "g"), "&lt;")
     .replace(new RegExp(`\\-\\-${signIndex}\\]`, "g"), "&gt;")
+
+  html = showHiddenHtml(html, htmlStore);
+
   html = htmlFilter(html);
   return html;
 }
@@ -261,7 +328,16 @@ exports.setMark = setMark;
  *    ...
  * ]
  */
+
 function getMark(html) {
+  // 部分元素（例如 nkcsource）不参与划词笔记位置计算，
+  // 所以需要提前去掉这些元素的HTML内容，存入缓存，
+  // 待划词笔记位置计算完成后再复原
+
+  const htmlStore = new HtmlStore();
+
+  // 隐藏nkcSource中的html
+  html = hideNKCSourceHtml(html, htmlStore);
   // 处理数学公式
   html = canvertFormulaExpression(html);
   // 处理emoji
@@ -316,7 +392,12 @@ function getMark(html) {
   reduFormulaExpression(body);
   // 还原emoji
   reduEmojis(body);
+
   html = $(body).html();
+
+  // 显示nkcSource中的html
+  html = showHiddenHtml(html, htmlStore);
+
   html = htmlFilter(html);
   return {
     html: html,
