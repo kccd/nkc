@@ -1,3 +1,5 @@
+import {getUrl} from "../../../lib/js/tools";
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -75,6 +77,7 @@ var app = new Vue({
     this.order = data.order;
   },
   methods: {
+    getUrl: getUrl,
     format: NKC.methods.format,
     clearInfo: function() {
       this.error = "";
@@ -180,7 +183,7 @@ var app = new Vue({
         if(!this.mobile) return this.error = "请输入收件人手机号";
         if(!this.address) return this.error = "请输入收件人地址";
       }
-      
+
       nkcAPI(url, method, {
         orderId: this.order.orderId,
         type: type,

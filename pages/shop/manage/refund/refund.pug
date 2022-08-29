@@ -4,7 +4,7 @@ block shopTitle
 block content
   .container-fluid.max-width
     .hidden#data= JSON.stringify({user: data.user, dealInfo: data.dealInfo, order: data.order, user: data.user, refund: data.refund, refunds: data.refunds, param: data.param})
-    .row#app(v-cloak)   
+    .row#app(v-cloak)
       div(v-if="order")
         .col-xs-12.col-md-12
           h4 退款说明
@@ -29,7 +29,7 @@ block content
                 | ）
               h5 商品列表
               div(v-for="p in params")
-                img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                img.m-r-1(:src="getUrl('resourceCover', p.product.imgMaster)"  style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
                   a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
                   h5 商品ID：{{p.costId}}，
@@ -45,7 +45,7 @@ block content
               .m-t-1(v-if='refund && order.status !== "finish" && !order.closeStatus')
                 h4 退款中的商品
                 div(v-if='param')
-                  img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                  img.m-r-1(:src="getUrl('resourceCover', p.product.imgMaster)"  style='height: 4rem;width: 4rem;vertical-align:top;')
                   div.display-i-b
                     a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}} ({{param.productParam.name}})
                     h5
@@ -55,7 +55,7 @@ block content
                       strong.text-danger {{param.count}}
                 div(v-else)
                   div(v-for="p in order.params" v-if="p.refundStatus === 'ing'")
-                    img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                    img.m-r-1(:src="getUrl('resourceCover', p.product.imgMaster)" style='height: 4rem;width: 4rem;vertical-align:top;')
                     div.display-i-b
                       a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
                       h5
@@ -67,10 +67,10 @@ block content
                 h5 进度：{{status.description}}
               .m-t-1
                 include ../../order/refundStatus.pug
-              
-                   
+
+
             .col-xs-12.col-md-6(v-if="refund")
-              .m-t-1      
+              .m-t-1
                 .m-t-1(v-if="['B_APPLY_RM', 'B_APPLY_RP'].indexOf(refund.status) !== -1")
                   //- 退款退货说明
                   .m-b-3
@@ -79,7 +79,7 @@ block content
                       li 买家申请退款时...
                   .form
                     .form-group
-                      h4.text-danger 
+                      h4.text-danger
                         strong 用户正在申请
                           span(v-if="refund.status === 'B_APPLY_RM'") &nbsp;只退款
                           span(v-if="refund.status === 'B_APPLY_RP'") &nbsp;退货退款
@@ -93,31 +93,31 @@ block content
                     .form-group(v-if="agree === true && refund.status === 'B_APPLY_RM'")
                       h5 请输入登录密码
                       input.form-control(type="password" v-model="password")
-                    div(v-if="agree === true && refund.status === 'B_APPLY_RP'") 
+                    div(v-if="agree === true && refund.status === 'B_APPLY_RP'")
                       .form-group
                         h4.text-danger 请完善以下信息，以便买家寄回商品。
                       .form-group
-                        h5 收件人姓名  
+                        h5 收件人姓名
                         input.form-control(type="text" v-model="storeName")
                       .form-group
                         h5 收件人电话
-                        input.form-control(type="text" v-model="mobile")   
+                        input.form-control(type="text" v-model="mobile")
                       .form-group
                         h5 收件人地址
-                        textarea.form-control(v-model="address" rows=7)  
-                    .form-group(v-if="agree === false")    
+                        textarea.form-control(v-model="address" rows=7)
+                    .form-group(v-if="agree === false")
                       textarea.form-control(rows="7" placeholder="请输入理由（不超过1000字节）" v-model="reason")
                     .form-group
                       h5.text-danger(v-if="error") {{error}}
                       button.btn.btn-block.btn-primary(@click="sellerPost") 提交
-                .m-t-1(v-if="refund.status === 'B_INPUT_INFO'")  
+                .m-t-1(v-if="refund.status === 'B_INPUT_INFO'")
                   .m-b-2
                     h5.text-danger 注意事项：
                     ul
                       li 请在收到退货并确认无误时再点击同意，如有疑问请与买家友好协商。
                       li 点击同意后，系统会立即将买家申请的退款金额退回买家...
                   .form
-                    .form-group      
+                    .form-group
                       h4.text-danger 买家已发货 快递单号：
                         strong {{refund.trackNumber}}
                       div
@@ -128,7 +128,7 @@ block content
                         <label class="radio-inline">
                           <input type="radio" :value="false" v-model="agree"> 未收到货或商品有问题，拒绝退款
                         </label>
-                    .form-group(v-if="agree === false")    
+                    .form-group(v-if="agree === false")
                       textarea.form-control(rows="7" placeholder="请输入理由（不超过1000字节）" v-model="reason")
                     .form-group(v-else-if="agree === true")
                       h5 请输入登录密码
@@ -137,12 +137,12 @@ block content
                       h5.text-danger(v-if="error") {{error}}
                       h5.text-success(v-if="info") {{info}}
                       button.btn.btn-block.btn-primary(@click="sellerPost") 提交
-              .m-t-1(v-if='refund && ["B_INPUT_CERT_RM", "P_APPLY_RM"].indexOf(refund.status) !== -1')      
-                
-                .form  
+              .m-t-1(v-if='refund && ["B_INPUT_CERT_RM", "P_APPLY_RM"].indexOf(refund.status) !== -1')
+
+                .form
                   div(v-if="refund.status !== 'P_APPLY_RM'")
                     .form-group
-                      h4.text-danger 
+                      h4.text-danger
                         strong 买家已申请平台介入，请卖家及时上传凭证，超时未上传则默认支持买家的请求。
                       div
                         <label class="radio-inline">
@@ -155,12 +155,12 @@ block content
                         <label class="radio-inline">
                           <input type="radio" :value="true" v-model="agree"> 同意平台介入
                         </label>
-                    .form-group(v-if="agree === false && refund.status === 'B_INPUT_CERT_RM'")    
+                    .form-group(v-if="agree === false && refund.status === 'B_INPUT_CERT_RM'")
                       h5 请输入登录密码
                       input.form-control(type="password" v-model="password")
                     .form-group(v-if="agree")
                       h5 理由（不超过1000字节）：
-                      textarea.form-control(rows=7 v-model="reason")    
+                      textarea.form-control(rows=7 v-model="reason")
                   .form-group(v-if="agree || refund.status === 'P_APPLY_RM'")
                     h5(v-if="refund.status !== 'P_APPLY_RM'") 上传凭证（不超过
                       strong.text-danger 5
@@ -170,13 +170,13 @@ block content
                         strong.text-danger 等待平台处理，若需要补充凭证，请上传文件
                       h4 补充凭证（不超过
                         strong.text-danger 5
-                        |张）  
+                        |张）
                     input(type="file" @change='selectedFile' multiple="multiple")
                     <transition name="fade">
                       h5.text-success(v-if="uploadStatus") {{uploadStatus}}
-                    </transition> 
+                    </transition>
                     div(v-if="order.certs && order.certs.length !== 0")
-                      h5 已上传的凭证   
+                      h5 已上传的凭证
                       .shop-cert(v-for="cert in order.certs" :title="cert.name" v-if="(!param && !cert.paramId) || (param && param.costId === cert.paramId)")
                         .shop-cert-options
                           span(@click="viewCert(cert)").fa.fa-eye
@@ -191,4 +191,4 @@ block content
 
 block shopScripts
   include ../../../publicModules/moment.pug
-  +includeJS("/shop/manage/refund/refund.js")  
+  +includeJS("/shop/manage/refund/refund.js")
