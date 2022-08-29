@@ -171,7 +171,7 @@ block content
                   .form-group
                     label 3、填写退款金额（不超过
                       strong.text-danger {{refundMoneyMax / 100 }}
-                      | 元：{{!order.shipToc ? "含运费" : "不含运费，商品已发货"}}）
+                      | 元，{{order.orderStatus === 'unShip' ? "含运费" : "不含运费，商品已发货"}}）
                     input.form-control(v-model.number="newRefund.money" type="number")
                   .form-group
                     label 4、填写理由（不超过

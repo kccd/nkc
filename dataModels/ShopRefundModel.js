@@ -222,7 +222,22 @@ schema.methods.returnMoney = async function () {
     });
     await record.save();
     await UserModel.updateUserKcb(record.to);
-  } else if(orderPrice === money) {
+  } else {
+    const totalPrice = orderPrice + orderFreightPrice;
+    const unShip = orderStatus === 'unShip';
+    const canReturnPrice = unShip? totalPrice: orderPrice;
+    const sellerMoney = totalPrice - money;
+    const buyerDesc = description + `（${unShip? '含运费': '不含运费'}）`;
+    const sellerDesc = description;
+
+    if(unShip && money > canReturnPrice) {
+      throwErr(400, `申请退款的金额不能超过订单的总金额（商品+运费）！orderId=${orderId}`);
+    }
+
+    if(!unShip && money > canReturnPrice) {
+      throwErr(400, `申请退款的金额不能超过订单的商品金额（不含邮费，商品已发货）！orderId=${orderId}`);
+    }
+
     // 情况2
     // 将商品退款金额打给买家
     const record = KcbsRecordModel({
@@ -233,73 +248,27 @@ schema.methods.returnMoney = async function () {
       scoreType: mainScore.type,
       toc: time,
       num: money,
-      description,
+      description: buyerDesc,
       ordersId: [orderId]
     });
     await record.save();
     await UserModel.updateUserKcb(record.to);
-    if(orderStatus === "unShip") {
-      // 将运费打给买家
-      const recordBuyer = KcbsRecordModel({
-        _id: await SettingModel.operateSystemID("kcbsRecords", 1),
-        from: "bank",
-        to: buyerId,
-        scoreType: mainScore.type,
-        type: "refund",
-        toc: time,
-        num: orderFreightPrice,
-        description: description+"(运费)",
-        ordersId: [orderId]
-      })
-      await recordBuyer.save();
-      await UserModel.updateUserKcb(recordBuyer.to);
-    }else{
-      // 将运费打给卖家
-      const recordSeller = KcbsRecordModel({
+
+    if(sellerMoney > 0) {
+      const orderToB = KcbsRecordModel({
         _id: await SettingModel.operateSystemID("kcbsRecords", 1),
         from: "bank",
         to: sellerId,
-        type: "refund",
-        scoreType: mainScore.type,
+        type: "sell",
+        num: sellerMoney,
         toc: time,
-        num: orderFreightPrice,
-        description: description+"(运费)",
+        scoreType: mainScore.type,
+        description: sellerDesc,
         ordersId: [orderId]
-      })
-      await recordSeller.save();
-      await UserModel.updateUserKcb(recordSeller.to);
+      });
+      await orderToB.save();
+      await UserModel.updateUserKcb(sellerId);
     }
-  } else if(money < orderPrice) {
-    // 情况1
-    const diff = (orderPrice+orderFreightPrice) - money;
-    const orderToS = KcbsRecordModel({
-      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
-      from: "bank",
-      to: buyerId,
-      scoreType: mainScore.type,
-      type: "refund",
-      num: money,
-      toc: time,
-      description,
-      ordersId: [orderId]
-    });
-    const orderToB = KcbsRecordModel({
-      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
-      from: "bank",
-      to: sellerId,
-      type: "sell",
-      num: diff,
-      toc: time,
-      scoreType: mainScore.type,
-      description,
-      ordersId: [orderId]
-    });
-    await orderToS.save();
-    await orderToB.save();
-    await UserModel.updateUserKcb(buyerId);
-    await UserModel.updateUserKcb(sellerId);
-  } else {
-    throwErr(400, `申请退款的金额不能超过支付订单的金额！orderId=${orderId}`);
   }
 
   await ShopRefundModel.updateMany({_id}, {

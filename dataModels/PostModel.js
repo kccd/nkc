@@ -2128,6 +2128,7 @@ postSchema.methods.noticeAuthorReply = async function() {
   if(!newPost) return;
   let {type, pid, tid, reviewed, disabled, toDraft, quote, parentPostId} = newPost;
   if(type === 'thread') return;
+  let parentPostUid;
   //如果评论被已经审核成功,并且状态正常就创建消息通知
   if(reviewed) {
     Promise.resolve()
@@ -2187,6 +2188,7 @@ postSchema.methods.noticeAuthorReply = async function() {
               }
             });
             await message.save();
+            parentPostUid = parentPost.uid;
             return await socket.sendMessageToUser(message._id);
           }
         }
@@ -2203,6 +2205,7 @@ postSchema.methods.noticeAuthorReply = async function() {
           'c.pid': thread.oc,
         });
         if(oldMessage) return;
+        if(thread.uid === parentPostUid) return;
         const messageId = await SettingModel.operateSystemID('messages', 1);
         const message = await MessageModel({
           _id: messageId,

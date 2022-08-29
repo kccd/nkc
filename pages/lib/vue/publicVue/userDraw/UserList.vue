@@ -32,10 +32,18 @@
         a(:href="'/u/' + user.uid + '/profile/finance?t=all'")
           span.fa.fa-file-text-o &nbsp;我的账单
           span.pull-right.fa.fa-angle-right
+      li
+        a(:href="'/u/' + user.uid + '/profile/subscribe/user'")
+          span.fa.fa-star &nbsp;我的关注
+          span.pull-right.fa.fa-angle-right
+      li
+        a(:href="'/sticker'")
+          span.fa.fa-smile-o &nbsp;我的表情
+          span.pull-right.fa.fa-angle-right
     ul.user-drawer-list
       li
         a(:href="'/u/' + user.uid + '/settings'")
-          span.fa.fa-cog &nbsp;设置
+          span.fa.fa-cog &nbsp;资料设置
           span.pull-right.fa.fa-angle-right
     ul.user-drawer-list
       li
