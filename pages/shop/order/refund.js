@@ -79,7 +79,7 @@ var app = new Vue({
         return this.param.singlePrice * this.param.count;
       } else {
         // 没发货的情况
-        if(this.order.shipToc === null){
+        if(this.order.orderStatus === 'unShip'){
           return this.order.orderPrice + this.order.orderFreightPrice;
         }
         return this.order.orderPrice
@@ -182,7 +182,7 @@ var app = new Vue({
         } else {
           // 1.1 * 100 不会得到预期结果
           // 如果只考虑 最大两位小数 （parseInt(Number)）
-          if( parseInt(newRefund.money*100) > this.order.orderPrice + (!this.order.shipToc ? this.order.orderFreightPrice : 0) ) return this.error = "退款金额不能超过商品总金额";
+          if( parseInt(newRefund.money*100) > this.order.orderPrice + (this.order.orderStatus === 'unShip' ? this.order.orderFreightPrice : 0) ) return this.error = "退款金额不能超过商品总金额";
         }
       }
       else return this.error = "请输入正确的退款金额";
