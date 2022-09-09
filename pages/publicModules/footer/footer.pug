@@ -55,7 +55,11 @@ footer.footer
         .website-name
           h5=`${remoteState.serverSettings.statement}`
           h5
-            .display-i-b.m-b-05=`${remoteState.serverSettings.copyright} `
-            .display-i-b.m-b-05=`${remoteState.serverSettings.record}`
+            span=`${remoteState.serverSettings.copyright}`
+            for record in remoteState.serverSettings.record
+              if record.url
+                a(href=record.url target="_blank" title=record.title).display-i-b.m-b-05=record.title
+              else
+                span=record.title
 
           //h5=`${state.serverSettings.websiteName}`

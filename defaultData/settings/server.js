@@ -8,7 +8,11 @@ module.exports = {
     telephone: '00000000',
     github: 'https://github.com/kccd/nkc.git',
     copyright: 'name(c)2005-2018',
-    record: '备案信息',
+    record: [
+      {
+        title: '备案信息'
+      }
+    ],
     description: '网站介绍',
     statement: "网站声明",
     brief: '网站简介',

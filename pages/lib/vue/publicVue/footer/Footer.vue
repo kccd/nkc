@@ -53,15 +53,17 @@ footer.footer
         .website-name
           h5 {{ statement }}
           h5
-            .display-i-b.m-b-05 {{ copyright }}
-            .display-i-b.m-b-05 {{ record }}
+            span {{ copyright }}
+            template(v-for="r in record")
+              a(v-if='r.url' :href="r.url" target="_blank" :title="r.title") {{r.title}}
+              span(v-else) {{r.title}}
 </template>
 <script>
 import { getState } from "../../../js/state";
 export default {
   data() {
     return {
-      record: "",
+      record: [],
       copyright: "",
       statement: "",
       gitHub: "",
@@ -152,6 +154,12 @@ export default {
     margin-top: 2rem;
     font-size: 1.4rem;
     color: #9baec8;
+    span, a{
+      margin-right: 0.5rem;
+    }
+    a{
+      color: #9baec8;
+    }
   }
   .footer-li-div {
     min-height: 17.5rem;
