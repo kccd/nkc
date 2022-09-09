@@ -87,7 +87,6 @@ export default {
       about,
       appStableVersion
     } = getState();
-    console.log({record})
     const data = {
       record,
       copyright,
