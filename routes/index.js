@@ -90,6 +90,8 @@ const momentRouter = routers.moment;
 const settingsRouter = routers.settings;
 // 最新页
 const latestRouter = routers.latest;
+// 第三方登录
+const oauthRouter = routers.oauth;
 
 const path = require('path');
 
@@ -212,4 +214,5 @@ router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
 router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
+router.use('/oauth', oauthRouter.routes(), oauthRouter.allowedMethods());
 module.exports = router;

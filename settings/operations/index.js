@@ -92,6 +92,7 @@ const article = require('./article');
 const moment = require ('./moment');
 const settings = require('./settings');
 const latest = require('./latest');
+const oauth = require("./oauth");
 const operationObj = {};
 
 
@@ -297,6 +298,7 @@ operationObj.operationTree = {
 		moment, // 动态
     settings, // 加载系统设置
     n: latest, // 最新页
+		oauth, // 第三方登录
 	}
 };
 module.exports = operationObj;

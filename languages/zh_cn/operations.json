@@ -879,5 +879,11 @@
   "unDigestComment": "取消将独立文章回复为精选",
   "getDigestSettings": "获取加精设置",
   "getCreditSettings": "获取评学术分、鼓励设置",
-  "publishArticle": "发表独立文章（长电文、专栏文章）"
+  "publishArticle": "发表独立文章（长电文、专栏文章）",
+  "createOAuthClient": "创建第三方应用",
+  "modifyOAuthClientSecret": "更新第三方应用秘钥",
+  "disableOAuthClient": "封禁/解禁第三方应用",
+  "modifyOAuthClientInfo": "修改第三方应用信息",
+  "deleteOAuthClient": "删除第三方应用",
+  "OAuthClientLogin": "第三方应用登录"
 }
