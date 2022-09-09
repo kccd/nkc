@@ -1,7 +1,5 @@
 module.exports = async (ctx) => {
-  const {state, nkcModules, template, remoteTemplate, db} = ctx;
-  // 取网站代号
-  let serverSetting = await db.SettingModel.getSettings("server");
+  const {state, nkcModules, template, remoteTemplate} = ctx;
   if(!template && !remoteTemplate) return;
   const userInfo = !state.uid? null: {
     uid: state.uid,

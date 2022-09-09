@@ -142,7 +142,10 @@ module.exports = {
       GET: 'creationCenter',
       POST: 'publishMoment',
       PARAMETER: {
-        POST: 'publishMomentComment'
+        POST: 'publishMomentComment',
+        comment: {
+          POST: 'publishMomentComment'
+        }
       }
     }
   },

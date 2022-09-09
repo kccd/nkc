@@ -107,6 +107,7 @@ export class DraggableElement {
       // 宽屏
       JQRoot.css({
         'left':  (width - JQRoot.width()) * 0.5 - 20,
+        'top': 200,
         'height': 'auto!important'
       });
     }

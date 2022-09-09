@@ -34,7 +34,8 @@ block content
                     data-global-mouseout="hideUserPanel"
                     data-global-data=objToStr({uid: post.uid})
                   )
-                    img.user-avatar(src=tools.getUrl('userAvatar', post.user.avatar))
+                    -var banned = post.user && post.user.certs && post.user.certs.includes('banned');
+                    img.user-avatar(src=tools.getUrl('userAvatar', post.user.avatar) class=banned? 'user-banned-avatar': '')
                     .username= post.user.username
                 else
                   img.user-avatar(src=anonymousInfo.avatar)

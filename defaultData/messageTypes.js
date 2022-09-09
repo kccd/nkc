@@ -607,9 +607,10 @@ module.exports = {
       parameters: [
         'userHomeUrl',
         'username',
-        'momentUrl'
+        'momentUrl',
+        'content',
       ],
-      content: "收到来自[url=userHomeUrl(username)]的电文回复，[url=momentUrl(点击查看)]。",
+      content: "收到来自[url=userHomeUrl(username)]的电文回复，[url=momentUrl(点击查看)]。\n以下是回复内容：[text=content]",
       type: 'momentComment'
     },
   ]

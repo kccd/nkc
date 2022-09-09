@@ -1,4 +1,5 @@
 import Moment from '../../lib/vue/zone/Moment';
+import MomentCommentChild from '../../lib/vue/zone/MomentCommentChild';
 import MomentOption from "../../lib/vue/zone/momentOption/MomentOption";
 import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
@@ -11,12 +12,14 @@ const app = new Vue({
     'moment': Moment,
     'moment-option': MomentOption,
     'complaint': Complaint,
-    'violation-record': ViolationRecord
-    
+    'violation-record': ViolationRecord,
+    'moment-comment-child': MomentCommentChild,
   },
   data: {
-    focusCommentId: data.commentId,
-    momentListData: data.momentListData
+    focusCommentId: data.focusCommentId,
+    momentListData: data.momentListData,
+    permissions: data.permissions,
+
   },
   mounted() {
     const self = this;
@@ -27,6 +30,7 @@ const app = new Vue({
     });
   },
   methods: {
+
     showCommentPanel() {
       this.$refs.moment.showCommentPanel();
     },
@@ -37,5 +41,13 @@ const app = new Vue({
     complaint(mid) {
       this.$refs.complaint.open('moment', mid);
     },
+    showCommentChild() {
+      const {parentCommentId, focusCommentId} = this;
+      this.$refs.momentCommentChild.open({
+        commentId: parentCommentId,
+        focusCommentId
+      });
+    }
   }
 });
+

@@ -2,7 +2,7 @@ const router = require('koa-router')();
 const PATH = require('path');
 router
   .get('/', async (ctx, next) => {
-    const {data, db, query, params, state, nkcModules} = ctx;
+    const {data, db, query, params, state, nkcModules, permission} = ctx;
     const {page = 0} = query;
     const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
@@ -73,6 +73,10 @@ router
     data.tid = post.tid;
     data.pid = post.pid;
     data.paging = paging;
+    data.permissions = {
+      cancelXsf: permission('cancelXsf'),
+      modifyKcbRecordReason: permission('modifyKcbRecordReason')
+    }
     data.htmlContent = await nkcModules.render(
       PATH.resolve(__dirname, `../../pages/thread/singleComment/singleComments.pug`),
       {...data, comments},

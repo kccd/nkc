@@ -94,6 +94,7 @@ const latestRouter = routers.latest;
 const oauthRouter = routers.oauth;
 
 const path = require('path');
+const remoteState = require('../middlewares/body/remoteState');
 
 router.use('/', async (ctx, next) => {
   const {data, state, db, nkcModules, settings} = ctx;
@@ -139,7 +140,9 @@ router.use('/', async (ctx, next) => {
         return ctx.throw(403, description);
       } else {
         data.description = nkcModules.nkcRender.plainEscape(description);
-        return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state);
+        ctx.template = 'filter_visitor.pug';
+        await remoteState(ctx);
+        return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state, ctx.remoteState);
       }
     }
   }

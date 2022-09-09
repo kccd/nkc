@@ -1,5 +1,5 @@
 <template lang="pug">
-  .modal.fade.module-login(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal.fade.module-login(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-name="loginModule")
     verifications(ref="verifications")
     .modal-dialog(role="document").module-login-app
       .modal-content
@@ -113,6 +113,9 @@
 </template>
 
 <style lang="less" scoped>
+  .module-login{
+    z-index: 2000;
+  }
   @media (min-width: 768px){
     .module-login .modal-dialog{
       width: 370px;

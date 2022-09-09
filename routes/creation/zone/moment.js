@@ -135,9 +135,29 @@ router
       });
       if(type === 'publish' || type === 'forward') {
         await momentComment.publishMomentComment(postType, alsoPost);
-        data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
+        // data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
       }
+      data.momentCommentId = momentComment._id;
     }
+    await next();
+  })
+  // 发表评论回复
+  .post('/:parent/comment', async (ctx, next) => {
+    const {body, db, state, params, nkcModules, data} = ctx;
+    const {content} = body;
+    const {parent} = params;
+    nkcModules.checkData.checkString(content, {
+      name: '内容',
+      minLength: 1,
+      maxLength: 1000,
+    });
+    const comment = await db.MomentModel.createMomentCommentChildAndPublish({
+      uid: state.uid,
+      content,
+      parent
+    });
+
+    data.commentId = comment._id;
     await next();
   })
 module.exports = router;

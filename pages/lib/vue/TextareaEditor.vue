@@ -25,6 +25,7 @@
   .textarea-editor{
     position: relative;
     .textarea-editor-container{
+      background-color: #fff;
       &.ghost{
         position: absolute;
         top: 0;
@@ -58,10 +59,11 @@
 <script>
   import {debounce} from '../js/execution';
   export default {
-    props: ['placeholder', 'height'],
+    props: ['placeholder', 'height', 'max-height'],
     data: () => ({
       defaultPlaceholder: "想分享什么新鲜事？",
       defaultHeight: "5rem",
+      defaultMaxHeight: "100rem",
       content: '',
       textareaHeight: '0',
     }),
@@ -69,11 +71,14 @@
       minHeight() {
         return this.height || this.defaultHeight;
       },
+      editorMaxHeight() {
+        return this.maxHeight || this.defaultMaxHeight;
+      },
       ghostTextareaStyle() {
-        return `height: 0;min-height: ${this.minHeight}`
+        return `height: 0;min-height: ${this.minHeight}; max-height: ${this.editorMaxHeight};`
       },
       textareaStyle() {
-        return `height: ${this.textareaHeight}; min-height: ${this.minHeight};`;
+        return `height: ${this.textareaHeight}; min-height: ${this.minHeight}; max-height: ${this.editorMaxHeight};`;
       }
     },
     watch: {
@@ -126,6 +131,9 @@
       },
       onContentChange: function() {
         this.$emit('content-change', this.content);
+      },
+      focus() {
+        this.$refs.textarea.focus();
       }
     }
   }

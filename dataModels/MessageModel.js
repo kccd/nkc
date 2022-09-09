@@ -1191,6 +1191,10 @@ messageSchema.statics.getParametersData = async (message) => {
       uid: 1,
     });
     if(!moment) return null;
+    const documentSources = await DocumentModel.getDocumentSources();
+    const betaDocuments = await DocumentModel.getStableDocumentsBySource(documentSources.moment, [moment._id]);
+    if(betaDocuments.length === 0) return null;
+    const betaDocument = betaDocuments[0];
     const user = await UserModel.findOne({uid: moment.uid}, {
       username: 1,
       uid: 1
@@ -1200,6 +1204,7 @@ messageSchema.statics.getParametersData = async (message) => {
       userHomeUrl: getUrl('userHome', user.uid),
       username: user.username,
       momentUrl: getUrl('zoneMoment', momentId),
+      content: await MomentModel.renderContent(betaDocument.content)
     };
   }
   return parameters;

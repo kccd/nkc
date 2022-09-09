@@ -282,6 +282,7 @@ postsVoteSchema.statics.createVoteMessages = async (uid) => {
   const {voteDeadline} = await UsersGeneralMode.findOne({uid}, {voteDeadline: 1});
   const votes = await PostsVoteModel.find({
     tUid: uid,
+    uid: {$ne: uid},
     toc: {
       $gte: voteDeadline
     },
