@@ -14,7 +14,16 @@ const tools = new Tools();
 const vueApp = createApp({
   setup() {
     return {
-      settings: reactive(data)
+      settings: reactive(data),
+      addRecord(index) {
+        this.settings.record.splice(index + 1, 0, {
+          title: '',
+          url: ''
+        })
+      },
+      deleteRecord(index) {
+        this.settings.record.splice(index, 1);
+      }
     }
   },
   data: () => ({
@@ -48,11 +57,41 @@ const vueApp = createApp({
             label="版权信息"
             vModel={this.settings.copyright}>
           </InputItem>
-          <InputItem
-            label="备案信息"
-            vModel={this.settings.record}
-            type="textarea">
-          </InputItem>
+          <FormItem label={'备案信息'}>
+            <table class={'table table-bordered'}>
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>链接</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody >
+
+                  {
+                    this.settings.record.map((r, index) => (
+                      <tr>
+                        <th>
+                          <input class={'form-control'} type="text" v-model={r.title}/>
+                        </th>
+                        <th>
+                          <input class={'form-control'} type="text" v-model={r.url}/>
+                        </th>
+                        <th>
+                          <button onClick={() => {
+                            this.addRecord(index);
+                          }} class={'btn btn-default btn-xs m-r-05'}>添加</button>
+                          <button onClick={() => {
+                            this.deleteRecord(index);
+                          }} class={'btn btn-danger btn-xs m-r-05'}>删除</button>
+                        </th>
+                      </tr>
+
+                    ))
+                  }
+              </tbody>
+            </table>
+          </FormItem>
           <InputItem
             label="网站简介"
             vModel={this.settings.brief}
@@ -152,6 +191,11 @@ const vueApp = createApp({
               onClick={async () => {
                 this.saving = true;
                 const settings = this.settings;
+                for(const record of settings.record) {
+                  if(!record.title) {
+                    sweetError('备案信息名称不能为空')
+                  }
+                }
                 const file = this.siteIconFile;
                 const form = new FormData();
                 form.append("siteicon", file);

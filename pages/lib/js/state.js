@@ -12,6 +12,7 @@ export function getState() {
     websiteName: '',
     websiteBrief: '',
     column: '',
+    record: [],
   };
   try{
     const windowDataDom = document.querySelector('meta[name="window-data"]');

@@ -15,6 +15,13 @@ baseRouter
 		if(!websiteName) ctx.throw(400, '网站名不能为空');
 		if(!websiteCode) ctx.throw(400, `网站代号不能为空`);
 		websiteName = websiteName.trim();
+		record = record.filter(r => !!r.title).map(r => {
+			const {title = '', url = ''} = r;
+			return {
+				title: title.trim(),
+				url: url.trim()
+			};
+		});
 		const serverSettings = await db.SettingModel.findOnly({_id: 'server'});
 		const obj = {
 			c: {
