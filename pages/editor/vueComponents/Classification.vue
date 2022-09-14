@@ -47,21 +47,21 @@
             :style="'background-color: ' + mf.color",
             v-if="!mf.logo",
 
-            data-global-mouseover="showUserPanel"
-            data-global-mouseout="hideUserPanel"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
             :data-global-data="objToStr({fid: mf.fid})"
           )
           img.editor-main-forum-avatar(
             :src="getUrl('forumLogo', mf.logo)",
             v-else,
-            data-global-mouseover="showUserPanel"
-            data-global-mouseout="hideUserPanel"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
             :data-global-data="objToStr({fid: mf.fid})"
           )
           .editor-main-forum-name
             span(
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
               :data-global-data="objToStr({fid: mf.fid})"
             ) {{ mf.forum.displayName }}
             | :
@@ -204,6 +204,7 @@ export default {
     }
   },
   methods: {
+    getUrl,
     removeForumByForumId(index) {
       this.selectedForums.splice(index, 1);
     },
