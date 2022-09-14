@@ -1,4 +1,8 @@
-const data = NKC.methods.getDataById('data');
+import {getDataById} from "../../../lib/js/dataConversion";
+import {getUrl} from "../../../lib/js/tools";
+import {objToStr} from "../../../lib/js/dataConversion";
+
+const data = getDataById('data');
 
 const forums = [];
 
@@ -69,7 +73,8 @@ window.app = new Vue({
     }
   },
   methods: {
-    getUrl: NKC.methods.tools.getUrl,
+    getUrl,
+    objToStr,
     updateForums() {
       const self = this;
       sweetQuestion(`确定要刷新所有专业信息？`)
