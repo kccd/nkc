@@ -301,7 +301,7 @@ router
 
   //   data.reqUrl = {
   //    type,
-  //    id 
+  //    id
   //   }
   //   await next();
   // })
@@ -312,13 +312,13 @@ router
     ctx.template = "editor/editor.pug";
     const {id, type, o} = query;
     const typeMap = {
-      'newThread': '新文章', 
-      'modifyThread': '修改文章', 
-      'newPost': '新回复', 
-      'modifyPost': '修改回复', 
-      'newComment': '新评论', 
+      'newThread': '新文章',
+      'modifyThread': '修改文章',
+      'newPost': '新回复',
+      'modifyPost': '修改回复',
+      'newComment': '新评论',
       'modifyComment': '修改评论',
-      'redit': o === 'update' ? '更新已发布的文章' : 
+      'redit': o === 'update' ? '更新已发布的文章' :
         o === 'copy' ? '复制为新文章' : ''
     }
     if (!typeMap[type]) ctx.throw(400, '编辑器类型错误');
@@ -326,7 +326,7 @@ router
      type,
      typeCn: typeMap[type],
      id,
-     o 
+     o
     }
     await next();
   })
@@ -349,7 +349,7 @@ router
     // 直接进编辑器
     if(!type) {
       data.type = "newThread";
-    } else if(type === draftDesType.newThread) { 
+    } else if(type === draftDesType.newThread) {
       // 在专业进编辑器，需要预制当前专业
       const {id} = query;
       data.type = "newThread";
@@ -360,7 +360,7 @@ router
       } catch(err) {
         data.permissionInfo = err.message;
       }
-    } 
+    }
     // else if(type === "thread") {
     else if(type === draftDesType.newPost) {
       data.type = "newPost";
@@ -380,7 +380,7 @@ router
       // type === thread
       // 新回复
       selectedForumsId = thread.mainForumsId || [];
-    } 
+    }
     /* else if(type === "post") { // 修改文章或者修改回复
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
@@ -540,7 +540,7 @@ router
           url: `/t/${thread.tid}`,
         };
         selectedForumsId = thread.mainForumsId;
-      } 
+      }
       else if (desType === draftDesType.newComment) {
         const thread = await db.ThreadModel.findOnly({tid: desTypeId});
         // 验证用户是否有权限查看文章
@@ -619,7 +619,7 @@ router
       // //     title: forum.displayName,
       // //     url: `/f/${forum.fid}`
       // //   };
-      // } 
+      // }
       else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }
@@ -627,7 +627,17 @@ router
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {
-      const forums_ = await db.ForumModel.find({fid: {$in: selectedForumsId}});
+      let forums_ = await db.ForumModel.find({fid: {$in: selectedForumsId}});
+      const forumsObj_ = {};
+      for(const f of forums_) {
+        forumsObj_[f.fid] = f;
+      }
+      forums_ = [];
+      for(const fid_ of selectedForumsId) {
+        const f = forumsObj_[fid_];
+        if(!f) continue;
+        forums_.push(f);
+      }
       const forums = [];
       for(const f of forums_) {
         const childForumsId = [] || await f.getAllChildForumsId();
@@ -710,7 +720,7 @@ router
       data.postPermission = await db.UserModel.getPostPermission(state.uid, 'thread', []);
     }
 
-    data.post = data.post || {}; 
+    data.post = data.post || {};
     state.editorSettings = await db.SettingModel.getSettings("editor");
     data.state = state;
     // 多维分类

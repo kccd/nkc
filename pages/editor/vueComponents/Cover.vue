@@ -3,8 +3,8 @@
   .editor-header 封面图
     small （如未指定，默认从内容中选取）
   .editor-cover
-    .editor-cover-default(v-if="!cover && !coverUrl" @click="selectCover")
-      .fa.fa-plus
+    .editor-cover-default(v-if="!cover && !coverUrl" )
+      .fa.fa-plus(@click="selectCover")
     div(v-else)
       .editor-cover-img
         img(:src="setUrl" v-if="url || coverUrl")

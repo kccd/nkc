@@ -47,21 +47,21 @@
             :style="'background-color: ' + mf.color",
             v-if="!mf.logo",
 
-            data-global-mouseover="showUserPanel"
-            data-global-mouseout="hideUserPanel"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
             :data-global-data="objToStr({fid: mf.fid})"
           )
           img.editor-main-forum-avatar(
             :src="getUrl('forumLogo', mf.logo)",
             v-else,
-            data-global-mouseover="showUserPanel"
-            data-global-mouseout="hideUserPanel"
+            data-global-mouseover="showForumPanel"
+            data-global-mouseout="hideForumPanel"
             :data-global-data="objToStr({fid: mf.fid})"
           )
           .editor-main-forum-name
             span(
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
+              data-global-mouseover="showForumPanel"
+              data-global-mouseout="hideForumPanel"
               :data-global-data="objToStr({fid: mf.fid})"
             ) {{ mf.forum.displayName }}
             | :
@@ -70,7 +70,7 @@
               option(v-for="tt in mf.forum.threadTypes", :value="tt.cid") {{ tt.name }}
               option(:value="''") 不分类
             //span(v-if="mf.cName") ：{{mf.cName}}
-          .fa.fa-trash-o(@click="removeSelectedForums(index + 1)", title="移除")
+          .fa.fa-trash-o.form-delete-button(@click="removeForumByForumId(index + 1)", title="移除")
         .editor-main-forum-note.bg-warning.text-warning.p-a-05.bg-border(
           v-if="mf && mf.forum.noteOfPost"
         ) 注意事项：{{ mf.forum.noteOfPost }}
@@ -204,12 +204,16 @@ export default {
     }
   },
   methods: {
+    getUrl,
+    removeForumByForumId(index) {
+      this.selectedForums.splice(index, 1);
+    },
     selectionStatus(tcId, threadCategories) {
       if(!tcId && threadCategories) return threadCategories
       if(!threadCategories && !threadCategories.length) return
       const newThreadCategories = JSON.parse(JSON.stringify(threadCategories))
       for( let obj of newThreadCategories) {
-          obj.selectedNode = ''    
+          obj.selectedNode = ''
           for (let node of obj.nodes) {
             if(tcId.includes(node._id)) {
               obj.selectedNode = node
@@ -347,6 +351,20 @@ export default {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   margin: 0 0.5rem 0.5rem 0;
   font-size: 0;
+  .form-delete-button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 2.4rem;
+    cursor: pointer;
+    line-height: 2.4rem;
+    text-align: center;
+    font-size: 1.2rem;
+    width: 2.4rem;
+    &:hover{
+      opacity: 0.7;
+    }
+  }
 }
 .editor-header {
   font-size: 1.25rem;
