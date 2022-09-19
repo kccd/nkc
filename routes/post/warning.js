@@ -5,7 +5,7 @@ router
     const {data, params, db, body} = ctx;
     const {pid} = params;
     const {reason} = body;
-    if(!reason) ctx.throw(400, "请输入理由");
+    if(!reason) ctx.throw(400, "管理提醒内容不能为空");
     const post = await db.PostModel.findOnly({pid});
     const thread = await db.ThreadModel.findOnly({tid: post.tid});
     const type = thread.oc === pid? "warningThread": "warningPost";
@@ -40,7 +40,7 @@ router
     const {warningId, reason} = body;
     const {user} = data;
     const warning = await db.PostWarningModel.findOnly({_id: warningId});
-    if(!reason) ctx.throw(400, "修改建议不能为空");
+    if(!reason) ctx.throw(400, "管理提醒内容不能为空");
     await warning.updateOne({
       reason,
       modifierId: user.uid,
