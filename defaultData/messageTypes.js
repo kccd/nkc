@@ -258,7 +258,7 @@ module.exports = {
         "editPostURL",
         "reason"
       ],
-      content: "您在文章[url=threadURL(threadTitle)]下发表的回复被建议修改，该操作不影响文章的正常显示。请点击[url=editPostURL(这里)]修改，建议详情：[text=reason]"
+      content: "基于您在文章[url=threadURL(threadTitle)]下发表的回复，管理员做出如下提醒：[text=reason]。如需修改内容请点击[url=editPostURL(这里)]。"
     },
     {
       type: "warningThread",
@@ -269,7 +269,7 @@ module.exports = {
         "reason",
         "editThreadURL"
       ],
-      content: "您的文章[url=threadURL(threadTitle)]被建议修改，该操作不影响文章的正常显示。请点击[url=editThreadURL(这里)]修改，建议详情：[text=reason]"
+      content: "基于您发表的文章[url=threadURL(threadTitle)]，管理员做出如下提醒：[text=reason]。如需修改内容请点击[url=editThreadURL(这里)]。"
     },
     {
       parameters: [
