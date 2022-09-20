@@ -382,19 +382,49 @@ schema.statics.createMomentComment = async (props) => {
 * */
 schema.methods.modifyMoment = async function(props) {
   const {content, resourcesId} = props;
+  const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const time = new Date();
+  const newResourcesId = await MomentModel.replaceMomentResourcesId(resourcesId);
   await DocumentModel.updateDocumentByDid(this.did, {
     content,
     tlm: time,
   });
   await this.updateOne({
     $set: {
-      files: resourcesId,
+      files: newResourcesId,
       tlm: time
     }
   });
 };
+
+// 限制动态图片和视频的数量
+schema.statics.replaceMomentResourcesId = async function(resourcesId) {
+  const ResourceModel = mongoose.model('resources');
+  const resources = await ResourceModel.find({
+    rid: {$in: resourcesId.slice(0, 9)},
+    mediaType: {$in: ['mediaPicture', 'mediaVideo']}
+  }, {
+    mediaType: 1, rid: 1,
+  });
+  const resourcesObj = {};
+  for(const r of resources) {
+    resourcesObj[r.rid] = r;
+  }
+  let newResourcesId = [];
+  let type = '';
+  for(const rid of resourcesId) {
+    const resource = resourcesObj[rid];
+    if(!resource) continue;
+    if(!type) type = resource.mediaType;
+    if(type !== resource.mediaType) continue;
+    newResourcesId.push(resource.rid);
+  }
+  if(type === 'mediaVideo' && newResourcesId.length > 1) {
+    newResourcesId = [newResourcesId[0]];
+  }
+  return newResourcesId;
+}
 
 /*
 * 标记当前动态为已删除

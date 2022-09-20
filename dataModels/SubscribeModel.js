@@ -98,7 +98,7 @@ schema.statics.getUserSubUsersId = async (uid) => {
   }
   return subscribeUsersId;
 };
-schema.statics.getUserSubUsersCount
+// schema.statics.getUserSubUsersCount
 /*
 * 将用户关注的所有用户ID存入redis
 * @param {String} uid 用户ID

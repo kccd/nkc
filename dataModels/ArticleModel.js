@@ -1276,7 +1276,7 @@ schema.statics.getArticlesInfo = async function(articles) {
 * */
 schema.statics.getArticleInfo = async (article) => {
   const ArticleModel = mongoose.model('articles');
-  return (await ArticleModel.getArticlesInfo(article))[0];
+  return (await ArticleModel.getArticlesInfo([article]))[0];
 }
 
 /*
