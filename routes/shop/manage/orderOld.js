@@ -140,7 +140,7 @@ orderRouter
 		const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber, trackName);
 		data.trackNumber = trackNumber;
 		data.trackInfo = trackInfo;
-		ctx.template = "/shop/manage/logositics.pug";
+		ctx.template = "shop/manage/logositics.pug";
 		await next();
 	})
 	// 修改订单卖家备注
@@ -160,7 +160,7 @@ orderRouter
 		const {user} = data;
 		const order = await db.ShopOrdersModel.findOne({orderId, sellUid: user.uid});
 		if(!order) ctx.throw(404, `订单不存在，orderId: ${orderId}`);
-		
+
 		const {checkNumber} = nkcModules.checkData;
 		let orderPrice = order.orderPrice;
 		if(type === "modifyParam") {
@@ -187,7 +187,7 @@ orderRouter
         const product = await db.ShopGoodsModel.findOne({productId: costRecord.productId});
         if(product.stockCostMethod === "orderReduceStock") {
           const productParam = await db.ShopProductsParamModel.findOne({
-            _id: costRecord.productParamId, 
+            _id: costRecord.productParamId,
             productId: costRecord.productId
           });
           await productParam.updateOne({
@@ -247,7 +247,7 @@ orderRouter
 		let orderLists = await db.ShopOrdersModel.find(searchMap);
 		data.orderLists = await db.ShopOrdersModel.storeExtendOrdersInfo(orderLists);
 		data.orderLists = await db.ShopOrdersModel.translateOrderStatus(data.orderLists);
-		ctx.template = "/shop/manage/orderList.pug";
+		ctx.template = "shop/manage/orderList.pug";
 		await next();
 	})
   .use("/cancel", cancelRouter.routes(), cancelRouter.allowedMethods())

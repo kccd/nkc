@@ -63,7 +63,7 @@ router
     data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
     data.orders = await db.ShopOrdersModel.checkRefundCanBeAll(data.orders);
     data.orderStatus = orderStatus;
-    ctx.template = '/shop/order/order.pug';
+    ctx.template = 'shop/order/order.pug';
     await next();
   })*/
   // 查看订单详情
