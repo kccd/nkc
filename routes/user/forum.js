@@ -17,7 +17,7 @@ router
     const forumSettings = await db.SettingModel.getSettings('forum');
     data.reviewNewForumGuide = forumSettings.reviewNewForumGuide;
     data.appliedForums = await db.PreparationForumModel.find({uid: state.uid});
-    ctx.template = "/user/forum/apply.pug";
+    ctx.template = "user/forum/apply.pug";
     await next();
   })
   .post('/apply', async (ctx, next) => {
