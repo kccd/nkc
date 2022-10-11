@@ -2,7 +2,6 @@ const router = require('koa-router')();
 
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
-  const {pageSettings, uid} = state;
   const {highlight, t, last_page, token} = query;
   let {page = 0} = query;
   ctx.template = 'columns/article.pug';
@@ -10,7 +9,7 @@ router.get('/:aid', async (ctx, next)=>{
   const {_id, aid} = params;
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
-  
+
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
@@ -128,15 +127,16 @@ router.get('/:aid', async (ctx, next)=>{
     //文章浏览数加一
     await article.addArticleHits();
   } else if(columnPostData.type === thread) {
-    const permissions = {
+    data.permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
     };
-    data.permissions = permissions;
     //获取论坛文章的评论
     const thread = await db.ThreadModel.findOnly({tid: columnPostData.thread.tid});
     //
     if(!thread) ctx.throw(400, '未找到文章，请刷新');
+    // 专业权限判断
+    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     //判断用户是否具有专家权限
     isModerator = await db.ForumModel.isModerator(state.uid, thread.mainForumsId);
     //文章收藏数
