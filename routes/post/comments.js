@@ -75,7 +75,8 @@ router
     data.paging = paging;
     data.permissions = {
       cancelXsf: permission('cancelXsf'),
-      modifyKcbRecordReason: permission('modifyKcbRecordReason')
+      modifyKcbRecordReason: permission('modifyKcbRecordReason'),
+      unblockPosts: permission('unblockPosts'),
     }
     data.htmlContent = await nkcModules.render(
       PATH.resolve(__dirname, `../../pages/thread/singleComment/singleComments.pug`),
