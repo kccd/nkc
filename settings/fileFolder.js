@@ -36,6 +36,8 @@ module.exports = {
   bookCover: 'attachment/cover',
   // documentCover
   documentCover: 'attachment/cover',
+  // OAuth App
+  OAuthAppIcon: 'attachment/cover',
 
 
   // VerifiedUploadModel

@@ -1,3 +1,10 @@
+export const HttpMethods = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE',
+};
+
 /*
 * 发起请求/上传文件
 * @param {String} type 普通请求："post", 上传文件："upload"

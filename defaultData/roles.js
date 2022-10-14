@@ -484,6 +484,7 @@ module.exports = [
     defaultRole: true,
     type: 'system',
     operationsId: [
+      "getOAuthToken",
       "linkToTarget",
       "reportLinkToTarget",
       "getAttachment",

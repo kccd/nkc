@@ -1,21 +1,36 @@
 module.exports = {
-  editor: {
-    GET: 'createOAuthClient',
-    POST: 'createOAuthClient'
+  GET: 'visitOAuthHome',
+  creation: {
+    GET: 'createOAuthApp',
+    POST: 'createOAuthApp'
   },
-  client: {
+  app: {
     PARAMETER: {
-      PUT: 'modifyOAuthClientInfo',
-      DELETE: 'deleteOAuthClient',
+      DELETE: 'deleteOAuthApp',
+      settings: {
+        GET: 'modifyOAuthAppInfo',
+        PUT: 'modifyOAuthAppInfo',
+      },
       secret: {
-        POST: 'modifyOAuthClientSecret'
+        POST: 'modifyOAuthAppSecret'
       },
       ban: {
-        PUT: 'disableOAuthClient'
+        PUT: 'disableOAuthApp'
       },
     }
   },
-  login: {
-    GET: 'OAuthClientLogin'
+  token: {
+    // 由于GET请求会完全暴露url中的信息，所以此处通过POST请求获取token
+    creation: {
+      POST: 'getOAuthToken',
+    },
+    content: {
+      POST: 'getOAuthToken',
+    }
+  },
+
+  authentication: {
+    GET: 'OAuthAuthentication',
+    POST: 'OAuthAuthentication',
   }
 }
