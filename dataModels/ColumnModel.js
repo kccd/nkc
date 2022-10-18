@@ -911,5 +911,23 @@ schema.statics.getColumnsById = async (columnsId, format = 'array') => {
   return columnsObj;
 }
 
+schema.statics.checkAccessControlPermissionWithThrowError = async (props) => {
+  const AccessControlModel = mongoose.model('accessControl');
+  const {
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+  } = props;
+  const sources = await AccessControlModel.getSources();
+  await AccessControlModel.checkAccessControlPermissionWithThrowError({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.column
+  });
+}
+
 
 module.exports = mongoose.model("columns", schema);

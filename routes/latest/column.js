@@ -5,7 +5,7 @@ const columnTypes = {
 };
 router
   .use('/', async (ctx, next) => {
-    const {data, query} = ctx;
+    const {data, query, state, db} = ctx;
     let {t} = query;
     if(t !== columnTypes.comment) {
       t = columnTypes.article;
@@ -13,6 +13,14 @@ router
     data.columnTypes = columnTypes;
     data.t = t;
     data.pageTitle = `专栏 - ${data.pageTitle}`;
+
+    await db.ColumnModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+
     await next();
   })
   .get('/', async (ctx, next) => {

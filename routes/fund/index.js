@@ -17,6 +17,14 @@ fundRouter
 	//检测科创基金是否开放
 	.use('/', async (ctx, next) => {
 		const {data, db, nkcModules, state} = ctx;
+
+    await db.FundModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+
 		const fundSettings = await db.SettingModel.getSettings('fund');
     data.fundSettings = fundSettings;
 		if(!fundSettings.enableFund) { // 已关闭

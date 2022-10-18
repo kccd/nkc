@@ -9,6 +9,19 @@ const HttpErrorCodes = {
   BadGateway: 502,
   ServiceUnavailable: 503,
 };
+
+const HttpErrorCodeDescription = {
+  200: 'OK',
+  301: 'MovedPermanently',
+  400: 'BadRequest',
+  401: 'UnAuthorized',
+  403: 'Forbidden',
+  404: 'NotFound',
+  500: 'InternalServerError',
+  502: 'BadGateway',
+  503: 'ServiceUnavailable',
+};
+
 const HttpErrorTypes = {
   ERR_INVALID_COOKIE: 'ERR_INVALID_COOKIE',
   ERR_FORBIDDEN: 'ERR_FORBIDDEN',
@@ -21,8 +34,41 @@ function ThrowError(code, type, message) {
   throw error;
 }
 
+function ThrowErrorToRenderErrorPage(status = HttpErrorCodes.InternalServerError, template, props) {
+  let {
+    title = '',
+    abstract = '',
+    description = '',
+    showLogin = false,
+  } = props;
+  title = title || `${status} ${HttpErrorCodeDescription[status]}`;
+  const error = new Error(JSON.stringify({
+    errorType: template,
+    errorData: {
+      title,
+      abstract,
+      description,
+      showLogin,
+    }
+  }));
+  error.status = status;
+  throw error;
+}
+
+function ThrowErrorToRenderFullErrorPage(status, props) {
+  ThrowErrorToRenderErrorPage(status, 'errorPageFull', props);
+}
+
+function ThrowErrorToRenderStaticErrorPage(status, props) {
+  ThrowErrorToRenderErrorPage(status, 'errorPageStatic', props);
+}
+
 module.exports = {
   HttpErrorCodes,
   HttpErrorTypes,
-  ThrowError
+  HttpErrorCodeDescription,
+  ThrowError,
+  ThrowErrorToRenderErrorPage,
+  ThrowErrorToRenderFullErrorPage,
+  ThrowErrorToRenderStaticErrorPage,
 };

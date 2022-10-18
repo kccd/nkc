@@ -13,7 +13,7 @@ const momentsCount = {
 
 router
   .use('/', async (ctx, next) => {
-    const {query, data, db} = ctx;
+    const {query, data, db, state} = ctx;
     let {t} = query;
     if(t !== zoneTypes.article) {
       t = zoneTypes.moment;
@@ -21,6 +21,14 @@ router
     data.zoneTypes = zoneTypes;
     data.t = t;
     data.pageTitle = `空间 - ${data.pageTitle}`;
+
+    await db.MomentModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+
     await next();
   })
   // 动态

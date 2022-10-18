@@ -3,55 +3,69 @@ router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
     data.roles = await db.RoleModel.find({_id: {$nin: ['default', 'dev']}}, {_id: 1, displayName: 1});
-    data.grades = await db.UsersGradeModel.find({}, {_id: 1, displayName: 1});
-    data.visitSettings = await db.SettingModel.getSettings('visit');
+    data.grades = await db.UsersGradeModel.find({}, {_id: 1, displayName: 1}).sort({_id: 1});
+    data.accessControl = await db.AccessControlModel.getAllAccessControlDetail();
     ctx.template = 'experimental/settings/visit/visit.pug';
     await next();
   })
   .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {userHomeLimitVisitor, globalAccessLimit} = body.visitSettings;
-    nkcModules.checkData.checkString(globalAccessLimit.userDescription, {
-      name: '全局访问限制 - 登录用户提示内容',
-      maxLength: 100000,
-    });
-    nkcModules.checkData.checkString(globalAccessLimit.visitorDescription, {
-      name: '全局访问限制 - 游客提示内容',
-      maxLength: 100000,
-    });
-    nkcModules.checkData.checkString(userHomeLimitVisitor.description, {
-      name: '游客用户名片访问限制 - 提示内容',
-      maxLength: 100000,
-    });
-    const roles = await db.RoleModel.find({_id: {$nin: ['default', 'dev']}}, {_id: 1, displayName: 1});
-    const grades = await db.UsersGradeModel.find({}, {_id: 1, displayName: 1});
-    const rolesId = roles.map(r => r._id);
-    const gradesId = grades.map(g => g._id);
-    const {whitelist} = globalAccessLimit;
-    whitelist.rolesId = whitelist.rolesId.filter(id => rolesId.includes(id));
-    whitelist.gradesId = whitelist.gradesId.filter(id => gradesId.includes(id));
-    if(!['or', 'and'].includes(whitelist.relation)) {
-      ctx.throw(400, `全局访问限制白名单关系设置错误 relation=${whitelist.relation}`);
+    const {accessControl} = body;
+
+    const sourcesName = {
+      column: '专栏',
+      zone: '空间',
+      community: '社区',
+      fund: '基金',
+      global: '全局',
+      user: '用户名片'
+    };
+
+    const checkAndModifyAC = (source, acForm) => {
+      const {userDesc, visitorDesc, whitelist} = acForm;
+      nkcModules.checkData.checkString(userDesc, {
+        name: `${sourcesName[source]} 访问控制用户提示`,
+        minLength: 1,
+        maxLength: 10000
+      });
+      nkcModules.checkData.checkString(visitorDesc, {
+        name: `${sourcesName[source]} 访问控制游客提示`,
+        minLength: 1,
+        maxLength: 10000
+      });
+      whitelist.rolesId = whitelist.rolesId.filter(roleId => rolesId.includes(roleId));
+      whitelist.gradesId = whitelist.gradesId.filter(gradeId => gradesId.includes(gradeId));
     }
-    await db.SettingModel.updateOne({_id: 'visit'}, {
-      $set: {
-        "c.userHomeLimitVisitor": {
-          status: !!userHomeLimitVisitor.status,
-          description: userHomeLimitVisitor.description
-        },
-        "c.globalAccessLimit": {
-          status: !!globalAccessLimit.status,
-          userDescription: globalAccessLimit.userDescription,
-          visitorDescription: globalAccessLimit.visitorDescription,
-          whitelist: {
-            relation: whitelist.relation,
-            rolesId: whitelist.rolesId,
-            gradesId: whitelist.gradesId
-          }
+
+    for(const ac of accessControl) {
+      const {source, app, web} = ac;
+      checkAndModifyAC(source, app);
+      checkAndModifyAC(source, web);
+    }
+
+    for(const ac of accessControl) {
+      const {source, app, web} = ac;
+      await db.AccessControlModel.updateOne({source}, {
+        $set: {
+          'app.enabled': app.enabled,
+          'app.userDesc': app.userDesc,
+          'app.visitorDesc': app.visitorDesc,
+          'app.whitelist.rolesId': app.whitelist.rolesId,
+          'app.whitelist.gradesId': app.whitelist.gradesId,
+          'app.whitelist.relation': app.whitelist.relation,
+          'app.whitelist.usersId': app.whitelist.usersId,
+
+          'web.enabled': web.enabled,
+          'web.userDesc': web.userDesc,
+          'web.visitorDesc': web.visitorDesc,
+          'web.whitelist.rolesId': web.whitelist.rolesId,
+          'web.whitelist.gradesId': web.whitelist.gradesId,
+          'web.whitelist.relation': web.whitelist.relation,
+          'web.whitelist.usersId': web.whitelist.usersId,
         }
-      }
-    });
-    await db.SettingModel.saveSettingsToRedis('visit');
+      });
+    }
+    await db.AccessControlModel.saveToCache();
     await next();
   });
 module.exports = router;

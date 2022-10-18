@@ -481,7 +481,7 @@
       open: function(type) {
         $(this.$el).modal("show");
         this.type = type || LoginType.SignIn;
-        this.getSvgData();
+        // this.getSvgData();
       }
     }
   };

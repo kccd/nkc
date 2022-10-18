@@ -2776,6 +2776,22 @@ userSchema.statics.getUsersObjectByUsersId = async (usersId) => {
   return usersObj;
 }
 
+userSchema.statics.getUsersBaseObjectByUsersId = async (usersId) => {
+  const {getUrl} = require('../nkcModules/tools');
+  const UserModel = mongoose.model('users');
+  const users = await UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+  const usersObj = {};
+  for(let i = 0; i < users.length; i++) {
+    const {uid, avatar, username} = users[i];
+    usersObj[uid] = {
+      uid,
+      avatar: tools.getUrl('userAvatar', avatar),
+      username,
+    };
+  }
+  return usersObj;
+}
+
 userSchema.statics.getImproveUserInfoByMiddlewareUser = async function(user) {
   if(!user) return null;
   const UsersPersonalModel = mongoose.model("usersPersonal");
@@ -2805,6 +2821,24 @@ userSchema.statics.getImproveUserInfoByMiddlewareUser = async function(user) {
     setDescription: !!description,
     verifyPhoneNumber: !needVerifyPhoneNumber,
   };
+}
+
+userSchema.statics.checkAccessControlPermissionWithThrowError = async props => {
+  const AccessControlModel = mongoose.model('accessControl');
+  const sources = await AccessControlModel.getSources();
+  const {
+    uid,
+    rolesId,
+    gradeId,
+    isApp
+  } = props;
+  await AccessControlModel.checkAccessControlPermissionWithThrowError({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.user,
+  });
 }
 
 module.exports = mongoose.model('users', userSchema);

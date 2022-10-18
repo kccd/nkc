@@ -2489,4 +2489,30 @@ forumSchema.statics.getUrl = async function(fid, cid) {
   return tools.getUrl('forumHome', fid) + (cid? `?cat=${cid}`: '');
 }
 
+forumSchema.statics.checkAccessControlPermission = async (props) => {
+  const {uid, rolesId, gradeId, isApp} = props;
+  const AccessControlModel = mongoose.model('accessControl');
+  const sources = await AccessControlModel.getSources();
+  await AccessControlModel.checkAccessControlPermission({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.community,
+  });
+};
+
+forumSchema.statics.checkAccessControlPermissionWithThrowError = async (props) => {
+  const {uid, rolesId, gradeId, isApp} = props;
+  const AccessControlModel = mongoose.model('accessControl');
+  const sources = await AccessControlModel.getSources();
+  await AccessControlModel.checkAccessControlPermissionWithThrowError({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.community,
+  });
+}
+
 module.exports = mongoose.model('forums', forumSchema);

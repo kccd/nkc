@@ -37,7 +37,6 @@ const contentRouter = require("./content");
 const profileRouter = require('./p/index');
 const subscribeRouter = require('./subscribe');
 const userPanelRouter = require('./userPanel');
-const path = require('path');
 
 
 userRouter
@@ -75,15 +74,17 @@ userRouter
     await next();
   })
   .use('/:uid', async (ctx, next) => {
-    const {data, db, state, nkcModules} = ctx;
-    const {user} = data;
-    if(!user) {
-      const visitSettings = await db.SettingModel.getSettings('visit');
-      if(visitSettings.userHomeLimitVisitor.status) {
-        data.description = nkcModules.nkcRender.plainEscape(visitSettings.userHomeLimitVisitor.description);
-        ctx.status = 401;
-        return ctx.body = nkcModules.render(path.resolve(__dirname, '../../pages/filter_visitor.pug'), data, state);
-      }
+    const {db, state, data} = ctx;
+    if(
+      !state.uid ||
+      state.uid !== data.targetUser.uid
+    ) {
+      await db.UserModel.checkAccessControlPermissionWithThrowError({
+        uid: state.uid,
+        rolesId: data.userRoles.map(role => role._id),
+        gradeId: state.uid? data.userGrade._id: undefined,
+        isApp: state.isApp,
+      });
     }
     ctx.template = 'vueRoot/index.pug';
     await next();

@@ -1716,5 +1716,22 @@ schema.statics.getMomentsObjectByMomentsId = async function(momentsId) {
   return momentsObj;
 }
 
+schema.statics.checkAccessControlPermissionWithThrowError = async props => {
+  const AccessControlModel = mongoose.model('accessControl');
+  const {
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+  } = props;
+  const sources = await AccessControlModel.getSources();
+  await AccessControlModel.checkAccessControlPermissionWithThrowError({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.zone
+  });
+}
 module.exports = mongoose.model('moments', schema);
 

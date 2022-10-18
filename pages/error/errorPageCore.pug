@@ -1,0 +1,87 @@
+style.
+  .error-container{
+    padding: 5rem 0 10rem 0;
+  }
+
+  .error-title {
+    color: #e85a71;
+    text-align: center;
+    font-size: 2rem;
+  }
+
+  .error-url {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0.5rem 0;
+    font-size: 1.2rem;
+  }
+  .error-content {
+    padding: 1.2rem 1rem;
+    margin: 2rem auto;
+    border-radius: 0 0 3px 3px;
+    max-width: 100%;
+    width: 40rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    border-top: 2px solid #2b90d9;
+  }
+
+  .error-header {
+    color: #282c37;
+    font-size: 1.3rem;
+    line-height: 2.4rem;
+    white-space: pre-wrap;
+  }
+
+  .error-nav {
+    text-align: center;
+    margin-top: 1rem;
+    color: #282c37;
+    font-size: 1.25rem;
+  }
+
+  .error-nav a {
+    color: #2b90d9;
+    text-decoration: none;
+    margin-right: 1rem;
+  }
+
+  .error-url code {
+    font-size: 1.3rem;
+  }
+
+  .error-nav a:hover {
+    opacity: 0.7;
+  }
+
+  .b-s-10 {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  .error-description {
+    font-size: 1.25rem;
+    padding: 0.5rem;
+    border-radius: 2px;
+    color: #31708f;
+    line-height: 2rem;
+    margin-top: 0.5rem;
+    background-color: #d9edf7;
+    white-space: pre-wrap;
+  }
+
+
+mixin errorPageCore(props)
+  .error-container
+    .error-title=props.title
+    .error-content.b-s-10
+      if props.abstract
+        .error-header=props.abstract
+      if props.url
+        .error-url
+          span URL:&nbsp;
+          code=props.url
+      if props.description
+        .error-description=props.description
+    .error-nav
+      a(href='/') 网站首页
+      a(href=`/problem/add?c=${props.url}`) 上报问题

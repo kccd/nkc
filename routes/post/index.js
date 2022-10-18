@@ -10,11 +10,9 @@ const anonymousRouter = require("./anonymous");
 const hideRouter = require("./hide");
 const deleteRouter = require("./delete");
 const postRouter = require("./post");
-const Path = require("path");
 const toppedRouter = require("./topped");
 const authorRouter = require("./author");
 const resourcesRouter = require("./resources");
-const markNotes = require('../../nkcModules/nkcRender/markNotes');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
 const commentRouter = require('./comment');
@@ -23,6 +21,16 @@ const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
 
 router
+  .use('/', async (ctx, next) => {
+    const {state, data, db} = ctx;
+    await db.ForumModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    await next();
+  })
   .get('/:pid', async (ctx, next) => {
     const {nkcModules, data, db, query, state} = ctx;
 		const {token, page=0, highlight, redirect} = query;

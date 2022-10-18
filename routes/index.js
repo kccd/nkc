@@ -93,62 +93,39 @@ const latestRouter = routers.latest;
 // 第三方登录
 const oauthRouter = routers.oauth;
 
-const path = require('path');
-const remoteState = require('../middlewares/body/remoteState');
-
-router.use('/', async (ctx, next) => {
-  const {data, state, db, nkcModules, settings} = ctx;
-  const {user, operationId} = data;
-  const visitSettings = await db.SettingModel.getSettings('visit');
-  const isWhitelistOperation = settings.operationsType.whitelistOfVisitorLimit.includes(operationId);
-  const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
-  let isDev = false;
-  if(user && user.certs && user.certs.includes('dev')) {
-    isDev = true;
-  }
-  // 如果后台开启了全局访问限制且当前操作未在白名单
-  if(visitSettings.globalAccessLimit.status && !isWhitelistOperation && !isDev) {
-    let userRolesId;
-    let userGradeId;
-    if(!user) {
-      userRolesId = ['visitor'];
-      userGradeId = null;
-    } else {
-      userRolesId = data.userRoles.map(r => r._id);
-      userGradeId = data.userGrade._id;
-    }
-    const {relation, rolesId, gradesId} = visitSettings.globalAccessLimit.whitelist;
-    let hasRole = false;
-    for(const roleId of userRolesId) {
-      if(!rolesId.includes(roleId)) continue;
-      hasRole = true;
-      break;
-    }
-    const hasGrade = gradesId.includes(userGradeId);
+router
+  .use('/', async (ctx, next) => {
+    const {db, state, data, settings} = ctx;
+    const {operationId, user} = data;
+    const isWhitelistOperation = settings.operationsType.whitelistOfGlobalAccessControl.includes(operationId);
+    const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
     if(
-      // 与关系时，证书不满足或用户等级不满足
-      (relation === 'and' && (!hasRole || !hasGrade)) ||
-      // 或关系时，证书和用户等级均不满足
-      (relation === 'or' && !hasRole && !hasGrade)
+      !isWhitelistOperation &&
+      (
+        !user ||
+        !user.certs ||
+        !user.certs.includes('dev')
+      )
     ) {
-      const description = user? visitSettings.globalAccessLimit.userDescription: visitSettings.globalAccessLimit.visitorDescription;
-      if(!state.isApp) ctx.status = 401;
+      // 非白名单操作且非管理员需要进行全局权限判断
+      const sources = await db.AccessControlModel.getSources();
+      let permissionChecker = db.AccessControlModel.checkAccessControlPermissionWithThrowError;
       if(
         isResourceOperation ||
         (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
       ) {
-        return ctx.throw(403, description);
-      } else {
-        data.description = nkcModules.nkcRender.plainEscape(description);
-        ctx.template = 'filter_visitor.pug';
-        await remoteState(ctx);
-        return ctx.body = nkcModules.render(path.resolve(__dirname, "../pages/filter_visitor.pug"), data, state, ctx.remoteState);
+        permissionChecker = db.AccessControlModel.checkAccessControlPermission;
       }
+      await permissionChecker({
+        isApp: state.isApp,
+        uid: state.uid,
+        rolesId: data.userRoles.map(role => role._id),
+        gradeId: state.uid? data.userGrade._id: undefined,
+        source: sources.global,
+      });
     }
-  }
-  await next();
-});
-
+    await next();
+  });
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());

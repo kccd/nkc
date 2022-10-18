@@ -2,7 +2,15 @@ const router = require('koa-router')();
 router
   .use('/', async (ctx, next) => {
     // 公共数据
-    const {query, data, db} = ctx;
+    const {query, state, data, db} = ctx;
+
+    await db.ForumModel.checkAccessControlPermissionWithThrowError({
+      isApp: state.isApp,
+      uid: state.uid,
+      rolesId: data.userRoles.map(role => role._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+    });
+
     let {t} = query;
     const communityTypes = {
       thread: 'thread',

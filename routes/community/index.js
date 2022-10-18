@@ -1,5 +1,15 @@
 const router = require('koa-router')();
 router
+  .use('/', async (ctx, next) => {
+    const {state, db, data} = ctx;
+    await db.ForumModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const {db, data, state, nkcModules} = ctx;
     const {user} = data;
