@@ -73,6 +73,7 @@ module.exports = {
     "getMessageFile"
   ],
   whitelistOfGlobalAccessControl: [
+    'getDrawData',
     'logout',
     'visitLogin',
     'submitLogin',
