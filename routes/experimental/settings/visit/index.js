@@ -11,7 +11,10 @@ router
   .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {accessControl} = body;
-
+    const roles = await db.RoleModel.find({_id: {$nin: ['default', 'dev']}}, {_id: 1, displayName: 1});
+    const grades = await db.UsersGradeModel.find({}, {_id: 1, displayName: 1});
+    const rolesId = roles.map(r => r._id);
+    const gradesId = grades.map(g => g._id);
     const sourcesName = {
       column: '专栏',
       zone: '空间',
@@ -66,6 +69,7 @@ router
       });
     }
     await db.AccessControlModel.saveToCache();
+    // await db.SettingModel.saveSettingsToRedis('visit');
     await next();
   });
 module.exports = router;
