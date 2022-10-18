@@ -743,6 +743,37 @@ schema.statics.saveColumnBanner = async (columnId, file) => {
   return attachment;
 }
 
+schema.statics.saveOAuthAppIcon = async (OAuthAppId, file) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const OAuthAppModel = mongoose.model('OAuthApps');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  const aid = await AttachmentModel.getNewId();
+  const time = new Date();
+  const attachment = await AttachmentModel.createAttachmentAndPushFile({
+    aid,
+    file,
+    ext,
+    sizeLimit: 20 * 1024 * 1024,
+    time,
+    type: 'OAuthAppIcon',
+    images: [
+      {
+        type: 'def',
+        name: `${aid}.${ext}`,
+        height: 500,
+        width: 500,
+        quality: 90,
+      }
+    ]
+  });
+  await OAuthAppModel.updateOne({_id: OAuthAppId}, {
+    $set: {
+      icon: attachment._id,
+    }
+  });
+};
+
 schema.statics.saveBookCover = async (bookId, file) => {
   const AttachmentModel = mongoose.model('attachments');
   const BookModel = mongoose.model('books');

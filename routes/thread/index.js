@@ -17,6 +17,16 @@ function isIncludes(arr, id, type) {
 }
 
 threadRouter
+  .use('/', async (ctx, next) => {
+    const {db, state, data} = ctx;
+    await db.ForumModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    await next();
+  })
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
 		const {user} = data;

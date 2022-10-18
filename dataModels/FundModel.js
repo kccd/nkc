@@ -640,5 +640,23 @@ fundSchema.statics.extendUFuncInfo = async function(funds) {
   return results;
 }
 
+fundSchema.statics.checkAccessControlPermissionWithThrowError = async props => {
+  const AccessControlModel = mongoose.model('accessControl');
+  const sources = await AccessControlModel.getSources();
+  const {
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+  } = props;
+  await AccessControlModel.checkAccessControlPermissionWithThrowError({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.fund,
+  });
+}
+
 const FundModel = mongoose.model('funds', fundSchema);
 module.exports = FundModel;

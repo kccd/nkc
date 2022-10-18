@@ -4,7 +4,7 @@ html(lang="zh-cn")
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0')
     meta(http-equiv="X-UA-Compatible" content="ie=edge")
-    title=data.title || '404 Not Found'
+    title 403 Forbidden
     style.
       html {
         font-size: 12px;
@@ -93,14 +93,10 @@ html(lang="zh-cn")
       }
 
   body
-    .error-icon=data.title || '404 Not Found'
+    .error-icon 403 Forbidden
     .error-list.b-s-10
-      .error-header=data.abstract || '糟糕！你访问的页面 404 了，请检查链接。'
-      .error-code
-        span URL:&nbsp;
-        code=data.url
-      if data.description
-        .error-description=data.description
+      .error-header 您没有权限访问当前资源
+      .error-description=data.error
       .error-info
         a.home-btn(href='/') 网站首页
         a(href=`/problem/add?c=${data.url}`) 上报问题

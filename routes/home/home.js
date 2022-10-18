@@ -3,6 +3,24 @@ module.exports = async (options) => {
   const {data, db, nkcModules, state} = ctx;
   const {user} = data;
 
+  // 首页访问控制
+  try{
+    await db.ForumModel.checkAccessControlPermission({
+      uid: state.uid,
+      rolesId: data.userRoles.map(role => role._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+  } catch(err) {
+    data.accessControlApps = await db.AccessControlModel.getCanAccessApps({
+      uid: state.uid,
+      rolesId: data.userRoles.map(role => role._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    return ctx.template = 'home/accessControlHome.pug';
+  }
+
   const homeSettings = await db.SettingModel.getSettings("home");
 
   // 最新文章

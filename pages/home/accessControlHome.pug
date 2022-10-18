@@ -1,0 +1,47 @@
+extends ../bootstrap_base
+block title
+  include ../publicModules/web_header
+  style.
+    body{
+      background: #fff;
+    }
+    .url{
+      margin: 0 0.5rem;
+    }
+    .page-content{
+      margin: 10rem 0;
+    }
+block content
+  -
+    var apps = [];
+    if (data.accessControlApps.forum) {
+      apps.push({
+        name: '社区',
+        url: '/community'
+      });
+    }
+    if (data.accessControlApps.column) {
+      apps.push({
+        name: '专栏',
+        url: '/m'
+      });
+    }
+    if (data.accessControlApps.zone) {
+      apps.push({
+        name: '空间',
+        url: '/n/zone'
+      });
+    }
+    if (data.accessControlApps.fund) {
+      apps.push({
+        name: '基金',
+        url: '/fund'
+      });
+    }
+
+  .container-fluid.max-width
+    .page-content.text-center
+      h4 目前网站处于局部开放状态，请点击访问目前开放的栏目。
+      .m-t-2
+        for app in apps
+          a.btn.btn-default.btn-lg.url(href=app.url)=app.name

@@ -3,6 +3,16 @@ const router = new Router();
 const columnRouter = require("./column");
 
 router
+  .use('/', async (ctx, next) => {
+    const {db, data, state} = ctx;
+    await db.ColumnModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    await next();
+  })
   .get("/", async (ctx, next) => {
     const {query, data, db} = ctx;
     const {page = 0} = query;

@@ -1,91 +1,90 @@
 extends ../../experimental
 block eTitle
   title 访问设置
+  +includeCSS('/experimental/settings/visit/visit.css')
 block eContent
   .container-fluid.max-width
     .row
-      .hidden#data= objToStr({visitSettings: data.visitSettings, roles: data.roles, grades: data.grades})
+      -
+        var dataString = objToStr({
+          accessControl: data.accessControl,
+          roles: data.roles,
+          grades: data.grades
+        })
+      .hidden#data=dataString
       .col-xs-12.col-md-12#app(v-cloak)
+        user-selector(ref='userSelector')
         .form-horizontal
-          h4 全局访问限制
-          .form-group
-            label.col-sm-2.control-label 状态
-            .col-sm-10
-              .radio
-                label.m-r-1
-                  input(type="radio" v-model="visitSettings.globalAccessLimit.status" :value="true")
-                  | 开启
-                label
-                  input(type="radio" v-model="visitSettings.globalAccessLimit.status" :value="false")
-                  | 关闭
-          .form-group
-            label.col-sm-2.control-label 白名单
-            .col-sm-6
-              .checkbox
-                h5 证书
-                label.m-r-1(v-for='role in roles')
-                  input(type='checkbox' v-model="visitSettings.globalAccessLimit.whitelist.rolesId" :value='role._id')
-                  span {{role.displayName}}
-              .radio
-                h5 关系
-                label.m-r-1
-                  input(type='radio' v-model="visitSettings.globalAccessLimit.whitelist.relation" value='and')
-                  span 与
-                label
-                  input(type='radio' v-model="visitSettings.globalAccessLimit.whitelist.relation" value='or')
-                  span 或
-              .checkbox
-                h5 用户等级
-                label.m-r-1(v-for='grade in grades')
-                  input(type='checkbox' v-model="visitSettings.globalAccessLimit.whitelist.gradesId" :value='grade._id')
-                  span {{grade.displayName}}
-          .form-group
-            label.col-sm-2.control-label 登录用户提示内容
-            .col-sm-6
-              textarea.form-control(rows=5 v-model="visitSettings.globalAccessLimit.userDescription")
-              span.text-info 支持空格和换行
-          .form-group
-            label.col-sm-2.control-label 游客提示内容
-            .col-sm-6
-              textarea.form-control(rows=5 v-model="visitSettings.globalAccessLimit.visitorDescription")
-              span.text-info 支持空格和换行
-          h4 游客全局访问限制
-          .form-group
-            label.col-sm-2.control-label 状态
-            .col-sm-10
-              .radio
-                label.m-r-1
-                  input(type="radio" v-model="visitSettings.globalLimitVisitor.status" :value="true")
-                  | 开启
-                label
-                  input(type="radio" v-model="visitSettings.globalLimitVisitor.status" :value="false")
-                  | 关闭
+          mixin acForm(platform)
+            .form-group
+              label.col-sm-2.control-label 平台
+              .col-sm-10
+                h5
+                  strong=platform.toUpperCase()
+            .form-group
+              label.col-sm-2.control-label 状态
+              .col-sm-10
+                .radio
+                  label.m-r-1
+                    input(type="radio" v-model=`ac.${platform}.enabled` :value="true")
+                    | 开启
+                  label
+                    input(type="radio" v-model=`ac.${platform}.enabled` :value="false")
+                    | 关闭
+            .form-group
+              label.col-sm-2.control-label 白名单
+              .col-sm-10
+                .m-b-2
+                  h5
+                    strong 证书和等级
+                  .checkbox
+                    label.m-r-1(v-for='role in roles')
+                      input(type='checkbox' v-model=`ac.${platform}.whitelist.rolesId` :value='role._id')
+                      span {{role.displayName}}
+                  .radio
+                    label.m-r-1
+                      input(type='radio' v-model=`ac.${platform}.whitelist.relation` value='and')
+                      span 与
+                    label
+                      input(type='radio' v-model=`ac.${platform}.whitelist.relation` value='or')
+                      span 或
+                  .checkbox
+                    label.m-r-1(v-for='grade in grades')
+                      input(type='checkbox' v-model=`ac.${platform}.whitelist.gradesId` :value='grade._id')
+                      span {{grade.displayName}}
+                .m-b-2
+                  h5
+                    strong 指定用户
+                  .user-item-container
+                    div(v-for=`(user, index) in ac.${platform}.whitelist.users`)
+                      img(:src="getUrl('userAvatar', user.avatar)")
+                      a(:href='getUrl("userHome", user.uid)' target="_blank") {{user.username}}
+                      .icon.fa.fa-remove(@click=`removeFormArr(ac.${platform}.whitelist.users, index)`)
+                    button.btn.btn-sm.btn-default(@click.stop=`selectUser(ac.${platform}.whitelist.users)`) 选择用户
+            .form-group
+              label.col-sm-2.control-label 会员提示
+              .col-sm-10
+                textarea.form-control(rows=4 v-model=`ac.${platform}.userDesc`)
+            .form-group
+              label.col-sm-2.control-label 游客提示
+              .col-sm-10
+                textarea.form-control(rows=4 v-model=`ac.${platform}.visitorDesc`)
 
-          .form-group
-            label.col-sm-2.control-label 提示内容
-            .col-sm-6
-              textarea.form-control(rows=5 v-model="visitSettings.globalLimitVisitor.description")
-              span.text-info 支持空格和换行
-          h4 游客用户名片页访问限制
-          .form-group
-            label.col-sm-2.control-label 状态
-            .col-sm-10
-              .radio
-                label.m-r-1
-                  input(type="radio" v-model="visitSettings.userHomeLimitVisitor.status" :value="true")
-                  | 开启
-                label
-                  input(type="radio" v-model="visitSettings.userHomeLimitVisitor.status" :value="false")
-                  | 关闭
+          div(v-for='ac in accessControl').m-b-5
+            h4
+              strong {{getAccessControlTitle(ac.source)}}访问控制
+            .row
+              .col-xs-12.col-md-6
+                +acForm(`web`)
+              .col-xs-12.col-md-6
+                +acForm(`app`)
 
-          .form-group
-            label.col-sm-2.control-label 提示内容
-            .col-sm-6
-              textarea.form-control(rows=5 v-model="visitSettings.userHomeLimitVisitor.description")
-              span.text-info 支持空格和换行
-          .form-group
-            label.col-sm-2.control-label
-            .col-sm-6
-              button.btn.btn-primary(@click="submit") 保存
+
+          .row
+            .col-xs-12.col-md-6
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-6
+                  button.btn.btn-lg.btn-primary(@click="submit") 保存
 block scripts
   +includeJS("/experimental/settings/visit/visit.js")

@@ -72,7 +72,7 @@ module.exports = {
     "visitForumBanner",
     "getMessageFile"
   ],
-  whitelistOfVisitorLimit: [
+  whitelistOfGlobalAccessControl: [
     'logout',
     'visitLogin',
     'submitLogin',
@@ -96,11 +96,15 @@ module.exports = {
     'visitAppDownload', // app 相关
     'downloadApp',
     'APPcheckout',
+    'APPGetAccountInfo',
+    'APPGetNav',
+    'APPGetMy',
+    'appGetDownload',
 
     'rechargePost', // 支付相关
     'receiveAliPayPaymentInfo',
     'receiveWeChatPaymentInfo',
-    'fundDonation'
+    'fundDonation',
   ],
   whitelistOfClosedFund: [
 

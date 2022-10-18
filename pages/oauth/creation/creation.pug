@@ -1,0 +1,39 @@
+extends ../../bootstrap_base
+block title
+  title 创建第三方应用
+  +includeCSS('/oauth/creation/creation.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-sm-6.col-md-6.col-md-offset-3.col-sm-offset-3.box-shadow-panel
+        .form
+          .form-group
+            h3 申请 OAuth 信息
+          .form-group
+            label.control-label 名称
+            input.form-control(type="text" v-model="name")
+          .form-group
+            label.control-label 简介
+            textarea.form-control(v-model="desc" rows="4")
+          .form-group
+            label.control-label 图标
+            .icon-container(v-if="iconUrl")
+              img(:src="iconUrl")
+            div
+              input.hidden(
+                type="file"
+                accept="image/jpeg,image/png"
+                ref="iconInput"
+                @change="onSelectedFile"
+              )
+              button.btn.btn-default.btn-sm(@click="selectFile") 选择图片
+          .form-group
+            label.control-label 应用主页
+            textarea.form-control(v-model="home")
+          .form-group
+            label.control-label 应用回调链接
+            textarea.form-control(v-model="callback")
+          .form-group
+            button.btn.btn-primary.btn-block(@click="submit") 提交
+block scripts
+  +includeJS('/oauth/creation/creation.js')

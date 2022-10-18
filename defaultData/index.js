@@ -326,6 +326,34 @@ async function initShopSettings() {
   }
 }
 
+async function initAccessControl() {
+  const db = require('../dataModels');
+  const sourcesObj = await db.AccessControlModel.getSources();
+  const sources = Object.values(sourcesObj);
+  const accessControls = await db.AccessControlModel.find({}, {source: 1});
+  const existSources = accessControls.map(ac => ac.source);
+  for(const source of sources) {
+    if(existSources.includes(source)) continue;
+    const platformData = {
+      enabled: false,
+      whitelist: {
+        rolesId: [],
+        gradesId: [],
+        relation: 'or',
+        usersId: [],
+      },
+      userDesc: '无权访问',
+      visitorDesc: '无权访问',
+    }
+    await db.AccessControlModel.createAccessControl({
+      source,
+      app: platformData,
+      web: platformData,
+    });
+    console.log(`Insert accessControl "${source}"`);
+  }
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -343,6 +371,7 @@ async function init() {
   await initDefaultHomeBlocks();
   await initUsersOnlineStatus();
   await initShopSettings();
+  await initAccessControl();
 }
 
 module.exports = {
@@ -361,4 +390,5 @@ module.exports = {
   initComplaintType,
   initUsersOnlineStatus,
   initShopSettings,
+  initAccessControl,
 };

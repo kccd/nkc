@@ -1,0 +1,15 @@
+extends ../bootstrap_base
+block title
+  title=data.error.title
+
+block content
+  include ./errorPageCore
+  .container-fluid.max-width
+    -
+      var errorPageCoreProps = {
+        title: data.error.title,
+        abstract: data.error.abstract,
+        description: data.error.description,
+        url: data.url,
+      }
+    +errorPageCore(errorPageCoreProps)

@@ -34,4 +34,6 @@ module.exports = async () => {
   await db.ScoreOperationModel.saveAllScoreOperationToRedis();
   // IP 黑名单
   await db.IPBlacklistModel.saveIPBlacklistToRedis();
+  // 访问控制
+  await db.AccessControlModel.saveToCache();
 }

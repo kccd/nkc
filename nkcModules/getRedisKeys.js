@@ -18,5 +18,6 @@ module.exports = (type, v1, v2) => {
     case 'newMomentId': return `newMomentId`;
     case 'momentOrder': return `moment:${v1}:order`;
     case 'commentOrder': return `comment:${v1}:order`;
+    case 'accessControl': return `accessControl`;
   }
 }

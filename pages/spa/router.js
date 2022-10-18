@@ -2,7 +2,7 @@ import creationRoutes from './routes/creation';
 import userRouter from './routes/user';
 const routes = [
   ...creationRoutes,
-  ...userRouter
+  ...userRouter,
 ];
 
 

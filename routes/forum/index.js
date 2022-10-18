@@ -3,6 +3,16 @@ const singleForumRouter = require('./singleForum');
 const forumRouter = new Router();
 
 forumRouter
+  .use('/', async (ctx, next) => {
+    const {db, state, data} = ctx;
+    await db.ForumModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const {data, query, db, nkcModules} = ctx;
     const {user} = data;
