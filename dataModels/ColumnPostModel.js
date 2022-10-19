@@ -573,38 +573,35 @@ schema.statics.checkColumnPost = async (columnId, pid) => {
 * @param {Number} count 条数
 * */
 schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
+  const {getUrl} = require('../nkcModules/tools');
   const ColumnPostModel = mongoose.model('columnPosts');
-  const PostModel = mongoose.model('posts');
-  const columnPosts = await ColumnPostModel.find({
+  let columnPosts = await ColumnPostModel.find({
     hidden: false,
     columnId,
-    type: 'thread'
-  }, {
-    pid: 1
+    type: {
+      $in: ['thread', 'article']
+    }
   })
     .sort({toc: -1})
     .limit(count);
-  const postsId = columnPosts.map(cp => cp.pid);
-  const posts = await PostModel.find({
-    pid: {
-      $in: postsId
-    },
-    type: 'thread',
-    mainForumsId: {$in: fids}
-  }, {
-    t: 1,
-    pid: 1,
-    tid: 1,
+  columnPosts = await ColumnPostModel.extendColumnPosts({
+    columnPosts: columnPosts,
+    fidOfCanGetThread: fids,
+    isModerator: false
   });
-  const postsObj = {};
-  for(const post of posts) {
-    postsObj[post.pid] = post;
-  }
   const results = [];
-  for(const pid of postsId) {
-    const post = postsObj[pid];
-    if(!post) continue;
-    results.push(post);
+  for(const cp of columnPosts) {
+    const url = getUrl('columnThread', cp.columnId, cp._id);
+    let title;
+    if(cp.type === 'thread') {
+      title = cp.post.t;
+    } else {
+      title = cp.article.document.title;
+    }
+    results.push({
+      title,
+      url
+    });
   }
   return results;
 };
@@ -625,7 +622,7 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
     sid = selectCategory.selectedMinorCategoriess[0].columnId;
   }
   if(!sid) {
-    throw(500, '未找到分享的专栏');
+    throwErr(500, '未找到分享的专栏');
   }
   //如果article存在sid,通过sid查找专栏
   const column = await ColumnModel.findOnly({_id: sid});
