@@ -12,6 +12,7 @@ const controlSources = {
   fund: 'fund',
   global: 'global',
   user: 'user',
+  search: 'search',
 };
 
 const platformData = {

@@ -67,7 +67,7 @@ block content
                     )=text
               .column-threads
                 for thread in column.latestThreads
-                  a(href=`/t/${thread.tid}` title=thread.t target="_blank")=thread.t
+                  a(href=thread.url title=thread.title target="_blank")=thread.title
         include ../publicModules/paging/paging_input
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
