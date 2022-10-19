@@ -3,13 +3,23 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const time = Date.now();
-    const {db, data, query, nkcModules} = ctx;
+    const {db, data, query, state, nkcModules} = ctx;
+
+    const sources = await db.AccessControlModel.getSources();
+    await db.AccessControlModel.checkAccessControlPermissionWithThrowError({
+      isApp: state.isApp,
+      uid: state.uid,
+      rolesId: data.userRoles.map(role => role._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      source: sources.search,
+    });
+
     const {nkcRender} = nkcModules;
     let {page=0, t, c, d, form = ''} = query;
     const {user} = data;
     // 通过mongodb精准搜索用户名
     let targetUser, existUser = false, searchUserFromMongodb = false, uidToUser;
-  
+
     if(c) {
       if(!d) {
         data.c = Buffer.from(encodeURIComponent(c)).toString("base64");
@@ -252,7 +262,7 @@ router
             }
           }
         }
-        
+
       });
       const posts = await db.PostModel.find({pid: {$in: [...pids]}, reviewed: true});
       posts.map(post => {

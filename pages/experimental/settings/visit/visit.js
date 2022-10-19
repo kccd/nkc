@@ -62,6 +62,7 @@ const app = new Vue({
         fund: '基金',
         global: '全局',
         user: '用户名片',
+        search: '搜索',
       })[source]) || source;
     },
     removeFormArr(arr, index) {

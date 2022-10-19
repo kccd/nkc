@@ -21,7 +21,8 @@ router
       community: '社区',
       fund: '基金',
       global: '全局',
-      user: '用户名片'
+      user: '用户名片',
+      search: '搜索',
     };
 
     const checkAndModifyAC = (source, acForm) => {
