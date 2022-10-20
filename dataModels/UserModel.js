@@ -1124,6 +1124,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
         avatar: column.avatar,
         abbr: column.abbr,
         subCount: column.subCount,
+        closed: column.closed,
       }
     }
     for(const cert of certs) {
@@ -1937,7 +1938,7 @@ userSchema.statics.checkStatusForDestroyAccount = async (uid) => {
   const user = await UserModel.findOnly({uid});
   // 拓展用户信息 判断账号下是否有正常开发的专栏
   await UserModel.extendUserInfo(user);
-  if(user.column) status.column = false;
+  if(user.column && !user.column.closed) status.column = false;
   // 判断用户出售的商品是否均停售，订单是否都已完成
   const productCount = await ShopGoodsModel.countDocuments({uid, productStatus: "insale"});
   if(productCount > 0) status.shopSeller = false;
