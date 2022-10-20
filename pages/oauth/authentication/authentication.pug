@@ -11,12 +11,14 @@ block content
           .oauth-title.m-b-1
             span 应用「
             a(:href="appHome" target="_blank") {{appName}}
-            span 」正在申请以下权限：
+            span 」申请执行以下操作：
           .oauth-operations.m-b-1
-            div(v-for='operation in operations')
-              span {{operation}}
-          .oauth-options
-            button.btn.btn-primary(@click='submit') 确认授权
-            button.btn.btn-default(@click='cancel') 取消
+            .oauth-operation(v-for='operation in operations') # {{operation.name}}
+          .oauth-options(v-if='logged')
+            button.btn.btn-primary.m-r-05(@click='submit()') 确认授权
+            button.btn.btn-default(@click='cancel()') 取消
+          .oauth-options(v-else)
+            button.btn.btn-primary.m-r-05(@click='toLogin()') 登录
+            button.btn.btn-default(@click='toLogin("register")') 注册
 block scripts
   +includeJS('/oauth/authentication/authentication.js')
