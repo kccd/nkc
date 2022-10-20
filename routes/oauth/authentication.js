@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {query, db, data, nkcModules} = ctx;
+    const {query, db, data, nkcModules, state} = ctx;
     const {t: token} = query;
     const {getUrl} = nkcModules.tools;
     const tokenData = await db.OAuthTokenModel.getTokenByTokenString(token);
@@ -13,7 +13,10 @@ router
       appName: app.name,
       appHome: app.home,
       operations: [
-        tokenData.operation
+        {
+          type: tokenData.operation,
+          name: state.lang('oauth', tokenData.operation)
+        }
       ],
       token,
     };
@@ -22,10 +25,17 @@ router
   })
   .post('/', async (ctx, next) => {
     const {body, state, db, data} = ctx;
-    const {token} = body;
+    const {token, approved} = body;
+    if(!state.uid) {
+      ctx.throw(403, `请先登录`);
+    }
     const tokenData = await db.OAuthTokenModel.getTokenByTokenString(token);
     await tokenData.verifyTokenBeforeAuthorize();
-    await tokenData.authorizeToken(state.uid);
+    if(approved) {
+      await tokenData.authorizeToken(state.uid);
+    } else {
+      await tokenData.useToken();
+    }
     const app = await db.OAuthAppModel.getAppById(tokenData.appId);
     data.url = `${app.callback}?o=${tokenData.operation}&t=${token}`;
     await next();
