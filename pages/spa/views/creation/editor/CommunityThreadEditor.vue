@@ -18,7 +18,7 @@
           .status.fa(:class="[{ 'fa-check-circle': err.status}, {'status-true' : err.status} , {'status-false': !err.status}, {'fa-exclamation-circle': !err.status}]")
           span {{ err.val }}
       .error-info 请前往
-        a(:href="'/u/' + err.user.uid + '/settings/info'") 资料设置
+        a(:href="'/u/' + user.uid + '/settings/info'") 资料设置
         | 页面完善相关信息。
 </template>
 
@@ -49,6 +49,7 @@ export default {
   },
   methods: {
     noPermission(err) {
+      this.user = err.user;
       this.err = err.status === 403;
       const error = err.error;
       for (let key in error) {

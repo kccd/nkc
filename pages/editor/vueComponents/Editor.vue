@@ -302,12 +302,12 @@ export default {
           }
         })
         .catch((err) => {
-          if(err.error){
+          if(err.error && !err.error.status){
             this.err = err.error;
             this.$emit('noPermission', err);
+          } else {
             return sweetError(err.error);
           }
-
         });
     },
     // 设置编辑器标题、内容
