@@ -3,7 +3,7 @@ if !isIncluded('singlePostTop')
   mixin singlePostTop(props)
     -var {pid, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
-    -var {cancelTopped, url} = props;
+    -var {cancelTopped, url, addr} = props;
     .single-post-top
       .single-post-avatar(
         data-global-mouseover="showUserPanel"
@@ -35,6 +35,7 @@ if !isIncluded('singlePostTop')
           if tlm
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
+          span=` IP:${addr}`
       .single-post-floor
         a(href=url)=floor + '楼'
         .single-post-checkbox

@@ -220,7 +220,7 @@ schema.statics.createComment = async (options) => {
 /*
 * 发布comment, 检测评论的发表权限，不需要审核，即comment的状态为正常时，为评论生成一条新的动态并且通知作者文章文章被评论了
 * */
-schema.methods.publishComment = async function (article, toColumn) {
+schema.methods.publishComment = async function (article, toColumn, {ip, port}) {
   const DocumentModel = mongoose.model('documents');
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
@@ -249,6 +249,8 @@ schema.methods.publishComment = async function (article, toColumn) {
     try {
       //生成一条新动态
       MomentModel.createQuoteMomentAndPublish({
+        ip,
+        port,
         uid: this.uid,
         quoteType: commentQuoteType,
         quoteId: this._id,
@@ -412,12 +414,13 @@ schema.statics.extendPostComments = async (props) => {
       reason = delLog.reason;
     }
     if(d.quoteDid) quoteIdArr.push(d.quoteDid);
-    const {content, _id, type, status} = d;
+    const {content, _id, type, status, addr} = d;
     documentObj[d.did] = {
       content,
       _id,
       type,
       status,
+      addr,
       reason: reason?reason : '',
     };
   }
@@ -476,6 +479,7 @@ schema.statics.extendPostComments = async (props) => {
       type: documentObj[c.did].type,
       reason: documentObj[c.did]?documentObj[c.did].reason : null, //审核原因
       tlm: documentObj[c.did].tlm,
+      addr: documentObj[c.did].addr,
       user: {
         uid: user.uid,
         username: user.username,

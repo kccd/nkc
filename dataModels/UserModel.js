@@ -2842,5 +2842,50 @@ userSchema.statics.checkAccessControlPermissionWithThrowError = async props => {
   });
 }
 
+/*
+* 获取账号注册信息
+* @param {{
+*    uid: string
+*    ipId: string
+*    ip: string
+* }} props
+* @return {{
+*   addr: string ip归属地
+*   authType: string 认证方式
+*   field: string 领域信息
+*   subject: string 主体类型
+* }}
+* */
+userSchema.statics.getAccountRegisterInfo = async (props) => {
+  const {uid, ipId, ip} = props;
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const IPModel = mongoose.model('ips');
+  const up =  await UsersPersonalModel.findOne({uid}, {email: 1, uid: 1, regIp: 1});
+  const authLevel = await up.getAuthLevel();
+  let authType = '未同步';
+  if([2, 3].includes(authLevel)) {
+    authType = '身份证号';
+  } else if(authLevel === 1) {
+    authType = '手机号';
+  } else if(up.email) {
+    authType = '邮箱';
+  }
+  let targetIp = up.regIp;
+  if(!targetIp) {
+    if(ipId) {
+      targetIp = await IPModel.getIpByIpId(ipId);
+    } else if(ip) {
+      targetIp = ip;
+    }
+  }
+  const addr = await IPModel.getIpAddr(targetIp);
+  return {
+    addr,
+    authType,
+    field: '无',
+    subject: '个人'
+  };
+}
+
 module.exports = mongoose.model('users', userSchema);
 

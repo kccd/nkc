@@ -278,6 +278,11 @@ const postSchema = new Schema({
     type: [Number],
     default: [],
     index: 1
+  },
+  // 归属地
+  addr: {
+    type: String,
+    default: ''
   }
 }, {toObject: {
   getters: true,
@@ -1587,6 +1592,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       hide: post.hidePost || post.hide,
       cRead: ['r', 'rw'].includes(post.comment),
       url: tools.getUrl('post', post.pid),
+      addr: post.addr,
       user,
       quote,
       kcb,
@@ -1668,6 +1674,7 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
       type: post.type,
       voteUp: post.voteUp,
       digest: post.digest,
+      addr: post.addr,
       user,
       kcb,
       xsf

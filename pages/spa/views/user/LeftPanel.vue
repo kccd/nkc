@@ -6,6 +6,10 @@
     //- 用户信息
     .m-b-1(v-if="targetUser").hidden-xs.hidden-sm
       user-profile-info(ref="userProfileInfo" :target-user="targetUser" :code="code")
+
+    .m-b-1.hidden-xs.hidden-sm
+      .panel-header 主体信息
+      account-register-info(:info="accountRegisterInfo")
     //- 用户创作信息
     //-.m-b-1.user-creation
       user-creation(:target-user="targetUser")
@@ -39,9 +43,9 @@ import Share from "../../../lib/vue/Share";
 import UserManage from "./userPanel/UserManage";
 import UserCreation from "./userPanel/UserCreation";
 import {getState} from "../../../lib/js/state";
-
+import AccountRegisterInfo from './propfile/profile/AccountRegisterInfo'
 export default {
-  props: ['nav-links', 'target-user', "code","targetUserScores", "usersBlUid"],
+  props: ['nav-links', 'target-user', "code","targetUserScores", "usersBlUid", 'accountRegisterInfo'],
   data: () => ({
     rolePermissionsType: null,
     targetUid: '',
@@ -57,6 +61,7 @@ export default {
     }
   },
   components: {
+    'account-register-info': AccountRegisterInfo,
     "user-focus-on": UserFocusOn,
     "nav-links": NavLinks,
     "share": Share,

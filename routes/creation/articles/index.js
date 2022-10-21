@@ -104,6 +104,8 @@ router
     }
     if(type === 'create' && !article) {
       article = await db.ArticleModel.createArticle({
+        ip: ctx.address,
+        port: ctx.port,
         uid: state.uid,
         title,
         content,

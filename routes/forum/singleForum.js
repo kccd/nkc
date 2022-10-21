@@ -72,7 +72,7 @@ router
     }
 		const _post = await db.ThreadModel.postNewThread(options);
     if(surveyDB) await surveyDB.updateOne({pid: _post.pid});
-		
+
 		// 根据thread生成封面图
     const thread = await db.ThreadModel.findOne({tid: _post.tid});
     if(files.postCover) {
@@ -114,6 +114,8 @@ router
       // 生成动态
       const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
       db.MomentModel.createQuoteMomentAndPublish({
+        ip: ctx.address,
+        port: ctx.port,
         uid: _post.uid,
         quoteType: momentQuoteTypes.post,
         quoteId: _post.pid,

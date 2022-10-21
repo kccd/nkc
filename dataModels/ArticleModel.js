@@ -390,6 +390,8 @@ schema.statics.getArticleByIdAndUid = async (aid, uid) => {
 * */
 schema.statics.createArticle = async (props) => {
   const {
+    ip,
+    port,
     uid,
     title,
     content,
@@ -410,6 +412,8 @@ schema.statics.createArticle = async (props) => {
   const aid = await ArticleModel.getNewId();
   const {default: defaultStatus} = await ArticleModel.getArticleStatus();
   const document = await DocumentModel.createBetaDocument({
+    ip,
+    port,
     uid,
     coverFile,
     title,
@@ -630,7 +634,11 @@ schema.methods.publishArticle = async function(options) {
   //如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
   //不需要审核的文章状态不为默认状态
   if(!isModify && newArticle.status === normalStatus) {
+    // 获取IP
+    const {ip, port} = await this.getIpAndPort();
     MomentModel.createQuoteMomentAndPublish({
+      ip,
+      port,
       uid,
       quoteType: articleQuoteType,
       quoteId: articleId
@@ -639,6 +647,19 @@ schema.methods.publishArticle = async function(options) {
   }
 
   return articleUrl;
+}
+
+schema.methods.getIpAndPort = async function() {
+  const DocumentModel = mongoose.model('documents');
+  const IPModel = mongoose.model('ips');
+  const sources = await DocumentModel.getDocumentSources();
+  const document = await DocumentModel.getStableDocumentsBySource(sources.article, this._id);
+  const ipId = document.ip;
+  const ip = await IPModel.getIpByIpId(ipId);
+  return {
+    ip,
+    port: document.port
+  }
 }
 
 schema.methods.getStableDocId = async function () {

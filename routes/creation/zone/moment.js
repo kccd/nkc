@@ -69,6 +69,8 @@ router
         });
       } else {
         moment = await db.MomentModel.createMoment({
+          ip: ctx.address,
+          port: ctx.port,
           content,
           resourcesId,
           uid: state.uid
@@ -118,6 +120,8 @@ router
         });
       } else {
         momentComment = await db.MomentModel.createMomentComment({
+          ip: ctx.address,
+          port: ctx.port,
           content,
           uid: state.uid,
           parent: momentId,
@@ -152,6 +156,8 @@ router
       maxLength: 1000,
     });
     const comment = await db.MomentModel.createMomentCommentChildAndPublish({
+      ip: ctx.address,
+      port: ctx.port,
       uid: state.uid,
       content,
       parent
