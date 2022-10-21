@@ -137,6 +137,10 @@ router
     data.isModerator =  isModerator;
     data.comments = comments || [];
     data.article = _article;
+    data.authorRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: data.article.uid,
+      ipId: data.article.document.ip
+    });
     //文章浏览数加一
     await article.addArticleHits();
     await next();
