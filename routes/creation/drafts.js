@@ -34,6 +34,8 @@ router
     if(type === 'create') {
       //创建草稿和文档
       draft = await db.CreationDraftsModel.createDraft({
+        ip: ctx.address,
+        port: ctx.port,
         uid: state.uid,
         title,
         content,

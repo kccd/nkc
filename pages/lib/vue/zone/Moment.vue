@@ -24,6 +24,7 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
+            span &nbsp;IP:{{momentData.addr}}
           //- 其他操作
           .single-moment-header-options.fa.fa-ellipsis-h(@click.stop="openOption($event)" data-direction="down")
             moment-option(

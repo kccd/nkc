@@ -1,7 +1,18 @@
 <template lang="pug">
   div
     panel(ref="panel" :fans-count="fansCount" :followers-count="followersCount" :code="code"  v-if="targetUser")
-    account-user(ref="accountUser" :users-bl-uid="usersBlUid" :target-user-scores="targetUserScores" :target-user-fans="targetUserFans" :target-user-followers="targetUserFollowers" :target-user="targetUser" :nav-links="navLinks" :forums="subForums" :code="code")
+    account-user(
+      ref="accountUser"
+      :users-bl-uid="usersBlUid"
+      :target-user-scores="targetUserScores"
+      :target-user-fans="targetUserFans"
+      :target-user-followers="targetUserFollowers"
+      :target-user="targetUser"
+      :nav-links="navLinks"
+      :forums="subForums"
+      :code="code"
+      :account-register-info="accountRegisterInfo"
+      )
     footer-vue(ref="footerVue")
 </template>
 
@@ -32,6 +43,7 @@ export default {
     followersCount: null,
     targetUserFans: null,
     targetUserFollowers: null,
+    accountRegisterInfo: null,
     code: null,
     usersBlUid: [],
   }),
@@ -66,6 +78,7 @@ export default {
         self.targetUserFans = res.targetUserFans;
         self.targetUserFollowers = res.targetUserFollowers;
         self.code = res.code;
+        self.accountRegisterInfo = res.authorAccountRegisterInfo;
         self.usersBlUid = res.usersBlUid;
         const title = self.targetUser.username ? self.targetUser.username : '用户';
         setPageTitle(title  + '的主页');

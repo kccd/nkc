@@ -5,7 +5,7 @@ if !isIncluded('singleComment')
   +includeDeferJS("/publicModules/commentCenter/singleComment/singleComment.js")
   mixin singleComment(props)
     -var {user, content, _id, order, quote, isAuthor, reason, type, status, uid, toc, tlm, docId, did, commentUrl, digest, kcb = [], xsf = [], vote, articleId} = props;
-    -var {voteUp, voteDown} = props
+    -var {voteUp, voteDown, addr} = props
     .single-post-container(
       data-un-reviewed=status === 'unknown'
       data-disabled=status === 'disabled'
@@ -19,7 +19,7 @@ if !isIncluded('singleComment')
       include ./singleCommentWarningInfo
       +singleCommentWarningInfo({status, docId, cid: _id, reason})
       include ./singleCommentTop
-      +singleCommentTop(Object.assign({}, user, {_id, docId, did, isAuthor, digest, order, reviewed: status !== 'unknown', reason, toc, tlm, commentUrl}))
+      +singleCommentTop(Object.assign({}, user, {_id, addr, docId, did, isAuthor, digest, order, reviewed: status !== 'unknown', reason, toc, tlm, commentUrl}))
       include ./singleCommentCenter
       +singleCommentCenter({content, cid: _id, quote, kcb, xsf})
       include ./singleCommentBottom

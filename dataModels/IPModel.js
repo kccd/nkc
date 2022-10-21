@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const localAddr = '未同步';
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: String,
@@ -154,14 +155,14 @@ schema.statics.getIPInfoByIP= async (ip) => {
 *   @param {String} location
 * @author pengxiguaa 2020-12-25
 * */
-schema.statics.getIPInfoFromLocal = async (ip, hideServiceProvider = false) => {
+schema.statics.getIPInfoFromLocal = async (ip = '0.0.0.0', hideServiceProvider = false) => {
   const apiFunction = require('../nkcModules/apiFunction');
   let location = '';
   try{
-    let {region} = await apiFunction.getIpInfoFromLocalModule(ip);
-    region = region.split('|').filter(v => v !== "0");
-    if(hideServiceProvider) {
-      region.pop();
+    const {country, province, city, isp} = await apiFunction.getIpInfoFromLocalModule(ip);
+    const region = [country, province. city];
+    if(!hideServiceProvider) {
+      region.push(isp)
     }
     location = region.join(' ');
   } catch(err) {
@@ -173,4 +174,109 @@ schema.statics.getIPInfoFromLocal = async (ip, hideServiceProvider = false) => {
     location,
   };
 };
+
+/*
+* @return {
+*   [key: string]: {
+*     country: string;
+*     province: string;
+*     city: string;
+*     isp: string;
+*   }
+* }
+* */
+schema.statics.getIPInfoObjectById = async (ids) => {
+  const IPModel = mongoose.model('ips');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const ips = await IPModel.find({_id: {$in: ids}}, {
+    ip: 1,
+    _id: 1,
+  });
+  const ipsInfo = {};
+  for(let i = 0; i < ips.length; i ++) {
+    const ip = ips[i];
+    const info = await apiFunction.getIpInfoFromLocalModule(ip.ip);
+    ipsInfo[ip._id] = {
+      ip: ip.ip,
+      ...info
+    }
+  }
+  return ipsInfo;
+}
+
+schema.statics.getLocalAddr = () => {
+  return localAddr;
+}
+
+schema.statics.getIpsAddrInfoById = async (ids) => {
+  const IPModel = mongoose.model('ips');
+  const ipsData = await IPModel.find({_id: {$in: ids}}, {
+    ip: 1,
+    _id: 1,
+  });
+  const ipsDataObj = {};
+  const ips = [];
+  for(const ipData of ipsData) {
+    ipData.ip = ipData.ip || '0.0.0.0';
+    ipsDataObj[ipData._id] = ipData;
+    ips.push(ipData.ip);
+  }
+  const ipsAddr = await IPModel.getIpsAddrInfo(ips);
+  const result = {};
+  for(const id of ids) {
+    const ipData = ipsDataObj[id];
+    let addr = '';
+    let ip = '';
+    if(ipData) {
+      ip = ipData.ip;
+      addr = ipsAddr[ip].addr;
+    }
+    result[id] = {
+      ip: ip || '0.0.0.0',
+      addr: addr || localAddr
+    };
+  }
+  return result;
+}
+
+schema.statics.getIpsAddrInfo = async (ips) => {
+  const apiFunction = require('../nkcModules/apiFunction');
+  const result = {};
+  for(let ip of ips) {
+    ip = ip || '0.0.0.0';
+    let addr = '';
+    try{
+      const {
+        country,
+        province,
+      } = await apiFunction.getIpInfoFromLocalModule(ip);
+      if(country) {
+        if(country === '中国' && !!province) {
+          addr = province.replace('省', '');
+        } else {
+          addr = country;
+        }
+      }
+    } catch(err) {
+      //
+    }
+    addr = addr || localAddr;
+    result[ip] = {ip, addr};
+  }
+  return result;
+}
+
+schema.statics.getIpAddr = async (ip = '0.0.0.0') => {
+  const IPModel = mongoose.model('ips');
+  const info = await IPModel.getIpsAddrInfo([ip]);
+  return info[ip].addr;
+}
+
+schema.statics.getIpByIpId = async (id) => {
+  const IPModel = mongoose.model('ips');
+  const ipInfo = await IPModel.findOne({_id: id}, {_id: 1, ip: 1});
+  return ipInfo? ipInfo.ip: '0.0.0.0';
+}
+
+
 module.exports = mongoose.model('ips', schema);

@@ -9,10 +9,12 @@ router.get('/:aid', async (ctx, next)=>{
   const {_id, aid} = params;
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
-
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
+  data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+    uid: columnPostData.column.uid
+  });
   const {article, thread} = await db.ColumnPostModel.getColumnPostTypes();
   const homeSettings = await db.SettingModel.getSettings("home");
   let isModerator;

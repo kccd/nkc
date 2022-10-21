@@ -29,6 +29,7 @@
 
         .moment-comment-time
           from-now(:time="commentData.toc")
+          span &nbsp;IP:{{commentData.addr}}
 
         .moment-comment-options
           .moment-comment-option(title="回复" @click="switchEditor" v-if="type === 'comment'")

@@ -2,6 +2,12 @@
   @param data.contributeCount 待处理的投稿数
 
 -var canManagement = permission("column_single_disabled");
+
+.m-b-1.column-tool-container(style=columnToolStyle)
+  include ../../publicModules/accountRegisterInfo
+  .column-header.m-b-1 主体信息
+  +accountRegisterInfo(data.authorAccountRegisterInfo)
+
 if canManagement
   .m-b-1.column-tool-container(style=columnToolStyle)
     .column-management

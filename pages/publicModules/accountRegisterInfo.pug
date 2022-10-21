@@ -1,0 +1,7 @@
+mixin accountRegisterInfo(info)
+  .row.m-b-05
+    .col-xs-12.col-md-6=`主体类型：${info.subject}`
+    .col-xs-12.col-md-6=`所属领域：${info.field}`
+  .row.m-b-05
+    .col-xs-12.col-md-6.p-r-0=`认证方式：${info.authType}`
+    .col-xs-12.col-md-6=`IP归属地：${info.addr}`

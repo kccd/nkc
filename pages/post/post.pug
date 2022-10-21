@@ -42,6 +42,7 @@ block content
                   .username.anonymous-name= anonymousInfo.username
                 span
                   +fromNow(post.toc)
+                span=` IP:${post.addr}`
               .options
                 include ../module_vote
                 +voteButtons(post, !!data.user)
@@ -115,6 +116,7 @@ block content
             share(:type='"post"' :id=`'${post.pid}'`)
         if !post.anonymous
           -var user = post.user
+          -var accountRegisterInfo = data.authorAccountRegisterInfo;
           include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0
           .vote-user.m-b-1

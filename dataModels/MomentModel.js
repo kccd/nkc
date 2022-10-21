@@ -261,6 +261,8 @@ schema.statics.createMomentCore = async (props) => {
     quoteId = '',
     quoteType = '',
     parents = [],
+    ip = '',
+    port = ''
   } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
@@ -274,6 +276,8 @@ schema.statics.createMomentCore = async (props) => {
   const toc = time || new Date();
   const momentId = await MomentModel.getNewId();
   const document = await DocumentModel.createBetaDocument({
+    ip,
+    port,
     uid,
     content,
     toc,
@@ -307,9 +311,11 @@ schema.statics.createMomentCore = async (props) => {
 * @return {moment schema}
 * */
 schema.statics.createMoment = async (props) => {
-  const {uid, content, resourcesId} = props;
+  const {uid, content, resourcesId, ip, port} = props;
   const MomentModel = mongoose.model('moments');
   return await MomentModel.createMomentCore({
+    ip,
+    port,
     uid,
     content,
     resourcesId
@@ -327,9 +333,14 @@ schema.statics.createMoment = async (props) => {
 * @return {moment schema}
 * */
 schema.statics.createQuoteMoment = async props => {
-  const {time, uid, content, resourcesId, quoteId, quoteType} = props;
+  const {
+    time, uid, content, resourcesId, quoteId, quoteType,
+    ip, port,
+  } = props;
   const MomentModel = mongoose.model('moments');
   return await MomentModel.createMomentCore({
+    ip,
+    port,
     time,
     publishTime: time,
     uid,
@@ -341,9 +352,11 @@ schema.statics.createQuoteMoment = async props => {
 };
 
 schema.statics.createCommentChild = async props => {
-  const {time, uid, content, parent, parents} = props;
+  const {time, uid, content, parent, parents, ip, port} = props;
   const MomentModel = mongoose.model('moments');
   return await MomentModel.createMomentCore({
+    ip,
+    port,
     time,
     publishTime: time,
     uid,
@@ -364,8 +377,10 @@ schema.statics.createCommentChild = async props => {
 * */
 schema.statics.createMomentComment = async (props) => {
   const MomentModel = mongoose.model('moments');
-  const {uid, content, parent, resourcesId} = props;
+  const {uid, content, parent, resourcesId, ip, port} = props;
   return await MomentModel.createMomentCore({
+    ip,
+    port,
     uid,
     content,
     resourcesId,
@@ -840,13 +855,14 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
     throwErr(500, `类型指定错误 postType=${postType}`);
   }
   const MomentModel = mongoose.model('moments');
+  const IPModel = mongoose.model('ips');
   const {moment: quoteType} = momentQuoteTypes;
   const {uid, resourcesId, parent} = this;
-  const {content} = await this.getBetaDocument();
+  const {content, ip: ipId, port} = await this.getBetaDocument();
   const {uid: parentUid} = await MomentModel.findOne({_id: parent}, {uid: 1});
   let commentMomentId;
   let repostMomentId;
-
+  const ip = await IPModel.getIpByIpId(ipId);
   if(postType === 'comment' || alsoPost) {
     // 需要创建评论
     await this.updateMomentCommentOrder();
@@ -857,6 +873,8 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
   if(postType === 'repost' || alsoPost) {
     // 需要转发动态
     const repostMoment = await MomentModel.createQuoteMomentAndPublish({
+      ip,
+      port,
       uid,
       content,
       resourcesId,
@@ -891,7 +909,7 @@ schema.methods.publishMomentComment = async function(postType, alsoPost) {
 * @return {moment schema}
 * */
 schema.statics.createQuoteMomentAndPublish = async (props) => {
-  const {time, uid, quoteType, quoteId, content, resourcesId = []} = props;
+  const {time, uid, quoteType, quoteId, content, resourcesId = [], ip, port} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const quoteTypes = await MomentModel.getMomentQuoteTypes();
@@ -906,6 +924,8 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
   }
   if(!moment) {
     moment = await MomentModel.createQuoteMoment({
+      port,
+      ip,
       uid,
       time,
       resourcesId,
@@ -930,7 +950,7 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
 };
 
 schema.statics.createMomentCommentChildAndPublish = async (props) => {
-  const {uid, content, parent} = props;
+  const {uid, content, parent, ip, port} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const parentComment = await MomentModel.findOne({_id: parent}, {parent: 1, parents: 1, uid: 1});
@@ -940,6 +960,8 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
   await DocumentModel.checkGlobalPostPermission(uid, documentSource.moment);
   const time = new Date();
   const moment = await MomentModel.createCommentChild({
+    ip,
+    port,
     time,
     uid,
     content,
@@ -1159,6 +1181,8 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   const DocumentModel = mongoose.model('documents');
   const PostsVoteModel = mongoose.model('postsVotes');
   const {getUrl, fromNow} = require('../nkcModules/tools');
+  const IPModel = mongoose.model('ips');
+  const localAddr = await IPModel.getLocalAddr();
   const {moment: momentSource} = await DocumentModel.getDocumentSources();
   const momentStatus = await MomentModel.getMomentStatus();
   const usersId = [];
@@ -1211,8 +1235,10 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     const {username, avatar} = user;
     const betaDocument = stableDocumentsObj[_id];
     let content = '';
+    let addr = localAddr;
     if(betaDocument) {
       content = await MomentModel.renderContent(betaDocument.content);
+      addr = betaDocument.addr;
     }
 
     if(!content && quoteType) {
@@ -1289,6 +1315,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       content,
       voteUp,
       status,
+      addr,
       statusInfo: '',
       voteType: votesType[_id],
       commentCount: commentAll,
@@ -1511,6 +1538,8 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const UserModel = mongoose.model('users');
   const PostsVoteModel = mongoose.model('postsVotes');
   const ReviewModel = mongoose.model('reviews');
+  const IPModel = mongoose.model('ips');
+  const localAddr = await IPModel.getLocalAddr();
   const momentStatus = await MomentModel.getMomentStatus();
   const {getUrl, timeFormat} = require('../nkcModules/tools');
   const usersId = [];
@@ -1553,9 +1582,10 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     } = comment;
     const user = usersObj[uid];
     if(!user) continue;
+    let addr = localAddr;
     const stableDocument = stableDocuments[_id];
     if(!stableDocument) continue;
-
+    addr = stableDocument.addr;
     const data = {
       _id,
       momentId: parents[0],
@@ -1567,6 +1597,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       status,
       order,
       voteUp,
+      addr,
       voteType: votesType[_id],
       content: await MomentModel.renderContent(stableDocument.content),
       username: user.username,

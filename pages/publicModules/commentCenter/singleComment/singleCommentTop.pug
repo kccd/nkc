@@ -1,7 +1,7 @@
 if !isIncluded('singleCommentTop')
   mixin singleCommentTop(props)
     -var {_id: cid, docId, did, username, toc, uid, avatar, home, gradeId, gradeName, commentUrl, digest} = props;
-    -var {reason, reviewed, isAuthor, order, tlm} = props;
+    -var {reason, reviewed, isAuthor, order, tlm, addr} = props;
     .single-post-top
       .single-post-avatar(
         data-global-mouseover="showUserPanel"
@@ -30,6 +30,7 @@ if !isIncluded('singleCommentTop')
           if tlm
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
+          span=` IP:${addr}`
       .single-post-floor
         a(href=commentUrl)=order + '楼'
         .single-post-checkbox

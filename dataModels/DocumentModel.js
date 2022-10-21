@@ -14,7 +14,6 @@ const documentStatus = {
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
   cancelled: 'cancelled', // 取消发布
-  unknown: "unknown"// 需要审核
 };
 
 const documentTypes = {
@@ -192,7 +191,12 @@ const schema = new mongoose.Schema({
   // IP 所对应的端口
   port: {
     type: String,
-    default: ''
+    default: '',
+  },
+  // 归属地
+  addr: {
+    type: String,
+    default: '',
   }
   // 已发送过@通知的用户
 }, {
@@ -314,6 +318,8 @@ schema.statics.createBetaDocument = async (props) => {
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
   const did = await DocumentModel.getDid();
+  const ipId = await IPModel.saveIPAndGetToken(ip);
+  const addr = await IPModel.getIpAddr(ip);
   const document = await DocumentModel({
     _id,
     did,
@@ -333,8 +339,9 @@ schema.statics.createBetaDocument = async (props) => {
     type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
-    ip: await IPModel.saveIPAndGetToken(ip),
-    port
+    ip: ipId,
+    port,
+    addr,
   });
   await document.save();
   await document.updateResourceReferences();

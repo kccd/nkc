@@ -151,6 +151,10 @@ router
       data.code = data.code.pop();
     }
 
+    data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: data.targetUser.uid,
+    });
+
     //用户的黑名单
     const match = {};
     if(user) {

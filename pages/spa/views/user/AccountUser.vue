@@ -17,7 +17,14 @@
           //  left-panel(:nav-links="navLinks" :users-bl-uid="usersBlUid" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
           //.left-panel-box-operation.fa(@click="clickLeftBox" :class="leftPanelBoxOperation ? 'fa-angle-up' : 'fa-angle-down'").clearPaddingLeftByMargin.clearPaddingRightByMargin
           .left-panel-box.clearPaddingLeftByMargin.clearPaddingRightByMargin
-            left-panel(:nav-links="navLinks" :users-bl-uid="usersBlUid" :target-user="targetUser" :code="code" :target-user-scores="targetUserScores")
+            left-panel(
+              :account-register-info="accountRegisterInfo"
+              :nav-links="navLinks"
+              :users-bl-uid="usersBlUid"
+              :target-user="targetUser"
+              :code="code"
+              :target-user-scores="targetUserScores"
+              )
 
         //- 用户中间面板 先hi用户的动态， 文章，恢复等信息
         .col-xs-12.col-md-7.center-panel-container
@@ -81,7 +88,18 @@ import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 import UserCreationHome from "./userPanel/UserCreationHome";
 export default {
-  props: ['navLinks', 'target-user', 'type', 'forums', "targetUserFans", "targetUserFollowers", "code","targetUserScores", "usersBlUid"],
+  props: [
+    'navLinks',
+    'target-user',
+    'type',
+    'forums',
+    "targetUserFans",
+    "targetUserFollowers",
+    "code",
+    "targetUserScores",
+    "usersBlUid",
+    'accountRegisterInfo'
+  ],
   data: () => ({
     targetColumn: '',
     leftPanelBoxOperation: false,

@@ -9,7 +9,7 @@
   @params {String} _id 专栏ID
   @params {String} type 文章类型
 mixin title(data)
-  -var {t, authorInfos, uid, toc, originState, name, _id, user ,type} = data;
+  -var {t, authorInfos, uid, toc, originState, name, _id, user ,type, article} = data;
   if authorInfos && authorInfos.length  && type !== "product"
     -var agencyIndex = 1;
     -var agencyArray = [];
@@ -73,3 +73,4 @@ mixin title(data)
             span(style="padding:5px")!=`${getOriginLevel(originState)}`
       if _id
         a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
+      span=` IP:${article.document? article.document.addr: article.addr}`

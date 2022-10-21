@@ -651,6 +651,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   // 创建post数据
   const IPModel = mongoose.model('ips');
   const ipToken = await IPModel.saveIPAndGetToken(ip);
+  const ipAddr = await IPModel.getIpAddr(ip);
   const nowTime = Date.now();
   let _post = await new PostModel({
     toc: nowTime,
@@ -666,6 +667,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     originState,
     ipoc: ipToken,
     iplm: ipToken,
+    addr: ipAddr,
     quote,
     l,
     mainForumsId: this.mainForumsId,
@@ -2030,6 +2032,7 @@ threadSchema.methods.createNewPost = async function(post) {
     rpid.push(quote[2]);
   }
   const ipToken = await IPModel.saveIPAndGetToken(post.ip);
+  const ipAddr = await IPModel.getIpAddr(post.ip);
   let _post = await new PostModel({
     cover,
     pid,
@@ -2045,6 +2048,7 @@ threadSchema.methods.createNewPost = async function(post) {
     iplm: ipToken,
     l,
     tcId,
+    addr: ipAddr,
     mainForumsId: this.mainForumsId,
     minorForumsId: this.minorForumsId,
     tid: this.tid,

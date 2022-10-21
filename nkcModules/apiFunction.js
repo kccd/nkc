@@ -4,7 +4,8 @@ const fs = require("fs");
 const moment = require('moment');
 const http = require("http");
 const randomatic = require('randomatic');
-const searchIp = require('node-ip2region').create();
+const IP2Region = require('ip2region').default;
+const searchIp = new IP2Region();
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 const axios = require('axios');
@@ -482,12 +483,7 @@ fn.getIpAddress = async (ip) => {
 * @author pengxiguaa 2020-12-25
 * */
 fn.getIpInfoFromLocalModule = async (ip) => {
-  return new Promise((resolve, reject) => {
-    searchIp.memorySearch(ip, (err, result) => {
-      if(err) return reject(err);
-      resolve(result);
-    });
-  });
+  return searchIp.search(ip);
 }
 
 fn.getTrackInfo = async (trackNumber, trackName) => {

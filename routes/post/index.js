@@ -42,6 +42,10 @@ router
       const url = await db.PostModel.getUrl(post.pid, true);
       return ctx.redirect(url);
     }
+    data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: post.uid,
+      ipId: post.ip
+    });
     const thread = await post.extendThread();
     await thread.extendFirstPost();
     data.thread = {

@@ -74,6 +74,9 @@ router
     const q = {
       columnId: column._id
     };
+    data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: column.uid
+    });
 
     //当前用户能查看的文章
     const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');

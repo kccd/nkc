@@ -2,6 +2,8 @@
 
   @param {String} pid post ID
   @param {String} tid thread ID
+
+  @param {String} addr 归属地
   @param {Number} floor 所在楼层
   @param {Date} toc 内容发表时间
   @param {Date} tlm 内容修改时间 未修改时此字段为null
@@ -75,7 +77,7 @@ if !isIncluded('singlePost')
   mixin singlePost(props)
     -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp, disableAutoHideContent} = props;
-    -var {digest, type, tid, highlight, hide} = props;
+    -var {digest, type, tid, highlight, hide, addr} = props;
     -var {cancelTopped, hidePostBottom, cRead, hideComment} = props;
     .single-post-container(
       data-un-reviewed=!reviewed
@@ -88,7 +90,7 @@ if !isIncluded('singlePost')
       )
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
 
-      +singlePostTop(Object.assign({}, user, {pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
+      +singlePostTop(Object.assign({}, user, {addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
         +singlePostBottom({vote, voteUp, pid, count, tid, cRead, hideComment})

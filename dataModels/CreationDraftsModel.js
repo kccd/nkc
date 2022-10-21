@@ -59,12 +59,14 @@ schema.statics.createDraft = async (props) => {
   const SettingModel = mongoose.model('settings');
   const DocumentModel = mongoose.model('documents');
   const CreationDraftsModel = mongoose.model('creationDrafts');
-  const {uid, title , content} = props;
+  const {uid, title , content, ip, port} = props;
   const {draft: documentSource} = await DocumentModel.getDocumentSources();
   const toc = new Date();
   const Did = await SettingModel.getNewId();
   //创建文档
   const document = await DocumentModel.createBetaDocument({
+    ip,
+    port,
     uid,
     content,
     title,

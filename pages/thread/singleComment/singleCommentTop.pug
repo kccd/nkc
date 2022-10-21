@@ -2,7 +2,7 @@ if !isIncluded('singleCommentTop')
   include ../../publicModules/mixin
   include ../singlePost/singlePostVote
   mixin singleCommentTop(props)
-    -var {uid, username, avatar, banned, digest} = props;
+    -var {uid, username, avatar, banned, digest, addr} = props;
     -var {voteUp, vote, pid, toc, tlm, parentUser} = props;
     .single-comment-top
       img.single-comment-avatar(src=avatar class=banned? 'user-banned-avatar':'')
@@ -33,6 +33,7 @@ if !isIncluded('singleCommentTop')
           if tlm
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
+          span=` IP:${addr}`
       .single-comment-options
         +singlePostVote(pid, vote, voteUp)
         .single-post-bottom-item.icon-item(
