@@ -1538,6 +1538,8 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const UserModel = mongoose.model('users');
   const PostsVoteModel = mongoose.model('postsVotes');
   const ReviewModel = mongoose.model('reviews');
+  const IPModel = mongoose.model('ips');
+  const localAddr = await IPModel.getLocalAddr();
   const momentStatus = await MomentModel.getMomentStatus();
   const {getUrl, timeFormat} = require('../nkcModules/tools');
   const usersId = [];
@@ -1580,9 +1582,10 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     } = comment;
     const user = usersObj[uid];
     if(!user) continue;
+    let addr = localAddr;
     const stableDocument = stableDocuments[_id];
     if(!stableDocument) continue;
-
+    addr = stableDocument.addr;
     const data = {
       _id,
       momentId: parents[0],
@@ -1594,6 +1597,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       status,
       order,
       voteUp,
+      addr,
       voteType: votesType[_id],
       content: await MomentModel.renderContent(stableDocument.content),
       username: user.username,
