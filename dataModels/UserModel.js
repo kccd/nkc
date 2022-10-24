@@ -1709,6 +1709,7 @@ userSchema.statics.getUserColumn = async (uid) => {
 * @author pengxiguaa 2019-8-16
 * */
 userSchema.statics.checkUsername = async (username = "") => {
+  const UserModel = mongoose.model('users');
   const {contentLength} = require("../tools/checkString");
   const length = contentLength(username);
   if (!length) throwErr(400, "用户名不能为空");
@@ -1718,6 +1719,7 @@ userSchema.statics.checkUsername = async (username = "") => {
   reg = /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
   if (!reg.test(username))
     throwErr(400, "用户名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始");
+  await UserModel.checkUsernameSensitiveWords(username);
 };
 /*
 * 判断用户是否有足够的科创币修改用户名
@@ -2389,6 +2391,7 @@ userSchema.statics.checkNewUsername = async (username) => {
   const UserModel = mongoose.model('users');
   const ColumnModel = mongoose.model('columns');
   const SecretBehaviorModel = mongoose.model('secretBehaviors');
+  await UserModel.checkUsernameSensitiveWords(username);
   await UserModel.checkUsername(username);
   username = username.toLowerCase();
   let sameNameUser = await UserModel.findOne({usernameLowerCase: username});
@@ -2886,6 +2889,30 @@ userSchema.statics.getAccountRegisterInfo = async (props) => {
     subject: '个人'
   };
 }
+
+userSchema.statics.checkUsernameSensitiveWords = async (text = '') => {
+  if(!text) return;
+  const SettingModel = mongoose.model('settings');
+  const usernameSettings = await SettingModel.getSettings('username');
+  const {words, usernameTip} = usernameSettings.sensitive;
+  for(const word of words) {
+    if(text.includes(word)) {
+      throwErr(400, usernameTip);
+    }
+  }
+};
+
+userSchema.statics.checkUserDescriptionSensitiveWords = async (text = '') => {
+  if(!text) return;
+  const SettingModel = mongoose.model('settings');
+  const usernameSettings = await SettingModel.getSettings('username');
+  const {words, descTip} = usernameSettings.sensitive;
+  for(const word of words) {
+    if(text.includes(word)) {
+      throwErr(400, descTip);
+    }
+  }
+};
 
 module.exports = mongoose.model('users', userSchema);
 

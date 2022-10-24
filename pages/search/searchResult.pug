@@ -55,10 +55,15 @@
               if data.user && result.user.uid !== data.user
                 .display-i-b
                   if data.user.subUid.includes(result.user.uid)
-                    button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', false)`) 取关
+                    button.btn.btn-xs.m-r-05.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', false)`) 取关
                   else
-                    button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', true)`) 关注
-                  a.pointer.m-l-05.btn.btn-xs.btn-default(onclick=`NKC.methods.toChat("${result.user.uid}")` target="_blank") 私信
+                    button.btn.btn-xs.m-r-05.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', true)`) 关注
+                  a.pointer.m-r-05.btn.btn-xs.btn-default(onclick=`NKC.methods.toChat("${result.user.uid}")` target="_blank") 私信
+                  if data.permissions.bandUser
+                    if result.user.certs.includes('banned')
+                      button.btn.btn-xs.btn-danger(onclick=`bandUser('${result.user.uid}', false)`) 解封
+                    else
+                      button.btn.btn-xs.btn-danger(onclick=`bandUser('${result.user.uid}', true)`) 封禁
               .search-result-certs=result.user.info.certsName
               .search-result-post
                 div
