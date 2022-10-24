@@ -6,8 +6,8 @@ block eContent
     .row
       .hidden#data= objToStr({usernameSettings: data.usernameSettings, scoreObject: data.scoreObject})
       .col-xs-12.col-md-12#app(v-cloak)
-        h4 修改用户名
         .form-horizontal
+          h4 修改用户名
           .form-group
             label.col-sm-2.control-label= "花费" + data.scoreObject.name
             .col-sm-10
@@ -31,6 +31,21 @@ block eContent
               label.col-sm-2.control-label= "花费最大值（" + data.scoreObject.name + "）"
               .col-sm-4
                 input.form-control(type="text" v-model.number="usernameSettings.maxKcb")
+
+          h4.m-t-4 敏感词
+          .form-group
+            label.col-sm-2.control-label 敏感词列表
+            .col-sm-4
+              textarea.form-control(rows=4 v-model='usernameSettings.sensitive.words')
+              span 以中英文逗号分隔
+          .form-group
+            label.col-sm-2.control-label 非法用户名提示
+            .col-sm-4
+              textarea.form-control(rows=3 v-model='usernameSettings.sensitive.usernameTip')
+          .form-group
+            label.col-sm-2.control-label 非法用户简介提示
+            .col-sm-4
+              textarea.form-control(rows=3 v-model='usernameSettings.sensitive.descTip')
           .form-group
             label.col-sm-2.control-label
             .col-sm-4

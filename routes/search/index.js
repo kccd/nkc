@@ -545,6 +545,9 @@ router
         data.results.push(r);
       }
     }
+    data.permissions = {
+      bandUser: ctx.permissionsOr(['unBannedUser', 'bannedUser'])
+    };
     data.time = Date.now() - time;
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
     data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
