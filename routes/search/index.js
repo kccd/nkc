@@ -546,7 +546,8 @@ router
       }
     }
     data.permissions = {
-      bandUser: ctx.permissionsOr(['unBannedUser', 'bannedUser'])
+      bandUser: ctx.permissionsOr(['unBannedUser', 'bannedUser']),
+      clearUserInfo: ctx.permission('clearUserInfo'),
     };
     data.time = Date.now() - time;
     data.forums = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);

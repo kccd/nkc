@@ -18,10 +18,12 @@ router
     } else if(type === "banner") {
       await db.UserModel.updateOne({uid: targetUser.uid}, {
         $set: {
-          banner: ''
+          banner: '',
+          homeBanner: '',
         }
       });
       await db.AttachmentModel.disableAttachment(targetUser.banner);
+      await db.AttachmentModel.disableAttachment(targetUser.homeBanner);
     } else if(type === "username") {
       const newUsername = `${serverSettings.websiteCode}-${targetUser.uid}`;
       const newUsernameLowerCase = newUsername.toLowerCase();

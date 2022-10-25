@@ -1,3 +1,5 @@
+import {clearUsername, clearUserBanner, clearUserDescription, clearUserAvatar} from "../lib/js/user";
+
 window.SubscribeTypes = undefined;
 var initComplexOptions = !!localStorage.getItem("search_complexOptions");
 const data = NKC.methods.getDataById('data');
@@ -216,4 +218,8 @@ Object.assign(window, {
   app,
   showResource,
   bandUser,
+  clearUsername,
+  clearUserDescription,
+  clearUserAvatar,
+  clearUserBanner,
 });

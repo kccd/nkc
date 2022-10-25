@@ -67,6 +67,7 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
 import {getState} from "../../../../lib/js/state";
+import {clearUserPublicProfile} from "../../../../lib/js/user";
 
 export default {
   props: ['targetUser', 'panelPermission'],
@@ -104,18 +105,7 @@ export default {
         .then(function() {location.reload()});
     },
     //清楚用户信息，type 类型， 可选：avatar、banner、description、username
-    clearUserInfo(uid, type) {
-      if(!confirm("该操作不可撤回，确定要执行？")) return;
-      nkcAPI("/u/" + uid + "/clear", "POST", {
-        type: type
-      })
-        .then(function() {
-          screenTopAlert("删除成功");
-        })
-        .catch(function(data) {
-          screenTopWarning(data);
-        })
-    },
+    clearUserInfo: clearUserPublicProfile,
     //用户信息管理显示控制
     changeShowBanBox(type) {
 
