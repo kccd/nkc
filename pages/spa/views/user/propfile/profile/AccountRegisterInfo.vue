@@ -1,5 +1,5 @@
 <template lang="pug">
-  .row
+  .row(v-if="info")
     .col-xs-12 主体类型：{{info.subject}}
     .col-xs-12 所属领域：{{info.field}}
     .col-xs-12 认证方式：{{info.authType}}

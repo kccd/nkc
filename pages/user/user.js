@@ -1,5 +1,6 @@
 import Moments from '../lib/vue/zone/Moments';
 import {getDataById} from "../lib/js/dataConversion";
+import {clearUserPublicProfile} from "../lib/js/user";
 
 const data = getDataById('data');
 
@@ -90,16 +91,7 @@ function toColumn() {
 * @author pengxiguaa 2019-7-26
 * */
 function clearUserInfo(uid, type) {
-  if(!confirm("该操作不可撤回，确定要执行？")) return;
-  nkcAPI("/u/" + uid + "/clear", "POST", {
-    type: type
-  })
-    .then(function() {
-      screenTopAlert("删除成功");
-    })
-    .catch(function(data) {
-      screenTopWarning(data);
-    })
+  return clearUserPublicProfile(uid, type);
 }
 
 /**

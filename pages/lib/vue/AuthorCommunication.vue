@@ -31,7 +31,7 @@ export default {
   // },
   methods:{
     // communicationShow(){
-    //   this.show = !this.show 
+    //   this.show = !this.show
     // }
   }
 }
