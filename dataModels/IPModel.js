@@ -160,7 +160,7 @@ schema.statics.getIPInfoFromLocal = async (ip = '0.0.0.0', hideServiceProvider =
   let location = '';
   try{
     const {country, province, city, isp} = await apiFunction.getIpInfoFromLocalModule(ip);
-    const region = [country, province. city];
+    const region = [country, province, city];
     if(!hideServiceProvider) {
       region.push(isp)
     }
