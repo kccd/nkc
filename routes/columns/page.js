@@ -111,6 +111,9 @@ router
       user: data.user
     });
     data.page = page;
+    data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: column.uid
+    });
     // data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     // data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     // data.timeline = await db.ColumnModel.getTimeline(column._id);

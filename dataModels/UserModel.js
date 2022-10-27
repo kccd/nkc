@@ -2863,7 +2863,7 @@ userSchema.statics.getAccountRegisterInfo = async (props) => {
   const {uid, ipId, ip} = props;
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const IPModel = mongoose.model('ips');
-  const up =  await UsersPersonalModel.findOne({uid}, {email: 1, uid: 1, regIp: 1});
+  const up =  await UsersPersonalModel.findOne({uid}, {email: 1, uid: 1, regIP: 1});
   const authLevel = await up.getAuthLevel();
   let authType = '未同步';
   if([2, 3].includes(authLevel)) {
@@ -2873,7 +2873,7 @@ userSchema.statics.getAccountRegisterInfo = async (props) => {
   } else if(up.email) {
     authType = '邮箱';
   }
-  let targetIp = up.regIp;
+  let targetIp = up.regIP;
   if(!targetIp) {
     if(ipId) {
       targetIp = await IPModel.getIpByIpId(ipId);
