@@ -155,7 +155,8 @@ schema.statics.getIPInfoByIP= async (ip) => {
 *   @param {String} location
 * @author pengxiguaa 2020-12-25
 * */
-schema.statics.getIPInfoFromLocal = async (ip = '0.0.0.0', hideServiceProvider = false) => {
+schema.statics.getIPInfoFromLocal = async (ip, hideServiceProvider = false) => {
+  ip = ip || '0.0.0.0';
   const apiFunction = require('../nkcModules/apiFunction');
   let location = '';
   try{
@@ -266,7 +267,8 @@ schema.statics.getIpsAddrInfo = async (ips) => {
   return result;
 }
 
-schema.statics.getIpAddr = async (ip = '0.0.0.0') => {
+schema.statics.getIpAddr = async (ip) => {
+  ip = ip || '0.0.0.0';
   const IPModel = mongoose.model('ips');
   const info = await IPModel.getIpsAddrInfo([ip]);
   return info[ip].addr;
