@@ -1237,7 +1237,8 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     let content = '';
     let addr = localAddr;
     if(betaDocument) {
-      content = await MomentModel.renderContent(betaDocument.content);
+      const originalContent = await betaDocument.renderAtUsers();
+      content = await MomentModel.renderContent(originalContent || betaDocument.content);
       addr = betaDocument.addr;
     }
 
@@ -1586,6 +1587,8 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     const stableDocument = stableDocuments[_id];
     if(!stableDocument) continue;
     addr = stableDocument.addr;
+    let content = await stableDocument.renderAtUsers();
+    content = await MomentModel.renderContent(content);
     const data = {
       _id,
       momentId: parents[0],
@@ -1599,7 +1602,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       voteUp,
       addr,
       voteType: votesType[_id],
-      content: await MomentModel.renderContent(stableDocument.content),
+      content,
       username: user.username,
       avatarUrl: getUrl('userAvatar', user.avatar),
       userHome: getUrl('userHome', user.uid),

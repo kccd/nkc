@@ -7,7 +7,7 @@
         a.pointer(onclick="RootApp.openLoginPanel('login')") 投稿
   else
     .column-button
-      a(href="/editor?toColumn=true" target="_blank") 发表
+      a(href="/creation/editor/column" target="_blank") 发表
   .column-button
     if !data.user
       a(onclick='RootApp.openLoginPanel("login")') 关注

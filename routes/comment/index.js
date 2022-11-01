@@ -89,7 +89,7 @@ router
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     let comment;
     if(commentId) {
-      comment = await db.CommentModel.findOne({_id: commentId});
+      comment = await db.CommentModel.findOne({_id: commentId, uid: state.uid});
     }
     if(type === 'create' && !comment) {
       comment = await db.CommentModel.createComment({

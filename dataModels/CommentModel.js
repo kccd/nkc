@@ -861,6 +861,7 @@ schema.statics.renderComment = async function(_id) {
     post: {
       c: document.content,
       resources,
+      atUsers: document.atUsers,
     },
     source: 'document',
     sid: _id
