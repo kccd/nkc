@@ -194,6 +194,20 @@ router.get('/:aid', async (ctx, next)=>{
     //拓展专栏的文章回复
     posts = await db.PostModel.extendPostsByColumn(posts, options);
     data.columnPost.posts  = posts;
+    // 文章的置顶回复
+    const toppedPostsId = thread.toppedPostsId;
+    const toppedPostMatch = {... match};
+    toppedPostMatch.pid = {$in: toppedPostsId};
+    const toppedPostsRandom = await db.PostModel.find(match);
+    let toppedPosts = [];
+    for(const post of toppedPostsRandom) {
+      const index = toppedPostsId.indexOf(post.pid);
+      if(index === -1) continue;
+      toppedPosts[index] = post;
+    }
+    toppedPosts = toppedPosts.filter(post => !!post);
+    toppedPosts = await db.PostModel.extendPostsByColumn(toppedPosts, options);
+    data.columnPost.toppedPosts = toppedPosts;
     // 文章访问量加1
     await thread.updateOne({$inc: {hits: 1}});
   } else {
