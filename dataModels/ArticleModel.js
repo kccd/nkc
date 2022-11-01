@@ -263,6 +263,7 @@ schema.statics.getZoneArticle = async (id)=>{
   const UserModel = mongoose.model("users");
   const ArticleModel = mongoose.model('articles');
   const ResourceModel = mongoose.model('resources')
+  const DocumentModel = mongoose.model('documents');
   let article = await ArticleModel.findOnly({_id: id});
   article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
@@ -278,7 +279,8 @@ schema.statics.getZoneArticle = async (id)=>{
     type: 'article',
     post: {
       c: documentContent.c,
-      resources
+      resources,
+      atUsers: document.atUsers,
     },
   });
   return {

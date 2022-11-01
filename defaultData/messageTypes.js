@@ -67,7 +67,7 @@ module.exports = {
         "title",
         "username",
       ],
-      content: "用户[url=userURL(username)]在文章[url=reviewLink(title)]中@了你，[url=reviewLink(查看)]",
+      content: "用户[url=userURL(username)]在文章[url=reviewLink(title)]中@了你，[url=reviewLink(查看)]。",
       type: "commentAt"
     },
     {
@@ -613,5 +613,14 @@ module.exports = {
       content: "收到来自[url=userHomeUrl(username)]的电文回复，[url=momentUrl(点击查看)]。\n以下是回复内容：[text=content]",
       type: 'momentComment'
     },
+    {
+      parameters: [
+        'userUrl',
+        'username',
+        'momentUrl'
+      ],
+      content: '用户[url=userUrl(username)]在电文中@了你，[url=momentUrl(查看)]。',
+      type: 'momentAt',
+    }
   ]
 };

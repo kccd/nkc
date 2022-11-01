@@ -32,7 +32,7 @@
               @complaint="complaint"
             )
         //- 动态内容
-        .single-moment-content.pointer(v-html="momentData.content" @click="visitUrl(momentData.url, true)")
+        .single-moment-content.pointer(v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
 
         //- 图片视频
         .single-moment-files

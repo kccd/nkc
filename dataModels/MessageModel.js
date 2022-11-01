@@ -388,18 +388,34 @@ messageSchema.statics.getParametersData = async (message) => {
     const {stable: stableType} = await DocumentModel.getDocumentTypes();
     const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
     const document = await DocumentModel.findOne({did, type: stableType, status: normalStatus});
-    if(!document) return null;
+    if (!document) return null;
     const user = await UserModel.findOne({uid: document.uid});
-    if(!user) return null;
+    if (!user) return null;
     const {normal} = await CommentModel.getCommentStatus();
     let comment = await CommentModel.findOne({did, status: normal});
-    if(!comment) return null;
+    if (!comment) return null;
     comment = await CommentModel.getCommentsInfo([comment]);
     parameters = {
       username: user.username,
       userURL: getUrl('userHome', document.uid),
-      reviewLink: comment[0].url,
+      reviewLink: comment[0].commentUrl,
       title: comment[0].articleDocument.title,
+    };
+  } else if(type === 'momentAt') {
+    const {did} = message.c;
+    const {stable: stableType} = await DocumentModel.getDocumentTypes();
+    const {normal: normalStatus} = await DocumentModel.getDocumentStatus();
+    const document = await DocumentModel.findOne({did, type: stableType, status: normalStatus});
+    if (!document) return null;
+    const user = await UserModel.findOne({uid: document.uid}, {
+      username: 1,
+      uid: 1,
+    });
+    if (!user) return null;
+    parameters = {
+      userUrl: getUrl('userHome', user.uid),
+      username: user.username,
+      momentUrl: getUrl('zoneMoment', document.sid),
     };
   } else if(type === 'xsf') {
     const {recordId} = message.c;
