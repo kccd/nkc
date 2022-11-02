@@ -1955,7 +1955,7 @@ postSchema.statics.extendPostsByColumn = async function(posts, options) {
   results = await PostModel.extendPosts(results, options);
   // results = await PostModel.extendPosts(results);
   results = await PostModel.filterPostsInfo(results);
-  results = results.reverse();
+  // results = results.reverse();
   return results;
 }
 

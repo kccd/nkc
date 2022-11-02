@@ -99,8 +99,11 @@ block baseColumnContent
             if !posts || posts.length === 0
               span 空空如也
             else
+              include ../publicModules/paging/paging
               for post in posts
                 +singlePost(Object.assign(post, {hidePostBottom: true}))
+              .m-t-05
+                include ../publicModules/paging/paging_input
           div
             a.btn.btn-default(href=url + '#container') 去评论
     //- .col-xs-12.col-md-3.box-shadow-panel#rightDom
