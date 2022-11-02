@@ -186,7 +186,7 @@ router.get('/:aid', async (ctx, next)=>{
     //获取文章下的所有回复
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList)
     data.paging = paging;
-    let posts = await db.PostModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    let posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     const options = {
       uid: data.user?data.user.uid:'',
       visitor: data.user,
