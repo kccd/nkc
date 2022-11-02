@@ -168,7 +168,6 @@ router
 
     // 如果搜索结果不为空
     if(results && results.length > 0) {
-      data.paging = nkcModules.apiFunction.paging(page, data.total, searchThreadList);
       const postObj = {}, threadObj = {}, userObj = {};
       const columnObj = {}, columnPageObj = {};
       const pids = new Set();
