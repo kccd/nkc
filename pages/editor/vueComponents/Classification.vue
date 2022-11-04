@@ -108,7 +108,7 @@
           span {{ n.name }}
         .editor-thread-category-node(
           @click="selectThreadCategory(i, 'default')",
-          :class="{ active: c.selectedNode === 'default' }"
+          :class="{ active: !c.selectedNode || c.selectedNode === 'default' }"
         )
           span {{ c.nodeName }}
       .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
