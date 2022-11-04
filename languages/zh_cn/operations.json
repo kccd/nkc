@@ -653,6 +653,7 @@
   "nkcManagementPost": "前台管理 - 社区内容",
   "nkcManagementDocument": "前台管理 - 独立内容",
   "nkcManagementColumn": "前台管理 - 专栏管理",
+  "nkcManagementOS": "前台管理 - 系统状态",
   "homeHotColumn": "设置/取消热门专栏",
   "homeToppedColumn": "设置/取消置顶专栏",
   "pushGoodsToHome": "推送商品到首页",
