@@ -862,6 +862,7 @@
   "deleteArticleDraft": "删除文章草稿",
   "collectionArticle": "收藏文章",
   "deleteMoment": "删除电文",
+  "managementMoment": "管理电文",
   "getMomentOption": "获取电文操作权限",
   "getMomentIpInfo": "获取电文的ip信息",
   "APPUpgrade": "APP检查更新",

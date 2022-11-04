@@ -36,3 +36,12 @@ window.deleteMoment = function (momentId) {
       sweetError(err);
     })
 }
+
+window.recoveryMoment = function(momentId) {
+  if(!momentId) return;
+  return nkcAPI(`/moment/${momentId}/recovery`, 'POST')
+    .then(() => {
+      sweetSuccess('操作成功');
+    })
+    .catch(sweetError);
+}
