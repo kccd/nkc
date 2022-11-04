@@ -104,9 +104,7 @@
           v-for="(r, index) in resources"
           :class="watchType === 'select'?'resource-select':'resource-category'"
           )
-          .resource(
-            :title="'时间：'+ timeFormat(r.toc)+'\\n文件名：' + r.oname"
-            )
+          .resource
             span(v-if='r.state === "usable"')
               .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
@@ -115,31 +113,32 @@
               .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
             span(v-else)
               .resource-picture.resource-in-process-bg
-            .resource-name
+            .resource-name(
+              :title="'时间：'+ timeFormat(r.toc)+'\\n文件名：' + r.oname"
+            )
               span(v-if="r.mediaType === 'mediaVideo'") (视频)
               span {{r.oname}}
-            span(v-if='r.state === "usable"')
-              .resource-options(v-if="selectedResourcesId.indexOf(r.rid) !== -1" )
-                .resource-mask.active(@click="fastSelectResource(r)")
+            span(v-if='["usable", "useless"].includes(r.state)')
+              .resource-options(v-if="selectedResourcesId.indexOf(r.rid) === -1")
+                .resource-mask(v-if='watchType === "category" ||  r.state === "usable"' @click="fastSelectResource(r)")
                 .resource-do
-                  .fa.fa-check-square-o.active(@click="selectResource(r)")
-                .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
-              .resource-options(v-else)
-                .resource-mask(@click="fastSelectResource(r)")
-                .resource-do
-                  .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
+                  .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture' && r.state === 'usable'")
                   .fa.fa-trash-o(@click="delResource(r, 'delete')" v-if="watchType === 'category' && !r.del")
                   .fa.fa-reply(@click="delResource(r, 'trash')" v-if="watchType === 'category' && r.del")
                   .fa.fa-square-o(v-if="watchType === 'category'" @click="checkbox(r)")
-                  .fa.fa-square-o(v-if="watchType === 'select'" @click="selectResource(r)")
+                  .fa.fa-square-o(v-if="r.state === 'usable' && watchType === 'select'" @click="selectResource(r)")
+              .resource-in-process.pointer(v-if="r.state === 'useless'" @click='selectedResourcesId.length === 0 && showErrorInfo(r)')
+                span 处理失败
+                .fa.fa-question-circle(v-if='r.errorInfo' :title='r.errorInfo' )
+              .resource-options(v-if="selectedResourcesId.indexOf(r.rid) !== -1" )
+                .resource-mask.active(v-if='watchType === "category" ||  r.state === "usable"' @click="fastSelectResource(r)")
+                .resource-do
+                  .fa.fa-check-square-o.active(v-if='watchType === "category" ||  r.state === "usable"' @click="selectResource(r)")
+                .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
             span(v-else-if='r.state === "inProcess"')
               .resource-in-process
                 span 处理中..
                 .fa.fa-spinner.fa-spin.fa-fw
-            span(v-else)
-              .resource-in-process
-                span 处理失败
-                .fa.fa-exclamation-circle.pointer(v-if='r.errorInfo' :title='r.errorInfo' @click='showErrorInfo(r)')
       .module-sr-footer
         .pull-left
           input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
@@ -641,13 +640,13 @@
     margin: auto;
     height: 2rem;
     width: 100%;
-    color: #777;
+    color: #545454;
     text-align: center;
     font-size: 1.1rem;
   }
 
   .resource-in-process-bg{
-    background-color: #dfdfdf;
+    background-color: #a6a6a6;
   }
 
   .resource-picture.media-picture {
@@ -1305,6 +1304,7 @@ export default {
         this.selectResource(r);
       }
     },
+
     //选中资源文件
     selectResource: function(r) {
       const self = this;
@@ -1319,7 +1319,7 @@ export default {
       } else if (self.watchType === 'category') {
         if(self.selectedResources.length) {
           self.checkbox(r);
-        } else {
+        } else if(r.state === 'usable') {
           if(r.mediaType === "mediaPicture") {
             self.openImages(r.rid);
           } else if (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio" ) {
