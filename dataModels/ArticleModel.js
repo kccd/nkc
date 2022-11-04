@@ -655,7 +655,7 @@ schema.methods.getIpAndPort = async function() {
   const DocumentModel = mongoose.model('documents');
   const IPModel = mongoose.model('ips');
   const sources = await DocumentModel.getDocumentSources();
-  const document = await DocumentModel.getStableDocumentsBySource(sources.article, this._id);
+  const document = await DocumentModel.getStableDocumentBySource(sources.article, this._id);
   const ipId = document.ip;
   const ip = await IPModel.getIpByIpId(ipId);
   return {
