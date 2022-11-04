@@ -3,6 +3,7 @@ const homeRouter = require("./home");
 const stickerRouter = require("./sticker");
 const noteRouter = require("./note");
 const columnRouter = require('./column');
+const osRouter = require('./os');
 const postRouter = require("./post");
 const section = require("./section");
 const applyForumRouter = require('./applyForum');
@@ -229,5 +230,6 @@ router
   .use('/securityApplication', securityApplication.routes(), securityApplication.allowedMethods())
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/document', documentRouter.routes(), documentRouter.allowedMethods())
+  .use('/os', osRouter.routes(), osRouter.allowedMethods())
   .use("/section", section.routes(), section.allowedMethods());
 module.exports = router;

@@ -55,5 +55,8 @@ module.exports = {
   securityApplication: {
     GET: 'nkcManagementSecurityApplication',
     POST: 'nkcManagementSecurityApplication'
+  },
+  os: {
+    GET: 'nkcManagementOS'
   }
 };

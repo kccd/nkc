@@ -37,11 +37,17 @@ block nkcContent
                 span.status 已被屏蔽
               else if document.status === 'faulty'
                 span.status 已被退休
-              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
-                if document.source !== 'moment'
+
+              if document.source === 'moment'
+                if permission('managementMoment')
+                  if document.status === 'deleted'
+                    button.btn-xs.btn.btn-success(onclick=`recoveryMoment('${document.momentInfo.momentId}')`) 恢复
+                  else if document.status === 'normal'
+                    button.btn-xs.btn.btn-danger(onclick=`deleteMoment('${document.momentInfo.momentId}')`) 删除
+
+              else
+                if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
                   button.btn-xs.btn.btn-danger(onclick=`deleteArticle('${document._id}')`) 退修/删除
-                else
-                  button.btn-xs.btn.btn-danger(onclick=`deleteMoment('${document.momentInfo.momentId}')`) 删除
           .post-body
             .row
               .col-xs-12.col-md-6

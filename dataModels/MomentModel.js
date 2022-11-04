@@ -454,6 +454,18 @@ schema.methods.deleteMoment = async function() {
 };
 
 /*
+* 恢复动态
+* */
+schema.methods.recoveryMoment = async function() {
+  this.status = momentStatus.normal;
+  const DocumentModel = mongoose.model('documents');
+  const {stable} = await DocumentModel.getDocumentTypes();
+  const {did} = this;
+  const document = await DocumentModel.findOnly({did, type: stable});
+  await document.setStatus(this.status);
+}
+
+/*
 * 修改当前动态的status
 * */
 schema.methods.changeStatus = async function(status) {

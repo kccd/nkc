@@ -61,6 +61,12 @@ block content
                 | 手机号申诉
                 if !permission("nkcManagementSecurityApplication")
                   | （无权）
+            li(class=data.nav === 'os' ? 'active' : '')
+              a(href=`/nkc/os`)
+                .fa.fa-list-alt
+                | 系统状态
+                if !permission("nkcManagementOS")
+                  | （无权）
       .col-xs-12.col-md-10.box-shadow-panel
         block nkcContent
 block scripts

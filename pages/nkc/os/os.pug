@@ -1,0 +1,38 @@
+extends ../nkc
+block nkcTitle
+  title 系统状态
+block nkcContent
+  div
+    -
+      var obj = {
+        totalMemory: data.totalMemory,
+        usedMemory: data.usedMemory,
+        disks: data.disks,
+        cpuUsage: data.cpuUsage,
+      }
+    .hidden#osData=objToStr(obj)
+
+    #osApp(v-cloak)
+      h4 系统状态信息
+      button.btn.btn-default.btn-xs(@click='getOSInfo' :disabled='loading') {{loading? '刷新中': '刷新'}}
+      .row
+        .col-xs-12.col-md-6
+          h5 CPU
+            small.m-l-1 {{cpuUsage}}%
+          .progress
+            .progress-bar(:style='cpuBarStyle')
+        .col-xs-12.col-md-6
+          h5 内存
+            small.m-l-1 {{getSize(totalMemory * 1024 * 1024 - usedMemory * 1024 * 1024)}} 可用，总共 {{getSize(totalMemory * 1024 * 1024)}}
+          .progress
+            .progress-bar(:style='memoryBarStyle')
+        .col-xs-12.col-md-6(v-for='disk in disks')
+          h5 数据盘 {{disk.diskPath}}
+            small.m-l-1 {{getSize(disk.free)}} 可用，共 {{getSize(disk.size)}}
+          .m-b-05 时间范围：{{disk.startingTime}} 至 {{disk.endTime}}
+          .m-b-05 文件夹路径：{{disk.path}}
+          .progress
+            .progress-bar(:style='"width: " + ((disk.size - disk.free) * 100 / disk.size) + "%"')
+
+block nkcScripts
+  +includeJS('/nkc/os/os.js')
