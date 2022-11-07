@@ -205,8 +205,10 @@ router
       });
       //通知作者文章/回复,被回复/评论了
       await post.noticeAuthorReply();
+      const ip = await db.IPModel.getIpByIpId(post.ipoc);
       //为post生成一条新的动态
       db.MomentModel.createQuoteMomentAndPublish({
+        ip,
         uid: post.uid,
         quoteType: momentQuoteTypes.post,
         quoteId: post.pid
@@ -254,7 +256,10 @@ router
         const {source} = document;
         if(momentQuoteTypes[source] && source !== 'moment') {
           //生成一条新的动态
+          const ip = await db.IPModel.getIpByIpId(document.ip);
           db.MomentModel.createQuoteMomentAndPublish({
+            ip,
+            port: document.port,
             uid: document.uid,
             quoteType: momentQuoteTypes[source],
             quoteId: document.sid
