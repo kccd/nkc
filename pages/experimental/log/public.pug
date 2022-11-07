@@ -84,7 +84,7 @@ block eContent
                   th= log.method
                   th= log.status
                   th
-                    a(href=ipUrl(log.ip) target="_blank")=log.ip
+                    .pointer.text-primary(onclick=`showIpInfo("${log.ip}")`)=log.ip
                   th
                     .referer
                       a(href=log.referer target="_blank")=log.referer

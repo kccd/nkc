@@ -1,3 +1,5 @@
+import {showIpInfo} from "../../lib/js/ip";
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -11,6 +13,7 @@ var app = new Vue({
     this.content = data.content || "";
   },
   methods: {
+    showIpInfo,
     search: function() {
       if(!this.content) return screenTopWarning('输入不能为空');
       // window.location.href = '/e/log/exam?t=' + this.t + '&content=' + this.content;
@@ -18,3 +21,5 @@ var app = new Vue({
     }
   }
 });
+
+window.showIpInfo = showIpInfo;

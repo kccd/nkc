@@ -206,7 +206,7 @@ export function getCommentEditorConfigs() {
         'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', "|"
       ]
     ],
-    maximumWords: 100000, // 最大字符数
+    maximumWords: 200, // 最大字符数
     initialFrameHeight: 100, // 编辑器高度
     autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长

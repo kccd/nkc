@@ -1,4 +1,5 @@
 import {objToStr} from "../../lib/js/tools";
+import {showIpInfo} from "../../lib/js/ip";
 var app = new Vue({
   el: '#app',
   data: {
@@ -14,6 +15,7 @@ var app = new Vue({
     fromNow: NKC.methods.fromNow,
     format: NKC.methods.format,
     ipUrl: NKC.methods.ipUrl,
+    showIpInfo,
     searchUser: function() {
       openToNewLocation('/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText + "&operationId=" + this.searchoperationId + '&scoreType=' + this.searchScoreType);
     },

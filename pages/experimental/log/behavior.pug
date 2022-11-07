@@ -10,11 +10,11 @@ block content
   .container-fluid.max-width
     .row
       include ../nav
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-12#app(v-cloak)
         .row
           .col-xs-12.col-md-12
             .row
-              .col-xs-12.col-md-12#app(v-cloak)
+              .col-xs-12.col-md-12
                 .form-inline(style='margin-bottom: 1rem;')
                   .form-group
                     select.form-control(v-model='searchType')
@@ -68,7 +68,7 @@ block content
                                 | uid：
                                 a(href=`/u/${behavior.toUid}` target="_blank")=behavior.toUid
                           th
-                            a(href=ipUrl(behavior.ip))=`${behavior.ip}: ${behavior.port}`
+                            .pointer.text-primary(@click=`showIpInfo("${behavior.ip}")`)=`${behavior.ip}: ${behavior.port}`
                           th
                             if behavior.user
                               a(href=`/u/${behavior.user.uid}/alt` target="_blank") 查马甲
@@ -77,21 +77,8 @@ block content
 
 block scripts
 
-  script.
-    var data = NKC.methods.getDataById("data");
-    var app = new Vue({
-      el: '#app',
-      data: {
-        searchType: data.t || "username",
-        searchText: data.c || ""
-      },
-      methods: {
-        searchUser: function () {
-          if (!this.searchText) return screenTopWarning('输入不能为空');
-          openToNewLocation('/e/log/behavior?t=' + this.searchType + '&c=' + this.searchText);
-        }
-      }
-    });
+  +includeJS('/experimental/log/behavior.js')
+
 
 
 
