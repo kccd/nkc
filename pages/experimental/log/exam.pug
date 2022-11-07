@@ -58,7 +58,7 @@ block content
               label.col-sm-5.control-label IP：
               h5.col-sm-7
                 strong
-                  a(href=ipUrl(data.paper.ip) target="_blank")=data.paper.ip
+                  .pointer.text-primary(onclick=`showIpInfo("${data.paper.ip}")`)=data.paper.ip
         .col-xs-12.col-md-7
           hr
           h3.m-b-2
@@ -150,7 +150,7 @@ block content
                   th=paper.passScore
                   th=paper.score
                   th
-                    a(href=ipUrl(paper.ip) target="_blank")=paper.ip
+                    .pointer.text-primary(onclick=`showIpInfo("${paper.ip}")`)=paper.ip
                   th
                     a(href=`/e/log/exam?t=paper&content=${paper._id}` target="_blank") 查看
           include ../../interface_navigation_paging

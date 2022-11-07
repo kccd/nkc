@@ -1,3 +1,5 @@
+import {showIpInfo} from "../../lib/js/ip";
+
 function delLogs(){
   var sTime = $("#startTime").val().trim();
   var eTime = $("#endTime").val().trim();
@@ -188,4 +190,5 @@ Object.assign(window, {
   checkFormData,
   searchLogs,
   deleteCurrentRecord,
+  showIpInfo,
 })

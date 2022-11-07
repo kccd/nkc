@@ -82,7 +82,7 @@ block eContent
                 th
                   a(v-if="record.url" :href="record.url" target="_blank") 查看详情
                 th
-                  a(:href="ipUrl(record.ip)" target="_blank") {{record.ip}}:{{record.port}}
+                  .pointer.text-primary(@click="showIpInfo(record.ip)") {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}
           include ../../publicModules/paging/paging_input
 block scripts

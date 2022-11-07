@@ -62,7 +62,7 @@ block eContent
                 th
                   span=log.kcb/100
                 th
-                  a(href=ipUrl(log.ip) target="_blank")=`${log.ip}:${log.port}`
+                  .pointer.text-primary(onclick=`showIpInfo("${log.ip}")`)=`${log.ip}:${log.port}`
                 th
                   .referer
                     a(href=log.referer target="_blank")=log.referer

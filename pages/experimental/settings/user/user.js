@@ -1,4 +1,6 @@
 import {objToStr} from "../../../lib/js/tools";
+import {showIpInfo} from "../../../lib/js/ip";
+
 const data = NKC.methods.getDataById('data');
 const usersObj = {};
 data.users.map(u => {
@@ -27,6 +29,7 @@ const app = new Vue({
   },
   methods: {
     objToStr: objToStr,
+    showIpInfo,
     format: NKC.methods.format,
     getUrl: NKC.methods.tools.getUrl,
     getIpUrl: NKC.methods.tools.getIpUrl,

@@ -84,7 +84,7 @@ block eContent
                     span.text-success 通过({{u.paperB?u.paperB.name: '试卷丢失'}})
                   span(v-else).text-danger 未通过
                 th.nwd
-                  a(:href="getIpUrl(u.regIP)" target="_blank") {{u.regIP}}:{{u.regPort}}
+                  .pointer.text-primary(@click="showIpInfo(u.regIP)") {{u.regIP}}:{{u.regPort}}
                 th
                   button.btn.btn-default.btn-xs(@click='disableUsers("one", false, u)' v-if='u.certs.includes("banned")') 解封
                   button.btn.btn-default.btn-xs(@click='disableUsers("one", true, u)' v-else) 封禁

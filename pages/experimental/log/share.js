@@ -1,3 +1,4 @@
+import {showIpInfo} from "../../lib/js/ip";
 /*
 function searchCode() {
   var code = $("#codeInp").val();
@@ -20,6 +21,9 @@ var app = new Vue({
     },
     reset: function() {
       NKC.methods.visitUrl("/e/log/share", false);
-    }
+    },
+    showIpInfo
   }
 });
+
+window.showIpInfo = showIpInfo;
