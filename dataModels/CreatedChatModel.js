@@ -379,7 +379,7 @@ chatSchema.statics.getCreatedChat = async (uid) => {
   };
 
   if(chat.systemInfo) {
-    const [message] = (await MessageModel.getMySystemInfoMessage(uid)).reverse();
+    const [message] = (await MessageModel.getUserSystemInfoMessages(uid)).reverse();
     if(message) {
       insertChat(chatList, {
         time: message.tc,

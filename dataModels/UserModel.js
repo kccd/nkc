@@ -945,9 +945,14 @@ userSchema.methods.getNewMessagesCount = async function() {
   let newApplicationsCount = 0;
   let newReminderCount = 0;
   if(systemInfo) {
-    const allMySystemInfoMessageCount = (await MessageModel.getMySystemInfoMessage(this.uid)).length;
-    // const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
-    const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
+    const mySystemInfoMessagesId = await MessageModel.getUserSystemInfoMessagesId(this.uid);
+    const allMySystemInfoMessageCount = mySystemInfoMessagesId.length;
+    const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({
+      uid: this.uid,
+      mid: {
+        $in: mySystemInfoMessagesId
+      },
+    });
     newSystemInfoCount = allMySystemInfoMessageCount - viewedSystemInfoCount;
     // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
     if(newSystemInfoCount < 0) {
