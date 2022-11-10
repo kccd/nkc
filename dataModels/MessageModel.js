@@ -1721,18 +1721,18 @@ messageSchema.statics.markAsRead = async (type, uid, tUid) => {
     });
     await CreatedChatModel.updateMany({uid, tUid}, {$set: {unread: 0}});
   } else if(type === 'STE') {
-    const messages = await MessageModel.find({ty: 'STE'});
-    const myMessage = await MessageModel.mySystemInfoMessageFilter(uid, messages);
-    const systemInfoIdList = myMessage.map(({ _id }) => _id);
-    const readedIdList = (await SystemInfoLogModel.find({uid}, {mid: true})).map(({ mid }) => mid);
-    systemInfoIdList
-      .filter(id => !readedIdList.includes(id))
-      .forEach(async mid => {
-        await SystemInfoLogModel({
-          uid,
-          mid
-        }).save();
-      });
+    const messagesId = await MessageModel.getUserSystemInfoMessagesId(uid);
+    const readMessagesId = (await SystemInfoLogModel.find({
+      uid,
+      mid: {$in: messagesId}
+    }, {mid: 1})).map(({ mid }) => mid);
+    for(const mid of messagesId) {
+      if(readMessagesId.includes(mid)) continue;
+      await SystemInfoLogModel({
+        uid,
+        mid,
+      }).save();
+    }
   } else if(type === 'STU'){
     await MessageModel.updateMany({ty: type, r: uid, vd: false}, {$set: {vd: true}});
   } else if(type === 'newFriends') {
@@ -1831,14 +1831,86 @@ messageSchema.statics.getStatusOfSendingMessage = async (uid, tUid, canSendToEve
   };
 };
 
-/**
- * 获取特定用户的系统消息
- */
-messageSchema.statics.getMySystemInfoMessage = async (uid, query) => {
+messageSchema.statics.getUserSystemInfoMatch = async (uid, match) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
+  const rolesId = user.roles.map(role => role._id);
+  const gradeId = user.grade._id;
+  match = match || {};
+  return {
+    ...match,
+    ty: 'STE',
+    $or: [
+      {
+        'c.mode': 'broadcast'
+      },
+      {
+        'c.mode': 'user',
+        'c.uids': uid,
+      },
+      {
+        'c.mode': 'filter',
+        $and: [
+          {
+            $or: [
+              {
+                'c.lastVisit.start': {
+                  $exists: false,
+                }
+              },
+              {
+                'c.lastVisit.start': {
+                  $lte: user.tlv,
+                }
+              }
+            ]
+          },
+          {
+            $or: [
+              {
+                'c.lastVisit.end': {
+                  $exists: false,
+                }
+              },
+              {
+                'c.lastVisit.end': {
+                  $gt: user.tlv,
+                }
+              }
+            ]
+          },
+          {
+            $or: [
+              {
+                'c.roles': {
+                  $in: rolesId,
+                }
+              },
+              {
+                'c.grades': gradeId,
+              }
+            ]
+          }
+        ],
+      }
+    ]
+  };
+}
+
+messageSchema.statics.getUserSystemInfoMessages = async (uid, match, filter) => {
   const MessageModel = mongoose.model('messages');
-  // 查出所有的系统消息
-  let messages = await MessageModel.find({...query, ty: "STE"}).sort({tc: 1}).limit(30);
-  return await MessageModel.mySystemInfoMessageFilter(uid, messages);
+  match = await MessageModel.getUserSystemInfoMatch(uid, match);
+  return await MessageModel.find(match, filter).sort({tc: 1});
+}
+
+messageSchema.statics.getUserSystemInfoMessagesId = async (uid, match) => {
+  const MessageModel = mongoose.model('messages');
+  const messages = await MessageModel.getUserSystemInfoMessages(uid, match,{
+    _id: 1
+  });
+  return messages.map(m => m._id);
 }
 
 /**

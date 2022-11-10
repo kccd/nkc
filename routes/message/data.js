@@ -67,15 +67,13 @@ router
       await db.CreatedChatModel.createChat(user.uid, uid);
 
     } else if(type === "STE") {
-      const queryDoc = {
-        ty: 'STE'
-      };
+      const queryDoc = {};
       if(firstMessageId) {
         queryDoc._id = {
           $lt: firstMessageId
         };
       }
-      const messages = await db.MessageModel.getMySystemInfoMessage(user.uid, queryDoc);
+      const messages = await db.MessageModel.getUserSystemInfoMessages(user.uid, queryDoc);
       // 取纯文本返回给前端
       messages.forEach(msg => msg.c = msg.c.content);
       data.messages = messages;
