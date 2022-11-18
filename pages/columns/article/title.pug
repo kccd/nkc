@@ -73,4 +73,5 @@ mixin title(data)
             span(style="padding:5px")!=`${getOriginLevel(originState)}`
       if _id
         a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
-      span=` IP:${article.document? article.document.addr: article.addr}`
+      if article
+        span=` IP:${article.document? article.document.addr: article.addr}`

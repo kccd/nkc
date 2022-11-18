@@ -46,13 +46,14 @@ block shopContent
                   .order-info
                     .name 买家：
                     a.value(href=`/u/${order.buyUid}`
+                      target="_blank"
                       data-global-mouseover="showUserPanel"
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: order.buyUser.uid})
                     )=order.buyUser.username
                     a.value.m-r-1.hidden-xs.hidden-sm(onclick=`NKC.methods.toChat("${order.buyUid}", '${order.buyUser.username}')` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
-                    a.value.m-r-1.hidden-md.hidden-lg(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
+                    a.value.m-r-1.hidden-md.hidden-lg(target="_blank" href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
                     if order.orderStatus !== "unCost" && permission("transferKcbToUser")
                       button.order-button(onclick=`transfer('${order.buyUid}')`) 转账
@@ -63,7 +64,7 @@ block shopContent
                         .order-cover
                           img(src=`/r/${param.product.imgMaster}`)
                         .order-name
-                          a(href=`/shop/product/${param.product.productId}` title=param.product.name)=param.product.name
+                          a(href=`/shop/product/${param.product.productId}` title=param.product.name target="_blank")=param.product.name
                           .order-param(title=param.productParam.name)=`规格：${param.productParam.name}`
                     td
                       div.order-price
@@ -113,19 +114,19 @@ block shopContent
 
                       td.order-status(rowspan=paramsCount)=order.status
                       td.order-links(rowspan=paramsCount)
-                        a(href=`/shop/manage/${data.user.uid}/order/detail?orderId=${order.orderId}`) 订单详情
+                        a(href=`/shop/manage/${data.user.uid}/order/detail?orderId=${order.orderId}` target="_blank") 订单详情
                         //- 正在退款 查看退款状态
                         if order.refundStatus === "ing"
-                          a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情
+                          a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}` target="_blank") 退款详情
                         if !order.closeStatus && ["unCost", "unShip"].includes(order.orderStatus)
                           //- 订单未关闭 且 订单待付款或待发货
-                          a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
+                          a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}` target="_blank") 取消订单
                         if order.orderStatus === "unSign" || order.orderStatus === "finish"
                           //- 已完成或已发货 可查看物流信息
                           if !order.trackNumber || order.trackNumber === "no"
                             a 无物流配送
                           else
-                            a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
+                            a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}` target="_blank") 查看物流
                         if order.orderStatus === "unSign" && !order.closeStatus
                           button(onclick=`ship(${order.orderId})`) 修改物流信息
                         if order.orderStatus === "unShip" && !order.closeStatus
