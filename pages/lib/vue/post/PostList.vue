@@ -10,9 +10,9 @@
       hr(v-if="index")
       review(ref="review" :post="post" :permissions="permissions" @refresh="refreshPage" v-if="!post.reviewed")
       .thread-draft-info(v-else-if="post.toDraft") 退修中，仅自己可见，修改后对所有人可见
-        .reason 理由: {{post.reviewReason}}
+        .reason(v-if="post.reviewReason") 理由: {{post.reviewReason}}
       .thread-disabled-info(v-else-if="post.disabled") 已屏蔽，仅自己可见
-        .reason 理由: {{post.reviewReason}}
+        .reason(v-if="post.reviewReason") 理由: {{post.reviewReason}}
       .checkbox(v-if="managementBtn" )
         label
           input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
