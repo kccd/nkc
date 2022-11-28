@@ -11,7 +11,7 @@
     | 按钮。
   .reviewed(v-else)
     | 审核中
-    .reason 理由: {{post.reviewReason}}
+    //.reason(v-if="post.reviewReason") 理由: {{post.reviewReason}}
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
