@@ -68,6 +68,7 @@ module.exports = async (ctx, next) => {
     htmlToText: true,
     reviewReason: true,
   });
+  const haveReviewPermission = ctx.permission('review');
   const results = [];
   for (const thread of threads) {
     if(
@@ -93,7 +94,7 @@ module.exports = async (ctx, next) => {
         continue;
       }
     }
-    
+
     const result = {
       postType: "postToForum",
       tid: thread.tid,
@@ -117,7 +118,7 @@ module.exports = async (ctx, next) => {
     } else {
       threadLogOne = await db.ReviewModel.findOne({pid: thread.firstPost.pid}).sort({toc: -1});
     }
-    if(threadLogOne) {
+    if(threadLogOne && (haveReviewPermission || result.toDraft)) {
       result.reviewReason = threadLogOne.reason;
     }
     results.push(result);

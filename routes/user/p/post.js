@@ -60,7 +60,7 @@ module.exports = async (ctx, next) => {
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   const results = [];
-  
+
   const tids = new Set(), threadsObj = {};
   posts.map(post => {
     tids.add(post.tid);
@@ -80,7 +80,7 @@ module.exports = async (ctx, next) => {
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
-  
+  const haveReviewPermission = ctx.permission('review');
   for(const post of posts) {
     const thread = threadsObj[post.tid];
     if(post.disabled || thread.disabled || thread.recycleMark) {
@@ -143,7 +143,7 @@ module.exports = async (ctx, next) => {
     } else {
       postLogOne = await db.ReviewModel.findOne({pid: post.pid}).sort({toc: -1});
     }
-    if(postLogOne) {
+    if(postLogOne && (haveReviewPermission || result.toDraft)) {
       result.reviewReason = postLogOne.reason;
     }
     results.push(result);
