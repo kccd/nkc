@@ -19,18 +19,9 @@ module.exports = {
       },
     }
   },
-  token: {
-    // 由于GET请求会完全暴露url中的信息，所以此处通过POST请求获取token
-    creation: {
-      POST: 'getOAuthToken',
-    },
-    content: {
-      POST: 'getOAuthToken',
-    }
-  },
-
   authentication: {
     GET: 'OAuthAuthentication',
     POST: 'OAuthAuthentication',
+    PUT: 'OAuthAuthentication',
   }
 }

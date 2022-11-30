@@ -32,6 +32,10 @@ const schema = mongoose.Schema({
     required: true,
     index: 1,
   },
+  callback: {
+    type: String,
+    required: true,
+  },
   used: {
     type: Boolean,
     default: false,
@@ -74,13 +78,14 @@ schema.statics.getTokenStatus = () => {
   return {...tokenStatus};
 }
 
-schema.statics.createToken = async (appId, operation) => {
+schema.statics.createToken = async (appId, operation, callback) => {
   const OAuthTokenModel = mongoose.model('OAuthTokens');
   const tokenString = await OAuthTokenModel.createTokenString();
   const token = new OAuthTokenModel({
     token: tokenString,
     appId,
     operation,
+    callback,
   });
   await token.save();
   return tokenString;

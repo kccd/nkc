@@ -887,6 +887,5 @@
   "disableOAuthApp": "封禁/解禁第三方应用",
   "modifyOAuthAppInfo": "修改第三方应用信息",
   "deleteOAuthApp": "删除第三方应用",
-  "OAuthAppLogin": "第三方应用登录",
-  "getOAuthToken": "获取第三方应用操作token"
+  "OAuthAuthentication": "第三方应用认证"
 }

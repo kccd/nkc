@@ -13,22 +13,22 @@ router
     const {icon} = body.files;
     const {checkString} = nkcModules.checkData;
     checkString(name, {
-      name: '应用名称',
+      name: '名称',
       minLength: 1,
       maxLength: 100,
     });
     checkString(desc, {
-      name: '应用简介',
+      name: '简介',
       minLength: 1,
       maxLength: 2000,
     });
     checkString(home, {
-      name: '应用主页',
+      name: '主页链接',
       minLength: 1,
       maxLength: 2000,
     });
     checkString(callback, {
-      name: '应用回调链接',
+      name: '回调链接',
       minLength: 1,
       maxLength: 2000,
     });

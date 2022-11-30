@@ -27,7 +27,7 @@ const app = new Vue({
     toLogin,
     post(approved) {
       const {token} = this;
-      nkcAPI(`/oauth/authentication`, 'POST', {
+      nkcAPI(`/oauth/authentication`, 'PUT', {
         token,
         approved,
       })
