@@ -882,6 +882,7 @@
   "getDigestSettings": "获取加精设置",
   "getCreditSettings": "获取评学术分、鼓励设置",
   "publishArticle": "发表独立文章（长电文、专栏文章）",
+  "visitEOauthSettings": "访问第三方应用管理",
   "createOAuthApp": "创建第三方应用",
   "modifyOAuthAppSecret": "更新第三方应用秘钥",
   "disableOAuthApp": "封禁/解禁第三方应用",

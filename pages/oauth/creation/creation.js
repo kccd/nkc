@@ -1,6 +1,10 @@
 import {HttpMethods, nkcUploadFile} from "../../lib/js/netAPI";
 import {sweetError, sweetSuccess} from "../../lib/js/sweetAlert";
-
+const data = NKC.methods.getDataById('data');
+const operations = [];
+for (let oauthOperationsKey in data.oauthOperations) {
+  operations.push(oauthOperationsKey)
+}
 const app = new Vue({
   el: '#app',
   data: () => ({
@@ -11,6 +15,9 @@ const app = new Vue({
     iconFile: null,
     url: '',
     submitting: false,
+    oauthOperations: data.oauthOperations,
+    operations,
+    checkOperation:[],
   }),
   computed: {
     iconUrl() {
@@ -25,7 +32,14 @@ const app = new Vue({
       this.iconFile = e.target.files[0];
     },
     submit() {
-      const {name, desc, iconFile, home, callback} = this;
+      const {name, desc, iconFile, home, callback,checkOperation} = this;
+      const checkOperationObj = document.getElementsByName("checkOperation");
+      for (let _operation in checkOperationObj) {
+        //判断复选框是否被选中
+        if (checkOperationObj[_operation].checked)
+          //获取被选中的复选框的值
+          checkOperation.push(checkOperationObj[_operation].value);
+      }
       this.submitting = true;
       return Promise.resolve()
         .then(() => {
@@ -40,6 +54,7 @@ const app = new Vue({
           formData.append('home', home);
           formData.append('callback', callback);
           formData.append('icon', iconFile);
+          formData.append('operations', checkOperation);
           return nkcUploadFile(
             `/oauth/creation`,
             HttpMethods.POST,

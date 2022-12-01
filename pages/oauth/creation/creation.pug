@@ -3,6 +3,7 @@ block title
   title 创建第三方应用
   +includeCSS('/oauth/creation/creation.css')
 block content
+  .hidden#data=objToStr({oauthOperations: data.oauthOperations})
   .container-fluid.max-width
     .row
       .col-xs-12.col-sm-6.col-md-6.col-md-offset-3.col-sm-offset-3.box-shadow-panel#app(v-cloak)
@@ -27,6 +28,11 @@ block content
                 @change="onSelectedFile"
               )
               button.btn.btn-default.btn-sm(@click="selectFile") 选择图片
+          .form-group
+            label.control-label 操作
+            span.form-control(v-for="operation in operations" )
+              input(type="checkbox" name="checkOperation" :value="operation")
+              span {{oauthOperations[operation]}}
           .form-group
             label.control-label 主页链接
             textarea.form-control(v-model="home")

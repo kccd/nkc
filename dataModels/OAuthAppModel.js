@@ -40,7 +40,7 @@ const schema = mongoose.Schema({
   },
   status: {
     type: String,
-    default: appStatus.unknown,
+    default: appStatus.normal,
     index: 1
   },
   operations: {
@@ -88,7 +88,7 @@ schema.statics.createAppSecret = async () => {
 * */
 schema.statics.createApp = async (props) => {
   const OAuthAppModel = mongoose.model(collectionName);
-  const {name, desc, uid, home, callback} = props;
+  const {name, desc, uid, home, callback, operations} = props;
   const appId = await OAuthAppModel.createAppId();
   const appSecret = await OAuthAppModel.createAppSecret();
   const client = new OAuthAppModel({
@@ -99,6 +99,7 @@ schema.statics.createApp = async (props) => {
     callback,
     uid,
     secret: appSecret,
+    operations,
   });
   await client.save();
   return client;

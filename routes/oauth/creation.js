@@ -1,7 +1,17 @@
+const translate = require("../../nkcModules/translate");
+const {languageNames} = require("../../nkcModules/language");
 const router = require('koa-router')();
+const appOperations = {
+  signIn: 'signIn',
+};
 router
   .get('/', async (ctx, next) => {
     ctx.remoteTemplate = 'oauth/creation/creation.pug';
+    const oauthOperations = {};
+    for (let appOperationKey in appOperations) {
+      oauthOperations[appOperationKey] = translate(languageNames.zh_cn,'oauth',appOperations[appOperationKey])
+    }
+    ctx.data.oauthOperations = oauthOperations;
     await next();
   })
   .post('/', async (ctx, next) => {
@@ -10,6 +20,7 @@ router
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
     const callback = body.fields.callback.trim();
+    const operations = body.fields.operations;
     const {icon} = body.files;
     const {checkString} = nkcModules.checkData;
     checkString(name, {
@@ -38,6 +49,7 @@ router
       desc,
       home,
       callback,
+      operations,
     });
     await db.AttachmentModel.saveOAuthAppIcon(app._id, icon);
     await next();
