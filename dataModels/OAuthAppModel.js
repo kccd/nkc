@@ -88,7 +88,7 @@ schema.statics.createAppSecret = async () => {
 * */
 schema.statics.createApp = async (props) => {
   const OAuthAppModel = mongoose.model(collectionName);
-  const {name, desc, uid, home, callback, operations} = props;
+  const {name, desc, uid, home, callback = '', operations} = props;
   const appId = await OAuthAppModel.createAppId();
   const appSecret = await OAuthAppModel.createAppSecret();
   const client = new OAuthAppModel({

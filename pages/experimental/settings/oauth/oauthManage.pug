@@ -5,6 +5,7 @@ block eTitle
 block eContent
   .hidden#data=objToStr({oauthList: data.oauthList,oauthStatus: data.oauthStatus,oauthOperations: data.oauthOperations})
   .container-fluid.max-width#app(v-cloak)
+    modify-oauth-app(ref="modifyOauth")
     .row
       .col-xs-12.col-md-12.m-b-1
           .form-group
@@ -18,7 +19,6 @@ block eContent
                 th 应用ID
                 th 应用名
                 th UID
-                th 创建者
                 th 状态
                 th 允许操作
                 th 其他
@@ -48,8 +48,8 @@ block eContent
                 th
                   span(v-for='r in oauth.operations') {{oauthOperations[r]}}&nbsp;
                 th
-                  button.btn.btn-default.btn-xs(@click='disableOauth("one", false, oauth)' v-if='oauth.status === "disabled"') 解封
-                  button.btn.btn-default.btn-xs(@click='disableOauth("one", true, oauth)' v-else) 封禁
+                  button.btn.btn-default.btn-xs(@click='disableOauth(false, oauth)' v-if='oauth.status === "disabled"') 解封
+                  button.btn.btn-default.btn-xs(@click='disableOauth(true, oauth)' v-else) 屏蔽
                   button.btn.btn-default.btn-xs(@click='editOauth(oauth)') 编辑
                   | &nbsp;
                   button.btn.btn-default.btn-xs(@click='deleteOauth(oauth)') 删除
@@ -58,4 +58,5 @@ block eContent
 
 block scripts
   include ../../../publicModules/moment
+  include ../../../publicModules/oauth/modifyOauth
   +includeJS('/experimental/settings/oauth/oauthManage.js')

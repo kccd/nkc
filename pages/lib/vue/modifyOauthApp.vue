@@ -1,0 +1,185 @@
+<template lang="pug">
+  .oauth-modal(v-show="show")
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button(type="button" class="close" @click="close")
+            span &times;
+          h5.modal-title 第三方应用
+        .modal-body
+          .form
+            .form-group
+              h4 修改应用
+            .form-group
+              label.control-label 名称
+              input.form-control(type="text" v-model="name")
+            .form-group
+              label.control-label 简介
+              textarea.form-control(v-model="desc" rows="4")
+            .form-group
+              label.control-label 图标
+              .icon-container(v-if="iconUrl")
+                img(:src="iconUrl")
+              div
+                input.hidden(
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  ref="iconInput"
+                  @change="onSelectedFile"
+                )
+                button.btn.btn-default.btn-sm(@click="selectFile") 选择图片
+            .form-group
+              label.control-label 操作
+              div.form-control
+                span.check-operations(v-for="operation in operations" )
+                  input(type="checkbox" :checked="checkOperations.includes(operation)" name="checkOperation" :value="operation")
+                  span {{oauthOperations[operation]}}
+            .form-group
+              label.control-label 主页链接
+              textarea.form-control(v-model="home")
+            .form-group
+              button.btn.btn-primary.btn-block(@click="submit") 提交
+</template>
+<script>
+import {nkcAPI, nkcUploadFile} from "../js/netAPI";
+import {getUrl} from "../js/tools";
+
+export default {
+  data() {
+    return {
+      show: false,
+      loading: true,
+      id: '',
+      name: '',
+      desc: '',
+      home: '',
+      callback: '',
+      iconFile: null,
+      icon: '',
+      checkOperations: [],
+      submitting: false,
+      operations: [],
+      oauthOperations: {},
+      checkOperation: [],
+    }
+  },
+  computed: {
+    iconUrl() {
+      console.log('this.icon',this.icon)
+      const url = getUrl('oauthAppIcon', this.icon);
+      console.log('url',url)
+      return this.iconFile ? window.URL.createObjectURL(this.iconFile) : url
+    }
+  },
+  methods: {
+    open(oauth){
+      this.loading = true;
+      this.show = true;
+      this.getOauthInfo(oauth);
+    },
+    close(){
+      this.name = "";
+      this.desc = "";
+      this.home = "";
+      this.callback = "";
+      this.iconFile = "";
+      this.operations = [];
+      this.show = false;
+    },
+    init: function () {
+      this.name = "";
+      this.desc = "";
+      this.home = "";
+      this.callback = "";
+      this.iconFile = "";
+    },
+    selectFile() {
+      this.$refs.iconInput.click();
+    },
+    onSelectedFile(e) {
+      this.iconFile = e.target.files[0];
+    },
+    submit() {
+      let {name, desc, iconFile, home, id, icon} = this;
+      const checkOperation = [];
+      const checkOperationObj = document.getElementsByName("checkOperation");
+      for (let _operation in checkOperationObj) {
+        //判断复选框是否被选中
+        console.log(checkOperationObj[_operation].checked)
+        if (checkOperationObj[_operation].checked){
+          //获取被选中的复选框的值
+          console.log(checkOperationObj[_operation].value)
+          checkOperation.push(checkOperationObj[_operation].value);
+        }
+      }
+      this.submitting = true;
+      return Promise.resolve()
+        .then(() => {
+          if (!name) throw new Error(`应用名称不能为空`);
+          if (!desc) throw new Error('应用简介不能为空');
+          if (!iconFile && icon){
+            iconFile = icon;
+          }else if(!iconFile && !icon) {
+            throw new Error('应用图标不能为空')
+          }
+          if (!home) throw new Error('应用主页不能为空');
+          const formData = new FormData();
+          formData.append('name', name);
+          formData.append('desc', desc);
+          formData.append('home', home);
+          formData.append('icon', iconFile);
+          formData.append('operations', JSON.stringify(checkOperation));
+          return nkcUploadFile(
+            "/e/settings/oauth/" + id + "/settings",
+            'PUT',
+            formData,
+          );
+        })
+        .then(() => {
+          sweetSuccess('提交成功');
+        })
+        .catch(sweetError)
+    },
+    getOauthInfo: function(oauth) {
+      var _this = this;
+      nkcAPI("/e/settings/oauth/" + oauth._id + "/settings", "GET")
+        .then(function(data) {
+          console.log('data',data);
+          _this.id = data.oauthInfo._id;
+          _this.name = data.oauthInfo.name;
+          _this.desc = data.oauthInfo.desc;
+          _this.home = data.oauthInfo.home;
+          _this.callback = data.oauthInfo.callback;
+          _this.icon = data.oauthInfo.icon;
+          _this.checkOperations = data.oauthInfo.operations;
+          _this.oauthOperations = data.oauthOperations;
+          for (const dataKey in data.oauthOperations) {
+            _this.operations.push(dataKey)
+          }
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    },
+  }
+}
+</script>
+<style lang="less" scoped>
+.oauth-modal {
+  overflow-x: scroll;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1050;
+  .icon-container {
+    img {
+      max-width: 100%;
+    }
+  }
+  .check-operations {
+    margin-right: 0.5rem;
+  }
+}
+</style>

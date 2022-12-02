@@ -32,7 +32,7 @@ const app = new Vue({
       this.iconFile = e.target.files[0];
     },
     submit() {
-      const {name, desc, iconFile, home, callback,checkOperation} = this;
+      const {name, desc, iconFile, home,checkOperation} = this;
       const checkOperationObj = document.getElementsByName("checkOperation");
       for (let _operation in checkOperationObj) {
         //判断复选框是否被选中
@@ -47,12 +47,10 @@ const app = new Vue({
           if(!desc) throw new Error('应用简介不能为空');
           if(!iconFile) throw new Error('应用图标不能为空')
           if(!home) throw new Error('应用主页不能为空');
-          if(!callback) throw new Error('应用回调链接不能为空');
           const formData = new FormData();
           formData.append('name', name);
           formData.append('desc', desc);
           formData.append('home', home);
-          formData.append('callback', callback);
           formData.append('icon', iconFile);
           formData.append('operations', checkOperation);
           return nkcUploadFile(

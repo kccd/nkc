@@ -37,9 +37,6 @@ block content
             label.control-label 主页链接
             textarea.form-control(v-model="home")
           .form-group
-            label.control-label 回调链接
-            textarea.form-control(v-model="callback")
-          .form-group
             button.btn.btn-primary.btn-block(@click="submit") 提交
 block scripts
   +includeJS('/oauth/creation/creation.js')

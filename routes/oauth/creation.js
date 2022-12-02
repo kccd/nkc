@@ -38,11 +38,6 @@ router
       minLength: 1,
       maxLength: 2000,
     });
-    checkString(callback, {
-      name: '回调链接',
-      minLength: 1,
-      maxLength: 2000,
-    });
     const app = await db.OAuthAppModel.createApp({
       uid: state.uid,
       name,
