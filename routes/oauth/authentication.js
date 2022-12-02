@@ -32,7 +32,8 @@ router
       getAccountInfo: 'getAccountInfo',
     };
     const {type, appId, secret} = body;
-    const app = await db.OAuthAppModel.getAppBySecret(appId, secret);
+    const ip = ctx.address;
+    const app = await db.OAuthAppModel.getAppBySecret({appId, secret, ip});
 
     switch(type) {
       case types.getToken: {

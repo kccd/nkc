@@ -56,6 +56,10 @@ const schema = mongoose.Schema({
     type: String,
     required: true,
   },
+  ips: {
+    type: [String],
+    default: [],
+  }
 }, {
   collection: collectionName
 });
@@ -111,11 +115,15 @@ schema.methods.ensurePermission= async function(operation) {
   }
 }
 
-schema.statics.getAppBySecret = async (appId, secret) => {
+schema.statics.getAppBySecret = async (props) => {
+  const {appId, secret, ip} = props;
   const OAuthAppModel = mongoose.model('OAuthApps');
   const app = await OAuthAppModel.findOne({_id: appId, secret});
   if(!app) {
     throwErr(403, '应用ID或秘钥错误');
+  }
+  if(!app.ips.includes(ip)) {
+    throwErr(403, `无权调用`);
   }
   if(app.status !== appStatus.normal) {
     throwErr(403, `应用不可用 status=${app.status}`);
@@ -162,7 +170,7 @@ schema.statics.getUserAccountInfo = async (uid) => {
     try {
       const attachment = await AttachmentModel.findOne({_id: user.avatar});
       if(attachment && !attachment.disabled) {
-        const {url} = await attachment.getRemoteFile();
+        const {url} = await attachment.getRemoteFile('lg');
         const {filePath} = await FILE.downloadFileToTmp(
           url,
           `download_user_avatar_${user.avatar}_${Date.now()}.jpg`
@@ -170,7 +178,7 @@ schema.statics.getUserAccountInfo = async (uid) => {
         avatar = (await fsPromises.readFile(filePath)).toString('base64');
       }
     } catch(err) {
-      console.log(`oauth获取用户头像出错：${err.message}`);
+      console.log(`oauth 获取用户头像出错：${err.message}`);
     }
   }
   return {
