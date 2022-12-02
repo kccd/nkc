@@ -122,7 +122,7 @@ schema.statics.getAppBySecret = async (props) => {
   if(!app) {
     throwErr(403, '应用ID或秘钥错误');
   }
-  if(!app.ips.includes(ip)) {
+  if(app.ips && app.ips.length !== 0 && !app.ips.includes(ip)) {
     throwErr(403, `无权调用`);
   }
   if(app.status !== appStatus.normal) {
