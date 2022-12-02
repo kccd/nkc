@@ -136,10 +136,16 @@ schema.methods.useToken = async function() {
 };
 
 schema.methods.authorizeToken = async function(uid) {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   await this.updateOne({
     $set: {
       uid,
       status: tokenStatus.authorized
+    }
+  });
+  await UsersPersonalModel.updateOne({uid}, {
+    $addToSet: {
+      oauthAppId: this.appId,
     }
   });
 };

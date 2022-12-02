@@ -3,6 +3,7 @@ const fsPromise = fs.promises;
 const moment = require('moment');
 const PATH = require('path');
 const axios = require("axios");
+const Downloader = require("nodejs-file-downloader")
 
 const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
 const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm', 'mkv', 'flv', 'wmv'];
@@ -350,6 +351,19 @@ async function getRemoteFile(props) {
   }
 }
 
+async function downloadFile(url, directory, filename) {
+  const downloader = new Downloader({
+    url,
+    directory: directory,
+    fileName: filename,
+  });
+  return await downloader.download();
+}
+
+async function downloadFileToTmp(url, filename) {
+  return await downloadFile(url, PATH.resolve('./tmp'), filename);
+}
+
 module.exports = {
   videoExtensions,
   pictureExtensions,
@@ -370,5 +384,7 @@ module.exports = {
   replaceFileExtension,
   getMetaInformation,
   removeResourceInfo,
-  getStorePath
+  getStorePath,
+  downloadFileToTmp,
+  downloadFile,
 }

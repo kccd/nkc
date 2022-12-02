@@ -29,19 +29,20 @@ router
       getToken: 'getToken',
       getContent: 'getContent',
       checkService: 'checkService',
+      getAccountInfo: 'getAccountInfo',
     };
-    const {type} = body;
+    const {type, appId, secret} = body;
+    const app = await db.OAuthAppModel.getAppBySecret(appId, secret);
+
     switch(type) {
       case types.getToken: {
-        const {callback, appId, secret, operation} = body;
-        const app = await db.OAuthAppModel.getAppBySecret(appId, secret);
+        const {callback, operation} = body;
         await app.ensurePermission(operation);
         data.token = await db.OAuthTokenModel.createToken(appId, operation, callback);
         break;
       }
       case types.getContent: {
-        const {appId, secret, token} = body;
-        const app = await db.OAuthAppModel.getAppBySecret(appId, secret);
+        const {token} = body;
         const tokenData = await db.OAuthTokenModel.getTokenByTokenString(token);
         if(app._id !== tokenData.appId) {
           ctx.throw(403, '权限不足');
@@ -54,6 +55,12 @@ router
       }
       case types.checkService: {
         data.status = 'OK';
+        break;
+      }
+      case types.getAccountInfo: {
+        const {uid} = body;
+        await app.userAuth(uid);
+        data.accountInfo = await db.OAuthAppModel.getUserAccountInfo(uid);
         break;
       }
       default: {

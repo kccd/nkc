@@ -369,7 +369,13 @@ const usersPersonalSchema = new Schema({
       type: [String],
       default: []
     }
-  }
+  },
+	// oauth应用授权
+	oauthAppId: {
+		type: [String],
+		default: [],
+		index: 1,
+	}
 },
   {
   	usePushEach: true,
@@ -612,7 +618,7 @@ usersPersonalSchema.statics.modifyUserPhoneNumber = async (props) => {
 	});
 };
 
-/* 
+/*
   修改最后验证手机号的时间为当前时间
 */
 usersPersonalSchema.statics.modifyVerifyPhoneNumberTime = async (uid) => {

@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const fsPromises = require("fs").promises;
 const collectionName = 'OAuthApps';
 const appStatus = {
   normal: 'normal', // 正常
@@ -129,6 +130,57 @@ schema.statics.getAppById = async (appId) => {
     throwErr(400, `appId无效`);
   }
   return app;
+};
+
+schema.methods.userAuth = async function(uid) {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const usersPersonal = await UsersPersonalModel.findOne({uid}, {uid: 1, oauthAppId: 1});
+  if(!usersPersonal) {
+    throwErr(404, `用户不存在(uid=${uid})`);
+  }
+  if(!usersPersonal.oauthAppId.includes(this._id)) {
+    throwErr(403, `权限不足，用户未授权`);
+  }
+};
+
+schema.statics.getUserAccountInfo = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const AttachmentModel = mongoose.model('attachments');
+  const FILE = require('../nkcModules/file');
+  const user = await UserModel.findOne({uid}, {
+    uid: 1,
+    description: 1,
+    username: 1,
+    avatar: 1,
+  });
+  const usersPersonal = await UsersPersonalModel.findOne({uid}, {
+    password: 1,
+  });
+  let avatar = '';
+  if(user.avatar) {
+    try {
+      const attachment = await AttachmentModel.findOne({_id: user.avatar});
+      if(attachment && !attachment.disabled) {
+        const {url} = await attachment.getRemoteFile();
+        const {filePath} = await FILE.downloadFileToTmp(
+          url,
+          `download_user_avatar_${user.avatar}_${Date.now()}.jpg`
+        );
+        avatar = (await fsPromises.readFile(filePath)).toString('base64');
+      }
+    } catch(err) {
+      console.log(`oauth获取用户头像出错：${err.message}`);
+    }
+  }
+  return {
+    uid,
+    name: user.username,
+    desc: user.description,
+    avatar,
+    passwdHash: usersPersonal.password.hash,
+    passwdSalt: usersPersonal.password.salt,
+  }
 }
 
 module.exports = mongoose.model(collectionName, schema);
