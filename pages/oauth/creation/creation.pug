@@ -21,11 +21,11 @@ block content
             .icon-container(v-if="iconUrl")
               img(:src="iconUrl")
             div
+              image-selector(ref="imageSelector" )
               input.hidden(
                 type="file"
                 accept="image/jpeg,image/png"
                 ref="iconInput"
-                @change="onSelectedFile"
               )
               button.btn.btn-default.btn-sm(@click="selectFile") 选择图片
           .form-group

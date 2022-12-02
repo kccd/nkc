@@ -1,5 +1,7 @@
 import {HttpMethods, nkcUploadFile} from "../../lib/js/netAPI";
 import {sweetError, sweetSuccess} from "../../lib/js/sweetAlert";
+import {blobToFile, fileToBase64} from "../../lib/js/file";
+import ImageSelector from "../../lib/vue/ImageSelector";
 const data = NKC.methods.getDataById('data');
 const operations = [];
 for (let oauthOperationsKey in data.oauthOperations) {
@@ -19,6 +21,9 @@ const app = new Vue({
     operations,
     checkOperation:[],
   }),
+  components: {
+    'image-selector': ImageSelector
+  },
   computed: {
     iconUrl() {
       return this.iconFile? window.URL.createObjectURL(this.iconFile): ''
@@ -26,7 +31,24 @@ const app = new Vue({
   },
   methods: {
     selectFile() {
-      this.$refs.iconInput.click();
+      const self = this;
+      self.$refs.imageSelector.open({
+        aspectRatio: 1
+      })
+        .then(res => {
+          const file = blobToFile(res);
+          fileToBase64(file)
+            .then(res => {
+              self.iconData = res;
+            });
+          self.iconFile = res;
+          self.$refs.imageSelector.close();
+        })
+        .catch(err => {
+          console.log(err);
+          sweetError(err);
+        });
+      // this.$refs.iconInput.click();
     },
     onSelectedFile(e) {
       this.iconFile = e.target.files[0];
@@ -51,7 +73,7 @@ const app = new Vue({
           formData.append('name', name);
           formData.append('desc', desc);
           formData.append('home', home);
-          formData.append('icon', iconFile);
+          formData.append('icon', iconFile, 'icon.png');
           formData.append('operations', checkOperation);
           return nkcUploadFile(
             `/oauth/creation`,

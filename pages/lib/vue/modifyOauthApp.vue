@@ -15,7 +15,7 @@
               input.form-control(type="text" v-model="name")
             .form-group
               label.control-label 简介
-              textarea.form-control(v-model="desc" rows="4")
+              textarea.form-control(v-model="desc")
             .form-group
               label.control-label 图标
               .icon-container(v-if="iconUrl")
@@ -25,7 +25,6 @@
                   type="file"
                   accept="image/jpeg,image/png"
                   ref="iconInput"
-                  @change="onSelectedFile"
                 )
                 button.btn.btn-default.btn-sm(@click="selectFile") 选择图片
             .form-group
@@ -39,12 +38,19 @@
               textarea.form-control(v-model="home")
             .form-group
               button.btn.btn-primary.btn-block(@click="submit") 提交
+        image-selector(ref="imageSelector")
+
 </template>
 <script>
 import {nkcAPI, nkcUploadFile} from "../js/netAPI";
 import {getUrl} from "../js/tools";
+import ImageSelector from "./ImageSelector";
+import {blobToFile, fileToBase64} from "../js/file";
 
 export default {
+  components: {
+    'image-selector': ImageSelector
+  },
   data() {
     return {
       show: false,
@@ -55,6 +61,7 @@ export default {
       home: '',
       callback: '',
       iconFile: null,
+      iconData: null,
       icon: '',
       checkOperations: [],
       submitting: false,
@@ -94,11 +101,28 @@ export default {
       this.iconFile = "";
     },
     selectFile() {
-      this.$refs.iconInput.click();
+      const self = this;
+      self.$refs.imageSelector.open({
+        aspectRatio: 1
+      })
+        .then(res => {
+          const file = blobToFile(res);
+          fileToBase64(file)
+            .then(res => {
+              self.iconData = res;
+            });
+          self.iconFile = res;
+          self.$refs.imageSelector.close();
+        })
+        .catch(err => {
+          console.log(err);
+          sweetError(err);
+        });
+      // this.$refs.iconInput.click();
     },
-    onSelectedFile(e) {
-      this.iconFile = e.target.files[0];
-    },
+    // onSelectedFile(e) {
+    //   this.iconFile = e.target.files[0];
+    // },
     submit() {
       let {name, desc, iconFile, home, id, icon} = this;
       const checkOperation = [];
@@ -127,7 +151,7 @@ export default {
           formData.append('name', name);
           formData.append('desc', desc);
           formData.append('home', home);
-          formData.append('icon', iconFile);
+          formData.append('icon', iconFile, 'icon.png');
           formData.append('operations', JSON.stringify(checkOperation));
           return nkcUploadFile(
             "/e/settings/oauth/" + id + "/settings",
@@ -174,6 +198,7 @@ export default {
   left: 0;
   z-index: 1050;
   .icon-container {
+    width: 20rem;
     img {
       max-width: 100%;
     }

@@ -33,17 +33,6 @@ block eContent
                     data-global-mouseout="hideUserPanel"
                     :data-global-data="objToStr({uid: oauth.uid})"
                   ) {{oauth.uid}}
-                //th
-                //  img.user-avatar(:src="getUrl('userAvatar', oauth.avatar)"
-                //    data-global-mouseover="showUserPanel"
-                //    data-global-mouseout="hideUserPanel"
-                //    :data-global-data="objToStr({uid: oauth.uid})"
-                //  )
-                //  a(:href="getUrl('userHome', oauth.uid)" target="_blank"
-                //    data-global-mouseover="showUserPanel"
-                //    data-global-mouseout="hideUserPanel"
-                //    :data-global-data="objToStr({uid: oauth.uid})"
-                //  ) {{oauth.username}}
                 th {{oauthStatus[oauth.status]}}
                 th
                   span(v-for='r in oauth.operations') {{oauthOperations[r]}}&nbsp;
@@ -53,10 +42,6 @@ block eContent
                   button.btn.btn-default.btn-xs(@click='editOauth(oauth)') 编辑
                   | &nbsp;
                   button.btn.btn-default.btn-xs(@click='deleteOauth(oauth)') 删除
-
-
-
 block scripts
   include ../../../publicModules/moment
-  include ../../../publicModules/oauth/modifyOauth
   +includeJS('/experimental/settings/oauth/oauthManage.js')
