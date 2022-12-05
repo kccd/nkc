@@ -75,7 +75,10 @@ const app = new Vue({
           HttpMethods.POST,
         );
       }).then(() => {
-        location.reload();
+        sweetSuccess('更新成功');
+        setTimeout(function() {
+          window.location.reload();
+        }, 2000)
       })
     }
   }
