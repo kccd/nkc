@@ -1,15 +1,9 @@
 const router = require('koa-router')();
-const translate = require("../../../../nkcModules/translate");
-const {languageNames} = require("../../../../nkcModules/language");
 router
   .get('/', async (ctx, next) => {
-    const {query, data, db, nkcModules} = ctx;
-    const {c = ''} = query;
-    let [searchType = '', searchContent = ''] = c.split(',');
+    const {data, db} = ctx;
     const appStatus = await db.OAuthAppModel.getAppStatus();
-    data.oauthList = await db.OAuthAppModel.find({status: {$ne: appStatus.deleted}}).sort({toc: 1});
-    data.searchType = searchType;
-    data.searchContent = searchContent;
+    data.oauthList = await db.OAuthAppModel.find({status: {$ne: appStatus.deleted}}).sort({toc: -1});
     ctx.template = 'experimental/settings/oauth/oauthManage.pug';
     await next();
   })
@@ -45,7 +39,7 @@ router
     await next();
   })
   .put('/:oid/settings', async (ctx, next) => {
-    const {body, db, nkcModules, state, params} = ctx;
+    const {body, db, nkcModules, params} = ctx;
     const {oid} = params;
     const name = body.fields.name.trim();
     const desc = body.fields.desc.trim();
@@ -110,5 +104,15 @@ router
     if(!oauth) ctx.throw(400, "第三方应用不存在");
     await db.OAuthAppModel.update({_id: oid},{status});
     await next();
+  })
+  .post('/:oid/secret', async (ctx, next) => {
+    const {db, params} = ctx;
+    const {oid} = params;
+    const appSecret = await db.OAuthAppModel.createAppSecret();
+    const oauth = await db.OAuthAppModel.find({_id: oid});
+    if(!oauth) ctx.throw(400, "第三方应用不存在");
+    await db.OAuthAppModel.updateOne({_id: oid},{secret: appSecret});
+    await next();
   });
+
 module.exports = router;

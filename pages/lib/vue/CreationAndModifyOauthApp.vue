@@ -5,11 +5,9 @@
         .modal-header
           button(type="button" class="close" @click="close")
             span &times;
-          h5.modal-title 第三方应用
+          h5.modal-title {{type === 'create' ? '创建第三方应用' : '修改第三方应用'}}
         .modal-body
           .form
-            .form-group
-              h4 修改应用
             .form-group
               label.control-label 名称
               div
@@ -64,13 +62,14 @@ export default {
   },
   data() {
     return {
+      type: 'create',
       show: false,
       loading: true,
       id: '',
       name: '',
       desc: '',
       home: '',
-      ips: [{ip: ''}],
+      ips: [],
       ipsArr: [''],
       iconFile: null,
       iconData: null,
@@ -84,7 +83,10 @@ export default {
   },
   computed: {
     iconUrl() {
-      const url = getUrl('oauthAppIcon', this.icon);
+      let url = '';
+      if(this.type === 'modify'){
+        url = getUrl('oauthAppIcon', this.icon);
+      }
       return this.iconFile ? window.URL.createObjectURL(this.iconFile) : url
     }
   },
@@ -92,18 +94,24 @@ export default {
     removeFromArray(arr, index) {
       arr.splice(index, 1);
     },
-    open(oauth){
+    open(oauth, type){
       this.loading = true;
       this.show = true;
-      this.getOauthInfo(oauth);
+      this.type = type
+      if(type === 'create'){
+        this.getCreation()
+      }else {
+        this.getOauthInfo(oauth);
+      }
     },
     close(){
       this.name = "";
       this.desc = "";
       this.home = "";
       this.iconFile = "";
-      this.ips = [{ip: ''}];
+      this.ips = [];
       this.operations = [];
+      this.checkOperations = [];
       this.show = false;
     },
     selectFile() {
@@ -139,7 +147,10 @@ export default {
           checkOperation.push(checkOperationObj[_operation].value);
         }
       }
-      const ipsArr = ips.map(item => item.ip.trim()).filter(Boolean)
+      const _ipsArr = ips.map(item => {
+        return item.ip.trim()
+      });
+      const ipsArr = _ipsArr.filter(Boolean);
       this.submitting = true;
       return Promise.resolve()
         .then(() => {
@@ -148,23 +159,35 @@ export default {
           if (!desc) throw new Error('应用简介不能为空');
           if (!home) throw new Error('应用主页不能为空');
           if (!ipsArr) throw new Error('IP名单不能为空');
+          if (_ipsArr.length !== ipsArr.length) throw new Error('添加IP不能为空');
           if (iconFile){
             formData.append('icon', iconFile, 'icon.png');
+          }else {
+            if(this.type === 'create'){
+              throw new Error('应用图标不能为空')
+            }
           }
           formData.append('name', name);
           formData.append('desc', desc);
           formData.append('home', home);
           formData.append('ips', JSON.stringify(ipsArr));
           formData.append('operations', JSON.stringify(checkOperation));
+          let url;
+          if(this.type === 'create'){
+            url = "/e/settings/oauth/creation"
+          }else {
+            url = "/e/settings/oauth/manage/" + id + "/settings";
+          }
           return nkcUploadFile(
-            "/e/settings/oauth/manage/" + id + "/settings",
-            'PUT',
+            url,
+            this.type === 'create' ? 'POST' : 'PUT',
             formData,
           );
         })
         .then(() => {
           sweetSuccess('提交成功');
           this.close()
+          location.reload();
         })
         .catch(sweetError)
     },
@@ -193,6 +216,20 @@ export default {
           sweetError(data);
         })
     },
+    getCreation: function() {
+      let _this = this;
+      nkcAPI("/e/settings/oauth/creation", "GET")
+        .then(function(data) {
+          _this.oauthOperations = data.oauthOperations;
+          for (const dataKey in data.oauthOperations) {
+            _this.operations.push(dataKey)
+          }
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    },
+
   }
 }
 </script>

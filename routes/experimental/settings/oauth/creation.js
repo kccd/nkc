@@ -1,10 +1,8 @@
-const translate = require("../../../../nkcModules/translate");
-const {languageNames} = require("../../../../nkcModules/language");
 const router = require('koa-router')();
 
 router
   .get('/', async (ctx, next) => {
-    ctx.remoteTemplate = 'oauth/creation/creation.pug';
+    // ctx.remoteTemplate = 'oauth/creation/creation.pug';
     await next();
   })
   .post('/', async (ctx, next) => {

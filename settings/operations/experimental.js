@@ -355,7 +355,6 @@ module.exports = {
 			},
 			manage: {
 				GET: 'manageOauthApp',
-				// POST: 'createOAuthApp',
 				PARAMETER: {
 					DELETE: 'manageOauthApp',
 					settings: {

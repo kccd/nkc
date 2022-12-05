@@ -1,7 +1,7 @@
 import {objToStr} from "../../../lib/js/tools";
-import {HttpMethods, nkcUploadFile} from "../../../lib/js/netAPI";
-import {sweetError, sweetSuccess} from "../../../lib/js/sweetAlert";
-import modifyOauthApp from "../../../lib/vue/modifyOauthApp";
+import {HttpMethods} from "../../../lib/js/netAPI";
+import {sweetConfirm, sweetError, sweetSuccess} from "../../../lib/js/sweetAlert";
+import CreationAndModifyOauthApp from "../../../lib/vue/CreationAndModifyOauthApp";
 
 const data = NKC.methods.getDataById('data');
 
@@ -14,7 +14,7 @@ const app = new Vue({
     oauthOperations: data.oauthOperations,
   },
   components:{
-    'modify-oauth-app': modifyOauthApp
+    'creation-modify-oauth-app': CreationAndModifyOauthApp
   },
   computed: {
     iconUrl() {
@@ -26,7 +26,7 @@ const app = new Vue({
     format: NKC.methods.format,
     getUrl: NKC.methods.tools.getUrl,
     create(){
-      window.open("/e/settings/oauth/creation", "_blank")
+      this.$refs.modifyOauth.open('', 'create')
     },
     disableOauth(type, oauth){
       return Promise.resolve()
@@ -41,6 +41,7 @@ const app = new Vue({
         })
         .then(() => {
           sweetSuccess('操作成功');
+          location.reload();
         })
         .catch(sweetError)
     },
@@ -54,11 +55,25 @@ const app = new Vue({
         })
         .then(() => {
           sweetSuccess('删除成功');
+          location.reload();
         })
         .catch(sweetError)
     },
     editOauth(oauth){
-      this.$refs.modifyOauth.open(oauth)
+      this.$refs.modifyOauth.open(oauth, 'modify')
+    },
+    getOauthKey(oauth){
+      sweetInfo(`${oauth.name}的密钥：${oauth.secret}`)
+    },
+    upDataOauth(oauth){
+      sweetConfirm('确定更新密钥').then(() => {
+        return nkcAPI(
+          `/e/settings/oauth/manage/${oauth._id}/secret`,
+          HttpMethods.POST,
+        );
+      }).then(() => {
+        location.reload();
+      })
     }
   }
 })
