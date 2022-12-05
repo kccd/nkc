@@ -114,7 +114,6 @@ export default {
           self.$refs.imageSelector.close();
         })
         .catch(err => {
-          console.log(err);
           sweetError(err);
         });
       // this.$refs.iconInput.click();
@@ -166,10 +165,9 @@ export default {
       this.ips.push({ ip: '' });
     },
     getOauthInfo: function(oauth) {
-      var _this = this;
+      let _this = this;
       nkcAPI("/e/settings/oauth/" + oauth._id + "/settings", "GET")
         .then(function(data) {
-          console.log('data',data);
           _this.id = data.oauthInfo._id;
           _this.name = data.oauthInfo.name;
           _this.desc = data.oauthInfo.desc;
