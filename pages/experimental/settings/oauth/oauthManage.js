@@ -1,6 +1,6 @@
 import {objToStr} from "../../../lib/js/tools";
 import {HttpMethods} from "../../../lib/js/netAPI";
-import {sweetError, sweetQuestion, sweetSuccess} from "../../../lib/js/sweetAlert";
+import {sweetConfirm, sweetError, sweetQuestion, sweetSuccess} from "../../../lib/js/sweetAlert";
 import CreationAndModifyOauthApp from "../../../lib/vue/CreationAndModifyOauthApp";
 
 const data = NKC.methods.getDataById('data');
@@ -46,18 +46,21 @@ const app = new Vue({
         .catch(sweetError)
     },
     deleteOauth(oauth){
-      return Promise.resolve()
-        .then(() => {
-          return nkcAPI(
-            `/e/settings/oauth/manage/${oauth._id}`,
-            HttpMethods.DELETE,
-          );
-        })
-        .then(() => {
-          sweetSuccess('删除成功');
-          location.reload();
-        })
-        .catch(sweetError)
+      sweetConfirm('确定要删除当前应用吗？该操作无法撤回').then(()=>{
+        return Promise.resolve()
+          .then(() => {
+            return nkcAPI(
+              `/e/settings/oauth/manage/${oauth._id}`,
+              HttpMethods.DELETE,
+            );
+          })
+          .then(() => {
+            sweetSuccess('删除成功');
+            location.reload();
+          })
+          .catch(sweetError)
+      })
+
     },
     editOauth(oauth){
       this.$refs.modifyOauth.open(oauth, 'modify')

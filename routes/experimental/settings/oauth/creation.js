@@ -11,7 +11,7 @@ router
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
     const ips = JSON.parse(body.fields.ips);
-    const operations = body.fields.operations;
+    const operations = JSON.parse(body.fields.operations);
     const {icon} = body.files;
     const {checkString} = nkcModules.checkData;
     checkString(name, {
