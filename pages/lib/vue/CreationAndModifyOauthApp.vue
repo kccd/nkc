@@ -29,7 +29,7 @@
             .form-group
               label.control-label 操作
               .checkbox.m-t-0
-                label(v-for="operation in operations" )
+                label.m-r-1(v-for="operation in operations" )
                   input(type="checkbox" :checked="checkOperations.includes(operation)" name="checkOperation" :value="operation")
                   span {{oauthOperations[operation]}}
 

@@ -1,6 +1,6 @@
 import {objToStr} from "../../../lib/js/tools";
 import {HttpMethods} from "../../../lib/js/netAPI";
-import {sweetConfirm, sweetError, sweetSuccess} from "../../../lib/js/sweetAlert";
+import {sweetError, sweetQuestion, sweetSuccess} from "../../../lib/js/sweetAlert";
 import CreationAndModifyOauthApp from "../../../lib/vue/CreationAndModifyOauthApp";
 
 const data = NKC.methods.getDataById('data');
@@ -66,7 +66,7 @@ const app = new Vue({
       sweetInfo(`${oauth.name}的密钥：${oauth.secret}`)
     },
     upDataOauth(oauth){
-      sweetConfirm('确定更新密钥').then(() => {
+      sweetQuestion('确定要更新密钥吗？当前操作无法撤回').then(() => {
         return nkcAPI(
           `/e/settings/oauth/manage/${oauth._id}/secret`,
           HttpMethods.POST,
