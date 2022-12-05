@@ -12,13 +12,14 @@
               h4 修改应用
             .form-group
               label.control-label 名称
-              input.form-control(type="text" v-model="name")
+              div
+                input.form-control(type="text" v-model="name")
             .form-group
               label.control-label 简介
               textarea.form-control(v-model="desc")
             .form-group
               label.control-label 图标
-              .icon-container(v-if="iconUrl")
+              .icon-container.m-b-05(v-if="iconUrl")
                 img(:src="iconUrl")
               div
                 input.hidden(
@@ -29,17 +30,20 @@
                 button.btn.btn-default.btn-sm(@click="selectFile") 选择图片
             .form-group
               label.control-label 操作
-              div.form-control
-                span.check-operations(v-for="operation in operations" )
+              .checkbox.m-t-0
+                label(v-for="operation in operations" )
                   input(type="checkbox" :checked="checkOperations.includes(operation)" name="checkOperation" :value="operation")
                   span {{oauthOperations[operation]}}
+
             .form-group
-              label.control-label IP名单
-              div.row
-                span.col-xs-12.col-sm-12.col-md-6.m-b-05(v-for="(item, index) in ips" :key="index")
-                  input.form-control(v-model="item.ip")
-            .form-group
-              button.btn.btn-primary.btn-block(@click="addIp") 添加
+              label.control-label IP白名单（添加IP后自动启用IP白名单功能）
+              div
+                .row.m-b-05(v-for="(item, index) in ips" :key="index")
+                  .col-xs-10
+                    input.form-control(type='text' v-model="item.ip")
+                  .col-xs-2
+                    button.btn.btn-danger.btn-sm(@click="removeFromArray(ips, index)") 删除
+                button.btn.btn-default.btn-sm(@click="addIp") 添加
             .form-group
               label.control-label 主页链接
               textarea.form-control(v-model="home")
@@ -85,6 +89,9 @@ export default {
     }
   },
   methods: {
+    removeFromArray(arr, index) {
+      arr.splice(index, 1);
+    },
     open(oauth){
       this.loading = true;
       this.show = true;
@@ -199,7 +206,7 @@ export default {
   left: 0;
   z-index: 1050;
   .icon-container {
-    width: 20rem;
+    width: 10rem;
     img {
       max-width: 100%;
     }
