@@ -1,11 +1,6 @@
-const fs = require("fs");
-const path = require("path");
 const settings = require('../settings');
-const folderTools = require("../nkcModules/file");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const ffmpeg = require("../tools/ffmpeg");
-const FILE = require("../nkcModules/file")
 
 const usersPersonalSchema = new Schema({
   uid: {
@@ -510,6 +505,45 @@ usersPersonalSchema.methods.ensurePassword = async function(passwordString) {
     default: throwErr(400, '未知的密码加密类型');
   }
 };
+
+/*
+* 获取用户密码信息
+* @return {
+*   hashType: string,
+*   salt: string,
+*   hash: string,
+* }
+*
+* */
+usersPersonalSchema.methods.getOauthPasswordInfo = async function () {
+  const {password, hashType} = this;
+  const {
+    encryptInMD5WithSalt,
+    encryptInSHA256HMACWithSalt
+  } = require("../tools/encryption");
+
+  let newSalt = password.salt;
+  let newHash = '';
+  const newHashType = hashType === 'pw9'? 'md5': 'sha256';
+  if(password.hash && password.salt) {
+    switch(hashType) {
+      case 'pw9': {
+        newHash = encryptInMD5WithSalt(password.hash, password.salt);
+        break;
+      }
+      case 'sha256HMAC': {
+        newHash = encryptInSHA256HMACWithSalt(password.hash, password.salt);
+        break;
+      }
+      default: throwErr(400, '未知的密码加密类型');
+    }
+  }
+  return {
+    hashType: newHashType,
+    salt: newSalt,
+    hash: newHash,
+  }
+}
 
 /**
  * 判断是否需要进行手机号验证

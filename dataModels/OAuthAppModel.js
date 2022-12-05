@@ -162,9 +162,8 @@ schema.statics.getUserAccountInfo = async (uid) => {
     username: 1,
     avatar: 1,
   });
-  const usersPersonal = await UsersPersonalModel.findOne({uid}, {
-    password: 1,
-  });
+  const usersPersonal = await UsersPersonalModel.findOne({uid});
+  const {hashType, hash, salt} = await usersPersonal.getOauthPasswordInfo();
   let avatar = '';
   if(user.avatar) {
     try {
@@ -186,8 +185,9 @@ schema.statics.getUserAccountInfo = async (uid) => {
     name: user.username,
     desc: user.description,
     avatar,
-    passwdHash: usersPersonal.password.hash,
-    passwdSalt: usersPersonal.password.salt,
+    passwdHashType: hashType,
+    passwdHash: hash,
+    passwdSalt: salt,
   }
 }
 
