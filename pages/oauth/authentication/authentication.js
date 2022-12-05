@@ -19,7 +19,7 @@ const app = new Vue({
     operations,
   },
   mounted() {
-    if(!this.uid) {
+    if(!this.logged) {
       this.toLogin();
     }
   },
