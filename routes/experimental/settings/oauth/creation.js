@@ -1,17 +1,8 @@
-const translate = require("../../nkcModules/translate");
-const {languageNames} = require("../../nkcModules/language");
 const router = require('koa-router')();
-const appOperations = {
-  signIn: 'signIn',
-};
+
 router
   .get('/', async (ctx, next) => {
-    ctx.remoteTemplate = 'oauth/creation/creation.pug';
-    const oauthOperations = {};
-    for (let appOperationKey in appOperations) {
-      oauthOperations[appOperationKey] = translate(languageNames.zh_cn,'oauth',appOperations[appOperationKey])
-    }
-    ctx.data.oauthOperations = oauthOperations;
+    // ctx.remoteTemplate = 'oauth/creation/creation.pug';
     await next();
   })
   .post('/', async (ctx, next) => {

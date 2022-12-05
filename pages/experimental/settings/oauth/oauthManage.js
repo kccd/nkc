@@ -1,7 +1,7 @@
 import {objToStr} from "../../../lib/js/tools";
-import {HttpMethods, nkcUploadFile} from "../../../lib/js/netAPI";
-import {sweetError, sweetSuccess} from "../../../lib/js/sweetAlert";
-import modifyOauthApp from "../../../lib/vue/modifyOauthApp";
+import {HttpMethods} from "../../../lib/js/netAPI";
+import {sweetError, sweetQuestion, sweetSuccess} from "../../../lib/js/sweetAlert";
+import CreationAndModifyOauthApp from "../../../lib/vue/CreationAndModifyOauthApp";
 
 const data = NKC.methods.getDataById('data');
 
@@ -14,7 +14,7 @@ const app = new Vue({
     oauthOperations: data.oauthOperations,
   },
   components:{
-    'modify-oauth-app': modifyOauthApp
+    'creation-modify-oauth-app': CreationAndModifyOauthApp
   },
   computed: {
     iconUrl() {
@@ -26,13 +26,13 @@ const app = new Vue({
     format: NKC.methods.format,
     getUrl: NKC.methods.tools.getUrl,
     create(){
-      window.open("/oauth/creation", "_blank")
+      this.$refs.modifyOauth.open('', 'create')
     },
     disableOauth(type, oauth){
       return Promise.resolve()
         .then(() => {
           return nkcAPI(
-            `/e/settings/oauth/${oauth._id}/ban`,
+            `/e/settings/oauth/manage/${oauth._id}/ban`,
             HttpMethods.PUT,
             {
               status: type? 'disabled' : 'normal'
@@ -41,6 +41,7 @@ const app = new Vue({
         })
         .then(() => {
           sweetSuccess('操作成功');
+          location.reload();
         })
         .catch(sweetError)
     },
@@ -48,17 +49,31 @@ const app = new Vue({
       return Promise.resolve()
         .then(() => {
           return nkcAPI(
-            `/e/settings/oauth/${oauth._id}`,
+            `/e/settings/oauth/manage/${oauth._id}`,
             HttpMethods.DELETE,
           );
         })
         .then(() => {
           sweetSuccess('删除成功');
+          location.reload();
         })
         .catch(sweetError)
     },
     editOauth(oauth){
-      this.$refs.modifyOauth.open(oauth)
+      this.$refs.modifyOauth.open(oauth, 'modify')
+    },
+    getOauthKey(oauth){
+      sweetInfo(`${oauth.name}的密钥：${oauth.secret}`)
+    },
+    upDataOauth(oauth){
+      sweetQuestion('确定要更新密钥吗？当前操作无法撤回').then(() => {
+        return nkcAPI(
+          `/e/settings/oauth/manage/${oauth._id}/secret`,
+          HttpMethods.POST,
+        );
+      }).then(() => {
+        location.reload();
+      })
     }
   }
 })

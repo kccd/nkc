@@ -5,7 +5,7 @@ block eTitle
 block eContent
   .hidden#data=objToStr({oauthList: data.oauthList,oauthStatus: data.oauthStatus,oauthOperations: data.oauthOperations})
   .container-fluid.max-width#app(v-cloak)
-    modify-oauth-app(ref="modifyOauth")
+    creation-modify-oauth-app(ref="modifyOauth")
     .row
       .col-xs-12.col-md-12.m-b-1
           .form-group
@@ -37,6 +37,8 @@ block eContent
                 th
                   span(v-for='r in oauth.operations') {{oauthOperations[r]}}&nbsp;
                 th
+                  button.btn.btn-default.btn-xs(@click='getOauthKey(oauth)') 查看秘钥
+                  button.btn.btn-default.btn-xs(@click='upDataOauth(oauth)') 更新秘钥
                   button.btn.btn-default.btn-xs(@click='disableOauth(false, oauth)' v-if='oauth.status === "disabled"') 解封
                   button.btn.btn-default.btn-xs(@click='disableOauth(true, oauth)' v-else) 屏蔽
                   button.btn.btn-default.btn-xs(@click='editOauth(oauth)') 编辑

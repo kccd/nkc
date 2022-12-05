@@ -349,20 +349,25 @@ module.exports = {
       PUT: 'experimentalFundSettings'
     },
 		oauth: {
-			GET: 'visitEOauthSettings',
-			POST: 'createOAuthApp',
-			PARAMETER: {
-				DELETE: 'deleteOAuthApp',
-				settings: {
-					GET: 'modifyOAuthAppInfo',
-					PUT: 'modifyOAuthAppInfo',
-				},
-				secret: {
-					POST: 'modifyOAuthAppSecret'
-				},
-				ban: {
-					PUT: 'disableOAuthApp'
-				},
+			creation: {
+				GET: 'manageOauthApp',
+				POST: 'manageOauthApp'
+			},
+			manage: {
+				GET: 'manageOauthApp',
+				PARAMETER: {
+					DELETE: 'manageOauthApp',
+					settings: {
+						GET: 'manageOauthApp',
+						PUT: 'manageOauthApp',
+					},
+					secret: {
+						POST: 'manageOauthApp'
+					},
+					ban: {
+						PUT: 'manageOauthApp'
+					},
+				}
 			}
 		},
 	},

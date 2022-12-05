@@ -63,6 +63,9 @@ const schema = mongoose.Schema({
 schema.statics.getAppOperations = () => {
   return {...appOperations};
 }
+schema.statics.getAppStatus = () => {
+  return {...appStatus};
+}
 /*
 * @return {String}
 * */
