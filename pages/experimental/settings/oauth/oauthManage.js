@@ -26,13 +26,13 @@ const app = new Vue({
     format: NKC.methods.format,
     getUrl: NKC.methods.tools.getUrl,
     create(){
-      window.open("/oauth/creation", "_blank")
+      window.open("/e/settings/oauth/creation", "_blank")
     },
     disableOauth(type, oauth){
       return Promise.resolve()
         .then(() => {
           return nkcAPI(
-            `/e/settings/oauth/${oauth._id}/ban`,
+            `/e/settings/oauth/manage/${oauth._id}/ban`,
             HttpMethods.PUT,
             {
               status: type? 'disabled' : 'normal'
@@ -48,7 +48,7 @@ const app = new Vue({
       return Promise.resolve()
         .then(() => {
           return nkcAPI(
-            `/e/settings/oauth/${oauth._id}`,
+            `/e/settings/oauth/manage/${oauth._id}`,
             HttpMethods.DELETE,
           );
         })

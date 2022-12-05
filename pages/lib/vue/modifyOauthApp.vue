@@ -150,7 +150,7 @@ export default {
           formData.append('ips', JSON.stringify(ipsArr));
           formData.append('operations', JSON.stringify(checkOperation));
           return nkcUploadFile(
-            "/e/settings/oauth/" + id + "/settings",
+            "/e/settings/oauth/manage/" + id + "/settings",
             'PUT',
             formData,
           );
@@ -166,7 +166,7 @@ export default {
     },
     getOauthInfo: function(oauth) {
       let _this = this;
-      nkcAPI("/e/settings/oauth/" + oauth._id + "/settings", "GET")
+      nkcAPI("/e/settings/oauth/manage/" + oauth._id + "/settings", "GET")
         .then(function(data) {
           _this.id = data.oauthInfo._id;
           _this.name = data.oauthInfo.name;

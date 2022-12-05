@@ -80,7 +80,7 @@ const app = new Vue({
           formData.append('icon', iconFile, 'icon.png');
           formData.append('operations', checkOperation);
           return nkcUploadFile(
-            `/oauth/creation`,
+            `/e/settings/oauth/creation`,
             HttpMethods.POST,
             formData,
           );
