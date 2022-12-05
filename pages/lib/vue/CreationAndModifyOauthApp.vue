@@ -159,7 +159,7 @@ export default {
           if (!desc) throw new Error('应用简介不能为空');
           if (!home) throw new Error('应用主页不能为空');
           if (!ipsArr) throw new Error('IP名单不能为空');
-          if (_ipsArr.length !== ipsArr.length) throw new Error('添加IP不能为空');
+          if (_ipsArr.length !== ipsArr.length) throw new Error('添加的IP不能为空');
           if (iconFile){
             formData.append('icon', iconFile, 'icon.png');
           }else {
