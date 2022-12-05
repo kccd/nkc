@@ -1,7 +1,8 @@
 const router = require('koa-router')();
+
 router
   .get('/', async (ctx, next) => {
-    ctx.remoteTemplate = 'oauth/creation/creation.pug';
+    // ctx.remoteTemplate = 'oauth/creation/creation.pug';
     await next();
   })
   .post('/', async (ctx, next) => {
@@ -9,26 +10,22 @@ router
     const name = body.fields.name.trim();
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
-    const callback = body.fields.callback.trim();
+    const ips = JSON.parse(body.fields.ips);
+    const operations = JSON.parse(body.fields.operations);
     const {icon} = body.files;
     const {checkString} = nkcModules.checkData;
     checkString(name, {
-      name: '应用名称',
+      name: '名称',
       minLength: 1,
       maxLength: 100,
     });
     checkString(desc, {
-      name: '应用简介',
+      name: '简介',
       minLength: 1,
       maxLength: 2000,
     });
     checkString(home, {
-      name: '应用主页',
-      minLength: 1,
-      maxLength: 2000,
-    });
-    checkString(callback, {
-      name: '应用回调链接',
+      name: '主页链接',
       minLength: 1,
       maxLength: 2000,
     });
@@ -37,7 +34,8 @@ router
       name,
       desc,
       home,
-      callback,
+      operations,
+      ips
     });
     await db.AttachmentModel.saveOAuthAppIcon(app._id, icon);
     await next();

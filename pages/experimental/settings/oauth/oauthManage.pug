@@ -1,0 +1,49 @@
+extends ../../experimental
+block eTitle
+  title 应用管理
+  +includeCSS('/experimental/settings/oauth/oauthManage.css')
+block eContent
+  .hidden#data=objToStr({oauthList: data.oauthList,oauthStatus: data.oauthStatus,oauthOperations: data.oauthOperations})
+  .container-fluid.max-width#app(v-cloak)
+    creation-modify-oauth-app(ref="modifyOauth")
+    .row
+      .col-xs-12.col-md-12.m-b-1
+          .form-group
+            button.btn.btn-primary(@click='create' @keyup.enter='create') 创建应用
+      .col-xs-12.col-md-12
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 注册时间
+                th 应用ID
+                th 应用名
+                th UID
+                th 状态
+                th 允许操作
+                th 其他
+            tbody
+              tr(v-for='oauth in oauthList' :class="{'disabled': oauth.status==='disabled'}")
+                th.nwd {{format("YYYY-MM-DD HH:mm:ss", oauth.toc)}}
+                th {{oauth._id}}
+                th {{oauth.name}}
+                th.mwd
+                  a(:href="getUrl('userHome', oauth.uid)" target='_blank'
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    :data-global-data="objToStr({uid: oauth.uid})"
+                  ) {{oauth.uid}}
+                th {{oauthStatus[oauth.status]}}
+                th
+                  span(v-for='r in oauth.operations') {{oauthOperations[r]}}&nbsp;
+                th
+                  button.btn.btn-default.btn-xs(@click='getOauthKey(oauth)') 查看秘钥
+                  button.btn.btn-default.btn-xs(@click='upDataOauth(oauth)') 更新秘钥
+                  button.btn.btn-default.btn-xs(@click='disableOauth(false, oauth)' v-if='oauth.status === "disabled"') 解封
+                  button.btn.btn-default.btn-xs(@click='disableOauth(true, oauth)' v-else) 屏蔽
+                  button.btn.btn-default.btn-xs(@click='editOauth(oauth)') 编辑
+                  | &nbsp;
+                  button.btn.btn-default.btn-xs(@click='deleteOauth(oauth)') 删除
+block scripts
+  include ../../../publicModules/moment
+  +includeJS('/experimental/settings/oauth/oauthManage.js')

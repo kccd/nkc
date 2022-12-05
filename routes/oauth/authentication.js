@@ -24,6 +24,53 @@ router
     await next();
   })
   .post('/', async (ctx, next) => {
+    const {data, db, body} = ctx;
+    const types = {
+      getToken: 'getToken',
+      getContent: 'getContent',
+      checkService: 'checkService',
+      getAccountInfo: 'getAccountInfo',
+    };
+    const {type, appId, secret} = body;
+    const ip = ctx.address;
+    const app = await db.OAuthAppModel.getAppBySecret({appId, secret, ip});
+
+    switch(type) {
+      case types.getToken: {
+        const {callback, operation} = body;
+        await app.ensurePermission(operation);
+        data.token = await db.OAuthTokenModel.createToken(appId, operation, callback);
+        break;
+      }
+      case types.getContent: {
+        const {token} = body;
+        const tokenData = await db.OAuthTokenModel.getTokenByTokenString(token);
+        if(app._id !== tokenData.appId) {
+          ctx.throw(403, '权限不足');
+        }
+        await tokenData.verifyTokenAfterAuthorize();
+        await tokenData.useToken();
+        data.operation = tokenData.operation;
+        data.content = await tokenData.getContent();
+        break;
+      }
+      case types.checkService: {
+        data.status = 'OK';
+        break;
+      }
+      case types.getAccountInfo: {
+        const {uid} = body;
+        await app.userAuth(uid);
+        data.accountInfo = await db.OAuthAppModel.getUserAccountInfo(uid);
+        break;
+      }
+      default: {
+        ctx.throw(403, '未知的操作类型')
+      }
+    }
+    await next();
+  })
+  .put('/', async (ctx, next) => {
     const {body, state, db, data} = ctx;
     const {token, approved} = body;
     if(!state.uid) {
@@ -36,8 +83,7 @@ router
     } else {
       await tokenData.useToken();
     }
-    const app = await db.OAuthAppModel.getAppById(tokenData.appId);
-    data.url = `${app.callback}?o=${tokenData.operation}&t=${token}`;
+    data.url = `${tokenData.callback}?o=${tokenData.operation}&t=${token}`;
     await next();
   });
 module.exports = router;

@@ -347,7 +347,29 @@ module.exports = {
     fund: {
 	    GET: 'experimentalFundSettings',
       PUT: 'experimentalFundSettings'
-    }
+    },
+		oauth: {
+			creation: {
+				GET: 'manageOauthApp',
+				POST: 'manageOauthApp'
+			},
+			manage: {
+				GET: 'manageOauthApp',
+				PARAMETER: {
+					DELETE: 'manageOauthApp',
+					settings: {
+						GET: 'manageOauthApp',
+						PUT: 'manageOauthApp',
+					},
+					secret: {
+						POST: 'manageOauthApp'
+					},
+					ban: {
+						PUT: 'manageOauthApp'
+					},
+				}
+			}
+		},
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',

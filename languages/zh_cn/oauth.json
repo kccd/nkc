@@ -1,3 +1,7 @@
 {
-  "signIn": "获取登录账号信息"
+  "signIn": "获取登录账号信息",
+  "normal": "正常",
+  "disabled": "被屏蔽",
+  "deleted": "被删除",
+  "unknown": "待审核"
 }
