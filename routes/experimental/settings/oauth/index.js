@@ -31,7 +31,7 @@ userRouter
     const {query, data, db, nkcModules} = ctx;
     const {c = ''} = query;
     let [searchType = '', searchContent = ''] = c.split(',');
-    data.oauthList = await db.OAuthAppModel.find({status: {$ne: appStatus.deleted}});
+    data.oauthList = await db.OAuthAppModel.find({status: {$ne: appStatus.deleted}}).sort({toc: 1});
     data.searchType = searchType;
     data.searchContent = searchContent;
     ctx.template = 'experimental/settings/oauth/oauthManage.pug';
@@ -41,7 +41,7 @@ userRouter
     const {data, db, params} = ctx;
     const {oid} = params;
     const {
-      _id, name, desc, icon, home, operations
+      _id, name, desc, icon, home, operations, ips
     } = await db.OAuthAppModel.findOne({
       _id: oid,
       status: {
@@ -53,7 +53,8 @@ userRouter
       desc: 1,
       icon: 1,
       home: 1,
-      operations: 1
+      operations: 1,
+      ips: 1
     });
     data.oauthInfo = {
       _id,
@@ -62,22 +63,24 @@ userRouter
       desc,
       icon,
       operations,
+      ips,
     };
     await next();
   })
   .put('/:oid/settings', async (ctx, next) => {
     const {body, db, nkcModules, state, params} = ctx;
     const {oid} = params;
-    console.log('body.fields.name',body.fields.name);
     const name = body.fields.name.trim();
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
+    const ips = JSON.parse(body.fields.ips);
     const operations = JSON.parse(body.fields.operations);
     let match={
       name,
       desc,
       home,
-      operations
+      operations,
+      ips,
     };
     let icon;
     if(body.fields.icon){
@@ -110,7 +113,6 @@ userRouter
     if(icon){
       await db.AttachmentModel.saveOAuthAppIcon(oid, icon);
     }
-    console.log('match',match);
 
     await next();
   })

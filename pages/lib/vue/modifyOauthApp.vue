@@ -34,6 +34,13 @@
                   input(type="checkbox" :checked="checkOperations.includes(operation)" name="checkOperation" :value="operation")
                   span {{oauthOperations[operation]}}
             .form-group
+              label.control-label IP名单
+              div.row
+                span.col-xs-12.col-sm-12.col-md-6.m-b-05(v-for="(item, index) in ips" :key="index")
+                  input.form-control(v-model="item.ip")
+            .form-group
+              button.btn.btn-primary.btn-block(@click="addIp") 添加
+            .form-group
               label.control-label 主页链接
               textarea.form-control(v-model="home")
             .form-group
@@ -59,7 +66,8 @@ export default {
       name: '',
       desc: '',
       home: '',
-      callback: '',
+      ips: [{ip: ''}],
+      ipsArr: [''],
       iconFile: null,
       iconData: null,
       icon: '',
@@ -72,9 +80,7 @@ export default {
   },
   computed: {
     iconUrl() {
-      console.log('this.icon',this.icon)
       const url = getUrl('oauthAppIcon', this.icon);
-      console.log('url',url)
       return this.iconFile ? window.URL.createObjectURL(this.iconFile) : url
     }
   },
@@ -88,17 +94,10 @@ export default {
       this.name = "";
       this.desc = "";
       this.home = "";
-      this.callback = "";
       this.iconFile = "";
+      this.ips = [{ip: ''}];
       this.operations = [];
       this.show = false;
-    },
-    init: function () {
-      this.name = "";
-      this.desc = "";
-      this.home = "";
-      this.callback = "";
-      this.iconFile = "";
     },
     selectFile() {
       const self = this;
@@ -124,34 +123,32 @@ export default {
     //   this.iconFile = e.target.files[0];
     // },
     submit() {
-      let {name, desc, iconFile, home, id, icon} = this;
+      let {name, desc, iconFile, home, id, ips} = this;
       const checkOperation = [];
       const checkOperationObj = document.getElementsByName("checkOperation");
       for (let _operation in checkOperationObj) {
         //判断复选框是否被选中
-        console.log(checkOperationObj[_operation].checked)
         if (checkOperationObj[_operation].checked){
           //获取被选中的复选框的值
-          console.log(checkOperationObj[_operation].value)
           checkOperation.push(checkOperationObj[_operation].value);
         }
       }
+      const ipsArr = ips.map(item => item.ip.trim()).filter(Boolean)
       this.submitting = true;
       return Promise.resolve()
         .then(() => {
+          const formData = new FormData();
           if (!name) throw new Error(`应用名称不能为空`);
           if (!desc) throw new Error('应用简介不能为空');
-          if (!iconFile && icon){
-            iconFile = icon;
-          }else if(!iconFile && !icon) {
-            throw new Error('应用图标不能为空')
-          }
           if (!home) throw new Error('应用主页不能为空');
-          const formData = new FormData();
+          if (!ipsArr) throw new Error('IP名单不能为空');
+          if (iconFile){
+            formData.append('icon', iconFile, 'icon.png');
+          }
           formData.append('name', name);
           formData.append('desc', desc);
           formData.append('home', home);
-          formData.append('icon', iconFile, 'icon.png');
+          formData.append('ips', JSON.stringify(ipsArr));
           formData.append('operations', JSON.stringify(checkOperation));
           return nkcUploadFile(
             "/e/settings/oauth/" + id + "/settings",
@@ -161,8 +158,12 @@ export default {
         })
         .then(() => {
           sweetSuccess('提交成功');
+          this.close()
         })
         .catch(sweetError)
+    },
+    addIp(){
+      this.ips.push({ ip: '' });
     },
     getOauthInfo: function(oauth) {
       var _this = this;
@@ -173,8 +174,10 @@ export default {
           _this.name = data.oauthInfo.name;
           _this.desc = data.oauthInfo.desc;
           _this.home = data.oauthInfo.home;
-          _this.callback = data.oauthInfo.callback;
           _this.icon = data.oauthInfo.icon;
+          _this.ips = data.oauthInfo.ips.map(item => {
+            return {ip: item}
+          })
           _this.checkOperations = data.oauthInfo.operations;
           _this.oauthOperations = data.oauthOperations;
           for (const dataKey in data.oauthOperations) {

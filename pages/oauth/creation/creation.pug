@@ -34,6 +34,13 @@ block content
               input(type="checkbox" name="checkOperation" :value="operation")
               span {{oauthOperations[operation]}}
           .form-group
+            label.control-label IP名单
+            div.row
+              span.col-xs-12.col-sm-12.col-md-6.m-b-05(v-for="(item, index) in ips" :key="index")
+                input.form-control(v-model="item.ip")
+          .form-group
+            button.btn.btn-primary.btn-block(@click="addIp") 添加
+          .form-group
             label.control-label 主页链接
             textarea.form-control(v-model="home")
           .form-group

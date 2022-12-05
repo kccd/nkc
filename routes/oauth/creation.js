@@ -19,6 +19,7 @@ router
     const name = body.fields.name.trim();
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
+    const ips = JSON.parse(body.fields.ips);
     const operations = body.fields.operations;
     const {icon} = body.files;
     const {checkString} = nkcModules.checkData;
@@ -43,6 +44,7 @@ router
       desc,
       home,
       operations,
+      ips
     });
     await db.AttachmentModel.saveOAuthAppIcon(app._id, icon);
     await next();

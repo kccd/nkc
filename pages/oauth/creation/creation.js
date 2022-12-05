@@ -19,7 +19,8 @@ const app = new Vue({
     submitting: false,
     oauthOperations: data.oauthOperations,
     operations,
-    checkOperation:[],
+    checkOperation: [],
+    ips: [{ip: ''}]
   }),
   components: {
     'image-selector': ImageSelector
@@ -54,7 +55,7 @@ const app = new Vue({
       this.iconFile = e.target.files[0];
     },
     submit() {
-      const {name, desc, iconFile, home,checkOperation} = this;
+      const {name, desc, iconFile, home, checkOperation, ips} = this;
       const checkOperationObj = document.getElementsByName("checkOperation");
       for (let _operation in checkOperationObj) {
         //判断复选框是否被选中
@@ -62,6 +63,7 @@ const app = new Vue({
           //获取被选中的复选框的值
           checkOperation.push(checkOperationObj[_operation].value);
       }
+      const ipsArr = ips.map(item => item.ip.trim()).filter(Boolean)
       this.submitting = true;
       return Promise.resolve()
         .then(() => {
@@ -69,10 +71,12 @@ const app = new Vue({
           if(!desc) throw new Error('应用简介不能为空');
           if(!iconFile) throw new Error('应用图标不能为空')
           if(!home) throw new Error('应用主页不能为空');
+          if(!ipsArr) throw new Error('IP名单不能为空');
           const formData = new FormData();
           formData.append('name', name);
           formData.append('desc', desc);
           formData.append('home', home);
+          formData.append('ips', JSON.stringify(ipsArr));
           formData.append('icon', iconFile, 'icon.png');
           formData.append('operations', checkOperation);
           return nkcUploadFile(
@@ -88,6 +92,9 @@ const app = new Vue({
         .finally(() => {
           this.submitting = false;
         })
+    },
+    addIp(){
+      this.ips.push({ ip: '' });
     }
   }
 })
