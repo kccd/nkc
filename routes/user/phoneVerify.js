@@ -8,7 +8,7 @@ router
     const { user } = data;
     if(!user) ctx.throw(403, "你还未登录");
     const userPersonal = await db.UsersPersonalModel.findOne({ uid: user.uid });
-    if(userPersonal.getAuthLevel() < 1) ctx.throw(403, "你还未绑定手机号");
+    if((await userPersonal.getAuthLevel()) < 1) ctx.throw(403, "你还未绑定手机号");
     const { nationCode, mobile } = userPersonal;
     data.phone = `+${nationCode || 86} ${mobile.substring(0, 3)}****${mobile.substring(7)}`;
     ctx.template = "user/phoneVerify/phoneVerify.pug";

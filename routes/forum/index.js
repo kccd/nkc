@@ -78,7 +78,8 @@ forumRouter
 					cloneForum.childrenForums = [];
 					subForums.push(f);
 				}
-				const visitedForumsId = user.generalSettings.visitedForumsId.slice(0, 5);
+				let visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(user.uid);
+				visitedForumsId = visitedForumsId.slice(0, 5);
 				for(const fid of visitedForumsId) {
 					const f = forumsObj[fid];
 					if(!f) continue;

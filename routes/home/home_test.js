@@ -39,13 +39,12 @@ module.exports = async (ctx, next) => {
     if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
     forumsObj[categoryId].push(f);
   });
-  data.categoryForums = [];
-  ctx.state.forumCategories.map(fc => {
-    const _fc = Object.assign({}, fc);
-    const {_id} = _fc;
-    _fc.forums = forumsObj[_id] || [];
-    if(_fc.forums.length) data.categoryForums.push(_fc);
+  data.categoryForums = await db.ForumModel.getUserCategoriesWithForums({
+    user: data.user,
+    userRoles: data.userRoles,
+    userGrade: data.userGrade,
   });
+
   // 热销商品
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});
   // 最新原创文章显示模式

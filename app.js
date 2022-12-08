@@ -43,13 +43,18 @@ const {
   filterDomain,
 } = require('./middlewares');
 
-const cookieConfig = require("./config/cookie");
 const uploadConfig = require('./config/upload');
 
 const koaBodySetting = settings.upload.koaBodySetting;
 koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
 app.keys = getCookieKeys();
+let time = 0;
+let count = 0;
 app
+  .use(async (ctx, next) => {
+    ctx.testTime = [Date.now()];
+    await next();
+  })
   .use(rateLimit.total)
   // gzip
   .use(koaCompress({threshold: 2048}))
@@ -67,10 +72,14 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
-  .use(initAddress)
+  .use(async (ctx, next) => {
+    ctx.testTime.push(Date.now());
+    await next();
+  })
   .use(init)
-  .use(initCtxMethods)
+  .use(initAddress)
   .use(initState)
+  .use(initCtxMethods)
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
@@ -81,10 +90,28 @@ app
   .use(rateLimit.userFile)
   .use(rateLimit.userHtml)
 
+  .use(async (ctx, next) => {
+    ctx.testTime.push(Date.now());
+    await next();
+  })
+
   .use(stayLogin)
   .use(cache)
   .use(permission)
   .use(logger)
+  .use(async (ctx, next) => {
+    ctx.testTime.push(Date.now());
+    await next();
+  })
   .use(mainRouter.routes())
-  .use(body);
+  .use(body)
+  .use(async (ctx, next) => {
+    ctx.testTime.push(Date.now());
+    const [t1, t2, t3, t4, t5] = ctx.testTime;
+    const all = t5 - t1;
+    time += all;
+    count ++;
+    console.log(`base=${t2 - t1}ms init=${t3-t2}ms user=${t4-t3}ms router=${t5 - t4}ms all=${all}ms P=${Math.round(time / count)}ms`);
+    await next();
+  });
 module.exports = app.callback();

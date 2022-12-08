@@ -808,7 +808,20 @@ usersPersonalSchema.methods.rejectVerify3 = async function(message) {
 }
 
 
-
+usersPersonalSchema.statics.getUserSecuritySettings = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const usersPersonal = await UsersPersonalModel.findOnly({uid}, {
+		password: 1,
+		email: 1,
+		mobile: 1,
+		nationCode: 1,
+	});
+	return {
+		setPassword: !!usersPersonal.password.salt && !!usersPersonal.password.hash,
+		boundMobile: !!usersPersonal.nationCode && !!usersPersonal.mobile,
+		boundEmail: !!usersPersonal.email,
+	}
+};
 
 /*
 * 获取上一个动态码

@@ -159,6 +159,7 @@
     "url-search-params-polyfill": "^8.1.1",
     "urllib": "^2.37.0",
     "v-viewer": "^1.6.4",
+    "v8-profiler-node8": "^6.4.0",
     "vue": "^2.5.16",
     "vue-contextmenu": "^1.5.11",
     "vue-router": "^3.5.3",

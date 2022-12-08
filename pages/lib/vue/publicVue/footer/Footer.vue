@@ -40,7 +40,7 @@ footer.footer
             ul.footer-link
               li.text-center
                 canvas.qrcode-canvas(data-path="/")
-          .col-xs-6.col-md-2.footer-li-div(v-if="appStableVersion")
+          .col-xs-6.col-md-2.footer-li-div
             .footer-header.text-center 安卓客户端
             ul.footer-link
               li.text-center
@@ -71,7 +71,6 @@ export default {
       links: "",
       app: "",
       about: "",
-      appStableVersion: "",
     };
   },
   created() {},
@@ -85,7 +84,6 @@ export default {
       links,
       app,
       about,
-      appStableVersion
     } = getState();
     const data = {
       record,
@@ -96,7 +94,6 @@ export default {
       links,
       app,
       about,
-      appStableVersion
     };
     for (let key in data) {
       data.hasOwnProperty(key) && (this[key] = data[key]);

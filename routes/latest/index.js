@@ -10,7 +10,8 @@ router
     const {data, db, state, internalData} = ctx;
     let visitedForums = [];
     if(data.user) {
-      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
+      let visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(data.user.uid);
+      visitedForumsId = visitedForumsId.slice(0, 5);
       visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
 
@@ -34,7 +35,11 @@ router
     data.appsData = await db.SettingModel.getAppsData();
     data.homeBigLogo = await db.SettingModel.getHomeBigLogo();
     data.visitedForums = visitedForums;
-    data.categoryForums = state.categoryForums;
+    data.categoriesWithForums = await db.ForumModel.getUserCategoriesWithForums({
+      user: data.user,
+      userRoles: data.userRoles,
+      userGrade: data.userGrade,
+    });
     data.subscribeForums = state.subForums;
     data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     data.permissions = {

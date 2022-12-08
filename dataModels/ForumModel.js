@@ -2515,4 +2515,30 @@ forumSchema.statics.checkAccessControlPermissionWithThrowError = async (props) =
   });
 }
 
+forumSchema.statics.getUserCategoriesWithForums = async (props) => {
+  const ForumModel = mongoose.model('forums');
+  const ForumCategoryModel = mongoose.model('forumCategories');
+  const {user, userRoles, userGrade} = props;
+  const forumsTree = await ForumModel.getForumsTree(
+    userRoles,
+    userGrade,
+    user
+  );
+  const forumsObj = {};
+  for(const f of forumsTree) {
+    const {categoryId} = f;
+    if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+    forumsObj[categoryId].push(f);
+  }
+  const forumCategories = await ForumCategoryModel.getCategories();
+  const categoryForums = [];
+  for(const fc of forumCategories) {
+    const _fc = Object.assign({}, fc);
+    const {_id} = _fc;
+    _fc.forums = forumsObj[_id] || [];
+    if(_fc.forums.length) categoryForums.push(_fc);
+  }
+  return categoryForums;
+}
+
 module.exports = mongoose.model('forums', forumSchema);

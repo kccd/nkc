@@ -2,6 +2,9 @@ const testRouter = require('koa-router')();
 testRouter
   .get('/', async (ctx, next) => {
     ctx.template = "test/test.pug";
+    /*const result = await ctx.db.UserModel.find({toc: {$gte: new Date('2021-01-01 00:00:00')}}).limit(10000).sort({toc: -1}).explain();
+    console.log(result)*/
+    // console.log(result.executionStats.executionTimeMillis, 'ms');
     await next();
   })
   .get("/demo", async (ctx, next) => {

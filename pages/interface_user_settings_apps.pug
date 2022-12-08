@@ -59,28 +59,6 @@ block content
       .col-xs-12.col-md-2
         include module_user_settings
       .col-xs-12.col-md-10
-        //-.panel.panel-default
-          .panel-heading
-            span 首页默认内容
-          .panel-body
-            .form-horizontal
-              .form-group
-                label.col-sm-2.control-label 首页内容：
-                .col-sm-10
-                  .radio
-                    label
-                      input(type="radio" name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList === "home")
-                      span.m-r-1 主页
-                    label
-                      input(type='radio' name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList === "latest")
-                      span.m-r-1 最新
-                    label
-                      input(type="radio" name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList==="subscribe")
-                      span.m-r-1 我关注的
-              .form-group
-                label.col-sm-2.control-label
-                .col-sm-9
-                  button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
         .panel.panel-default
           .panel-heading
             span 关注设置
@@ -91,10 +69,10 @@ block content
                 .col-sm-10
                   .radio
                     label
-                      input(type="radio" name='selectTypes' checked=data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
+                      input(type="radio" name='selectTypes' checked=data.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
                       span.m-r-1 开启
                     label
-                      input(type='radio' name='selectTypes' checked=!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
+                      input(type='radio' name='selectTypes' checked=!data.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
                       span 关闭
                   h5.text-info 开启后，每次关注弹出自定义分类选项；关闭后，新关注的内容在未分类中。
               .form-group
@@ -125,10 +103,10 @@ block content
                 .col-sm-10
                   .radio
                     label
-                      input(type="radio" name='envelope' checked=!data.user.generalSettings.lotterySettings.close)
+                      input(type="radio" name='envelope' checked=!data.generalSettings.lotterySettings.close)
                       span.m-r-1 显示
                     label
-                      input(type='radio' name='envelope' checked=data.user.generalSettings.lotterySettings.close)
+                      input(type='radio' name='envelope' checked=data.generalSettings.lotterySettings.close)
                       span 不显示
                   h5.text-info 每天第一次发表可能获得拆红包机会，选择不显示，则放弃拆红包机会。
               .form-group

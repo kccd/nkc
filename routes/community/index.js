@@ -23,12 +23,10 @@ router
       if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
       forumsObj[categoryId].push(f);
     });
-    data.categoryForums = [];
-    ctx.state.forumCategories.map(fc => {
-      const _fc = Object.assign({}, fc);
-      const {_id} = _fc;
-      _fc.forums = forumsObj[_id] || [];
-      if(_fc.forums.length) data.categoryForums.push(_fc);
+    data.categoryForums = await db.ForumModel.getUserCategoriesWithForums({
+      user: data.user,
+      userRoles: data.userRoles,
+      userGrade: data.userGrade,
     });
 
     // 是否启用了基金

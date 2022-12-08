@@ -368,7 +368,7 @@ router
 
     // 记录专业访问记录
 		if(data.user) {
-			const {visitedForumsId = []} = data.user.generalSettings;
+			const visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(data.user.uid);
 			const index = visitedForumsId.indexOf(fid);
 			if(index !== -1) {
 				visitedForumsId.splice(index, 1);

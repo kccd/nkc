@@ -275,6 +275,9 @@ router
     let {post, receInfo, paramCert, tempArr} = body;
     const {receiveAddress, receiveName, receiveMobile} = receInfo;
 
+    if(data.user) {
+      await data.user.extendAuthLevel();
+    }
 
     // 检验凭证
     for(const paramId in paramCert) {

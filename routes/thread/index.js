@@ -213,6 +213,9 @@ threadRouter
     let sameThreads = [];
 
 
+    if(data.user) {
+      await data.user.extendAuthLevel();
+    }
 
     // 拓展POST时的相关配置
     const extendPostOptions = {

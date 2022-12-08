@@ -5,9 +5,9 @@ div
       href=`/u/${data.targetUser.uid}/profile/subscribe/forum`
       data-type="reload"
     ) 全部
-    for c, index in state.forumCategories
+    for c, index in data.forumCategories
       -let klass = data.t === c._id? 'active': '';
-      if index+1 === state.forumCategories.length
+      if index+1 === data.forumCategories.length
         -klass += ' radius-right';
       a.button(
         class=klass

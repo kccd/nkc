@@ -19,7 +19,7 @@ block content
         .user-name(id="username")=data.user.username
         .user-certs
           img(src=tools.getUrl("gradeIcon", data.user.grade._id))
-          span=data.user.info.certsName
+          span=data.userCertsName
         .user-description(id="userDescription")=data.user.description || "未填写个人简介"
     .nav-banner-mask(data-global-click='viewImage' data-global-data=objToStr({name: 'banner', url: bannerUrl}))
     .nav-banner(style=`background-image: url(${bannerUrl})` id="userBanner")

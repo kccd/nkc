@@ -11,7 +11,7 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
         +renderVisitedForums(data.visitedForums)
-        +renderCategoryForums(state.categoryForums)
+        +renderCategoryForums(data.categoriesWithForums)
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         if !state.isApp && data.user && state.subForums.length
           .m-b-1

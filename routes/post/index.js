@@ -42,6 +42,9 @@ router
       const url = await db.PostModel.getUrl(post.pid, true);
       return ctx.redirect(url);
     }
+    if(data.user) {
+      await data.user.extendAuthLevel();
+    }
     data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
       uid: post.uid,
       ipId: post.ip
