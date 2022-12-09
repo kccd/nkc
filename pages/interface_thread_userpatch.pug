@@ -11,7 +11,7 @@
           if(data.user)
             .inline-block(style='vertical-align: middle;')
               if(user.uid != data.user.uid)
-                - var subscribeUsers = state.subUsersId || []
+                - var subscribeUsers = data.userSubscribeUsersId || []
                 if(subscribeUsers.indexOf(user.uid) > -1)
                   a.btn.btn-sm.subscribe-btn(onclick=`SubscribeTypes.subscribeUser("${uid}", false)`)#subscribeButton 取关
                 else

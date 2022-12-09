@@ -82,7 +82,7 @@ block content
                     a(onclick=`NKC.methods.toChat("${data.targetUser.uid}", '${data.targetUser.username}')` target="_blank") 私信
                   else
                     a.pointer(onclick=`NKC.methods.toChat("${data.targetUser.uid}")` target="_blank") 私信
-                  if data.userSubUid.includes(data.targetUser.uid)
+                  if (data.userSubUid || []).includes(data.targetUser.uid)
                     a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
                   else
                     a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", true)`) 关注

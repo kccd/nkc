@@ -36,9 +36,9 @@ router
     const paging = nkcModules.apiFunction.paging(page, count);
     const subscribes = await db.SubscribeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);
-    data.subForumsId = state.subForumsId;
-    data.subUsersId = state.subUsersId;
-    data.subColumnsId = state.subColumnsId;
+    data.subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
+    data.subUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+    data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(user.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(user.uid);
     data.paging = paging;

@@ -12,7 +12,7 @@
     if data.user && data.user.uid !== data.column.uid
       .column-user-button
         a.pointer(onclick=`NKC.methods.toChat("${data.column.uid}")` target="_blank") 私信
-        if data.user.subUid.includes(data.column.uid)
+        if data.userSubscribeUsersId && data.userSubscribeUsersId.includes(data.column.uid)
           a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", false)` target="_blank") 取关
         else
           a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", true)` target="_blank") 关注

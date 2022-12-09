@@ -143,6 +143,7 @@ router
       let visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(data.user.uid);
       visitedForumsId = visitedForumsId.slice(0, 5);
       data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
+      data.subForums = await db.ForumModel.getUserSubForums(data.user.uid, fidOfCanGetThreads);
     }
 
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];

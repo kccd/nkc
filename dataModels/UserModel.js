@@ -2231,6 +2231,18 @@ userSchema.statics.getUserScores = async (uid) => {
   return arr;
 };
 
+userSchema.statics.getUserScoresInfo = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const {getUrl} = require('../nkcModules/tools');
+  const scores = await UserModel.getUserScores(uid);
+  return scores.map(score => {
+    return {
+      ...score,
+      icon: getUrl('scoreIcon', score.icon)
+    }
+  });
+}
+
 /*
 * 更新用户所有积分
 * @param {String} uid 用户ID

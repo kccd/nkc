@@ -46,6 +46,11 @@ router
     if(!column.refreshTime || Date.now() - new Date(column.refreshTime).getTime() > timeout) {
       await column.updateBasicInfo();
     }
+    if(data.user) {
+      data.userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+      data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
+    }
+
     await next();
   })
   .use(['/a', '/page'], async (ctx, next)=>{

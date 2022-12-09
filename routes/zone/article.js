@@ -31,10 +31,14 @@ router
     if(state.userColumn) {
       data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: aid})) > 0;
     }
+
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    const userColumn = await db.UserModel.getUserColumn(data.user.uid);
+
     data.columnInfo = {
-      userColumn: state.userColumn,
-      columnPermission: state.columnPermission,
-      column: state.userColumn,
+      userColumn: userColumn,
+      columnPermission: columnPermission,
+      column: userColumn,
     };
     if(token) {
       //如果存在token就验证token是否合法

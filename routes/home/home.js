@@ -3,6 +3,9 @@ module.exports = async (options) => {
   const {data, db, nkcModules, state} = ctx;
   const {user} = data;
 
+  data.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+  data.userColumn = await db.UserModel.getUserColumn(state.uid);
+
   // 首页访问控制
   try{
     await db.ForumModel.checkAccessControlPermission({

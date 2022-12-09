@@ -18,7 +18,7 @@ module.exports = async (ctx, next) => {
   // }
   let paging;
   if(user) {
-    data.userSubUid = state.subUsersId;
+    data.userSubUid = await db.SubscribeModel.getUserSubUsersId(user.uid);
   }
   const q = {
     type: "user",

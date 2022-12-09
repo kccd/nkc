@@ -11,10 +11,11 @@ router
       gradeId: state.uid? data.userGrade._id: undefined,
       isApp: state.isApp,
     });
+    data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(state.uid);
     await next();
   })
   .get("/", async (ctx, next) => {
-    const {query, data, db} = ctx;
+    const {query, data, db, state} = ctx;
     const {page = 0} = query;
     let {t} = query;
     const match = {};

@@ -11,13 +11,6 @@ module.exports = async (ctx) => {
     gradeName: state.user.grade.displayName,
     gradeColor: state.user.grade.color,
     gradeIcon: nkcModules.tools.getUrl("gradeIcon", state.user.grade._id),
-    scores: state.userScores? state.userScores.map(score => {
-      score.icon = nkcModules.tools.getUrl('scoreIcon', score.icon);
-      return score;
-    }): [],
-    columnId: state.userColumn? state.userColumn._id: null,
-    columnPermission: state.columnPermission,
-    draftCount: state.user.draftCount,
   };
 
   ctx.remoteState = {

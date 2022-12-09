@@ -44,6 +44,7 @@ router
       userRoles: data.userRoles,
       userGrade: data.userGrade,
     });
+    data.subForums = await db.ForumModel.getUserSubForums(state.uid, fidOfCanGetThreads);
     await next();
   })
   .get(['/user', '/forum', '/column', '/thread'], async (ctx, next) => {

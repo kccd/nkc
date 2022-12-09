@@ -78,7 +78,7 @@
           a.pointer(onclick="RootApp.openLoginPanel('login')" target="_blank")
             button + 关注
         else
-          if state.subColumnsId.includes(data.column._id)
+          if data.subColumnsId.includes(data.column._id)
             button(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 已关注
           else
             button(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, true)`) + 关注

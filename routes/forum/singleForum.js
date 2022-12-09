@@ -268,6 +268,10 @@ router
 
 		data.subUsers = await db.UserModel.extendUsersInfo(data.subUsers);
 
+		if(data.user) {
+			data.userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+		}
+
     await forum.extendParentForums();
 		// 加载网站公告
 		await forum.extendNoticeThreads();

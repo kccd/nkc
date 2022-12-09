@@ -26,7 +26,7 @@ block content
     .nav-content
       .nav-scores
         include ../../publicModules/userScores
-        +userScores(state.userScores)
+        +userScores(data.userScores)
       .nav-numbers
         a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
           .name 文章
@@ -45,14 +45,14 @@ block content
           span 我的名片
           .icon-right
             .fa.fa-angle-right
-        if state.userColumn
-          a.nav-link(href=`/m/${state.userColumn._id}`)
+        if data.userColumn
+          a.nav-link(href=`/m/${data.userColumn._id}`)
             .icon-left
               .fa.fa-columns
             span 我的专栏
             .icon-right
               .fa.fa-angle-right
-        else if data.user && state.columnPermission
+        else if data.user && data.columnPermission
           a.nav-link(href=`/column/apply`)
             .icon-left
               .fa.fa-columns

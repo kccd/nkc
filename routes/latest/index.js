@@ -40,7 +40,10 @@ router
       userRoles: data.userRoles,
       userGrade: data.userGrade,
     });
-    data.subscribeForums = state.subForums;
+    data.subscribeForums = [];
+    if(state.uid) {
+      data.subscribeForums = await db.ForumModel.getUserSubForums(state.uid, fidOfCanGetThreads);
+    }
     data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     data.permissions = {
       isSuperModerator: ctx.permission("superModerator")

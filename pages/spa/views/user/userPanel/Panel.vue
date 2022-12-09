@@ -441,7 +441,7 @@ export default {
         if(res.user && res.user.uid !== self.$route.params.uid){
           self.subscribeBtn = true
         }
-        if(res.user && res.user.subUid.some((value)=>{ return value === res.targetUser.uid })){
+        if(res.user && res.userSubscribeUsersId.some((value)=>{ return value === res.targetUser.uid })){
           self.subscribeBtnType = true
         }
       })

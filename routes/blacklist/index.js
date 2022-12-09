@@ -14,7 +14,8 @@ router
       }
     }
     const {user} = data;
-    data.subscribed = state.subUsersId.includes(tUid);
+    const subscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+    data.subscribed = subscribeUsersId.includes(tUid);
     data.isFriend = !!(await db.FriendModel.findOne({uid: user.uid, tUid}));
     data.bl = await db.BlacklistModel.findOne({uid: user.uid, tUid});
     data.tbl = await db.BlacklistModel.findOne({uid: tUid, tUid: user.uid});

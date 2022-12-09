@@ -4,7 +4,8 @@
   .info
     a(href=`/u/${targetUser.uid}` target="_blank").name= targetUser.username
     if data.user && data.user.uid !== targetUser.uid
-      if state.subUsersId.includes(targetUser.uid)
+      -var userSubscribeUsersId = data.userSubscribeUsersId || [];
+      if userSubscribeUsersId.includes(targetUser.uid)
         .button(onclick=`SubscribeTypes.subscribeUser(${targetUser.uid}, false)`) 取关
       else
         .button(onclick=`SubscribeTypes.subscribeUser(${targetUser.uid}, true)`) 关注

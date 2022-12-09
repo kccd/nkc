@@ -18,6 +18,9 @@ router
       Object.keys(panelPermission).forEach((key) => {
           if(permission(key)) panelPermission[key] = true;
       })
+      if(data.user) {
+        data.userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+      }
       data.panelPermission = panelPermission;
       await next();
     })

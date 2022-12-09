@@ -1,11 +1,9 @@
 const languages = require('../languages');
 const translate = require('../nkcModules/translate');
-const {files: fileOperations} = require('../settings/operationsType');
 const {getUserInfo} = require('../nkcModules/cookie');
 
 module.exports = async (ctx, next) => {
 
-  const isResourcePost = fileOperations.includes(ctx.data.operationId);
   const {data, db, state} = ctx;
   let userInfo = ctx.getCookie("userInfo");
 	if(!userInfo) {
@@ -13,8 +11,8 @@ module.exports = async (ctx, next) => {
     const {cookie} = ctx.query || {};
     userInfo = getUserInfo(cookie);
 	}
-  let userRoles;
-  let userGrade = null;
+  let userRoles = [];
+  let userGrade = {};
   let user;
   let usersPersonal;
 	if(userInfo) {
@@ -69,23 +67,7 @@ module.exports = async (ctx, next) => {
   state.user = user;
   ctx.state.uid = user? user.uid: null;
 
-  // 获取用户的关注
-  if(data.user && !isResourcePost) {
-    data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
-    ctx.state.subUsersId = [...data.user.subUid];
-    ctx.state.visibleFid = await db.ForumModel.visibleFid(
-      data.userRoles,
-      data.userGrade,
-      data.user
-    );
-    // 关注的专业对象 用在手机网页侧栏专业导航
-    ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, ctx.state.visibleFid);
-    ctx.state.subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
-    ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
-    ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
-    ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
-    ctx.state.userScores = await db.UserModel.getUserScores(data.user.uid);
-
+  if(data.user) {
     data.user.roles = userRoles;
     data.user.grade = userGrade;
   }

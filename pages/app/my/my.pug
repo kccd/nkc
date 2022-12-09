@@ -16,7 +16,7 @@ block content
               .nav-user-username= data.user.username
               .nav-user-certs= data.userCertsName
               .nav-user-scores
-                -const targetUserScores = state.userScores;
+                -const targetUserScores = data.userScores;
                 include ../../publicModules/userScores
     .my-content
       .nav-numbers
