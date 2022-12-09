@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const getRedisKeys = require("../nkcModules/getRedisKeys");
+const redisClient = require("../settings/redisClient");
 const Schema = mongoose.Schema;
 const usersGradeSchema = new Schema({
 	_id: Number,
@@ -132,7 +134,38 @@ usersGradeSchema.statics.getGradeList = async (blacklist = []) => {
 usersGradeSchema.statics.getIconUrl = async (id) => {
   const tools = require('../nkcModules/tools');
   return tools.getUrl('gradeIcon', id);
-}
+};
+
+usersGradeSchema.statics.saveGradesToRedis = async () => {
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const redisClient = require('../settings/redisClient');
+  const UsersGradeModel = mongoose.model('usersGrades');
+  const grades = await UsersGradeModel.find();
+  const key = getRedisKeys('grades');
+  await redisClient.setAsync(key, JSON.stringify(grades));
+};
+
+usersGradeSchema.statics.getGradesFromRedis = async () => {
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const redisClient = require('../settings/redisClient');
+  const key = getRedisKeys('grades');
+  let grades = [];
+  try{
+    const _grades = await redisClient.getAsync(key);
+    grades = JSON.parse(_grades) || [];
+  } catch(err) {}
+  return grades;
+};
+
+usersGradeSchema.statics.getGradesSortByScore = async (sort = 1) => {
+  const UsersGradeModel = mongoose.model('usersGrades');
+  const grades = await UsersGradeModel.getGradesFromRedis();
+  sort = sort === 1? 1: -1;
+  return grades.sort((a, b) => {
+    return (a.score - b.score) * sort;
+  });
+};
+
 
 const UsersGradeModel = mongoose.model('usersGrades', usersGradeSchema);
 module.exports = UsersGradeModel;

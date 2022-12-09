@@ -901,17 +901,23 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function() {
 
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
-	if(!this.score || this.score < 0) {
-		this.score = 0
-	}
-	let grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
-	if(!grade) {
-	  // 如果未找到对应的用户等级（通常发生在删除了积分值为0的配置）时，读取最小等级
-	  grade = await UsersGradeModel.findOne().sort({score: 1});
+  let userScore = this.score || 0;
+  const grades = await UsersGradeModel.getGradesSortByScore(-1);
+
+  let grade = null;
+  for(const g of grades) {
+    if(userScore > g.score) {
+      grade = g;
+      break;
+    }
   }
-  if(grade) {
-    grade.iconUrl = await UsersGradeModel.getIconUrl(grade._id);
+
+  if(grade === null) {
+    grade = grades[grades.length - 1];
   }
+
+  grade.iconUrl = await UsersGradeModel.getIconUrl(grade._id);
+
 	return this.grade = grade;
 };
 /*
