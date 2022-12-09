@@ -49,11 +49,11 @@ router
   .get("/getColumn", async (ctx, next) => {
     const {db, data, state} = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
-    const userColumn = await db.UserModel.getUserColumn(data.user.uid);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
     const column = {
         userColumn: userColumn,
         columnPermission: columnPermission,
-        addedToColumn: addedToColumn
+        addedToColumn: state.addedToColumn
       };
     data.column = column;
     await next();
@@ -61,7 +61,7 @@ router
   .post("/", async (ctx, next) => {
     const {data, db, body, nkcModules, tools, state} = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
-    const userColumn = await db.UserModel.getUserColumn(data.user.uid);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
     if(!columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
     if(userColumn) ctx.throw(403, "你已开设专栏");
     const {contentLength} = tools.checkString;

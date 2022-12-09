@@ -1711,6 +1711,7 @@ userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, foru
 * @return {Object} 专栏对象
 * */
 userSchema.statics.getUserColumn = async (uid) => {
+  if(!uid) return null;
   return await mongoose.model("columns").findOne({uid, closed: false});
 };
 

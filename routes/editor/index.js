@@ -336,7 +336,7 @@ router
     const {type, id} = query;
     const {user} = data;
     data.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
-    data.userColumn = await db.UserModel.getUserColumn(data.user.uid);
+    data.userColumn = await db.UserModel.getUserColumn(state.uid);
     const draftDesType = await db.DraftModel.getDesType();
     await db.UserModel.checkUserBaseInfo(user);
     data.notice = '';

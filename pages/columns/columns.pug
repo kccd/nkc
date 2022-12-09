@@ -72,7 +72,7 @@ block content
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   script.
-    if(!window.SubscribeTypes) {
+    if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
       window.SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
     function subscribeColumn(columnId) {

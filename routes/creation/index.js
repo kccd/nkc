@@ -24,7 +24,7 @@ router
       ctx.remoteTemplate = 'vueRoot/index.pug';
     }
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
-    const userColumn = await db.UserModel.getUserColumn(data.user.uid);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
     data.column = {
       userColumn: userColumn,
       columnPermission: columnPermission,
