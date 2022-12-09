@@ -455,8 +455,9 @@ router
 	  	q.disabled = false;
 	  }
     // 转发到专栏
-    if(columnMainCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [targetThread.oc]);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
+    if(columnMainCategoriesId.length > 0 && userColumn) {
+      await db.ColumnPostModel.addColumnPosts(userColumn, columnMainCategoriesId, columnMinorCategoriesId, [targetThread.oc]);
     }
     data.redirect = await db.PostModel.getUrl(pid);
     data.targetUser = targetUser;

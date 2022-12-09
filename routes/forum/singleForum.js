@@ -82,8 +82,9 @@ router
     }
 
     // 转发到专栏
-    if(columnMainCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [_post.pid]);
+		const userColumn = await db.UserModel.getUserColumn(state.uid);
+    if(columnMainCategoriesId.length > 0 && userColumn) {
+      await db.ColumnPostModel.addColumnPosts(userColumn, columnMainCategoriesId, columnMinorCategoriesId, [_post.pid]);
     }
 
     // 发表匿名内容
