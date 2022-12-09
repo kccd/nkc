@@ -11,6 +11,8 @@ module.exports = async () => {
   // 清空缓存表
   // await CacheModel.remove();
 
+  // 缓存用户等级
+  await db.UsersGradeModel.saveGradesToRedis();
   // 专业权限相关
   await cacheForums();
   // 专业信息
@@ -36,6 +38,4 @@ module.exports = async () => {
   await db.IPBlacklistModel.saveIPBlacklistToRedis();
   // 访问控制
   await db.AccessControlModel.saveToCache();
-  // 缓存用户等级
-  await db.UsersGradeModel.saveGradesToRedis();
 }
