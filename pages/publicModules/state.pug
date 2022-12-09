@@ -5,14 +5,14 @@ if remoteState.uid
   -windowData.selectTypesWhenSubscribe = remoteState.selectTypesWhenSubscribe;
   -windowData.refererOperationId = remoteState.operationId;
   -windowData.newMessageCount = remoteState.newMessageCount;
-  
+
 
 if remoteState.isApp
   -windowData.isApp = true;
   -windowData.appOS = remoteState.appOS;
   -windowData.platform = remoteState.platform;
-//- footer内容 
-//- 关于 
+//- footer内容
+//- 关于
 -windowData.about = remoteState.serverSettings.links.info;
 //- 应用
 -windowData.app = remoteState.serverSettings.links.app;
@@ -28,8 +28,6 @@ if remoteState.isApp
 -windowData.copyright = remoteState.serverSettings.copyright;
 //- 备案
 -windowData.record = remoteState.serverSettings.record;
-//- app
--windowData.appStableVersion = remoteState.appStableVersion;
 
 -windowData.fileDomain = remoteState.fileDomain;
 -windowData.websiteCode = remoteState.serverSettings.websiteCode;

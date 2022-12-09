@@ -22,6 +22,7 @@ module.exports = async (ctx, next) => {
   const subscribesObj = {};
   subscribes.map(s => subscribesObj[s.fid] = s);
   data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);
+  data.forumCategories = await db.ForumCategoryModel.getCategories();
   data.subscribesObj = subscribesObj;
   data.paging = paging;
   await next();

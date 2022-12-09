@@ -3,6 +3,9 @@ module.exports = async (options) => {
   const {data, db, nkcModules, state} = ctx;
   const {user} = data;
 
+  data.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+  data.userColumn = await db.UserModel.getUserColumn(state.uid);
+
   // 首页访问控制
   try{
     await db.ForumModel.checkAccessControlPermission({
@@ -61,12 +64,10 @@ module.exports = async (options) => {
     if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
     forumsObj[categoryId].push(f);
   });
-  data.categoryForums = [];
-  ctx.state.forumCategories.map(fc => {
-    const _fc = Object.assign({}, fc);
-    const {_id} = _fc;
-    _fc.forums = forumsObj[_id] || [];
-    if(_fc.forums.length) data.categoryForums.push(_fc);
+  data.categoryForums = await db.ForumModel.getUserCategoriesWithForums({
+    user: data.user,
+    userRoles: data.userRoles,
+    userGrade: data.userGrade,
   });
 
   // 置顶专栏
@@ -78,13 +79,6 @@ module.exports = async (options) => {
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
   data.columnListPosition = homeSettings.columnListPosition;
-  // 首页置顶
-  // data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
-  // 浏览过的专业
-  /*if(data.user) {
-    const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
-    data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
-  }*/
   // 是否有权限开办专业
   data.hasPermissionOpenNewForum = await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
 

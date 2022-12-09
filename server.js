@@ -54,4 +54,4 @@ const start = async () => {
   }
 };
 
-start();
+start().catch(console.error);

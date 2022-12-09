@@ -98,7 +98,7 @@ registerRouter
     } else if(t === "user") {
       const registerSettings = await db.SettingModel.getSettings("register");
       const {recommendUsers} = registerSettings;
-      data.subUsersId = state.subUsersId;
+      data.subUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
       let users = await db.UserModel.aggregate([
         {
           $match: {

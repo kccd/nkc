@@ -401,5 +401,14 @@ usersGeneralSchema.statics.resetReviewedCount = async function (uid, type) {
   }
 }
 
+usersGeneralSchema.statics.getUserVisitedForumsId = async (uid) => {
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const generalSettings = await UsersGeneralModel.findOne({uid}, {
+    visitedForumsId: 1,
+  });
+  return generalSettings? generalSettings.visitedForumsId: [];
+}
+
+
 const UsersGeneralModel = mongoose.model('usersGeneral', usersGeneralSchema);
 module.exports = UsersGeneralModel;

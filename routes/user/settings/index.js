@@ -38,7 +38,10 @@ settingRouter
 		// 全局用户设置，包括修改用户名需要多少积分
 		data.usernameSettings = await db.SettingModel.getSettings("username");
 		// 此用户的用户名修改次数
-		data.modifyUsernameCount = data.user.generalSettings.modifyUsernameCount;
+		const generalSettings = await db.UsersGeneralModel.findOne({uid: user.uid}, {
+			modifyUsernameCount: 1
+		});
+		data.modifyUsernameCount = generalSettings.modifyUsernameCount;
 		// data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
 		await db.UserModel.updateUserScores(user.uid);
 		// 修改用户名需要使用的积分对象

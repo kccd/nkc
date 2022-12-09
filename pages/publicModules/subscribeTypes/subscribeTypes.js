@@ -38,6 +38,9 @@ NKC.modules.SubscribeTypes = function() {
       }
     },
     methods: {
+      getSubscribeSettings() {
+        return nkcAPI('/account/subscribe_settings', 'GET').then(res => res.subscribeSettings);
+      },
       getTypeById: function(id) {
         for(var i = 0; i < this.types.length; i++) {
           var type = this.types[i];
@@ -64,9 +67,6 @@ NKC.modules.SubscribeTypes = function() {
         if(!this.hideInfo && this.selectTypesWhenSubscribe && this.selectTypesWhenSubscribe.length > 0) {
           var uid = NKC.configs.uid;
           nkcAPI("/u/" + uid + "/settings/apps", "PUT", {selectTypesWhenSubscribe: false})
-            .then(function() {
-              NKC.configs.selectTypesWhenSubscribe = false;
-            })
             .catch(function(data) {
               screenTopWarning(data);
             })
@@ -148,37 +148,39 @@ NKC.modules.SubscribeTypes = function() {
     show: false,
     backdrop: "statics"
   });
-  this_.open = function(callback, options) {
-    options = options || {};
-    if(options.selectTypesWhenSubscribe === undefined) {
-      options.selectTypesWhenSubscribe = !!NKC.configs.selectTypesWhenSubscribe;
+  this_.open =  async function(callback, options) {
+    try {
+      options = options || {};
+      if(options.selectTypesWhenSubscribe === undefined) {
+        const subscribeSettings = await this_.app.getSubscribeSettings();
+        options.selectTypesWhenSubscribe = !!subscribeSettings.selectTypesWhenSubscribe;
+      }
+      if(!options.selectTypesWhenSubscribe) return callback([]);
+      this_.app.editType = options.editType || false;
+      this_.app.hideInfo = options.hideInfo || false;
+      this_.app.edit = !!options.edit;
+      this_.app.selectedTypesId = [];
+      this_.callback = callback;
+      this_.dom.modal("show");
+      await this_.app.getTypes();
+      if(this_.app.edit && options.typeId) {
+        var type = this_.app.getTypeById(options.typeId);
+        if(type) {
+          this_.app.type = type;
+        }
+      }
+      // 更改关注分类
+      if(options.selectedTypesId && options.selectedTypesId.length > 0) {
+        this_.app.selectedTypesId = [];
+        for(var i = 0; i < options.selectedTypesId.length; i++) {
+          var typeId = options.selectedTypesId[i];
+          var t = this_.app.getTypeById(typeId);
+          if(t) this_.app.selectedTypesId.push(t._id);
+        }
+      }
+    } catch(err) {
+      sweetError(err);
     }
-    if(!options.selectTypesWhenSubscribe) return callback([]);
-    this_.app.editType = options.editType || false;
-    this_.app.hideInfo = options.hideInfo || false;
-    this_.app.edit = !!options.edit;
-    this_.app.selectedTypesId = [];
-    this_.callback = callback;
-    this_.dom.modal("show");
-    this_.app.getTypes()
-      .then(function() {
-        // 修改分类
-        if(this_.app.edit && options.typeId) {
-          var type = this_.app.getTypeById(options.typeId);
-          if(type) {
-            this_.app.type = type;
-          }
-        }
-        // 更改关注分类
-        if(options.selectedTypesId && options.selectedTypesId.length > 0) {
-          this_.app.selectedTypesId = [];
-          for(var i = 0; i < options.selectedTypesId.length; i++) {
-            var typeId = options.selectedTypesId[i];
-            var t = this_.app.getTypeById(typeId);
-            if(t) this_.app.selectedTypesId.push(t._id);
-          }
-        }
-      });
   };
   this_.close = function() {
     this_.dom.modal("hide");
@@ -365,11 +367,11 @@ NKC.modules.SubscribeTypes = function() {
   this_.collectionThreadPromise = function(id, collection, cid) {
     return nkcAPI("/t/" + id + "/collection", "POST", {type: !!collection, cid: cid || []});
   };
-  
+
   this_.collectionArticlePromise = function (id, collection, cid) {
     return nkcAPI(`/article/${id}/collection`, "POST", {type: !!collection, cid: cid || []});
   }
-  
+
   //收藏独立文章
   this_.collectionArticle = function (id, collection) {
     if(collection) {
@@ -394,7 +396,7 @@ NKC.modules.SubscribeTypes = function() {
         })
     }
   }
-  
+
   //收藏社区文章
   this_.collectionThread = function(id, collection) {
     if(collection) {

@@ -19,7 +19,10 @@ luckRouter
       const postRewardScore = await db.SettingModel.getScoreByOperationType('postRewardScore');
       const {random} = redEnvelopeSettings;
       if(random.close) ctx.throw(403, '抱歉，红包功能已关闭！');
-      if(!user.generalSettings.lotterySettings.status) ctx.throw(403, '抱歉，你暂未获得开红包机会，请刷新。');
+      const generalSettings = await db.UsersGeneralModel.findOne({uid: user.uid}, {
+        lotterySettings: 1,
+      });
+      if(!generalSettings.lotterySettings.status) ctx.throw(403, '抱歉，你暂未获得开红包机会，请刷新。');
       let n = 1;
       const number = Math.ceil(Math.random()*100);
       let result;
@@ -61,7 +64,11 @@ luckRouter
         };
         data.result = result;
       }
-      await user.generalSettings.updateOne({'lotterySettings.status': false});
+      await db.UsersGeneralModel.updateOne({uid: user.uid}, {
+        $set: {
+          'lotterySettings.status': false
+        }
+      });
     } catch(err) {
       await lock.unlock();
       throw err;
@@ -69,9 +76,13 @@ luckRouter
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {data} = ctx;
+    const {data, db} = ctx;
     const {user} = data;
-    await user.generalSettings.updateOne({'lotterySettings.status': false});
+    await db.UsersGeneralModel.updateOne({uid: user.uid}, {
+      $set: {
+        'lotterySettings.status': false
+      }
+    });
     await next();
   });
 module.exports = luckRouter;

@@ -51,17 +51,9 @@ router
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
     //获取当前用户等级信息
     data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
-    if(targetUser.uid !== user.uid) {
-      data.targetColumn = await db.UserModel.getUserColumn(targetUser.uid);
-      data.targetColumnPermission = await db.UserModel.ensureApplyColumnPermission(targetUser.uid);
-    } else {
-      data.targetColumn = state.userColumn;
-      data.targetColumnPermission = state.columnPermission;
-    }
-    const noteCount = await db.NoteContentModel.countDocuments({
-      uid: targetUser.uid,
-      deleted: false
-    });
+    data.targetColumn = await db.UserModel.getUserColumn(targetUser.uid);
+    data.targetColumnPermission = await db.UserModel.ensureApplyColumnPermission(targetUser.uid);
+
     data.navbar_highlight = 'profile';
     if(state.isApp) {
       data.appLinks = [

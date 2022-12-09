@@ -22,13 +22,14 @@ paperRouter
     const paperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
     if(paperCount >= countOneDay) ctx.throw(403, `一天之内只能参加${countOneDay}次考试，今日您的考试次数已用完，请明天再试。`);
     const now = Date.now();
-    let {stageTime} = user.generalSettings.examSettings;
+    const generalSettings = await db.UsersGeneralModel.findOne({uid: user.uid});
+    let {stageTime} = generalSettings.examSettings;
     // const allPaperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
     const allPaperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: stageTime}});
     stageTime = new Date(stageTime).getTime();
     if(allPaperCount >= count) {
       if(now > stageTime + waitingTime*24*60*60*1000) {
-        await user.generalSettings.updateOne({'examSettings.stageTime': now});
+        await generalSettings.updateOne({'examSettings.stageTime': now});
       } else {
         ctx.throw(403, `您观看考题数量过多或考试次数达到${count}次，需等待${waitingTime}天后才能再次参加考试，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
       }
@@ -114,7 +115,7 @@ paperRouter
           }
           questions.map(q => {
             qidArr.push(q._id);
-          }); 
+          });
         }
       }
     }

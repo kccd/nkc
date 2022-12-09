@@ -544,6 +544,12 @@ router
         data.results.push(r);
       }
     }
+
+    if(data.user) {
+      data.userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+      data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
+    }
+
     data.permissions = {
       bandUser: ctx.permissionsOr(['unBannedUser', 'bannedUser']),
       clearUserInfo: ctx.permission('clearUserInfo'),

@@ -38,6 +38,13 @@ router
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     // 用户资料补全提示
     data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
+    // 左侧导航数据
+    data.categoriesWithForums = await db.ForumModel.getUserCategoriesWithForums({
+      user: data.user,
+      userRoles: data.userRoles,
+      userGrade: data.userGrade,
+    });
+    data.subForums = await db.ForumModel.getUserSubForums(state.uid, fidOfCanGetThreads);
     await next();
   })
   .get(['/user', '/forum', '/column', '/thread'], async (ctx, next) => {

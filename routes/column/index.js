@@ -48,9 +48,11 @@ router
   })
   .get("/getColumn", async (ctx, next) => {
     const {db, data, state} = ctx;
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
     const column = {
-        userColumn: state.userColumn,
-        columnPermission: state.columnPermission,
+        userColumn: userColumn,
+        columnPermission: columnPermission,
         addedToColumn: state.addedToColumn
       };
     data.column = column;
@@ -58,8 +60,10 @@ router
   })
   .post("/", async (ctx, next) => {
     const {data, db, body, nkcModules, tools, state} = ctx;
-    if(!state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
-    if(state.userColumn) ctx.throw(403, "你已开设专栏");
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
+    if(!columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
+    if(userColumn) ctx.throw(403, "你已开设专栏");
     const {contentLength} = tools.checkString;
     const {files, fields} = body;
     const {avatar, banner} = files;
@@ -106,9 +110,10 @@ router
     await next();
   })
   .get("/apply", async (ctx, next) => {
-    if(!ctx.state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
-    ctx.template = "column/apply.pug";
     const {data, db, nkcModules} = ctx;
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    if(!columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
+    ctx.template = "column/apply.pug";
     const nkcRender = nkcModules.nkcRender;
     const createColumnInfo = (await db.SettingModel.getSettings('column')).createColumnInfo;
     data.createColumnInfo = nkcRender.plainEscape(createColumnInfo);

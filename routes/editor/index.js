@@ -335,6 +335,8 @@ router
     const {db, data, query, state} = ctx;
     const {type, id} = query;
     const {user} = data;
+    data.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    data.userColumn = await db.UserModel.getUserColumn(state.uid);
     const draftDesType = await db.DraftModel.getDesType();
     await db.UserModel.checkUserBaseInfo(user);
     data.notice = '';
@@ -689,11 +691,11 @@ router
     data.allowedAnonymousForumsId = allowedAnonymousForums.map(f => f.fid);
 
     // 判断用户是否已经将文章转发到专栏
-    if(["modifyPost", "modifyThread", "newPost"].includes(data.type) && state.userColumn) {
-      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
+    if(["modifyPost", "modifyThread", "newPost"].includes(data.type) && data.userColumn) {
+      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: data.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
     }
     // 判断用户是否是在专栏主页点击了「我要投稿」
-    if(state.userColumn && query.toColumn === 'true' && data.type === 'newThread') {
+    if(data.userColumn && query.toColumn === 'true' && data.type === 'newThread') {
       data.toColumn = true;
     }
     if(["modifyThread", "newThread"].includes(data.type)) {

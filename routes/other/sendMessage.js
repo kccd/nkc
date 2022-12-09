@@ -1,6 +1,12 @@
 const Router = require('koa-router');
 const sendMessageRouter = new Router();
 sendMessageRouter
+	.use('/', async (ctx, next) => {
+		if(ctx.data.user) {
+			await ctx.data.user.extendAuthLevel();
+		}
+		await next();
+	})
 	.post('/login', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {nationCode, mobile, verifySecret} = body;

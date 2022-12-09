@@ -54,7 +54,7 @@
                 include ../user/module_user_grade
               if data.user && result.user.uid !== data.user
                 .display-i-b
-                  if data.user.subUid.includes(result.user.uid)
+                  if data.userSubscribeUsersId.includes(result.user.uid)
                     button.btn.btn-xs.m-r-05.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', false)`) 取关
                   else
                     button.btn.btn-xs.m-r-05.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', true)`) 关注
@@ -100,7 +100,7 @@
               -let targetUser = result.user;
               if data.user
                 .display-i-b
-                  if state.subColumnsId.includes(result.column._id)
+                  if data.subColumnsId.includes(result.column._id)
                     button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeColumn('${result.column._id}', false)`) 已关注
                   else
                     button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeColumn('${result.column._id}', true)`) 关注

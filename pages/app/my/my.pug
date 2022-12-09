@@ -14,9 +14,9 @@ block content
               img(src=tools.getUrl('userAvatar', data.user.avatar))
             .nav-user-text
               .nav-user-username= data.user.username
-              .nav-user-certs= data.user.info.certsName
+              .nav-user-certs= data.userCertsName
               .nav-user-scores
-                -const targetUserScores = state.userScores;
+                -const targetUserScores = data.userScores;
                 include ../../publicModules/userScores
     .my-content
       .nav-numbers
@@ -102,9 +102,9 @@ block content
                     .icon-left
                       img(src=tools.getUrl('getIcons', 'mingpian.png'))
                     span 我的名片
-                if data.user.column
+                if data.userColumn
                   .my-link
-                    a.nav-box(href=`/m/${data.user.column._id}`)
+                    a.nav-box(href=`/m/${data.userColumn._id}`)
                       .icon-left
                         img(src=tools.getUrl('getIcons', 'zhuanlan.png'))
                       span 我的专栏

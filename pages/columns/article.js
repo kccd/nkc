@@ -1,12 +1,17 @@
 import CommentHit from "../lib/vue/comment/CommentHit";
 import {screenTopAlert, screenTopWarning} from "../lib/js/topAlert";
 import {nkcAPI} from "../lib/js/netAPI";
-new Vue({
-  el: "#CommentHitBox",
-  components: {
-    "comment-hit": CommentHit
-  },
-})
+
+if($('#CommentHitBox').length > 0) {
+  new Vue({
+    el: "#CommentHitBox",
+    components: {
+      "comment-hit": CommentHit
+    },
+  })
+}
+
+
 
 //撤销学术分
 function cancelArticleXsf(aid, id) {

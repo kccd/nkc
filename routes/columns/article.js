@@ -30,13 +30,15 @@ router.get('/:aid', async (ctx, next)=>{
       //如果存在token就验证token是否合法
       await db.ShareModel.hasPermission(token, _article._id)
     }
-    if(state.userColumn) {
-      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "article", pid: article._id})) > 0;
+    const userColumn = await db.UserModel.getUserColumn(state.uid)
+    if(userColumn) {
+      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: userColumn._id, type: "article", pid: article._id})) > 0;
     }
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     data.columnInfo = {
-      userColumn: state.userColumn,
-      columnPermission: state.columnPermission,
-      column: state.userColumn,
+      userColumn: userColumn,
+      columnPermission: columnPermission,
+      column: userColumn,
     };
     data.columnPost.article.vote = await db.PostsVoteModel.getVoteByUid({uid: state.uid, id: data.columnPost.article._id, type: 'article'});
     const articlePost = await db.ArticlePostModel.findOne({sid: article._id, source: article.source});

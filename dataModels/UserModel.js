@@ -3,6 +3,15 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
 const redisClient = require('../settings/redisClient');
+
+const defaultCerts = {
+  'scholar': 'scholar',
+  'default': 'default',
+  'dev': 'dev',
+  'visitor': 'visitor',
+  'banned': 'banned',
+};
+
 const userSchema = new Schema({
   // 是否注销
   destroyed: {
@@ -549,20 +558,12 @@ userSchema.statics.extendUserSecretInfo = async (user) => {
 };
 
 userSchema.methods.extendRoles = async function() {
+  const UserModel = mongoose.model('users');
   const RoleModel = mongoose.model('roles');
-  let certs = [].concat(this.certs);
-  if(!certs.includes('default')) {
-    certs.push('default');
-  }
-  if(this.xsf > 0 && !certs.includes('scholar')) {
-    certs.push('scholar');
-  }
-  if(certs.includes('banned')) {
-    certs = ['banned'];
-  }
+  const certs = await UserModel.getUserCertsByXSF(this.certs, this.xsf);
   const roles = [];
 	for(let cert of certs) {
-		const role = await RoleModel.findOne({_id: cert});
+		const role = await RoleModel.extendRole(cert);
 		if(role) roles.push(role);
 	}
 	return this.roles = roles;
@@ -900,17 +901,23 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function() {
 
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
-	if(!this.score || this.score < 0) {
-		this.score = 0
-	}
-	let grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
-	if(!grade) {
-	  // 如果未找到对应的用户等级（通常发生在删除了积分值为0的配置）时，读取最小等级
-	  grade = await UsersGradeModel.findOne().sort({score: 1});
+  let userScore = this.score || 0;
+  const grades = await UsersGradeModel.getGradesSortByScore(-1);
+
+  let grade = null;
+  for(const g of grades) {
+    if(userScore > g.score) {
+      grade = g;
+      break;
+    }
   }
-  if(grade) {
-    grade.iconUrl = await UsersGradeModel.getIconUrl(grade._id);
+
+  if(grade === null) {
+    grade = grades[grades.length - 1];
   }
+
+  grade.iconUrl = await UsersGradeModel.getIconUrl(grade._id);
+
 	return this.grade = grade;
 };
 /*
@@ -1085,7 +1092,7 @@ userSchema.methods.getPostLimit = async function() {
   @author pengxiguaa 2019/2/27
 */
 userSchema.statics.extendUsersInfo = async (users) => {
-  const RoleModel = mongoose.model('roles');
+  const UserModel = mongoose.model('users');
   const ColumnModel = mongoose.model('columns');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const nkcRender = require('../nkcModules/nkcRender');
@@ -1105,21 +1112,15 @@ userSchema.statics.extendUsersInfo = async (users) => {
   }
   const users_ = []; // 普通对象
   for(const user of users) {
-    let certs = user.certs.concat([]);
-    // 若用户拥有“banned”证书，则忽略其他证书
-    if(certs.includes('banned')) {
-      certs = ['banned'];
-    } else {
-      if(!certs.includes('default')) {
-        certs.unshift('default');
-      }
-      // 若用户的学术分大于0，则临时添加“scholar”证书
-      if(!certs.includes('scholar') && user.xsf > 0){
-        certs.push('scholar');
-      }
-    }
-    const info = {};
-    info.certsName = [];
+    const userPersonal = personalObj[user.uid];
+    const hasMobile = !!userPersonal && !!userPersonal.mobile && !!userPersonal.nationCode;
+    const hasEmail = !!userPersonal && !!userPersonal.email;
+    const certs = await UserModel.getUserCertsByXSF(user.certs, user.xsf);
+    const certsName = await UserModel.getUserCertsNameByCerts(
+      certs,
+      hasMobile,
+      hasEmail
+    );
     const column = columnsObj[user.uid];
     if(column) {
       user.column = {
@@ -1132,22 +1133,10 @@ userSchema.statics.extendUsersInfo = async (users) => {
         closed: column.closed,
       }
     }
-    for(const cert of certs) {
-      const role = await RoleModel.extendRole(cert);
-      if(role && role.displayName && !role.hidden) {
-        info.certsName.push(role.displayName);
-      }
-    }
+    user.info = {
+      certsName: certsName.join(' '),
+    };
 
-    if(!certs.includes('banned')) {
-      const userPersonal = personalObj[user.uid];
-      // 若用户绑定了手机号，则临时添加“机友”标志
-      if(userPersonal.mobile && userPersonal.nationCode) info.certsName.push('机友');
-      // 若用户绑定了邮箱，则临时添加“笔友”标志
-      if(userPersonal.email) info.certsName.push('笔友');
-    }
-    info.certsName = info.certsName.join(' ');
-    user.info = info;
     if(!user.grade && user.extendGrade) {
       await user.extendGrade();
     }
@@ -1157,6 +1146,23 @@ userSchema.statics.extendUsersInfo = async (users) => {
   }
   return users_;
 };
+
+userSchema.methods.extendUserColumn = async function() {
+  const ColumnModel = mongoose.model('columns');
+  const column = await ColumnModel.findOne({uid: this.uid}, {
+    _id: 1,
+    name: 1,
+    banner: 1,
+    avatar: 1,
+    abbr: 1,
+    subCount: 1,
+    closed: 1,
+  });
+  if(column) {
+    this.column = column;
+  }
+  return column;
+}
 
 userSchema.statics.extendUserInfo = async function(user) {
   const UserModel = mongoose.model("users");
@@ -1619,6 +1625,7 @@ userSchema.statics.publishingCheck = async (user) => {
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const todayThreadCount = await ThreadModel.countDocuments({toc: {$gt: today}, uid: user.uid});
+  await user.extendAuthLevel();
   if(authLevelMin > user.authLevel) throwErr(403, `身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
   // ab卷考试是否开启或通过
   if((!volumeB || !user.authLevel) && (!volumeA || !user.volumeA)) {
@@ -1704,6 +1711,7 @@ userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, foru
 * @return {Object} 专栏对象
 * */
 userSchema.statics.getUserColumn = async (uid) => {
+  if(!uid) return null;
   return await mongoose.model("columns").findOne({uid, closed: false});
 };
 
@@ -2229,6 +2237,18 @@ userSchema.statics.getUserScores = async (uid) => {
   }
   return arr;
 };
+
+userSchema.statics.getUserScoresInfo = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const {getUrl} = require('../nkcModules/tools');
+  const scores = await UserModel.getUserScores(uid);
+  return scores.map(score => {
+    return {
+      ...score,
+      icon: getUrl('scoreIcon', score.icon)
+    }
+  });
+}
 
 /*
 * 更新用户所有积分
@@ -2809,22 +2829,20 @@ userSchema.statics.getImproveUserInfoByMiddlewareUser = async function(user) {
   const {
     uid,
     username,
-    setPassword,
-    boundEmail,
-    boundMobile,
     avatar,
     banner,
     description
   } = user;
+  const userSecuritySettings = await UsersPersonalModel.getUserSecuritySettings(uid);
   const reg = new RegExp(`^${serverSettings.websiteCode}-`);
   const setUsername =  username && !reg.test(username);
   const needVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
   return {
     uid,
     setUsername: !!setUsername,
-    setPassword: !!setPassword,
-    boundEmail: !!boundEmail,
-    boundMobile: !!boundMobile,
+    setPassword: userSecuritySettings.setPassword,
+    boundEmail: userSecuritySettings.boundEmail,
+    boundMobile: userSecuritySettings.boundMobile,
     setAvatar: !!avatar,
     setBanner: !!banner,
     setDescription: !!description,
@@ -2918,6 +2936,74 @@ userSchema.statics.checkUserDescriptionSensitiveWords = async (text = '') => {
     }
   }
 };
+
+userSchema.statics.getVisitorRoles = async () => {
+  const RoleModel = mongoose.model('roles');
+  const visitorRole = await RoleModel.extendRole('visitor');
+  return [visitorRole];
+};
+
+userSchema.statics.getVisitorOperationsId = async () => {
+  const UserModel = mongoose.model('users');
+  const roles = await UserModel.getVisitorRoles();
+  return await UserModel.getOperationsIdByRoles(roles);
+};
+
+userSchema.statics.getOperationsIdByRoles = async (roles) => {
+  let operationsId = [];
+  for(const role of roles) {
+    operationsId = operationsId.concat(role.operationsId);
+  }
+  return [...new Set(operationsId)];
+}
+
+userSchema.statics.getUserCertsByXSF = async (certs, xsf) => {
+  let newCerts = [...certs];
+  if(xsf && xsf > 0 && !newCerts.includes(defaultCerts.scholar)) {
+    newCerts.push(defaultCerts.scholar);
+  }
+  if(!newCerts.includes(defaultCerts.default)) {
+    newCerts.push(defaultCerts.default);
+  }
+  if(newCerts.includes(defaultCerts.banned)) {
+    newCerts = [defaultCerts.banned];
+  }
+  return newCerts;
+}
+
+userSchema.statics.getUserCertsNameByCerts = async (certs, hasMobile, hasEmail) => {
+  const RoleModel = mongoose.model('roles');
+  const names = [];
+  for(const cert of certs) {
+    const role = await RoleModel.extendRole(cert);
+    if(role && role.displayName && !role.hidden) {
+      names.push(role.displayName);
+    }
+  }
+  if(!certs.includes(defaultCerts.banned)) {
+    if(hasMobile) names.push('机友');
+    if(hasEmail) names.push('笔友');
+  }
+  return names;
+}
+
+userSchema.methods.getCertsName = async function() {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const UserModel = mongoose.model('users');
+  const {uid, certs, xsf} = this;
+  const userCerts = await UserModel.getUserCertsByXSF(certs, xsf);
+  const userSecuritySettings = await UsersPersonalModel.getUserSecuritySettings(uid);
+  return await UserModel.getUserCertsNameByCerts(
+    userCerts,
+    userSecuritySettings.boundMobile,
+    userSecuritySettings.boundEmail
+  );
+}
+
+userSchema.methods.getCertsNameString = async function() {
+  const certsName = await this.getCertsName();
+  return certsName.join(' ');
+}
 
 module.exports = mongoose.model('users', userSchema);
 

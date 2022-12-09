@@ -39,6 +39,8 @@ router
       count: 200
     });
     data.paging = paging;
+    data.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    data.userColumn = await db.UserModel.getUserColumn(data.user.uid);
     ctx.template = "columns/settings/addPost.pug";
     data.nav = "addPost";
     await next();

@@ -73,6 +73,7 @@ router
 			await grade.save();
 		}
 		await redis.cacheForums();
+		await db.UsersGradeModel.saveGradesToRedis();
 		await next();
 	});
 module.exports = router;

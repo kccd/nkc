@@ -98,7 +98,7 @@ router
       userInfo: {
         avatar: nkcModules.tools.getUrl('userAvatar', avatar),
         name: username,
-        certsName: info.certsName,
+        certsName: await user.getCertsNameString(),
         scores: await db.UserModel.getUserScores(data.user.uid),
         userColumn: await db.UserModel.getUserColumn(data.user.uid),
         draftCount: data.user.draftCount,
@@ -125,7 +125,7 @@ router
       username: data.user.username,
       gradeColor: data.user.grade.color,
       gradeName: data.user.grade.displayName,
-      certsName: data.user.info? data.user.info.certsName: '',
+      certsName: await data.user.getCertsNameString(),
       scores: userScores? userScores.map(score => {
         score.icon = nkcModules.tools.getUrl('scoreIcon', score.icon);
         return score;

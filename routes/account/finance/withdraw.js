@@ -23,6 +23,7 @@ router
     data.mainScore = await db.SettingModel.getMainScore();
     data.userScores = await db.UserModel.updateUserScores(user.uid);
     data.userMainScore = await db.UserModel.getUserMainScore(user.uid);
+    await data.user.extendAuthLevel();
     ctx.template = 'account/finance/withdraw.pug';
     await next();
   })

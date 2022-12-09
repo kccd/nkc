@@ -11,7 +11,7 @@
   .column-button
     if !data.user
       a(onclick='RootApp.openLoginPanel("login")') 关注
-    else if state.subColumnsId.includes(data.column._id)
+    else if data.subColumnsId.includes(data.column._id)
       a.subscribed(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 取关
     else
       a(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, true)`) 关注

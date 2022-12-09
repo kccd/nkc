@@ -79,7 +79,7 @@
           column(
             ref="column",
             :o="reqUrl.o",
-            :state="{ userColumn: pageState.userColumn, columnPermission: pageState.columnPermission, column: pageState.userColumn }",
+            :state="{ userColumn: pageData.userColumn, columnPermission: pageData.columnPermission, column: pageData.userColumn }",
             :data="{ addedToColumn: pageData.addedToColumn, toColumn: pageData.toColumn }"
             @info-change="infoChange"
           )

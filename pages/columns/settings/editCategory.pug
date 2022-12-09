@@ -29,7 +29,5 @@ block settingsContent
           h5.text-danger(v-if="error") {{error}}
           h5.text-success(v-if="info") {{info}}
           button.btn.btn-primary.btn-sm.btn-block(@click="save") 保存
-  -const column = data.column;
-  include ../../publicModules/toColumn/toColumn
 block scripts
   +includeJS("/columns/settings/editCategory.js")

@@ -6,7 +6,7 @@ router
     await next();
   })
   .put('/', async (ctx, next) => {
-    const {body, data} = ctx;
+    const {body, data, db} = ctx;
     const {user} = data;
     let {close} = body;
     close = !!close;
@@ -16,7 +16,9 @@ router
     if(close) {
       q['lotterySettings.status'] = false;
     }
-    await user.generalSettings.updateOne(q);
+    await db.UsersGeneralModel.updateOne({uid: user.uid}, {
+      $set: q
+    });
     await next();
   });
 module.exports = router;

@@ -49,12 +49,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if remoteState.uid
-          - var title = `${remoteState.userInfo.name}\n`+`学术分 ${remoteState.userInfo.xsf}\n`+`${remoteState.userInfo.certsName}`;
-          //-li
-            -let editorHref = "/editor";
-            if data.forum
-              -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
-            a(href=editorHref target='_blank') 创作中心
           li
             a(href='/creation' target="_blank") 创作中心
           li.new-message.message-switch.pointer.message-count-container(class="hidden" onclick="RootApp.openChatPanel()")

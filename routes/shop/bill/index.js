@@ -171,6 +171,9 @@ router
     if(count > paramCount) {
       ctx.throw(400, "购买商品不得超当前库存");
     }
+    if(data.user) {
+      await data.user.extendAuthLevel();
+    }
     // 检测限购
     const product = await db.ShopGoodsModel.findOne({productId: productParam.productId});
     data.sellUid = product.uid;
@@ -209,6 +212,9 @@ router
     data.productId = product.productId;
     // 计算小计价格（包含vip折扣价）
     // 计算小计价格(包括vip价格)
+    if(data.user) {
+      await data.user.extendAuthLevel();
+    }
     let vipNum = 100;
     if(product.vipDiscount) {
       for(let v=0;v<product.vipDisGroup.length;v++) {

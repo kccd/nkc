@@ -213,6 +213,9 @@ threadRouter
     let sameThreads = [];
 
 
+    if(data.user) {
+      await data.user.extendAuthLevel();
+    }
 
     // 拓展POST时的相关配置
     const extendPostOptions = {
@@ -495,9 +498,10 @@ threadRouter
     }
 
     // 判断用户是否将当前文章加入到了自己的专栏
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
     if(data.user) {
-      if(state.userColumn) {
-        addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
+      if(userColumn) {
+        addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
       if(thread.uid === data.user.uid) {
         // 标记未读的回复提醒为已读状态
@@ -546,6 +550,8 @@ threadRouter
       }
     }
 
+    let userSubscribeUsersId = [];
+
     // 判断是否收藏、关注，是否可以发表匿名内容
     if(data.user) {
       const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: thread.tid, type: "collection"});
@@ -560,6 +566,7 @@ threadRouter
       });
       if(sub) subscribed = true;
       sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid, thread.mainForumsId);
+      userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }
 
     // 判断文章是否置顶
@@ -772,11 +779,11 @@ threadRouter
     const creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
 
     // 访问者的专栏
-    const userColumn = state.userColumn;
-    const columnPermission = state.columnPermission;
+
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
 
     // 是否关注作者
-    const subscribeAuthor = !!(data.user && state.subUsersId.includes(authorId));
+    const subscribeAuthor = !!(data.user && userSubscribeUsersId.includes(authorId));
 
     // 文章访问次数加一
     await thread.updateOne({$inc: {hits: 1}});
@@ -788,8 +795,8 @@ threadRouter
     data.cat = thread.cid;
     data.pid = pid;
     data.firstPostCredit = firstPostCredit;
-    data.userColumn = state.userColumn;
-    data.columnPermission = state.columnPermission;
+    data.userColumn = userColumn;
+    data.columnPermission = columnPermission;
     data.serverBrief = serverBrief;
     data.serverBackgroundColor = serverBackgroundColor;
     data.pageTitle = pageTitle;
@@ -797,8 +804,6 @@ threadRouter
     data.step = step;
     data.replyTarget = `t/${thread.tid}`;
     data.thread = thread.toObject();
-    data.userColumn = userColumn;
-    data.columnPermission = columnPermission;
     data.forums = forums;
     data.posts = posts;
     data.targetUserThreads = targetUserThreads;
@@ -840,6 +845,7 @@ threadRouter
     data.postPermission = postPermission;
     data.authorAvatarUrl = authorAvatarUrl;
     data.authorRegisterInfo = authorRegisterInfo;
+    data.userSubscribeUsersId = userSubscribeUsersId;
 
     // 商品信息
     if(threadShopInfo) {
@@ -1171,9 +1177,10 @@ threadRouter
 		data.cat = thread.cid;
 		// 若当前用户已登录，则加载用户已发表的文章
 		if(data.user) {
+      const userColumn = await db.UserModel.getUserColumn(state.uid);
 		  data.usersThreads = await data.user.getUsersThreads();
-			if(state.userColumn) {
-			  data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
+			if(userColumn) {
+			  data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
 			if(thread.uid === data.user.uid) {
 			  // 标记未读的回复提醒为已读状态
@@ -1541,8 +1548,9 @@ threadRouter
     data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
-    if(columnMainCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [data.thread.oc]);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
+    if(columnMainCategoriesId.length > 0 && userColumn) {
+      await db.ColumnPostModel.addColumnPosts(userColumn, columnMainCategoriesId, columnMinorCategoriesId, [data.thread.oc]);
     }
 
     // 发表匿名内容

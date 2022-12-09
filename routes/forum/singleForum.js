@@ -82,8 +82,9 @@ router
     }
 
     // 转发到专栏
-    if(columnMainCategoriesId.length > 0 && state.userColumn) {
-      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnMainCategoriesId, columnMinorCategoriesId, [_post.pid]);
+		const userColumn = await db.UserModel.getUserColumn(state.uid);
+    if(columnMainCategoriesId.length > 0 && userColumn) {
+      await db.ColumnPostModel.addColumnPosts(userColumn, columnMainCategoriesId, columnMinorCategoriesId, [_post.pid]);
     }
 
     // 发表匿名内容
@@ -268,6 +269,10 @@ router
 
 		data.subUsers = await db.UserModel.extendUsersInfo(data.subUsers);
 
+		if(data.user) {
+			data.userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+		}
+
     await forum.extendParentForums();
 		// 加载网站公告
 		await forum.extendNoticeThreads();
@@ -368,7 +373,7 @@ router
 
     // 记录专业访问记录
 		if(data.user) {
-			const {visitedForumsId = []} = data.user.generalSettings;
+			const visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(data.user.uid);
 			const index = visitedForumsId.indexOf(fid);
 			if(index !== -1) {
 				visitedForumsId.splice(index, 1);

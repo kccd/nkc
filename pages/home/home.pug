@@ -11,15 +11,15 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
         +renderVisitedForums(data.visitedForums)
-        +renderCategoryForums(state.categoryForums)
+        +renderCategoryForums(data.categoriesWithForums)
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
-        if !state.isApp && data.user && state.subForums.length
+        if !state.isApp && data.user && data.subForums.length
           .m-b-1
             .panel-header 我关注的专业
               .panel-header-right-button
                 a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
             .visited-forums
-              for f in state.subForums
+              for f in data.subForums
                 .visited-forum(
                   data-global-mouseover="showForumPanel"
                   data-global-mouseout="hideForumPanel"

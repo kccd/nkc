@@ -23,9 +23,11 @@ router
     } else {
       ctx.remoteTemplate = 'vueRoot/index.pug';
     }
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
     data.column = {
-      userColumn: state.userColumn,
-      columnPermission: state.columnPermission,
+      userColumn: userColumn,
+      columnPermission: columnPermission,
       addedToColumn: state.addedToColumn
     };
     // 取网站代号

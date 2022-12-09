@@ -19,14 +19,14 @@ block content
         .user-name(id="username")=data.user.username
         .user-certs
           img(src=tools.getUrl("gradeIcon", data.user.grade._id))
-          span=data.user.info.certsName
+          span=data.userCertsName
         .user-description(id="userDescription")=data.user.description || "未填写个人简介"
     .nav-banner-mask(data-global-click='viewImage' data-global-data=objToStr({name: 'banner', url: bannerUrl}))
     .nav-banner(style=`background-image: url(${bannerUrl})` id="userBanner")
     .nav-content
       .nav-scores
         include ../../publicModules/userScores
-        +userScores(state.userScores)
+        +userScores(data.userScores)
       .nav-numbers
         a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
           .name 文章
@@ -45,14 +45,14 @@ block content
           span 我的名片
           .icon-right
             .fa.fa-angle-right
-        if state.userColumn
-          a.nav-link(href=`/m/${state.userColumn._id}`)
+        if data.userColumn
+          a.nav-link(href=`/m/${data.userColumn._id}`)
             .icon-left
               .fa.fa-columns
             span 我的专栏
             .icon-right
               .fa.fa-angle-right
-        else if data.user && state.columnPermission
+        else if data.user && data.columnPermission
           a.nav-link(href=`/column/apply`)
             .icon-left
               .fa.fa-columns

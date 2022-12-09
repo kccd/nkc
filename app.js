@@ -43,7 +43,6 @@ const {
   filterDomain,
 } = require('./middlewares');
 
-const cookieConfig = require("./config/cookie");
 const uploadConfig = require('./config/upload');
 
 const koaBodySetting = settings.upload.koaBodySetting;
@@ -67,10 +66,10 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
-  .use(initAddress)
   .use(init)
-  .use(initCtxMethods)
+  .use(initAddress)
   .use(initState)
+  .use(initCtxMethods)
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
@@ -86,5 +85,5 @@ app
   .use(permission)
   .use(logger)
   .use(mainRouter.routes())
-  .use(body);
+  .use(body)
 module.exports = app.callback();

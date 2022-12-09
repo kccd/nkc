@@ -1,5 +1,4 @@
 const rateLimit = require('koa-ratelimit');
-const redisClientCache = require('../settings/redisClientCache');
 const fs = require('fs');
 const redis = require('ioredis');
 const redisConfig = require('../config/redis');

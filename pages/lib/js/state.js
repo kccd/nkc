@@ -5,7 +5,6 @@ export function getState() {
     isApp: false,
     appOS: '',
     platform: '',
-    selectTypesWhenSubscribe: false,
     refererOperationId: '',
     fileDomain: '',
     websiteCode: '',
@@ -21,7 +20,6 @@ export function getState() {
     state.isApp = windowData.isApp;
     state.appOS = windowData.appOS;
     state.platform = windowData.platform;
-    state.selectTypesWhenSubscribe = windowData.selectTypesWhenSubscribe;
     state.refererOperationId = windowData.refererOperationId;
     state.newMessageCount = 0;
     state.fileDomain = windowData.fileDomain;
@@ -36,7 +34,6 @@ export function getState() {
     state.statement = windowData.statement;
     state.copyright = windowData.copyright;
     state.record = windowData.record;
-    state.appStableVersion = windowData.appStableVersion;
     return state;
   } catch(err) {
     console.error(`获取 state 数据失败`);

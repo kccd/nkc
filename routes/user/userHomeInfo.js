@@ -51,7 +51,8 @@ router
     //获取用户名片，用户消息等信息
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
       if(data.user) {
-        data.subscribed = state.subUsersId.includes(uid);
+        const subscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+        data.subscribed = subscribeUsersId.includes(uid);
         data.friend = null;
         const friend = await db.FriendModel.findOne({uid: data.user.uid, tUid: data.targetUser.uid});
         if(friend) {
@@ -101,8 +102,8 @@ router
       }
     });
     if(user) {
-      data.userSubUid = state.subUsersId;
-      data.userSubFid = state.subForumsId;
+      data.userSubUid = await db.SubscribeModel.getUserSubUsersId(user.uid);
+      data.userSubFid = await db.SubscribeModel.getUserSubForumsId(user.uid);
     }
 
     const targetUserDigestThreads = await db.ThreadModel.find({

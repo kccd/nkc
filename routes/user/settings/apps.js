@@ -42,6 +42,10 @@ router
     data.videoFlex = uploadSettings.watermark.video.flex;
     data.hasColumn = !!column;
     data.columnName = column?column.name:"";
+    data.generalSettings = await db.UsersGeneralModel.findOne({uid: user.uid}, {
+      lotterySettings: 1,
+      subscribeSettings: 1,
+    });
     ctx.template = "interface_user_settings_apps.pug";
     await next();
   })
@@ -52,7 +56,10 @@ router
       color
     } = body;
     const q = {};
-    const oldHomeThreadList = data.user.generalSettings.displaySettings.homeThreadList;
+    const generalSettings = await db.UsersGeneralModel.findOne({uid: data.user.uid}, {
+      displaySettings: 1,
+    });
+    const oldHomeThreadList = generalSettings.displaySettings.homeThreadList;
     if(homeThreadList !== undefined) {
       if(!["home", "latest", "subscribe"].includes(homeThreadList)) ctx.throw(400, `首页内容设置错误，未知类型：${homeThreadList}`);
       q[`displaySettings.homeThreadList`] = homeThreadList;

@@ -41,7 +41,7 @@ block content
               .column-bottom-container
                 .column-buttons
                   a.m-r-05.btn.btn-xs.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏
-                  -var subscribed = state.subColumnsId ? state.subColumnsId.includes(column._id) : false;
+                  -var subscribed = data.subColumnsId ? data.subColumnsId.includes(column._id) : false;
                   -var klass = subscribed ? 'btn-default' : 'btn-primary';
                   -var text = subscribed ? '已关注' : '关注'
                   button.m-r-05.column-subscription.btn.btn-xs(
@@ -72,7 +72,7 @@ block content
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   script.
-    if(!window.SubscribeTypes) {
+    if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
       window.SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
     function subscribeColumn(columnId) {

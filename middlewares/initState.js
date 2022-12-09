@@ -25,12 +25,6 @@ module.exports = async (ctx, next) => {
     threadSettings: await db.SettingModel.getSettings('thread'),
     // 缓存相关
     cachePage: false,
-    // 获取app稳定版本
-    appStableVersion: await db.AppVersionModel.findOne({
-      appPlatForm: "android",
-      stable: true,
-      disabled: false
-    }),
     fileDomain: serverConfig.fileDomain || ''
   };
 

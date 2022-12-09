@@ -39,9 +39,10 @@ router
     };
     if(user) {
       // 推送到专栏
-      if(state.userColumn && isThread) {
-        data.userColumnId = state.userColumn._id;
-        optionStatus.inColumn = await db.ColumnPostModel.checkColumnPost(state.userColumn._id, pid);
+      const userColumn = await db.UserModel.getUserColumn(state.uid);
+      if(userColumn && isThread) {
+        data.userColumnId = userColumn._id;
+        optionStatus.inColumn = await db.ColumnPostModel.checkColumnPost(userColumn._id, pid);
       }
       if(isThread) {
         // 收藏

@@ -165,6 +165,9 @@ export default {
     }
   },
   methods: {
+    getSubscribeSettings() {
+      return nkcAPI('/account/subscribe_settings', 'GET').then(res => res.subscribeSettings);
+    },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
       this.draggableElement.setPositionCenter();
@@ -199,9 +202,6 @@ export default {
       if(!this.hideInfo && this.selectTypesWhenSubscribe && this.selectTypesWhenSubscribe.length > 0) {
         var uid = NKC.configs.uid;
         nkcAPI("/u/" + uid + "/settings/apps", "PUT", {selectTypesWhenSubscribe: false})
-          .then(function() {
-            NKC.configs.selectTypesWhenSubscribe = false;
-          })
           .catch(function(data) {
             screenTopWarning(data);
           })
@@ -278,40 +278,44 @@ export default {
           sweetError(data);
         })
     },
-    open(callback, options) {
-      const self = this;
-      options = options || {};
-      if(options.selectTypesWhenSubscribe === undefined) {
-        options.selectTypesWhenSubscribe = !!NKC.configs.selectTypesWhenSubscribe;
+    async open(callback, options) {
+      try{
+        const self = this;
+        options = options || {};
+        if(options.selectTypesWhenSubscribe === undefined) {
+          const subscribeSettings = await this.getSubscribeSettings();
+          options.selectTypesWhenSubscribe = !!subscribeSettings.selectTypesWhenSubscribe;
+        }
+        if(!options.selectTypesWhenSubscribe) return callback([]);
+        self.editType = options.editType || false;
+        self.hideInfo = options.hideInfo || false;
+        self.edit = !!options.edit;
+        self.selectedTypesId = [];
+        self.callback = callback;
+        await self.getTypes();
+        // 修改分类
+        if(self.edit && options.typeId) {
+          var type = self.getTypeById(options.typeId);
+          if(type) {
+            self.type = type;
+          }
+        }
+        // 更改关注分类
+        if(options.selectedTypesId && options.selectedTypesId.length > 0) {
+          self.selectedTypesId = [];
+          for(var i = 0; i < options.selectedTypesId.length; i++) {
+            var typeId = options.selectedTypesId[i];
+            var t = self.getTypeById(typeId);
+            if(t) self.selectedTypesId.push(t._id);
+          }
+        }
+        self.callback = callback;
+        self.draggableElement.show();
+        self.show = true;
+      } catch(err) {
+        sweetError(err);
       }
-      if(!options.selectTypesWhenSubscribe) return callback([]);
-      self.editType = options.editType || false;
-      self.hideInfo = options.hideInfo || false;
-      self.edit = !!options.edit;
-      self.selectedTypesId = [];
-      self.callback = callback;
-      self.getTypes()
-        .then(function() {
-          // 修改分类
-          if(self.edit && options.typeId) {
-            var type = self.getTypeById(options.typeId);
-            if(type) {
-              self.type = type;
-            }
-          }
-          // 更改关注分类
-          if(options.selectedTypesId && options.selectedTypesId.length > 0) {
-            self.selectedTypesId = [];
-            for(var i = 0; i < options.selectedTypesId.length; i++) {
-              var typeId = options.selectedTypesId[i];
-              var t = self.getTypeById(typeId);
-              if(t) self.selectedTypesId.push(t._id);
-            }
-          }
-        });
-      self.callback = callback;
-      self.draggableElement.show();
-      self.show = true;
+
     },
     close() {
       this.draggableElement.hide();

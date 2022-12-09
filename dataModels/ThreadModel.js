@@ -1089,7 +1089,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
 
   // 验证是否完善过资料
   await user.ensureUserInfo();
-  if(!user.authLevel) await user.extendAuthLevel();
+  await user.extendAuthLevel();
   const postSettings = await SettingModel.findOnly({_id: 'post'});
   let {authLevelMin, exam} = postSettings.c.postToForum;
   authLevelMin = Number(authLevelMin);

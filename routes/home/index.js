@@ -96,29 +96,6 @@ router
     }
     if(!t) {
       threadListType = 'home';
-      /*if(!user) {
-        const {visitorThreadList} = homeSettings;
-        if(visitorThreadList === "latest") {
-          threadListType = "latest"
-        } else if(visitorThreadList === "recommend") {
-          threadListType = "recommend"
-        } else if(visitorThreadList === "home"){
-          threadListType = "home";
-        } else {
-          threadListType = "column";
-        }
-      } else {
-        const {homeThreadList} = user.generalSettings.displaySettings;
-        if(homeThreadList === "latest") {
-          threadListType = "latest";
-        } else if(homeThreadList === "subscribe") {
-          threadListType = "subscribe";
-        } else if(homeThreadList === "home") {
-          threadListType = "home";
-        } else {
-          threadListType = "column";
-        }
-      }*/
     }
 
     data.t = threadListType;
@@ -163,8 +140,10 @@ router
 
     // 最近访问的专业
     if(data.user) {
-      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
+      let visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(data.user.uid);
+      visitedForumsId = visitedForumsId.slice(0, 5);
       data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
+      data.subForums = await db.ForumModel.getUserSubForums(data.user.uid, fidOfCanGetThreads);
     }
 
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];
@@ -734,6 +713,11 @@ router
     }
     data.appsData = await db.SettingModel.getAppsData();
     data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
+    data.categoriesWithForums = await db.ForumModel.getUserCategoriesWithForums({
+      user: data.user,
+      userRoles: data.userRoles,
+      userGrade: data.userGrade,
+    });
     ctx.template = "home/home.pug";
     await next();
   });
