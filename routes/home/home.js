@@ -68,6 +68,7 @@ module.exports = async (options) => {
     user: data.user,
     userRoles: data.userRoles,
     userGrade: data.userGrade,
+    limitLevel: true,
   });
 
   // 置顶专栏
