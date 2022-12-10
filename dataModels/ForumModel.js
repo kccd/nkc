@@ -2518,12 +2518,26 @@ forumSchema.statics.checkAccessControlPermissionWithThrowError = async (props) =
 forumSchema.statics.getUserCategoriesWithForums = async (props) => {
   const ForumModel = mongoose.model('forums');
   const ForumCategoryModel = mongoose.model('forumCategories');
-  const {user, userRoles, userGrade} = props;
-  const forumsTree = await ForumModel.getForumsTree(
+  const {
+    user,
     userRoles,
     userGrade,
-    user
-  );
+    limitLevel = false,
+  } = props;
+  let forumsTree;
+  if(limitLevel) {
+    forumsTree = await ForumModel.getForumsTreeLevel2(
+      userRoles,
+      userGrade,
+      user,
+    );
+  } else {
+    forumsTree = await ForumModel.getForumsTree(
+      userRoles,
+      userGrade,
+      user,
+    );
+  }
   const forumsObj = {};
   for(const f of forumsTree) {
     const {categoryId} = f;

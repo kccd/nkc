@@ -27,6 +27,7 @@ router
       user: data.user,
       userRoles: data.userRoles,
       userGrade: data.userGrade,
+      limitLevel: true,
     });
 
     // 是否启用了基金
