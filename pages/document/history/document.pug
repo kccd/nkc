@@ -30,9 +30,9 @@ block content
           if data.history.length
             include ../../columns/article/nav
             +nav({})
-            -var {uid, origin: originState, toc, title: t, type, authorInfos, user} = data.document
+            -var {uid, origin: originState, dt, title: t, type, authorInfos, user} = data.document
             include ../../columns/article/title
-            +title({uid, originState, toc, t, type, authorInfos, user})
+            +title({uid, originState, dt, t, type, authorInfos, user})
             if data.type !== "draft"
               if (data.document.abstract.length || data.document.abstractEN.length)
                 .abstract(style="margin-top:1rem; word-break: break-all;")

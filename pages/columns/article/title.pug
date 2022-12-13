@@ -3,13 +3,13 @@
   @params {Array} authorInfos 文章作者
   @params {String} uid 用户id
   @params {String} userAvatar
-  @params {String} toc  文章创建时间
+  @params {String} dt  文章创建时间
   @params {String} originState  文章源
   @params {String} name 专栏名
   @params {String} _id 专栏ID
   @params {String} type 文章类型
 mixin title(data)
-  -var {t, authorInfos, uid, toc, originState, name, _id, user ,type, article} = data;
+  -var {t, authorInfos, uid, dt, toc, originState, name, _id, user ,type, article} = data;
   if authorInfos && authorInfos.length  && type !== "product"
     -var agencyIndex = 1;
     -var agencyArray = [];
@@ -66,7 +66,7 @@ mixin title(data)
         img(src=tools.getUrl('userAvatar', user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
         //- if authorInfos && authorInfos[0]
         span.kcid=user.username
-      span.modify-time.m-r-05(title=tools.timeFormat(new Date(toc)))=format('YYYY-MM-DD', new Date(toc))
+      span.modify-time.m-r-05(title=tools.timeFormat(new Date(dt || toc)))=format('YYYY-MM-DD', new Date(dt || toc))
       if ['3','4','5','6'].includes(String(originState))
         span.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown() 原创
           .dropdown-menu(aria-labelledby='dropdown-level')

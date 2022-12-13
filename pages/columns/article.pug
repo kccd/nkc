@@ -1,7 +1,7 @@
 extends ./pageBase
 block baseColumnTitle
-    title=`${data.columnPost.post.t}`
-    +includeCSS('/columns/article/article.css')
+  title=`${data.columnPost.post.t}`
+  +includeCSS('/columns/article/article.css')
 block baseColumnContent
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
   -var {_id, name} = column
@@ -19,7 +19,7 @@ block baseColumnContent
       //- 文章管理员操作
       +setUp()
       include ./article/title
-      +title({t, article, uid, toc, originState, name, _id, authorInfos, user, type})
+      +title({t, article, uid, dt, toc, originState, name, _id, authorInfos, user, type})
       include ./article/abstract
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./article/content

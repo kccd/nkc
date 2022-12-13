@@ -22,6 +22,17 @@ const app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     format: NKC.methods.format,
     visitUrl: NKC.methods.visitUrl,
+    shareSticker(s, status) {
+      nkcAPI("/nkc/sticker", "POST", {
+        stickers: [s],
+        shared: !!status,
+        type: "shared"
+      })
+        .then(() => {
+          s.shared = !!status;
+        })
+        .catch(sweetError)
+    },
     checkString: NKC.methods.checkData.checkString,
     setAll(t) {
       this.stickers.map(s => {

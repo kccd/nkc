@@ -23,11 +23,11 @@ block content
         //-     span 收藏
         //-   .nav-count
         //-     .fa.fa-cog
-        -var {uid, origin: originState, toc, title: t, type, authorInfos, user} = data.document
+        -var {uid, origin: originState, dt, title: t, type, authorInfos, user} = data.document
         include ../../columns/article/title
-        +title({uid, originState, toc, t, type, authorInfos, user})
+        +title({uid, originState, dt, t, type, authorInfos, user})
         if data.type !== "draft"
-          if (data.document.abstract.length || data.document.abstractEN.length) 
+          if (data.document.abstract.length || data.document.abstractEN.length)
             .abstract(style="margin-top:1rem; word-break: break-all;")
               if data.document.abstract.length
                 .panel.panel-default(style="border:0;margin-bottom:0")
@@ -37,7 +37,7 @@ block content
                 .panel.panel-default(style="border:0;margin-bottom:0")
                   .panel-heading.paperHeader Abstract
                   .panel-body!=LineFeedConversion(data.document.abstractEN)
-          if (data.document.keywords.length || data.document.keywordsEN.length) 
+          if (data.document.keywords.length || data.document.keywordsEN.length)
             .keyWords(style="margin-top:1rem;")
               .panel.panel-default(style="border:0;margin-bottom:0")
                 .panel-heading.paperHeader 关键词
@@ -52,7 +52,7 @@ block content
                         span.keyWordstagEn(style="cursor:pointer")!=keyEn
         .book-content-content!=data.document.content
         include ../../columns/article/authorInfo.pug
-        +authorInfo() 
+        +authorInfo()
         include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
 
 block scripts

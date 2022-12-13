@@ -10,16 +10,28 @@ router
     };
     if(t === "unReviewed") {
       q.reviewed = null;
-      q.shared = false;
+      // q.shared = false;
+      // 增加分享状态条件
+      q.shared = true;
     } else if(t === "reviewed") {
-      q.reviewed = {$ne: null};
+      // q.reviewed = {$ne: null};
+      // 改为已共享并且已审核的
+      q.reviewed = true;
+      q.shared = true;
     } else if(t === "unShared") {
       q.shared = false;
       q.reviewed = true;
     } else if(t === "shared") {
       q.shared = true;
+      // 增加已审核
+      q.reviewed = true;
     } else if(t === "disabled") {
       q.disabled = true;
+      // 增加未删除条件
+      q.deleted = false;
+      // 增加已删除
+    } else if (t === "deleted") {
+      q.deleted = true;
     }
     const count = await db.StickerModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
@@ -47,7 +59,9 @@ router
         const sticker = await db.StickerModel.findOne({
           from: "upload",
           _id: s._id,
-          shared: false,
+          // shared: false,
+          // 改为 share: true
+          shared: true,
           reviewed: null
         });
         if(!sticker) continue;
@@ -93,6 +107,18 @@ router
           "sm": 60,
           "xs": 30
         }[size]);
+      }
+    } else if (type === "shared") {
+      for(const s of stickers) {
+        const sticker = await db.StickerModel.findOne({
+          from: "upload",
+          _id: s._id,
+          shared: s.shared,
+        });
+        if(!sticker) continue;
+        await sticker.updateOne({
+          shared: !!body.shared
+        });
       }
     }
     await next();

@@ -19,6 +19,8 @@ block nkcContent
           a(href=`/nkc/sticker?t=unShared`) 未共享
         li(class=data.t === "shared" ? "active" : "")
           a(href=`/nkc/sticker?t=shared`) 已共享
+        li(class=data.t === "deleted" ? "active" : "")
+          a(href=`/nkc/sticker?t=deleted`) 已删除
       if ["unReviewed", "reviewed"].includes(data.t)
         .options-button
           if data.t === "unReviewed"
@@ -38,6 +40,7 @@ block nkcContent
               th 用户
               th 共享状态
               th 是否屏蔽
+              th 是否删除
               th 其他
           tbody
             tr.sticker-list(v-for="s in stickers" :class="{'gray': s.disabled}")
@@ -54,10 +57,12 @@ block nkcContent
                 a(@click="visitUrl('/u/' + s.uid, true)") {{s.user.username}}
               th
                 span(v-if="s.shared") 已共享
+                  button.btn.btn-xs.btn-danger(@click="shareSticker(s, false)") 关闭
                 span(v-else)
                   span(v-if="s.reviewed === null") 待审核
                   span(v-if="s.reviewed === false") 未共享，审核未通过
                   span(v-if="s.reviewed === true") 未共享
+                  button.btn.btn-xs.btn-danger(@click="shareSticker(s, true)") 启用
               th
                 div(v-if="s.disabled")
                   span 是&nbsp;
@@ -66,6 +71,9 @@ block nkcContent
                 div(v-else)
                   span 否&nbsp;
                   button.btn.btn-xs.btn-danger(@click="disableSticker(s, true)") 屏蔽
+              th
+                div
+                  span {{ s.deleted ? "是" :  "否" }}
               th
                 .text-danger(v-if="s.reviewed === false")
                   div 原因：{{s.reason || "暂未填写"}}

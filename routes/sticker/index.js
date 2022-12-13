@@ -47,6 +47,8 @@ router
         shared: true,
         disabled: false,
         deleted: false,
+        // 热门表情增加审核通过条件
+        reviewed: true,
       }).sort({hits: -1}).limit(24);
       data.paging = paging;
       data.emoji = state.twemoji;
@@ -77,8 +79,16 @@ router
     } else if(type === "collection") {
       for(const _id of stickersId) {
         const sticker = await db.StickerModel.findOne({_id, from: "upload", shared: true});
-        if(!sticker || sticker.tUid === data.user.uid) continue;
-        await db.StickerModel.collectionSticker(sticker, data.user.uid);
+        // if(!sticker || sticker.tUid === data.user.uid) continue;
+        if(!sticker) continue;
+        // 上传者删除后再次添加
+        if (sticker.tUid === data.user.uid && sticker.deleted) {
+          await sticker.updateOne({
+            deleted: false,
+          })
+        } else if (sticker.tUid !== data.user.uid) {
+          await db.StickerModel.collectionSticker(sticker, data.user.uid);
+        }
       }
     } else if(type === "share") {
       for(const _id of stickersId) {
