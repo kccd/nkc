@@ -5,6 +5,8 @@ import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
 import {getDataById} from "../../lib/js/dataConversion";
 import {EventBus} from "../../spa/eventBus";
+import {RNSetSharePanelStatus} from "../../lib/js/reactNative";
+import {shareTypes} from "../../lib/js/shareTypes";
 const data = getDataById('data');
 const app = new Vue({
   el: "#app",
@@ -28,6 +30,17 @@ const app = new Vue({
     EventBus.$on('violation-record', function (uid) {
       self.$refs.violationRecord.open({uid});
     });
+    let momentInfo;
+    const momentData = JSON.parse(JSON.stringify(data.momentListData));
+    if(NKC.configs.isApp) {
+      if(momentData.quoteData){
+        const data = momentData.quoteData.data;
+        momentInfo = {title:data.title,content:data.content}
+      }else {
+        momentInfo = {title:momentData.username,content:momentData.content}
+      }
+      RNSetSharePanelStatus(true,shareTypes.moment, momentData.momentId,JSON.stringify(momentInfo))
+    }
   },
   methods: {
 

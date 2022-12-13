@@ -408,11 +408,13 @@ export function RNSetPageTitle(title) {
 }
 /*
 * thread系列触发分享显示
+* data 需要携带的数据，需要JSON.stringify
 * */
-export function RNSetSharePanelStatus(show = true,type,id) {
+export function RNSetSharePanelStatus(show = true,type,id,data) {
   RNEmit('setSharePanelStatus', {
     show,
     type,
-    id
+    id,
+    data
   });
 }

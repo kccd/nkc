@@ -1,5 +1,5 @@
 <template lang="pug">
-  .moment-options( v-show="show" @click="")
+  .moment-options( v-show="show")
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
@@ -25,6 +25,14 @@
       //.option(v-if='options.ipInfo !== null' @click='displayIpInfo')
       //  .fa.fa-map-marker
       //  span 查看IP
+      //- 分享按钮
+      .option(
+        data-global-click='showSharePanel'
+        :data-global-data="objToStr({type: 'moment', id: moment.momentId})"
+        title='分享'
+      )
+        .fa.fa-share-square-o
+        span 分享
       .option.time
         span {{timeFormat(toc)}}
 </template>
@@ -90,7 +98,7 @@
 
 <script>
 import {nkcAPI} from "../../../js/netAPI";
-import {timeFormat} from "../../../js/tools";
+import {timeFormat, objToStr} from "../../../js/tools";
 import {EventBus} from "../../../../spa/eventBus";
 import {visitUrl} from "../../../js/pageSwitch";
 export default {
@@ -109,6 +117,7 @@ export default {
     })
   },
   methods: {
+    objToStr: objToStr,
     timeFormat: timeFormat,
     clickElement(e) {
       e.stopPropagation();
