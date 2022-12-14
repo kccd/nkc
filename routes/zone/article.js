@@ -1,13 +1,5 @@
 const router = require('koa-router')();
 const {renderMarkdown} = require('../../nkcModules/markdown');
-
-function isIncludes(arr, id, type) {
-  for(const a of arr) {
-    if(a.id === id && a.type === type)  return true;
-  }
-  return false;
-}
-
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
