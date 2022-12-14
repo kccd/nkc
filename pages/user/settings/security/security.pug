@@ -41,15 +41,15 @@ block content
                 label.col-sm-2.control-label 已绑定手机号：
                 .col-sm-6
                   h4=`+${data.nationCode} ${data.mobile}`
-                  if data.needPhoneVerify 
-                    span.text-danger(v-if='!formType') 手机号待验证，请点击验证按钮验证手机号，以获取更多权限
+                  if data.needPhoneVerify
+                    span.text-danger(v-if='!formType') 您的账号可能存在安全风险，请点击验证按钮验证手机号，以获取更多权限
               .form-group(v-if="!formType")
                 label.col-sm-2.control-label
                 .col-sm-4
                   button.btn.btn-primary(@click="formType = 'changeMobile'") 更换手机
                   if data.needPhoneVerify
                     button.btn.btn-primary(@click="toPhoneVerify()") 验证
-                  button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑  
+                  button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑
             .form-horizontal(v-if="formType === 'bind'")
               .form-group
                 label.col-sm-2.control-label 国际区号：

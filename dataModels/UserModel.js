@@ -2645,7 +2645,7 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const shouldVerifyPhoneNumber = await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
   if(shouldVerifyPhoneNumber) {
     result.warning = result.warning || '';
-    result.warning += `<div>请参与定期验证手机号，验证前你所发表的内容需通过审核后才能显示。<a href="/u/${uid}/settings/security" target="_blank">去验证</a></div>`;
+    result.warning += `<div>您的账号可能存在安全风险，请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号，验证前你所发表的内容需通过审核后才能显示。</div>`;
   }
   return result;
 };
