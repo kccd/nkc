@@ -117,10 +117,11 @@ export default {
     },
     //点击分页
     clickButton(num) {
-      this.getUserCardInfo(num);
+      this.getUserCardInfo(num, this.t);
     },
     //跳转到动态指定类型
     toType(type) {
+      this.t = type;
       this.getUserCardInfo(0, type);
     },
     onPublished() {

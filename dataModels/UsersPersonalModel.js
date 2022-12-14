@@ -557,7 +557,7 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
   const authSettings = await SettingModel.getSettings('auth');
   if(!authSettings.verifyPhoneNumber.enabled) return false;
 	if(!userPersonal.lastVerifyPhoneNumberTime) return true;
-	const lastVerifyPhoneNumberTime = userPersonal.lastVerifyPhoneNumberTime
+	const lastVerifyPhoneNumberTime = userPersonal.lastVerifyPhoneNumberTime;
 	const interval = authSettings.verifyPhoneNumber.interval * 60 * 60 * 1000;
   return Date.now() - lastVerifyPhoneNumberTime.getTime() > interval
 }

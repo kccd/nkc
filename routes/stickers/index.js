@@ -6,7 +6,9 @@ router
     const q = {
       disabled: false,
       deleted: false,
-      shared: true
+      shared: true,
+      // 加入审核通过条件
+      reviewed: true,
     };
     const {
       notesAboutUploading,

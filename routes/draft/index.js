@@ -4,8 +4,8 @@ const nkcRender = require('../../nkcModules/nkcRender');
 // const desTypeMap = {
 //   newThread: 'forum',
 //   newPost: "thread",
-//   modifyThread: 'post', 
-//   modifyPost: 'post', 
+//   modifyThread: 'post',
+//   modifyPost: 'post',
 // }
 const allowedDesTypes = ['newThread', 'modifyThread', 'newPost', 'modifyPost', 'newComment', 'modifyComment'];
 router
