@@ -19,9 +19,10 @@
           button.btn.btn-sm.btn-primary.m-r-05(@click="shareSticker" v-if="!sticker.shared && sticker.reviewed && uid === sticker.tUid") 设为共享
           button.btn.btn-sm.btn-primary.m-r-05(@click="moveSticker") 移到最前
           button.btn.btn-sm.btn-danger(@click="removeSticker") 删除
-      .sticker-option(v-else-if="sticker.shared")
+      // 分享审核通过后才能显示
+      .sticker-option(v-else-if="sticker.shared && sticker.reviewed")
         button.btn.btn-sm.btn-theme(@click="collection") 添加到表情
-      .sticker-warning(v-if="sticker.shared").pre-wrap {{notesAboutUsing}}
+      .sticker-warning(v-if="sticker.shared && sticker.reviewed").pre-wrap {{notesAboutUsing}}
 </template>
 
 <style lang="less" scoped>
@@ -196,15 +197,15 @@ export default {
       this.loading = true;
       const self = this;
       nkcAPI(`/sticker/${rid}?t=json`, 'GET')
-      .then(data => {
-        self.sticker = data.sticker;
-        self.loading = false;
-        self.notesAboutUsing = data.notesAboutUsing;
-      })
-      .catch(err => {
-        sweetError(err);
-        self.close();
-      })
+        .then(data => {
+          self.sticker = data.sticker;
+          self.loading = false;
+          self.notesAboutUsing = data.notesAboutUsing;
+        })
+        .catch(err => {
+          sweetError(err);
+          self.close();
+        })
     },
     close() {
       this.draggableElement.hide();
