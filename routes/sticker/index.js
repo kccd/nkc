@@ -78,7 +78,7 @@ router
       }
     } else if(type === "collection") {
       for(const _id of stickersId) {
-        const sticker = await db.StickerModel.findOne({_id, from: "upload", shared: true});
+        const sticker = await db.StickerModel.findOne({_id, from: "upload", shared: true, reviewed: true});
         // if(!sticker || sticker.tUid === data.user.uid) continue;
         if(!sticker) continue;
         // 上传者删除后再次添加

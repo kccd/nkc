@@ -108,7 +108,7 @@ router
           "xs": 30
         }[size]);
       }
-    } else if (type === "shared") {
+    } else if (type === "setShareStatus") {
       for(const s of stickers) {
         const sticker = await db.StickerModel.findOne({
           from: "upload",

@@ -82,7 +82,7 @@ mobileRouter
 		await smsCode.updateOne({used: true});
 		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		await userPersonal.updateOne({nationCode, mobile, unverifiedMobile: ''});
+		await userPersonal.updateOne({nationCode, mobile, unverifiedMobile: '', lastVerifyPhoneNumberTime: new Date()});
 		await db.SecretBehaviorModel({
 			type: "bindMobile",
 			uid: user.uid,

@@ -25,7 +25,7 @@ block content
         //-     .fa.fa-cog
         -var {uid, origin: originState, dt, title: t, type, authorInfos, user} = data.document
         include ../../columns/article/title
-        +title({uid, originState, dt, t, type, authorInfos, user})
+        +title({uid, originState, doc: dt, t, type, authorInfos, user})
         if data.type !== "draft"
           if (data.document.abstract.length || data.document.abstractEN.length)
             .abstract(style="margin-top:1rem; word-break: break-all;")

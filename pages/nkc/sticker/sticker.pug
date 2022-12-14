@@ -57,12 +57,12 @@ block nkcContent
                 a(@click="visitUrl('/u/' + s.uid, true)") {{s.user.username}}
               th
                 span(v-if="s.shared") 已共享
-                  button.btn.btn-xs.btn-danger(@click="shareSticker(s, false)") 关闭
+                  button.btn.btn-xs.btn-danger(@click="setShareStatus(s, false)") 关闭
                 span(v-else)
                   span(v-if="s.reviewed === null") 待审核
                   span(v-if="s.reviewed === false") 未共享，审核未通过
                   span(v-if="s.reviewed === true") 未共享
-                  button.btn.btn-xs.btn-danger(@click="shareSticker(s, true)") 启用
+                  button.btn.btn-xs.btn-danger(@click="setShareStatus(s, true)") 启用
               th
                 div(v-if="s.disabled")
                   span 是&nbsp;
