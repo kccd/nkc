@@ -46,7 +46,7 @@ router
         from: "upload",
         shared: true,
         disabled: false,
-        deleted: false,
+        // deleted: false,
         // 热门表情增加审核通过条件
         reviewed: true,
       }).sort({hits: -1}).limit(24);
