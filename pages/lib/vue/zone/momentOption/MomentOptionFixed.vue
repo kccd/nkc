@@ -9,7 +9,7 @@
       a.option(v-if="options.delete" @click="deleteMoment")
         .fa.fa-edit
         span 删除
-      .option(v-if="options.reviewed === 'unknown'" @click="passReview()")
+      .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
         .fa.fa-check-circle-o
         span 通过审核
       .option(v-if='options.violation !== null' @click='viewViolationRecord')
@@ -109,6 +109,7 @@ export default {
     moment: null,
     options: {},
     toc: null,
+    stableDocument: null,
   }),
   mounted() {
     const self = this;
@@ -128,6 +129,7 @@ export default {
       return nkcAPI(`/moment/${self.moment.momentCommentId?self.moment.momentCommentId:self.moment.momentId}/options`, 'GET', {})
         .then(res => {
           self.options = res.optionStatus;
+          self.stableDocument = res.stableDocument;
           self.toc = res.toc;
           self.loading = false;
         })
@@ -164,13 +166,14 @@ export default {
       if(_id) {
         docId = _id;
       } else {
-        if(!this.moment) return;
-        docId = this.moment.docId;
+        return
+        // if(!this.moment) return;
+        // docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
       }
       nkcAPI('/review' , 'PUT', {
         pass: true,
         docId,
-        type: 'document'
+        reviewType: 'document'
       })
         .then(res => {
           sweetSuccess('操作成功');

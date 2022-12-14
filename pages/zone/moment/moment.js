@@ -1,6 +1,6 @@
 import Moment from '../../lib/vue/zone/Moment';
 import MomentCommentChild from '../../lib/vue/zone/MomentCommentChild';
-import MomentOption from "../../lib/vue/zone/momentOption/MomentOption";
+// import MomentOption from "../../lib/vue/zone/momentOption/MomentOption";
 import Complaint from "../../lib/vue/Complaint";
 import ViolationRecord from "../../lib/vue/ViolationRecord";
 import {getDataById} from "../../lib/js/dataConversion";
@@ -12,7 +12,7 @@ new Vue({
   el: "#app",
   components: {
     'moment': Moment,
-    'moment-option': MomentOption,
+    // 'moment-option': MomentOption,
     'complaint': Complaint,
     'violation-record': ViolationRecord,
     'moment-comment-child': MomentCommentChild,
@@ -40,9 +40,9 @@ new Vue({
     showCommentPanel() {
       this.$refs.moment.showCommentPanel();
     },
-    openOption(data) {
-      this.$refs.momentOption.open(data);
-    },
+    // openOption(data) {
+    //   this.$refs.momentOption.open(data);
+    // },
     //投诉或举报
     complaint(mid) {
       this.$refs.complaint.open('moment', mid);
