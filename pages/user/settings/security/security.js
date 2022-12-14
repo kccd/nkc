@@ -133,7 +133,6 @@ function displayChangeDiv() {
   $('#changeBtnDiv').show();
 }
 var data = NKC.methods.getDataById("data");
-console.log(data.mobile, 1)
 var app = new Vue({
   el: "#app",
   data: {
