@@ -62,6 +62,12 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // thread（社区文章） 或 article（独立文章）
+  source: {
+    type: String,
+    required: true,
+    index: 1
   }
 }, {
   collection: 'threadCategories'
@@ -98,7 +104,8 @@ schema.statics.newCategory = async (props) => {
     description,
     warning,
     cid,
-    threadWarning
+    threadWarning,
+    source
   } = props;
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const SettingModel = mongoose.model('settings');
@@ -108,7 +115,8 @@ schema.statics.newCategory = async (props) => {
     warning,
     description,
     threadWarning,
-    cid
+    cid,
+    source
   });
   await tc.save();
   return tc;

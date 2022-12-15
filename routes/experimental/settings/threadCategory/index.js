@@ -3,7 +3,8 @@ module.exports = router;
 router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
-    data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
     await next();
   })
@@ -15,7 +16,8 @@ router
       description,
       warning,
       cid,
-      threadWarning
+      threadWarning,
+      source,
     } = body;
     checkString(name, {
       name: '分类名',
@@ -38,7 +40,15 @@ router
       name: '分类文章公告',
       minLength: 0,
       maxLength: 5000
+    });
+    checkString(source, {
+      name: '分类来源',
+      minLength: 6,
+      maxLength: 7
     })
+    if(!source) {
+      ctx.throw(400, `分类来源字段不存在 source: ${source}`);
+    }
     if(cid) {
       const category = await db.ThreadCategoryModel.findOne({_id: cid});
       if(!category) ctx.throw(400, `上级分类不存在 cid: ${cid}`);
@@ -48,9 +58,11 @@ router
       description,
       warning,
       cid,
-      threadWarning
+      threadWarning,
+      source
     });
-    data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     await next();
   })
   .put('/', async (ctx, next) => {
@@ -65,7 +77,8 @@ router
         }
       });
     }
-    data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     await next();
   })
   .put('/:cid', async (ctx, next) => {
@@ -150,4 +163,15 @@ router
       }
     });
     await next();
-  });
+  })
+  .get('/source/:type', async (ctx, next) => {
+  const {db, data, params} = ctx;
+  const {type} = params;
+  if(type==='thread'){
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+  }else if(type==='article'){
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
+  }
+  ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
+  await next();
+});
