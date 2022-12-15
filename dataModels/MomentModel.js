@@ -1675,10 +1675,6 @@ schema.statics.getPageByMomentCommentId = async (mode, momentCommentId) => {
 * */
 schema.methods.vote = async function(voteType, uid, cancel = false) {
   const PostsVoteModel = mongoose.model('postsVotes');
-  const DocumentModel = mongoose.model('documents');
-  const MessageModel = mongoose.model('messages');
-  const SettingModel = mongoose.model('settings');
-  const {sendMessageToUser} = require("../nkcModules/socket");
   const {moment: momentSource} = await PostsVoteModel.getVoteSources();
   const func = cancel? PostsVoteModel.cancelVote: PostsVoteModel.addVote;
   await func({
@@ -1688,24 +1684,6 @@ schema.methods.vote = async function(voteType, uid, cancel = false) {
     voteType,
     tUid: this.uid,
   });
-  const PostsVote = await PostsVoteModel.find({sid: this._id, source: 'moment'});
-  const stableDocument = await DocumentModel.getStableDocumentBySource('moment',this._id);
-  if(voteType === 'up' && cancel === false){
-    const message = await MessageModel({
-      _id: await SettingModel.operateSystemID("messages", 1),
-      r: stableDocument.uid,
-      ty: "STU",
-      c: {
-        type: 'latestVotes',
-        votesId: PostsVote.map( item => item._id),
-      }
-    })
-    if(message) {
-      await message.save();
-      //通过socket通知作者
-      await sendMessageToUser(message._id);
-    }
-  }
   const {voteUp, voteDown} = await this.syncVoteCount();
   return {
     voteUp,
