@@ -27,8 +27,8 @@ router
       q.reviewed = true;
     } else if(t === "disabled") {
       q.disabled = true;
-      // 增加未删除条件
-      q.deleted = false;
+      // // 增加未删除条件
+      // q.deleted = false;
       // 增加已删除
     } else if (t === "deleted") {
       q.deleted = true;
