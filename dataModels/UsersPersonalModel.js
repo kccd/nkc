@@ -568,13 +568,14 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
 	// const TextendedTime = userPersonal.numberOfVerifications * 60 * 1000;
 	// 一个小时
 	const oneHour = 60 * 60 * 1000;
-	// 三个月时间（90天）的毫秒
-	const threeMonths = 24 * 90 * oneHour;
-	const extendedTime = userPersonal.numberOfVerifications * threeMonths;
+	// 累加时间(小时)
+	const unitInterval = authSettings.verifyPhoneNumber.unitInterval * oneHour;
+	// 最大上限时间
+	const maxInterval = authSettings.verifyPhoneNumber.maxInterval * oneHour;
+	const extendedTime = userPersonal.numberOfVerifications * unitInterval;
 	const interval = authSettings.verifyPhoneNumber.interval * oneHour;
-	const oneYear = 365 * 24 * oneHour;
 	// 如果大于一年未验证
-	if (Date.now() - lastVerifyPhoneNumberTime.getTime() > oneYear) {
+	if (Date.now() - lastVerifyPhoneNumberTime.getTime() > maxInterval) {
 		return true
 		// 如果小于一年未验证
 	} else {

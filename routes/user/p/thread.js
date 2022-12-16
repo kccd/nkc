@@ -70,6 +70,7 @@ module.exports = async (ctx, next) => {
   });
   const haveReviewPermission = ctx.permission('review');
   const results = [];
+  const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
   for (const thread of threads) {
     if(
       !ctx.permission("getPostAuthor") &&
@@ -106,7 +107,6 @@ module.exports = async (ctx, next) => {
       (!isThread || thread.type !== 'fund') &&
       (post.uid === user.uid || ctx.permission('modifyOtherPosts'))
     ) {
-      const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
       if(modifyPostTimeLimit >= (Date.now() - new Date(post.toc).getTime())) {
         // 未超过修改的最大时间
         edit = true;
