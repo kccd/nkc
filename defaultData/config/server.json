@@ -8,5 +8,9 @@
   "domainWhitelist": [
     "127.0.0.1:9000"
   ],
-  "fileDomain": ""
+  "fileDomain": "",
+  "staticServer": {
+    "host": "0.0.0.0",
+    "port": 1086
+  }
 }
