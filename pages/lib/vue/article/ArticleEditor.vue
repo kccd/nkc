@@ -20,6 +20,14 @@
             span 继续编辑
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
+      // 多维分类
+      .form-group(v-if="((articleId && articleStatus === 'default') || !articleId) && tcId" )
+        .m-b-2
+          b 多维分类
+          editor-categories(
+            :tc-id="tcId"
+            ref="editorCategoriesRef"
+          )
       //只有article的状态为default或者不存在article时才会显示专栏文章分类
       .form-group(v-if="(articleStatus === 'default' || !articleStatus) && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
@@ -132,12 +140,15 @@ import {getState} from "../../js/state";
 import { getUrl } from '../../js/tools'
 import {visitUrl} from "../../js/pageSwitch";
 import {immediateDebounce} from "../../js/execution";
+import EditorCategories from "../publicVue/moveThreadOrArticle/EditorCategories";
 
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
     ready: false,
     articleId: null,
+    // articleCategories:[],//全部的独立文章分类
+    tcId: null, //已选的多维分类
     columnId: null,
     column: null,
     coverFile : null,
@@ -174,6 +185,7 @@ export default {
   components: {
     "document-editor": DocumentEditor,
     'select-column-categories': selectColumnCategories,
+    'editor-categories': EditorCategories
   },
   computed: {
     type() {
@@ -281,7 +293,10 @@ export default {
       }
       return nkcAPI(url + query, 'GET')
         .then(data => {
+          console.log('data', data);
           self.articleId = data.articleId;
+          // self.articleCategories = data.articleCategories;
+          self.tcId = data.editorInfo.article && data.editorInfo.article.tcId || [];
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
           if(data.editorInfo.article) {
             //获取文章的发表状态
@@ -368,11 +383,16 @@ export default {
             self.initAutoSaveToDraft();
           })
 
-      }, 60000)
+      }, 6000)
     },
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
       const self = this;
+      const _tcId = self.$refs.editorCategoriesRef.outSelectedCategoriesId();
+      if(_tcId.length>0){
+        this.tcId = _tcId;
+      }
+      console.log('tcId',this.tcId)
       return Promise.resolve()
         .then(() => {
           if(self.articleId) {
@@ -440,6 +460,7 @@ export default {
         cover,
         source,
         selectCategory = [],
+        tcId = [],
       } = this;
       const {
         title = '',
@@ -465,6 +486,9 @@ export default {
       };
       if(articleId) {
         formData.append('articleId', articleId);
+      }
+      if(tcId.length>0) {
+        formData.append('_tcId', JSON.stringify(tcId));
       }
       if(selectCategory) {
         formData.append('selectCategory', selectCategory);

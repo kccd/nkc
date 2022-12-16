@@ -63,11 +63,7 @@
                   | {{f.displayName}}
                   .fa.fa-plus
           .move-thread-category(v-if='mode === "move"')
-            //thread-category-list(
-            //  :categories='threadCategories'
-            //  :tcid='selectedThreadCategoriesId'
-            //  ref='threadCategoryList'
-            //  )
+            b 多维分类：
             move-category(
               :selected-cid='selectedThreadCategoriesId'
               ref='moveCategoryList'

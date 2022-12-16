@@ -11,7 +11,8 @@ mixin setUp()
           button.btn.btn-default.btn-sm(onclick=`unHomeTop('')`) 取消首页置顶
         else
           button.btn.btn-default.btn-sm(onclick=`homeTop('')`) 首页置顶
-        button.btn.btn-default.btn-sm(onclick="moveArticle()") 移动
+        if data.permissions && data.permissions.manageZoneArticleCategory
+          button.btn.btn-default.btn-sm(onclick="moveArticle()") 移动分类
         button.btn-sm.btn.btn-danger(onclick="deleteArticle()") 退修/删除
       else if data.columnPost.type === 'thread'
         button.btn-sm.btn.btn-default(onclick=`toUrl('${url}')`) 去社区文章

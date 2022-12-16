@@ -1,7 +1,5 @@
 <template lang="pug">
-  .module-dialog-body
-    .move-category
-      strong 更改属性
+  .move-category
       .thread-categories
         .thread-category(v-for='c in processCategories')
           div( v-if='c.nodes.length > 0')
@@ -11,10 +9,14 @@
               span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
               span(v-else) 已选择：{{c.selectedNode.name}}
               span ）
+            .editor-thread-category-description(v-if="c.description") 描述：{{ c.description }}
+            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
+              v-if="c.warning"
+            ) 注意事项：{{ c.warning }}
             .thread-category-nodes
               .thread-category-node(
                 @click='selectThreadCategory(c, "default")'
-                :class='{"active": c.selectedNode === "default"}'
+                :class="{ active: !c.selectedNode || c.selectedNode === 'default' }"
               )
                 span {{c.nodeName}}
               .thread-category-node(
@@ -24,43 +26,43 @@
                 :title='n.description'
               )
                 span {{n.name}}
+            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
+              v-if="c.selectedNode && c.selectedNode.warning"
+            ) 注意事项：{{ c.selectedNode.warning }}
         span.text-danger 注意：仅更改已选择类别的文章属性
 
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
-.module-dialog-body {
-  background-color: #fff;
-  .move-category {
-    padding: 0.5rem;
-    background-color: #eee;
+.move-category {
+  padding: 0.5rem;
+  background-color: #eee;
 
-    .thread-categories {
-      user-select: none;
+  .thread-categories {
+    user-select: none;
 
-      .thread-category {
-        .thread-category-name {
-          margin-bottom: 0.5rem;
-        }
+    .thread-category {
+      .thread-category-name {
+        margin-bottom: 0.5rem;
+      }
 
-        .thread-category-node {
-          display: inline-block;
-          box-sizing: border-box;
-          height: 2.6rem;;
-          line-height: 2.6rem;;
-          padding: 0 1rem;
-          background-color: #fff;
-          border: 1px solid #aaa;
-          border-radius: 3px;
-          color: #555;
-          margin: 0 0.8rem 0.8rem 0;
-          cursor: pointer;
+      .thread-category-node {
+        display: inline-block;
+        box-sizing: border-box;
+        height: 2.6rem;;
+        line-height: 2.6rem;;
+        padding: 0 1rem;
+        background-color: #fff;
+        border: 1px solid #aaa;
+        border-radius: 3px;
+        color: #555;
+        margin: 0 0.8rem 0.8rem 0;
+        cursor: pointer;
 
-          &.active {
-            color: #fff;
-            background-color: @primary;
-            border-color: @primary;
-          }
+        &.active {
+          color: #fff;
+          background-color: @primary;
+          border-color: @primary;
         }
       }
     }
@@ -71,7 +73,6 @@
 export default {
   props: ['selectedCid'],
   data: () => ({
-    show: false,
     source: "", // thread, article
     categories: [],
     processCategories: [],
@@ -95,7 +96,9 @@ export default {
   methods: {
     initCategories() {
       let {selectedCid = [], categories = []} = this;
+      console.log('selectedCid',selectedCid)
       categories = JSON.parse(JSON.stringify(categories));
+      console.log('categories',categories)
       for(const c of categories) {
         c.selectedNode = null; // null: 未选择, 'default': 默认, {Number}: 具体的属性 ID
         for(const n of c.nodes) {
@@ -116,8 +119,10 @@ export default {
       } else {
         c.selectedNode = n;
       }
+      this.callback(this.selectedCategoriesId);
     },
     open(callback, options = {}) {
+      console.log('options',options);
       this.callback = callback;
       const self = this;
       self.source = options.source;
@@ -131,10 +136,6 @@ export default {
         .catch(function(data) {
           screenTopWarning(data);
         })
-      this.show = true;
-    },
-    close() {
-      this.show = false;
     },
   },
 }

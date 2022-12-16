@@ -63,6 +63,7 @@ router.get('/:aid', async (ctx, next)=>{
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+      manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
     };
     //文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

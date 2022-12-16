@@ -1,22 +1,22 @@
 import {RNSetSharePanelStatus} from "../lib/js/reactNative";
 import {getDataById} from "../lib/js/dataConversion";
-import MoveCategory from '../lib/vue/publicVue/moveThreadOrArticle/MoveCategory';
+import MoveBox from '../lib/vue/publicVue/moveThreadOrArticle/MoveBox.vue';
 
 const data = getDataById('data');
 RNSetSharePanelStatus(true,'article',data.article.id)
-const MoveCategoryApp = new Vue({
-  el: "#moveCategoryApp",
+const MoveCategoryBoxAppInZone = new Vue({
+  el: "#moveCategoryBoxAppInZone",
   components: {
-    'move-category': MoveCategory,
+    'move-box': MoveBox,
   },
   methods:{
     open(){
-      console.log(this.$refs.moveCategoryList.open(()=>{},{source:'article'}))
+      this.$refs.moveCategoryBox.open(()=>{},{article: data.article})
     }
   },
 })
 function openMoveArticleCategory(){
-  MoveCategoryApp.open()
+  MoveCategoryBoxAppInZone.open()
 }
 Object.assign(window, {
   openMoveArticleCategory

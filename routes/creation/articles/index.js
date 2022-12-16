@@ -73,7 +73,11 @@ router
     const {db, data, state, body, nkcModules} = ctx;
     const {files, fields} = body;
     const {coverFile} = files;
-    const {type, articleId, source, sid} = fields;
+    const {type, articleId, source, sid, _tcId} = fields;
+    let tcId = [];
+    if(_tcId){
+      tcId = JSON.parse(_tcId);
+    }
     const {normal: normalStatus, default: defaultStatus} = await db.ArticleModel.getArticleStatus();
     const {column: columnSource, zone: zoneSource} = await db.ArticleModel.getArticleSources();
     if(!['modify', 'create', 'publish', 'save', 'autoSave'].includes(type)) ctx.throw(400, `未知的提交类型 ${type}`);
@@ -117,7 +121,8 @@ router
         origin,
         source,
         sid,
-        authorInfos
+        authorInfos,
+        tcId,
       });
     } else if(article){
       if(!articleId) ctx.throw(401, '未接收文章ID');
@@ -135,6 +140,7 @@ router
         origin,
         authorInfos
       });
+      await db.ArticleModel.updateOne({_id: articleId},{$set: {tcId}})
       if(type === 'publish') {
         //判断用户是否选择文章专栏分类
         if(source === columnSource && article.status === defaultStatus && (!selectCategory.selectedMainCategoriesId || selectCategory.selectedMainCategoriesId.length === 0)) ctx.throw(401, '未选择文章专栏分类');

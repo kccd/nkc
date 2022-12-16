@@ -5,6 +5,8 @@ router
     const {db, data} = ctx;
     data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
     data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
+    console.log('categoryTree',data.categoryTree)
+    console.log('categoryTree',data.articleCategoryTree)
     ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
     await next();
   })
