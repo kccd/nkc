@@ -298,7 +298,6 @@ const usersPersonalSchema = new Schema({
 	numberOfVerifications: {
 		type: Number,
 		default: 0,
-		index: 1
 	},
 	// 需要送审的次数，与后台管理中的审核设置同时作用
 	// 这里的审核次数主要用于限制已经审核通过多篇文章的用户
@@ -573,8 +572,14 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
 	const threeMonths = 24 * 90 * oneHour;
 	const extendedTime = userPersonal.numberOfVerifications * threeMonths;
 	const interval = authSettings.verifyPhoneNumber.interval * oneHour;
-  return Date.now() - lastVerifyPhoneNumberTime.getTime() > interval + extendedTime
-  // return Date.now() - lastVerifyPhoneNumberTime.getTime() > ToneMinute + TextendedTime;
+	const oneYear = 365 * 24 * oneHour;
+	// 如果大于一年未验证
+	if (Date.now() - lastVerifyPhoneNumberTime.getTime() > oneYear) {
+		return true
+		// 如果小于一年未验证
+	} else {
+		return Date.now() - lastVerifyPhoneNumberTime.getTime() > interval + extendedTime;
+	}
 }
 
 /*
