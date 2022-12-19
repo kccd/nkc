@@ -700,7 +700,9 @@ export default {
     // 选择多维分类时
     outSelectedCategoriesId(data){
       this.tcId = data;
-      this.post(this.types.autoSave)
+      if(this.type.create === this.types.create){
+        this.post(this.types.autoSave)
+      }
     }
   }
 }
