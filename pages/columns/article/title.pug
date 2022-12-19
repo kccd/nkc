@@ -1,15 +1,21 @@
 //-  文章的标题,作者等
-  @params {String} t 文章标题
+
   @params {Array} authorInfos 文章作者
-  @params {String} uid 用户id
-  @params {String} userAvatar
-  @params {String} toc  文章创建时间
-  @params {String} originState  文章源
-  @params {String} name 专栏名
-  @params {String} _id 专栏ID
   @params {String} type 文章类型
+  @params {String} uid 发表用户id
+  @params {String} username 文章发表用户名称
+  @params {String} avatarUrl 文章发表用户头像url
+  @params {String} toc  文章创建时间YYYY-MM-DD
+  @params {String} allToc  文章创建时间YYYY-MM-DD HH:mm:ss
+  @params {String} originState  文章源
+  @params {String} columnId 专栏ID(旧的_id)
+  @params {String} columnName 专栏名
+  @params {String} addr Ip
+  @params {String} title 文章标题
+
 mixin title(data)
-  -var {t, authorInfos, uid, toc, originState, name, _id, user ,type, article} = data;
+  -var {authorInfos, type, article} = data;
+  -var {title, uid, username, avatarUrl, toc, allToc, originState, columnId, columnName, addr} = data;
   if authorInfos && authorInfos.length  && type !== "product"
     -var agencyIndex = 1;
     -var agencyArray = [];
@@ -21,7 +27,7 @@ mixin title(data)
           -if(authorInfos[i].agencyCountry && authorInfos[i].agencyCountry.length > 0){
             -authorInfos[i].agencyAdd = authorInfos[i].agencyAdd.replace(/\//igm, " ");
             -agencyAddArray.push(authorInfos[i].agency+"，"+authorInfos[i].agencyCountry+" "+authorInfos[i].agencyAdd);
-          -}else if(authorInfos[i].agencyAdd){
+          -} else if(authorInfos[i].agencyAdd){
             -agencyAddArray.push(authorInfos[i].agency+"，" + authorInfos[i].agencyAdd);
           -}else{
             -agencyAddArray.push(authorInfos[i].agency);
@@ -30,13 +36,13 @@ mixin title(data)
           -agencyIndex++;
         -}else{
           -authorInfos[i].agencyIndex = agencyArray.indexOf(authorInfos[i].agency)+1;
-        -}
-      -}
-    -}
+        -};
+      -};
+    -};
   +includeCSS('/columns/article/title.css')
   .common-article-head
     //-  hover显示作者信息
-    h1.common-article-title=t
+    h1.common-article-title=title
     p
       if authorInfos && authorInfos.length
         for authorInfo in authorInfos
@@ -63,15 +69,15 @@ mixin title(data)
         data-global-mouseout="hideUserPanel"
         data-global-data=objToStr({uid})
       )
-        img( style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+        img(src=avatarUrl style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
         //- if authorInfos && authorInfos[0]
-        span.kcid=user.username
-      span.modify-time.m-r-05(title=tools.timeFormat(new Date(toc)))=format('YYYY-MM-DD', new Date(toc))
+        span.kcid=username
+      span.modify-time.m-r-05(title=allToc)=toc
       if ['3','4','5','6'].includes(String(originState))
         span.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown() 原创
           .dropdown-menu(aria-labelledby='dropdown-level')
             span(style="padding:5px")!=`${getOriginLevel(originState)}`
-      if _id
-        a.column.jump.m-r-1(href=`/m/${_id}` target="_blank")=name
-      if article
-        span=` IP:${article.document? article.document.addr: article.addr}`
+      if columnId
+        a.column.jump.m-r-1(href=`/m/${columnId}` target="_blank")=columnName
+      if addr
+        span=` IP:${addr}`
