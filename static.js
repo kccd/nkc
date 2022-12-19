@@ -2,6 +2,8 @@ const {program} = require('commander');
 const path = require('path');
 const KOA = require('koa');
 const http = require('http');
+const koaCompress = require("koa-compress");
+const helmet = require("koa-helmet");
 
 program
   .option('-p, --port <number>', 'Server port(default 1086)', '1086')
@@ -22,9 +24,11 @@ const staticServe = path => {
 };
 
 const app = new KOA();
+app.use(koaCompress({threshold: 2048}));
 for(const dir of options.dir) {
   app.use(staticServe(path.resolve(dir)));
 }
+app.use(helmet());
 
 const staticServer = http.createServer(app.callback());
 
