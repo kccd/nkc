@@ -3,6 +3,7 @@
     move-category(
       :selected-cid='tcId'
       ref='moveCategoryList'
+      @selectedCategories="selectedCategories"
     )
 </template>
 <style lang="less" scoped>
@@ -23,23 +24,12 @@ export default {
     'move-category':MoveCategory
   },
   data: () => ({
-    selectedCategoriesId: [],
-
   }),
   computed:{
 
   },
   mounted() {
-    this.$refs.moveCategoryList.open((data)=>{
-      console.log('datat',data)
-      this.selectedCategoriesId = data.map(item=>{
-        if(item.nodeId === 'default'){
-          return false
-        }else {
-          return item.nodeId
-        }
-      }).filter(Boolean);
-    },{source:'article'})
+    this.$refs.moveCategoryList.open(()=>{},{source:'article'})
   },
   methods: {
     selectionStatus(tcId, articleCategories) {
@@ -56,8 +46,16 @@ export default {
       }
       return newThreadCategories;
     },
-    outSelectedCategoriesId(){
-      return this.selectedCategoriesId;
+
+    selectedCategories(data){
+      const selectedCategoriesIdList = data.map(item=>{
+        if(item.nodeId === 'default'){
+          return false
+        }else {
+          return item.nodeId
+        }
+      }).filter(Boolean);
+      this.$emit('outSelectedCategoriesId', selectedCategoriesIdList)
     }
   },
 }

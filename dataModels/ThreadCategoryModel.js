@@ -22,6 +22,7 @@ const schema = new mongoose.Schema({
     index: 1
   },
   // 作为父级时，在编辑器页默认选择的子分类，cid、default、none
+  // cid代表该类选择默认为添加的子类，default代表选择默认为父级上的nodeName（一个不存在的子类），node没有选择默认
   defaultNode: {
     type: String,
     default: 'none'

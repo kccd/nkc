@@ -21,11 +21,12 @@
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
       // 多维分类
-      .form-group(v-if="((articleId && articleStatus === 'default') || !articleId) && tcId" )
+      .form-group(v-if="tcId" )
         .m-b-2
           b 多维分类
           editor-categories(
             :tc-id="tcId"
+            @outSelectedCategoriesId="outSelectedCategoriesId"
             ref="editorCategoriesRef"
           )
       //只有article的状态为default或者不存在article时才会显示专栏文章分类
@@ -293,10 +294,12 @@ export default {
       }
       return nkcAPI(url + query, 'GET')
         .then(data => {
-          console.log('data', data);
           self.articleId = data.articleId;
-          // self.articleCategories = data.articleCategories;
-          self.tcId = data.editorInfo.article && data.editorInfo.article.tcId || [];
+          if(self.type === self.types.create){
+            self.tcId = data.articleCategoryTree.map(item=>Number(item.defaultNode)).filter(Boolean);
+          }else {
+            self.tcId = data.editorInfo.article && data.editorInfo.article.tcId || [];
+          }
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
           if(data.editorInfo.article) {
             //获取文章的发表状态
@@ -388,11 +391,6 @@ export default {
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
       const self = this;
-      const _tcId = self.$refs.editorCategoriesRef.outSelectedCategoriesId();
-      if(_tcId.length>0){
-        this.tcId = _tcId;
-      }
-      console.log('tcId',this.tcId)
       return Promise.resolve()
         .then(() => {
           if(self.articleId) {
@@ -487,7 +485,7 @@ export default {
       if(articleId) {
         formData.append('articleId', articleId);
       }
-      if(tcId.length>0) {
+      if(tcId) {
         formData.append('_tcId', JSON.stringify(tcId));
       }
       if(selectCategory) {
@@ -699,6 +697,11 @@ export default {
       };
       this.modifyArticle();
     },
+    // 选择多维分类时
+    outSelectedCategoriesId(data){
+      this.tcId = data;
+      this.post(this.types.autoSave)
+    }
   }
 }
 </script>

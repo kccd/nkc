@@ -96,9 +96,7 @@ export default {
   methods: {
     initCategories() {
       let {selectedCid = [], categories = []} = this;
-      console.log('selectedCid',selectedCid)
       categories = JSON.parse(JSON.stringify(categories));
-      console.log('categories',categories)
       for(const c of categories) {
         c.selectedNode = null; // null: 未选择, 'default': 默认, {Number}: 具体的属性 ID
         for(const n of c.nodes) {
@@ -120,9 +118,9 @@ export default {
         c.selectedNode = n;
       }
       this.callback(this.selectedCategoriesId);
+      this.$emit('selectedCategories',this.selectedCategoriesId)
     },
     open(callback, options = {}) {
-      console.log('options',options);
       this.callback = callback;
       const self = this;
       self.source = options.source;

@@ -66,6 +66,7 @@ router
       editorInfo.articles = articles;
     }
     data.editorInfo = editorInfo;
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     await next();
   })
   .post('/editor', async (ctx, next) => {
@@ -168,6 +169,7 @@ router
         sid: article._id
       });
       data.articleId = article._id;
+      data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     }
     await next();
   })

@@ -50,7 +50,7 @@ export default {
       },{source:'article'})
     },
     submit(){
-      const tcId = this.selectedCategories.map(item=>item.nodeId)
+      const tcId = this.selectedCategories.map(item=>item.nodeId).filter(item=>typeof item === 'number');
       nkcAPI('/zone/a/'+this.article._id+'/category', 'PUT',{
         tcId
       }).then(()=>{
