@@ -1,25 +1,33 @@
+const {program} = require('commander');
+const path = require('path');
 const KOA = require('koa');
 const http = require('http');
-const serverConfig = require('./config/server.json');
-const {port, host} = serverConfig.staticServer;
+
+program
+  .option('-p, --port <number>', 'Server port(default 1086)', '1086')
+  .option('--host <char>', 'Server host(default 0.0.0.0)', '0.0.0.0')
+  .option('-a, --age <char>', 'max age(default 2592000)', '2592000')
+  .option('-d, --dir [dirs...]', 'target directory(default ./)', './')
+
+program.parse();
+
+const options = program.opts();
 
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response) {
-      response.setHeader('Cache-Control', `public, max-age=604800`)
+      response.setHeader('Cache-Control', `public, max-age=${options.age}`)
     }
   });
 };
 
 const app = new KOA();
-app
-  .use(staticServe('./dist/pages'))
-  .use(staticServe('./node_modules'))
-  .use(staticServe('./nkcModules'))
-  .use(staticServe('./public'))
+for(const dir of options.dir) {
+  app.use(staticServe(path.resolve(dir)));
+}
 
 const staticServer = http.createServer(app.callback());
 
-staticServer.listen(port, host, () => {
-  console.log(`Static file server is running at ${host}:${port}`);
+staticServer.listen(options.port, options.host, () => {
+  console.log(`Static service is running at ${options.host}:${options.port}`);
 });
