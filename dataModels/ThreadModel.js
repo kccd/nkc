@@ -563,7 +563,10 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
     parentPostId: "",
     $or: [
       {
-        reviewed: true
+        reviewed: true,
+        toDraft: {
+          $ne: true
+        }
       },
       {
         pid: oc.pid,

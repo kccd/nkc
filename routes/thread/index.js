@@ -349,7 +349,7 @@ threadRouter
         // 用户能查看自己被退回的回复
         if(data.user) {
           $or.push({
-            disabled: true,
+            // disabled: true,
             toDraft: true,
             uid: data.user.uid
           });
