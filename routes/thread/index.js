@@ -250,17 +250,18 @@ threadRouter
     // 获取当前用户有权查看的专业ID
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
 
-    // 权限判断（时间限制）
-    await db.SettingModel.restrictAccess({
-      toc: thread.toc,
-      forums: forums,
-      isAuthor: state.uid && state.uid === thread.uid,
-      userRolesId: data.userRoles.map(role => role._id),
-      userGradeId: data.userGrade._id
-    });
+    // 权限判断（通过分享链接访问时无需判断时间权限、专业文章阅读权限）
+    if(!await db.ShareModel.hasPermission(token, thread.tid)) {
 
-    // 权限判断（通过分享链接访问时无需判断权限）
-    if(!await db.ShareModel.hasPermission(token, thread.oc)) {
+      // 权限判断（时间限制）
+      await db.SettingModel.restrictAccess({
+        toc: thread.toc,
+        forums: forums,
+        isAuthor: state.uid && state.uid === thread.uid,
+        userRolesId: data.userRoles.map(role => role._id),
+        userGradeId: data.userGrade._id
+      });
+
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     }
 

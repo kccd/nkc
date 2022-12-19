@@ -1559,7 +1559,7 @@ schema.statics.extendArticlesPanelData = async function(articles) {
       homeUrl: tools.getUrl('userHome', articleUser.uid)
     };
     const content = {
-      time: article.tlm,
+      time: article.toc,
       coverUrl: document.cover? tools.getUrl('documentCover', document.cover): '',
       title: document.title,
       url: article.url,

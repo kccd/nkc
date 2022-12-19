@@ -5,8 +5,10 @@ router
     const {page = 0, perpage = 120} = query;
     const q = {
       disabled: false,
-      deleted: false,
-      shared: true
+      // deleted: false,
+      shared: true,
+      // 加入审核通过条件
+      reviewed: true,
     };
     const {
       notesAboutUploading,

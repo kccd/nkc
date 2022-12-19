@@ -402,7 +402,7 @@ export function RNOpenDownloadList() {
 * 同步网页 title
 * */
 export function RNSetPageTitle(title) {
-  RNEmit('syncPageTitle', {
+  RNEmitCore('syncPageTitle', {
     title
   });
 }
