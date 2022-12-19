@@ -111,6 +111,12 @@ const schema = new mongoose.Schema({
     type: [String],
     default: [],
     index: 1
+  },
+  // 多维分类ID
+  tcId: {
+    type: [Number],
+    default: [],
+    index: 1
   }
 }, {
   collection: 'articles',
@@ -405,7 +411,8 @@ schema.statics.createArticle = async (props) => {
     origin,
     source,
     sid,
-    authorInfos
+    authorInfos,
+    tcId
   } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
@@ -438,6 +445,7 @@ schema.statics.createArticle = async (props) => {
     source,
     sid,
     status: defaultStatus,
+    tcId,
   });
   await article.save();
   return article;

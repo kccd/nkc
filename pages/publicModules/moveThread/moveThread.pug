@@ -14,7 +14,7 @@
             h5 已选择的专业：
               span(v-if="!selectedForums.length") 无
             .move-thread-forum-name(
-              :style="'background-color: ' + forum.color" v-for="forum, index in selectedForums"
+              :style="'background-color: ' + forum.color" v-for="(forum, index) in selectedForums"
             )
               span(@click="showThreadType(forum)") {{forum.displayName}}
                 span(v-if="forum.selectedThreadType") ：{{forum.selectedThreadType.name}}
@@ -63,12 +63,11 @@
                   | {{f.displayName}}
                   .fa.fa-plus
           .move-thread-category(v-if='mode === "move"')
-            strong 更改属性
-            thread-category-list(
-              :categories='threadCategories'
-              :tcid='selectedThreadCategoriesId'
-              ref='threadCategoryList'
-              )
+            b 多维分类：
+            move-category(
+              :selected-cid='selectedThreadCategoriesId'
+              ref='moveCategoryList'
+            )
           .move-thread-options(v-if='mode === "move"')
             .checkbox
               label

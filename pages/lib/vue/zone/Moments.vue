@@ -28,13 +28,13 @@
   import Moment from './Moment';
   import Complaint from "../Complaint";
   import ViolationRecord from "../ViolationRecord";
-  import MomentOption from "./momentOption/MomentOption";
+  // import MomentOption from "./momentOption/MomentOption";
   import MomentStatus from "./MomentStatus";
   import {EventBus} from "../../../spa/eventBus";
   export default {
     props: ['moments', 'permissions'],
     components: {
-      'moment-option': MomentOption,
+      // 'moment-option': MomentOption,
       'moment': Moment,
       'complaint': Complaint,
       'violation-record': ViolationRecord,

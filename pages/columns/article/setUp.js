@@ -9,8 +9,12 @@ function showSetUp(){
     $('.set-up').height(0)
   }
 }
-
+// 为了打开article文章分类弹窗
+function moveArticle(){
+  window.openMoveArticleCategory()
+}
 Object.assign(window, {
-  showSetUp
+  showSetUp,
+  moveArticle,
 })
 
