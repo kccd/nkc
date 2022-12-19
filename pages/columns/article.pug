@@ -41,6 +41,7 @@ block baseColumnContent
         voteDown: article.voteDown,
         replyCount: count || 0,
         vote: article.vote,
+        permissions: data.permissions,
       })
   .hidden#data=objToStr({type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   .move-article-category#moveCategoryBoxAppInColumns(v-cloak)

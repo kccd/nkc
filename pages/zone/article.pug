@@ -10,10 +10,11 @@ extends ../bootstrap_base
 block title
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected, vote} = data.columnPost
   -var {_id, name} = column
+  -var {targetUser} = data
   -var {hits, comment: count, oc, url} = thread
   -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
   title=t
-  -var showManagement = data.user && permissionsOr(['review']);
+  -var showManagement = data.user && data.permissions.review;
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
   if data.postHeight
@@ -39,7 +40,7 @@ block content
       include ../columns/article/articleEditTime
       +articleEditTime(tlm, dt, toc)
       include ../columns/article/articleOptions
-      +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, vote, voteDown: article.voteDown, replyCount: count || 0, vote: article.vote})
+      +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, vote, voteDown: article.voteDown, replyCount: count || 0, vote: article.vote, permissions: data.permissions})
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   .move-article-category#moveCategoryBoxAppInZone
     move-box(

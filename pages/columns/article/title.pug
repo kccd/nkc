@@ -63,7 +63,7 @@ mixin title(data)
         data-global-mouseout="hideUserPanel"
         data-global-data=objToStr({uid})
       )
-        img(src=tools.getUrl('userAvatar', user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+        img( style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
         //- if authorInfos && authorInfos[0]
         span.kcid=user.username
       span.modify-time.m-r-05(title=tools.timeFormat(new Date(toc)))=format('YYYY-MM-DD', new Date(toc))

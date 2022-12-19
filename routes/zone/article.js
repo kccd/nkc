@@ -3,7 +3,8 @@ const {renderMarkdown} = require('../../nkcModules/markdown');
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
-    ctx.template = 'zone/article.pug'
+    // ctx.template = 'zone/article.pug'
+    ctx.remoteTemplate = 'zone/article.pug';
     const { db, data, params, query, state, permission, nkcModules } = ctx;
     const { aid } = params;
     const {pageSettings, uid} = state;
@@ -75,6 +76,9 @@ router
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
       manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
+      review: ctx.permission('review'),
+      creditKcb: ctx.permission('creditKcb'),
+      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr(["movePostsToRecycle", "movePostsToDraft"])
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
