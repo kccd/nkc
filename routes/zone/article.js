@@ -74,6 +74,7 @@ router
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+      manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
@@ -139,6 +140,15 @@ router
     });
     //文章浏览数加一
     await article.addArticleHits();
+    await next();
+  })
+  .put('/:aid/category',async (ctx, next) => {
+    const { db, params, body } = ctx;
+    const {tcId} = body;
+    const {aid} = params;
+    if(tcId){
+      await db.ArticleModel.update({_id: aid},{$set: {tcId}})
+    }
     await next();
   });
 module.exports = router;

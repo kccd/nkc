@@ -40,7 +40,7 @@ router
       if(isAuthor && moment.status !== deleted) {
         optionStatus.delete = true;
       }
-      
+
       // 未匿名
       if(!moment.anonymous) {
         if(!isAuthor) {
@@ -52,6 +52,13 @@ router
         // 违规记录
         optionStatus.violation = ctx.permission('violationRecord')? true: null;
       }
+    }
+    const stableDocument = await db.DocumentModel.getStableDocumentBySource(optionStatus.type,mid);
+    data.stableDocument={
+      _id: stableDocument._id,
+      type: stableDocument.type,
+      source: stableDocument.source,
+      sid: stableDocument.sid,
     }
     data.optionStatus = optionStatus;
     data.toc = moment.toc;

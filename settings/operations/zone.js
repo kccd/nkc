@@ -1,7 +1,10 @@
 module.exports = {
   a: {
     PARAMETER: {
-      GET: 'visitZoneArticle'
+      GET: 'visitZoneArticle',
+      category: {
+        PUT: 'manageZoneArticleCategory'
+      }
     }
   },
   m: {

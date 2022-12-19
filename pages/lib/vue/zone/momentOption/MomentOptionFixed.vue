@@ -1,5 +1,5 @@
 <template lang="pug">
-  .moment-options( v-show="show" @click="")
+  .moment-options( v-show="show")
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
@@ -9,7 +9,7 @@
       a.option(v-if="options.delete" @click="deleteMoment")
         .fa.fa-edit
         span 删除
-      .option(v-if="options.reviewed === 'unknown'" @click="passReview()")
+      .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
         .fa.fa-check-circle-o
         span 通过审核
       .option(v-if='options.violation !== null' @click='viewViolationRecord')
@@ -25,6 +25,14 @@
       //.option(v-if='options.ipInfo !== null' @click='displayIpInfo')
       //  .fa.fa-map-marker
       //  span 查看IP
+      //- 分享按钮
+      .option(
+        data-global-click='showSharePanel'
+        :data-global-data="objToStr({type: 'moment', id: moment.momentId})"
+        title='分享'
+      )
+        .fa.fa-share-square-o
+        span 分享
       .option.time
         span {{timeFormat(toc)}}
 </template>
@@ -90,7 +98,7 @@
 
 <script>
 import {nkcAPI} from "../../../js/netAPI";
-import {timeFormat} from "../../../js/tools";
+import {timeFormat, objToStr} from "../../../js/tools";
 import {EventBus} from "../../../../spa/eventBus";
 import {visitUrl} from "../../../js/pageSwitch";
 export default {
@@ -101,6 +109,7 @@ export default {
     moment: null,
     options: {},
     toc: null,
+    stableDocument: null,
   }),
   mounted() {
     const self = this;
@@ -109,6 +118,7 @@ export default {
     })
   },
   methods: {
+    objToStr: objToStr,
     timeFormat: timeFormat,
     clickElement(e) {
       e.stopPropagation();
@@ -119,6 +129,7 @@ export default {
       return nkcAPI(`/moment/${self.moment.momentCommentId?self.moment.momentCommentId:self.moment.momentId}/options`, 'GET', {})
         .then(res => {
           self.options = res.optionStatus;
+          self.stableDocument = res.stableDocument;
           self.toc = res.toc;
           self.loading = false;
         })
@@ -155,13 +166,14 @@ export default {
       if(_id) {
         docId = _id;
       } else {
-        if(!this.moment) return;
-        docId = this.moment.docId;
+        return
+        // if(!this.moment) return;
+        // docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
       }
       nkcAPI('/review' , 'PUT', {
         pass: true,
         docId,
-        type: 'document'
+        reviewType: 'document'
       })
         .then(res => {
           sweetSuccess('操作成功');

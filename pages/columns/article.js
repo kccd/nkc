@@ -1,6 +1,9 @@
 import CommentHit from "../lib/vue/comment/CommentHit";
 import {screenTopAlert, screenTopWarning} from "../lib/js/topAlert";
 import {nkcAPI} from "../lib/js/netAPI";
+import MoveBox from "../lib/vue/publicVue/moveThreadOrArticle/MoveBox";
+import {getDataById} from "../lib/js/dataConversion";
+const data = getDataById('data');
 
 if($('#CommentHitBox').length > 0) {
   new Vue({
@@ -10,7 +13,23 @@ if($('#CommentHitBox').length > 0) {
     },
   })
 }
-
+let MoveCategoryBoxAppInColumns;
+if($('#moveCategoryBoxAppInColumns').length > 0) {
+  MoveCategoryBoxAppInColumns = new Vue({
+    el: "#moveCategoryBoxAppInColumns",
+    components: {
+      'move-box': MoveBox,
+    },
+    methods:{
+      open(){
+        this.$refs.moveCategoryBox.open(()=>{},{article: data.article})
+      }
+    },
+  })
+}
+function openMoveArticleCategory(){
+  MoveCategoryBoxAppInColumns.open()
+}
 
 
 //撤销学术分
@@ -47,6 +66,7 @@ function hideArticleKcbRecordReason(aid, recordId, hide) {
 Object.assign(window, {
   cancelArticleXsf,
   hideArticleKcbRecordReason,
+  openMoveArticleCategory
 })
 
 
