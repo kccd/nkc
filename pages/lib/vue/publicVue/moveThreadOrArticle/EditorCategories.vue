@@ -13,7 +13,6 @@
 <script>
 import MoveCategory from "./MoveCategory";
 export default {
-
   props: {
     tcId:{
       require: true,
@@ -22,11 +21,6 @@ export default {
   },
   components: {
     'move-category':MoveCategory
-  },
-  data: () => ({
-  }),
-  computed:{
-
   },
   mounted() {
     this.$refs.moveCategoryList.open(()=>{},{source:'article'})

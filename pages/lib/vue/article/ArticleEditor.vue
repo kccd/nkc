@@ -386,7 +386,7 @@ export default {
             self.initAutoSaveToDraft();
           })
 
-      }, 6000)
+      }, 60000)
     },
     //自动保存草稿 保存成功无提示
     autoSaveToDraft() {
