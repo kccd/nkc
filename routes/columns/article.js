@@ -23,6 +23,8 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    data.targetUser = await article.extendUser();
+    data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
     // 验证权限 - new
     // 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限

@@ -23,9 +23,13 @@ block content
         //-     span 收藏
         //-   .nav-count
         //-     .fa.fa-cog
-        -var {uid, origin: originState, dt, title: t, type, authorInfos, user} = data.document
+        -var {uid, origin: originState, originDesc, dt, title, type, authorInfos} = data.document
+        -var {user} = data;
         include ../../columns/article/title
-        +title({uid, originState, doc: dt, t, type, authorInfos, user})
+        +title({
+          uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(dt)), allToc: tools.timeFormat(new Date(dt)),
+          title, type, authorInfos, username: user.username, avatarUrl: user.avatarUrl
+        })
         if data.type !== "draft"
           if (data.document.abstract.length || data.document.abstractEN.length)
             .abstract(style="margin-top:1rem; word-break: break-all;")

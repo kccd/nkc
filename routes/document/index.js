@@ -1,6 +1,6 @@
 const router = require('koa-router')();
 const nkcRender = require('../../nkcModules/nkcRender');
-/* 
+/*
 * 如果是专栏文章预览就返回分类信息
 */
 // async function setCategory(data, state, db, source) {
@@ -14,14 +14,14 @@ const nkcRender = require('../../nkcModules/nkcRender');
 //       data.mainCategory = await db.ColumnPostCategoryModel.getParentCategoryByIds(cid);
 //       data.auxiliaryCategory = await db.ColumnPostCategoryModel.getArticleAllMinorCategories(mcid);
 //       data.columnName = column.name;
-//     }  
+//     }
 //   }
 // }
 router
 .get('/preview', async (ctx, next) => {
   //获取文档预览信息
   ctx.template='document/preview/document.pug'
-  const {db, data, state, query, permission} = ctx;
+  const {db, data, state, query, permission, nkcModules} = ctx;
   const {sid, source} = query;
   // 需要返回 分类信息
   const document = await db.DocumentModel.find({sid, source, uid: state.uid, type: "beta"}).sort({tlm: -1}).skip(0).limit(1);
@@ -34,8 +34,6 @@ router
   if(data.document.uid !== state.uid){
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
   }
-  // 查询文章作者
-  data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
@@ -45,6 +43,16 @@ router
       resources
     },
   });
+  // 查询文章作者
+  const user = await db.UserModel.findOnly({uid: data.document.uid});
+  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+  data.user = {...user.toObject(), avatarUrl};
+  if(data.document.origin !== 0){
+    const originDesc = await nkcModules.apiFunction.getOriginLevel(data.document.origin);
+    data.document = {...data.document.toObject(), originDesc};
+  }else {
+    data.document = data.document.toObject();
+  }
   await next();
 })
 .get('/history', async (ctx, next)=>{
@@ -67,7 +75,7 @@ router
     if(data.document.uid !== state.uid){
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
-    data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
+    // data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
     const documentResourceId = await data.document.getResourceReferenceId();
     let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
     data.document.content = nkcRender.renderHTML({
@@ -98,6 +106,15 @@ router
     // data.bookId = ''
     data.urlComponent = ''
   }
+  const user = await db.UserModel.findOnly({uid: data.document.uid});
+  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+  data.user = {...user.toObject(), avatarUrl};
+  if(data.document.origin !== 0){
+    const originDesc = await nkcModules.apiFunction.getOriginLevel(data.document.origin);
+    data.document = {...data.document.toObject(), originDesc};
+  }else {
+    data.document = data.document.toObject();
+  }
   await next()
 })
 .get('/history/:_id',async (ctx, next)=>{
@@ -127,7 +144,6 @@ router
     if(!permission("viewUserArticle")) ctx.throw(403, "没有权限");
   }
   data.paging = paging;
-  data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   data.document.content = nkcRender.renderHTML({
@@ -151,6 +167,15 @@ router
     throw "editorUrl is not defined"
   }
   data.urlComponent = {_id: data.document._id, source: data.document.source, sid: data.document.sid, editorUrl, page};
+  const user = await db.UserModel.findOnly({uid: data.document.uid});
+  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+  data.user = {...user.toObject(), avatarUrl};
+  if(data.document.origin !== 0){
+    const originDesc = await nkcModules.apiFunction.getOriginLevel(data.document.origin);
+    data.document = {...data.document.toObject(), originDesc};
+  }else {
+    data.document = data.document.toObject();
+  }
   await next()
 })
 .post('/history/:_id/edit',async (ctx, next)=>{

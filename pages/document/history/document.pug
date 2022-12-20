@@ -30,9 +30,11 @@ block content
           if data.history.length
             include ../../columns/article/nav
             +nav({})
-            -var {uid, origin: originState, dt, title: t, type, authorInfos, user} = data.document
+            -var {uid, origin: originState, originDesc, dt, title, type, authorInfos} = data.document
+            -var {user} = data;
             include ../../columns/article/title
-            +title({uid, originState, toc: dt, t, type, authorInfos, user})
+            +title({uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(dt)), allToc: tools.timeFormat(new Date(dt)),
+              title, type, authorInfos, username: user.username, avatarUrl: user.avatarUrl})
             if data.type !== "draft"
               if (data.document.abstract.length || data.document.abstractEN.length)
                 .abstract(style="margin-top:1rem; word-break: break-all;")
