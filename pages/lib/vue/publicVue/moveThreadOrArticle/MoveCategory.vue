@@ -9,10 +9,11 @@
               span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
               span(v-else) 已选择：{{c.selectedNode.name}}
               span ）
-            .editor-thread-category-description(v-if="c.description") 描述：{{ c.description }}
-            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
-              v-if="c.warning"
-            ) 注意事项：{{ c.warning }}
+            if componentType === 'dialog'
+              .editor-thread-category-description(v-if="c.description") 描述：{{ c.description }}
+              .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
+                v-if="c.warning"
+              ) 注意事项：{{ c.warning + componentType}}
             .thread-category-nodes
               .thread-category-node(
                 @click='selectThreadCategory(c, "default")'
@@ -26,9 +27,10 @@
                 :title='n.description'
               )
                 span {{n.name}}
-            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
-              v-if="c.selectedNode && c.selectedNode.warning"
-            ) 注意事项：{{ c.selectedNode.warning }}
+            if componentType === 'dialog'
+              .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
+                v-if="c.selectedNode && c.selectedNode.warning"
+              ) 注意事项：{{ c.selectedNode.warning }}
         span.text-danger 注意：仅更改已选择类别的文章属性
 
 </template>
@@ -71,7 +73,15 @@
 </style>
 <script>
 export default {
-  props: ['selectedCid'],
+  props: {
+    selectedCid: {
+      type: Array
+    },
+    // 用于弹窗不显示注意事项 'dialog',不传或其他字符会显示
+    componentType: {
+      type: String
+    }
+  },
   data: () => ({
     source: "", // thread, article
     categories: [],

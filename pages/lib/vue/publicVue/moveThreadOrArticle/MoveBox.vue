@@ -9,6 +9,7 @@
         .modal-body
           move-category(
             :selected-cid='article.tcId'
+            component-type='dialog'
             ref='moveCategoryList'
           )
         .modal-footer
