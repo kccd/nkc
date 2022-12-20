@@ -41,10 +41,8 @@ router
       minLength: 0,
       maxLength: 5000
     });
-    if(!source) {
-      ctx.throw(400, `分类来源字段不存在 source: ${source}`);
-    }else if(source && (source !== 'thread' || source !== 'article')) {
-      ctx.throw(400, `分类来源字段错误 source: ${source}`);
+    if(!['thread', 'article'].includes(source)) {
+      ctx.throw(400, `分类来源错误 source: ${source}`);
     }
     if(cid) {
       const category = await db.ThreadCategoryModel.findOne({_id: cid});
