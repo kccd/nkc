@@ -23,6 +23,15 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}})
+    if(categories && categories.length>0){
+      data.categoryList =  categories.map(item=>{
+        return {
+          _id: item._id,
+          threadWarning: item.threadWarning
+        }
+      })
+    }
     data.targetUser = await article.extendUser();
     data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
     // 验证权限 - new

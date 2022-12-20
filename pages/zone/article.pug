@@ -10,7 +10,7 @@ extends ../bootstrap_base
 block title
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected, vote} = data.columnPost
   -var {_id, name} = column
-  -var {targetUser} = data
+  -var {targetUser, categoryList} = data
   -var {hits, comment: count, oc, url} = thread
   -var {uid, originState, originDesc, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
   title=t
@@ -29,6 +29,9 @@ block content
       if type === 'article'
         //- 文章管理员操作
         +setUp()
+      include ../columns/article/categoryWarning
+      if categoryList
+        +categoryWarning({categoryList})
       include ../columns/article/title
       +title({article, authorInfos, type, title: t, uid, username: user.username, avatarUrl: targetUser.avatar,
         toc: format('YYYY-MM-DD', new Date(toc)), allToc: tools.timeFormat(new Date(toc)), originState,

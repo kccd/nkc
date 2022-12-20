@@ -9,11 +9,10 @@
               span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
               span(v-else) 已选择：{{c.selectedNode.name}}
               span ）
-            if componentType === 'dialog'
-              .editor-thread-category-description(v-if="c.description") 描述：{{ c.description }}
-              .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
-                v-if="c.warning"
-              ) 注意事项：{{ c.warning + componentType}}
+            .editor-thread-category-description(v-if="c.description && isShowWarn") 描述：{{ c.description }}
+            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
+              v-if="c.warning && isShowWarn"
+            ) 注意事项：{{ c.warning}}
             .thread-category-nodes
               .thread-category-node(
                 @click='selectThreadCategory(c, "default")'
@@ -27,10 +26,9 @@
                 :title='n.description'
               )
                 span {{n.name}}
-            if componentType === 'dialog'
-              .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
-                v-if="c.selectedNode && c.selectedNode.warning"
-              ) 注意事项：{{ c.selectedNode.warning }}
+            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
+              v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
+            ) 注意事项：{{ c.selectedNode.warning }}
         span.text-danger 注意：仅更改已选择类别的文章属性
 
 </template>
@@ -87,7 +85,13 @@ export default {
     categories: [],
     processCategories: [],
     callback: null,
+    isShowWarn: true,
   }),
+  created() {
+    if(this.componentType && this.componentType === 'dialog'){
+      this.isShowWarn = false;
+    }
+  },
   computed: {
     selectedCategoriesId() {
       const categoriesId = [];

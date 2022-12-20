@@ -4,7 +4,7 @@ block baseColumnTitle
   +includeCSS('/columns/article/article.css')
 block baseColumnContent
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
-  -var {targetUser} = data
+  -var {targetUser, categoryList} = data
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
   -var {uid, originState,originDesc, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
@@ -19,6 +19,9 @@ block baseColumnContent
       include ./article/setUp
       //- 文章管理员操作
       +setUp()
+      include ./article/categoryWarning
+      if categoryList
+        +categoryWarning({categoryList})
       include ./article/title
       +title({
         article, authorInfos, type, title: t, uid, username: user.username, avatarUrl: targetUser.avatar,

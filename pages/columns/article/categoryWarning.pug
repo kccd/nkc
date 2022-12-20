@@ -1,0 +1,11 @@
+//-  文章的多维分类存在的公告
+  @params {Array} categoryList 多维分类数组
+  {
+    _id,分类id
+    threadWarning,分类公告
+  }
+mixin categoryWarning(data)
+  -var {categoryList} = data;
+  .bg-warning.text-warning.p-a-1.bg-border.m-t-1
+    for category in categoryList
+      div=category.threadWarning

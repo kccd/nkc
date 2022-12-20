@@ -13,49 +13,50 @@
   @params {String} columnName 专栏名
   @params {String} addr Ip
   @params {String} title 文章标题
-
-mixin title(data)
-  -var {authorInfos, type} = data;
-  -var {title, uid, username, avatarUrl, toc, allToc, originState, originDesc, columnId, columnName, addr} = data;
-  +includeCSS('/columns/article/title.css')
-  .common-article-head
-    //-  hover显示作者信息
-    h1.common-article-title=title
-    p
-      if authorInfos && authorInfos.length
-        for authorInfo, index in authorInfos
-          if authorInfo.kcid.length
-            span.common-article-author-name(style="cursor: pointer;" onclick=`turnUser(${authorInfo.kcid})`)!=`${authorInfo.name}`
-          else
-            span.common-article-author-name!=`${authorInfo.name}`
-          if authorInfos.length > 1
-            sup!=`${index+1}`
-          //- span.common-article-author-name=authorInfo.name
-          if authorInfo.isContract && authorInfo.contractObj && authorInfo.contractObj.contractEmail
-            span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
-    p
-      if authorInfos && authorInfos.length
-        if authorInfos.length > 1
+if !isIncluded('title')
+  mixin title(data)
+    -var {authorInfos, type} = data;
+    -var {title, uid, username, avatarUrl, toc, allToc, originState, originDesc, columnId, columnName, addr} = data;
+    +includeCSS('/columns/article/title.css')
+    .common-article-head
+      //-  hover显示作者信息
+      h1.common-article-title=title
+      p
+        if authorInfos && authorInfos.length
           for authorInfo, index in authorInfos
-            span.common-article-author!=`${index+1}.${authorInfo.agency}，${authorInfo.agencyAdd}`
-        if authorInfos.length <= 1
-          for authorInfo,index in authorInfos
-            span.common-article-author!=`${authorInfo.agency}，${authorInfo.agencyAdd}`
-    .common-article-info
-      a.common-article-author.jump.m-r-05(href=`/u/${uid}` target="_blank"
-        data-global-mouseover="showUserPanel"
-        data-global-mouseout="hideUserPanel"
-        data-global-data=objToStr({uid})
-      )
-        img(src=avatarUrl style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-        //- if authorInfos && authorInfos[0]
-        span.kcid=username
-      span.modify-time.m-r-05(title=allToc)=toc
-      if originDesc
-        span.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown() 原创
-          .dropdown-menu(aria-labelledby='dropdown-level')
-            span(style="padding:5px")!=`${originDesc}`
-      if columnId
-        a.column.jump.m-r-1(href=`/m/${columnId}` target="_blank")=columnName
-      if addr
-        span=` IP:${addr}`
+            if authorInfo.kcid.length
+              span.common-article-author-name(style="cursor: pointer;" onclick=`turnUser(${authorInfo.kcid})`)!=`${authorInfo.name}`
+            else
+              span.common-article-author-name!=`${authorInfo.name}`
+            if authorInfos.length > 1
+              sup!=`${index+1}`
+            //- span.common-article-author-name=authorInfo.name
+            if authorInfo.isContract && authorInfo.contractObj && authorInfo.contractObj.contractEmail
+              span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
+      p
+        if authorInfos && authorInfos.length
+          if authorInfos.length > 1
+            for authorInfo, index in authorInfos
+              span.common-article-author!=`${index+1}.${authorInfo.agency}，${authorInfo.agencyAdd}`
+          if authorInfos.length <= 1
+            for authorInfo,index in authorInfos
+              span.common-article-author!=`${authorInfo.agency}，${authorInfo.agencyAdd}`
+      .common-article-info
+        a.common-article-author.jump.m-r-05(href=`/u/${uid}` target="_blank"
+          data-global-mouseover="showUserPanel"
+          data-global-mouseout="hideUserPanel"
+          data-global-data=objToStr({uid})
+        )
+          img(src=avatarUrl style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+          //- if authorInfos && authorInfos[0]
+          span.kcid=username
+        span.modify-time.m-r-05(title=allToc)=toc
+        if originDesc
+          span.m-r-1.origin.fa.fa-caret-square-o-down.origin-icon.dropdown() 原创
+            .dropdown-menu(aria-labelledby='dropdown-level')
+              span(style="padding:5px")!=`${originDesc}`
+        if columnId
+          a.column.jump.m-r-1(href=`/m/${columnId}` target="_blank")=columnName
+        if addr
+          span=` IP:${addr}`
+  +includeJS('/columns/article/title.js')

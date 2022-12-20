@@ -12,11 +12,23 @@ router
     const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
+    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}})
+    if(categories && categories.length>0){
+      data.categoryList =  categories.map(item=>{
+        return {
+          _id: item._id,
+          threadWarning: item.threadWarning
+        }
+      })
+    }
     data.targetUser = await article.extendUser();
     data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
     data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
     await data.targetUser.extendGrade();
     await db.UserModel.extendUserInfo(data.targetUser);
+    if(data.targetUser && typeof data.targetUser.toObject === 'function') {
+      data.targetUser = data.targetUser.toObject();
+    }
     // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
     // if(data.targetColumn) {
     //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
