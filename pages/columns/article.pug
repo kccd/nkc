@@ -19,7 +19,7 @@ block baseColumnContent
       //- 文章管理员操作
       +setUp()
       include ./article/title
-      +title({t, article, uid, toc: dt, originState, name, _id, authorInfos, user, type})
+      +title({t, article, uid, toc: toc, originState, name, _id, authorInfos, user, type})
       include ./article/abstract
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./article/content
