@@ -209,7 +209,7 @@ const app = new Vue({
         ]
       })
     },
-    editCategory(category) {
+    editCategory(category, _source) {
       commonModel.open(data => {
         const name = data[0].value;
         const description = data[1].value;
@@ -220,7 +220,8 @@ const app = new Vue({
           name,
           description,
           warning,
-          threadWarning
+          threadWarning,
+          source:_source
         })
           .then(data => {
             commonModel.close();
@@ -231,7 +232,7 @@ const app = new Vue({
           })
           .catch(sweetError);
       }, {
-        title: '新建分类',
+        title: '编辑分类',
         data: [
           {
             dom: 'input',

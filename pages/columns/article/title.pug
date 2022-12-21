@@ -21,10 +21,10 @@ if !isIncluded('title')
     .common-article-head
       //-  hover显示作者信息
       h1.common-article-title=title
-      p
-        if authorInfos && authorInfos.length
+      if authorInfos && authorInfos.length > 0
+        p
           for authorInfo, index in authorInfos
-            if authorInfo.kcid.length
+            if authorInfo.kcid && authorInfo.kcid.length > 0
               span.common-article-author-name(style="cursor: pointer;" onclick=`turnUser(${authorInfo.kcid})`)!=`${authorInfo.name}`
             else
               span.common-article-author-name!=`${authorInfo.name}`
@@ -33,14 +33,24 @@ if !isIncluded('title')
             //- span.common-article-author-name=authorInfo.name
             if authorInfo.isContract && authorInfo.contractObj && authorInfo.contractObj.contractEmail
               span.common-article-author.fa.fa-envelope-open-o(onclick="displayAuthor('"+objToStr(authorInfo.contractObj)+"')")
-      p
-        if authorInfos && authorInfos.length
+        p
           if authorInfos.length > 1
             for authorInfo, index in authorInfos
-              span.common-article-author!=`${index+1}.${authorInfo.agency}，${authorInfo.agencyAdd}`
+              span=`${index+1}.`
+              if(authorInfo.agency)
+                span=`${authorInfo.agency}`
+              if(authorInfo.agency && authorInfo.agencyAdd)
+                span.m-r-05=','
+              if(authorInfo.agencyAdd)
+                span.m-r-05=`${authorInfo.agencyAdd}`
           if authorInfos.length <= 1
             for authorInfo,index in authorInfos
-              span.common-article-author!=`${authorInfo.agency}，${authorInfo.agencyAdd}`
+              if(authorInfo.agency)
+                span=`${authorInfo.agency}`
+              if(authorInfo.agency && authorInfo.agencyAdd)
+                span.m-r-05=','
+              if(authorInfo.agencyAdd)
+                span.m-r-05=`${authorInfo.agencyAdd}`
       .common-article-info
         a.common-article-author.jump.m-r-05(href=`/u/${uid}` target="_blank"
           data-global-mouseover="showUserPanel"

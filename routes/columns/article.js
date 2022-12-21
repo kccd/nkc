@@ -10,6 +10,12 @@ router.get('/:aid', async (ctx, next)=>{
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
+  // 简化设置发表目标用户信息
+  data.targetUser = {
+    uid: columnPostData.user.uid,
+    username: columnPostData.user.username
+  };
+  data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', columnPostData.user.avatar);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
   data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
@@ -23,7 +29,7 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
-    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}})
+    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}, disabled: false})
     if(categories && categories.length>0){
       data.categoryList =  categories.map(item=>{
         return {
@@ -49,8 +55,6 @@ router.get('/:aid', async (ctx, next)=>{
         child: categoriesObj[item._id]
       }
     })
-    data.targetUser = await article.extendUser();
-    data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
     // 验证权限 - new
     // 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限

@@ -5,7 +5,8 @@
     threadWarning,分类公告
   }
 mixin categoryWarning(data)
-  -var {categoryList} = data;
-  .bg-warning.text-warning.p-a-1.bg-border.m-t-1
-    for category in categoryList
-      div=category.threadWarning
+  -var {categoryList = []} = data;
+  if categoryList && categoryList.length > 0
+    .bg-warning.text-warning.p-a-1.bg-border.m-t-1
+      for category in categoryList
+        div=category.threadWarning

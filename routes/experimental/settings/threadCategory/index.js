@@ -86,7 +86,8 @@ router
       warning,
       threadWarning,
       type,
-      disabled
+      disabled,
+      source
     } = body;
     const category = await db.ThreadCategoryModel.findOnly({_id: cid});
     const {checkString} = nkcModules.checkData;
@@ -96,7 +97,7 @@ router
         minLength: 0,
         maxLength: 20
       });
-      const saveName = await db.ThreadCategoryModel.countDocuments({name, _id: {$ne: cid}});
+      const saveName = await db.ThreadCategoryModel.countDocuments({source, name, _id: {$ne: cid}});
       if (saveName) ctx.throw(400, `分类名已存在`);
       checkString(description, {
         name: '分类介绍',
@@ -163,9 +164,9 @@ router
   const {db, data, params} = ctx;
   const {type} = params;
   if(type==='thread'){
-    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread', disabled: false});
   }else if(type==='article'){
-    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article', disabled: false});
   }
   ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
   await next();

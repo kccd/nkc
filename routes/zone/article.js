@@ -12,7 +12,7 @@ router
     const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
-    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}})
+    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}, disabled: false})
     if(categories && categories.length>0){
       data.categoryList =  categories.map(item=>{
         return {
