@@ -74,13 +74,6 @@ module.exports = {
 			}
 		}
 	},
-	resources: {// 侧栏logo
-		site_specific: {
-			PARAMETER: {
-				GET: 'getSiteSpecific'
-			}
-		}
-	},
 	default: {// 默认图片
 		PARAMETER: {
 			GET: 'getDefaultImage'
