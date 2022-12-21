@@ -43,7 +43,7 @@ block content
             -var {user} = data
             include ../../columns/article/title
             +title({uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(toc)), allToc: tools.timeFormat(new Date(toc)),
-              title: t, type, authorInfos, username: user.username, avatarUrl: user.avatarUrl})
+              title: t, authorInfos, username: user.username, avatarUrl: user.avatarUrl})
             if (data.document.abstractCn && data.document.abstractCn.length || data.document.abstractCn && data.document.abstractEn.length)
               .abstractCn(style="margin-top:1rem; word-break: break-all;")
                 if data.document.abstractCn.length

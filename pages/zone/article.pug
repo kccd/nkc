@@ -33,7 +33,7 @@ block content
       if categoryList
         +categoryWarning({categoryList})
       include ../columns/article/title
-      +title({article, authorInfos, type, title: t, uid, username: user.username, avatarUrl: targetUser.avatar,
+      +title({authorInfos, title: t, uid, username: user.username, avatarUrl: targetUser.avatar,
         toc: format('YYYY-MM-DD', new Date(toc)), allToc: tools.timeFormat(new Date(toc)), originState,
         columnId: _id, columnName: name, addr: article ? article.document.addr : article.addr, originDesc})
       include ../columns/article/abstract

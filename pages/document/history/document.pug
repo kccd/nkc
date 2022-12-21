@@ -34,7 +34,7 @@ block content
             -var {user} = data;
             include ../../columns/article/title
             +title({uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(dt)), allToc: tools.timeFormat(new Date(dt)),
-              title, type, authorInfos, username: user.username, avatarUrl: user.avatarUrl})
+              title, authorInfos, username: user.username, avatarUrl: user.avatarUrl})
             if data.type !== "draft"
               if (data.document.abstract.length || data.document.abstractEN.length)
                 .abstract(style="margin-top:1rem; word-break: break-all;")

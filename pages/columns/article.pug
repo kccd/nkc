@@ -24,7 +24,7 @@ block baseColumnContent
         +categoryWarning({categoryList})
       include ./article/title
       +title({
-        article, authorInfos, type, title: t, uid: targetUser && targetUser.uid, username: targetUser && targetUser.username, avatarUrl: targetUser && targetUser.avatar,
+        authorInfos, title: t, uid: targetUser && targetUser.uid, username: targetUser && targetUser.username, avatarUrl: targetUser && targetUser.avatar,
         toc: format('YYYY-MM-DD', new Date(toc)), allToc: tools.timeFormat(new Date(toc)), originState,
         columnId: _id, columnName: name, addr: article ? article.document && article.document.addr : article.addr, originDesc
       })
