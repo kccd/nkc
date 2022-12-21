@@ -32,6 +32,23 @@ router.get('/:aid', async (ctx, next)=>{
         }
       })
     }
+    let categoriesObj = {};
+    // 查子分类的父级分类信息
+    const cids = categories.map(item=>{
+      categoriesObj[item.cid] = {
+        _id: item._id,
+        name: item.name,
+      }
+      return item.cid
+    })
+    const father_categories = await db.ThreadCategoryModel.find({_id: {$in: cids}})
+    data.categoriesTree = father_categories.map(item=>{
+      return {
+        cid: item._id,
+        father_name: item.name,
+        child: categoriesObj[item._id]
+      }
+    })
     data.targetUser = await article.extendUser();
     data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
     // 验证权限 - new

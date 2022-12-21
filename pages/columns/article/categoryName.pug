@@ -1,0 +1,15 @@
+//-  文章的多维分类存在的名称
+  @params {Array} categoriesTree 多维分类树结构
+  {
+    cid,父级分类id
+    father_name,父级分类名
+    child:{
+      _id:子分类id,
+      name:子分类名
+    }
+  }
+mixin categoryName(data)
+  -var {categoriesTree} = data;
+  .m-t-1='来自：'
+    for category in categoriesTree
+      span.p-r-1=`${category.father_name}：${category.child && category.child.name}`

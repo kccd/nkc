@@ -24,7 +24,7 @@ router
       minLength: 0,
       maxLength: 20
     });
-    const saveName = await db.ThreadCategoryModel.countDocuments({name});
+    const saveName = await db.ThreadCategoryModel.countDocuments({name, source});
     if(saveName) ctx.throw(400, `分类名已存在`);
     checkString(description, {
       name: '分类介绍',

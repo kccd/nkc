@@ -4,7 +4,7 @@ block baseColumnTitle
   +includeCSS('/columns/article/article.css')
 block baseColumnContent
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
-  -var {targetUser, categoryList} = data
+  -var {targetUser, categoryList, categoriesTree} = data
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
   -var {uid, originState,originDesc, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
@@ -37,6 +37,8 @@ block baseColumnContent
       -var {kcb = [], xsf = []} = article;
       +articleCredits(kcb.concat(xsf), article._id, data.permissions)
       +articleEditTime(tlm, dt, toc)
+      include ./article/categoryName
+      +categoryName({categoriesTree})
       include ../columns/article/articleOptions
       +articleOptions({
         logged: !!data.user,

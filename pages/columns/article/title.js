@@ -3,9 +3,11 @@ import {asyncSweetCustom} from "../../lib/js/sweetAlert";
 
 function displayAuthor(contractObjStr){
   const contractObj = strToObj(contractObjStr);
-  asyncSweetCustom(`联系邮箱：${contractObj.contractEmail}\n 
-  联系邮箱：${contractObj.contractEmail}\n 
-  联系邮箱：${contractObj.contractEmail}`)
+  console.log(contractObj);
+  asyncSweetCustom(`<div>联系邮箱：${contractObj.contractEmail || '无'}</div>
+  <div>联系电话：${contractObj.contractTel || '无'}</div>
+  <div>联系地址：${contractObj.contractAdd || '无'}</div>
+  <div>邮政编码：${contractObj.contractCode || '无'}</div>`)
 }
 Object.assign(window, { turnUser, displayAuthor })
 document.addEventListener('click', (e) => {
