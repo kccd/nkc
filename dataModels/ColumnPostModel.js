@@ -110,8 +110,7 @@ schema.statics.filterData = async (filterData, allowKey) => {
           newObj[key] = timeFormat(filterData[key])
           continue;
         }
-        const item = filterData[key];
-        newObj[key] = item
+        newObj[key] = filterData[key];
       }
     }
   }
@@ -129,7 +128,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
   let res = {};
   if(articleData.type === articleType){
     const {_id: columnPostId, thread, article, editorUrl, column, mainCategory, auxiliaryCategory, type} = articleData;
-    const {uid, atUsers, origin, toc, title, abstract, abstractEN, keywordsEN, keywords, content, tlm, dt, authorInfos} = article.document;
+    const {uid, atUsers, origin, originDesc, toc, title, abstract, abstractEN, keywordsEN, keywords, content, dt, authorInfos} = article.document;
     //获取文章评论数
     thread.count = article.count;
     res = {
@@ -147,6 +146,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
         dt,
         uid,
         originState: origin,
+        originDesc,
         toc,
         tlm: article.tlm,
         t: title,
@@ -664,8 +664,7 @@ schema.statics.deleteColumnPost = async function(aid) {
 * */
 schema.statics.extendColumnArticles = async function(articles) {
   const ArticleModel = mongoose.model('articles');
-  const _articles = await ArticleModel.getArticlesInfo(articles);
-  return _articles;
+  return await ArticleModel.getArticlesInfo(articles);;
 }
 
 /*
@@ -674,8 +673,7 @@ schema.statics.extendColumnArticles = async function(articles) {
 schema.methods.extendColumnPost = async function() {
   const ColumnModel = mongoose.model('columns');
   const {columnId} = this;
-  const column = await ColumnModel.findOne({_id: columnId});
-  return column;
+  return ColumnModel.findOne({_id: columnId});;
 }
 
 

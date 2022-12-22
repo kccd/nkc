@@ -726,7 +726,7 @@ router
     state.editorSettings = await db.SettingModel.getSettings("editor");
     data.state = state;
     // 多维分类
-    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
+    data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false, source: 'thread'});
     await next();
   })
   ;

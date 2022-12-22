@@ -1,16 +1,23 @@
-import CommentHit from "../lib/vue/comment/CommentHit";
-new Vue({
-  el: "#CommentHitBox",
-  data: {
+import {RNSetSharePanelStatus} from "../lib/js/reactNative";
+import {getDataById} from "../lib/js/dataConversion";
+import MoveBox from '../lib/vue/publicVue/moveThreadOrArticle/MoveBox.vue';
 
-  },
+const data = getDataById('data');
+RNSetSharePanelStatus(true,'article',data.article.id)
+const MoveCategoryBoxAppInZone = new Vue({
+  el: "#moveCategoryBoxAppInZone",
   components: {
-    "comment-hit": CommentHit
+    'move-box': MoveBox,
   },
-  mounted() {
-
+  methods:{
+    open(){
+      this.$refs.moveCategoryBox.open(()=>{},{article: data.article})
+    }
   },
-  methods: {
-
-  }
+})
+function openMoveArticleCategory(){
+  MoveCategoryBoxAppInZone.open()
+}
+Object.assign(window, {
+  openMoveArticleCategory
 })

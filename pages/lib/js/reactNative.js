@@ -402,17 +402,18 @@ export function RNOpenDownloadList() {
 * 同步网页 title
 * */
 export function RNSetPageTitle(title) {
-  RNEmit('syncPageTitle', {
+  RNEmitCore('syncPageTitle', {
     title
   });
 }
 /*
 * thread系列触发分享显示
+* data 需要携带的数据，需要JSON.stringify
 * */
 export function RNSetSharePanelStatus(show = true,type,id) {
   RNEmit('setSharePanelStatus', {
     show,
     type,
-    id
+    id,
   });
 }

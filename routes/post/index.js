@@ -438,6 +438,7 @@ router
     targetPost.authorInfos = newAuthInfos;
     targetPost.originState = originState;
     targetPost.tlm = Date.now();
+    targetPost.toDraft = false;
 	  if(targetThread.oc === pid) {
       targetPost.cover = cover;
 	  }
@@ -505,6 +506,8 @@ router
         });
       }
     }
+
+    await targetThread.updateThreadMessage(false);
 
     // 帖子曾经在草稿箱中，发表时，删除草稿
     // if(did) {

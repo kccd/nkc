@@ -13,7 +13,7 @@
       :code="code"
       :account-register-info="accountRegisterInfo"
       )
-    footer-vue(ref="footerVue")
+    footer-vue(ref="footerVue" v-if="!isApp")
 </template>
 
 <style lang="less" scoped>

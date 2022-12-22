@@ -832,4 +832,24 @@ fn.arrayShuffle = (array) => {
   }
   return array;
 };
+fn.getOriginLevel=(index) => {
+  const obj = {
+    "0": "不声明",
+    "1": "普通转载",
+    "2": "获授权转载",
+    "3": "受权发表(包括投稿)",
+    "4": "发表人参与原创(翻译)",
+    "5": "发表人是合作者之一",
+    "6": "发表人本人原创"
+  };
+  if(!index) {
+    return obj;
+  }else{
+    for(const i in obj) {
+      if(i == index) {
+        return obj[i]
+      }
+    }
+  }
+}
 module.exports = fn;

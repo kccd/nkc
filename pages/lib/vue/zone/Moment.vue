@@ -26,7 +26,7 @@
             from-now(:time="momentData.toc")
             span &nbsp;IP:{{momentData.addr}}
           //- 其他操作
-          .single-moment-header-options.fa.fa-ellipsis-h(@click.stop="openOption($event)" data-direction="down")
+          .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
             moment-option(
               ref="momentOption"
               @complaint="complaint"

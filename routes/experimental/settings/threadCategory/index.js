@@ -3,7 +3,8 @@ module.exports = router;
 router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
-    data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
     await next();
   })
@@ -15,14 +16,15 @@ router
       description,
       warning,
       cid,
-      threadWarning
+      threadWarning,
+      source,
     } = body;
     checkString(name, {
       name: '分类名',
       minLength: 0,
       maxLength: 20
     });
-    const saveName = await db.ThreadCategoryModel.countDocuments({name});
+    const saveName = await db.ThreadCategoryModel.countDocuments({name, source});
     if(saveName) ctx.throw(400, `分类名已存在`);
     checkString(description, {
       name: '分类介绍',
@@ -38,7 +40,10 @@ router
       name: '分类文章公告',
       minLength: 0,
       maxLength: 5000
-    })
+    });
+    if(!['thread', 'article'].includes(source)) {
+      ctx.throw(400, `分类来源错误 source: ${source}`);
+    }
     if(cid) {
       const category = await db.ThreadCategoryModel.findOne({_id: cid});
       if(!category) ctx.throw(400, `上级分类不存在 cid: ${cid}`);
@@ -48,9 +53,11 @@ router
       description,
       warning,
       cid,
-      threadWarning
+      threadWarning,
+      source
     });
-    data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     await next();
   })
   .put('/', async (ctx, next) => {
@@ -65,7 +72,8 @@ router
         }
       });
     }
-    data.categoryTree = await db.ThreadCategoryModel.getCategoryTree();
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread'});
+    data.articleCategoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article'});
     await next();
   })
   .put('/:cid', async (ctx, next) => {
@@ -78,7 +86,8 @@ router
       warning,
       threadWarning,
       type,
-      disabled
+      disabled,
+      source
     } = body;
     const category = await db.ThreadCategoryModel.findOnly({_id: cid});
     const {checkString} = nkcModules.checkData;
@@ -88,7 +97,7 @@ router
         minLength: 0,
         maxLength: 20
       });
-      const saveName = await db.ThreadCategoryModel.countDocuments({name, _id: {$ne: cid}});
+      const saveName = await db.ThreadCategoryModel.countDocuments({source, name, _id: {$ne: cid}});
       if (saveName) ctx.throw(400, `分类名已存在`);
       checkString(description, {
         name: '分类介绍',
@@ -150,4 +159,15 @@ router
       }
     });
     await next();
-  });
+  })
+  .get('/source/:type', async (ctx, next) => {
+  const {db, data, params} = ctx;
+  const {type} = params;
+  if(type==='thread'){
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread', disabled: false});
+  }else if(type==='article'){
+    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article', disabled: false});
+  }
+  ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
+  await next();
+});
