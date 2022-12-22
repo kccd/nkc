@@ -11,6 +11,6 @@
 mixin categoryName(data)
   -var {categoriesTree = []} = data;
   if categoriesTree && categoriesTree.length > 0
-    .m-t-1='来自：'
+    .m-t-1='来自 '
       for category in categoriesTree
         span.p-r-1=`${category.father_name}：${category.child && category.child.name}`

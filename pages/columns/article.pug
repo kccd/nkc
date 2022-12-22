@@ -25,7 +25,7 @@ block baseColumnContent
       include ./article/title
       +title({
         authorInfos, title: t, uid: targetUser && targetUser.uid, username: targetUser && targetUser.username, avatarUrl: targetUser && targetUser.avatar,
-        toc: format('YYYY-MM-DD', new Date(toc)), allToc: tools.timeFormat(new Date(toc)), originState,
+        toc: format('YYYY-MM-DD', new Date(dt || toc)), allToc: tools.timeFormat(new Date(dt || toc)), originState,
         columnId: _id, columnName: name, addr: article ? article.document && article.document.addr : article.addr, originDesc
       })
       include ./article/abstract
@@ -54,7 +54,7 @@ block baseColumnContent
         permissions: data.permissions,
       })
   .hidden#data=objToStr({type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
-  .move-article-category#moveCategoryBoxAppInColumns(v-cloak)
+  span.move-article-category#moveCategoryBoxAppInColumns(v-cloak)
     move-box(
       ref='moveCategoryBox'
     )
