@@ -6,6 +6,37 @@ block eTitle
       color: #333;
       text-decoration: none;
     }
+    .classification {
+      display: inline-block;
+      cursor: pointer;
+    }
+    .search  a {
+      text-decoration: none;
+      outline: none;
+      color: inherit;
+    }
+    .active {
+      border-bottom: #409eff 2px solid;
+      color: #409eff;
+    }
+    .checkbox-item {
+      display: inline-block;
+      vertical-align: middle;
+      user-select: none;
+    }
+    .checkbox-item .check-in {
+      display: inline-block;
+      margin-right: 0.3rem;
+    }
+    .auth .title {
+      color: rgba(14, 14, 14, 0.54);
+      width: 4.6rem;
+      display: inline-block;
+    }
+
+    .auth .content a{
+      cursor: pointer;
+    }
 block eContent
   -const mainContainer1400 = true
     #data.hidden=objToStr({searchType: data.searchType, searchContent: data.searchContent, t: data.t})
@@ -21,19 +52,31 @@ block eContent
             input.form-control(type='text' v-model.trim='searchContent' placeholder="请输入检索内容" @keyup.enter='search')
           .form-group
             button.btn.btn-default(@click='search') 搜索
-            button.btn.btn-default.reset
-              a(href="/e/auth") 重置
+            button.btn.btn-default.reset(@click="resetSearch") 重置
         .panel.panel-default
-          .panel-heading
-            if data.searchContent
-              span 搜索结果
-            else
-              span 待审核列表
+          .panel-heading.search
+            //if data.searchContent
+            //  span 搜索结果
+            //else
+            .waiting-review.classification.m-r-05(:class="{'active': activeWaitingReview()}")
+              //a(href="/e/auth") 待审核列表
+              span(@click="selectedBtn('waiting-review')") 待审核列表
+            .all.classification(:class="{'active': !activeWaitingReview()}")
+              //a(href="/e/auth?allFilter=auth1-2") 全部
+              span(@click="selectedBtn('all')") 全部
+            .filter(v-if="!activeWaitingReview()")
+              label.checkbox-item.m-r-05
+                input.check-in(type="checkbox" v-model="checkbox.auth1" @change="selectedCheckBox()")
+                span 通过身份认证1
+              label.checkbox-item.m-r-05
+                input.check-in(type="checkbox" v-model="checkbox.auth2" @change="selectedCheckBox()")
+                span 通过身份认证2
           .panel-body
             table.table.table-striped
               thead
                 tr
-                  th UID
+                  th 身份认证1
+                  th 身份认证2
                   th 用户名
                   th 认证类型
                   th 链接
@@ -41,7 +84,34 @@ block eContent
                 for auth in data.usersAuth
                   -const {targetUser, authLevel} = auth;
                   tr
-                    th= targetUser.uid
+                    th.auth.auth1
+                      p
+                        span.title 状态:
+                        span.content xxx
+                      p
+                        span.title  审核时间:
+                        span.content xxxxxxxxxx
+                      p
+                        span.title 过期时间:
+                        span.content xxxxxxxxxx
+                      p
+                        span.title 审核人:
+                        span.content
+                          a.user xxxxx
+                    th.auth.auth2
+                      p
+                        span.title 状态:
+                        span.content xxx
+                      p
+                        span.title  审核时间:
+                        span.content xxxxxxxxxx
+                      p
+                        span.title 过期时间:
+                        span.content xxxxxxxxxx
+                      p
+                        span.title 审核人:
+                        span.content
+                          a.user xxxxx
                     th
                       a(href=`/u/${targetUser.uid}` target='_blank')=targetUser.username
                     th= `身份认证${authLevel}`

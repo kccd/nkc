@@ -69,12 +69,65 @@ new Vue({
 	data: {
 		searchType: data.searchType || 'username',
 		searchContent: data.searchContent || '',
+		checkbox: {
+			auth1: true,
+			auth2: true,
+		},
+		btnType: '',
+		btnTypeUrl: {
+			'waiting-review': "/e/auth?type=waiting-review",
+			all: '/e/auth?type=auth1-2'
+		}
+	},
+	mounted() {
+		this.initCheckbox()
 	},
 	methods: {
+		selectedBtn(btnType) {
+			this.btnType = btnType;
+
+			window.location.href = this.btnTypeUrl[btnType];
+		},
+		resetSearch() {
+			this.searchType = 'username';
+			this.searchContent = '';
+			// 得区分点的是全部还是待审核
+			if (this.btnType === 'waiting-review') {
+				window.location.href = this.btnTypeUrl['waiting-review'];
+			} else {
+				window.location.href = window.location.href.replace(/(c)(.n)(&exp)/, '')
+			}
+		},
+		selectedCheckBox() {
+			const {searchType, searchContent, checkbox: {auth1, auth2}} = this;
+			if (auth1 || auth2) {
+				const allFilter = auth1 && auth2 ? 'auth1-2' : auth1 ? 'auth1' : 'auth2';
+				window.location.href = `/e/auth?c=${searchType},${searchContent}&type=${allFilter}`;
+			} else {
+				window.location.href = `/e/auth?c=${searchType},${searchContent}`;
+			}
+		},
+		initCheckbox() {
+			['auth1','auth2', 'auth1-2'].forEach((item) => {
+				if (item === 'auth1-2' && window.location.search.includes(item)) {
+					this.checkbox['auth1'] = true
+					this.checkbox['auth2'] = true
+				} else {
+					window.location.search.includes(item) ? (this.checkbox[item] = true) : (this.checkbox[item] = false)
+				}
+			})
+		},
+		activeWaitingReview() {
+			return (window.location.pathname === '/e/auth?type=waiting-review')
+		},
 		search() {
-			const {searchType, searchContent, t} = this;
+			const {searchType, searchContent} = this;
 			if(!searchContent) return sweetError('请输入搜索内容');
-			window.location.href = `/e/auth?c=${searchType},${searchContent}`;
+			if (this.btnType === 'waiting-review') {
+				window.location.href = `/e/auth?c=${searchType},${searchContent}`;
+			} else {
+				this.selectedCheckBox();
+			}
 		},
 		resetInput(){
 			this.searchContent = '';
