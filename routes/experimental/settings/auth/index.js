@@ -42,6 +42,14 @@ router
       name: '间隔时间',
       min: 1,
     });
+    checkNumber(verifyPhoneNumber.unitInterval, {
+      name: '累加时间',
+      min: 0,
+    });
+    checkNumber(verifyPhoneNumber.maxInterval, {
+      name: '间隔上限时间',
+      min: 0,
+    });
     if(!['reviewPost', 'disablePublish'].includes(verifyPhoneNumber.type)) {
       ctx.throw(400, `未验证手机号时的操作类型错误`);
     }
@@ -67,6 +75,8 @@ router
         'c.verifyPhoneNumber': {
           enabled: !!verifyPhoneNumber.enabled,
           interval: verifyPhoneNumber.interval,
+          unitInterval: verifyPhoneNumber.unitInterval,
+          maxInterval: verifyPhoneNumber.maxInterval,
           type: verifyPhoneNumber.type,
           reviewPostContent: verifyPhoneNumber.reviewPostContent,
           disablePublishContent: verifyPhoneNumber.disablePublishContent

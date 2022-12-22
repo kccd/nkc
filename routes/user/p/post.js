@@ -81,6 +81,8 @@ module.exports = async (ctx, next) => {
     threadsObj[thread.tid] = thread;
   });
   const haveReviewPermission = ctx.permission('review');
+  const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
+  
   for(const post of posts) {
     const thread = threadsObj[post.tid];
     if(post.disabled || thread.disabled || thread.recycleMark) {
@@ -119,7 +121,27 @@ module.exports = async (ctx, next) => {
     if(firstPost.t.length > 20) {
       firstPost.t = firstPost.t.slice(0, 20) + "...";
     }
+    // 增加 编辑权限
+    // const post = await db.PostModel.findOnly({pid: thread.oc});
+    const isComment = !!post.parentPostId;
+    const isThread = post.type === 'thread';
+    // const postType = isThread? 'thread': 'post';
+    let edit = null;
+    // 编辑
+    if(
+      // 回复或不是基金的文章
+      (!isThread || thread.type !== 'fund') &&
+      (post.uid === user.uid || ctx.permission('modifyOtherPosts'))
+    ) {
+      if(modifyPostTimeLimit >= (Date.now() - new Date(post.toc).getTime())) {
+        // 未超过修改的最大时间
+        edit = true;
+      }
+    }
     const result = {
+      edit,
+      isComment,
+      editType: post.type,
       postType: thread.oc === post.pid?'postToForum': 'postToThread',
       parentPostId: post.parentPostId,
       tid: thread.tid,
