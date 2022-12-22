@@ -3,14 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
 const redisClient = require('../settings/redisClient');
-
-const defaultCerts = {
-  'scholar': 'scholar',
-  'default': 'default',
-  'dev': 'dev',
-  'visitor': 'visitor',
-  'banned': 'banned',
-};
+const {defaultCerts} = require('../settings/userCerts');
 
 const userSchema = new Schema({
   // 是否注销

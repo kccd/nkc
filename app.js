@@ -81,7 +81,7 @@ app
 
   .use(stayLogin)
   .use(cache)
-  .use(permission)
+  .use(permission.permission)
   .use(logger)
   .use(mainRouter.routes())
   .use(body)
