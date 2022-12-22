@@ -1,5 +1,5 @@
 <template lang="pug">
-  .moment-options( v-show="show")
+  .moment-options(v-show="show")
     .post-options-panel(v-if='loading')
       .loading 加载中...
     .post-options-panel(v-else)
@@ -28,7 +28,7 @@
       //- 分享按钮
       .option(
         data-global-click='showSharePanel'
-        :data-global-data="objToStr({type: 'moment', id: moment.momentId})"
+        :data-global-data="objToStr({type: 'moment', id: moment.momentCommentId? moment.momentCommentId: moment.momentId})"
         title='分享'
       )
         .fa.fa-share-square-o
@@ -110,12 +110,11 @@ export default {
     options: {},
     toc: null,
     stableDocument: null,
+    isAddEvent: false,
   }),
   mounted() {
     const self = this;
-    document.addEventListener('click', () => {
-      self.show = false;
-    })
+
   },
   methods: {
     objToStr: objToStr,
@@ -142,6 +141,13 @@ export default {
       visitUrl(url,true)
     },
     open(props) {
+      if(!this.isAddEvent){
+        document.addEventListener('click', (e) => {
+          this.show = false;
+          this.isAddEvent = true;
+          e.stopPropagation();
+        })
+      }
       this.loading = true;
       const {moment, DOM, direction} = props;
       this.toc = null;

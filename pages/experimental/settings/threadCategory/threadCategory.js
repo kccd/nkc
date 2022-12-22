@@ -124,13 +124,49 @@ const app = new Vue({
         })
         .catch(sweetError);
     },
-    newCategory(cid) {
+    newCategory(cid, _source) {
+      let data = [
+        {
+          dom: 'input',
+          label: '名称',
+          value: ''
+        },
+        {
+          dom: 'textarea',
+          label: '介绍',
+          value: ''
+        },
+        {
+          dom: 'textarea',
+          label: '注意事项',
+          value: ''
+        },
+        {
+          dom: 'textarea',
+          label: '文章公告',
+          value: ''
+        }
+      ];
+      if(!_source){
+        data.splice(3, 0,
+          {
+          dom: 'radio',
+          label: '来源',
+          radios: [{name:'社区文章',value:'thread'},{name:'独立文章',value:'article'}],
+        })
+      }
       commonModel.open(data => {
         const name = data[0].value;
         const description = data[1].value;
         const warning = data[2].value;
-        const threadWarning = data[4].value;
-        const source = data[3].value;
+        let threadWarning, source;
+        if(!_source){
+          threadWarning = data[4].value;
+          source = data[3].value
+        }else {
+          threadWarning = data[3].value;
+          source = _source;
+        }
         nkcAPI(`/e/settings/threadCategory`, 'POST', {
           name,
           description,
@@ -147,33 +183,7 @@ const app = new Vue({
           .catch(sweetError);
       }, {
         title: '新建分类',
-        data: [
-          {
-            dom: 'input',
-            label: '名称',
-            value: ''
-          },
-          {
-            dom: 'textarea',
-            label: '介绍',
-            value: ''
-          },
-          {
-            dom: 'textarea',
-            label: '注意事项',
-            value: ''
-          },
-          {
-            dom: 'radio',
-            label: '来源',
-            radios: [{name:'社区文章',value:'thread'},{name:'独立文章',value:'article'}],
-          },
-          {
-            dom: 'textarea',
-            label: '文章公告',
-            value: ''
-          }
-        ]
+        data
       })
     },
     editDefaultCategory(category) {
@@ -199,7 +209,7 @@ const app = new Vue({
         ]
       })
     },
-    editCategory(category) {
+    editCategory(category, _source) {
       commonModel.open(data => {
         const name = data[0].value;
         const description = data[1].value;
@@ -210,7 +220,8 @@ const app = new Vue({
           name,
           description,
           warning,
-          threadWarning
+          threadWarning,
+          source:_source
         })
           .then(data => {
             commonModel.close();
@@ -221,7 +232,7 @@ const app = new Vue({
           })
           .catch(sweetError);
       }, {
-        title: '新建分类',
+        title: '编辑分类',
         data: [
           {
             dom: 'input',

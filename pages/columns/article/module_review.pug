@@ -1,7 +1,7 @@
 .thread-review-info
   -let {document, reason} = reviewData || {};
   -let {_id} = document || {};
-  if permission("review")
+  if permissions.review
     h4 内容未审核
     if reason
       p= "送审理由：" + reason

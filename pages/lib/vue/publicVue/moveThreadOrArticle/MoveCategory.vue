@@ -9,10 +9,10 @@
               span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
               span(v-else) 已选择：{{c.selectedNode.name}}
               span ）
-            .editor-thread-category-description(v-if="c.description") 描述：{{ c.description }}
+            .editor-thread-category-description(v-if="c.description && isShowWarn") 描述：{{ c.description }}
             .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
-              v-if="c.warning"
-            ) 注意事项：{{ c.warning }}
+              v-if="c.warning && isShowWarn"
+            ) 注意事项：{{ c.warning}}
             .thread-category-nodes
               .thread-category-node(
                 @click='selectThreadCategory(c, "default")'
@@ -27,7 +27,7 @@
               )
                 span {{n.name}}
             .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
-              v-if="c.selectedNode && c.selectedNode.warning"
+              v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
             ) 注意事项：{{ c.selectedNode.warning }}
         span.text-danger 注意：仅更改已选择类别的文章属性
 
@@ -71,13 +71,27 @@
 </style>
 <script>
 export default {
-  props: ['selectedCid'],
+  props: {
+    selectedCid: {
+      type: Array
+    },
+    // 用于弹窗不显示注意事项 'dialog',不传或其他字符会显示
+    componentType: {
+      type: String
+    }
+  },
   data: () => ({
     source: "", // thread, article
     categories: [],
     processCategories: [],
     callback: null,
+    isShowWarn: true,
   }),
+  created() {
+    if(this.componentType && this.componentType === 'dialog'){
+      this.isShowWarn = false;
+    }
+  },
   computed: {
     selectedCategoriesId() {
       const categoriesId = [];

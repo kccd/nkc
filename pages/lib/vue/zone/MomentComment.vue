@@ -210,7 +210,7 @@ export default {
       const target = e.target;
       const name = `momentOption_${moment._id}`;
       self.$refs[name].open({DOM: $(target), moment});
-      e.stopPropagation();
+      // e.stopPropagation();
     },
     visitCommentChild() {
       // this.$emit('visit-comment-child', this.commentData);

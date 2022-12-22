@@ -564,20 +564,11 @@ shareSchema.statics.getShareContent = async function(props) {
     const moment = await MomentsModel.findOnly({_id: id});
     const momentsData = await MomentsModel.extendMomentsListData([moment], user && user.uid);
     const momentInfo = momentsData[0]
-    if(momentInfo.quoteData){
-      const data = momentInfo.quoteData.data;
-      shareContent = {
-        title: `「动态电文」${data.title}`,
-        cover: getUrl('userAvatar', momentInfo.user.avatar),
-        desc: nkcRender.htmlToPlain(data.content, 100),
-      };
-    }else {
-      shareContent = {
-        title: `「动态电文」${momentInfo.username}`,
-        cover: getUrl('userAvatar', momentInfo.user.avatar),
-        desc: nkcRender.htmlToPlain(momentInfo.content, 100),
-      };
-    }
+    shareContent = {
+      title: `「动态电文」${momentInfo.username || ''}`,
+      cover: getUrl('userAvatar', momentInfo.user.avatar),
+      desc: nkcRender.htmlToPlain(momentInfo.content || '', 100),
+    };
 
   }
   return shareContent;
