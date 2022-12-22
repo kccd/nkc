@@ -1,17 +1,10 @@
 const router = require('koa-router')();
 const {renderMarkdown} = require('../../nkcModules/markdown');
-
-function isIncludes(arr, id, type) {
-  for(const a of arr) {
-    if(a.id === id && a.type === type)  return true;
-  }
-  return false;
-}
-
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
-    ctx.template = 'zone/article.pug'
+    // ctx.template = 'zone/article.pug'
+    ctx.remoteTemplate = 'zone/article.pug';
     const { db, data, params, query, state, permission, nkcModules } = ctx;
     const { aid } = params;
     const {pageSettings, uid} = state;
@@ -19,11 +12,40 @@ router
     const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
+    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}, disabled: false})
+    if(categories && categories.length>0){
+      data.categoryList =  categories.map(item=>{
+        return {
+          _id: item._id,
+          threadWarning: item.threadWarning
+        }
+      })
+    }
+    let categoriesObj = {};
+    // 查子分类的父级分类信息
+    const cids = categories.map(item=>{
+      categoriesObj[item.cid] = {
+        _id: item._id,
+        name: item.name,
+      }
+      return item.cid
+    })
+    const father_categories = await db.ThreadCategoryModel.find({_id: {$in: cids}})
+    data.categoriesTree = father_categories.map(item=>{
+      return {
+        cid: item._id,
+        father_name: item.name,
+        child: categoriesObj[item._id]
+      }
+    })
     data.targetUser = await article.extendUser();
     data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
     data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
     await data.targetUser.extendGrade();
     await db.UserModel.extendUserInfo(data.targetUser);
+    if(data.targetUser && typeof data.targetUser.toObject === 'function') {
+      data.targetUser = data.targetUser.toObject();
+    }
     // data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
     // if(data.targetColumn) {
     //   data.ColumnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type : 'article', pid: article._id});
@@ -82,6 +104,10 @@ router
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+      manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
+      review: ctx.permission('review'),
+      creditKcb: ctx.permission('creditKcb'),
+      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr(["movePostsToRecycle", "movePostsToDraft"])
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
@@ -147,6 +173,15 @@ router
     });
     //文章浏览数加一
     await article.addArticleHits();
+    await next();
+  })
+  .put('/:aid/category',async (ctx, next) => {
+    const { db, params, body } = ctx;
+    const {tcId} = body;
+    const {aid} = params;
+    if(tcId){
+      await db.ArticleModel.update({_id: aid},{$set: {tcId}})
+    }
     await next();
   });
 module.exports = router;

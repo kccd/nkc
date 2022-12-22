@@ -847,6 +847,7 @@
   "bookInvitation": "处理专题创作邀请",
   "columnEditor": "访问专栏编辑器页",
   "visitZoneArticle": "访问空间文章",
+  "manageZoneArticleCategory": "修改空间文章多维分类",
   "getCommentPermission": "获取评论权限",
   "getColumnInfo": "专栏 - 获取用户专栏信息",
   "getCommentIpInfo": "获取评论ip",

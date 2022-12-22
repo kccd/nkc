@@ -2,7 +2,7 @@ if !isIncluded('columns/article/articleOptions')
   -var types = {article: 'article', thread: 'thread'};
   +includeCSS('/columns/article/articleOptions.css')
   mixin articleOptions(props)
-    -var {logged, type, _id, tid, collected, digest, voteUp, voteDown, replyCount, vote} = props;
+    -var {logged, type, _id, tid, collected, digest, voteUp, voteDown, replyCount, vote, permissions} = props;
     .article-options
 
       mixin replyItem
@@ -40,7 +40,7 @@ if !isIncluded('columns/article/articleOptions')
             vote=vote
             )
         //- 鼓励
-        if permission('creditKcb')
+        if permissions && permissions.creditKcb
           .single-post-bottom-item.m-l-05(
             data-global-click=`showCreditPanel`
             data-global-data=objToStr({creditType: 'kcb', contentType: 'article', contentId: _id})

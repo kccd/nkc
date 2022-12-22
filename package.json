@@ -68,6 +68,7 @@
     "cheerio": "^1.0.0-rc.3",
     "cli-cursor": "^3.1.0",
     "colors": "^1.1.2",
+    "commander": "^9.4.1",
     "commonmark": "^0.28.1",
     "content-disposition": "^0.5.3",
     "cookie-signature": "^1.1.0",

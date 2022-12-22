@@ -1,6 +1,6 @@
 if !isIncluded('comment')
   +includeCSS('/publicModules/commentCenter/comment.css')
-  -var disableComment = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
+  -var disableComment = data.permissions.movePostsToRecycleOrMovePostsToDraft && data.isModerator;
   //- 发表人筛选
   mixin articleNav
     .paging-button

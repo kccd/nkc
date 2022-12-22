@@ -10,8 +10,8 @@
     a(href=`/u/${author.uid}` target='_blank').thread-author-name=author.username
     .thread-author-cert
       if author.certs.indexOf('banned') < 0
-        img(src=author.grade.iconUrl title=author.grade.displayName)
-      span(title=author.info.certsName)=author.info.certsName
+        img(src=author.grade && author.grade.iconUrl title=author.grade && author.grade.displayName)
+      span(title=author.info && author.info.certsName)=author.info && author.info.certsName
     .thread-author-number
       .group
         .name 文章

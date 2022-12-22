@@ -10,6 +10,12 @@ router.get('/:aid', async (ctx, next)=>{
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
+  // 简化设置发表目标用户信息
+  data.targetUser = {
+    uid: columnPostData.user.uid,
+    username: columnPostData.user.username
+  };
+  data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', columnPostData.user.avatar);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
   data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
@@ -23,6 +29,32 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}, disabled: false})
+    if(categories && categories.length>0){
+      data.categoryList =  categories.map(item=>{
+        return {
+          _id: item._id,
+          threadWarning: item.threadWarning
+        }
+      })
+    }
+    let categoriesObj = {};
+    // 查子分类的父级分类信息
+    const cids = categories.map(item=>{
+      categoriesObj[item.cid] = {
+        _id: item._id,
+        name: item.name,
+      }
+      return item.cid
+    })
+    const father_categories = await db.ThreadCategoryModel.find({_id: {$in: cids}})
+    data.categoriesTree = father_categories.map(item=>{
+      return {
+        cid: item._id,
+        father_name: item.name,
+        child: categoriesObj[item._id]
+      }
+    })
     // 验证权限 - new
     // 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
@@ -63,6 +95,7 @@ router.get('/:aid', async (ctx, next)=>{
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+      manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
     };
     //文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

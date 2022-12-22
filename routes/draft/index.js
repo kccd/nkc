@@ -54,7 +54,7 @@ router
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
   const queryCriteria = { desTypeId, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
   const {newThread} = await db.DraftModel.getDesType();
-  
+
   if (source === newThread) {
     queryCriteria.did = desTypeId;
     delete queryCriteria.desTypeId;
@@ -74,7 +74,6 @@ router
     if(data.document.uid !== state.uid){
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
-    data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
     // const documentResourceId = await data.document.getResourceReferenceId();
     const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
     data.document.content = nkcRender.renderHTML({
@@ -90,6 +89,16 @@ router
     data.document = '';
     // data.bookId = ''
     data.urlComponent = ''
+  }
+  // 查询文章作者
+  const user = await db.UserModel.findOnly({uid: data.document.uid});
+  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+  data.user = {...user.toObject(), avatarUrl};
+  if(data.document.origin !== 0){
+    const originDesc = nkcModules.apiFunction.getOriginLevel(data.document.origin);
+    data.document = {...data.document.toObject(), originDesc};
+  }else {
+    data.document = data.document.toObject();
   }
   await next()
 })
