@@ -9,12 +9,12 @@ if !isIncluded('singlePostWarningInfo')
       .single-post-header
         .disabled
           span.m-r-05 内容已被屏蔽
-          if permissions.unblockPosts || permission('unblockPosts')
+          if permissions && permissions.unblockPosts
             a(onclick=`window.singleCommentBottom['${cid}'].unblock('${docId}')`) 点击解封
     else if status === 'unknown'
       .single-post-header
         .review 内容待审核
-        if permissions.review || permission('review')
+        if permissions && permissions.review
           if reason
             span= "送审原因：" + reason
           div

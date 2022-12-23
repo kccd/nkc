@@ -29,7 +29,7 @@ if !isIncluded('comment')
     .comment-list.m-t-1
       include ./singleComment/singleComment
       for comment in data.comments
-        +singleComment({commentData: comment, permissions})
+        +singleComment(Object.assign({}, comment, {permissions: data.permissions}))
     if !data.comments || data.comments.length === 0
       .null.p-t-1#nullComments 还没有人评论哦~~
   .m-b--05

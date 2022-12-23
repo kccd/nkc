@@ -1,4 +1,4 @@
 div
   include ../../../publicModules/mixin
   include ./singleComment
-  +singleComment({commentData: data.commentData})
+  +singleComment(Object.assign({}, data.commentData, {permissions: data.permissions}))

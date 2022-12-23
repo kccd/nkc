@@ -2,7 +2,7 @@
 if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
-    -var {cid, docId, props: comment, voteDown, voteUp, vote, articleId} = props;
+    -var {cid, docId, props: comment, voteDown, voteUp, vote, articleId, permissions} = props;
     .single-post-bottom(id=`singleCommentBottom_${cid}` cid=cid)
       violation-record(ref="violationRecord")
       complaint(ref="complaint")
@@ -24,7 +24,7 @@ if !isIncluded('singlePostBottom')
           .post-vote-container
             comment-hit(cid=cid, vote-down=voteDown vote-up=voteUp vote=vote)
         if data.user
-          if (data.permissions && permissions.creditKcb) || permission('creditKcb')
+          if (permissions && permissions.creditKcb)
             .single-post-bottom-item(
               data-global-click=`showCreditPanel`
               data-global-data=objToStr({creditType: 'kcb', contentType: 'comment', contentId: cid})

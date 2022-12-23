@@ -8,7 +8,7 @@ block baseColumnContent
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
   -var {uid, originState,originDesc, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
-  -var showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+  -var showManagement = data.user && data.isModerator && data.permissions.showManagement;
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
     +hidePostContentSettings(data.postHeight)

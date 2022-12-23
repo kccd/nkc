@@ -4,10 +4,11 @@ if !isIncluded('singleCommentCenter')
   //-引入学术分和鼓励
   include ./singleCommentCredit
   mixin singleCommentCenter(props)
-    -var {quote, title, content, cid, xsf, kcb} = props;
+    -var {quote, title, content, cid, xsf, kcb, user} = props;
     .single-post-center
       if quote
-        +singleCommentQuote(quote)
+        //+singleCommentQuote({quote, user})
+        +singleCommentQuote(Object.assign({}, {userHome: user.userHome}, quote))
       .single-post-title=title
       .single-post-content!=content
       +singleCommentCredit(cid, xsf.concat(kcb))

@@ -96,6 +96,10 @@ router.get('/:aid', async (ctx, next)=>{
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
       manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
+      showManagement: ctx.permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']),
+      creditKcb: ctx.permission('creditKcb'),
+      unblockPosts: ctx.permission('unblockPosts'),
+      review: ctx.permission('review'),
     };
     //文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
