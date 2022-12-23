@@ -107,7 +107,8 @@ router
       manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
       review: ctx.permission('review'),
       creditKcb: ctx.permission('creditKcb'),
-      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr(["movePostsToRecycle", "movePostsToDraft"])
+      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr(["movePostsToRecycle", "movePostsToDraft"]),
+      unblockPosts: ctx.permission('unblockPosts'),
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

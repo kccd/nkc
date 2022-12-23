@@ -1,6 +1,7 @@
 if !isIncluded('comment')
   +includeCSS('/publicModules/commentCenter/comment.css')
   -var disableComment = data.permissions.movePostsToRecycleOrMovePostsToDraft && data.isModerator;
+  -var {permissions} = data;
   //- 发表人筛选
   mixin articleNav
     .paging-button
@@ -28,7 +29,7 @@ if !isIncluded('comment')
     .comment-list.m-t-1
       include ./singleComment/singleComment
       for comment in data.comments
-        +singleComment(comment)
+        +singleComment({commentData: comment, permissions})
     if !data.comments || data.comments.length === 0
       .null.p-t-1#nullComments 还没有人评论哦~~
   .m-b--05

@@ -75,7 +75,7 @@ function initSingleCommentBottom(cid) {
         const data = this.getDataById(`comment_${cid}`);
         const init = e.getAttribute('data-init');
         if(init === 'true') return;
-        this.$refs.commentOptions.open({DOM: target, comment: data.comment, direction});
+        this.$refs.commentOptions.open({DOM: target, comment: data.comment.commentData, direction});
         //阻止事件冒泡到父级
         // event.stopPropagation();
       },
@@ -127,14 +127,14 @@ function initSingleCommentBottom(cid) {
         nkcAPI(`/comment/${docId}/unblock`, 'POST', {
           docsId: [docId]
         })
-          .then(res => {
+          .then(() => {
             screenTopAlert(docId +' 已解除屏蔽')
           })
           .catch(err => {
             sweetError(err);
           })
       }
-      
+
     }
   });
 }
