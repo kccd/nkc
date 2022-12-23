@@ -47,40 +47,46 @@ authRouter
 		return ctx.throw(403, "参数错误");
 	})
 	.post("/verify2", async (ctx, next) => {
-		const { body, data, params } = ctx;
+		const { body, data, params, state } = ctx;
 		const { uid } = params;
 		const { status, expiredDate, message } = body;
+		const reviewer = state.uid;
+		const reviewDate = Date.now();
+		const expiryDate = new Date(expiredDate);
 		const userPersonal = await UsersPersonalModel.findOne({ uid });
 		if(status === "passed") {
 			if(!expiredDate) {
 				return ctx.throw(403, "需要填写过期日期");
 			}
-			await userPersonal.passVerify2(new Date(expiredDate));
+			await userPersonal.passVerify2({expiryDate, reviewer, reviewDate});
 		}
 		if(status === "fail") {
 			if(!message) {
 				return ctx.throw(403, "需要填写不通过原因");
 			}
-			await userPersonal.rejectVerify2(message);
+			await userPersonal.rejectVerify2({message, reviewDate, reviewer});
 		}
 		return next();
 	})
 	.post("/verify3", async (ctx, next) => {
-		const { body, data, params } = ctx;
+		const { body, data, params, state } = ctx;
 		const { uid } = params;
 		const { status, expiredDate, message } = body;
+		const reviewer = state.uid;
+		const reviewDate = Date.now();
+		const expiryDate = new Date(expiredDate);
 		const userPersonal = await UsersPersonalModel.findOne({ uid });
 		if(status === "passed") {
 			if(!expiredDate) {
 				return ctx.throw(403, "需要填写过期日期");
 			}
-			await userPersonal.passVerify3(new Date(expiredDate));
+			await userPersonal.passVerify3({expiryDate, reviewer, reviewDate});
 		}
 		if(status === "fail") {
 			if(!message) {
 				return ctx.throw(403, "需要填写不通过原因");
 			}
-			await userPersonal.rejectVerify3(message);
+			await userPersonal.rejectVerify3({message, reviewDate, reviewer});
 		}
 		return next();
 	})

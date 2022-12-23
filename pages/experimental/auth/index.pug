@@ -37,6 +37,20 @@ block eTitle
     .auth .content a{
       cursor: pointer;
     }
+    .paging span {
+      cursor: pointer;
+      display: inline-block;
+      margin-right: 0.3rem;
+      padding: 0 0.5rem;
+      height: 2rem;
+      line-height: 2rem;
+      border-radius: 4px;
+    }
+
+    .paging .active {
+      color: white;
+      background-color: #409eff;
+    }
 block eContent
   -const mainContainer1400 = true
     #data.hidden=objToStr({searchType: data.searchType, searchContent: data.searchContent, t: data.t})
@@ -71,52 +85,73 @@ block eContent
               label.checkbox-item.m-r-05
                 input.check-in(type="checkbox" v-model="checkbox.auth2" @change="selectedCheckBox()")
                 span 通过身份认证2
+              label.checkbox-item.m-r-05
+                input.check-in(type="checkbox" v-model="checkbox.auth3" @change="selectedCheckBox()")
+                span 通过身份认证3
+              -const paging = data.paging
+            if paging && paging.pageCount
+              .paging
+                for btn in paging.buttonValue
+                  span(class=`${btn.type}` @click=`paging(${btn.num})`)=btn.num !== undefined ? btn.num + 1 : '...'
           .panel-body
             table.table.table-striped
               thead
                 tr
                   th 身份认证1
                   th 身份认证2
+                  th 身份认证3
                   th 用户名
                   th 认证类型
-                  th 链接
+                  //th 链接
+                  th 其他
               tbody
                 for auth in data.usersAuth
-                  -const {targetUser, authLevel} = auth;
+                  -const {targetUser, authLevel, auth1, auth2, auth3} = auth;
                   tr
                     th.auth.auth1
                       p
                         span.title 状态:
-                        span.content xxx
-                      p
-                        span.title  审核时间:
-                        span.content xxxxxxxxxx
-                      p
-                        span.title 过期时间:
-                        span.content xxxxxxxxxx
-                      p
-                        span.title 审核人:
-                        span.content
-                          a.user xxxxx
+                        span.content=auth1.status
                     th.auth.auth2
                       p
                         span.title 状态:
-                        span.content xxx
+                        span.content=auth2.status
                       p
                         span.title  审核时间:
-                        span.content xxxxxxxxxx
+                        span.content=auth2.reviewDate || '无'
                       p
                         span.title 过期时间:
-                        span.content xxxxxxxxxx
+                        span.content=auth2.expiryDate || '无'
                       p
                         span.title 审核人:
                         span.content
-                          a.user xxxxx
+                          if auth2.reviewer.uid
+                            a.user(href=`/u/${auth2.reviewer.uid}`)=auth2.reviewer.username
+                          else
+                            span 无
+
+                    th.auth.auth3
+                      p
+                        span.title 状态:
+                        span.content=auth3.status
+                      p
+                        span.title  审核时间:
+                        span.content=auth3.reviewDate || '无'
+                      p
+                        span.title 过期时间:
+                        span.content=auth3.expiryDate || '无'
+                      p
+                        span.title 审核人:
+                        span.content
+                          if auth3.reviewer.uid
+                            a.user(href=`/u/${auth3.reviewer.uid}`)=auth3.reviewer.username
+                          else
+                            span 无
                     th
                       a(href=`/u/${targetUser.uid}` target='_blank')=targetUser.username
                     th= `身份认证${authLevel}`
                     th
-                      a(href=`/e/auth/${targetUser.uid}`) 去处理
+                      a(href=`/e/auth/${targetUser.uid}`) 查看详情
             if data.usersAuth.length === 0
               .p-t-2.p-b-2.text-center 空空如也~
 block scripts

@@ -334,6 +334,14 @@ const usersPersonalSchema = new Schema({
 			  type: [String],
         default: []
       },
+			reviewer: {
+				type: String,
+				default: null
+			},
+			reviewDate: {
+				type: Date,
+				default: null
+			}
 		},
 		video: {
 			status: {
@@ -349,6 +357,14 @@ const usersPersonalSchema = new Schema({
 			  type: Date,
         default: null
       },
+			reviewer: {
+				type: String,
+				default: null
+			},
+			reviewDate: {
+				type: Date,
+				default: null
+			},
 			code: {
 			  type: String,
         default: ''
@@ -744,12 +760,16 @@ usersPersonalSchema.methods.changeVerify2Status = async function(status) {
 /**
  * 审核通过此用户的身份认证2
  * @param {Date} expiryDate 过期日期
+ * @param reviewer 审核人
+ * @param reviewDate 审核日期
  */
-usersPersonalSchema.methods.passVerify2 = async function(expiryDate) {
+usersPersonalSchema.methods.passVerify2 = async function({expiryDate, reviewer, reviewDate}) {
 	await this.changeVerify2Status("passed");
 	await this.updateOne({
 		$set: {
-			"authenticate.card.expiryDate": expiryDate
+			"authenticate.card.expiryDate": expiryDate,
+			"authenticate.card.reviewer": reviewer,
+			"authenticate.card.reviewDate": reviewDate
 		}
 	});
 }
@@ -757,12 +777,16 @@ usersPersonalSchema.methods.passVerify2 = async function(expiryDate) {
 /**
  * 把此用户的身份认证2置为审核不通过状态
  * @param {string} message 给用户看的信息
+ * @param reviewer 审核人
+ * @param reviewDate 审核日期
  */
-usersPersonalSchema.methods.rejectVerify2 = async function(message) {
+usersPersonalSchema.methods.rejectVerify2 = async function({message,reviewer, reviewDate}) {
 	await this.changeVerify2Status("fail");
 	await this.updateOne({
 		$set: {
-			"authenticate.card.message": message
+			"authenticate.card.message": message,
+			"authenticate.card.reviewer": reviewer,
+			"authenticate.card.reviewDate": reviewDate
 		}
 	});
 }
@@ -808,12 +832,16 @@ usersPersonalSchema.statics.checkExpiryAuthenticate = async function(uid) {
 /**
  * 审核通过此用户的身份认证3
  * @param {Date} expiryDate 过期日期
+ * @param reviewer 审核人
+ * @param reviewDate 审核日期
  */
-usersPersonalSchema.methods.passVerify3 = async function(expiryDate) {
+usersPersonalSchema.methods.passVerify3 = async function({expiryDate, reviewer, reviewDate}) {
 	await this.changeVerify3Status("passed");
 	await this.updateOne({
 		$set: {
-			"authenticate.video.expiryDate": expiryDate
+			"authenticate.video.expiryDate": expiryDate,
+			"authenticate.video.reviewer": reviewer,
+			"authenticate.video.reviewDate": reviewDate
 		}
 	});
 }
@@ -821,12 +849,16 @@ usersPersonalSchema.methods.passVerify3 = async function(expiryDate) {
 /**
  * 把此用户的身份认证3置为审核不通过状态
  * @param {string} message 给用户看的信息
+ * @param reviewer 审核人
+ * @param reviewDate 审核日期
  */
-usersPersonalSchema.methods.rejectVerify3 = async function(message) {
+usersPersonalSchema.methods.rejectVerify3 = async function({message, reviewer, reviewDate}) {
 	await this.changeVerify3Status("fail");
 	await this.updateOne({
 		$set: {
-			"authenticate.video.message": message
+			"authenticate.video.message": message,
+			"authenticate.video.reviewer": reviewer,
+			"authenticate.video.reviewDate": reviewDate
 		}
 	});
 }
