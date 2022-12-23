@@ -21,7 +21,7 @@
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
       // 多维分类
-      .form-group(v-if="tcId" )
+      .form-group(v-if="tcId && (articleStatus === 'default' || !articleStatus)" )
         .m-b-2
           b 多维分类
           editor-categories(
@@ -301,6 +301,7 @@ export default {
             self.tcId = data.editorInfo.article && data.editorInfo.article.tcId || [];
           }
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
+          console.log(data.editorInfo.article)
           if(data.editorInfo.article) {
             //获取文章的发表状态
             self.articleStatus = data.editorInfo.article.status;
