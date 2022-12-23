@@ -10,7 +10,7 @@ router
   .get('/:file', async (ctx, next) => {
     const {file} = ctx.params;
     const {fs} = ctx;
-    let filePath = `${attachIconPath}/kc${file}`;
+    let filePath = `${attachIconPath}/kc${file}.png`;
     try{
       await fs.access(filePath);
     }catch(e) {
@@ -18,7 +18,6 @@ router
     }
     ctx.filePath = filePath;
     ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
-    const [name, ext] = file;
     ctx.type = "png";
     await next()
   });

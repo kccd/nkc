@@ -30,6 +30,17 @@ module.exports = async (ctx, next) => {
   ctx.nkcModules = nkcModules;
   ctx.state = {};
 
+  // 这个字段用于在路由层临时传输数据。
+  // 例如在 use('/u/:uid') 中准备好 user 的数据放入 ctx.internalData 中。
+  // 然后在 get('/u/:uid') 和 put('/u/:uid') 中使用。
+  ctx.internalData = {};
+
+  // 由于历史原因，ctx.data 中包含了很多渲染页面所需要的数据，例如user、userOperations等。
+  // 这部分数据可能不是接口所需要的，所以有必要创建一个字段用于返回接口所需要的、干净的数据。
+  // 并且需要兼容旧代码，所以最终返回数据时，会优先判断是否走的 /api/.. 路由。
+  // 如果走了 /api/.. 则会将 ctx.apiData 字段中的值作为响应数据。
+  ctx.apiData = {};
+
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
@@ -45,7 +56,6 @@ module.exports = async (ctx, next) => {
   }
 
   try {
-    ctx.internalData = {};
     ctx.body = ctx.request.body;
     ctx.db = db;
 	  ctx.tools = tools;

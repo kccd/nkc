@@ -15,6 +15,11 @@ import {routesName} from "../../../routes/creation";
 import {getState} from "../../../../lib/js/state";
 import {nkcAPI} from "../../../../lib/js/netAPI";
 export default {
+  components:{
+    'post-list': PostList,
+    'blank': Blank,
+    'paging': Paging
+  },
   data: () => ({
     postRouteName: routesName.creationCommunityPost,
     threadRouteName: routesName.creationCommunityThread,
@@ -28,11 +33,6 @@ export default {
     checkboxPosts: [],
     t: '',
   }),
-  components:{
-    'post-list': PostList,
-    'blank': Blank,
-    'paging': Paging
-  },
   computed: {
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
