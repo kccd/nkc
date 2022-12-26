@@ -109,8 +109,8 @@
               .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
-              .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
-              .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
+              .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url('+getUrl('fileCover', 'mp3')+')'")
+              .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url('+getUrl('fileCover', r.ext)+')'")
             span(v-else)
               .resource-picture.resource-in-process-bg
             .resource-name(
