@@ -1,4 +1,5 @@
 const mongoose = require("../settings/database");
+const {getUrl} = require("../nkcModules/tools");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
@@ -123,10 +124,12 @@ schema.statics.getCategoryTree = async (columnId) => {
 * */
 schema.statics.getCategoryList = async (columnId) => {
   const categories = await mongoose.model("columnPostCategories").getCategoryTree(columnId);
+  const {getUrl} = require('../nkcModules/tools');
   const arr = [];
   const func = (cc, index) => {
     for(const c of cc) {
       c.level = index;
+      c.columnCategoryUrl = getUrl('columnCategory', columnId, c._id);
       arr.push(c);
       if(c.children && c.children.length > 0) {
         func(c.children, index+1);
@@ -203,6 +206,7 @@ schema.statics.computeCategoryOrder = async (_id) => {
 * */
 schema.statics.getChildCategory = async (categoryId) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const {getUrl} = require('../nkcModules/tools');
   const category = await ColumnPostCategoryModel.findOne({
     _id: categoryId,
     type: 'main'
@@ -212,6 +216,7 @@ schema.statics.getChildCategory = async (categoryId) => {
   const func = (category) => {
     for(const c of categories) {
       if(c.parentId === category._id) {
+        c.columnCategoryUrl = getUrl('columnCategory', category.columnId, c._id)
         results.push(c);
         func(c);
       }
@@ -234,6 +239,7 @@ schema.statics.getColumnNavCategory = async (columnId) => {
   const results = [];
   for(let category of categories) {
     category = category.toObject();
+    category.columnCategoryUrl = getUrl('columnCategory', columnId, category._id)
     category.children = await ColumnPostCategoryModel.getChildCategory(category._id);
     results.push(category);
   }

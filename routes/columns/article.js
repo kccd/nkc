@@ -4,7 +4,8 @@ router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {highlight, t, last_page, token} = query;
   let {page = 0} = query;
-  ctx.template = 'columns/article.pug';
+  // ctx.template = 'columns/article.pug';
+  ctx.remoteTemplate = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
   data.highlight = highlight;
@@ -77,6 +78,9 @@ router.get('/:aid', async (ctx, next)=>{
       creditKcb: ctx.permission('creditKcb'),
       unblockPosts: ctx.permission('unblockPosts'),
       review: ctx.permission('review'),
+      homeHotColumn: ctx.permission('homeHotColumn'),
+      homeToppedColumn: ctx.permission('homeToppedColumn'),
+      column_single_disabled: ctx.permission('column_single_disabled'),
     };
     //文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);
@@ -234,6 +238,8 @@ router.get('/:aid', async (ctx, next)=>{
   }
   const hidePostSettings = await db.SettingModel.getSettings("hidePost");
   data.postHeight = hidePostSettings.postHeight;
+  data.column.columnBanner = nkcModules.tools.getUrl('columnBanner', data.column.banner);
+  data.column.columnUrl = nkcModules.tools.getUrl('column', data.column._id);
   await next();
 })
 module.exports = router;

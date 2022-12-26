@@ -4,7 +4,7 @@ mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner)
     .column
       .column-avatar-container
         .column-avatar
-          img(src=tools.getUrl('columnAvatar', column.avatar))
+          img(src=column.columnBanner)
         .column-name-info
           -var subscribed = false;
           if user
@@ -27,13 +27,13 @@ mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner)
               data-number=column.subCount
               data-type='subscriptionNumber'
               data-column-id=column._id
-              )=tools.briefNumber(column.subCount)
+              )=(tools.briefNumber && tools.briefNumber(column.subCount)) || (briefNumber && briefNumber(column.subCount))
           .column-name-number
             h5 获赞数
-            span=tools.briefNumber(column.postVoteUp)
+            span=(tools.briefNumber && tools.briefNumber(column.postVoteUp)) || (briefNumber && briefNumber(column.postVoteUp))
           .column-name-number
             h5 阅读数
-            span=tools.briefNumber(column.postHits)
+            span=(tools.briefNumber && tools.briefNumber(column.postHits)) || (briefNumber && briefNumber(column.postHits))
 
         //-
           // 关注按钮
