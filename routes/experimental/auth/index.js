@@ -35,7 +35,15 @@ authRouter
 				const delimiter = ','
 				const arr = type.split(delimiter);
 				const part1 = arr[0];
-				const part2 = arr[1].includes('-') ? arr[1].split('-').map(s => part1 + s) : [part1 + arr[1]];
+				let part2 = '';
+				if (arr[1] && arr[1].includes('-')) {
+					part2 = arr[1].split('-').map(s => part1 + s);
+				} else if (arr[1] && !arr[1].includes('-')) {
+					part2 = [part1 + arr[1]];
+				} else {
+					// 不存在 auth1 auth2 auth3 任何一个
+					part2 = []
+				}
 				part2.forEach(item => {
 					const keys = Object.keys(matchMap[item])
 					keys.forEach(key => {

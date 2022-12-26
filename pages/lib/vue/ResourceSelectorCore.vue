@@ -1218,7 +1218,7 @@ export default {
       }
       // return console.log(self.files);
       // var promise = this.startUpload(f);
-      return self.uploadFileSeries()
+      return Promise.all(this.files.map(file => this.startUpload(file)))
         .then(function() {
           console.log("【全部上传完成】");
           if(self.category === "upload" && !self.files.length) {
@@ -1229,30 +1229,32 @@ export default {
           }
         })
     },
-    uploadFileSeries() {
-      const self = this;
-      var file;
-      for(var i = 0; i < self.files.length; i++) {
-        var f = self.files[i];
-        if(f.status !== 'unUpload' || f.error) continue;
-        file = f;
-        break;
-      }
-      // var file = self.files[0];
-      if(!file) return Promise.resolve();
-      return self.startUpload(file)
-        .then(new Promise(function(resolve, _) {
-          console.log("【上传成功】", file.name);
-          setTimeout(resolve, 1000);
-        }))
-        .then(function() {
-          return self.uploadFileSeries();
-        })
-    },
+   // async uploadFileSeries() {
+      // const self = this;
+      // var file;
+      // for(var i = 0; i < self.files.length; i++) {
+      //   var f = self.files[i];
+      //   if(f.status !== 'unUpload' || f.error) continue;
+      //   file = f;
+      //   break;
+      // }
+      // if(!file) return Promise.resolve();
+      // return self.startUpload(file)
+      //   .then(new Promise(function(resolve, _) {
+      //     console.log("【上传成功】", file.name);
+      //     setTimeout(resolve, 1000);
+      //   }))
+      //   .then(function() {
+      //     return self.uploadFileSeries();
+      //   })
+    // },
     // 用户已选择待上传的文件
     selectedFiles: function() {
       var self = this;
       var input = this.$refs.inputElement;
+      if (input.files.length > 3) {
+        return sweetInfo("一次最多选择三张图片")
+      }
       // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
       var files = [].slice.call(input.files);
       input.value = "";
