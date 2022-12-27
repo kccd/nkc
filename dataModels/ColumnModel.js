@@ -195,6 +195,9 @@ schema.statics.extendColumns = async (columns) => {
   for(let column of columns) {
     column = column.toObject();
     column.user = usersObj[column.uid];
+    column.columnBanner = getUrl('columnBanner', column.banner);
+    column.columnUrl = getUrl('column', column._id);
+    column.columnAvatar = getUrl('columnAvatar', column.avatar);
     results.push(column);
   }
   return results;

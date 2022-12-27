@@ -254,6 +254,8 @@ schema.statics.extendColumnPosts = async (options) => {
   const ColumnModel = mongoose.model("columns");
   const ArticleModel = mongoose.model('articles');
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const {getUrl} = require('../nkcModules/tools');
+
   const {normal} = await ArticleModel.getArticleStatus();
   const pid = new Set();
   const tid = new Set();
@@ -352,7 +354,11 @@ schema.statics.extendColumnPosts = async (options) => {
   const usersObj = {};
   const users = await UserModel.find({uid: {$in: [...uid]}});
   users.map(user => {
-    usersObj[user.uid] = user;
+    const _user = user.toObject();
+    usersObj[user.uid] = {
+      ..._user,
+      avatarUrl: getUrl('userAvatar', user.avatar, 'sm')
+    };
   });
   const categories = await ColumnPostCategoryModel.find({_id: {$in: cid}}, {_id: 1, name: 1, description: 1});
   const categoriesObj = {};
@@ -372,6 +378,7 @@ schema.statics.extendColumnPosts = async (options) => {
         p.thread.firstPost.uid = "";
         p.thread.firstPost.user = "";
       }
+      p.thread.firstPost.coverUrl = getUrl("postCover", p.thread.firstPost.cover)
       p.post = p.thread.firstPost;
     } else if(p.type === 'post') {
       p.post = postsObj[p.pid];
@@ -388,6 +395,8 @@ schema.statics.extendColumnPosts = async (options) => {
       if(!p.article) continue;
       p.article.user = usersObj[p.article.uid];
       p.article.document.content = obtainPureText(p.article.document.content, true, 200);
+      p.article.document.coverUrl = getUrl("postCover", p.article.document.cover);
+      p.article.avatarUrl = getUrl("userAvatar", p.article.avatar);
     }
     // p.post.url = await PostModel.getUrl(p.pid);
     if(p.post) {

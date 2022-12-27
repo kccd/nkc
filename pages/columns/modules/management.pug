@@ -1,7 +1,7 @@
 //- 专栏管理面板 专栏管理员、专栏主
   @param data.contributeCount 待处理的投稿数
 
--var canManagement = data.permissions.column_single_disabled;
+-var canManagement = data.permissions && data.permissions.column_single_disabled;
 
 .m-b-1.column-tool-container(style=columnToolStyle)
   include ../../publicModules/accountRegisterInfo

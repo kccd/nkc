@@ -238,8 +238,6 @@ router.get('/:aid', async (ctx, next)=>{
   }
   const hidePostSettings = await db.SettingModel.getSettings("hidePost");
   data.postHeight = hidePostSettings.postHeight;
-  data.column.columnBanner = nkcModules.tools.getUrl('columnBanner', data.column.banner);
-  data.column.columnUrl = nkcModules.tools.getUrl('column', data.column._id);
   await next();
 })
 module.exports = router;

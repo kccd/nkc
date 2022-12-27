@@ -1,4 +1,5 @@
 -var {column, from, type, post, thread, article, mainCategories, columnId, toc} = columnPost
+-console.log('thread.firstPost.user',thread && thread.firstPost.user)
 if thread
   -var {firstPost} = thread;
 .column-posts-post
@@ -21,9 +22,9 @@ if thread
   .column-post-body(class=(thread && thread.firstPost.cover) || (article && article.document.cover)?"cover":"")
     .column-post-cover
       if thread && thread.firstPost.cover
-        div(style=`background-image:url(${tools.getUrl("postCover", thread.firstPost.cover)})`)
+        div(style=`background-image:url(${thread.firstPost.coverUrl})`)
       else if article && article.document.cover
-        div(style=`background-image:url(${tools.getUrl("postCover", article.document.cover)})`)
+        div(style=`background-image:url(${article.document.coverUrl})`)
     .column-post-abstract
       if type === "post"
         .column-post-content.post
@@ -57,7 +58,7 @@ if thread
               data-global-mouseout="hideUserPanel"
               data-global-data=objToStr({uid: thread.firstPost.uid})
             ).column-post-author
-              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
+              img(src=thread.firstPost.user.avatarUrl)
               span=thread.firstPost.user.username
           else
             span.column-post-author
@@ -69,7 +70,7 @@ if thread
             data-global-mouseout="hideUserPanel"
             data-global-data=objToStr({uid: article.user.uid})
           ).column-post-author
-            img(src=tools.getUrl('userAvatar', article.avatar, 'sm'))
+            img(src=article.user.avatarUrl)
             span=article.user.username
         .column-post-time
           span.m-r-05

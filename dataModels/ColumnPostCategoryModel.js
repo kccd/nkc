@@ -1,5 +1,5 @@
 const mongoose = require("../settings/database");
-const {getUrl} = require("../nkcModules/tools");
+// const {getUrl} = require("../nkcModules/tools");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
@@ -231,6 +231,7 @@ schema.statics.getChildCategory = async (categoryId) => {
 * */
 schema.statics.getColumnNavCategory = async (columnId) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const {getUrl} = require('../nkcModules/tools');
   const categories = await ColumnPostCategoryModel.find({
     columnId,
     type: 'main',
