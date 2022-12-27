@@ -2540,7 +2540,7 @@ forumSchema.statics.getUserCategoriesWithForums = async (props) => {
   }
   const forumsObj = {};
   for(const f of forumsTree) {
-    const {categoryId} = f;
+    const {categoryId} = f
     if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
     forumsObj[categoryId].push(f);
   }

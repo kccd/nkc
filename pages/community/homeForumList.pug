@@ -29,7 +29,8 @@ if !isIncluded('homeForumList')
             .detailed-forum-panel
               if disableChild
                 if f.logo
-                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo)
+                  //img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo)
+                  img.detailed-forum-panel-icon(src=f.logo
                     data-global-mouseover="showForumPanel"
                     data-global-mouseout="hideForumPanel"
                     data-global-data=objToStr({fid: f.fid})
@@ -83,7 +84,7 @@ if !isIncluded('homeForumList')
             .detailed-forum-panel
               if disableChild
                 if f.logo
-                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo)
+                  img.detailed-forum-panel-icon(src=f.logo
                     data-global-mouseover="showForumPanel"
                     data-global-mouseout="hideForumPanel"
                     data-global-data=objToStr({fid: f.fid})

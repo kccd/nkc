@@ -33,8 +33,9 @@ mixin renderHome(homeBlock, options)
         .swiper-container.swiper-home
           .swiper-wrapper
             for thread in homeBlock.data
+              // // 'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
               a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
+                'background-image': `url(${thread.cover})`
               })
                 .swiper-title= `${thread.title}`
           .swiper-pagination
@@ -53,7 +54,8 @@ mixin renderHome(homeBlock, options)
             a(href=`/t/${thread.tid}` target="_blank" title=thread.title
               class=index > 2 ? 'm-b-0' : ''
             )
-              .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+              //.home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+              .home-covers-sm-img(style=`background-image:url(${thread.cover})`)
               .home-covers-sm-title=thread.title
   else if homeBlock._id === 'toppedThreads'
     //首页顶置
@@ -74,7 +76,8 @@ mixin renderHome(homeBlock, options)
             .home-goods-content
               .home-goods-avatar
                 if goods.post && goods.post.cover
-                  div(style=`background-image: url(${tools.getUrl('postCover', goods.post.cover)})`)
+                  //div(style=`background-image: url(${tools.getUrl('postCover', goods.post.cover)})`)
+                  div(style=`background-image: url(${goods.post.cover})`)
                 else
                   div(style=`background-image: url(/r/${goods.imgMaster})`)
               .home-goods-info
@@ -82,7 +85,8 @@ mixin renderHome(homeBlock, options)
                 .home-goods-description=goods.abstract
                 .home-goods-other
                   a.home-goods-user(href=`/u/${goods.user.uid}`)
-                    img(src=tools.getUrl("userAvatar", goods.user.avatar)
+                    //img(src=tools.getUrl("userAvatar", goods.user.avatar)
+                    img(src=goods.user.avatar
                       data-global-mouseover="showUserPanel"
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: goods.user.uid})
@@ -111,7 +115,8 @@ mixin renderHome(homeBlock, options)
               data-global-data=objToStr({fid: f.fid})
             )
               if f.logo
-                img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
+                //img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
+                img.home-goods-forum-icon(src=f.logo)
               else
                 .home-goods-forum-icon(style=`background-color: ${f.color}`)
               span=f.displayName
@@ -124,12 +129,14 @@ mixin renderHome(homeBlock, options)
           for column in homeBlock.data
             a(href=`/m/${column._id}` target="_blank").home-column
               .home-column-avatar
-                img(src=tools.getUrl("columnAvatar", column.avatar))
+                //img(src=tools.getUrl("columnAvatar", column.avatar))
+                img(src=column.avatar)
               .home-column-info
                 .home-column-title= column.name
                 .home-column-description= column.abbr || "无简介"
                 .home-column-statics
-                  span=tools.briefTime(column.tlm) + "更新 "
+                  //span=tools.briefTime(column.tlm) + "更新 "
+                  span=column.tlm + "更新 "
                   span= "共" + column.postCount + "篇文章"
         .m-t-05
           a.home-threads-more-link(href=`/m`) 查看更多
@@ -145,9 +152,11 @@ mixin renderHome(homeBlock, options)
           .col-xs-12.col-md-6
             .home-main-column-left
               .home-main-column-avatar
-                img(src=tools.getUrl('columnAvatar', column.avatar))
+                //img(src=tools.getUrl('columnAvatar', column.avatar))
+                img(src=column.avatar)
               .home-main-column-info
-                a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                //a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                a(href=column._id target="_blank").home-main-column-name=column.name
                 .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
           .col-xs-12.col-md-6
             .home-main-column-right(class=klass || '')
@@ -191,7 +200,8 @@ mixin renderHome(homeBlock, options)
                       if cf.countPostsToday && cf.countPostsToday > 0
                         sup=cf.countPostsToday
   else if homeBlock._id === 'management'
-    if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+    //if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+    if data.permissionsOr.management
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         include ../publicModules/management/management

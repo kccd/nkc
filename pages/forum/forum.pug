@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   meta(name='description' content=`${data.forum.description}` || '暂无专业介绍')
-  title=`${data.forum.displayName} - ${state.serverSettings.websiteName}`
+  title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
   +includeCSS("/forum/forum.css")
   if data.type === "home"
     include ../publicModules/plyr/plyr.css.pug
@@ -51,13 +51,13 @@ block content
           .forum-banner
             .forum-banner-cover
             if !data.forum.banner
-              .forum-banner-img(style=`background-image: url(${tools.getUrl('defaultFile', 'forum_banner.jpg')})`)
+              .forum-banner-img(style=`background-image: url(${data.forum_banner_url})`)
             else
-              .forum-banner-img(style=`background-image: url(${tools.getUrl('forumBanner', data.forum.banner)})`)
+              .forum-banner-img(style=`background-image: url(${data.forum_banner_url})`)
           .forum-info-body
             .forum-avatar
               if data.forum.logo
-                img.forum-avatar-icon(src=tools.getUrl('forumLogo', data.forum.logo))
+                img.forum-avatar-icon(src= data.forum.logoUrl)
               else
                 .forum-avatar-icon(style=`background-color: ${data.forum.color}`)
             .forum-info
@@ -82,7 +82,8 @@ block content
                     .count=data.forum.countPostsToday
                     .name 条更新
             .forum-buttons
-              if permission('visitForumInfoSettings')
+              //if permission('visitForumInfoSettings')
+              if data.permission.visitForumInfoSettings
                 a(href=`/f/${data.forum.fid}/settings`).btn-sm.forum-sub-btn.btn 设置
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
                 if data.user
@@ -98,7 +99,7 @@ block content
           .forum-nav
             .thread-nav
               .thread-nav-left
-                a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
+                a.nav-link(href='/?t=home' title=data.serverSettings.brief) 主页
                 for n in data.forumNav
                   -const {fid, name, cid} = n;
                   span.nav-delimiter >
@@ -118,7 +119,7 @@ block content
                     button.forum-post-button.btn.btn-default.btn-xs(title=data.noPermissionReason onclick=`sweetInfo('${data.noPermissionReason}')`)
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
-                  else if state.isApp
+                  else if data.isApp
                     //button.forum-post-button.btn.btn-default.btn-xs(onclick=`openEditSite()`)
                     //- a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
                     a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=newThread&id=${data.forum.fid}` target="_blank")
@@ -153,7 +154,7 @@ block content
           div
             .m-b-1
               //- 手机导航 其他文章链接
-              if !(state.isApp && state.platform === 'reactNative')
+              if !(data.isApp && data.platform === 'reactNative')
                 include ../publicModules/mobile_drawer/right_drawer
               include ../publicModules/paging/forum_nav
             if data.forum.latestBlockNotice && data.paging.page === 0
@@ -246,7 +247,7 @@ block content
                   .warning-panel
                     .fa.fa-exclamation
                     span &nbsp;当前文库已被关闭。
-                if !data.libraryClosed || permission("modifyAllResource")
+                if !data.libraryClosed || data.permission.modifyAllResource
                   include ../publicModules/library/library
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom.box-shadow-panel
         if data.isPreparationForum
@@ -255,24 +256,28 @@ block content
             ul.forum-founder-list
               for founder in data.founderList
                 li.forum-founder-item
-                  .forum-founder-avatar(style=`background-image: url(${tools.getUrl("userAvatar", founder.avatar)})`)
-                  a.fouum-founder-username(href=tools.getUrl("userHome", founder.uid) target="_blank"
+                  //.forum-founder-avatar(style=`background-image: url(${tools.getUrl("userAvatar", founder.avatar)})`)
+                  .forum-founder-avatar(style=`background-image: url(${founder.avatar})`)
+                  a.fouum-founder-username(href=founder.uid
+                    target="_blank"
                     data-global-mouseover="showUserPanel"
                     data-global-mouseout="hideUserPanel"
                     data-global-data=objToStr({uid: founder.uid})
                   )= founder.username
         .m-b-1
           .panel-header 专业介绍
-          .forum-description!= nkcRender.htmlFilter(data.forum.description) || "暂无专业介绍"
-        if permission('visitForumInfoSettings') && data.isModerator
+          //.forum-description!= nkcRender.htmlFilter(data.forum.description) || "暂无专业介绍"
+          .forum-description!= data.htmlFilterDescription || "暂无专业介绍"
+        //if permission('visitForumInfoSettings') && data.isModerator
+        if data.permission.visitForumInfoSettings && data.isModerator
           .m-b-1
             .panel-header 专业设置
             .forum-links
               a.forum-link(href=`/f/${data.forum.fid}/settings/info`) 基本信息
               a.forum-link(href=`/f/${data.forum.fid}/settings/category`) 分类
-              if permission('forumScoreSettings')
+              if data.permission.forumScoreSettings
                 a.forum-link(href=`/f/${data.forum.fid}/settings/score`) 积分策略
-              if permission('visitForumPermissionSettings')
+              if data.permission.visitForumPermissionSettings
                 a.forum-link(href=`/f/${data.forum.fid}/settings/permission`) 权限
         if data.moderators && data.moderators.length
           .m-b-1
@@ -282,7 +287,7 @@ block content
               for u in data.moderators
                 a.forum-moderator(href=`/u/${u.uid}` target="_blank")
                   .forum-moderator-avatar
-                    img(src=tools.getUrl("userAvatar", u.avatar)
+                    img(src=u.avatarUrl
                       data-global-mouseover="showUserPanel"
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: u.uid})

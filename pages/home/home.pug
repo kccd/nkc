@@ -2,7 +2,6 @@ extends ../bootstrap_base
 block title
   include ../publicModules/web_header
   +includeCSS("/home/home.css")
-
 block content
   -var canManagement = permission("superModerator") && data.t !== 'subscribe';
   .container-fluid.max-width

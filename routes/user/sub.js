@@ -2,7 +2,9 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/t", async (ctx, next) => {
-    const {nkcModules, db, data, query, params} = ctx;
+    const {nkcModules, db, data, query, params, state} = ctx;
+    data.threadListStyle = state.threadListStyle;
+    // data.threadPostList = state.pageSettings.threadPostList;
     const {page = 0} = query;
     const {user} = data;
     const {uid} = params;
@@ -26,8 +28,13 @@ router
     data.threads = await db.ThreadModel.extendThreads(threads_, {
       htmlToText: true
     });
+    data.threads.forEach(t => {
+      t.lastPost.user.avatar = nkcModules.tools.getUrl("userAvatar", t.lastPost.user.avatar, "sm")
+      t.firstPost.user.avatar = nkcModules.tools.getUrl('userAvatar', t.firstPost.user.avatar, 'sm')
+    });
     data.paging = paging;
-    ctx.template = "user/sub/threads.pug";
+    // ctx.template = "user/sub/threads.pug";
+    ctx.remoteTemplate = "user/sub/threads.pug";
     await next();
   });
 module.exports = router;

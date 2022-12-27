@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title=`社区 - ${state.serverSettings.websiteName}`
+  title=`社区 - ${data.websiteName}`
   +includeCSS('/community/community.css')
 block content
   include ./homeForumList
@@ -59,7 +59,7 @@ block content
                       ).home-subscribe-forum
                       .home-subscribe-forum-avatar
                         if forum.logo
-                          img(src=tools.getUrl("forumLogo", forum.logo))
+                          img(src=forum.logoUrl)
                         else
                           div(style=`background-color: ${forum.color}`)
                       .home-subscribe-forum-info=forum.displayName
@@ -95,7 +95,8 @@ block content
                   span 匿名用户
                 else
                   a.home-post-user(href=`/u/${post.user.uid}` target="_blank")
-                    img(src=tools.getUrl("userAvatar", post.user.avatar)
+                    //img(src=tools.getUrl("userAvatar", post.user.avatar)
+                    img(src=post.user.avatar
                       data-global-mouseover="showUserPanel"
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: post.user.uid})
@@ -109,7 +110,8 @@ block content
                   span 匿名用户
                 else
                   a.home-post-user(href=`/u/${post.targetUser.uid}` target="_blank")
-                    img(src=tools.getUrl("userAvatar", post.targetUser.avatar)
+                    //img(src=tools.getUrl("userAvatar", post.targetUser.avatar)
+                    img(src=post.targetUserAvatar
                       data-global-mouseover="showUserPanel"
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: post.targetUser.uid})
@@ -127,8 +129,8 @@ block content
               .home-thread
                 a(href=`/t/${thread.tid}` target="_blank").home-thread-title=thread.firstPost.t
                 if thread.firstPost.cover
-                  .home-thread-cover
-                    img(src=tools.getUrl("postCover", thread.firstPost.cover))
+                  .home-thread-cover.d.d
+                    img(src=thread.firstPost.cover)
                 .home-thread-content
                   .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
                   .home-thread-info
@@ -138,7 +140,8 @@ block content
                         span=anonymousInfo.username
                     else
                       a(href=`/u/${thread.firstPost.uid}` target="_blank").home-thread-user
-                        img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar)
+                        //img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar)
+                        img(src=thread.firstPost.user.avatar
                           data-global-mouseover="showUserPanel"
                           data-global-mouseout="hideUserPanel"
                           data-global-data=objToStr({uid: thread.firstPost.uid})
@@ -162,7 +165,8 @@ block content
                     .home-fund-money=form.money + ' 元'
                     a(href=`/fund/list/${form.fund._id}` target="_blank").home-fund-link.fund-name=form.fund.name
                     a(href=`/u/${form.uid}` target="_blank").home-fund-user
-                      img(src=tools.getUrl("userAvatar", form.applicant.user.avatar)
+                      //img(src=tools.getUrl("userAvatar", form.applicant.user.avatar)
+                      img(src=form.applicant.user.avatar
                         data-global-mouseover="showUserPanel"
                         data-global-mouseout="hideUserPanel"
                         data-global-data=objToStr({uid: form.uid})

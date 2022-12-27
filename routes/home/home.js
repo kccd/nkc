@@ -76,6 +76,9 @@ module.exports = async (options) => {
   // 热销商品
   // data.showShopGoods = homeSettings.showShopGoods;
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});
+  data.goodsForums.forEach(f => {
+    f.logo = nkcModules.tools.getUrl("forumLogo", f.logo)
+  })
   // data.goods = await db.ShopGoodsModel.getHomeGoods();
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
@@ -94,8 +97,49 @@ module.exports = async (options) => {
     fidOfCanGetThreads: forumsId,
     showDisabledBlock: ctx.permission('nkcManagementHome')
   });
+  // 处理nkc-render需要的数据
+  function processHomeBlockDataLeftOrRight(LeftOrRight) {
+    LeftOrRight.forEach(homeBlock => {
+      homeBlock.data.forEach(thread => {
+        if (homeBlock._id === 'recommendThreadsMovable') {
+          thread.cover = nkcModules.tools.getUrl('recommendThreadCover', thread.cover)
+        } else if (homeBlock._id === 'recommendThreadsFixed') {
+          thread.cover = nkcModules.tools.getUrl('recommendThreadCover', thread.cover)
+        } else if (homeBlock._id === 'toppedThreads') {
+        
+        } else  if (homeBlock._id === 'goods') {
+          thread.post.cover = nkcModules.tools.getUrl('postCover', thread.post.cover);
+          thread.user = thread.user.toObject();
+          thread.user.avatar = nkcModules.tools.getUrl("userAvatar", thread.user.avatar)
+        } else if (homeBlock._id === 'hotColumns') {
+          thread.avatar = nkcModules.tools.getUrl("columnAvatar", thread.avatar)
+          thread.tlm = nkcModules.tools.briefTime(thread.tlm)
+        } else if (homeBlock._id === 'toppedColumns') {
+          thread.avatar = nkcModules.tools.getUrl('columnAvatar', thread.avatar)
+          thread._id = nkcModules.tools.getUrl('columnHome', thread._id)
+        } else if (homeBlock._id === 'forums') {
+        
+        } else if (homeBlock._id === 'management') {
+        
+        } else if (homeBlock._id === 'webApply') {
+        
+        } else {
+        
+        }
+      })
+    })
+  }
+  processHomeBlockDataLeftOrRight(data.homeBlockData.left);
+  processHomeBlockDataLeftOrRight(data.homeBlockData.right);
   data.defaultThreadListStyle = state.threadListStyle;
   // 多维分类
   data.threadCategories = await db.ThreadCategoryModel.getCategoryTree({disabled: false});
-  ctx.template = "home/home_all.pug";
+  // ctx.template = "home/home_all.pug";
+  
+  data.isApp = state.isApp;
+  data.permissionsOr = {}
+  data.permissionsOr.management = ctx.permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+  data.permission = {};
+  data.permission.nkcManagementHome = ctx.permission("nkcManagementHome")
+  ctx.remoteTemplate = "home/home_all.pug";
 };

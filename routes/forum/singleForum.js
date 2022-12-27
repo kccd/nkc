@@ -180,7 +180,18 @@ router
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
 	// .use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
 	.use("/", async (ctx, next) => {
-		const {data, db, params, query, url, method, state} = ctx;
+		const {data, db, params, query, url, method, state, nkcModules} = ctx;
+		data.threadListStyle = state.threadListStyle;
+		data.serverSettings = {};
+		data.serverSettings.brief = state.serverSettings.brief;
+		data.serverSettings.websiteName = state.serverSettings.websiteName;
+		data.isApp = state.isApp;
+		data.platform = state.platform;
+		data.permission = {};
+		data.permission.visitForumInfoSettings = ctx.permission('visitForumInfoSettings');
+		data.permission.modifyAllResource = ctx.permission('modifyAllResource');
+		data.permission.forumScoreSettings = ctx.permission('forumScoreSettings');
+		data.permission.visitForumPermissionSettings = ctx.permission('visitForumPermissionSettings');
 		let _url = url.replace(/\?.*/g, "");
 		_url = _url.replace(/^\/f\/[0-9a-zA-Z]+?\/(.+)/i, "$1");
 		const {fid} = params;
@@ -197,8 +208,7 @@ router
 		}
 
 		const {token} = query;
-
-		const forum = await db.ForumModel.findOnly({fid});
+		let forum = await db.ForumModel.findOnly({fid});
 		data.forumNav = await forum.getForumNav(query.cat);
 		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
     if(!await db.ShareModel.hasPermission(token, fid)) {
@@ -206,7 +216,6 @@ router
     }
 		// await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
     data.isModerator = (await forum.isModerator(data.user)) || ctx.permission('superModerator');
-		data.forum = forum;
 
 		const {today} = ctx.nkcModules.apiFunction;
 		// 能看到入口的专业id
@@ -253,7 +262,9 @@ router
 			}
     }
     data.users = await db.UserModel.extendUsersInfo(data.users);
-
+		data.users.forEach(user => {
+			user.avatat = nkcModules.tools.getUrl('userAvatar', user.avatar)
+		})
 		// 获取最新关注的用户
 		const subUsers = await db.SubscribeModel.find({
       type: "forum",
@@ -267,8 +278,11 @@ router
       }
     });
 
-		data.subUsers = await db.UserModel.extendUsersInfo(data.subUsers);
-
+		data.subUsers = (await db.UserModel.extendUsersInfo(data.subUsers));
+		data.subUsers.forEach(user => {
+			// user = user.toObject()
+			user.avatar = nkcModules.tools.getUrl('userAvatar', user.avatar)
+		})
 		if(data.user) {
 			data.userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
 		}
@@ -277,15 +291,17 @@ router
 		// 加载网站公告
 		await forum.extendNoticeThreads();
 
-
 		//版主
 		data.moderators = [];
 		if (forum.moderators.length > 0) {
       data.moderators = await db.UserModel.find({uid: {$in: forum.moderators}});
     }
     await db.UserModel.extendUsersInfo(data.moderators);
-
-    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+		data.moderators.forEach(u => {
+			u = u.toObject();
+			u.avatarUrl = nkcModules.tools.getUrl("userAvatar", u.avatar)
+		})
+		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
       data.user
@@ -308,6 +324,18 @@ router
 		// 加载同级的专业
 			//获取父级专业
     const parentForums = await forum.extendParentForums();
+		
+		forum = forum.toObject()
+		data.forum = forum;
+		if (!data.forum.banner) {
+			data.forum_banner_url = nkcModules.tools.getUrl('defaultFile', 'forum_banner.jpg')
+		} else {
+			data.forum_banner_url = nkcModules.tools.getUrl('forumBanner', data.forum.banner)
+		}
+		if (data.forum.logo) {
+			data.forum.logoUrl = nkcModules.tools.getUrl('forumLogo', data.forum.logo)
+		}
+		
 		data.parentForums = parentForums;
     let parentForum;
     if(parentForums.length !== 0) parentForum = parentForums[0];
@@ -343,7 +371,7 @@ router
       description: 1
     }).sort({order: 1});
 
-
+		data.htmlFilterDescription =  nkcRender.htmlFilter(data.forum.description)
 		data.subUsersCount = await db.SubscribeModel.countDocuments({cancel: false, fid, type: "forum"});
 		if(data.user) {
       const sub = await db.SubscribeModel.countDocuments({
@@ -406,7 +434,8 @@ router
 		} catch(err) {
 			data.noPermissionReason = err.message;
 		}
-		ctx.template = 'forum/forum.pug';
+		// ctx.template = 'forum/forum.pug';
+		ctx.remoteTemplate = 'forum/forum.pug';
 		await next();
   })
 	.get(['/', '/library'], async (ctx, next) => {
@@ -551,11 +580,18 @@ router
 				const user = await db.UserModel.findOne({uid});
 				list.push({
 					username: user.username,
-					uid,
-					avatar: user.avatar
+					// uid,
+					uidUrl: ctx.nkcModules.tools.getUrl("userHome", founder.uid),
+					// avatar: user.avatar,
+					avatarUrl: ctx.nkcModules.tools.getUrl("userAvatar", founder.avatar)
 				})
 			}
+			list.forEach((founder) => {
+				founder
+				founder.uidUrl = nkcModules.tools.getUrl("userHome", founder.uid)
+			})
 			data.founderList = list;
+			
 		}
 
 		await next();

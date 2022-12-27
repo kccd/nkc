@@ -5,15 +5,16 @@ if data.singleThread
 mixin threadCover(klass)
   if (thread.firstPost && thread.firstPost.cover) || (thread.document && thread.document.cover)
     .thread-panel-cover-big.hidden-xs.hidden-sm(class=klass)
+      // style=`background-image: url(${tools.getUrl('postCover', (thread.firstPost?thread.firstPost.cover:'' || thread.document?thread.document.cover:''))})`
       .thread-panel-image(
-        style=`background-image: url(${tools.getUrl('postCover', (thread.firstPost?thread.firstPost.cover:'' || thread.document?thread.document.cover:''))})`
+        style=`background-image: url(${thread.firstPost.coverUrl})`
       )
 
 mixin minThreadCover(klass)
   if (thread.firstPost && thread.firstPost.cover) || (thread.document && thread.document.cover)
     .thread-panel-cover.hidden-md.hidden-lg(class=klass)
       .thread-panel-image(
-        style=`background-image: url(${tools.getUrl('postCover', (thread.firstPost?thread.firstPost.cover:'' || thread.document?thread.document.cover:''))})`
+        style=`background-image: url(${thread.firstPost.coverUrl})`
       )
 mixin checkBox
   if canManagement
@@ -56,7 +57,7 @@ mixin displayForum
           target=aTarget)= forum.displayName
 
 mixin displayPageCount
-  -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
+  -const pageCount = Math.ceil(thread.count / data.threadPostList)
   -var ellipsis = false;
   if pageCount >= 2
     a.thread-title-page(href=`/t/${thread.tid}?&page=${1}`)= 2
@@ -85,9 +86,11 @@ mixin displayColumn(columns)
 if thread.type !== 'newArticle'
   -lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
   -hasReply = thread.firstPost.pid !== thread.lastPost.pid;
--const threadListStyle = defaultThreadListStyle || state.threadListStyle;
+
+-const threadListStyle = defaultThreadListStyle || data.threadListStyle;
 -var postCoverPosition = 'null';
 -var styleType = threadListStyle.type;
+
 - if (styleType === 'abstract') {
   -postCoverPosition = threadListStyle.cover;
 -}
@@ -109,9 +112,10 @@ if data.t === 'column' || data.t === 'home'
 else
   -threadTitle = thread.firstPost.t;
   -threadUrl = `/t/${thread.tid}`;
+
 if (data.t  === 'column' || data.t  === 'home') && thread.type === 'newArticle'
   .thread-panel(class=threadPanelClass)
-    .thread-panel-body(class=styleType)
+    .thread-panel-body(class=styleType).dddd
       if styleType === 'minimalist'
         .thread-panel-content
           .thread-panel-author-info
@@ -121,6 +125,7 @@ if (data.t  === 'column' || data.t  === 'home') && thread.type === 'newArticle'
               data-global-data=objToStr({uid: thread.uid})
             )
               img(src=tools.getUrl('userAvatar', thread.user.avatar, 'sm') class=thread.user.certs.includes('banned') ? 'user-banned-avatar':'')
+              //img(src=thread.user.avatarUrl class=thread.user.certs.includes('banned') ? 'user-banned-avatar':'')
             .thread-panel-minimalist-title
               a.thread-panel-minimalist-title-a.thread-panel-url(href=threadUrl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
             .absolute-count
@@ -267,10 +272,12 @@ if (data.t  === 'column' || data.t  === 'home') && thread.type === 'newArticle'
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: thread.lastPost.uid})
                     )
-                      img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
+                      //img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
+                      img(src=thread.lastPost.user.avatar)
                   else
                     .thread-panel-reply-user
-                      img(src=tools.getUrl("anonymousUserAvatar"))
+                      //img(src=tools.getUrl("anonymousUserAvatar"))
+                      img(src=data.anonymousUserAvatar)
             if postCoverPosition === 'right'
               +minThreadCover('p-l-1')
         if postCoverPosition === 'right'
@@ -293,7 +300,7 @@ else
                 data-global-mouseout="hideUserPanel"
                 data-global-data=objToStr({uid: thread.uid})
               )
-                img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
+                img(src=thread.firstPost.user.avatarUrl class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
             else
               .thread-panel-minimalist-avatar
                 img(src=anonymousInfo.avatar)
@@ -302,10 +309,12 @@ else
               a.thread-panel-minimalist-title-a.thread-panel-url(href=threadUrl title=threadTitle class=thread.digest ? "digest" : ""  target=aTarget)=threadTitle
               +displayPageCount
             .absolute-count
-              -const toc = tools.briefTime(thread.firstPost.toc);
+              // -const toc = tools.briefTime(thread.firstPost.toc);
+              -const toc = thread.firstPost.briefTime;
               -var tlm;
               if hasReply
-                -tlm = tools.briefTime(thread.lastPost.toc);
+                // -tlm = tools.briefTime(thread.lastPost.toc);
+                -tlm = thread.lastPost.briefTime;
               span.thread-panel-minimalist-toc
                 if toc
                   span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=toc
@@ -330,7 +339,7 @@ else
                 data-global-data=objToStr({uid: thread.uid})
               )
                 a(href=`/u/${thread.uid}` target="_blank")
-                  img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
+                  img(src=thread.firstPost.user.avatar class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
             else
               .thread-panel-author
                 img(src=anonymousInfo.avatar)
@@ -405,7 +414,7 @@ else
                   +fromNow(thread.lastPost.toc)
                   //-span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=`${fromNow(thread.lastPost.toc)}`
 
-
+        // /u/92841/sub/t
       else
         if postCoverPosition === 'left'
           +threadCover('p-r-1')
@@ -423,7 +432,7 @@ else
                   data-global-mouseout="hideUserPanel"
                   data-global-data=objToStr({uid: thread.uid})
                   )
-                  img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
+                  img(src=thread.firstPost.user.avatar class=thread.firstPost.user.certs.includes('banned')?'user-banned-avatar':'')
                 a(
                   data-global-mouseover="showUserPanel"
                   data-global-mouseout="hideUserPanel"
@@ -466,7 +475,7 @@ else
           //- 文章标题
           .thread-panel-title
             a.title-content.thread-panel-url(href=threadUrl class=thread.digest ? "digest" : "" title=threadTitle target=aTarget)= threadTitle
-            -const pageCount = thread.count / state.pageSettings.threadPostList
+            -const pageCount = thread.count / data.threadPostList
             -var ellipsis = false;
             -for(var i = 1; i < pageCount; i++)
               if i < 4 || i > pageCount - 3
@@ -498,10 +507,11 @@ else
                       data-global-mouseout="hideUserPanel"
                       data-global-data=objToStr({uid: thread.lastPost.uid})
                     )
-                      img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
+                      img(src=thread.lastPost.user.avatar a-a-a='1')
                   else
                     .thread-panel-reply-user
-                      img(src=tools.getUrl("anonymousUserAvatar"))
+                      //img(src=tools.getUrl("anonymousUserAvatar"))
+                      img(src=data.anonymousUserAvatar)
             if postCoverPosition === 'right'
               +minThreadCover('p-l-1')
         if postCoverPosition === 'right'

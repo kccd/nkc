@@ -103,8 +103,7 @@ router
 
     // 管理面板需要的数据
     data.managementData = await db.SettingModel.getManagementData(user);
-
-
+    
     if(threadListType === "home") {
       await home({
         ctx, fidOfCanGetThreads
@@ -719,6 +718,7 @@ router
       userGrade: data.userGrade,
     });
     ctx.template = "home/home.pug";
+    // ctx.remoteTemplate = "home/home.pug";
     await next();
   });
 module.exports = router;
