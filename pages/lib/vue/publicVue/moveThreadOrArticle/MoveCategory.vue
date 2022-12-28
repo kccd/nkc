@@ -29,8 +29,7 @@
             .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
               v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
             ) 注意事项：{{ c.selectedNode.warning }}
-        span.text-danger 注意：仅更改已选择类别的文章属性
-      .thread-categories(v-else) 暂无~~
+      .thread-categories(v-else) 空空如也~
 
 
 </template>

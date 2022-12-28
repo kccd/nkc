@@ -12,6 +12,7 @@
             component-type='dialog'
             ref='moveCategoryList'
           )
+          .m-t-05.text-danger 注意：仅更改已选择类别的文章属性
         .modal-footer
           .display-i-b(v-if="submitting") 处理中，请稍候...
           button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
