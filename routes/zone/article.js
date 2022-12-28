@@ -12,32 +12,9 @@ router
     const {page = 0, last_pages, highlight, t, did, redirect, token} = query;
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     let article = await db.ArticleModel.findOnly({_id: aid});
-    const categories = await db.ThreadCategoryModel.find({_id: {$in: article.tcId}, disabled: false})
-    if(categories && categories.length>0){
-      data.categoryList =  categories.map(item=>{
-        return {
-          _id: item._id,
-          threadWarning: item.threadWarning
-        }
-      })
-    }
-    let categoriesObj = {};
-    // 查子分类的父级分类信息
-    const cids = categories.map(item=>{
-      categoriesObj[item.cid] = {
-        _id: item._id,
-        name: item.name,
-      }
-      return item.cid
-    })
-    const father_categories = await db.ThreadCategoryModel.find({_id: {$in: cids}})
-    data.categoriesTree = father_categories.map(item=>{
-      return {
-        cid: item._id,
-        father_name: item.name,
-        child: categoriesObj[item._id]
-      }
-    })
+    const categoriesObj = await db.ThreadCategoryModel.getCategories(article.tcId, 'article')
+    data.categoryList = categoriesObj.categoryList;
+    data.categoriesTree = categoriesObj.categoriesTree;
     data.targetUser = await article.extendUser();
     data.targetUser.description = renderMarkdown(nkcModules.nkcRender.replaceLink(data.targetUser.description));
     data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', data.targetUser.avatar);
@@ -107,7 +84,8 @@ router
       manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
       review: ctx.permission('review'),
       creditKcb: ctx.permission('creditKcb'),
-      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr(["movePostsToRecycle", "movePostsToDraft"])
+      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr(["movePostsToRecycle", "movePostsToDraft"]),
+      unblockPosts: ctx.permission('unblockPosts'),
     };
     //获取文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

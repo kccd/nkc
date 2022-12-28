@@ -1,8 +1,8 @@
 .column-banner-body
-  .column-banner(style=`background-image:url(${tools.getUrl('columnBanner', data.column.banner)})`)
+  .column-banner(style=`background-image:url(${data.column.columnBanner})`)
     .column
       .column-avatar
-        img(src=tools.getUrl('columnAvatar', data.column.avatar))
+        img(src=data.column.avatarUrl)
       .column-info
         .column-other-info
           .column-name=data.column.name

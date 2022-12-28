@@ -127,14 +127,14 @@ function initSingleCommentBottom(cid) {
         nkcAPI(`/comment/${docId}/unblock`, 'POST', {
           docsId: [docId]
         })
-          .then(res => {
+          .then(() => {
             screenTopAlert(docId +' 已解除屏蔽')
           })
           .catch(err => {
             sweetError(err);
           })
       }
-      
+
     }
   });
 }

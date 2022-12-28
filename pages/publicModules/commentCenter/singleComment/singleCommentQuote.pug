@@ -1,19 +1,19 @@
 //- 评论编辑框引用内容
 if !isIncluded('singleCommentQuote')
   mixin singleCommentQuote(props)
-    -var {aid, uid, username, order, content} = props;
+    -var {aid, uid, username, order, content, commentUrl, userHome} = props;
     blockquote.quote-post
       .quote-position
         | 引用
         a(
           data-anonymous=!uid
-          href=tools.getUrl('userHome', uid)
+          href=userHome
           target="_blank"
           data-global-mouseover="showUserPanel"
           data-global-mouseout="hideUserPanel"
           data-global-data=objToStr({uid})
         )=username
         | 发表于
-        a(href=tools.getUrl('article', aid, true) target="_blank")=order
+        a(href=commentUrl target="_blank")=order
         | 楼的内容
       .quote-content=content

@@ -2,12 +2,12 @@
   @param data.contributeCount 待处理的投稿数
   @param data.timeline 内容统计
 
--var canManagement = permission("column_single_disabled");
+-var canManagement = data.permissions.column_single_disabled;
 .m-b-1.column-tool-container(style=columnToolStyle)
   .column-user
     .column-user-avatar
       a(href=`/u/${data.column.uid}`)
-        img(src=tools.getUrl('userAvatar', data.column.user.avatar))
+        img(src=data.column.user.avatarUrl)
     a(href=`/u/${data.column.uid}`).column-user-username=data.column.user.username
     if data.user && data.user.uid !== data.column.uid
       .column-user-button
