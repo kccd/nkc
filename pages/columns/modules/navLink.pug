@@ -18,9 +18,9 @@ mixin mixinColumnNavLink(column, navCategories, categories)
           //- 不展开分类
           //- 专栏内所有文章分类 仅有一个下拉列表
           li
-            -var _categories = [{name: '全部', url: tools.getUrl('column', column._id), level: 0}];
+            -var _categories = [{name: '全部', url: column.columnUrl, level: 0}];
             for c in categories
-              -_categories.push({name: c.name, url: tools.getUrl('columnCategory', column._id, c._id), level: c.level});
+              -_categories.push({name: c.name, url: c.columnCategoryUrl, level: c.level});
             a(
               data-type='columnDropdownMenu'
               data-categories=objToStr({categories: _categories})
@@ -34,7 +34,7 @@ mixin mixinColumnNavLink(column, navCategories, categories)
               if c.children && c.children.length
                 -var _categories = [];
                 for cc in c.children
-                  -_categories.push({name: cc.name, url: tools.getUrl('columnCategory', column._id, cc._id), level: cc.level});
+                  -_categories.push({name: cc.name, url: cc.columnCategoryUrl, level: cc.level});
                 li(
                   data-type='columnDropdownMenu'
                   data-categories=objToStr({categories: _categories})
@@ -50,7 +50,7 @@ mixin mixinColumnNavLink(column, navCategories, categories)
                           span=cc.name
               else
                 li
-                  a(href=tools.getUrl('columnCategory', column._id, c._id))=c.name
+                  a(href=c.columnCategoryUrl)=c.name
                   //-a(href=`/m/${column._id}?c=${c._id}`)=c.name
         //- 用户自定义专栏导航
         //- 子导航也处于下拉列表中

@@ -21,7 +21,7 @@
         .article-more(@click="more") 查看更多
       document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
       // 多维分类
-      .form-group(v-if="tcId" )
+      .form-group(v-if="tcId && (articleStatus === 'default' || !articleStatus)" )
         .m-b-2
           b 多维分类
           editor-categories(

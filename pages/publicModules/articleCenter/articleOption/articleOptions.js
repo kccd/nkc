@@ -8,11 +8,11 @@ window.articleOption = new Vue({
   el: '#moduleArticleOptions',
   data: {
     show: false,
-    
+
     loading: true,
-    
+
     jqDOM: null,
-    
+
     uid: NKC.configs.uid,
     // 类型 thread、post
     pid: '',
@@ -29,14 +29,14 @@ window.articleOption = new Vue({
       username: '',
       uid: ''
     },
-    
+
     article: null,
-  
+
     direction: null,
-    
+
     top: 300,
     left: 300,
-    
+
     domHeight: 0,
     domWidth: 0,
     optionStatus: {},
@@ -158,7 +158,7 @@ window.articleOption = new Vue({
         .catch(function(data) {
           sweetError(data);
         })
-      
+
     },
     viewAuthorInfo() {
       if(!window.UserInfo) {
@@ -356,7 +356,7 @@ window.articleOption = new Vue({
         })
     },
     displayIpInfo() {
-      NKC.methods.getIpInfo(this.ipInfo);
+      NKC.methods.getIpInfo(this.optionStatus && this.optionStatus.ipInfo);
     },
     reviewArticle() {
       const {_id} = this.article.document;

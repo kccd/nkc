@@ -181,6 +181,7 @@ schema.methods.extendColumn = async function () {
 };
 schema.statics.extendColumns = async (columns) => {
   const UserModel = mongoose.model("users");
+  const {getUrl} = require('../nkcModules/tools');
   const uid = new Set();
   for(const c of columns) {
     uid.add(c.uid);
@@ -188,12 +189,15 @@ schema.statics.extendColumns = async (columns) => {
   const users = await UserModel.find({uid: {$in: [...uid]}});
   const usersObj = {};
   users.map(user => {
-    usersObj[user.uid] = user;
+    usersObj[user.uid] = {...user, avatarUrl : getUrl('userAvatar', user.avatar)}
   });
   const results = [];
   for(let column of columns) {
     column = column.toObject();
     column.user = usersObj[column.uid];
+    column.columnBanner = getUrl('columnBanner', column.banner);
+    column.columnUrl = getUrl('column', column._id);
+    column.columnAvatar = getUrl('columnAvatar', column.avatar);
     results.push(column);
   }
   return results;
