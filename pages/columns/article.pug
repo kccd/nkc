@@ -45,11 +45,12 @@ block baseColumnContent
         type,
         _id: article._id,
         tid: article.tid,
+        threadUrl: thread.url,
         collected,
         digest: article.digest,
         voteUp: article.voteUp,
         voteDown: article.voteDown,
-        replyCount: count || 0,
+        replyCount: type === 'article' ? article.count : count,
         vote: article.vote,
         permissions: data.permissions,
       })
