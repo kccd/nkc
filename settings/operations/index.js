@@ -22,6 +22,7 @@ const {
 	photo,
 	photo_small,
 } = resourceObj;
+const api = require('./api');
 const mathJax = require('./mathJax');
 const document = require('./document');
 const draft = require('./draft');
@@ -299,6 +300,7 @@ operationObj.operationTree = {
     settings, // 加载系统设置
     n: latest, // 最新页
 		oauth, // 第三方登录
+		api, // 纯数据接口
 	}
 };
 module.exports = operationObj;

@@ -285,7 +285,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
   const ShareModel = mongoose.model('share');
   const UserModel = mongoose.model('users');
   const shareSettings = await SettingModel.getSettings('share');
-  const translate = require('../nkcModules/translate');
+  const {translate} = require('../nkcModules/translate');
   const {languageNames} = require('../nkcModules/language');
   let {today} = require("../nkcModules/apiFunction");
   today = today();
@@ -577,7 +577,7 @@ shareSchema.statics.getShareContent = async function(props) {
 
 shareSchema.statics.getShareNameByType = async function(type) {
   const {languageNames} = require('../nkcModules/language');
-  const translate = require('../nkcModules/translate');
+  const {translate} = require('../nkcModules/translate');
   return translate(languageNames.zh_cn, 'share', type);
 }
 

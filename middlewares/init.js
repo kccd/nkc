@@ -9,6 +9,9 @@ const fsPromise = fs.promises;
 const redis = require('../redis');
 const errorTips = require('../config/errorTips.json');
 const {getErrorPage404, getErrorPage500} = require('../nkcModules/errorPage');
+const {ErrorTypes} = require('../nkcModules/error');
+const {translateResponseType} = require('../nkcModules/translate');
+const apiRouteReg = /^\/api\/v[0-9]+/;
 
 const fsSync = {
   access: fsPromise.access,
@@ -28,9 +31,20 @@ module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
+  // 客户端语言，暂时固定
+  ctx.acceptLanguage = 'zh_cn';
+  // 是否为API路由
+  ctx.isAPIRoute = apiRouteReg.test(ctx.path);
+  ctx.acceptJSON =
+    ctx.isAPIRoute ||
+    (
+      ctx.request.accepts('json', 'html') === 'json' &&
+      ctx.request.get('FROM') === 'nkcAPI'
+    );
+
   ctx.state = {};
 
-  // 这个字段用于在路由层临时传输数据。
+    // 这个字段用于在路由层临时传输数据。
   // 例如在 use('/u/:uid') 中准备好 user 的数据放入 ctx.internalData 中。
   // 然后在 get('/u/:uid') 和 put('/u/:uid') 中使用。
   ctx.internalData = {};
@@ -73,29 +87,58 @@ module.exports = async (ctx, next) => {
 			ctx.data.targetUser = ctx.data.targetUser.toObject();
 		}
   } catch(err) {
+    // 错误处理
+    // 这里将处理三种类型的错误
+    // 1. 自定义响应类型错误 - 抛出错误时需要指定响应类型和类型所需要的参数，最后在翻译组件的帮助下合成错误信息；
+    // 2. 定制错误页面 - 抛出错误时需要指定错误页面的名称，最后通过页面渲染合成错误页面；
+    // 3. 一般错误 - 抛出错误，根据错误状态码自动匹配错误页面，最后通过页面渲染合成错误页面；
+
 	  ctx.status = err.statusCode || err.status || 500;
 	  ctx.error = err.stack || err;
-	  let error;
+    let errorMessageString = '';
+
 	  if(typeof err === 'object'){
-		  error = err.message;
+      errorMessageString = err.message;
 	  } else {
-		  error = err;
+      errorMessageString = err;
 	  }
-	  try{
-	    const errObj = JSON.parse(error);
-	    const {errorType, errorData} = errObj;
-	    if(errorType) {
-        error = errorData;
-        ctx.errorType = errorType;
+
+    let errorData;
+    let errorPage;
+
+    try{
+      const {type, args} = JSON.parse(errorMessageString);
+
+      switch (type) {
+        case ErrorTypes.RESPONSE_TYPE: {
+          errorData = translateResponseType(ctx.acceptLanguage, args.responseType, args.args);
+          break;
+        }
+        case ErrorTypes.ERROR_PAGE: {
+          errorData = args.errorData;
+          errorPage = args.errorPage;
+          break;
+        }
+        case ErrorTypes.COMMON: {
+          errorData = args.message;
+          break;
+        }
+        default: {
+          errorData = errorMessageString;
+        }
       }
-    } catch(err) {}
-	  if(ctx.errorType) {
-	    ctx.template = `error/${ctx.errorType}.pug`;
-    } else {
-      ctx.template = 'error/error.pug';
+    } catch(parseError) {
+      errorData = errorMessageString;
     }
+
+    errorPage = errorPage || 'error';
+
+    ctx.template = `error/${errorPage}.pug`;
+
+    // 出错时的小提示
     ctx.data.errorTips = errorTips;
-    ctx.data.error = error;
+    // 错误信息，字符串或对象
+    ctx.data.error = errorData;
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
 		ctx.type = ctx.type || 'application/json';

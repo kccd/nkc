@@ -1,9 +1,11 @@
 const {defaultCerts} = require('../settings/userCerts');
+const {ThrowForbiddenResponseTypeError} = require('../nkcModules/error');
+const {ResponseTypes} = require('../settings/response');
 
 async function permission(ctx, next){
-  const {data, state} = ctx;
+  const {data} = ctx;
 	if(!data.userOperationsId.includes(data.operationId)) {
-		ctx.throw(403, `${state.operation.errInfo || "权限不足"}`);
+		ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 	}
 	await next();
 }
@@ -11,7 +13,7 @@ async function permission(ctx, next){
 function OnlyVisitor() {
 	return async (ctx, next) => {
 		if(ctx.state.uid) {
-			ctx.throw(403, "权限不足，当前资源仅允许游客访问");
+			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_LOGGED);
 		}
 		await next();
 	};
@@ -20,7 +22,7 @@ function OnlyVisitor() {
 function OnlyUser() {
 	return async (ctx, next) => {
 		if(!ctx.static.uid) {
-			ctx.throw(403, "权限不足，当前资源仅允许登录用户访问");
+			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_UN_LOGGED);
 		}
 		await next();
 	};
@@ -29,7 +31,7 @@ function OnlyUser() {
 function OnlyUnbannedUser() {
 	return async (ctx, next) => {
 		if(ctx.data.user.certs.includes(defaultCerts.banned)) {
-			ctx.throw(403, "权限不足，当前资源仅允许正常用户访问");
+			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_BANNED);
 		}
 		await next();
 	}
@@ -38,7 +40,7 @@ function OnlyUnbannedUser() {
 function OnlyBannedUser() {
 	return async (ctx, next) => {
 		if(!ctx.data.user.certs.includes(defaultCerts.banned)) {
-			ctx.throw(403, "权限不足，当前资源仅允许被开除学籍的用户访问");
+			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_UN_BANNED);
 		}
 		await next();
 	}
@@ -55,6 +57,7 @@ function OnlyPermissionsOr(operations) {
 				return await next();
 			}
 		}
+		ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 	}
 }
 
@@ -62,7 +65,7 @@ function OnlyPermissionsAnd(operations) {
 	return async (ctx, next) => {
 		for(const operation of operations) {
 			if(!ctx.data.userOperations.includes(operation)) {
-				ctx.throw(403, "权限不足");
+				ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 			}
 		}
 		await next();
