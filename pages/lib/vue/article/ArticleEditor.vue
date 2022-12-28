@@ -301,7 +301,6 @@ export default {
             self.tcId = data.editorInfo.article && data.editorInfo.article.tcId || [];
           }
           if(!data.editorInfo.document) self.contentChangeEventFlag = true;
-          console.log(data.editorInfo.article)
           if(data.editorInfo.article) {
             //获取文章的发表状态
             self.articleStatus = data.editorInfo.article.status;
