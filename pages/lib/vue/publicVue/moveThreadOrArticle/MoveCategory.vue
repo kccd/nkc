@@ -9,7 +9,7 @@
               span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
               span(v-else) 已选择：{{c.selectedNode.name}}
               span ）
-            .editor-thread-category-description(v-if="c.description && isShowWarn") 描述：{{ c.description }}
+            .editor-thread-category-description.m-b-05(v-if="c.description && isShowWarn") {{ c.description }}
             .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
               v-if="c.warning && isShowWarn"
             ) 注意事项：{{ c.warning}}

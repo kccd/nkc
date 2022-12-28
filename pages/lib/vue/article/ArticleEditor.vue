@@ -23,7 +23,7 @@
       // 多维分类
       .form-group(v-if="tcId && (articleStatus === 'default' || !articleStatus)" )
         .m-b-2
-          b 多维分类
+          .editor-header 多维分类
           editor-categories(
             :tc-id="tcId"
             @outSelectedCategoriesId="outSelectedCategoriesId"
@@ -126,6 +126,12 @@
       color: #428bca;
       font-style: italic;
     }
+  }
+  .editor-header{
+    font-size: 1.25rem;
+    margin: 0.3rem 0;
+    color: #555;
+    font-weight: 700;
   }
 </style>
 
