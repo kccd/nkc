@@ -34,14 +34,14 @@ block name
         div(style="background-color:#ddd;padding:30px")
           //- if trackInfo.result.deliverystatus == "3"
           for logInfo,index in trackInfo.result.list
-            p 
+            p
               span(style="margin-right:20px;font-weight:bold" class=index == "0"?"redFont":"")=logInfo.time
               span(class=index == "0"?"redFont":"")=logInfo.status
         br
         div
           p
             span 运单号码：
-            span(style="font-weight:bold")=trackInfo.result.number
+            span(style="font-weight:bold")=data.trackNumber
           p
             span 物流公司：
             span(style="font-weight:bold")=trackInfo.result.expName
@@ -52,26 +52,26 @@ block name
             span 快递员：
             if trackInfo.result.courier
               span(style="font-weight:bold")=trackInfo.result.courier
-            else 
+            else
               span(style="font-weight:bold") 暂无信息
           p
             span 快递员电话：
             if trackInfo.result.courierPhone
               span(style="font-weight:bold")=trackInfo.result.courierPhone
-            else 
+            else
               span(style="font-weight:bold") 暂无信息
       else
         div
           p
-            span(style="font-weight:bold") 运单号码： 
+            span(style="font-weight:bold") 运单号码：
             span=data.trackNumber
           p
-            span(style="font-weight:bold") 错误码： 
+            span(style="font-weight:bold") 错误码：
             span=trackInfo.status
-          p  
-            span(style="font-weight:bold") 错误信息： 
+          p
+            span(style="font-weight:bold") 错误信息：
             span=trackInfo.msg
-          p 
+          p
             span 快递信息获取失败，请联系快递公司查询或前往快递官网进行查询
 
 block manageScripts
