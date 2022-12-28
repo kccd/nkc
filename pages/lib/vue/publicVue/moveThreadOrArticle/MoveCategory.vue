@@ -1,8 +1,8 @@
 <template lang="pug">
   .move-category
-      .thread-categories
+      .thread-categories(v-if="processCategories && processCategories.length > 0" )
         .thread-category(v-for='c in processCategories')
-          div( v-if='c.nodes.length > 0')
+          div(v-if='c.nodes.length > 0')
             .thread-category-name(:title='c.description')
               span {{c.name}}（
               span(v-if="c.selectedNode === null") 未选择
@@ -30,6 +30,8 @@
               v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
             ) 注意事项：{{ c.selectedNode.warning }}
         span.text-danger 注意：仅更改已选择类别的文章属性
+      .thread-categories(v-else) 暂无~~
+
 
 </template>
 <style lang="less" scoped>

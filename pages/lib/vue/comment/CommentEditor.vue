@@ -194,9 +194,9 @@
           } else {
             screenTopAlert('发布成功');
             self.contentChangeEventFlag = false;
-            if(res.renderedComment) {
-              window.insertRenderedComment(res.renderedComment);
-            }
+            // if(res.user) {
+            //   window.insertRenderedComment(res.user);
+            // }
             //发布成功后通知上层将content清空
             self.clearContent();
             self.type = 'create';

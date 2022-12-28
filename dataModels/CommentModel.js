@@ -577,6 +577,7 @@ schema.statics.extendSingleComment = async (comment) => {
       userHome: `/u/${user.uid}`,
       gradeId: userGrade._id,
       gradeName: userGrade.displayName,
+      gradeIconUrl: getUrl('gradeIcon', userGrade._id),
     },
     commentUrl: (await comment.getLocationUrl()).url,
     isAuthor: commentInfo.isAuthor,
