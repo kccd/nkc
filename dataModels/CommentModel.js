@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const {getUrl} = require("../nkcModules/tools");
 const commentSource = {
         article: 'article',
 
@@ -487,6 +486,7 @@ schema.statics.extendPostComments = async (props) => {
         userHome: `/u/${user.uid}`,
         gradeId: userGrade._id,
         gradeName: userGrade.displayName,
+        gradeIconUrl: getUrl('gradeIcon', userGrade._id),
       },
       xsf,
       kcb,
@@ -595,7 +595,7 @@ schema.statics.extendReviewComments = async function(comments) {
   const ArticleModel = mongoose.model('articles');
   const ArticlePostModel = mongoose.model('articlePosts');
   const {comment: documentSource} = await DocumentModel.getDocumentSources();
-  const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const {timeFormat} = require('../nkcModules/tools');
   const commentsId = [];
   const articlePostSid = [];
   const articleId = [];
@@ -798,7 +798,7 @@ schema.statics.extendComments = async function(comments) {
   const ArticlePostModel = mongoose.model('articlePosts');
   const ArticleModel = mongoose.model('articles');
   const CommentModel = mongoose.model('comments');
-  const {timeFormat, getUrl} = require('../nkcModules/tools');
+  const {timeFormat} = require('../nkcModules/tools');
   const didArr = [];
   const uidArr = [];
   const articlePostId = [];
