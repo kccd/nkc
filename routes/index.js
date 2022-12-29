@@ -94,6 +94,8 @@ const latestRouter = routers.latest;
 const oauthRouter = routers.oauth;
 // 纯数据路由
 const apiRouter = routers.api;
+// 多维分裂
+const tcRouter = routers.tc;
 
 router
   .use('/', async (ctx, next) => {
@@ -198,4 +200,5 @@ router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods()
 router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 router.use('/oauth', oauthRouter.routes(), oauthRouter.allowedMethods());
 router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
+router.use('/tc', tcRouter.routes(), tcRouter.allowedMethods());
 module.exports = router;

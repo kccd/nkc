@@ -138,7 +138,7 @@ export default {
       this.callback = callback;
       const self = this;
       self.source = options.source;
-      nkcAPI(`/e/settings/threadCategory/source/${options.source}`, "GET")
+      nkcAPI(`/tc?type=${options.source}`, "GET")
         .then(function(data) {
           self.categories = data.categoryTree;
         })

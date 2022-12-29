@@ -159,15 +159,4 @@ router
       }
     });
     await next();
-  })
-  .get('/source/:type', async (ctx, next) => {
-  const {db, data, params} = ctx;
-  const {type} = params;
-  if(type==='thread'){
-    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'thread', disabled: false});
-  }else if(type==='article'){
-    data.categoryTree =  await db.ThreadCategoryModel.getCategoryTree({source: 'article', disabled: false});
-  }
-  ctx.template = 'experimental/settings/threadCategory/threadCategory.pug';
-  await next();
-});
+  });

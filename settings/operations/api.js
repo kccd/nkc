@@ -1,11 +1,11 @@
 module.exports = {
   v1: {
-    user: {
+    /*user: {
       PARAMETER: {
         'public-info': {
           GET: 'getUserPublicInfo'
         }
       }
-    }
+    }*/
   }
 }

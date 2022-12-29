@@ -94,6 +94,7 @@ const moment = require ('./moment');
 const settings = require('./settings');
 const latest = require('./latest');
 const oauth = require("./oauth");
+const tc = require('./tc');
 const operationObj = {};
 
 
@@ -301,6 +302,7 @@ operationObj.operationTree = {
     n: latest, // 最新页
 		oauth, // 第三方登录
 		api, // 纯数据接口
+		tc, // 多维分类
 	}
 };
 module.exports = operationObj;

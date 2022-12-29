@@ -884,5 +884,6 @@
   "getCreditSettings": "获取评学术分、鼓励设置",
   "publishArticle": "发表独立文章（长电文、专栏文章）",
   "manageOauthApp": "管理第三方应用",
-  "OAuthAuthentication": "第三方应用认证"
+  "OAuthAuthentication": "第三方应用认证",
+  "getThreadCategories": "获取多维分类"
 }

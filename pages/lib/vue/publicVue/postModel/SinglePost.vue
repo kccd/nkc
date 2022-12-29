@@ -28,10 +28,13 @@
       .fa.fa-share-square-o.share-icon &nbsp;分享
     .option(v-if='post.edit !== null' @click='visitUrl(`/editor?ver=ue&type=${getEditType}&id=` + post.pid, true)')
       .fa.fa-edit
-      span 编辑
+      span &nbsp;编辑
 </template>
 <style lang="less">
   @import "../../../../publicModules/base";
+  .operations{
+    color: #404040;
+  }
   .single-post {
     display: inline-block;
     .single-post-info > * {
