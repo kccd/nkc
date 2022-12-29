@@ -1,5 +1,5 @@
 const router = require('koa-router')();
-const translate = require("../../../../nkcModules/translate");
+const {translate} = require("../../../../nkcModules/translate");
 const {languageNames} = require("../../../../nkcModules/language");
 const creationRouter = require('./creation');
 const manageRouter = require('./manage');
