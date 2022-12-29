@@ -9,11 +9,6 @@ module.exports = {
       GET: 'experimentalThreadCategorySettings',
       POST: 'experimentalThreadCategorySettings',
       PUT: 'experimentalThreadCategorySettings',
-			source: {
-				PARAMETER:{
-					GET: 'experimentalThreadCategorySettings'
-				}
-			},
       PARAMETER: {
         PUT: 'experimentalThreadCategorySettings',
         DELETE: 'experimentalThreadCategorySettings',
