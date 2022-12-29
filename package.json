@@ -144,7 +144,7 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "signal-exit": "^3.0.3",
-    "socket.io": "^4.4.0",
+    "socket.io": "^4.5.4",
     "socket.io-client": "^4.4.0",
     "socket.io-redis": "6.0.1",
     "sortablejs": "^1.13.0",
