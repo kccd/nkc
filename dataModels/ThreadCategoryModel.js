@@ -22,6 +22,7 @@ const schema = new mongoose.Schema({
     index: 1
   },
   // 作为父级时，在编辑器页默认选择的子分类，cid、default、none
+  // cid代表该类选择默认为添加的子类，default代表选择默认为父级上的nodeName（一个不存在的子类），node没有选择默认
   defaultNode: {
     type: String,
     default: 'none'
@@ -62,6 +63,12 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // thread（社区文章） 或 article（独立文章）
+  source: {
+    type: String,
+    required: true,
+    index: 1
   }
 }, {
   collection: 'threadCategories'
@@ -98,7 +105,8 @@ schema.statics.newCategory = async (props) => {
     description,
     warning,
     cid,
-    threadWarning
+    threadWarning,
+    source
   } = props;
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const SettingModel = mongoose.model('settings');
@@ -108,7 +116,8 @@ schema.statics.newCategory = async (props) => {
     warning,
     description,
     threadWarning,
-    cid
+    cid,
+    source
   });
   await tc.save();
   return tc;
@@ -240,5 +249,58 @@ schema.methods.deleteAndClearReference = async function() {
   await ThreadCategoryModel.deleteMany({_id: {$in: categoriesId}});
 };
 
+/*
+* @param {[Number]} tcId 属性 ID 组成的数组
+* @param {source} 分类来源
+* @return {Object} 属性对象组成的数组
+*   @param {Array} categoriesTree 父子结构数组
+*   @param {Array} threadWarningList 文章页顶部公告数组
+* */
+schema.statics.getCategories = async function(tcId,source){
+  const ThreadCategoryModel = mongoose.model('threadCategories');
+  const categories = await ThreadCategoryModel.find({source})
+  let _categoryList = [];
+  let categoriesObj = {};
+  let father_categoriesId = [];
+  categories.forEach(item=>{
+    if(tcId.includes(item._id)){
+      if(item.threadWarning){
+        _categoryList.push(item)
+      }
+      categoriesObj[item.cid] = {
+        _id: item._id,
+        name: item.name,
+      }
+      father_categoriesId.push(item.cid)
+    }
+  })
+
+  // 查子分类的父级分类信息
+  let father_categories = [];
+  categories.forEach(item=>{
+    if(father_categoriesId.includes(item._id)){
+      father_categories.push(item)
+    }
+  })
+
+  const categoriesTree = father_categories.map(item=>{
+    return {
+      cid: item._id,
+      father_name: item.name,
+      child: categoriesObj[item._id]
+    }
+  })
+
+  return {
+    categoriesTree,
+    categoryList: _categoryList.map(item=>{
+      return {
+        _id: item._id,
+        threadWarning: item.threadWarning
+      }
+
+    })
+  }
+};
 module.exports = mongoose.model('threadCategories', schema);
 

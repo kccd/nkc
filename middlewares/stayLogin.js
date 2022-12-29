@@ -1,5 +1,5 @@
 const languages = require('../languages');
-const translate = require('../nkcModules/translate');
+const {translate} = require('../nkcModules/translate');
 const {getUserInfo} = require('../nkcModules/cookie');
 
 module.exports = async (ctx, next) => {

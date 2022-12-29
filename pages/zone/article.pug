@@ -10,10 +10,11 @@ extends ../bootstrap_base
 block title
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected, vote} = data.columnPost
   -var {_id, name} = column
+  -var {targetUser, categoryList, categoriesTree} = data
   -var {hits, comment: count, oc, url} = thread
-  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
+  -var {uid, originState, originDesc, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
   title=t
-  -var showManagement = data.user && permissionsOr(['review']);
+  -var showManagement = data.user && data.permissions.review;
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
   if data.postHeight
@@ -28,8 +29,13 @@ block content
       if type === 'article'
         //- 文章管理员操作
         +setUp()
+      include ../columns/article/categoryWarning
+      if categoryList
+        +categoryWarning({categoryList})
       include ../columns/article/title
-      +title({t, article, uid, user, toc: dt, originState, name, _id, authorInfos, type})
+      +title({authorInfos, title: t, uid, username: user.username, avatarUrl: targetUser.avatar,
+        toc: format('YYYY-MM-DD', new Date(dt)), allToc: tools.timeFormat(new Date(dt)), originState,
+        columnId: _id, columnName: name, addr: article ? article.document.addr : article.addr, originDesc})
       include ../columns/article/abstract
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ../columns/article/content
@@ -38,9 +44,15 @@ block content
       +articleCredits(article.kcb.concat(article.xsf), article._id, data.permissions)
       include ../columns/article/articleEditTime
       +articleEditTime(tlm, dt, toc)
+      include ../columns/article/categoryName
+      +categoryName({categoriesTree})
       include ../columns/article/articleOptions
-      +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, vote, voteDown: article.voteDown, replyCount: count || 0, vote: article.vote})
+      +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, vote, voteDown: article.voteDown, replyCount: count || 0, vote: article.vote, permissions: data.permissions})
   .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  .move-article-category#moveCategoryBoxAppInZone
+    move-box(
+      ref='moveCategoryBox'
+    )
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-9.article-common.box-shadow-panel#comment-content
@@ -62,6 +74,7 @@ block content
                   +thread
             else if article.status === 'unknown'
               -let reviewData = article;
+              -let permissions = data.permissions;
               include ../columns/article/module_review
               +thread
             else if article.status === 'deleted'
@@ -88,6 +101,7 @@ block scripts
   +includeJS("/columns/article.js")
   +includeJS('/columns/article/setUp.js')
   +includeDeferJS('/columns/article/article.js', false)
+  +includeJS("/zone/article.js")
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/articleCenter/articleOption/articleOptions
   include ../publicModules/disabledPost/disabledPost

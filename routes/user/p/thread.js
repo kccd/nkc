@@ -70,6 +70,7 @@ module.exports = async (ctx, next) => {
   });
   const haveReviewPermission = ctx.permission('review');
   const results = [];
+  const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
   for (const thread of threads) {
     if(
       !ctx.permission("getPostAuthor") &&
@@ -94,8 +95,27 @@ module.exports = async (ctx, next) => {
         continue;
       }
     }
-
+    // 增加 编辑权限
+    const post = await db.PostModel.findOnly({pid: thread.oc});
+    const isComment = !!post.parentPostId;
+    const isThread = post.type === 'thread';
+    // const postType = isThread? 'thread': 'post';
+    let edit = null;
+    // 编辑
+    if(
+      // 回复或不是基金的文章
+      (!isThread || thread.type !== 'fund') &&
+      (post.uid === user.uid || ctx.permission('modifyOtherPosts'))
+    ) {
+      if(modifyPostTimeLimit >= (Date.now() - new Date(post.toc).getTime())) {
+        // 未超过修改的最大时间
+        edit = true;
+      }
+    }
     const result = {
+      edit,
+      isComment,
+      editType: post.type,
       postType: "postToForum",
       tid: thread.tid,
       cover: thread.firstPost.cover,

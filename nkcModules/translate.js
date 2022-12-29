@@ -1,5 +1,19 @@
 const languages = require('../languages');
-module.exports = (languageName, type, value) => {
+
+function translate(languageName, type, value, args = []) {
   const language = languages[languageName];
-  return language[type][value] || value;
+  const file = language[type];
+  let content = file[value] || value;
+  return content.replace(/\{v([1-9]+)}/gi, (c, v) => {
+    return args[Number(v) - 1] || 'unknown';
+  });
 }
+
+function translateResponseType(languageName, value, args = []) {
+  return translate(languageName, 'response', value, args);
+}
+
+module.exports = {
+  translate,
+  translateResponseType,
+};

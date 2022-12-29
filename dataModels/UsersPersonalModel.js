@@ -294,6 +294,11 @@ const usersPersonalSchema = new Schema({
     default: Date.now,
 		index: 1
 	},
+		// 验证次数
+	numberOfVerifications: {
+		type: Number,
+		default: 0,
+	},
 	// 需要送审的次数，与后台管理中的审核设置同时作用
 	// 这里的审核次数主要用于限制已经审核通过多篇文章的用户
 	// 比如用户早已脱离新手审核期（前几篇需审核）但出现违规，规定违规后3篇需审核
@@ -552,14 +557,31 @@ usersPersonalSchema.methods.getOauthPasswordInfo = async function () {
 usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
 	const SettingModel = mongoose.model("settings");
 	const UsersPersonalModel = mongoose.model("usersPersonal");
-  const userPersonal = await UsersPersonalModel.findOne({uid}, { lastVerifyPhoneNumberTime: 1 });
+  const userPersonal = await UsersPersonalModel.findOne({uid}, { lastVerifyPhoneNumberTime: 1, numberOfVerifications: 1});
 	if(!userPersonal) return false;
   const authSettings = await SettingModel.getSettings('auth');
   if(!authSettings.verifyPhoneNumber.enabled) return false;
 	if(!userPersonal.lastVerifyPhoneNumberTime) return true;
 	const lastVerifyPhoneNumberTime = userPersonal.lastVerifyPhoneNumberTime;
-	const interval = authSettings.verifyPhoneNumber.interval * 60 * 60 * 1000;
-  return Date.now() - lastVerifyPhoneNumberTime.getTime() > interval
+	// 测试时间
+	// const ToneMinute = 60 * 1000;
+	// const TextendedTime = userPersonal.numberOfVerifications * 60 * 1000;
+	// 一个小时
+	const oneHour = 60 * 60 * 1000;
+	// 累加时间(小时)
+	const unitInterval = authSettings.verifyPhoneNumber.unitInterval * oneHour;
+	// 最大上限时间
+	const maxInterval = authSettings.verifyPhoneNumber.maxInterval * oneHour;
+	const extendedTime = userPersonal.numberOfVerifications * unitInterval;
+	const interval = authSettings.verifyPhoneNumber.interval * oneHour;
+	if (Date.now() - lastVerifyPhoneNumberTime.getTime() > maxInterval) {
+		// 如果超过认证时间上限
+		return true
+	} else {
+		// 判断是否需要认证
+		// 实际间隔时间 = 间隔时间 + 验证次数 x 累加时间
+		return Date.now() - lastVerifyPhoneNumberTime.getTime() > interval + extendedTime;
+	}
 }
 
 /*
@@ -660,7 +682,10 @@ usersPersonalSchema.statics.modifyVerifyPhoneNumberTime = async (uid) => {
   await UsersPersonalModel.updateOne({uid}, {
     $set: {
       lastVerifyPhoneNumberTime: new Date(),
-    }
+    },
+		$inc: {
+			numberOfVerifications: 1,
+		}
   });
 }
 

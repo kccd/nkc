@@ -5,7 +5,8 @@ import Sortable from 'sortablejs';
 const app = new Vue({
   el: '#app',
   data: {
-    categoryTree: data.categoryTree
+    categoryTree: data.categoryTree,
+    articleCategoryTree: data.articleCategoryTree
   },
   mounted() {
     // this.initSort();
@@ -63,13 +64,45 @@ const app = new Vue({
           onEnd: this.saveOrder
         });
       }
+      const articleMasterContainer = document.getElementsByClassName('article-categories')[0];
+      new Sortable(articleMasterContainer, {
+        group: 'master',
+        invertSwap: true,
+        handle: '.article-category-master-handle',
+        animation: 150,
+        fallbackOnBody: true,
+        swapThreshold: 0.65,
+        onEnd: this.saveOrder
+      });
+      const articleNodeContainer = document.getElementsByClassName('article-category-node-list');
+      for(let i = 0; i < articleNodeContainer.length; i ++) {
+        const node = articleNodeContainer[i];
+        new Sortable(node, {
+          group: `node_${i}`,
+          invertSwap: true,
+          handle: '.article-category-node',
+          animation: 150,
+          fallbackOnBody: true,
+          swapThreshold: 0.65,
+          onEnd: this.saveOrder
+        });
+      }
     },
     saveOrder() {
       const masters = $('.thread-category-master');
+      const articles = $('.article-category-master');
       const nodes = $('.thread-category-node');
       const categories = [];
       for(let i = 0; i < masters.length; i++) {
         const m = masters.eq(i);
+        const cid = Number(m.attr('data-cid'));
+        categories.push({
+          cid,
+          order: i
+        });
+      }
+      for(let i = 0; i < articles.length; i++) {
+        const m = articles.eq(i);
         const cid = Number(m.attr('data-cid'));
         categories.push({
           cid,
@@ -91,19 +124,56 @@ const app = new Vue({
         })
         .catch(sweetError);
     },
-    newCategory(cid) {
-      const self = this;
+    newCategory(cid, _source) {
+      let data = [
+        {
+          dom: 'input',
+          label: '名称',
+          value: ''
+        },
+        {
+          dom: 'textarea',
+          label: '介绍',
+          value: ''
+        },
+        {
+          dom: 'textarea',
+          label: '注意事项',
+          value: ''
+        },
+        {
+          dom: 'textarea',
+          label: '文章公告',
+          value: ''
+        }
+      ];
+      if(!_source){
+        data.splice(3, 0,
+          {
+          dom: 'radio',
+          label: '来源',
+          radios: [{name:'社区文章',value:'thread'},{name:'独立文章',value:'article'}],
+        })
+      }
       commonModel.open(data => {
         const name = data[0].value;
         const description = data[1].value;
         const warning = data[2].value;
-        const threadWarning = data[3].value;
+        let threadWarning, source;
+        if(!_source){
+          threadWarning = data[4].value;
+          source = data[3].value
+        }else {
+          threadWarning = data[3].value;
+          source = _source;
+        }
         nkcAPI(`/e/settings/threadCategory`, 'POST', {
           name,
           description,
           warning,
           threadWarning,
           cid,
+          source,
         })
           .then(data => {
             commonModel.close();
@@ -113,28 +183,7 @@ const app = new Vue({
           .catch(sweetError);
       }, {
         title: '新建分类',
-        data: [
-          {
-            dom: 'input',
-            label: '名称',
-            value: ''
-          },
-          {
-            dom: 'textarea',
-            label: '介绍',
-            value: ''
-          },
-          {
-            dom: 'textarea',
-            label: '注意事项',
-            value: ''
-          },
-          {
-            dom: 'textarea',
-            label: '文章公告',
-            value: ''
-          }
-        ]
+        data
       })
     },
     editDefaultCategory(category) {
@@ -160,7 +209,7 @@ const app = new Vue({
         ]
       })
     },
-    editCategory(category) {
+    editCategory(category, _source) {
       commonModel.open(data => {
         const name = data[0].value;
         const description = data[1].value;
@@ -171,7 +220,8 @@ const app = new Vue({
           name,
           description,
           warning,
-          threadWarning
+          threadWarning,
+          source:_source
         })
           .then(data => {
             commonModel.close();
@@ -182,7 +232,7 @@ const app = new Vue({
           })
           .catch(sweetError);
       }, {
-        title: '新建分类',
+        title: '编辑分类',
         data: [
           {
             dom: 'input',

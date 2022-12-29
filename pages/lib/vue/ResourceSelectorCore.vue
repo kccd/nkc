@@ -94,10 +94,10 @@
       .resources-body(
         v-else
         :class="watchType === 'select'?'':'min-length'")
-        //-.resources-loading(v-if="loading")
+        .resources-loading.resources-list-placeholder(v-if="loading")
           .fa.fa-spinner.fa-spin.fa-fw
           .loading-text 加载中...
-        .resource-info(v-if="!resources.length") 空空如也~
+        .resource-info.resources-list-placeholder(v-else-if="resources.length === 0") 空空如也~
         //- 资源显示
         .resource-padding-container(
           v-else
@@ -109,8 +109,8 @@
               .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
-              .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
-              .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
+              .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url('+getUrl('fileCover', 'mp3')+')'")
+              .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url('+getUrl('fileCover', r.ext)+')'")
             span(v-else)
               .resource-picture.resource-in-process-bg
             .resource-name(
@@ -284,8 +284,6 @@
         }
         .resource-info {
           font-size: 1.2rem;
-          height: 15rem;
-          line-height: 15rem;
           font-weight: 700;
           text-align: center;
           .resource-picture {
@@ -662,6 +660,16 @@
   }
   .size-limit .fa{
     color: #555;
+  }
+  .resources-list-placeholder{
+    min-height: 40rem;
+    padding-top: 15rem;
+  }
+  @media(max-width: 768px) {
+    .resources-list-placeholder{
+      min-height: 19rem;
+      padding-top: 8rem;
+    }
   }
 </style>
 <script>
@@ -1084,7 +1092,6 @@ export default {
       this.getResourcesDebounce(0);
     },
     getResources: function(skip = 0, reqType = 'all') {
-      this.loading = true;
       let {
         quota,
         resourceType,
@@ -1119,6 +1126,7 @@ export default {
           }
         })
         .catch(function(data) {
+          self.loading = false;
           sweetError(data);
         });
     },

@@ -9,6 +9,7 @@ const shareTypes = {
   user: 'user', // 分享用户
   column: 'column', // 分享专栏
   article: 'article', // 分享独立文章文章
+  moment: 'moment', // 分享电文动态
   fund: 'fund', // 分享基金项目
   fundForm: 'fundForm', // 分享基金申请表
   comment: 'comment', // 分享独立文章评论
@@ -230,6 +231,7 @@ shareSchema.statics.ensureEffective = async function(token, id) {
       case 'fundForm': reg = RegExp(/\/fund\/a\/([0-9a-zA-Z]*)/ig);break;
       case 'article': reg = RegExp(/\/m\/([0-9]*)\/a\/([0-9a-zA-Z]*)/ig);break;
       case 'comment': reg = RegExp(/\/comment\/([0-9a-zA-Z]*)/ig);break;
+      case 'moment': reg = RegExp(/\/zone\/m\/([0-9a-z]*)/ig);break;
       default: throwErr(500, `分享类型错误`);
     }
     const arr = reg.exec(shareUrl);
@@ -283,7 +285,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
   const ShareModel = mongoose.model('share');
   const UserModel = mongoose.model('users');
   const shareSettings = await SettingModel.getSettings('share');
-  const translate = require('../nkcModules/translate');
+  const {translate} = require('../nkcModules/translate');
   const {languageNames} = require('../nkcModules/language');
   let {today} = require("../nkcModules/apiFunction");
   today = today();
@@ -423,6 +425,7 @@ shareSchema.methods.getShareUrl = async function() {
       return article.url + t;
     }
     case shareTypes.activity: return getUrl('activity', targetId) + t;
+    case shareTypes.moment: return getUrl('zoneMoment', targetId) + t;
     default:
       return '/';
   }
@@ -453,6 +456,7 @@ shareSchema.statics.getShareContent = async function(props) {
   const FundModel = mongoose.model('funds');
   const FundApplicationFormModel = mongoose.model('fundApplicationForms');
   const ArticleModel = mongoose.model('articles');
+  const MomentsModel = mongoose.model('moments');
   const SettingModel = mongoose.model('settings');
   const ColumnModel = mongoose.model('columns');
   const {getUrl} = require('../nkcModules/tools');
@@ -556,6 +560,16 @@ shareSchema.statics.getShareContent = async function(props) {
       cover: getUrl('columnAvatar', column.avatar),
       desc: column.abbr,
     };
+  } else if(type === shareTypes.moment) {
+    const moment = await MomentsModel.findOnly({_id: id});
+    const momentsData = await MomentsModel.extendMomentsListData([moment], user && user.uid);
+    const momentInfo = momentsData[0]
+    shareContent = {
+      title: `「动态电文」${momentInfo.username || ''}`,
+      cover: getUrl('userAvatar', momentInfo.user.avatar),
+      desc: nkcRender.htmlToPlain(momentInfo.content || '', 100),
+    };
+
   }
   return shareContent;
 }
@@ -563,7 +577,7 @@ shareSchema.statics.getShareContent = async function(props) {
 
 shareSchema.statics.getShareNameByType = async function(type) {
   const {languageNames} = require('../nkcModules/language');
-  const translate = require('../nkcModules/translate');
+  const {translate} = require('../nkcModules/translate');
   return translate(languageNames.zh_cn, 'share', type);
 }
 

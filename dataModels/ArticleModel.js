@@ -111,6 +111,12 @@ const schema = new mongoose.Schema({
     type: [String],
     default: [],
     index: 1
+  },
+  // 多维分类ID
+  tcId: {
+    type: [Number],
+    default: [],
+    index: 1
   }
 }, {
   collection: 'articles',
@@ -218,15 +224,19 @@ schema.statics.checkArticleSource = async (source) => {
 schema.statics.getDocumentInfoById = async (_id)=>{
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
+  const {getOriginLevel} = require('../nkcModules/apiFunction');
   let articleInfo = await ArticleModel.findOne({_id});
   articleInfo = articleInfo.toObject()
   articleInfo.url = `/zone/a/${_id}`;
   if(!articleInfo) throwErr(500, '未查找到对应文章');
   let document = await DocumentModel.getStableArticleById(_id);
   const documentResourceId = await document.getResourceReferenceId();
-
-  document = document.toObject()
-
+  if(document.origin !== 0){
+    const originDesc = await getOriginLevel(document.origin);
+    document = {...document.toObject(), originDesc};
+  }else {
+    document = document.toObject();
+  }
   return {articleInfo, document, documentResourceId}
 }
 
@@ -247,8 +257,7 @@ schema.statics.filterData = (filterData, allowKey)=>{
           newObj[key] = timeFormat(filterData[key])
           continue;
         }
-        const item = filterData[key];
-        newObj[key] = item
+        newObj[key] = filterData[key];
       }
     }
   }
@@ -263,11 +272,11 @@ schema.statics.getZoneArticle = async (id)=>{
   const UserModel = mongoose.model("users");
   const ArticleModel = mongoose.model('articles');
   const ResourceModel = mongoose.model('resources')
-  const DocumentModel = mongoose.model('documents');
+  // const DocumentModel = mongoose.model('documents');
   let article = await ArticleModel.findOnly({_id: id});
   article = (await ArticleModel.getArticlesInfo([article]))[0];
   const {articleInfo, document, documentResourceId} = await ArticleModel.getDocumentInfoById(id);
-  const documentAllowKey = ['title', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm', 'dt'];
+  const documentAllowKey = ['title', 'originDesc', 'content', 'abstract', 'abstractEN', 'keywords', 'keywordsEN', 'authorInfos', 'toc', 'origin', 'uid', 'collectedCount', 'tlm', 'dt'];
   // 返回需要的数据
   const filteredDocument = await ArticleModel.filterData(document, documentAllowKey)
   // 统一key
@@ -313,6 +322,7 @@ schema.statics.changeKey = async (content)=>{
       authorInfos: 'authorInfos',
       toc: 'toc',
       origin: 'originState',
+      originDesc: 'originDesc',
       uid : 'uid',
       collectedCount: 'collectedCount',
       tlm: 'tlm',
@@ -320,8 +330,7 @@ schema.statics.changeKey = async (content)=>{
     }
     for (const key in content) {
       if (Object.hasOwnProperty.call(content, key)) {
-        const element = content[key];
-        changeKeyPost[map[key]] = element
+        changeKeyPost[map[key]] = content[key];
       }
     }
     return changeKeyPost
@@ -405,7 +414,8 @@ schema.statics.createArticle = async (props) => {
     origin,
     source,
     sid,
-    authorInfos
+    authorInfos,
+    tcId
   } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
@@ -438,6 +448,7 @@ schema.statics.createArticle = async (props) => {
     source,
     sid,
     status: defaultStatus,
+    tcId,
   });
   await article.save();
   return article;
@@ -1152,6 +1163,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
+  const {getOriginLevel} = require('../nkcModules/apiFunction');
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1229,7 +1241,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   for(const article of articles) {
     let url;
     let editorUrl;
-    const document = articleDocumentsObj[article.did];
+    let document = articleDocumentsObj[article.did];
     let reason;
     let documentResourceId;
     if(document) {
@@ -1272,6 +1284,12 @@ schema.statics.getArticlesInfo = async function(articles) {
     const {xsf = [], kcb = []} = await XsfsRecordModel.extendCredits(credits);
     //获取文章引用的资源
     // const resources = await ResourceModel.getResourcesByReference(documentResourceId);
+    if(document.origin !== 0){
+      const originDesc = await getOriginLevel(document.origin);
+      document = {...document.toObject(), originDesc};
+    }else {
+      document = document.toObject();
+    }
     const info = {
       ...article.toObject(),
       xsf,

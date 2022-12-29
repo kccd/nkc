@@ -19,9 +19,22 @@
       .post-cover-img(:style="`background-image: url('${getUrl('postCover', post.cover)}')`")
     .post-content
       a(:href="post.link").single-post-content {{post.abstract || post.content}}
+  .operations
+    .single-post-bottom-item(
+      data-global-click='showSharePanel'
+      :data-global-data="objToStr({type: post.editType, id: getShareId})"
+      title='分享'
+    )
+      .fa.fa-share-square-o.share-icon &nbsp;分享
+    .option(v-if='post.edit !== null' @click='visitUrl(`/editor?ver=ue&type=${getEditType}&id=` + post.pid, true)')
+      .fa.fa-edit
+      span &nbsp;编辑
 </template>
 <style lang="less">
   @import "../../../../publicModules/base";
+  .operations{
+    color: #404040;
+  }
   .single-post {
     display: inline-block;
     .single-post-info > * {
@@ -104,16 +117,52 @@
   }
 </style>
 <script>
-import {fromNow, getUrl} from "../../../js/tools";
+import {fromNow, getUrl, objToStr} from "../../../js/tools";
 export default {
-  props: ['post'],
+  props: {
+    post: {
+      type: Object,
+      required: true,
+    },
+  },
   data: () => ({
   }),
   mounted() {
   },
+  computed: {
+    getShareId() {
+      const { editType, tid, pid } = this.post;
+      const typeMapId= {
+        "post": pid,
+        "thread": tid,
+      }
+      return typeMapId[editType]
+    },
+    getEditType() {
+      const { editType, isComment } = this.post;
+          if (editType === 'thread') {
+           return  'modifyThread'
+          } else if (editType === 'post' && isComment) {
+            return  'modifyComment'
+          } else if (editType === 'post' && !isComment) {
+            return  'modifyPost'
+          }
+          return undefined
+        }
+    },
   methods: {
+    objToStr: objToStr,
+    visitUrl: NKC.methods.visitUrl,
     getUrl: getUrl,
     fromNow: fromNow,
   }
 }
 </script>
+<style scoped>
+.operations > div {
+  margin-right: 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  display: inline-block;
+}
+</style>

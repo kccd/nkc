@@ -1,5 +1,5 @@
 const permission = {};
-const operationObj = require('../settings/operations');
+const operationObj = require('../settings/operations/index.js');
 const methods = ['GET', 'POST', 'PUT', 'DELETE'];
 
 permission.getOperationsId = () => {

@@ -1,4 +1,4 @@
-if !state.isApp
+if (state && !state.isApp) || (remoteState && !remoteState.isApp)
   -var reg = /[\n\r]/ig;
   -shareDescription = (shareDescription || "").replace(reg, " ");
   +includeCSS("/publicModules/share/share.css")

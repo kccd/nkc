@@ -57,6 +57,16 @@ block eContent
                 span 间隔时间：
                 input.m-r-05.form-control(type='text' v-model.number='authSettings.verifyPhoneNumber.interval')
                 span 小时
+              .m-b-05.form-inline.m-t-05
+                span 累加时间：
+                input.m-r-05.form-control(type='text' v-model.number='authSettings.verifyPhoneNumber.unitInterval')
+                span 小时
+              .m-b-05.form-inline.m-t-05
+                span.text-info 实际间隔时间 = 间隔时间 + 验证次数 x 累加时间
+              .m-b-05.form-inline.m-t-05
+                span 间隔时间上限：
+                input.m-r-05.form-control(type='text' v-model.number='authSettings.verifyPhoneNumber.maxInterval ')
+                span 小时
               .radio
                 span 未验证手机号时：
                 label.m-r-1

@@ -4,12 +4,19 @@ router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
   const {highlight, t, last_page, token} = query;
   let {page = 0} = query;
-  ctx.template = 'columns/article.pug';
+  // ctx.template = 'columns/article.pug';
+  ctx.remoteTemplate = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
+  // 简化设置发表目标用户信息
+  data.targetUser = {
+    uid: columnPostData.user.uid,
+    username: columnPostData.user.username
+  };
+  data.targetUser.avatar = nkcModules.tools.getUrl('userAvatar', columnPostData.user.avatar);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
   data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
@@ -23,6 +30,9 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
+    const categoriesObj = await db.ThreadCategoryModel.getCategories(article.tcId, 'article')
+    data.categoryList = categoriesObj.categoryList;
+    data.categoriesTree = categoriesObj.categoriesTree;
     // 验证权限 - new
     // 如果是分享出去的连接，含有token，则允许直接访问
     // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
@@ -63,6 +73,14 @@ router.get('/:aid', async (ctx, next)=>{
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+      manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
+      showManagement: ctx.permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']),
+      creditKcb: ctx.permission('creditKcb'),
+      unblockPosts: ctx.permission('unblockPosts'),
+      review: ctx.permission('review'),
+      homeHotColumn: ctx.permission('homeHotColumn'),
+      homeToppedColumn: ctx.permission('homeToppedColumn'),
+      column_single_disabled: ctx.permission('column_single_disabled'),
     };
     //文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

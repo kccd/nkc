@@ -92,6 +92,8 @@ const settingsRouter = routers.settings;
 const latestRouter = routers.latest;
 // 第三方登录
 const oauthRouter = routers.oauth;
+// 纯数据路由
+const apiRouter = routers.api;
 
 router
   .use('/', async (ctx, next) => {
@@ -195,4 +197,5 @@ router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
 router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 router.use('/oauth', oauthRouter.routes(), oauthRouter.allowedMethods());
+router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
 module.exports = router;

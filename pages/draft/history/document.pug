@@ -31,7 +31,7 @@ block content
         //- 内容
         .col-xs-12.col-md-9.book-content-container.m-b-1
           if data.history.length
-            
+
             include ../../columns/article/nav
             +nav({})
             //- threadCategory
@@ -39,10 +39,11 @@ block content
               .bg-warning.text-warning.p-a-1.bg-border
                 for tcw in data.document.threadCategoriesWarning
                   div=tcw
-            
-            -var {uid, originState, toc, t, type, authorInfos, user} = data.document
+            -var {uid, originState, originDesc, toc, t, type, authorInfos} = data.document
+            -var {user} = data
             include ../../columns/article/title
-            +title({uid, originState, toc, t, type, authorInfos, user})
+            +title({uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(toc)), allToc: tools.timeFormat(new Date(toc)),
+              title: t, authorInfos, username: user.username, avatarUrl: user.avatarUrl})
             if (data.document.abstractCn && data.document.abstractCn.length || data.document.abstractCn && data.document.abstractEn.length)
               .abstractCn(style="margin-top:1rem; word-break: break-all;")
                 if data.document.abstractCn.length

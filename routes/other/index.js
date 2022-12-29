@@ -3,7 +3,6 @@ const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
 const otherRouter = new Router();
 const shopLogo = require('./shopLogo');
-const resourcesRouter = require('./resources');
 const attachIconRouter = require('./attachIcon');
 const rmRouter = require('./rm');
 const roRouter = require('./ro');
@@ -41,7 +40,6 @@ otherRouter
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
-  .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('rm', rmRouter.routes(), rmRouter.allowedMethods())
   .use('ro', roRouter.routes(), roRouter.allowedMethods())
   .use('attachIcon', attachIconRouter.routes(), attachIconRouter.allowedMethods())

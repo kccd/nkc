@@ -146,7 +146,7 @@ chatSchema.statics.createDefaultChat = async (type, uid) => {
 chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
   const FriendModel = mongoose.model('friends');
   const UserModel = mongoose.model('users');
-  const translate = require('../nkcModules/translate');
+  const {translate} = require('../nkcModules/translate');
   const {getUrl} = require('../nkcModules/tools');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const MessageModel = mongoose.model('messages');
@@ -262,7 +262,7 @@ chatSchema.statics.getCreatedChat = async (uid) => {
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const MessageTypeModel = mongoose.model('messageTypes');
   const FriendsApplicationModel = mongoose.model('friendsApplications');
-  const translate = require('../nkcModules/translate');
+  const {translate} = require('../nkcModules/translate');
   const user = await UserModel.findOnly({uid});
   const {getUrl} = require('../nkcModules/tools');
   const chats = await CreatedChatModel.find({uid}).sort({tlm: -1});

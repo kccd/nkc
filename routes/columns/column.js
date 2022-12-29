@@ -73,7 +73,7 @@ router
     let mcid = categoriesId[1];
     if(cid) cid = parseInt(cid);
     if(mcid) mcid = parseInt(mcid);
-    ctx.template = "columns/column.pug";
+    ctx.remoteTemplate = "columns/column.pug";
     const {column} = data;
     data.column = await column.extendColumn();
     const q = {
@@ -145,6 +145,12 @@ router
     if(ctx.permission("homeToppedColumn")) {
       data.homeToppedColumn = homeSettings.toppedColumnsId.includes(column._id);
     }
+    const permissions = {
+      homeHotColumn: ctx.permission('homeHotColumn'),
+      homeToppedColumn: ctx.permission('homeToppedColumn'),
+      column_single_disabled: ctx.permission('column_single_disabled'),
+    };
+    data.permissions = permissions
     data.c = categoriesIdString;
     await next();
   })

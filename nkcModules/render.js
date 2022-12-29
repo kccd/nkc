@@ -111,6 +111,11 @@ const format = (type, toc) => {
   return moment(toc).format(type);
 }
 
+function timeFormat(time) {
+	const type = 'YYYY/MM/DD HH:mm:ss';
+	return format(type, time);
+}
+
 
 
 function highlightString(content, str) {
@@ -312,6 +317,7 @@ let pugRender = (template, data, state, remoteState) => {
     dateTimeString: dateTimeString,
     fromNow: fromNow,
 		format: format,
+		timeFormat,
 		LineFeedConversion: LineFeedConversion,
 		getOriginLevel: getOriginLevel,
     server: settings.server,

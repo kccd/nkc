@@ -1,6 +1,6 @@
 if !isIncluded('singleCommentTop')
   mixin singleCommentTop(props)
-    -var {_id: cid, docId, did, username, toc, uid, avatar, home, gradeId, gradeName, commentUrl, digest} = props;
+    -var {_id: cid, docId, did, username, toc, uid, avatar, userHome, gradeId, gradeName, gradeIconUrl, commentUrl, digest} = props;
     -var {reason, reviewed, isAuthor, order, tlm, addr} = props;
     .single-post-top
       .single-post-avatar(
@@ -13,14 +13,14 @@ if !isIncluded('singleCommentTop')
         .single-post-username
           a(
             data-anonymous=!uid
-            href=tools.getUrl('userHome', uid)
+            href=userHome
             target='_blank'
             data-global-mouseover="showUserPanel"
             data-global-mouseout="hideUserPanel"
             data-global-data=objToStr({uid})
           )=username
           include ../../../user/grade
-          +userGrade(gradeId, gradeName)
+          +userGrade(gradeId, gradeName, gradeIconUrl)
           if isAuthor
             span 作者
           if digest

@@ -4,10 +4,11 @@ block baseColumnTitle
   +includeCSS('/columns/article/article.css')
 block baseColumnContent
   -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
+  -var {targetUser, categoryList, categoriesTree} = data
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
-  -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
-  -var showManagement = data.user && data.isModerator && permissionsOr(['pushThread', 'moveThreads', 'movePostsToDraft', 'movePostsToRecycle', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+  -var {uid, originState,originDesc, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
+  -var showManagement = data.user && data.isModerator && data.permissions.showManagement;
   //- 与post隐藏相关的设置
   include ../thread/hidePostContentSettings
     +hidePostContentSettings(data.postHeight)
@@ -18,8 +19,15 @@ block baseColumnContent
       include ./article/setUp
       //- 文章管理员操作
       +setUp()
+      include ./article/categoryWarning
+      if categoryList
+        +categoryWarning({categoryList})
       include ./article/title
-      +title({t, article, uid, toc: dt, originState, name, _id, authorInfos, user, type})
+      +title({
+        authorInfos, title: t, uid: targetUser && targetUser.uid, username: targetUser && targetUser.username, avatarUrl: targetUser && targetUser.avatar,
+        toc: format('YYYY-MM-DD', new Date(dt || toc)), allToc: format(new Date(dt || toc)), originState,
+        columnId: _id, columnName: name, addr: article ? article.document && article.document.addr : article.addr, originDesc
+      })
       include ./article/abstract
       +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./article/content
@@ -29,20 +37,28 @@ block baseColumnContent
       -var {kcb = [], xsf = []} = article;
       +articleCredits(kcb.concat(xsf), article._id, data.permissions)
       +articleEditTime(tlm, dt, toc)
+      include ./article/categoryName
+      +categoryName({categoriesTree})
       include ../columns/article/articleOptions
       +articleOptions({
         logged: !!data.user,
         type,
         _id: article._id,
         tid: article.tid,
+        threadUrl: thread.url,
         collected,
         digest: article.digest,
         voteUp: article.voteUp,
         voteDown: article.voteDown,
-        replyCount: count || 0,
+        replyCount: type === 'article' ? article.count : count,
         vote: article.vote,
+        permissions: data.permissions,
       })
   .hidden#data=objToStr({type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  span.move-article-category#moveCategoryBoxAppInColumns(v-cloak)
+    move-box(
+      ref='moveCategoryBox'
+    )
   .article-common.m-b-1
     div
       if type === 'article' && article.status !== 'normal' && article.status !== undefined

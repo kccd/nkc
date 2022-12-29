@@ -138,7 +138,7 @@ orderRouter
 			trackNumber = trackNumber + ":" + order.receiveMobile.substring(order.receiveMobile.length -2,order.receiveMobile.length)
 		}
 		const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber, trackName);
-		data.trackNumber = trackNumber;
+		data.trackNumber = order.trackNumber;
 		data.trackInfo = trackInfo;
 		ctx.template = "shop/manage/logositics.pug";
 		await next();

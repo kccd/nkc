@@ -72,7 +72,6 @@
   import FromNow from '../FromNow';
   import MomentCommentEditor from './MomentCommentEditor';
   import MomentStatus from "./MomentStatus";
-  import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
   import MomentComment from "./MomentComment";
@@ -87,7 +86,6 @@
       'from-now': FromNow,
       'moment-comment-editor': MomentCommentEditor,
       'moment-status': MomentStatus,
-      'moment-option': MomentOptionFixed,
       'moment-comment-child-editor': MomentCommentChildrenEditor,
       'moment-comment': MomentComment
     },

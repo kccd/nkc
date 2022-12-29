@@ -1,4 +1,5 @@
 import List from '../threadCategory/list';
+import MoveCategory from '../../lib/vue/publicVue/moveThreadOrArticle/MoveCategory';
 NKC.modules.MoveThread = function() {
   var this_ = this;
   this_.dom = $("#moduleMoveThread");
@@ -33,7 +34,8 @@ NKC.modules.MoveThread = function() {
       reason: ''
     },
     components: {
-      'thread-category-list': List
+      'thread-category-list': List,
+      'move-category': MoveCategory,
     },
     computed: {
 
@@ -150,7 +152,7 @@ NKC.modules.MoveThread = function() {
         });
       },
       getSelectedThreadCategoriesId() {
-        return this.$refs.threadCategoryList.getSelectedCategoriesId();
+        return this.$refs.moveCategoryList.getSelectedCategoriesId();
       },
       showThreadType: function(forum) {
         this.forum = forum;
@@ -207,6 +209,9 @@ NKC.modules.MoveThread = function() {
           this_.app.showAnonymousCheckbox = options.showAnonymousCheckbox || false;
           if(options.forumCountLimit) this_.app.forumCountLimit = options.forumCountLimit;
         }
+      })
+      .then(()=>{
+        this_.app.$refs.moveCategoryList.open(()=>{},{source: 'thread'})
       })
       .catch(function(data) {
         screenTopWarning(data);

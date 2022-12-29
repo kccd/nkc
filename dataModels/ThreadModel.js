@@ -4,6 +4,7 @@ const redisClient = require("../settings/redisClient");
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
+const {getUrl} = require("../nkcModules/tools");
 const {getQueryObj, obtainPureText} = apiFunction;
 const threadSchema = new Schema({
   tid: {
@@ -563,7 +564,10 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
     parentPostId: "",
     $or: [
       {
-        reviewed: true
+        reviewed: true,
+        toDraft: {
+          $ne: true
+        }
       },
       {
         pid: oc.pid,
@@ -901,7 +905,11 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         await UserModel.extendUsersInfo(users);
       }
       users.map(user => {
-        usersObj[user.uid] = user;
+        const _user = user.toObject();
+        usersObj[user.uid] = {
+          ..._user,
+          avatarUrl: getUrl('userAvatar', user.avatar, 'sm')
+        };
       });
     }
   }

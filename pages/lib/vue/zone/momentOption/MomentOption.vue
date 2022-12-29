@@ -202,7 +202,7 @@ export default {
       nkcAPI('/review' , 'PUT', {
         pass: true,
         docId,
-        type: 'document'
+        reviewType: 'document'
       })
         .then(res => {
           sweetSuccess('操作成功');

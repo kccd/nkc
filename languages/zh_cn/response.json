@@ -1,0 +1,8 @@
+{
+  "FORBIDDEN_BECAUSE_LOGGED": "权限不足，当前资源不允许已登录用户访问。",
+  "FORBIDDEN_BECAUSE_UN_LOGGED": "权限不足，当前资源不允许游客访问。",
+  "FORBIDDEN_BECAUSE_BANNED": "权限不足，当前资源不允许开除学籍的用户访问。",
+  "FORBIDDEN_BECAUSE_UN_BANNED": "权限不足，当前资源仅允许开除学籍的用户访问。",
+  "FORBIDDEN_WITH_MESSAGE": "权限不足：{v1}",
+  "FORBIDDEN": "权限不足"
+}

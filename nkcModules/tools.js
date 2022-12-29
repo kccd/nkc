@@ -60,7 +60,7 @@ var Tools = function() {
         return "/default/default_anonymous_user_avatar.jpg";
       }
       case "fileCover": {
-        return "/attachIcon/" + (id||"").toLowerCase() + ".png";
+        return "/attachIcon/" + (id || "unknown").toLowerCase();
       }
       case "gradeIcon": {
         return "/statics/grade_icon/v" + id + "l.png";

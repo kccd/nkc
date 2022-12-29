@@ -14,8 +14,7 @@ module.exports = async (ctx, next) => {
     ctx.set('content-length', ctx.fileContentLength);
   } else {
     if(
-      request.accepts('json', 'html') === 'json' &&
-      request.get('FROM') === 'nkcAPI'
+      ctx.acceptJSON
     ) {
       await jsonRes(ctx);
     } else {

@@ -90,6 +90,15 @@ module.exports = {
       kcb: 0,
       maxKcb: 0,
       rewardCount: 0
+    },
+    moment: {
+      status: true,
+      countLimit: 10,
+      timeLimit: 12,
+      rewardStatus: false,
+      kcb: 0,
+      maxKcb: 0,
+      rewardCount: 0
     }
   }
 };
