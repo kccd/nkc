@@ -206,7 +206,15 @@ function insertRenderedComment(renderedComment) {
   if(!renderedComment) return;
   //排除自己的发表
   if(renderedComment.comment && NKC.configs.uid !== renderedComment.comment.uid) {
-    bulletComments.add(renderedComment.comment);
+    const comment={
+      content: renderedComment.comment.content,
+      contentUrl: renderedComment.comment.commentUrl,
+      avatarUrl: renderedComment.comment.user && renderedComment.comment.user.avatarUrl,
+      postId: renderedComment.comment.did,
+      uid: renderedComment.comment.uid,
+      username: renderedComment.comment.user && renderedComment.comment.user.username,
+    }
+    bulletComments.add(comment);
   }
   //仅在最后一页时才动态插入内容
   if(!data.isLastPage) return;

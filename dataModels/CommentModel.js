@@ -953,6 +953,7 @@ schema.statics.getCommentsInfo = async function(comments) {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
+  const nkcRender = require('../nkcModules/nkcRender');
   const commentsSid = [];
   const commentDid = [];
   const commentsId = [];
@@ -1062,6 +1063,7 @@ schema.statics.getCommentsInfo = async function(comments) {
       url,
       isAuthor: commentDocument.uid === articleDocument.uid,
       commentUrl,
+      content: nkcRender.htmlToPlain(commentDocument.content),
       credits,
     });
   }

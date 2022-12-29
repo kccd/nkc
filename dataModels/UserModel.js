@@ -1089,6 +1089,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
   const ColumnModel = mongoose.model('columns');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const nkcRender = require('../nkcModules/nkcRender');
+  const {getUrl} = require('../nkcModules/tools');
   const uid = new Set(), personalObj = {};
   for(const user of users) {
     uid.add(user.uid);
@@ -1135,7 +1136,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     const _user = user.toObject? user.toObject(): user;
     _user.description = nkcRender.replaceLink(_user.description);
-    users_.push(_user);
+    users_.push({..._user, avatarUrl: getUrl('userAvatar', _user.avatar)});
   }
   return users_;
 };
