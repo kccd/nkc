@@ -47,7 +47,7 @@ router
       min: 0,
     });
     checkNumber(verifyPhoneNumber.maxInterval, {
-      name: '间隔上限时间',
+      name: '间隔时间上限',
       min: 0,
     });
     if(!['reviewPost', 'disablePublish'].includes(verifyPhoneNumber.type)) {

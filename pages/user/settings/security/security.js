@@ -433,7 +433,7 @@ var mobileApp = new Vue({
       nkcAPI("/u/"+ NKC.configs.uid +"/phoneVerify", "POST", { code: self.code })
         .then(function() {
           self.complete = true;
-          return sweetAlert("验证成功");
+          return sweetSuccess("验证成功");
         })
         .then(function() {
           location.reload();

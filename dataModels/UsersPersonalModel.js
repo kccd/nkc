@@ -574,11 +574,12 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
 	const maxInterval = authSettings.verifyPhoneNumber.maxInterval * oneHour;
 	const extendedTime = userPersonal.numberOfVerifications * unitInterval;
 	const interval = authSettings.verifyPhoneNumber.interval * oneHour;
-	// 如果大于一年未验证
 	if (Date.now() - lastVerifyPhoneNumberTime.getTime() > maxInterval) {
+		// 如果超过认证时间上限
 		return true
-		// 如果小于一年未验证
 	} else {
+		// 判断是否需要认证
+		// 实际间隔时间 = 间隔时间 + 验证次数 x 累加时间
 		return Date.now() - lastVerifyPhoneNumberTime.getTime() > interval + extendedTime;
 	}
 }
