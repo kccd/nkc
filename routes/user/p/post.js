@@ -81,7 +81,10 @@ module.exports = async (ctx, next) => {
     threadsObj[thread.tid] = thread;
   });
   const haveReviewPermission = ctx.permission('review');
-
+  let modifyPostTimeLimit;
+  if(user && user.uid){
+    modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
+  }
   for(const post of posts) {
     const thread = threadsObj[post.tid];
     if(post.disabled || thread.disabled || thread.recycleMark) {
@@ -132,7 +135,6 @@ module.exports = async (ctx, next) => {
       (!isThread || thread.type !== 'fund') &&
       ((user && (post.uid === user.uid)) || ctx.permission('modifyOtherPosts'))
     ) {
-      const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
       if(modifyPostTimeLimit >= (Date.now() - new Date(post.toc).getTime())) {
         // 未超过修改的最大时间
         edit = true;
