@@ -644,6 +644,7 @@ messageSchema.statics.getParametersData = async (message) => {
     let comment = await CommentModel.findOnly({_id: document.sid});
     if(!comment) return console.log('未找到comment');
     comment = (await CommentModel.getCommentsInfo([comment]))[0];
+    if(!comment) return null;
     const {status, commentDocument, articleDocument} = comment;
     const userObj = await UserModel.getUsersObjectByUsersId([commentDocument.uid]);
     const user = userObj[commentDocument.uid];
