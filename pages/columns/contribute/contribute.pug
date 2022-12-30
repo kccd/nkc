@@ -42,9 +42,13 @@ block content
                       button.m-r-05.btn.btn-danger.btn-xs(@click="remove(index)") 删除
                       a(:href="'/t/' + thread.tid" target="_blank") {{thread.firstPost.t}}
               .form-group
+                article-selector-dialog(
+                  ref="articleSelectorDialog"
+                )
                 h5
                   b 我的文章&nbsp;
                     small 请勾选需要投稿的文章
+                button.btn.btn-primary.btn-sm(@click="openSelector()") 选择
                 .m-t-05
                   button.btn.btn-default.btn-xs(@click="showThreadsToggle") 点击{{showThreads?"折叠":"展开"}}
                     .fa.fa-caret-down

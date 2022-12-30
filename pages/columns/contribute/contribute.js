@@ -1,6 +1,10 @@
+import ArticleSelectorDialog from "../../lib/vue/publicVue/selectorArticleOrThread/ArticleSelectorDialog";
 var data = NKC.methods.getDataById("data");
 var app = new Vue({
   el: "#app",
+  components:{
+    'article-selector-dialog':ArticleSelectorDialog,
+  },
   data: {
     column: data.column,
     user: data.user,
@@ -144,6 +148,9 @@ var app = new Vue({
         .catch(function(data) {
           app.error = data.error || data;
         })
+    },
+    openSelector: function (){
+      this.$refs.articleSelectorDialog.open()
     }
   }
 });
