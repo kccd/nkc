@@ -106,7 +106,7 @@
           )
           .resource
             span(v-if='r.state === "usable"')
-              .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
+              .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url('+getUrl('fileCover', 'mp3')+')'")
