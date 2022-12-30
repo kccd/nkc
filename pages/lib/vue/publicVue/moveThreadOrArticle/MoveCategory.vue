@@ -2,33 +2,32 @@
   .move-category
       .thread-categories(v-if="processCategories && processCategories.length > 0" )
         .thread-category(v-for='c in processCategories')
-          div(v-if='c.nodes.length > 0')
-            .thread-category-name(:title='c.description')
-              span {{c.name}}（
-              span(v-if="c.selectedNode === null") 未选择
-              span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
-              span(v-else) 已选择：{{c.selectedNode.name}}
-              span ）
-            .editor-thread-category-description.m-b-05(v-if="c.description && isShowWarn") {{ c.description }}
-            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
-              v-if="c.warning && isShowWarn"
-            ) 注意事项：{{ c.warning}}
-            .thread-category-nodes
-              .thread-category-node(
-                @click='selectThreadCategory(c, "default")'
-                :class="{ active: !c.selectedNode || c.selectedNode === 'default' }"
-              )
-                span {{c.nodeName}}
-              .thread-category-node(
-                v-for='n in c.nodes'
-                @click='selectThreadCategory(c, n)'
-                :class='{"active": c.selectedNode === n}'
-                :title='n.description'
-              )
-                span {{n.name}}
-            .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
-              v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
-            ) 注意事项：{{ c.selectedNode.warning }}
+          .thread-category-name(:title='c.description')
+            span {{c.name}}（
+            span(v-if="c.selectedNode === null") 未选择
+            span(v-else-if="c.selectedNode === 'default'") 已选择：{{c.nodeName}}
+            span(v-else) 已选择：{{c.selectedNode.name}}
+            span ）
+          .editor-thread-category-description.m-b-05(v-if="c.description && isShowWarn") {{ c.description }}
+          .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05(
+            v-if="c.warning && isShowWarn"
+          ) 注意事项：{{ c.warning}}
+          .thread-category-nodes
+            .thread-category-node(
+              @click='selectThreadCategory(c, "default")'
+              :class="{ active: !c.selectedNode || c.selectedNode === 'default' }"
+            )
+              span {{c.nodeName}}
+            .thread-category-node(
+              v-for='n in c.nodes'
+              @click='selectThreadCategory(c, n)'
+              :class='{"active": c.selectedNode === n}'
+              :title='n.description'
+            )
+              span {{n.name}}
+          .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
+            v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
+          ) 注意事项：{{ c.selectedNode.warning }}
       .thread-categories(v-else) 空空如也~
 
 

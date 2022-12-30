@@ -40,9 +40,6 @@ new Vue({
     showCommentPanel() {
       this.$refs.moment.showCommentPanel();
     },
-    // openOption(data) {
-    //   this.$refs.momentOption.open(data);
-    // },
     //投诉或举报
     complaint(mid) {
       this.$refs.complaint.open('moment', mid);
