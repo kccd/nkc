@@ -14,10 +14,11 @@
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .articles
           label(v-for="article in articles")
-            input(type='checkbox' :value='article.id' v-model='selectedArticlesId')
+            input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
             div.content-position
-              div {{article.name}}
-              div 来自专业
+              div 标题：{{article.t}}
+              div 内容：{{article.c}}
+              div 创作时间：{{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
 
 </template>
 <style lang="less" scoped>
@@ -48,10 +49,15 @@
   .selector-core-body {
     label {
       display: block;
+      position: relative;
+      input {
+        position: absolute;
+      }
       .content-position {
         position: relative;
-        left: 1.5rem;
-        top: -2.5rem;
+        left: 2rem;
+        display: inline-block;
+        padding-right: 1rem;
       }
     }
   }
@@ -60,13 +66,14 @@
 <script>
 import Paging from "../../Paging";
 import {nkcAPI} from "../../../js/netAPI";
+import {timeFormat} from "../../../js/time";
 
 export default {
   data: () => ({
     selectedSource: 'threads',
     selectedArticles: [],
     selectedArticlesId: [],
-    articles: [{id:1,name:1},{id:2,name:2},{id:3,name:1},{id:4,name:1}],
+    articles: [],
     paging: {},
 
   }),
@@ -77,23 +84,31 @@ export default {
     pageButtons() {
       return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
     },
+    selectedArticlesObj() {
+      let obj = {};
+      this.selectedArticles.forEach(item=>{
+        obj[item.tid] = item
+      })
+      return obj;
+    },
   },
   mounted() {
-    console.log('11')
-    // this.getUserArticles(0);
+    this.getUserArticles(0);
   },
   methods:{
+    timeFormat: timeFormat,
     getUserArticles(page) {
       const self= this;
       let url;
       if(this.selectedSource === 'threads') {
-        url = `/api/v1/threads/selector`;
+        url = `/api/v1/threads/selector?page=${page}`;
       } else {
-        url = `/api/v1/articles/selector`;
+        url = `/api/v1/articles/selector?page=${page}`;
       }
       nkcAPI(url, "GET")
         .then(res => {
           self.paging = res.paging;
+          self.articles = res.articles;
 
         })
         .catch(err => {
@@ -104,9 +119,18 @@ export default {
     clickButton(num) {
       this.getUserArticles(num);
     },
-    getSelectedArticles(){
-      return this.selectedArticles
+    // 保存选过的
+    selectedArticlesFunc(article){
+      if(!this.selectedArticlesObj[article.tid]){
+        this.selectedArticles.push(article)
+      }
     },
+    getSelectedArticles(){
+      return this.selectedArticlesId.map(item=>{
+        return this.selectedArticlesObj[item];
+      });
+    },
+    // 点击文章来源
     selectSource(source){
       this.selectedSource = source;
     },

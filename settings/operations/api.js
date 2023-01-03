@@ -7,5 +7,15 @@ module.exports = {
         }
       }
     }*/
+    threads: {
+      selector: {
+        GET: 'getUserArticles'
+      }
+    },
+    articles: {
+      selector: {
+        GET: 'getUserArticles'
+      }
+    }
   }
 }
