@@ -9,14 +9,12 @@ const alipayConfig = require('../config/alipay.json');
 const serverConfig = require('../config/server.json');
 
 let privateKey = '';
-let publicKey = '';
 let alipayCertPublicKey = '';
 let alipayRootCert = '';
 let appCertPublicKey = '';
 
 const {
   privateKeyPath,
-  publicKeyPath,
   alipayCertPublicKeyPath,
   alipayRootCertPath,
   appCertPublicKeyPath
@@ -24,9 +22,6 @@ const {
 
 if(fs.existsSync(privateKeyPath)) {
   privateKey = fs.readFileSync(privateKeyPath).toString();
-}
-if(fs.existsSync(publicKeyPath)) {
-  publicKey = fs.readFileSync(publicKeyPath).toString();
 }
 
 if(fs.existsSync(alipayCertPublicKeyPath)) {
