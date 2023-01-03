@@ -34,7 +34,7 @@ function getPostAuthor(pid) {
 }
 
 $(function () {
-
+  const rootElement = $('[data-type="nkc-render-content"]').eq(0)[0];
   NKC.oneAfter("mathJaxRendered", function(_data, next) {
     if (data.notes && data.notes.length) {
       for (var i = 0; i < data.notes.length; i++) {
@@ -42,7 +42,8 @@ $(function () {
         new NKC.modules.NKCHL({
           type: n.type,
           targetId: n.targetId,
-          notes: n.notes
+          notes: n.notes,
+          rootElement: rootElement,
         });
       }
     }

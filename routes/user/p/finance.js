@@ -30,7 +30,7 @@ module.exports = async (ctx, next) => {
   const kcbNumber = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
   data.kcbsRecords = kcbNumber.map((item)=>{
     const m = item;
-    m.lang = nkcModules.translate(nkcModules.language.languageNames.zh_cn, 'kcbsTypes', item.type);
+    m.lang = nkcModules.translate.translate(nkcModules.language.languageNames.zh_cn, 'kcbsTypes', item.type);
     return m;
   });
   data.paging = paging;
