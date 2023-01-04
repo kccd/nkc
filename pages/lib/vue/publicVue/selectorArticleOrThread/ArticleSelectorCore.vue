@@ -10,7 +10,11 @@
           @click.stop='selectSource("articles")'
           :class="{active : selectedSource === 'articles'}"
         ) 空间或专栏文章
-    .selector-core-body
+        .selected-table-span(
+          @click.stop='selectSource("choose")'
+          :class="{active : selectedSource === 'choose'}"
+        ) 已选泽
+    .selector-core-body(v-if="selectedSource !== 'choose'" )
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .articles
         label(v-for="article in articles")
@@ -19,6 +23,14 @@
             div.title {{article.t}}
             div.toc {{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
             div.content {{article.c}}
+    .selector-core-body(v-else)
+      .articles
+        label(v-for="article in getSelectedArticles()")
+          input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
+          div.content-position
+              div.title {{article.t}}
+              div.toc {{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
+              div.content {{article.c}}
 
 </template>
 <style lang="less" scoped>
@@ -26,8 +38,6 @@
 .selector-core {
   padding: 0.5rem;
   background-color: #ffffff;
-  max-height: 100px;
-  overflow: hidden;
   .selected-table {
     .selected-table-span {
       display: inline-block;
@@ -49,22 +59,24 @@
     }
   }
   .selector-core-body {
+    max-height: 450px;
+    overflow: auto;
     label {
       display: block;
       position: relative;
       input {
         position: absolute;
       }
-      .content-position {
-        position: relative;
-        left: 2rem;
-        display: inline-block;
-        padding-right: 1rem;
-        font-weight: normal;
-        .title {
-          font-weight: bold;
-          font-size: 18px;
-        }
+    }
+    .content-position {
+      position: relative;
+      left: 2rem;
+      display: inline-block;
+      padding-right: 1rem;
+      font-weight: normal;
+      .title {
+        font-weight: bold;
+        font-size: 18px;
       }
     }
   }
@@ -98,9 +110,6 @@ export default {
       })
       return obj;
     },
-  },
-  mounted() {
-    this.getUserArticles(0);
   },
   methods:{
     timeFormat: timeFormat,
@@ -140,7 +149,19 @@ export default {
     // 点击文章来源
     selectSource(source){
       this.selectedSource = source;
+      if(source!=='choose'){
+        this.getUserArticles(0);
+      }
     },
+    init(){
+      this.selectedSource= 'threads';
+      this.selectedArticles= [];
+      this.selectedArticlesId= [];
+      this.articles= [];
+      this.paging= {};
+      this.getUserArticles(0);
+
+    }
   }
 }
 </script>

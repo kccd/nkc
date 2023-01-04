@@ -23,18 +23,16 @@ export default {
     draggable
   },
   data: ()=>({
+    callback: null,
     submitting: false,
     showDialog: false,
   }),
-  mounted() {
-    // this.dom = $("#moduleArticleSelector");
-    // this.dom.modal({
-    //   show: false
-    // });
-  },
   methods:{
     open(callback, options={}){
+      this.$refs.articleSelectorCore.init()
       this.$refs.selectorRef.open()
+      this.callback = callback;
+
       // this.dom.modal("show");
       // this.$refs.articleSelectorCore.open((data)=>{
       //   this.selectedCategories = data;
@@ -44,7 +42,8 @@ export default {
     //   return this.$refs.articleSelectorCore.getSelectedArticles()
     // },
     submit(){
-      console.log('执行getSelectedArticles');
+      const articles = this.$refs.articleSelectorCore.getSelectedArticles()
+      this.callback(articles);
     },
   }
 }

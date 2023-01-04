@@ -69,7 +69,6 @@ export default {
   },
   data: () => ({
     submitting: false,
-    show: false,
   }),
   mounted() {
     this.initDraggableElement();
@@ -85,14 +84,13 @@ export default {
     open(callback, options) {
       const self = this;
       self.draggableElement.show();
-      self.show = true;
     },
     close() {
       this.draggableElement.hide();
-      this.show = false;
     },
     submit(){
       this.$emit('submit')
+      this.close()
     },
   }
 }

@@ -57,8 +57,12 @@ router
     ctx.apiData = {
       articles: threads.map(item=>{
         return{
-          ...item,
+          tid: item.tid,
+          toc: item.toc,
+          t: item.t,
+          source: 'thread',
           c: nkcModules.nkcRender.htmlToPlain(item.c,20),
+          url: nkcModules.tools.getUrl('thread', item.tid)
           }
       }),
       paging
