@@ -3,8 +3,11 @@ const {ThrowForbiddenResponseTypeError} = require('../nkcModules/error');
 const {ResponseTypes} = require('../settings/response');
 
 async function permission(ctx, next){
-  const {data} = ctx;
-	if(!data.userOperationsId.includes(data.operationId)) {
+  const {data, isAPIRoute} = ctx;
+	// 这里判断了请求的是否为API路由
+	// 如果是API路由则绕过全局的权限判断
+	// API路由需要在路由中间件中进行权限判断
+	if(!isAPIRoute && !data.userOperationsId.includes(data.operationId)) {
 		ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 	}
 	await next();
@@ -41,6 +44,16 @@ function OnlyBannedUser() {
 	return async (ctx, next) => {
 		if(!ctx.data.user.certs.includes(defaultCerts.banned)) {
 			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_UN_BANNED);
+		}
+		await next();
+	}
+}
+
+function OnlyCurrentPermission() {
+	return async (ctx, next) => {
+		const operationId = ctx.data.operationId;
+		if(!ctx.data.userOperations.includes(operationId)) {
+			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 		}
 		await next();
 	}
