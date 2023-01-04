@@ -14,17 +14,17 @@
           ) 注意事项：{{ c.warning}}
           .thread-category-nodes
             .thread-category-node(
-              @click='selectThreadCategory(c, "default")'
-              :class="{ active: !c.selectedNode || c.selectedNode === 'default' }"
-            )
-              span {{c.nodeName}}
-            .thread-category-node(
               v-for='n in c.nodes'
               @click='selectThreadCategory(c, n)'
               :class='{"active": c.selectedNode === n}'
               :title='n.description'
             )
               span {{n.name}}
+            .thread-category-node(
+              @click='selectThreadCategory(c, "default")'
+              :class="{ active: !c.selectedNode || c.selectedNode === 'default' }"
+            )
+              span {{c.nodeName}}
           .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border(
             v-if="c.selectedNode && c.selectedNode.warning && isShowWarn"
           ) 注意事项：{{ c.selectedNode.warning }}
@@ -112,7 +112,7 @@ export default {
       let {selectedCid = [], categories = []} = this;
       categories = JSON.parse(JSON.stringify(categories));
       for(const c of categories) {
-        c.selectedNode = null; // null: 未选择, 'default': 默认, {Number}: 具体的属性 ID
+        c.selectedNode = 'default'; // null: 未选择, 'default': 默认, {Number}: 具体的属性 ID
         for(const n of c.nodes) {
           if(selectedCid.includes(n._id)){
             c.selectedNode = n;
