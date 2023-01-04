@@ -13,12 +13,12 @@
     .selector-core-body
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       .articles
-          label(v-for="article in articles")
-            input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
-            div.content-position
-              div 标题：{{article.t}}
-              div 内容：{{article.c}}
-              div 创作时间：{{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
+        label(v-for="article in articles")
+          input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
+          div.content-position
+            div.title {{article.t}}
+            div.toc {{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
+            div.content {{article.c}}
 
 </template>
 <style lang="less" scoped>
@@ -26,6 +26,8 @@
 .selector-core {
   padding: 0.5rem;
   background-color: #ffffff;
+  max-height: 100px;
+  overflow: hidden;
   .selected-table {
     .selected-table-span {
       display: inline-block;
@@ -58,6 +60,11 @@
         left: 2rem;
         display: inline-block;
         padding-right: 1rem;
+        font-weight: normal;
+        .title {
+          font-weight: bold;
+          font-size: 18px;
+        }
       }
     }
   }
