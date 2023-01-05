@@ -33,15 +33,19 @@ var app = new Vue({
   computed: {
     selectedThreadsArr: function() {
       const selectedThreads = this.selectedThreads;
-      const arr = [];
+      const threadsId = [];
+      const articlesId = [];
       for(let i = 0; i < selectedThreads.length; i++) {
-        const t = selectedThreads[i];
-        arr.push({
-          source: selectedThreads[i].source,
-          id: selectedThreads[i].tid
-        });
+        if(selectedThreads[i].source === 'thread'){
+          threadsId.push(selectedThreads[i].tid);
+        }else {
+          articlesId.push(selectedThreads[i].tid);
+        }
       }
-      return arr;
+      return {
+        threadsId,
+        articlesId,
+      };
     }
   },
   methods: {
@@ -137,20 +141,22 @@ var app = new Vue({
     submit: function() {
       this.error = "";
       let selectedThreadsArr = this.selectedThreadsArr;
-      if(selectedThreadsArr.length === 0) return this.error = "请选择需要投稿的文章";
+      if(this.selectedThreads.length === 0) return this.error = "请选择需要投稿的文章";
       if(!this.mainCategoriesId || this.mainCategoriesId.length === 0) return this.error = "请选择文章分类";
-      // nkcAPI("/m/" + this.column._id + "/contribute", "POST", {
-      //   threadsId: selectedThreadsArr,
-      //   mainCategoriesId: this.mainCategoriesId,
-      //   minorCategoriesId: this.minorCategoriesId,
-      //   description: this.description
-      // })
-      //   .then(function() {
-      //     app.succeed = true;
-      //   })
-      //   .catch(function(data) {
-      //     app.error = data.error || data;
-      //   })
+      console.log('selectedThreadsArr',selectedThreadsArr);
+      nkcAPI("/m/" + this.column._id + "/contribute", "POST", {
+        threadsId: selectedThreadsArr.threadsId,
+        articlesId: selectedThreadsArr.articlesId,
+        mainCategoriesId: this.mainCategoriesId,
+        minorCategoriesId: this.minorCategoriesId,
+        description: this.description
+      })
+        .then(function() {
+          // app.succeed = true;
+        })
+        .catch(function(data) {
+          // app.error = data.error || data;
+        })
     },
     chooseArticles: function(articles) {
       this.selectedThreads = articles;

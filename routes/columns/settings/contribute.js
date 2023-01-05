@@ -26,7 +26,8 @@ router
     const count = await db.ColumnContributeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const contributes = await db.ColumnContributeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    data.contributes = await db.ColumnContributeModel.extendContributes(contributes);
+    // data.contributes = await db.ColumnContributeModel.extendContributes(contributes);
+    data.contributes = await db.ColumnContributeModel.extendColumnContributes(contributes);
     data.resolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: {$ne: null}});
     data.unresolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: null});
     data.paging = paging;
@@ -35,7 +36,7 @@ router
   })
   .post("/", async (ctx, next) => {
     const {data, db, body} = ctx;
-    const {contributesId, type, reason, mainCategoriesId, minorCategoriesId} = body;
+    const {contributes, type, reason, mainCategoriesId, minorCategoriesId} = body;
     const {column} = data;
     if(!mainCategoriesId || mainCategoriesId.length === 0) {
       if(type === "agree") ctx.throw(400, "请选择文章分类");
@@ -44,10 +45,15 @@ router
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
-    for(const _id of contributesId) {
-      const contribute = await db.ColumnContributeModel.findOne({_id, columnId: column._id});
+    for(const _contribute of contributes) {
+      const contribute = await db.ColumnContributeModel.findOne({_id: _contribute._id, columnId: column._id});
       if(!contribute || contribute.passed !== null) continue;
-      const thread = await db.ThreadModel.findOne({tid: contribute.tid});
+      let thread;
+      if(_contribute.source === 'thread'){
+        thread = await db.ThreadModel.findOne({tid: contribute.tid});
+      }else if(_contribute.source === 'article'){
+        thread = await db.ArticleModel.findOne({_id: contribute.tid});
+      }
       if(!thread) continue;
       await contribute.updateOne({
         tlm: Date.now(),
@@ -55,16 +61,21 @@ router
         passed: type === "agree"
       });
       if(type === "agree") {
-        const p = await db.ColumnPostModel.findOne({columnId: column._id, pid: thread.oc});
+        let p;
+        if(_contribute.source === 'thread'){
+          p = await db.ColumnPostModel.findOne({columnId: column._id, pid: thread.oc, type: _contribute.source});
+        }else if(_contribute.source === 'article'){
+          p = await db.ColumnPostModel.findOne({columnId: column._id, pid: thread._id, type: _contribute.source});
+        }
         if(p) continue;
         const categoriesOrder = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
         await db.ColumnPostModel({
           _id: await db.SettingModel.operateSystemID("columnPosts", 1),
-          tid: thread.tid,
+          tid: '',
           from: "contribute",
-          pid: thread.oc,
+          pid: _contribute.source === 'thread' ? thread.oc : thread._id,
           columnId: column._id,
-          type: "thread",
+          type: _contribute.source,
           order: categoriesOrder,
           top: thread.toc,
           cid: mainCategoriesId,

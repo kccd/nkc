@@ -40,8 +40,15 @@ router
           let: { oc_pid: "$oc" },
           pipeline: [
             { $match:
-                { $expr:
-                    { $eq: [ "$pid",  "$$oc_pid" ] },
+                {
+                  $expr:
+                    { $and:
+                        [
+                          { $eq: [ "$pid",  "$$oc_pid" ] },
+                          { $eq: [ "$anonymous", false ] },
+                          { $eq: [ "$type", "thread" ] },
+                        ]
+                    }
                 }
             },
             { $project: {c: 1, pid: 1, t: 1, toc: 1 } }
@@ -54,17 +61,21 @@ router
       },
       { $project: { content: 0 } }
     ]);
-    ctx.apiData = {
-      articles: threads.map(item=>{
-        return{
+    const _articles = [];
+    threads.forEach(item=>{
+      if(item.toc){
+        _articles.push({
           tid: item.tid,
           toc: item.toc,
           t: item.t,
           source: 'thread',
           c: nkcModules.nkcRender.htmlToPlain(item.c,20),
           url: nkcModules.tools.getUrl('thread', item.tid)
-          }
-      }),
+        })
+      }
+    })
+    ctx.apiData = {
+      articles: _articles,
       paging
     };
     await next();

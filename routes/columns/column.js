@@ -132,6 +132,8 @@ router
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
+    console.log('columnPosts',columnPosts);
+
     data.paging = paging;
     //获取专栏文章
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts({columnPosts, fidOfCanGetThread, isModerator});

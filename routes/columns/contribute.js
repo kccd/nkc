@@ -15,56 +15,149 @@ router
     const {db, body, data} = ctx;
     const {user, column} = data;
     if(user.uid === column.uid) ctx.throw(400, "自己的专栏无需投稿，可在文章页直接将文章推送到专栏");
-    let {threadsId, description, mainCategoriesId, minorCategoriesId} = body;
-    if(threadsId.length === 0) ctx.throw(400, "请选择需要投稿的文章");
+    let {threadsId, articlesId, description, mainCategoriesId, minorCategoriesId} = body;
+    if(threadsId.length === 0 && articlesId.length === 0) ctx.throw(400, "请选择需要投稿的文章");
     if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "请选择文章分类");
     for(const _id of mainCategoriesId.concat(minorCategoriesId)) {
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
     let threadCount = 0;
-    for(const tid of threadsId) {
-      const thread = await db.ThreadModel.findOne({tid, uid: user.uid});
-      if(!thread) continue;
-      const p = await db.ColumnPostModel.findOne({
-        columnId: column._id,
-        pid: thread.oc
-      });
-      if(p) continue;
-      // if(p) ctx.throw(400, `ID为${tid}的文章已经被加入到专栏了，请勿重复投稿`);
-      let contribute = await db.ColumnContributeModel.findOne({columnId: column._id, pid: thread.oc, passed: null});
-      if(contribute) {
-        continue;
-        // ctx.throw(400, `ID为${tid}的文章正在等待专栏主审核，请勿重复投稿`);
+    let threads = [];
+    if(threadsId.length !== 0){
+      const _threadsObj ={};
+      const _threads = await db.ThreadModel.find({tid: {$in: threadsId}, uid: user.uid});
+      let ocs;
+      if(_threads && _threads.length > 0){
+        ocs = _threads.map(item => {
+          _threadsObj[item.oc] = item;
+          return item.oc
+        })
       }
-      contribute = db.ColumnContributeModel({
+      const pArr = await db.ColumnPostModel.find({
+        columnId: column._id,
+        pid: {$in: ocs},
+        type: 'thread'
+      });
+      if(pArr && pArr.length > 0){
+        const pocs = pArr.map(item => {
+          return item.pid
+        })
+        ocs = ocs.filter(item=>{
+          return !pocs.includes(item)
+        })
+        // if(p) ctx.throw(400, `ID为${tid}的文章已经被加入到专栏了，请勿重复投稿`);
+      }
+      if(ocs && ocs.length > 0){
+        let contributes = await db.ColumnContributeModel.find({
+          columnId: column._id, pid: {$in: ocs}, source: 'thread',passed: null
+        });
+        if(contributes && contributes.length > 0){
+          const contributesPids = contributes.map(item => {
+            return item.pid
+          })
+          ocs = ocs.filter(item=>{
+            return !contributesPids.includes(item)
+          })
+          // ctx.throw(400, `ID为${tid}的文章正在等待专栏主审核，请勿重复投稿`);
+        }
+      }
+      if(ocs && ocs.length > 0){
+        ocs.forEach(item=>{
+          threads.push(_threadsObj[item])
+        })
+      }
+    }
+    let articles = [];
+    if(articlesId.length !== 0){
+      const _articlesObj ={};
+      const _articles = await db.ArticleModel.find({_id: {$in: articlesId}, uid: user.uid});
+      let ids;
+      if(_articles && _articles.length > 0){
+        ids = _articles.map(item => {
+          _articlesObj[item._id] = item;
+          return item._id
+        })
+      }
+      const pArr = await db.ColumnPostModel.find({
+        columnId: column._id,
+        pid: {$in: ids},
+        type: 'article'
+      });
+      if(pArr && pArr.length > 0){
+        const pids = pArr.map(item => {
+          return item.pid
+        })
+        ids = ids.filter(item=>{
+          return !pids.includes(item)
+        })
+      }
+      if(ids && ids.length > 0){
+        let contributes = await db.ColumnContributeModel.find({
+          columnId: column._id, pid: {$in: ids}, source: 'thread',passed: null
+        });
+        if(contributes && contributes.length > 0){
+          const contributesPids = contributes.map(item => {
+            return item.pid
+          })
+          ids = ids.filter(item=>{
+            return !contributesPids.includes(item)
+          })
+          // ctx.throw(400, `ID为${tid}的文章正在等待专栏主审核，请勿重复投稿`);
+        }
+      }
+      if(ids && ids.length > 0){
+        ids.forEach(item=>{
+          articles.push(_articlesObj[item])
+        })
+      }
+    }
+
+    for(const _thread of threads) {
+      const contribute = db.ColumnContributeModel({
         _id: await db.SettingModel.operateSystemID("columnContributes", 1),
         uid: user.uid,
-        tid,
-        pid: thread.oc,
+        tid: _thread.tid,
+        pid: '',
         cid: mainCategoriesId,
         mcid: minorCategoriesId,
         description,
-        columnId: column._id
+        columnId: column._id,
+        source: 'thread'
       });
       await contribute.save();
       threadCount++;
     }
-    if(threadCount > 0) {
-      const message = db.MessageModel({
-        _id: await db.SettingModel.operateSystemID("messages", 1),
-        r: column.uid,
-        ty: "STU",
-        ip: ctx.address,
-        port: ctx.port,
-        c: {
-          type: "newColumnContribute",
-          columnId: column._id
-        }
+    for(const _article of articles) {
+      const contribute = db.ColumnContributeModel({
+        _id: await db.SettingModel.operateSystemID("columnContributes", 1),
+        uid: user.uid,
+        tid: _article._id,
+        pid: '',
+        cid: mainCategoriesId,
+        mcid: minorCategoriesId,
+        description,
+        columnId: column._id,
+        source: 'article'
       });
-      await message.save();
-      await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      await contribute.save();
+      threadCount++;
     }
+    // if(threadCount > 0) {
+    //   const message = db.MessageModel({
+    //     _id: await db.SettingModel.operateSystemID("messages", 1),
+    //     r: column.uid,
+    //     ty: "STU",
+    //     ip: ctx.address,
+    //     port: ctx.port,
+    //     c: {
+    //       type: "newColumnContribute",
+    //       columnId: column._id
+    //     }
+    //   });
+    //   await message.save();
+    //   await ctx.nkcModules.socket.sendMessageToUser(message._id);
+    // }
     await next();
   });
 module.exports = router;

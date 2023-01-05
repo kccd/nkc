@@ -45,6 +45,8 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 增加独立文章投稿时，决定放弃，置为空字符串
+  // 以type和pid查询
   tid: {
     type: String,
     default: '',
@@ -258,7 +260,7 @@ schema.statics.extendColumnPosts = async (options) => {
 
   const {normal} = await ArticleModel.getArticleStatus();
   const pid = new Set();
-  const tid = new Set();
+  const oc = new Set();
   const uid = new Set();
   const aid = new Set();
   const columnId = new Set();
@@ -267,15 +269,15 @@ schema.statics.extendColumnPosts = async (options) => {
   //文章类型分类
   columnPosts.map(post => {
     if (post.type === 'post') pid.add(post.pid);
-    if (post.type === 'thread') tid.add(post.tid);
+    if (post.type === 'thread') oc.add(post.pid);
     if (post.type === 'article') aid.add(post.pid);
     columnId.add(post.columnId);
     cid = cid.concat(post.cid, post.mcid);
   });
   //文章查找规则
   const threadMatch = {
-    tid: {
-      $in: [...tid]
+    oc: {
+      $in: [...oc]
     }
   };
   if (fidOfCanGetThread) {
@@ -308,7 +310,7 @@ schema.statics.extendColumnPosts = async (options) => {
     removeLink: true,
   });
   threads.map(thread => {
-    threadsObj[thread.tid] = thread;
+    threadsObj[thread.oc] = thread;
   });
   //post文章查找规则
   const postMatch = {
@@ -370,7 +372,7 @@ schema.statics.extendColumnPosts = async (options) => {
     p = p.toObject();
     p.column = columnsObj[p.columnId];
     if(!p.column) continue;
-    p.thread = threadsObj[p.tid];
+    p.thread = threadsObj[p.pid];
     if(!p.thread && p.type !== 'article') continue;
     if(p.type === "thread") {
       if(p.thread.firstPost.anonymous) {
@@ -509,10 +511,10 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, minorCategoriesId
     }
     const post = await PostModel.findOne({pid});
     if(!post) continue;
-    const thread = await ThreadModel.findOne({tid: post.tid});
+    const thread = await ThreadModel.findOne({oc: post.pid});
     columnPost = ColumnPostModel({
       _id: await SettingModel.operateSystemID("columnPosts", 1),
-      tid: thread.tid,
+      tid: '',
       top: post.toc,
       order,
       tUid: thread.uid,
@@ -532,7 +534,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, minorCategoriesId
 * */
 schema.post("save", async function(columnPost) {
   if(columnPost.type === "thread") {
-    await mongoose.model("threads").updateOne({tid: columnPost.tid}, {
+    await mongoose.model("threads").updateOne({oc: columnPost.pid}, {
       $set: {
         inColumn: true
       },
@@ -547,7 +549,7 @@ schema.post("remove", async function(columnPost) {
     const count = await mongoose.model("columnPosts").countDocuments({
       _id: {$ne: columnPost._id},
       type: "thread",
-      tid: columnPost.tid
+      pid: columnPost.pid
     });
     const obj = {
       $pull: {
@@ -559,7 +561,7 @@ schema.post("remove", async function(columnPost) {
         inColumn: false
       }
     }
-    await mongoose.model("threads").updateOne({tid: columnPost.tid}, obj);
+    await mongoose.model("threads").updateOne({oc: columnPost.pid}, obj);
   }
   const column = await mongoose.model('columns').findOne({_id: columnPost.columnId});
   if(column) await column.updateBasicInfo();
@@ -673,7 +675,7 @@ schema.statics.deleteColumnPost = async function(aid) {
 * */
 schema.statics.extendColumnArticles = async function(articles) {
   const ArticleModel = mongoose.model('articles');
-  return await ArticleModel.getArticlesInfo(articles);;
+  return await ArticleModel.getArticlesInfo(articles);
 }
 
 /*
@@ -682,7 +684,7 @@ schema.statics.extendColumnArticles = async function(articles) {
 schema.methods.extendColumnPost = async function() {
   const ColumnModel = mongoose.model('columns');
   const {columnId} = this;
-  return ColumnModel.findOne({_id: columnId});;
+  return ColumnModel.findOne({_id: columnId});
 }
 
 
