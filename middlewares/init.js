@@ -135,12 +135,19 @@ module.exports = async (ctx, next) => {
 
     ctx.template = `error/${errorPage}.pug`;
 
-    // 出错时的小提示
-    ctx.data.errorTips = errorTips;
-    // 错误信息，字符串或对象
-    ctx.data.error = errorData;
-	  ctx.data.status = ctx.status;
-	  ctx.data.url = ctx.url;
+    if(ctx.isAPIRoute) {
+      ctx.apiData = {
+        error: errorData
+      };
+    } else {
+      // 出错时的小提示
+      ctx.data.errorTips = errorTips;
+      // 错误信息，字符串或对象
+      ctx.data.error = errorData;
+      ctx.data.status = ctx.status;
+      ctx.data.url = ctx.url;
+    }
+
 		ctx.type = ctx.type || 'application/json';
 		if(ctx.filePath) ctx.filePath = "";
     if(ctx.remoteFile) ctx.remoteFile = null;

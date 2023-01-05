@@ -24,7 +24,7 @@ function OnlyVisitor() {
 
 function OnlyUser() {
 	return async (ctx, next) => {
-		if(!ctx.static.uid) {
+		if(!ctx.state.uid) {
 			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_UN_LOGGED);
 		}
 		await next();
@@ -52,7 +52,7 @@ function OnlyBannedUser() {
 function OnlyCurrentPermission() {
 	return async (ctx, next) => {
 		const operationId = ctx.data.operationId;
-		if(!ctx.data.userOperations.includes(operationId)) {
+		if(!ctx.data.userOperationsId.includes(operationId)) {
 			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 		}
 		await next();
@@ -66,7 +66,7 @@ function OnlyPermission(operation) {
 function OnlyPermissionsOr(operations) {
 	return async (ctx, next) => {
 		for(const operation of operations) {
-			if(ctx.data.userOperations.includes(operation)) {
+			if(ctx.data.userOperationsId.includes(operation)) {
 				return await next();
 			}
 		}
@@ -77,7 +77,7 @@ function OnlyPermissionsOr(operations) {
 function OnlyPermissionsAnd(operations) {
 	return async (ctx, next) => {
 		for(const operation of operations) {
-			if(!ctx.data.userOperations.includes(operation)) {
+			if(!ctx.data.userOperationsId.includes(operation)) {
 				ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 			}
 		}
