@@ -105,6 +105,7 @@ module.exports = async (ctx, next) => {
 
     let errorData;
     let errorPage;
+    let responseType = 'ERROR';
 
     try{
       const {type, args} = JSON.parse(errorMessageString);
@@ -112,6 +113,7 @@ module.exports = async (ctx, next) => {
       switch (type) {
         case ErrorTypes.RESPONSE_TYPE: {
           errorData = translateResponseType(ctx.acceptLanguage, args.responseType, args.args);
+          responseType = args.responseType;
           break;
         }
         case ErrorTypes.ERROR_PAGE: {
@@ -137,7 +139,10 @@ module.exports = async (ctx, next) => {
 
     if(ctx.isAPIRoute) {
       ctx.apiData = {
-        error: errorData
+        code: 0,
+        type: responseType,
+        message: errorData,
+        data: {}
       };
     } else {
       // 出错时的小提示

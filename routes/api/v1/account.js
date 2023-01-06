@@ -44,6 +44,7 @@ router
           return score;
         }): [],
         xsf: data.user.xsf,
+        xsfIcon: nkcModules.tools.getUrl('defaultFile', 'xsf.png'),
         hasColumn,
         columnUrl,
         draftCount: await db.DraftModel.countDocuments({uid: data.user.uid, type: beta}),
