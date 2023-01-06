@@ -63,5 +63,36 @@ router
     ctx.template = 'shop/order/detail.pug';
     await next();
   })
+  .put('/delivery', async (ctx, next) => {
+    const {state, db, body, nkcModules, data} = ctx;
+    const {checkString} = nkcModules.checkData;
+    if(state.uid !== data.order.buyUid) {
+      ctx.throw(403, '权限不足');
+    }
+    const {receiveMobile, receiveName, receiveAddress} = body;
+    checkString(receiveName, {
+      name: '收件人',
+      minLength: 1,
+      maxLength: 20,
+    });
+    checkString(receiveMobile, {
+      name: '收件人手机号',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(receiveAddress, {
+      name: '收货地址',
+      minLength: 1,
+      maxLength: 500
+    });
+    await db.ShopOrdersModel.updateOne({orderId: data.order.orderId}, {
+      $set: {
+        receiveAddress,
+        receiveName,
+        receiveMobile
+      }
+    });
+    await next();
+  })
   .use('/refund', refundRouter.routes(), refundRouter.allowedMethods());
 module.exports = router;

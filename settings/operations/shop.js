@@ -198,6 +198,9 @@ module.exports = {
       },
       detail: {
         GET: 'visitSingleOrderDetail'
+      },
+      delivery: {
+        PUT: 'modifyShopOrderDeliveryInfo'
       }
     }
   },
