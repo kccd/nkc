@@ -2,12 +2,14 @@ const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
     //获取当前登录用户的独立文章信息
-    const { db, data, params, query, state, permission, nkcModules } = ctx;
+    const { db, data, query, nkcModules } = ctx;
     const {user} = data;
-    const {page} = query;
+    const {page, articleSource} = query;
+    const articleSourceArr = JSON.parse(articleSource);
     const match = {
       uid: user.uid,
       status: 'normal',
+      source: {$in: articleSourceArr}
     };
     const count = await db.ArticleModel.countDocuments(match);
     const paging = await nkcModules.apiFunction.paging(page, count);

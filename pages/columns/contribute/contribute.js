@@ -152,10 +152,10 @@ var app = new Vue({
         description: this.description
       })
         .then(function() {
-          // app.succeed = true;
+          app.succeed = true;
         })
         .catch(function(data) {
-          // app.error = data.error || data;
+          app.error = data.error || data;
         })
     },
     chooseArticles: function(articles) {

@@ -88,6 +88,13 @@ import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat} from "../../../js/time";
 
 export default {
+  props:{
+    articleSource:{
+      require: true,
+      type: Array,
+      default: () => ['zone', 'column']
+    }
+  },
   data: () => ({
     selectedSource: 'threads',
     selectedArticles: [],
@@ -119,7 +126,7 @@ export default {
       if(this.selectedSource === 'threads') {
         url = `/api/v1/threads/selector?page=${page}`;
       } else {
-        url = `/api/v1/articles/selector?page=${page}`;
+        url = `/api/v1/articles/selector?page=${page}&articleSource=${JSON.stringify(this.articleSource)}`;
       }
       nkcAPI(url, "GET")
         .then(res => {
