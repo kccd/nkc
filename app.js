@@ -41,6 +41,7 @@ const {
   cache,
   IPLimit,
   filterDomain,
+  apiData,
 } = require('./middlewares');
 
 const uploadConfig = require('./config/upload');
@@ -84,5 +85,6 @@ app
   .use(permission.permission)
   .use(logger)
   .use(mainRouter.routes())
+  .use(apiData)
   .use(body)
 module.exports = app.callback();

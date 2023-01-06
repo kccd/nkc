@@ -2,6 +2,117 @@ const CommonModal = new NKC.modules.CommonModal();
 const Ship = new NKC.modules.ShopShip();
 const ModifyPrice = new NKC.modules.ShopModifyPrice();
 const Transfer = new NKC.modules.Transfer();
+import * as XLSX from 'xlsx';
+import {getDataById} from "../../../lib/js/dataConversion";
+
+const data = getDataById('data');
+
+const ordersObject = {};
+for(const order of data.orders) {
+  ordersObject[order.orderId] = order;
+}
+
+window.selectAllOrder = function() {
+  const elements = GetCheckboxInputElements();
+  const selectedOrdersId = GetSelectedOrdersId();
+  if(elements.length !== selectedOrdersId.length) {
+    elements.prop('checked', true);
+  } else {
+    elements.prop('checked', false);
+  }
+}
+
+window.exportData = function() {
+  const ordersId = GetSelectedOrdersId();
+  const ordersData = [];
+  for(const orderId of ordersId) {
+    const order = ordersObject[orderId];
+    if(!order) continue;
+    const orderData = GetOrderData(order);
+    ordersData.push(orderData);
+  }
+  ExportFile(ordersData, `order_${Date.now()}`);
+}
+
+function ExportFile(ordersData, fileName) {
+  const sheet = XLSX.utils.json_to_sheet(ordersData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, sheet, fileName);
+  const workbookBlob = workbook2blob(wb)
+  openDownload(workbookBlob, `${fileName}.xls`)
+}
+
+function GetCheckboxInputElements() {
+  return $('.order-info .checkbox label input[type="checkbox"]');
+}
+
+function workbook2blob(workbook) {
+  const options = {
+    bookType: 'xlsx',
+    bookSST: false,
+    type: 'binary',
+  };
+  const workData = XLSX.write(workbook, options);
+  function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
+    return buf;
+  }
+  return new Blob([s2ab(workData)], {
+    type: 'application/octet-stream',
+  });
+}
+
+function openDownload(blob, fileName) {
+  if (typeof blob === 'object' && blob instanceof Blob) {
+    blob = URL.createObjectURL(blob);
+  }
+  const aLink = document.createElement('a');
+  aLink.href = blob;
+  aLink.download = fileName || '';
+  let event;
+  if (window.MouseEvent) event = new MouseEvent('click');
+  else {
+    event = document.createEvent('MouseEvents');
+    event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+  }
+  aLink.dispatchEvent(event);
+}
+
+function GetSelectedOrdersId() {
+  const elements = GetCheckboxInputElements();
+  let selectedOrdersId = [];
+  for(let i = 0; i < elements.length; i++) {
+    const element = elements.eq(i);
+    if(element.prop('checked')) {
+      const orderId = element.attr('value');
+      selectedOrdersId.push(orderId);
+    }
+  }
+  return selectedOrdersId;
+}
+
+function GetOrderData(order) {
+  let product = '';
+  for(let i = 0; i < order.params.length; i++) {
+    const param = order.params[i];
+    product += `${i !== 0?"\n": ''}${param.product.name} - ${param.productParam.name} - 数量${param.count}`
+  }
+  return {
+    "时间": order.orderToc,
+    "订单号": order.orderId,
+    "买家": `${order.buyUser.username}(${order.buyUser.uid})`,
+    "商品信息": product,
+    "商品价格（元）": order.orderPrice / 100,
+    "运费（元）": order.orderFreightPrice / 100,
+    "总价（元）": (order.orderPrice + order.orderFreightPrice) / 100,
+    "收件人名称": order.receiveName,
+    "收件人手机号": order.receiveMobile,
+    "收货地址": order.receiveAddress,
+  };
+}
+
 window.transfer = function(tUid) {
   Transfer.open(function() {
 
@@ -134,7 +245,7 @@ window.modifyParamCount = function(sellUid, orderId, costId) {
           }
         })
       })
-    
+
       .then(() => {
         countDom.text(`${newCount}`);
         computeOrderPrice(orderId);
@@ -182,7 +293,7 @@ window.modifyFreight = function(sellUid, orderId) {
 // 发货/修改物流信息
 window.ship = function(orderId) {
   Ship.open(() => {
-  
+
   }, {
     orderId
   })

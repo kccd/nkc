@@ -1322,7 +1322,7 @@ threadSchema.statics.extendArticlesPanelData = async function(threads) {
     const {firstPost, lastPost} = thread;
     if(!firstPost) continue;
     let user;
-    if(thread.anonymous) {
+    if(firstPost.anonymous) {
       user = {
         uid: '',
         username: anonymousUser.username,
