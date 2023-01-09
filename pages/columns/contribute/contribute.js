@@ -143,7 +143,6 @@ var app = new Vue({
       let selectedThreadsArr = this.selectedThreadsArr;
       if(this.selectedThreads.length === 0) return this.error = "请选择需要投稿的文章";
       if(!this.mainCategoriesId || this.mainCategoriesId.length === 0) return this.error = "请选择文章分类";
-      console.log('selectedThreadsArr',selectedThreadsArr);
       nkcAPI("/m/" + this.column._id + "/contribute", "POST", {
         threadsId: selectedThreadsArr.threadsId,
         articlesId: selectedThreadsArr.articlesId,

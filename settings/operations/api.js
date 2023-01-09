@@ -16,6 +16,13 @@ module.exports = {
       selector: {
         GET: 'getUserArticles'
       }
+    },
+    column: {
+      PARAMETER: {
+        'articles': {
+          POST: 'columnManage'
+        }
+      }
     }
   }
 }

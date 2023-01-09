@@ -2509,7 +2509,7 @@ threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
   column = column.toObject()
   // 获取当前专栏下一篇文章的分类及其父级
   const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
-  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getArticleAllMinorCategories(mcid)
   //获取文章的链接
   const url = getUrl('thread', thread.tid);
   //获取引用的所有资源

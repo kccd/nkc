@@ -5,9 +5,13 @@ block settingsContent
   #data.hidden=objToStr({column: data.column})
   #app(v-cloak)
     .row
+      article-selector-dialog(
+        ref="articleSelectorDialog"
+      )
       .col-xs-12.col-md-12
         h3 文章管理
         hr
+        button.btn.btn-primary.btn-sm.m-b-05(@click="openSelector()") 添加内容
       .col-xs-12.col-md-3.m-b-2
         ul.nav.nav-tabs
         .column-settings-post-categories

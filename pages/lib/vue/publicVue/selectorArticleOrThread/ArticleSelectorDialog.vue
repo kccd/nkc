@@ -4,6 +4,7 @@
       template(v-slot:content)
         article-selector-core(
           ref="articleSelectorCore"
+          :articleSource="articleSource"
         )
 
 </template>
@@ -26,21 +27,17 @@ export default {
     callback: null,
     submitting: false,
     showDialog: false,
+    articleSource: null
   }),
   methods:{
     open(callback, options={}){
       this.$refs.articleSelectorCore.init()
       this.$refs.selectorRef.open()
       this.callback = callback;
+      this.articleSource = options.articleSource;
 
-      // this.dom.modal("show");
-      // this.$refs.articleSelectorCore.open((data)=>{
-      //   this.selectedCategories = data;
-      // },{source:'article'})
     },
-    // getSelectedArticles(){
-    //   return this.$refs.articleSelectorCore.getSelectedArticles()
-    // },
+
     submit(){
       const articles = this.$refs.articleSelectorCore.getSelectedArticles()
       this.callback(articles);

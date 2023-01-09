@@ -1,7 +1,12 @@
+import ArticleSelectorDialog from "../../lib/vue/publicVue/selectorArticleOrThread/ArticleSelectorDialog";
+
 var data = NKC.methods.getDataById("data");
 
 var app = new Vue({
   el: "#app",
+  components:{
+    'article-selector-dialog': ArticleSelectorDialog,
+  },
   data: {
     column: data.column,
     mainCategories: [],
@@ -235,6 +240,40 @@ var app = new Vue({
       if(!disableGetPosts) {
         this.getPosts(0);
       }
+    },
+    chooseArticles: function(articles) {
+      const threadsId = [];
+      const articlesId = [];
+      for(let i = 0; i < articles.length; i++) {
+        if(articles[i].source === 'thread'){
+          threadsId.push(articles[i].tid);
+        }else {
+          articlesId.push(articles[i].tid);
+        }
+      }
+      moduleToColumn.show(function(data) {
+        var mainCategoriesId = data.mainCategoriesId;
+        var minorCategoriesId = data.minorCategoriesId;
+        var columnId = data.columnId;
+        nkcAPI("/api/v1/column/" + columnId + "/articles", "POST", {
+          threadsId,
+          articlesId,
+          mainCategoriesId: mainCategoriesId,
+          minorCategoriesId: minorCategoriesId,
+        })
+          .then(function() {
+            screenTopAlert("操作成功");
+            moduleToColumn.hide();
+          })
+          .catch(function(data) {
+            screenTopWarning(data);
+          })
+      }, {
+        selectMul: true
+      })
+    },
+    openSelector: function (){
+      this.$refs.articleSelectorDialog.open(this.chooseArticles, {articleSource:['zone']})
     }
   }
 });
