@@ -1,28 +1,7 @@
+const {OnlyUser} = require("../../../../middlewares/permission");
 const router = require('koa-router')();
-const {OnlyUser} = require('../../../middlewares/permission');
 router
-  .get('/info', async (ctx, next) => {
-    const {data, state, nkcModules} = ctx;
-    const accountInfo = {
-      logged: false,
-      name: '',
-      desc: '',
-      avatar: '',
-      uid: ''
-    };
-    if(state.uid) {
-      accountInfo.logged = true;
-      accountInfo.name = data.user.username;
-      accountInfo.desc = data.user.description;
-      accountInfo.uid = state.uid;
-      accountInfo.avatar = nkcModules.tools.getUrl('userAvatar', data.user.avatar);
-    }
-    ctx.apiData = {
-      accountInfo,
-    };
-    await next();
-  })
-  .get('/card', OnlyUser(),  async (ctx, next) => {
+  .get('/', OnlyUser(),  async (ctx, next) => {
     const {data, nkcModules, db} = ctx;
     const userScores = await db.UserModel.getUserScores(data.user.uid);
     const userColumn = await db.UserModel.getUserColumn(data.user.uid);

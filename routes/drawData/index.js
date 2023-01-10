@@ -1,5 +1,6 @@
 const router = require("koa-router")();
 router
+  // 小屏左侧抽屉
   .get('/leftDraw', async (ctx, next) => {
     const {data, state, db, permission} = ctx;
     const homeSettings = await db.SettingModel.getSettings("home");
@@ -28,12 +29,7 @@ router
       if(_fc.forums.length) data.categoryForums.push(_fc);
     });
 
-    // 获取 管理面板 和 应用面板 数据
-    // data.managementData = await db.SettingModel.getManagementData(data.user);
-    // data.appsData = await db.SettingModel.getAppsData();
-
-    const user = await db.UserModel.findOnly({uid: state.uid});
-    data.managementData = await db.SettingModel.getManagementData(user);
+    data.managementData = await db.SettingModel.getManagementData(data.user);
     data.permission = {
       fundSettings: fundSettings,
       hasUser: !!state.uid,
@@ -42,44 +38,9 @@ router
       enableFund: fundSettings.enableFund,
       fundName: fundSettings.enableFund?fundSettings.fundName:null,
     };
-    const recycleId = await db.SettingModel.getRecycleId();
-    // 管理 未处理条数
-    if(!state.isApp) {
-      // if(permission("complaintGet")) {
-      //   data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
-      // }
-      // if(permission("visitProblemList")) {
-      //   data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
-      // }
-      if(permission("review")) {
-        const q = {
-          reviewed: false,
-          disabled: false,
-          mainForumsId: {$ne: recycleId}
-        };
-        if(!permission("superModerator")) {
-          const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
-          const fid = forums.map(f => f.fid);
-          q.mainForumsId = {
-            $in: fid
-          }
-        }
-        // const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
-        // const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
-        // const threadsObj = {};
-        // threads.map(thread => threadsObj[thread.tid] = thread);
-        // let count = 0;
-        // posts.map(post => {
-        //   const thread = threadsObj[post.tid];
-        //   if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
-        //     count++;
-        //   }
-        // });
-        // data.unReviewedCount = count;
-      }
-    }
     await next();
   })
+  // 小屏右侧抽屉
   .get('/userDraw', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;
@@ -106,6 +67,7 @@ router
     };
     await next();
   })
+  // 宽屏右侧用户卡片
   .get('/userNav', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;

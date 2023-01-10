@@ -834,7 +834,6 @@
   "getForumChildForums": "获取专业下的子专业信息",
   "getAppsWatermark": "获取用户偏好设置水印",
   "creationCenter": "访问创作中心",
-  "getDrawData": "获取滑动框数据",
   "mathJax": "编辑器预览公式",
   "resourceCategory": "获取资源分组",
   "getBook": "查看书籍内容",
@@ -886,5 +885,8 @@
   "manageOauthApp": "管理第三方应用",
   "OAuthAuthentication": "第三方应用认证",
   "getThreadCategories": "获取多维分类",
-  "modifyShopOrderDeliveryInfo": "修改商城订单收货信息"
+  "modifyShopOrderDeliveryInfo": "修改商城订单收货信息",
+  "getLeftDrawData": "小屏时获取左侧抽屉数据",
+  "getUserDrawData": "小屏时获取右侧抽屉数据",
+  "getUserNavData": "大屏时获取登录用户卡片数据"
 }
