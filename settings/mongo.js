@@ -42,14 +42,14 @@ mongoose.Promise = Promise;
 
 mongoose.plugin(function(schema) {
   //
-  schema.statics.findOnly = async function(query) {
+  schema.statics.findOnly = async function(query, filter = {}) {
     // this method should be used when you need the query throws an error
     // instead of returning a [] or null when no document matching
     const err = new Error(`${JSON.stringify(query)} document not found`);
     err.status = 404;
     if(JSON.stringify(query) === '{}')
       throw new Error('param not specify');
-    const docs = await this.find(query);
+    const docs = await this.find(query, filter);
     if(docs.length !== 1)
       throw err;
     return docs[0]

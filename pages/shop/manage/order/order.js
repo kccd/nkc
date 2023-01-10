@@ -146,7 +146,7 @@ function GetOrdersData(orders) {
         "商品价格（元）": param.singlePrice / 100,
         "运费（元）": order.orderFreightPrice / 100,
         "总价（元）": (order.orderPrice + order.orderFreightPrice) / 100,
-        "收件人名称": order.receiveName,
+        "收件人": order.receiveName,
         "收件人手机号": order.receiveMobile,
         "收货地址": order.receiveAddress,
         "买家备注": order.buyMessage || '无',

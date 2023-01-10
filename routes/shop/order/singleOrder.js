@@ -59,6 +59,14 @@ router
     if(refund) {
       refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
     }
+    let canModifyAddressInfo;
+    try{
+      await db.ShopOrdersModel.checkModifyAddressInfoPermission(data.order.orderId);
+      canModifyAddressInfo = true;
+    } catch(err) {
+      canModifyAddressInfo = false;
+    }
+    data.canModifyAddressInfo = canModifyAddressInfo;
     data.refund = refund;
     ctx.template = 'shop/order/detail.pug';
     await next();
@@ -69,6 +77,7 @@ router
     if(state.uid !== data.order.buyUid) {
       ctx.throw(403, '权限不足');
     }
+    await db.ShopOrdersModel.checkModifyAddressInfoPermission(data.order.orderId);
     const {receiveMobile, receiveName, receiveAddress} = body;
     checkString(receiveName, {
       name: '收件人',

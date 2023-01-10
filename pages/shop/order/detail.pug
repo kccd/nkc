@@ -181,7 +181,7 @@ block shopAccountContent
         .panel-body
           h4.infoTitle
             span 收货信息
-            if data.user && data.user.uid === data.order.buyUid
+            if data.user && data.user.uid === data.order.buyUid && data.canModifyAddressInfo
               button.btn.btn-default.btn-xs(onclick='modifyAddress()') 修改收货信息
           .row
             .col-xs-6
