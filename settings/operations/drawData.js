@@ -1,14 +1,11 @@
 module.exports = {
   leftDraw: {
-    GET: "getDrawData"
-  },
-  rightDraw: {
-    GET: "getDrawData"
+    GET: "getLeftDrawData"
   },
   userDraw: {
-    GET: "getDrawData"
+    GET: "getUserDrawData"
   },
   userNav: {
-    GET: "getDrawData"
+    GET: "getUserNavData"
   }
 }
