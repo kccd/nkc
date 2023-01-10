@@ -28,7 +28,7 @@ block shopSettings
 
   .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;padding:1rem')
     a.btn.btn-primary(href=`/e/settings/shop/refunds`) 返回申请列表
-    .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
+    .hidden#refundDetailData= objToStr({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
     .row#app(v-cloak)
       div(v-if='order')
         .col-xs-12.col-md-12
@@ -44,7 +44,7 @@ block shopSettings
                 | ）
               h5 商品列表
               div(v-for="p in params")
-                img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                img.m-r-1(:src="getUrl('resource', p.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
                   a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
                   h5 商品ID：{{p.costId}}，商品总价：
@@ -58,7 +58,7 @@ block shopSettings
               .m-t-1(v-if='refund && order.status !== "finish" && !order.closeStatus')
                 h4 退款中的商品
                 div(v-if='param')
-                  img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                  img.m-r-1(:src="getUrl('resource', param.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                   div.display-i-b
                     a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}} ({{param.productParam.name}})
                     h5 商品总价：
@@ -66,7 +66,7 @@ block shopSettings
                       | 元（{{param.count}}件）
                 div(v-else)
                   div(v-for="p in order.params" v-if="p.refundStatus === 'ing'")
-                    img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
+                    img.m-r-1(:src="getUrl('resource', p.product.imgMaster, 'sm')" style='height: 4rem;width: 4rem;vertical-align:top;')
                     div.display-i-b
                       a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
                       h5 商品总价：

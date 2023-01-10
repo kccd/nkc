@@ -14,56 +14,161 @@ router
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
-    for(const tid of threadsId) {
-      const _thread = await db.ThreadModel.findOne({tid, uid: user.uid});
-      let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid: _thread.oc, type: 'thread'});
-      const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
-      if(columnPost) {
-        await columnPost.updateOne({
-          cid: mainCategoriesId,
-          mcid: minorCategoriesId,
-          order
-        });
-        continue;
+    const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
+    const threadColumnPostArr = await db.ThreadModel.aggregate([
+      {
+        $match : {tid: {$in: threadsId}, uid: user.uid}
+      },
+      {
+        $project: {
+          toc: 1,
+          oc: 1
+        }
+      },
+      {
+        $lookup:{
+          from: 'columnPosts',
+          let: { oc_pid: "$oc" },
+          pipeline: [
+            { $match:
+                {
+                  $expr:
+                    { $and:
+                        [
+                          { $eq: [ "$pid",  "$$oc_pid" ] },
+                          { $eq: [ "$columnId", column._id ] },
+                          { $eq: [ "$type", "thread" ] },
+                        ]
+                    }
+                }
+            },
+          ],
+          as: "content"
+        }
+      },
+    ]);
+    const articleColumnPostArr = await db.ArticleModel.aggregate([
+      {
+        $match : {_id: {$in: articlesId}, uid: user.uid}
+      },
+      {
+        $project: {
+          toc: 1,
+          _id: 1
+        }
+      },
+      {
+        $lookup:{
+          from: 'columnPosts',
+          let: { id_pid: "$_id" },
+          pipeline: [
+            { $match:
+                {
+                  $expr:
+                    { $and:
+                        [
+                          { $eq: [ "$pid",  "$$id_pid" ] },
+                          { $eq: [ "$columnId", column._id ] },
+                          { $eq: [ "$type", "article" ] },
+                        ]
+                    }
+                }
+            },
+          ],
+          as: "content"
+        }
+      },
+    ]);
+    // 已存在的专栏引用，需更新
+    const oldColumnPostIds = new Set();
+    // 新的，保存
+    const newColumnPost = [];
+    for(const articleColumnPost of articleColumnPostArr){
+      if(articleColumnPost.content.length > 0){
+        oldColumnPostIds.add(articleColumnPost.content[0]._id)
+      } else {
+        newColumnPost.push({...articleColumnPost,type: 'article'})
       }
-      await db.ColumnPostModel({
-        _id: await db.SettingModel.operateSystemID("columnPosts", 1),
-        tid: '',
-        from: 'own',
-        pid: _thread.oc,
-        columnId: column._id,
-        type: 'thread',
-        order: order,
-        top: _thread.toc,
+    }
+    for(const threadColumnPost of threadColumnPostArr){
+      if(threadColumnPost.content.length > 0){
+        oldColumnPostIds.add(threadColumnPost.content[0]._id)
+      } else {
+        newColumnPost.push({...threadColumnPost,type: 'thread'})
+      }
+    }
+    if(oldColumnPostIds.size > 0){
+      await db.ColumnPostModel.updateMany({_id: {$in: [...oldColumnPostIds]}},{
         cid: mainCategoriesId,
         mcid: minorCategoriesId,
-      }).save();
+        order
+      });
     }
-    for(const articleId of articlesId) {
-      const article = await db.ArticleModel.findOne({_id: articleId});
-      let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid: article._id, type: 'article'});
-      const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
-      if(columnPost) {
-        await columnPost.updateOne({
+    if(newColumnPost.length > 0){
+      for(const columnPost of newColumnPost){
+        await db.ColumnPostModel({
+          _id: await db.SettingModel.operateSystemID("columnPosts", 1),
+          tid: '',
+          from: 'own',
+          pid: columnPost.type==='thread'?columnPost.oc: columnPost._id,
+          columnId: column._id,
+          type: columnPost.type,
+          order,
+          top: columnPost.toc,
           cid: mainCategoriesId,
           mcid: minorCategoriesId,
-          order
-        });
-        continue;
+        }).save();
       }
-      await db.ColumnPostModel({
-        _id: await db.SettingModel.operateSystemID("columnPosts", 1),
-        tid: '',
-        from: 'own',
-        pid: article._id,
-        columnId: column._id,
-        type: 'article',
-        order: order,
-        top: article.toc,
-        cid: mainCategoriesId,
-        mcid: minorCategoriesId,
-      }).save();
     }
+    // for(const tid of threadsId) {
+    //
+    //   const _thread = await db.ThreadModel.findOne({tid, uid: user.uid});
+    //   let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid: _thread.oc, type: 'thread'});
+    //   if(columnPost) {
+    //     await columnPost.updateOne({
+    //       cid: mainCategoriesId,
+    //       mcid: minorCategoriesId,
+    //       order
+    //     });
+    //     continue;
+    //   }
+    //   await db.ColumnPostModel({
+    //     _id: await db.SettingModel.operateSystemID("columnPosts", 1),
+    //     tid: '',
+    //     from: 'own',
+    //     pid: _thread.oc,
+    //     columnId: column._id,
+    //     type: 'thread',
+    //     order,
+    //     top: _thread.toc,
+    //     cid: mainCategoriesId,
+    //     mcid: minorCategoriesId,
+    //   }).save();
+    // }
+    // for(const articleId of articlesId) {
+    //   const article = await db.ArticleModel.findOne({_id: articleId});
+    //   let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid: article._id, type: 'article'});
+    //   if(columnPost) {
+    //     await columnPost.updateOne({
+    //       cid: mainCategoriesId,
+    //       mcid: minorCategoriesId,
+    //       order
+    //     });
+    //     continue;
+    //   }
+    //   await db.ColumnPostModel({
+    //     _id: await db.SettingModel.operateSystemID("columnPosts", 1),
+    //     tid: '',
+    //     from: 'own',
+    //     pid: article._id,
+    //     columnId: column._id,
+    //     type: 'article',
+    //     order,
+    //     top: article.toc,
+    //     cid: mainCategoriesId,
+    //     mcid: minorCategoriesId,
+    //   }).save();
+    // }
     ctx.apiData = {};
     await next();
   });

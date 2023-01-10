@@ -130,8 +130,8 @@ export default {
       }
       nkcAPI(url, "GET")
         .then(res => {
-          self.paging = res.paging;
-          self.articles = res.articles;
+          self.paging = res.data.paging;
+          self.articles = res.data.articles;
 
         })
         .catch(err => {

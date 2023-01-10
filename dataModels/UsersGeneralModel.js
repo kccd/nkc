@@ -377,7 +377,7 @@ usersGeneralSchema.statics.updateUserAccessLogs = async (uid, tUid) => {
 usersGeneralSchema.statics.resetReviewedCount = async function (uid, type) {
   const UsersGeneralSchema = mongoose.model('usersGeneral');
   const SettingModel = mongoose.model('settings');
-  const review = await SettingModel. findOne({_id: 'review'}, {
+  const review = await SettingModel.findOne({_id: 'review'}, {
     article: 1,
     document: 1
   });

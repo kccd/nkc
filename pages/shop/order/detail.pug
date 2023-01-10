@@ -89,6 +89,9 @@ block shopAccountTitle
       max-height: 100%;
       max-width: 100%;
     }
+    .data-input{
+      display: inline;
+    }
 block shopAccountContent
   .row
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px")
@@ -157,14 +160,11 @@ block shopAccountContent
           h4.infoTitle
             span 订单信息
           p
-            span.infoCaption 收货地址：
-            span.infoListLiDd!=`${order.receiveName}, ${order.receiveMobile}, ${order.receiveAddress}`
-          p
             span.infoCaption 订单编号：
-            span.infoListLiDd!=`${order.orderId}`
+            span.infoListLiDd=`${order.orderId}`
           p
             span.infoCaption 商家昵称：
-            span.infoListLiDd!=`${order.sellUser.username}`
+            span.infoListLiDd=`${order.sellUser.username}`
           p
             span.infoCaption 运单编号：
             if order.trackNumber
@@ -177,13 +177,43 @@ block shopAccountContent
               span.infoListLiDd=`${order.trackName}`
             else
               span.infoListLiDd 暂无物流信息
-          //-p
-            span.infoCaption 运费模板：
-            if order.freightName
-              span.infoListLiDd-noneWidth#trakcNumText=`${order.freightName}`
-            else
-              span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
+      .panel.panel-default
+        .panel-body
+          h4.infoTitle
+            span 收货信息
+            if data.user && data.user.uid === data.order.buyUid
+              button.btn.btn-default.btn-xs(onclick='modifyAddress()') 修改收货信息
+          .row
+            .col-xs-6
+              .form-inline
+                p
+                  span.infoCaption 行政区域：
+                  span.infoListLiDd.data-value=order.receiveAddress
+                  .data-input.hidden
+                    input.form-control(data-type='location' readonly="true" onclick="selectLocation()")
+                p
+                  .data-input.hidden
+                    span.infoCaption 详细地址：
+                    div
+                      input.form-control(data-type='address' value="")
+                p
+                  span.infoCaption 收件人：
+                  span.data-value.infoListLiDd=order.receiveName
+                  .data-input.hidden
+                    input.form-control(data-type='name' value=order.receiveName)
+                p
+                  span.infoCaption 联系电话：
+                  span.data-value.infoListLiDd=order.receiveMobile
+                  .data-input.hidden
+                    input.form-control(data-type='mobile' value=order.receiveMobile)
+                p
+                  .data-input.hidden
+                    button.btn.btn-primary(onclick=`submitAddress("${order.orderId}")`) 提交
+              .form
+                .form-
 
+      .panel.panel-default
+        .panel-body
           h4.infoTitle
             span 时间信息
           p
@@ -223,9 +253,9 @@ block shopAccountContent
               tr
                 td
                   a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
-                td!=`${para.productParam.name}`
+                td=`${para.productParam.name}`
                 td #{numToFloatTwo(para.singlePrice)}
-                td!=`${para.count}`
+                td=`${para.count}`
     .col-sm-12.col-md-12.col-xs-12
       h5 相关凭证：
         if !order.certs || !order.certs.length
@@ -239,9 +269,11 @@ block shopAccountContent
       div(style='text-align:right')
         p
           span(style='font-weight: bold;') 实付款
-          span!=`( 含运费`
+          span=`( 含运费`
           span #{numToFloatTwo(order.orderFreightPrice)}
-          span!=`)：`
+          span=`)：`
           span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice+order.orderFreightPrice)}
 block shopScripts
+  include ../../publicModules/selectAddress/selectAddress
   +includeJS("/shop/order/order.js")
+  +includeJS("/shop/order/detail.js")
