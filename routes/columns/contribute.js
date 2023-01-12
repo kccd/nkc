@@ -143,21 +143,21 @@ router
       await contribute.save();
       threadCount++;
     }
-    // if(threadCount > 0) {
-    //   const message = db.MessageModel({
-    //     _id: await db.SettingModel.operateSystemID("messages", 1),
-    //     r: column.uid,
-    //     ty: "STU",
-    //     ip: ctx.address,
-    //     port: ctx.port,
-    //     c: {
-    //       type: "newColumnContribute",
-    //       columnId: column._id
-    //     }
-    //   });
-    //   await message.save();
-    //   await ctx.nkcModules.socket.sendMessageToUser(message._id);
-    // }
+    if(threadCount > 0) {
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID("messages", 1),
+        r: column.uid,
+        ty: "STU",
+        ip: ctx.address,
+        port: ctx.port,
+        c: {
+          type: "newColumnContribute",
+          columnId: column._id
+        }
+      });
+      await message.save();
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
+    }
     await next();
   });
 module.exports = router;

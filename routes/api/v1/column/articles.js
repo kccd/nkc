@@ -120,55 +120,6 @@ router
         }).save();
       }
     }
-    // for(const tid of threadsId) {
-    //
-    //   const _thread = await db.ThreadModel.findOne({tid, uid: user.uid});
-    //   let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid: _thread.oc, type: 'thread'});
-    //   if(columnPost) {
-    //     await columnPost.updateOne({
-    //       cid: mainCategoriesId,
-    //       mcid: minorCategoriesId,
-    //       order
-    //     });
-    //     continue;
-    //   }
-    //   await db.ColumnPostModel({
-    //     _id: await db.SettingModel.operateSystemID("columnPosts", 1),
-    //     tid: '',
-    //     from: 'own',
-    //     pid: _thread.oc,
-    //     columnId: column._id,
-    //     type: 'thread',
-    //     order,
-    //     top: _thread.toc,
-    //     cid: mainCategoriesId,
-    //     mcid: minorCategoriesId,
-    //   }).save();
-    // }
-    // for(const articleId of articlesId) {
-    //   const article = await db.ArticleModel.findOne({_id: articleId});
-    //   let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid: article._id, type: 'article'});
-    //   if(columnPost) {
-    //     await columnPost.updateOne({
-    //       cid: mainCategoriesId,
-    //       mcid: minorCategoriesId,
-    //       order
-    //     });
-    //     continue;
-    //   }
-    //   await db.ColumnPostModel({
-    //     _id: await db.SettingModel.operateSystemID("columnPosts", 1),
-    //     tid: '',
-    //     from: 'own',
-    //     pid: article._id,
-    //     columnId: column._id,
-    //     type: 'article',
-    //     order,
-    //     top: article.toc,
-    //     cid: mainCategoriesId,
-    //     mcid: minorCategoriesId,
-    //   }).save();
-    // }
     ctx.apiData = {};
     await next();
   });

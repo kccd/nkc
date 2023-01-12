@@ -27,9 +27,6 @@ var app = new Vue({
     description: "",
     error: ""
   },
-  mounted: function() {
-    // this.getThreads();
-  },
   computed: {
     selectedThreadsArr: function() {
       const selectedThreads = this.selectedThreads;
@@ -50,94 +47,9 @@ var app = new Vue({
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
-    // reset: function() {
-    //   this.pid = "";
-    //   this.getThreads();
-    // },
-    // search: function() {
-    //   if(!this.pid) return;
-    //   nkcAPI("/t?type=selfThreads&pid=" + this.pid + "&columnId=" + this.column._id, "GET")
-    //     .then(function(data) {
-    //       app.paging = "";
-    //       for(var i = 0; i < data.threads.length; i++) {
-    //         data.threads[i].showInfo = false;
-    //       }
-    //       app.threads = data.threads;
-    //     })
-    //     .catch(function(data) {
-    //       sweetError(data);
-    //     })
-    // },
-    // selectPage: function(type, num) {
-    //   if(type === "null") return;
-    //   this.getThreads(num);
-    // },
-    // getThreadById: function(tid) {
-    //   var threads = this.threads;
-    //   for(var i = 0; i < threads.length; i++) {
-    //     if(threads[i].tid === tid) return threads[i];
-    //   }
-    // },
     remove: function(index) {
       this.selectedThreads.splice(index, 1);
     },
-    // getThreads: function(page) {
-    //   page = page || 0;
-    //   this.chooseTid = [];
-    //   nkcAPI("/t?type=selfThreads&columnId="+this.column._id+"&page=" + page, "GET")
-    //     .then(function(data) {
-    //       app.paging = data.paging;
-    //       for(var i = 0; i < data.threads.length; i++) {
-    //         data.threads[i].showInfo = false;
-    //       }
-    //       app.threads = data.threads;
-    //     })
-    //     .catch(function(data) {
-    //       screenTopWarning(data);
-    //     })
-    // },
-    // choose: function() {
-    //   var selectedThreadsArr = this.selectedThreadsArr;
-    //   var chooseTid = this.chooseTid;
-    //   for(var i = 0; i < chooseTid.length; i++) {
-    //     var tid = chooseTid[i];
-    //     if(selectedThreadsArr.indexOf(tid) === -1) {
-    //       var thread = this.getThreadById(tid);
-    //       this.selectedThreads.push(thread);
-    //     }
-    //   }
-    //   this.chooseTid = [];
-    // },
-    // showThreadsToggle: function() {
-    //   this.showThreads = !this.showThreads;
-    //   this.chooseTid = [];
-    // },
-    // showAllThreadsInfo: function() {
-    //   var threads = this.threads;
-    //   var threadCount = threads.length;
-    //   var show = 0;
-    //   for(var i = 0; i < threadCount; i++) {
-    //     if(threads[i].showInfo) show++;
-    //   }
-    //   var showInfo = true;
-    //   if(threadCount === show) {
-    //     showInfo = false;
-    //   }
-    //   for(i = 0; i < threadCount; i++) {
-    //     threads[i].showInfo = showInfo
-    //   }
-    // },
-    // checkAll: function() {
-    //   var threads = this.threads;
-    //   if(this.chooseTid.length === threads.length) {
-    //     this.chooseTid = [];
-    //   } else {
-    //     this.chooseTid = [];
-    //     for(var i = 0 ; i < this.threads.length; i++) {
-    //       this.chooseTid.push(this.threads[i].tid);
-    //     }
-    //   }
-    // },
     submit: function() {
       this.error = "";
       let selectedThreadsArr = this.selectedThreadsArr;

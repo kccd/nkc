@@ -26,7 +26,6 @@ router
     const count = await db.ColumnContributeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const contributes = await db.ColumnContributeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    // data.contributes = await db.ColumnContributeModel.extendContributes(contributes);
     data.contributes = await db.ColumnContributeModel.extendColumnContributes(contributes);
     data.resolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: {$ne: null}});
     data.unresolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: null});

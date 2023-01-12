@@ -11,9 +11,6 @@ router
       disabled: false,
     };
     const count = await db.ThreadModel.countDocuments(match);
-    // const threads = await db.ThreadModel.find(match).sort({toc: -1}).limit(10);;
-    // const _threads = await db.ThreadModel.extendThreads(threads,{parentForum:true});
-    // console.log('_threads',_threads);
     const paging = await nkcModules.apiFunction.paging(page, count);
     const threads = await db.ThreadModel.aggregate([
       {

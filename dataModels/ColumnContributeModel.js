@@ -1,5 +1,4 @@
 const mongoose = require("../settings/database");
-const tools = require("../nkcModules/tools");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
@@ -165,8 +164,6 @@ schema.statics.extendColumnContributes = async (contributes) => {
       },
       { $project: { content: 0 } }
     ]);
-    // threads = await ThreadModel.find({tid: {$in: [...thread_tid]}});
-    // threads = await ThreadModel.extendThreads(threads);
     threads.map(thread => {
       threadsObj[thread.tid] = {
         tid: thread.tid,
@@ -237,8 +234,6 @@ schema.statics.extendColumnContributes = async (contributes) => {
       },
       { $project: { doc: 0, columnArticle: 0, did: 0 } },
     ]);
-    // articles = await ArticleModel.find({_id: {$in: [...article_tid]}});
-    // articles = await ArticleModel.extendDocumentsOfArticles(articles, 'stable',['title', 'content', 'uid', 'cover', 'keywordsEN', 'keywords', 'abstractEN', 'abstract', 'reviewed', 'wordCount', 'did', 'toc', 'type','source']);
     articles.map(article => {
       let url;
       if(article.source === 'zone'){
