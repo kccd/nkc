@@ -54,7 +54,7 @@ block baseColumnContent
         vote: article.vote,
         permissions: data.permissions,
       })
-  .hidden#data=objToStr({type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  .hidden#data=objToStr({allCategories: data.allCategories, type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   span.move-article-category#moveCategoryBoxAppInColumns(v-cloak)
     move-box(
       ref='moveCategoryBox'

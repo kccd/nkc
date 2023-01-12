@@ -30,7 +30,8 @@ router.get('/:aid', async (ctx, next)=>{
     const {normal: commentStatus, default: defaultComment} = await db.CommentModel.getCommentStatus();
     const _article = columnPostData.article;
     const article = await db.ArticleModel.findOnly({_id: _article._id});
-    const categoriesObj = await db.ThreadCategoryModel.getCategories(article.tcId, 'article')
+    const categoriesObj = await db.ThreadCategoryModel.getCategories(article.tcId, 'article');
+    data.allCategories = categoriesObj.allCategories;
     data.categoryList = categoriesObj.categoryList;
     data.categoriesTree = categoriesObj.categoriesTree;
     // 验证权限 - new

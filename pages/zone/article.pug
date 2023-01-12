@@ -48,7 +48,7 @@ block content
       +categoryName({categoriesTree})
       include ../columns/article/articleOptions
       +articleOptions({logged: !!data.user, type, _id: article._id, tid: article.tid, collected, digest: article.digest, voteUp: article.voteUp, vote, voteDown: article.voteDown, replyCount: count || 0, vote: article.vote, permissions: data.permissions})
-  .hidden#data=objToStr({comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  .hidden#data=objToStr({allCategories: data.allCategories, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   .move-article-category#moveCategoryBoxAppInZone
     move-box(
       ref='moveCategoryBox'

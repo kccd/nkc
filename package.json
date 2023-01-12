@@ -119,7 +119,7 @@
     "mkdirp": "^1.0.4",
     "moleculer": "^0.14.21",
     "moleculer-web": "^0.10.4",
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "mongodb": "^3.6.5",
     "mongodb-uri": "^0.9.7",
     "mongoose": "^5.12.3",
