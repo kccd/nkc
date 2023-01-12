@@ -4,6 +4,12 @@
 */
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const orderStatus = {
+  unCost: 'unCost', // 待付款
+  unShip: 'unShip', // 待发货
+  unSign: 'unSign', // 待收货
+  finish: 'finish', // 完成
+};
 const shopOrdersSchema = new Schema({
   // 订单id
   orderId: {
@@ -35,12 +41,12 @@ const shopOrdersSchema = new Schema({
     type: Array,
     default: []
   },
-  // 购买者uid
+  // 买家uid
   buyUid: {
     type: String,
     required: true
   },
-  // 贩卖者udi
+  // 卖家uid
   sellUid: {
     type: String,
     required: true
@@ -113,7 +119,7 @@ const shopOrdersSchema = new Schema({
    */
   orderStatus: {
     type: String,
-    default: "unCost"
+    default: orderStatus.unCost,
   },
   // 自动收货的时间
   autoReceiveTime: {
@@ -996,6 +1002,23 @@ shopOrdersSchema.statics.updateShopStatus = async () => {
         error: err.message || JSON.stringify(err)
       });
     }
+  }
+}
+
+shopOrdersSchema.statics.checkModifyAddressInfoPermission = async (orderId) => {
+  const ShopOrdersModel = mongoose.model('shopOrders');
+  const order = await ShopOrdersModel.findOnly({orderId}, {
+    orderStatus: 1,
+    closeStatus: 1,
+  });
+  if(order.closeStatus) {
+    throwErr(403, '订单已关闭，无法修改收货信息');
+  }
+  if(![
+    orderStatus.unCost,
+    orderStatus.unShip,
+  ].includes(order.orderStatus)) {
+    throwErr(403, '卖家已发货，不允许修改收货信息');
   }
 }
 

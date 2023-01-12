@@ -690,7 +690,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     tlm: nowTime
   });
   // 如果存在引用并且不需要审核，则给被引用者发送引用通知
-  if(quotePost && _post.reviewed) {
+  if(quotePost) {
     const messageId = await SettingModel.operateSystemID('messages', 1);
     const message = MessageModel({
       _id: messageId,

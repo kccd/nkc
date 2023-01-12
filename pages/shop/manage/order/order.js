@@ -3,10 +3,10 @@ const Ship = new NKC.modules.ShopShip();
 const ModifyPrice = new NKC.modules.ShopModifyPrice();
 const Transfer = new NKC.modules.Transfer();
 import * as XLSX from 'xlsx';
+import {detailedTime} from "../../../lib/js/time";
 import {getDataById} from "../../../lib/js/dataConversion";
 
 const data = getDataById('data');
-
 const ordersObject = {};
 for(const order of data.orders) {
   ordersObject[order.orderId] = order;
@@ -24,19 +24,58 @@ window.selectAllOrder = function() {
 
 window.exportData = function() {
   const ordersId = GetSelectedOrdersId();
-  const ordersData = [];
+  const orders = [];
   for(const orderId of ordersId) {
     const order = ordersObject[orderId];
     if(!order) continue;
-    const orderData = GetOrderData(order);
-    ordersData.push(orderData);
+    orders.push(order);
   }
-  ExportFile(ordersData, `order_${Date.now()}`);
+  const ordersData = GetOrdersData(orders);
+  if(ordersData.length === 0) {
+    sweetError('请勾选需要导出的订单');
+  } else {
+    ExportFile(ordersData, `orders_${Date.now()}`);
+  }
 }
 
 function ExportFile(ordersData, fileName) {
   const sheet = XLSX.utils.json_to_sheet(ordersData);
   const wb = XLSX.utils.book_new();
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const ignoreIndex = [3, 4, 5];
+  const [_, endLetter] = sheet['!ref'].split(':').map(k => {
+    return k.replace(/[0-9]/ig, '')
+  });
+  const endLetterIndex = letters.indexOf(endLetter) + 1;
+  const mergeIndex = [];
+  let sameIndex = [];
+  let lastOrderId = '';
+  for(let i = 0; i >= 0; i++) {
+    const targetB = sheet[`B${i + 1}`];
+    if(!targetB) break;
+    const orderId = targetB.v;
+    if(lastOrderId === orderId) {
+      sameIndex.push(i);
+    } else {
+      if(sameIndex.length > 1) {
+        mergeIndex.push([...sameIndex]);
+      }
+      lastOrderId = orderId;
+      sameIndex = [i];
+    }
+    lastOrderId = targetB.v;
+  }
+  const merge = [];
+  for(const mergeIndexArr of mergeIndex) {
+    for(let i = 0; i < endLetterIndex; i++) {
+      if(ignoreIndex.includes(i)) continue;
+      merge.push({
+        s: {r: mergeIndexArr[mergeIndexArr.length - 1], c: i},
+        e: {r: mergeIndexArr[0], c: i}
+      })
+    }
+  }
+  sheet["!merges"] = merge;
   XLSX.utils.book_append_sheet(wb, sheet, fileName);
   const workbookBlob = workbook2blob(wb)
   openDownload(workbookBlob, `${fileName}.xls`)
@@ -93,24 +132,32 @@ function GetSelectedOrdersId() {
   return selectedOrdersId;
 }
 
-function GetOrderData(order) {
-  let product = '';
-  for(let i = 0; i < order.params.length; i++) {
-    const param = order.params[i];
-    product += `${i !== 0?"\n": ''}${param.product.name} - ${param.productParam.name} - 数量${param.count}`
+function GetOrdersData(orders) {
+  const productions = [];
+  for(const order of orders) {
+    for(let i = 0; i < order.params.length; i++) {
+      const param = order.params[i];
+      productions.push({
+        "时间": detailedTime(order.orderToc),
+        "订单号": order.orderId,
+        "买家": `${order.buyUser.username}(${order.buyUser.uid})`,
+        "商品信息": `${param.product.name} - ${param.productParam.name}`,
+        "商品数量": param.count,
+        "商品价格（元）": param.singlePrice / 100,
+        "运费（元）": order.orderFreightPrice / 100,
+        "总价（元）": (order.orderPrice + order.orderFreightPrice) / 100,
+        "收件人": order.receiveName,
+        "收件人手机号": order.receiveMobile,
+        "收货地址": order.receiveAddress,
+        "买家备注": order.buyMessage || '无',
+        "卖家备注": order.sellMessage || '无',
+        "物流类型": order.trackNumber? order.freightName: '无',
+        "物流单号": order.trackNumber || '无',
+        "订单状态": order.status,
+      });
+    }
   }
-  return {
-    "时间": order.orderToc,
-    "订单号": order.orderId,
-    "买家": `${order.buyUser.username}(${order.buyUser.uid})`,
-    "商品信息": product,
-    "商品价格（元）": order.orderPrice / 100,
-    "运费（元）": order.orderFreightPrice / 100,
-    "总价（元）": (order.orderPrice + order.orderFreightPrice) / 100,
-    "收件人名称": order.receiveName,
-    "收件人手机号": order.receiveMobile,
-    "收货地址": order.receiveAddress,
-  };
+  return productions;
 }
 
 window.transfer = function(tUid) {
