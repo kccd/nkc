@@ -76,6 +76,7 @@ block settingsContent
                   span(v-if='p.minorCategories.length === 0') 无
                   span(v-else v-for="c in p.minorCategories") {{c.name}}&nbsp;
               b.text-danger(v-if="(p.thread && p.thread.disabled) || (p.article && p.article.status === 'disabled')") 文章已屏蔽，仅后台可见
+              b.text-danger(v-else-if="p.article && p.article.status === 'deleted'") 文章已删除，仅后台可见
               b.text-danger(v-else-if="p.post && p.post.disabled") 回复已屏蔽，仅后台可见
               b.text-danger(v-else-if="(p.thread && p.thread.recycleMark) || (p.article && p.article.status === 'faulty')") 文章已退修，仅后台可见
               b.text-danger(v-else-if="p.post && p.post.toDraft") 回复已退修，仅后台可见
