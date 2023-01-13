@@ -1007,7 +1007,7 @@ settingSchema.statics.getManagementData = async (user) => {
       ]
     });
     results.push({
-      name: '用户审核',
+      name: '身份认证',
       url: '/e/auth',
       icon: 'i-server',
       webIcon: 'fa-cogs',

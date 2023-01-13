@@ -1,6 +1,8 @@
 const router = require('koa-router')();
+const permissions = require("../../../../middlewares/permission");
 router
-  .post('/', async (ctx, next) => {
+  .post('/', permissions.OnlyUser(), async (ctx, next) => {
+    //专栏主自己添加文章
     const {body, data, db} = ctx;
     const {
       threadsId, articlesId, mainCategoriesId, minorCategoriesId,
@@ -15,6 +17,7 @@ router
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
     const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
+    const columnPostTypes = await db.ColumnPostModel.getColumnPostTypes();
     const threadColumnPostArr = await db.ThreadModel.aggregate([
       {
         $match : {tid: {$in: threadsId}, uid: user.uid}
@@ -37,7 +40,7 @@ router
                         [
                           { $eq: [ "$pid",  "$$oc_pid" ] },
                           { $eq: [ "$columnId", column._id ] },
-                          { $eq: [ "$type", "thread" ] },
+                          { $eq: [ "$type", columnPostTypes.thread ] },
                         ]
                     }
                 }
@@ -69,7 +72,7 @@ router
                         [
                           { $eq: [ "$pid",  "$$id_pid" ] },
                           { $eq: [ "$columnId", column._id ] },
-                          { $eq: [ "$type", "article" ] },
+                          { $eq: [ "$type", columnPostTypes.article ] },
                         ]
                     }
                 }

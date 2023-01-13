@@ -22,13 +22,14 @@ router
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
+    const columnPostTypes = await db.ColumnPostModel.getColumnPostTypes();
     let threadCount = 0;
     let threads = [];
     if(threadsId.length !== 0){
       const _threadsObj ={};
       const _threads = await db.ThreadModel.find({tid: {$in: threadsId}, uid: user.uid});
       let ocs;
-      if(_threads && _threads.length > 0){
+      if(_threads.length > 0){
         ocs = _threads.map(item => {
           _threadsObj[item.oc] = item;
           return item.oc
@@ -37,9 +38,9 @@ router
       const pArr = await db.ColumnPostModel.find({
         columnId: column._id,
         pid: {$in: ocs},
-        type: 'thread'
+        type: columnPostTypes.thread
       });
-      if(pArr && pArr.length > 0){
+      if(pArr.length > 0){
         const pocs = pArr.map(item => {
           return item.pid
         })
@@ -50,7 +51,10 @@ router
       }
       if(ocs && ocs.length > 0){
         let contributes = await db.ColumnContributeModel.find({
-          columnId: column._id, pid: {$in: ocs}, source: 'thread',passed: null
+          columnId: column._id,
+          pid: {$in: ocs},
+          source: columnPostTypes.thread,
+          passed: null
         });
         if(contributes && contributes.length > 0){
           const contributesPids = contributes.map(item => {
@@ -82,7 +86,7 @@ router
       const pArr = await db.ColumnPostModel.find({
         columnId: column._id,
         pid: {$in: ids},
-        type: 'article'
+        type: columnPostTypes.article
       });
       if(pArr && pArr.length > 0){
         const pids = pArr.map(item => {
@@ -123,7 +127,7 @@ router
         mcid: minorCategoriesId,
         description,
         columnId: column._id,
-        source: 'thread'
+        source: columnPostTypes.thread
       });
       await contribute.save();
       threadCount++;
@@ -138,7 +142,7 @@ router
         mcid: minorCategoriesId,
         description,
         columnId: column._id,
-        source: 'article'
+        source: columnPostTypes.article
       });
       await contribute.save();
       threadCount++;

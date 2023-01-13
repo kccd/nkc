@@ -1,6 +1,7 @@
 const router = require('koa-router')();
+const permissions = require('../../../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', permissions.OnlyUser(), async (ctx, next) => {
     //获取当前登录用户的独立文章信息
     const { db, data, query, nkcModules } = ctx;
     const {user} = data;
@@ -11,6 +12,7 @@ router
       disabled: false,
     };
     const count = await db.ThreadModel.countDocuments(match);
+    const postType = await db.PostModel.getType();
     const paging = await nkcModules.apiFunction.paging(page, count);
     const threads = await db.ThreadModel.aggregate([
       {
@@ -43,7 +45,7 @@ router
                         [
                           { $eq: [ "$pid",  "$$oc_pid" ] },
                           { $eq: [ "$anonymous", false ] },
-                          { $eq: [ "$type", "thread" ] },
+                          { $eq: [ "$type", postType.thread ] },
                         ]
                     }
                 }
@@ -65,7 +67,7 @@ router
           tid: item.tid,
           toc: item.toc,
           t: item.t,
-          source: 'thread',
+          source: postType.thread,
           c: nkcModules.nkcRender.htmlToPlain(item.c,20),
           url: nkcModules.tools.getUrl('thread', item.tid)
         })

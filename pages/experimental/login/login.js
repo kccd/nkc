@@ -6,9 +6,6 @@ var app = new Vue({
     error: "",
     info: ""
   },
-  mounted() {
-    console.log('mo')
-    },
   methods: {
     submit: function() {
       this.error = "";
