@@ -44,6 +44,7 @@
               div.content-position
                 div.title {{article.t}}
                 div.content
+                  span.source {{source[article.source]}}
                   span.toc(:title="detailedTime(article.toc)") {{fromNow(article.toc)}}
                   span {{article.c}}
 
@@ -94,8 +95,13 @@
         font-size: 1.2rem;
         color: @primary;
       }
-      .content{
+      .content {
         color: #555;
+        .source {
+          font-size: 12px;
+          padding-right: 0.5rem;
+          color: #838383;
+        }
         .toc{
           font-size: 1.2rem;
           color: @accent;
@@ -120,7 +126,6 @@ import Paging from "../../Paging";
 import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat, detailedTime} from "../../../js/time";
 import {fromNow} from "../../../js/tools";
-
 export default {
   props:{
     articleSource:{
@@ -138,6 +143,11 @@ export default {
     number: 0,
     loading: true,
     allChecked: false,
+    source: {
+      'thread': '社区',
+      'zone': '空间',
+      'column': '专栏',
+    }
   }),
   components:{
     "paging": Paging,

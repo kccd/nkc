@@ -95,7 +95,7 @@ router
         }
         return{
           tid: item._id,
-          source: columnPostTypes.article,
+          source: item.source,
           toc: item.dt,
           t: item.title,
           c: nkcModules.nkcRender.htmlToPlain(item.content,200),
