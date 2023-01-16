@@ -68,7 +68,7 @@ router
           toc: item.toc,
           t: item.t,
           source: postType.thread,
-          c: nkcModules.nkcRender.htmlToPlain(item.c,20),
+          c: nkcModules.nkcRender.htmlToPlain(item.c,200),
           url: nkcModules.tools.getUrl('thread', item.tid)
         })
       }

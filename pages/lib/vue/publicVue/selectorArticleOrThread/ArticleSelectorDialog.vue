@@ -1,12 +1,16 @@
 <template lang="pug">
   .modal-box
-    draggable(ref="selectorRef" title="选择文章" @submit="submit")
+    draggable(ref="selectorRef" title="选择文章")
       template(v-slot:content)
         article-selector-core(
           ref="articleSelectorCore"
           :articleSource="articleSource"
-          @close="close"
         )
+        .modal-footer
+          .display-i-b(v-if="submitting") 处理中，请稍候...
+          button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
+          button(v-if="submitting" type="button" class="btn btn-primary btn-sm" disabled) 确定
+          button(v-else type="button" class="btn btn-primary btn-sm" @click="submit") 确定
 
 </template>
 <style lang="less" scoped>
@@ -27,7 +31,6 @@ export default {
   data: ()=>({
     callback: null,
     submitting: false,
-    showDialog: false,
     articleSource: null
   }),
   methods:{
@@ -35,17 +38,17 @@ export default {
       this.$refs.articleSelectorCore.init()
       this.$refs.selectorRef.open()
       this.callback = callback;
+      this.submitting = false;
       this.articleSource = options.articleSource;
-
     },
-
     close() {
       this.$refs.selectorRef.close();
     },
-
     submit(){
-      const articles = this.$refs.articleSelectorCore.getSelectedArticles()
+      this.submitting = true;
+      const articles = this.$refs.articleSelectorCore.getSelectedArticles;
       this.callback(articles);
+      this.close()
     },
   }
 }
