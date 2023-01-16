@@ -67,7 +67,7 @@
             .mask(v-else-if = 's.state === "inProcess"')
               span 处理中...
             .mask(v-else-if='s.state === "useless"')
-              span 处理失败   
+              span 处理失败
             .mask(v-else)
               span 加载中...
           .share-warning(v-if="type === 'share'")
@@ -283,7 +283,8 @@
   import {screenTopWarning} from "../js/topAlert";
   import { getSocket } from "../js/socket";
   import { debounce } from "../js/execution";
-
+  import {getState} from "../js/state";
+  const {fileDomain} = getState();
   const socket = getSocket();
   export default {
     data: () => ({
@@ -422,7 +423,11 @@
             if(self.share) {
               formData.append("share", "true");
             }
-            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+            let url = '/r';
+            if(fileDomain) {
+              url = fileDomain + url;
+            }
+            return nkcUploadFile(url, "POST", formData, function(e, progress) {
               sticker.progress = progress;
             });
           })

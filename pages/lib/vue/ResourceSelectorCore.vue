@@ -689,7 +689,7 @@ import CommonModal from "./CommonModal";
 import SelectCategory from "./SelectCategory";
 import {openImageViewer} from "../js/imageViewer";
 
-const {isApp} = getState();
+const {isApp, fileDomain} = getState();
 import {
   RNTakePictureAndUpload,
   RNTakeAudioAndUpload,
@@ -1172,7 +1172,11 @@ export default {
             var formData = new FormData();
             formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
             formData.append('cid', self.resourceCategories);
-            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+            let url = '/r';
+            if(fileDomain) {
+              url = fileDomain + url;
+            }
+            return nkcUploadFile(url, "POST", formData, function(e, progress) {
               f.progress = progress;
             }, 60 * 60 * 1000);
           }
