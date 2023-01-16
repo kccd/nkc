@@ -132,6 +132,7 @@ router
     const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
+
     data.paging = paging;
     //获取专栏文章
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts({columnPosts, fidOfCanGetThread, isModerator});
@@ -145,12 +146,11 @@ router
     if(ctx.permission("homeToppedColumn")) {
       data.homeToppedColumn = homeSettings.toppedColumnsId.includes(column._id);
     }
-    const permissions = {
+    data.permissions = {
       homeHotColumn: ctx.permission('homeHotColumn'),
       homeToppedColumn: ctx.permission('homeToppedColumn'),
       column_single_disabled: ctx.permission('column_single_disabled'),
     };
-    data.permissions = permissions
     data.c = categoriesIdString;
     await next();
   })

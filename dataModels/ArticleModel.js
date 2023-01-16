@@ -76,7 +76,7 @@ const schema = new mongoose.Schema({
   },
   // 引用文章的模块类型
   source: {
-    type: String, // column, alone
+    type: String, // column, zone
     required: true,
     index: 1
   },

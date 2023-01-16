@@ -1,7 +1,7 @@
 <template lang="pug">
   .module-sr-body
-    .module-sr-header(ref="draggableHandle")
-      .module-sr-title 学术分隐藏
+    .module-sr-header
+      .module-sr-title(ref="draggableHandle") 学术分隐藏
       .module-sr-close(@click="close")
         .fa.fa-remove
     .module-sr-content
@@ -34,6 +34,7 @@
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
+    padding-right: 3rem;
     .module-sr-close{
       cursor: pointer;
       color: #aaa;

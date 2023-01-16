@@ -1,15 +1,20 @@
 <template lang="pug">
   .module-dialog-body
     .module-dialog-header
-      .module-dialog-title(ref="draggableHandle") 插入资源
+      .module-dialog-title(ref="draggableHandle") {{title}}
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
-      resource-selector-core(ref="resourceSelectorCore" watch-type="select")
-</template>
+      slot(name="content")
+    .modal-footer
+      .display-i-b(v-if="submitting") 处理中，请稍候...
+      button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
+      button(v-if="submitting" type="button" class="btn btn-primary btn-sm" disabled) 确定
+      button(v-else type="button" class="btn btn-primary btn-sm" @click="submit") 确定
 
+</template>
 <style lang="less" scoped>
-@import "../../publicModules/base";
+@import "../../../publicModules/base";
 .module-dialog-body{
   display: none;
   position: fixed;
@@ -53,18 +58,19 @@
   }
 }
 </style>
-
 <script>
-import {DraggableElement} from "../js/draggable";
-import ResourceSelectorCore from "./ResourceSelectorCore";
+import {DraggableElement} from "../../js/draggable";
 
 export default {
-  data: () => ({
-    show: false,
-  }),
-  components: {
-    'resource-selector-core': ResourceSelectorCore,
+  props: {
+    title:{
+      type: String || Number,
+      default: ''
+    }
   },
+  data: () => ({
+    submitting: false,
+  }),
   mounted() {
     this.initDraggableElement();
   },
@@ -79,17 +85,13 @@ export default {
     open(callback, options) {
       const self = this;
       self.draggableElement.show();
-      self.show = true;
-      return self.$refs.resourceSelectorCore.open(function (res){
-        if(res) {
-          callback(res);
-        }
-      }, options);
     },
     close() {
       this.draggableElement.hide();
-      this.show = false;
-      this.$refs.resourceSelectorCore.close();
+    },
+    submit(){
+      this.$emit('submit')
+      this.close()
     },
   }
 }

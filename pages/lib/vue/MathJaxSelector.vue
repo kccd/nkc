@@ -1,7 +1,7 @@
 <template lang="pug">
   .math-jax-editor
-    .module-header(ref="draggableHandle")
-      .module-title 插入公式
+    .module-header
+      .module-title(ref="draggableHandle") 插入公式
       .module-close.fa.fa-close(@click="close")
     .module-body
       .bg-warning.text-warning.p-a-05.m-b-1
@@ -47,6 +47,7 @@
       line-height: 3rem;
       background-color: #f6f6f6;
       position: relative;
+      padding-right: 3rem;
       .module-title{
         margin-left: 1rem;
         color: #666;

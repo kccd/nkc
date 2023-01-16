@@ -21,6 +21,7 @@ block title
 
 block content
   .container-fluid.max-width
+    #data.hidden=objToStr({toUrl: data.toUrl})
     .b-s-20.panel#app(v-cloak)
       .title 验证身份
       .form
@@ -35,31 +36,4 @@ block content
           h5.text-success(v-if="info") {{info}}
           button.btn.btn-block.btn-primary(@click="submit") 提交
 block scripts
-  script.
-    var app = new Vue({
-      el: "#app",
-      data: {
-        password: "",
-
-        error: "",
-        info: ""
-      },
-      methods: {
-        submit: function() {
-          this.error = "";
-          this.info = "";
-          if(!this.password) return this.password = "请输入密码";
-          nkcAPI("/e/login", "POST", {
-            password: this.password,
-          })
-            .then(function(data) {
-              //- window.location.href = data.redirect;
-              NKC.methods.visitUrl(data.redirect);
-              // openToNewLocation("/e/status");
-            })
-            .catch(function(data) {
-              app.error = data.error || data;
-            })
-        }
-      }
-    })
+  +includeJS("/experimental/login/login.js")
