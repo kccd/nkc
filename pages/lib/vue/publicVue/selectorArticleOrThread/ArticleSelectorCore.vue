@@ -9,7 +9,7 @@
         a.selected-table-span.button(
           v-if="articleSource && articleSource.includes('zone')"
           @click.stop='selectSource("zone")'
-          :class="{active : selectedSource === 'zone'}"
+          :class="{active : selectedSource === 'zone', 'radius-right': articleSource && !articleSource.includes('column')}"
         ) 空间
         a.selected-table-span.button.radius-right(
           v-if="articleSource && articleSource.includes('column')"
@@ -18,11 +18,11 @@
         ) 专栏
         a.selected-table-span.button.m-l-1.relative(
           @click.stop='selectSource("choose")'
-          :class="{active : selectedSource === 'choose'}"
+          :class="{active : selectedSource === 'choose', 'radius-left': true, 'radius-right': true}"
         ) 已选泽
           .selected-count.absolute(v-if="getSelectedArticles.length !== 0") {{getSelectedArticles.length}}
     div
-      div(v-if="loading" ) 加载中...
+      div.selector-core-body(v-if="loading" ) 加载中...
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
           paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
