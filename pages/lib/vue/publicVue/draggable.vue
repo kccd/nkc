@@ -1,16 +1,11 @@
 <template lang="pug">
-  .module-dialog-body
+  .module-dialog-body(ref="draggableBox")
     .module-dialog-header
       .module-dialog-title(ref="draggableHandle") {{title}}
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
       slot(name="content")
-    .modal-footer
-      .display-i-b(v-if="submitting") 处理中，请稍候...
-      button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
-      button(v-if="submitting" type="button" class="btn btn-primary btn-sm" disabled) 确定
-      button(v-else type="button" class="btn btn-primary btn-sm" @click="submit") 确定
 
 </template>
 <style lang="less" scoped>
@@ -60,6 +55,8 @@
 </style>
 <script>
 import {DraggableElement} from "../../js/draggable";
+import {debounce} from "../../js/execution";
+import {getScrollBarWidth, hasScrollBar} from "../../js/scrollBar";
 
 export default {
   props: {
@@ -68,9 +65,11 @@ export default {
       default: ''
     }
   },
-  data: () => ({
-    submitting: false,
-  }),
+  data: ()=>{
+    return {
+      mouseOver: false,
+    }
+  },
   mounted() {
     this.initDraggableElement();
   },
@@ -78,9 +77,51 @@ export default {
     this.draggableElement && this.draggableElement.destroy();
   },
   methods: {
+    initContainerMouseEvent() {
+      const app = this;
+      const containerElement = $(this.$refs.draggableBox);
+      containerElement.on('mouseleave', () => {
+        app.onMouseLeave();
+      });
+      containerElement.on('mouseover', () => {
+        app.onMouseOver();
+      });
+    },
+    // 离开弹窗，取消禁止滚动
+    enableScroll: debounce(function() {
+      $('body').css({
+        'overflow': '',
+        'padding-right': ''
+      });
+    }, 200),
+    // 禁止body滚动
+    disableScroll: debounce(function() {
+      const body = $('body');
+      const cssObj = {
+        overflow: 'hidden'
+      };
+      if(hasScrollBar()) {
+        const scrollBarWidth = getScrollBarWidth();
+        cssObj['padding-right'] = scrollBarWidth + 'px';
+      }
+      body.css(cssObj);
+    }, 200),
+    // 鼠标离开面板
+    onMouseLeave() {
+      if(!this.mouseOver) return;
+      this.mouseOver = false;
+      this.enableScroll();
+    },
+    // 鼠标悬浮于面板之上
+    onMouseOver() {
+      if(this.mouseOver) return;
+      this.mouseOver = true;
+      this.disableScroll();
+    },
     initDraggableElement() {
       this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
       this.draggableElement.setPositionCenter();
+      this.initContainerMouseEvent()
     },
     open(callback, options) {
       const self = this;
@@ -88,10 +129,6 @@ export default {
     },
     close() {
       this.draggableElement.hide();
-    },
-    submit(){
-      this.$emit('submit')
-      this.close()
     },
   }
 }

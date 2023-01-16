@@ -5,13 +5,12 @@ router
     //获取当前登录用户的独立文章信息
     const { db, data, query, nkcModules } = ctx;
     const {user} = data;
-    const {page, articleSource} = query;
-    const articleSourceArr = JSON.parse(articleSource);
+    const {page, selectedSource} = query;
     const articleStatus = await db.ArticleModel.getArticleStatus();
     const match = {
       uid: user.uid,
       status: articleStatus.normal,
-      source: {$in: articleSourceArr}
+      source: selectedSource
     };
     const count = await db.ArticleModel.countDocuments(match);
     const paging = await nkcModules.apiFunction.paging(page, count);
