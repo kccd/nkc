@@ -86,7 +86,7 @@
     }
     .content-position {
       position: relative;
-      left: 2rem;
+      padding-left: 2rem;
       display: inline-block;
       padding-right: 1rem;
       font-weight: normal;
