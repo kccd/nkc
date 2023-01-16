@@ -98,7 +98,7 @@ router
           source: columnPostTypes.article,
           toc: item.dt,
           t: item.title,
-          c: nkcModules.nkcRender.htmlToPlain(item.content,20),
+          c: nkcModules.nkcRender.htmlToPlain(item.content,200),
           url
         }
       }),
