@@ -33,7 +33,7 @@
             label(v-for="article in articles")
               input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
               div.content-position
-                div.title {{article.t}}
+                a.title(:href="article.url" target="_blank") {{article.t}}
                 div.content
                   span.toc(:title="detailedTime(article.toc)") {{fromNow(article.toc)}}
                   span {{article.c}}
@@ -42,7 +42,7 @@
             label(v-for="article in getSelectedArticles")
               input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
               div.content-position
-                div.title {{article.t}}
+                a.title(:href="article.url" target="_blank") {{article.t}}
                 div.content
                   span.source {{source[article.source]}}
                   span.toc(:title="detailedTime(article.toc)") {{fromNow(article.toc)}}

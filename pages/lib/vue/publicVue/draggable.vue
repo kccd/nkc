@@ -128,6 +128,7 @@ export default {
       self.draggableElement.show();
     },
     close() {
+      this.enableScroll();
       this.draggableElement.hide();
     },
   }
