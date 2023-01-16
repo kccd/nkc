@@ -26,11 +26,11 @@
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
           paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-          .articles
-            label
+          label
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position 全选
-            label(v-for="article in articles")
+          .articles
+            label.he(v-for="article in articles")
               input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
               div.content-position
                 a.title(:href="article.url" target="_blank") {{article.t}}
@@ -73,8 +73,10 @@
   }
   .selector-core-body {
     padding-left: 1rem;
-    height: 400px;
-    overflow-y: auto;
+    .articles {
+      height: 400px;
+      overflow-y: auto;
+    }
     label {
       display: block;
       position: relative;
@@ -111,6 +113,9 @@
       }
     }
   }
+}
+.he {
+  height: 400px
 }
 .relative {
   position: relative;
@@ -182,7 +187,7 @@ export default {
       const article = this.articles.find(item=>{
         return !this.selectedArticlesId.includes(item.tid)
       })
-      if(article){
+      if(this.articles.length === 0 || article){
         type = false;
       }
       return type;
