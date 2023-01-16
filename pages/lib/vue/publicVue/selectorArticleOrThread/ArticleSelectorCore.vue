@@ -30,7 +30,7 @@
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position 全选
           .articles
-            label.he(v-for="article in articles")
+            label(v-for="article in articles")
               input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
               div.content-position
                 a.title(:href="article.url" target="_blank") {{article.t}}
@@ -113,9 +113,6 @@
       }
     }
   }
-}
-.he {
-  height: 400px
 }
 .relative {
   position: relative;
