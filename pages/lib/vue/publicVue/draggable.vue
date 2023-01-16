@@ -54,7 +54,7 @@
     }
   }
   .module-dialog-content{
-    padding: 0 1rem;
+    //padding: 0 1rem;
   }
 }
 </style>

@@ -5,6 +5,7 @@
         article-selector-core(
           ref="articleSelectorCore"
           :articleSource="articleSource"
+          @close="close"
         )
 
 </template>
@@ -36,6 +37,10 @@ export default {
       this.callback = callback;
       this.articleSource = options.articleSource;
 
+    },
+
+    close() {
+      this.$refs.selectorRef.close();
     },
 
     submit(){

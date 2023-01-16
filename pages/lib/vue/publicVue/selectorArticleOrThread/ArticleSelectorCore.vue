@@ -21,23 +21,27 @@
           input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
           div.content-position
             div.title {{article.t}}
-            div.toc {{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
-            div.content {{article.c}}
+            div.content
+              span.toc(:title="detailedTime(article.toc)") {{fromNow(article.toc)}}
+              span {{article.c}}
     .selector-core-body(v-else)
       .articles
         label(v-for="article in getSelectedArticles()")
           input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
           div.content-position
-              div.title {{article.t}}
-              div.toc {{timeFormat("YYYY-MM-DD HH:mm:ss", article.toc)}}
-              div.content {{article.c}}
-
+            div.title {{article.t}}
+            div.content
+              span.toc(:title="detailedTime(article.toc)") {{fromNow(article.toc)}}
+              span {{article.c}}
+    //button.btn.btn-default(@click="close") 关闭
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";
 .selector-core {
-  padding: 0.5rem;
   background-color: #ffffff;
+  .selector-core-header{
+    padding: 1rem 1rem 0 1rem;
+  }
   .selected-table {
     .selected-table-span {
       display: inline-block;
@@ -59,11 +63,15 @@
     }
   }
   .selector-core-body {
+    padding-left: 1rem;
     max-height: 450px;
-    overflow: auto;
+    overflow-y: auto;
     label {
       display: block;
       position: relative;
+      &:hover{
+        background-color: #eee;
+      }
       input {
         position: absolute;
       }
@@ -75,8 +83,17 @@
       padding-right: 1rem;
       font-weight: normal;
       .title {
-        font-weight: bold;
-        font-size: 18px;
+        font-size: 1.2rem;
+        color: @primary;
+      }
+      .content{
+        color: #555;
+        .toc{
+          font-size: 1.2rem;
+          color: @accent;
+          margin-right: 0.5rem;
+        }
+        .hideText(@line: 1);
       }
     }
   }
@@ -85,7 +102,8 @@
 <script>
 import Paging from "../../Paging";
 import {nkcAPI} from "../../../js/netAPI";
-import {timeFormat} from "../../../js/time";
+import {timeFormat, detailedTime} from "../../../js/time";
+import {fromNow} from "../../../js/tools";
 
 export default {
   props:{
@@ -101,6 +119,7 @@ export default {
     selectedArticlesId: [],
     articles: [],
     paging: {},
+    number: 0,
 
   }),
   components:{
@@ -119,7 +138,16 @@ export default {
     },
   },
   methods:{
+    fromNow,
+    detailedTime,
     timeFormat: timeFormat,
+    close() {
+      this.$emit('close');
+    },
+    getNumber() {
+      this.number += 1;
+      return this.number;
+    },
     getUserArticles(page) {
       const self= this;
       let url;
@@ -128,11 +156,13 @@ export default {
       } else {
         url = `/api/v1/articles/selector?page=${page}&articleSource=${JSON.stringify(this.articleSource)}`;
       }
+      const number = this.getNumber();
       nkcAPI(url, "GET")
         .then(res => {
-          self.paging = res.data.paging;
-          self.articles = res.data.articles;
-
+          if(this.number === number) {
+            self.paging = res.data.paging;
+            self.articles = res.data.articles;
+          }
         })
         .catch(err => {
           sweetError(err);
