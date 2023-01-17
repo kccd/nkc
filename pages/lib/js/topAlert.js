@@ -9,7 +9,7 @@ export function screenTopAlert(text){
 
 export function screenTopWarning(text){
   screenTopAlertInit();
-  text = text.error || text;
+  text = text.error || text.message || text.toString();
   return screenTopAlertOfStyle(text,'warning')
 }
 
