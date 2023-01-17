@@ -144,7 +144,6 @@ export default {
     paging: {},
     number: 0,
     loading: true,
-    allChecked: false,
     source: {
       'thread': '社区',
       'zone': '空间',
@@ -213,7 +212,6 @@ export default {
             this.loading = false
             self.paging = res.data.paging;
             self.articles = res.data.articles;
-            this.allChecked = this.isAllChecked;
           }
         })
         .catch(err => {
@@ -231,8 +229,7 @@ export default {
       }
     },
     selectedAllArticlesFunc() {
-      if(!this.allChecked){
-        this.allChecked = true;
+      if(!this.isAllChecked){
         const set = new Set(this.selectedArticlesId);
         this.articles.forEach(item => {
           set.add(item.tid)
@@ -240,7 +237,6 @@ export default {
         })
         this.selectedArticlesId = [...set]
       } else {
-        this.allChecked = false;
         this.selectedArticlesId = this.selectedArticlesId.filter(item=>{
           return !this.articlesObj.articlesId.includes(item)
         })
