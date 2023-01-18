@@ -28,10 +28,7 @@ var app = new Vue({
     selectMul: true,
   },
   mounted: function() {
-    this.init();
-    this.getCategories();
-    this.getPosts(0);
-    moduleToColumn.init();
+    this.initAllData()
   },
   computed: {
     category: function() {
@@ -64,6 +61,12 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    initAllData: function() {
+      this.init();
+      this.getCategories();
+      this.getPosts(0);
+      moduleToColumn.init();
+    },
     moveSelected: function() {
       var selectedColumnPostsId = this.selectedColumnPostsId;
       if(selectedColumnPostsId.length === 0) return screenTopWarning("请勾选需要处理的文章");
@@ -242,6 +245,7 @@ var app = new Vue({
       }
     },
     chooseArticles: function(articles) {
+      const _this = this;
       const threadsId = [];
       const articlesId = [];
       for(let i = 0; i < articles.length; i++) {
@@ -264,6 +268,7 @@ var app = new Vue({
           .then(function() {
             screenTopAlert("操作成功");
             moduleToColumn.hide();
+            _this.initAllData();
           })
           .catch(function(data) {
             screenTopWarning(data);
