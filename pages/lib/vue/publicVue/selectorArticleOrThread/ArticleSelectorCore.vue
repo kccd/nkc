@@ -30,6 +30,7 @@
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position 全选
           .articles
+            .text-center.p-t-3.p-b-1(v-if="articles.length === 0") 空空如也~
             label(v-for="article in articles")
               input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
               div.content-position
@@ -39,8 +40,9 @@
                   span {{article.c}}
         .selector-core-body(v-else)
           .articles
+            .text-center.p-t-3.p-b-1(v-if="getSelectedArticles.length === 0") 空空如也~
             label(v-for="(article, index) in getSelectedArticles")
-              button.btn.btn-xs.btn-default(@click="removeFromArr(selectedArticlesId, index)") 删除
+              button.btn.btn-xs.btn-default(@click="removeFromArr(selectedArticlesId, index)") 移除
               div.content-position.selected-content-position
                 a.title(:href="article.url" target="_blank") {{article.t}}
                 div.content
@@ -76,12 +78,13 @@
     .articles {
       height: 400px;
       overflow-y: auto;
+      background-color: #eceeef;
     }
     label {
       display: block;
       position: relative;
       &:hover{
-        background-color: #eee;
+        background-color: #d9dfe3;
       }
       input {
         position: absolute;

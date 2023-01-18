@@ -6,7 +6,7 @@
           ref="articleSelectorCore"
           :articleSource="articleSource"
         )
-        .modal-footer
+        .box-footer
           .display-i-b(v-if="submitting") 处理中，请稍候...
           button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
           button(v-if="submitting" type="button" class="btn btn-primary btn-sm" disabled) 确定
@@ -18,6 +18,13 @@
 .selector-box {
   padding: 0.5rem;
   background-color: #eee;
+}
+.box-footer{
+  padding: 0.8rem 1.4rem;
+  button{
+    margin-left: 0.5rem;
+  }
+  text-align: right;
 }
 </style>
 <script>
