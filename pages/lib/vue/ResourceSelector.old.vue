@@ -24,8 +24,8 @@
           input.input.radius-left(type="text" v-model.number="pageNumber")
           a.button.radius-right(@click="fastSelectPage") 确定
     .module-sr-body
-      .module-sr-header(ref="draggableHandle")
-        .module-sr-title 插入资源
+      .module-sr-header
+        .module-sr-title(ref="draggableHandle") 插入资源
         .fa.fa-remove(@click="close")
       .module-sr-content(v-if="pageType === 'list'")
         .selected-resources
@@ -146,6 +146,7 @@
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
+    padding-right: 3rem;
   }
   .module-sr-title{
     cursor: move;

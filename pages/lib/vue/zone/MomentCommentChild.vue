@@ -1,7 +1,7 @@
 <template lang="pug">
   .comment-comment-editor(ref="container")
-    .comment-comment-header(ref="header")
-      .comment-comment-title {{title}}
+    .comment-comment-header
+      .comment-comment-title(ref="header") {{title}}
       .comment-comment-button(@click="close")
         .fa.fa-remove
     .comment-comment-body

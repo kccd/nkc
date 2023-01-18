@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-selector
-    .module-header(ref="draggableHandle")
-      .module-title 选择用户
+    .module-header
+      .module-title(ref="draggableHandle") 选择用户
       .module-close.fa.fa-close(@click="close")
     .module-body
       .selected-users
@@ -181,6 +181,7 @@
       line-height: 3rem;
       background-color: #f6f6f6;
       position: relative;
+      padding-right: 3rem;
       .module-title{
         margin-left: 1rem;
         color: #666;

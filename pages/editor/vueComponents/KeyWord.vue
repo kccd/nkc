@@ -17,10 +17,10 @@
   //- .modal.fade(v-if="showModel", )
   //-   .modal-dialog.modal-sm
   .modal-key-word(ref="model" v-show="showModel")
-    .modal-header(ref="addKeyword")
+    .modal-header
+      .modal-title(ref="addKeyword") {{ title }}
+        span.quote-content(v-if="quote") {{ quote }}
       .fa.fa-remove.close-modal(@click="close")
-      .modal-title {{ title }}
-      .quote-content(v-if="quote") {{ quote }}
     .modal-body
       .form
         .form-group(v-for="(d, index) in data")
@@ -142,7 +142,7 @@ export default {
       this.$refs.addKeyword
     );
     this.draggableElement.setPositionCenter()
-    
+
   },
   destroyed(){
     this.draggableElement && this.draggableElement.destroy();
@@ -319,9 +319,11 @@ h5:nth-child(1) {
   color: #888;
   text-align: center;
   line-height: 2.8rem;
-  float: right;
   width: 2.8rem;
   height: 2.8rem;
+  position: absolute;
+  top: 0;
+  right: 0;
   &:hover {
     background-color: rgba(0, 0, 0, 0.08);
     cursor: pointer;
@@ -338,28 +340,31 @@ h5:nth-child(1) {
   border-bottom: 1px solid #e5e5e5;
   line-height: 2.8rem;
   color: #000;
-  padding: 0;
+  padding: 0 2.8rem 0 0;
   cursor: all-scroll;
   height: 2.8rem;
-  position: relative;
   background-color: #f6f6f6;
   // padding-right: 2.8rem;
   border-radius: 6px 6px 0 0;
   user-select: none;
+  text-align: left;
+
 }
 .form-group {
   margin-bottom: 15px;
 }
 .modal-title {
   padding-left: 0.5rem;
-  float: left;
   cursor: move;
-  text-align: center;
   height: 2.8rem;
   color: #282c37;
   font-weight: 700;
   line-height: 2.8rem;
   // font-size: 1.3rem;
+  .quote-content {
+    position: absolute;
+    top: 0;
+  }
 }
 .p-l-05 {
   padding-left: 0.5rem !important;
