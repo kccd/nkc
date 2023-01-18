@@ -79,6 +79,7 @@ block baseColumnContent
               +thread
         else if article.status === 'unknown'
           -let reviewData = article
+          -let permissions = data.permissions;
           include ./article/module_review
           +thread
         else if article.status === 'deleted'
