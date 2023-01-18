@@ -1,7 +1,7 @@
 <template lang="pug">
   .modal-is-content
-    .modal-is-header(ref="draggableHandle")
-      .modal-is-title 图片选择
+    .modal-is-header
+      .modal-is-title(ref="draggableHandle") 图片选择
       .modal-is-close(@click="close")
         .fa.fa-remove
     .modal-is-body
@@ -41,7 +41,7 @@
     height: @height;
     background-color: #f6f6f6;
     position: relative;
-
+    padding-right: @height;
     .modal-is-title {
       cursor: move;
       height: @height;
@@ -151,11 +151,11 @@
           if(image.height > image.width){
             this.imgInfo.radio = image.width / image.height
             this.imgInfo.max = 'height'
-            this.imgInfo.value = image.height 
+            this.imgInfo.value = image.height
           }else if(image.height < image.width){
             this.imgInfo.radio = image.width / image.height
             this.imgInfo.max = 'width'
-            this.imgInfo.value = image.width 
+            this.imgInfo.value = image.width
             // 宽没占满高也未占满
           }else{
             this.imgInfo={}
@@ -166,7 +166,7 @@
           // 然后 根据比率 来缩小 scale
           this.rotateValue = e.detail.rotate
         }
-        
+
         });
         this.init = true;
       },
@@ -241,8 +241,8 @@
               this.rotateZoom(contaiorWidth, self.minContainerHeight)
             }else{
               this.rotateZoom(self.minContainerHeight, contaiorWidth)
-            } 
-            // 高占满 
+            }
+            // 高占满
           }else{
             const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
             if(nextImgWidthInCanvas > contaiorWidth){

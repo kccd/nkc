@@ -1,8 +1,8 @@
 <template lang="pug">
 div()
   .moduleForumSelectorApp(v-show="show" ref="selectForum")
-    .draggable-panel-header( ref="title")
-      .draggable-panel-title() 选择专业
+    .draggable-panel-header
+      .draggable-panel-title(ref="title") 选择专业
       .draggable-panel-right-button(@click='close')
         .fa.fa-remove
     .draggable-panel-body

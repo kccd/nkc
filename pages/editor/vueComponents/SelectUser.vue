@@ -2,9 +2,10 @@
   //- .modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ref="selectUser")
   //-   .modal-dialog(role="document" v-cloak)
   .modal-content(ref="selectUser" v-if="show")
-    .modal-header(ref="header")
-      span.fa.fa-remove(@click="close")
-      .modal-title.text-left 选择用户
+    .modal-header
+      .modal-title.text-left(ref="header") 选择用户
+      .modal-close(@click="close")
+        .fa.fa-remove
     .modal-body
       .selected-users
         h5 已选择用户({{selectedUsersId.length + '/' + userCount}})：
@@ -170,30 +171,26 @@ export default {
   width: 400px;
 }
 }
-.fa-remove{
-  width: 3rem;
-  height: 3rem;
-  text-align: center;
-  line-height: 3rem;
-  float: right;
-  color: #888;
-  &:hover{
-    background-color: rgba(0, 0, 0, 0.08);
-    cursor: pointer;
-  }
-}
 .modal-title{
   padding-left: 5px;
   height: 3rem;
   line-height: 3rem;
 }
-// .close{
-//   padding: 3px 9px;
-//   &:hover{
-//     background: red;
-//     cursor: pointer;
-//   }
-// }
+.modal-close{
+  cursor: pointer;
+  color: #aaa;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  &:hover{
+    background-color: rgba(0,0,0,0.08);
+    color: #777;
+  }
+}
 .text-left{
   text-align: left;
 }

@@ -1,7 +1,7 @@
 <template lang="pug">
   .emoji-selector
-    .emoji-header(ref="draggableHandle")
-      .emoji-title 表情选择
+    .emoji-header
+      .emoji-title(ref="draggableHandle") 表情选择
       .emoji-close(@click="close")
         .fa.fa-remove
     .emoji-form
@@ -57,6 +57,7 @@
       line-height: 3rem;
       background-color: #f6f6f6;
       position: relative;
+      padding-right: 3rem;
       .emoji-title{
         margin-left: 1rem;
         color: #666;

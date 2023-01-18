@@ -1,7 +1,7 @@
 <template lang="pug">
   .float-share-panel
-    .float-share-panel-header(ref="draggableHandle")
-      .float-share-panel-header-title {{panelTitle}}
+    .float-share-panel-header
+      .float-share-panel-header-title(ref="draggableHandle") {{panelTitle}}
       .float-share-panel-header-button(@click="close")
         .fa.fa-remove
     .float-share-panel-container(v-if="loading")

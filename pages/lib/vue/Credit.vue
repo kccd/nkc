@@ -1,7 +1,8 @@
 <template lang="pug">
   .nkc-credit(ref="content")
-    .nkc-credit-header(ref="creditHeader")
-      span {{headerTitle}}
+    .nkc-credit-header
+      .nkc-credit-title(ref="creditHeader")
+        span {{headerTitle}}
       .close-icon(type="button" @click="close")
         span.fa.fa-remove
     .nkc-credit-content(v-if="loading")
