@@ -26,10 +26,10 @@
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
           paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
-          .articles
-            label
+          label
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position 全选
+          .articles
             label(v-for="article in articles")
               input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
               div.content-position
@@ -73,8 +73,10 @@
   }
   .selector-core-body {
     padding-left: 1rem;
-    height: 400px;
-    overflow-y: auto;
+    .articles {
+      height: 400px;
+      overflow-y: auto;
+    }
     label {
       display: block;
       position: relative;
@@ -142,7 +144,6 @@ export default {
     paging: {},
     number: 0,
     loading: true,
-    allChecked: false,
     source: {
       'thread': '社区',
       'zone': '空间',
@@ -182,7 +183,7 @@ export default {
       const article = this.articles.find(item=>{
         return !this.selectedArticlesId.includes(item.tid)
       })
-      if(article){
+      if(this.articles.length === 0 || article){
         type = false;
       }
       return type;
@@ -211,7 +212,6 @@ export default {
             this.loading = false
             self.paging = res.data.paging;
             self.articles = res.data.articles;
-            this.allChecked = this.isAllChecked;
           }
         })
         .catch(err => {
@@ -229,8 +229,7 @@ export default {
       }
     },
     selectedAllArticlesFunc() {
-      if(!this.allChecked){
-        this.allChecked = true;
+      if(!this.isAllChecked){
         const set = new Set(this.selectedArticlesId);
         this.articles.forEach(item => {
           set.add(item.tid)
@@ -238,7 +237,6 @@ export default {
         })
         this.selectedArticlesId = [...set]
       } else {
-        this.allChecked = false;
         this.selectedArticlesId = this.selectedArticlesId.filter(item=>{
           return !this.articlesObj.articlesId.includes(item)
         })
