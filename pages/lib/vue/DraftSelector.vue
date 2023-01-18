@@ -1,7 +1,7 @@
 <template lang="pug">
   .draft-selector
-    .module-header(ref="draggableHandle")
-      .module-sd-title 草稿箱
+    .module-header
+      .module-sd-title(ref="draggableHandle") 草稿箱
       .module-sd-close.fa.fa-close(@click="close")
     .module-sd-body
       //-.module-content(v-if="loading")
@@ -42,6 +42,7 @@
       line-height: 3rem;
       background-color: #f6f6f6;
       position: relative;
+      padding-right: 3rem;
       .module-sd-title{
         margin-left: 1rem;
         color: #666;

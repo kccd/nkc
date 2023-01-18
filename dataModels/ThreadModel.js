@@ -1047,7 +1047,16 @@ threadSchema.statics.findThreadById = async (tid) => {
   if(!thread) throwErr(404, `未找到ID为【${tid}】的文章`);
   return thread;
 };
-
+/*
+  通过oc查找文章
+  @param oc: 文章oc
+*/
+threadSchema.statics.findThreadByOc = async (oc) => {
+  const ThreadModel = mongoose.model('threads');
+  const thread = await ThreadModel.findOne({oc});
+  if(!thread) throwErr(404, `未找到oc为【${oc}】的文章`);
+  return thread;
+};
 
 /**
  * -------
@@ -2480,9 +2489,12 @@ threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
   const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
   const ResourceModel = mongoose.model('resources');
   const {getUrl} = require('../nkcModules/tools');
-  const {tid, pid, columnId, cid, mcid} = columnPost;
+  // columnPost表放弃tid,使用pid加type
+  // columnPost的type=thread,pid对应oc
+  // const {tid, pid, columnId, cid, mcid} = columnPost;
+  const {pid, columnId, cid, mcid, type} = columnPost;
   // thread 中 包括需要的 回复数 观看数
-  let thread = await ThreadModel.findThreadById(tid);
+  let thread = await ThreadModel.findThreadByOc(pid);
   thread = thread.toObject()
   // 文章主体内容
   let post = await PostModel.getPostByPid(pid)
@@ -2491,13 +2503,13 @@ threadSchema.statics.getThreadInfoByColumn = async function(columnPost) {
   let user = await UserModel.findOne({uid: post.uid})
   user = user.toObject()
   // 收藏数
-  let collect = await ThreadModel.getCollectedCountByTid(tid)
+  let collect = await ThreadModel.getCollectedCountByTid(thread.tid)
   //获取专栏名和id
   let column = await ColumnModel.findOne({_id: columnId})
   column = column.toObject()
   // 获取当前专栏下一篇文章的分类及其父级
   const mainCategory = await ColumnPostCategoryModel.getParentCategoryByIds(cid)
-  const auxiliaryCategory = await ColumnPostCategoryModel.getMinorCategories(columnId, mcid)
+  const auxiliaryCategory = await ColumnPostCategoryModel.getArticleAllMinorCategories(mcid)
   //获取文章的链接
   const url = getUrl('thread', thread.tid);
   //获取引用的所有资源

@@ -292,6 +292,7 @@ schema.statics.getCategories = async function(tcId,source){
   })
 
   return {
+    allCategories: categories,
     categoriesTree,
     categoryList: _categoryList.map(item=>{
       return {

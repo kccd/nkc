@@ -2,7 +2,8 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {db} = ctx;
+    const {db, data,query} = ctx;
+    data.toUrl = query.toUrl;
     const safeSettings = await db.SettingModel.getSettings("safe");
     if(!safeSettings.experimentalVerifyPassword) return ctx.redirect('/e');
     ctx.template = "experimental/login/login.pug";

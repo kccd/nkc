@@ -15,6 +15,23 @@ module.exports = {
       drawer: {
         GET: 'api_get_account_drawer'
       }
+    },
+    threads: {
+      selector: {
+        GET: 'getUserArticles'
+      }
+    },
+    articles: {
+      selector: {
+        GET: 'getUserArticles'
+      }
+    },
+    column: {
+      PARAMETER: {
+        'articles': {
+          POST: 'columnManage'
+        }
+      }
     }
   }
 }

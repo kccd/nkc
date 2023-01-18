@@ -5,9 +5,14 @@ block settingsContent
   #data.hidden=objToStr({column: data.column})
   #app(v-cloak)
     .row
+      article-selector-dialog(
+        ref="articleSelectorDialog"
+      )
       .col-xs-12.col-md-12
         h3 文章管理
         hr
+        a.btn.btn-primary.btn-sm.m-b-05(href='/creation/editor/column' target="_blank") 发表文章
+        button.btn.btn-default.btn-sm.m-b-05(@click="openSelector()") 添加已有文章
       .col-xs-12.col-md-3.m-b-2
         ul.nav.nav-tabs
         .column-settings-post-categories
@@ -72,6 +77,7 @@ block settingsContent
                   span(v-if='p.minorCategories.length === 0') 无
                   span(v-else v-for="c in p.minorCategories") {{c.name}}&nbsp;
               b.text-danger(v-if="(p.thread && p.thread.disabled) || (p.article && p.article.status === 'disabled')") 文章已屏蔽，仅后台可见
+              b.text-danger(v-else-if="p.article && p.article.status === 'deleted'") 文章已删除，仅后台可见
               b.text-danger(v-else-if="p.post && p.post.disabled") 回复已屏蔽，仅后台可见
               b.text-danger(v-else-if="(p.thread && p.thread.recycleMark) || (p.article && p.article.status === 'faulty')") 文章已退修，仅后台可见
               b.text-danger(v-else-if="p.post && p.post.toDraft") 回复已退修，仅后台可见

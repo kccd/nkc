@@ -24,8 +24,8 @@
         a.button.radius-right(@click="fastSelectPage") 确定
   .sticker-selector
     input.hidden(ref='imageInput' @change="selectedLocalFile" type="file" accept="image/gif,image/png,image/jpeg" multiple="multiple")
-    .module-ss-header(ref="draggableHandle")
-      .module-ss-title 插入表情
+    .module-ss-header
+      .module-ss-title(ref="draggableHandle") 插入表情
       .module-ss-close(@click="close")
         .fa.fa-remove
     .module-ss-body
@@ -67,7 +67,7 @@
             .mask(v-else-if = 's.state === "inProcess"')
               span 处理中...
             .mask(v-else-if='s.state === "useless"')
-              span 处理失败   
+              span 处理失败
             .mask(v-else)
               span 加载中...
           .share-warning(v-if="type === 'share'")
@@ -92,6 +92,7 @@
       height: @height;
       background-color: #f6f6f6;
       position: relative;
+      padding-right: 3rem;
       .module-ss-title{
         cursor: move;
         height: @height;
@@ -282,7 +283,8 @@
   import {screenTopWarning} from "../js/topAlert";
   import { getSocket } from "../js/socket";
   import { debounce } from "../js/execution";
-
+  import {getState} from "../js/state";
+  const {fileDomain} = getState();
   const socket = getSocket();
   export default {
     data: () => ({
@@ -421,7 +423,11 @@
             if(self.share) {
               formData.append("share", "true");
             }
-            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+            let url = '/r';
+            if(fileDomain) {
+              url = fileDomain + url;
+            }
+            return nkcUploadFile(url, "POST", formData, function(e, progress) {
               sticker.progress = progress;
             });
           })

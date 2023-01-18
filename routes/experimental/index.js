@@ -11,13 +11,14 @@ const experimentalRouter = new Router();
 experimentalRouter
   .use("/", async (ctx, next) => {
     const {data, path, db} = ctx;
+    const toUrl = ctx.request.url;
     if(path === "/e/login") return await next();
     if(!data.user) return ctx.redirect("/login");
     const experimentalSettings = await db.SettingModel.findById('safe');
     const {experimentalVerifyPassword, experimentalTimeout, experimentalPassword} = experimentalSettings.c;
     if(experimentalVerifyPassword) {
       const experimental = ctx.getCookie("experimental");
-      if(!experimental) return ctx.redirect("/e/login");
+      if(!experimental) return ctx.redirect(`/e/login?toUrl=${toUrl}`);
       const {uid, p, secret, time} = experimental;
       const up = await db.UsersPersonalModel.findOne({uid: data.user.uid, secret: p});
       if(
@@ -26,7 +27,7 @@ experimentalRouter
         !up ||
         Date.now() - time > experimentalTimeout*60*1000
       ) {
-        return ctx.redirect("/e/login");
+        return ctx.redirect(`/e/login?toUrl=${toUrl}`);
       }
       ctx.setCookie("experimental", {
         uid,

@@ -8,7 +8,6 @@ const PATH = require("path");
 const fs = require("fs");
 const statics = require("../settings/statics");
 const destroy = require("destroy");
-const {getUrl} = require("../nkcModules/tools");
 const fsPromise = fs.promises;
 
 const settingSchema = new Schema({
@@ -981,6 +980,7 @@ settingSchema.statics.getManagementData = async (user) => {
   const DocumentModel = mongoose.model('documents');
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model('problems');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   const results = [];
 
   if(await user.hasPermission('nkcManagement')) {
@@ -999,6 +999,19 @@ settingSchema.statics.getManagementData = async (user) => {
       icon: 'i-server',
       webIcon: 'fa-cogs',
       count: 0
+    });
+    const count = await UsersPersonalModel.countDocuments({
+      $or: [
+        {"authenticate.card.status": "in_review"},
+        {"authenticate.video.status": "in_review"}
+      ]
+    });
+    results.push({
+      name: '身份认证',
+      url: '/e/auth',
+      icon: 'i-server',
+      webIcon: 'fa-cogs',
+      count: count
     });
   }
   if(await user.hasPermission('review')) {
