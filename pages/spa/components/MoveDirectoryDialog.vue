@@ -1,7 +1,7 @@
 <template lang="pug">
 .module-dialog-body
-  .module-dialog-header(ref="draggableHandle")
-    .module-dialog-title {{ title }}
+  .module-dialog-header
+    .module-dialog-title(ref="draggableHandle") {{ title }}
     .module-dialog-close(@click="close")
       .fa.fa-remove
   .module-dialog-content
@@ -71,7 +71,7 @@ export default {
       }else{
         this.$set(data, "isOpen", status);
       }
-      
+
       // this.openMenuIndex = childIndex;
     });
     EventBus.$on("moveDirectory", async (msg, childIndex, type = "move", callBack) => {
@@ -102,7 +102,7 @@ export default {
             isOPen(1);
           }
           this.moveIndex = childIndex;
-          //发布需要带上所有子元素进行更新  
+          //发布需要带上所有子元素进行更新
           //如果不进行处理需要在点击编辑时把数据传递 tree》 editor》moveDialog
           if (type === "publish") {
             // console.log(msg)
@@ -438,6 +438,7 @@ export default {
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
+    padding-right: 3rem;
     .module-dialog-close {
       cursor: pointer;
       color: #aaa;

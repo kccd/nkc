@@ -1,8 +1,8 @@
 <template lang="pug">
   .module-dialog-body
-    .module-dialog-header(ref="draggableHandle")
-      .module-dialog-title(v-if="edit") {{!type._id?"新建分类":"编辑分类"}}
-      .module-dialog-title(v-else) 选择分类
+    .module-dialog-header
+      .module-dialog-title(ref="draggableHandle" v-if="edit") {{!type._id?"新建分类":"编辑分类"}}
+      .module-dialog-title(ref="draggableHandle" v-else) 选择分类
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
@@ -65,6 +65,7 @@
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
+    padding-right: 3rem;
     .module-dialog-close{
       cursor: pointer;
       color: #aaa;

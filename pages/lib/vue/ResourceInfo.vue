@@ -1,9 +1,9 @@
 <template lang="pug">
   .module-dialog-body
     download-panel(ref="downloadPanel")
-    .module-dialog-header(ref="draggableHandle")
-      .module-dialog-title(v-if="!resource.type || resource.type === 'file'") 文件详情
-      .module-dialog-title(v-else) 文件夹详情
+    .module-dialog-header
+      .module-dialog-title(ref="draggableHandle" v-if="!resource.type || resource.type === 'file'") 文件详情
+      .module-dialog-title(ref="draggableHandle" v-else) 文件夹详情
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content(v-if="loading").text-center
@@ -60,7 +60,7 @@
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
-
+    padding-right: 3rem;
     .module-dialog-close {
       cursor: pointer;
       color: #aaa;
