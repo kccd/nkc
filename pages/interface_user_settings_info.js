@@ -44,9 +44,9 @@ function selectAvatar() {
       .then(function() {
         formData.append("file", data, Date.now() + '.png');
         let url = '/avatar/' + user.uid;
-        if(fileDomain) {
+        /*if(fileDomain) {
           url = fileDomain + url;
-        }
+        }*/
         return uploadFilePromise(url, formData, function(e, percentage) {
           $(".upload-info").text('上传中...' + percentage);
           if(e.total === e.loaded) {
@@ -76,9 +76,9 @@ function selectBanner() {
     var formData = new FormData();
     formData.append("file", data, Date.now() + '.png');
     let url = '/banner/' + user.uid;
-    if(fileDomain) {
+    /*if(fileDomain) {
       url = fileDomain + url;
-    }
+    }*/
     uploadFilePromise(url, formData, function (e, percentage) {
       $(".upload-info-banner").text('上传中...' + percentage);
       if (e.total === e.loaded) {

@@ -1173,9 +1173,9 @@ export default {
             formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
             formData.append('cid', self.resourceCategories);
             let url = '/r';
-            if(fileDomain) {
+            /*if(fileDomain) {
               url = fileDomain + url;
-            }
+            }*/
             return nkcUploadFile(url, "POST", formData, function(e, progress) {
               f.progress = progress;
             }, 60 * 60 * 1000);
