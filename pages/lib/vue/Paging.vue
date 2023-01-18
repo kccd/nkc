@@ -29,6 +29,8 @@
       &.null{
         color: #555;
         padding: 0 0.2rem;
+        margin-top: 0;
+        margin-bottom: 0;
       }
       &.common{
         background-color: @darkGray;

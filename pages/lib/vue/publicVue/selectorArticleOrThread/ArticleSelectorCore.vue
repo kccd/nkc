@@ -39,9 +39,9 @@
                   span {{article.c}}
         .selector-core-body(v-else)
           .articles
-            label(v-for="article in getSelectedArticles")
-              input(type='checkbox' :value='article.tid' v-model='selectedArticlesId' @click="selectedArticlesFunc(article)")
-              div.content-position
+            label(v-for="(article, index) in getSelectedArticles")
+              button.btn.btn-xs.btn-default(@click="removeFromArr(selectedArticlesId, index)") 删除
+              div.content-position.selected-content-position
                 a.title(:href="article.url" target="_blank") {{article.t}}
                 div.content
                   span.source {{source[article.source]}}
@@ -86,6 +86,12 @@
       input {
         position: absolute;
       }
+      button {
+        position: absolute;
+        top: 0.6rem;
+        left: 0;
+        cursor: pointer;
+      }
     }
     .content-position {
       position: relative;
@@ -111,6 +117,9 @@
         }
         .hideText(@line: 1);
       }
+    }
+    .selected-content-position{
+      padding-left: 4rem;
     }
   }
 }
@@ -196,6 +205,9 @@ export default {
     getNumber() {
       this.number += 1;
       return this.number;
+    },
+    removeFromArr(arr, index) {
+      arr.splice(index, 1);
     },
     getUserArticles(page) {
       const self= this;
