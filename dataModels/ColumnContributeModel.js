@@ -108,6 +108,7 @@ schema.statics.extendColumnContributes = async (contributes) => {
   const UserModel = mongoose.model("users");
   const ThreadModel = mongoose.model("threads");
   const ArticleModel = mongoose.model("articles");
+  const DocumentModel = mongoose.model("documents");
   const tools = require("../nkcModules/tools");
   const nkcRender = require('../nkcModules/nkcRender');
   const uid = new Set(), thread_tid = new Set(), article_tid = new Set();
@@ -176,6 +177,8 @@ schema.statics.extendColumnContributes = async (contributes) => {
     });
   }
   if(article_tid && article_tid.size > 0){
+    const documentSources = await DocumentModel.getDocumentSources();
+    const documentTypes = await DocumentModel.getDocumentTypes();
     const articles = await ArticleModel.aggregate([
       {
         $match : {
@@ -202,8 +205,8 @@ schema.statics.extendColumnContributes = async (contributes) => {
                     { $and:
                         [
                           { $eq: [ "$did",  "$$did" ] },
-                          { $eq: [ "$source", "article" ] },
-                          { $eq: [ "$type", "stable" ] },
+                          { $eq: [ "$source", documentSources.article ] },
+                          { $eq: [ "$type", documentTypes.stable ] },
                         ]
                     }
 
