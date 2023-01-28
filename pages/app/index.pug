@@ -12,7 +12,7 @@ html(lang='zh-CN')
   body
     mixin logo
       div.logo-bottom
-        img(src=(state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico'))
+        img(src=(remoteState.logoICO? remoteState.logoICO : '/favicon.ico'))
         span= state.serverSettings.websiteName
     .container#app(v-cloak)
       .row(v-if='toBrowser')
