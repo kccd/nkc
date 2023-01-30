@@ -7,8 +7,11 @@
         .fa.fa-newspaper-o
         span 查看详情
       a.option(v-if="options.delete" @click="deleteMoment")
-        .fa.fa-edit
+        .fa.fa-remove
         span 删除
+      a.option(v-if="options.disable" @click="disableMoment")
+        .fa.fa-remove
+        span 屏蔽
       .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
         .fa.fa-check-circle-o
         span 通过审核
@@ -299,6 +302,25 @@ export default {
       sweetQuestion("删除后不可恢复，确定要删除吗？")
         .then(() => {
           nkcAPI(`/moment/${_id}`, 'DELETE', {
+          })
+            .then(() => {
+              sweetSuccess('操作成功');
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        })
+    },
+    disableMoment(){
+      const {momentId, momentCommentId} = this.moment;
+      let _id = momentCommentId || '';
+      if(!_id) {
+        _id = momentId;
+      }
+      if(!_id) return;
+      sweetQuestion("确定要屏蔽吗？")
+        .then(() => {
+          nkcAPI(`/moment/${_id}/disable`, 'POST',{
           })
             .then(() => {
               sweetSuccess('操作成功');

@@ -30,14 +30,16 @@ router
       reviewed: null,
       violation: null,
       blacklist: null,
+      disable: null,
+      delete: null,
     };
     if(user) {
       //审核权限
       if(permission('review')) {
         optionStatus.reviewed = moment.status;
-        if(moment.status !== deleted) optionStatus.delete = true;
+        if(moment.status === 'normal') optionStatus.disable = true;
       }
-      if(isAuthor && moment.status !== deleted) {
+      if(!optionStatus.disable && isAuthor && moment.status !== deleted) {
         optionStatus.delete = true;
       }
 

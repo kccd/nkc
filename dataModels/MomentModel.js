@@ -452,7 +452,17 @@ schema.methods.deleteMoment = async function() {
   const document = await DocumentModel.findOnly({did, type: stable});
   await document.setStatus(this.status);
 };
-
+/*
+* 标记当前动态为已屏蔽
+* */
+schema.methods.disableMoment = async function() {
+  this.status = momentStatus.disabled;
+  const DocumentModel = mongoose.model('documents');
+  const {stable} = await DocumentModel.getDocumentTypes();
+  const {did} = this;
+  const document = await DocumentModel.findOnly({did, type: stable});
+  await document.setStatus(this.status);
+};
 /*
 * 恢复动态
 * */
