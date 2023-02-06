@@ -75,9 +75,9 @@ const schema = new Schema({
 * @author pengxiguaa 2019-6-3
 * */
 //type, post, user, reason, document  ----之前的数据
-schema.statics.newReview = async (type,sid,uid,reason,handlerId,source, ) => {
+schema.statics.newReview = async ({type,sid,uid,reason,handlerId,source}) => {
   if(source==='docId'){
-    sid = Number(sid)
+    sid = sid.toString()
   }
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
@@ -263,7 +263,13 @@ schema.statics.autoPushToReview = async function(post) {
     }
     // 2. 黑名单
     if(blacklistUid.includes(uid)) {
-      await ReviewModel.newReview("blacklist", post, user, "黑名单中的用户");
+      await ReviewModel.newReview({
+        type:'blacklist',
+        sid:post.pid,
+        uid:post.uid,
+        reason:'黑名单中的用户',
+        handlerId:user.uid,
+      });
       return true
     }
 

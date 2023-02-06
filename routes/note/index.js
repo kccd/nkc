@@ -176,9 +176,15 @@ router
     await noteContent.save();   //保存笔记内容
     //出现了敏感词，就创建审核记录
     if(appear){
-      const {_id,uid}=noteContent
-      const  source = 'noteId'
-      db.ReviewModel.newReview('sensitiveWord',_id,uid,'出现了敏感词',null,source)
+      db.ReviewModel.newReview(
+        {
+          type:'sensitiveWord',
+          sid:noteContent._id,
+          uid:noteContent.uid,
+          reason:'出现了敏感词',
+          handlerId:'',
+          source:'note'
+        })
     }
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContent.edit = false;
