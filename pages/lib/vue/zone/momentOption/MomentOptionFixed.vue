@@ -7,10 +7,10 @@
         .fa.fa-newspaper-o
         span 查看详情
       a.option(@click="deleteMoment")
-        .fa.fa-remove
+        .fa.fa-trash
         span 删除
       a.option(v-if="options.disable" @click="disableMoment")
-        .fa.fa-remove
+        .fa.fa-ban
         span 屏蔽
       .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
         .fa.fa-check-circle-o
