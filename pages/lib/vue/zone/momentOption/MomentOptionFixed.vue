@@ -6,7 +6,7 @@
       a.option(v-if="moment.url" @click="toMoment(moment.url)" target="_blank")
         .fa.fa-newspaper-o
         span 查看详情
-      a.option(@click="deleteMoment")
+      a.option(v-if="options.delete" @click="deleteMoment")
         .fa.fa-trash
         span 删除
       a.option(v-if="options.disable" @click="disableMoment")

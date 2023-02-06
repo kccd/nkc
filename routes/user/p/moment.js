@@ -9,6 +9,7 @@ module.exports = async (ctx, next) => {
       normal: normalMoment,
       faulty: faultyMoment,
       unknown: unknownMoment,
+      disabled: disabledMoment,
     } = await db.MomentModel.getMomentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     //获取用户动态列表
@@ -33,6 +34,7 @@ module.exports = async (ctx, next) => {
               normalMoment,
               faultyMoment,
               unknownMoment,
+              disabledMoment,
             ]
           }
         }

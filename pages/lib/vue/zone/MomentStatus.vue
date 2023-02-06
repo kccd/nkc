@@ -13,8 +13,10 @@
       .review 内容审核中
   .moment-status(v-else-if="moment && moment.status === 'deleted'")
     .deleted 内容已被删除
+  .moment-status(v-else-if="moment && moment.status === 'disabled'")
+    .disabled 内容已被屏蔽
   .moment-status(v-else-if="moment && moment.status === 'faulty'")
-    .deleted 内容已被屏蔽
+    .faulty 内容已被退回修改
 </template>
 
 <style lang="less">
@@ -22,14 +24,15 @@
 .moment-status {
   text-align: center;
   font-style: oblique;
+  color: #ffffff;
   .review {
     color: red;
   }
-  .deleted {
-    background: #bdbdbd;
+  .faulty {
+    background: #FFBC42;
   }
-  .deleted {
-    background: #e29d9d;
+  .disabled {
+    background: #8f8f8f;
   }
 }
 </style>
@@ -42,6 +45,7 @@ export default {
   data: () => ({
   }),
   mounted() {
+    console.log(this.moment);
   },
   methods: {
     //动态审核通过
