@@ -74,17 +74,16 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-//type,uid,handlerId,source,sid,reason
-schema.statics.newReview = async (type, post, user, reason, document,source) => {
+//type, post, user, reason, document  ----之前的数据
+schema.statics.newReview = async (type,sid,uid,reason,handlerId,source, ) => {
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
+    sid,
+    uid,
     reason,
-    docId: document?document._id:'',
-    pid: post?post.pid:'',
-    tid: post?post.tid:'',
-    uid: post?post.uid:document.uid,
-    handlerId: user.uid
+    handlerId,
+    source,
   }).save();
 };
 
