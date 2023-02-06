@@ -140,7 +140,7 @@ router
 		// fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
 		if(userScore < num) ctx.throw(400, `你的${creditScore.name}不足`);
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
-    if(description.length > 60) ctx.throw(400, '理由不能超过60个字符');
+    if(description.length > 500) ctx.throw(400, '理由不能超过500个字');
     const record = await db.KcbsRecordModel.insertUsersRecord({
       fromUser,
       toUser,
