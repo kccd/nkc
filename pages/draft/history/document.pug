@@ -26,7 +26,7 @@ block content
               .post-list-paging
                 for page, i in data.paging.buttonValue
                   a(
-                    href=`/draft/history?source=${data.urlComponent.source}&did=${data.urlComponent.did}&page=${i}`
+                    href=`/draft/history?source=${data.urlComponent.source}&desTypeId=${data.urlComponent.did}&page=${i}`
                   )=`${page.type === 'null' ? '...' : page.num+1}`
         //- 内容
         .col-xs-12.col-md-9.book-content-container.m-b-1
