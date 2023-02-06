@@ -1301,6 +1301,7 @@ function insertRenderedPost(renderedPost) {
   NKC.methods.replaceNKCUrl();
 	// 划词笔记
   const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${renderedPost.postId}"]`);
+
   for(let i = 0; i < elements.length; i++) {
     const element = elements[i];
     nkchl.push(new NKC.modules.NKCHL({

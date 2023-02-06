@@ -65,12 +65,13 @@ router
     const {noteContent} = data;
     const {checkString} = nkcModules.checkData;
     const {content} = body;
+    const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
       maxLength: 1000
     });
-    await noteContent.cloneAndUpdateContent(content);
+    const test = await noteContent.cloneAndUpdateContent(content);
     noteContent.content = content;
     const nc = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContentHTML = nc.html;
@@ -88,16 +89,25 @@ router
     // 选区存在：存储笔记内容
     const {db, body, data, nkcModules} = ctx;
     const {checkString, checkNumber} = nkcModules.checkData;
-    const {_id, targetId, content, type, node} = body;
+    const {_id, targetId, content, type, node,} = body;
     const {user} = data;
+    const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
       maxLength: 1000
     });
-
+    //检测是否开启笔记敏感词检测
+    let appear =false; //是否出现了敏感词
+    if(enabled){
+      const {keyWordGroup}= await db.SettingModel.getSettings('note')//笔记勾选敏感词组id
+      const  result= await  db.ReviewModel.matchKeywordsByGroupsId(content,keyWordGroup)//敏感词检测
+      if(result.length!==0){
+         appear =true
+      }
+    }
+    
     let cv = null;
-
     if(type === "post") {
       const post = await db.PostModel.findOnly({pid: targetId}, {cv: 1});
       cv = post.cv;
@@ -106,11 +116,9 @@ router
     } else {
       ctx.throw(400, "未知划词类型");
     }
-
     const time = Date.now();
 
     let note;
-
     if(_id) {
       note = await db.NoteModel.findOne({_id});
       if(!note) ctx.throw(400, `笔记ID错误，请重试。id:${_id}`);
@@ -154,17 +162,24 @@ router
       });
       await note.save();
     }
-
-    const noteContent = await db.NoteContentModel({
+    const obj = {
       _id: await db.SettingModel.operateSystemID("noteContent", 1),
       toc: time,
       uid: user.uid,
       content,
       type,
       targetId,
-      noteId: note.originId
-    });
-    await noteContent.save();
+      noteId: note.originId,
+      status: appear ? 'unknown':'normal'
+    }
+    const noteContent = await db.NoteContentModel(obj);
+    await noteContent.save();   //保存笔记内容
+    //出现了敏感词，就创建审核记录
+    if(appear){
+      
+       //type,uid,handlerId,source,sid,reason
+    }
+    
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContent.edit = false;
     const options = {};

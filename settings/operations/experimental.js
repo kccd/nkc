@@ -5,6 +5,10 @@ module.exports = {
     POST: "experimentalLogin"
   },
 	settings: {
+		note: {
+			GET: 'visitNoteManagementSettings',
+			PUT: 'submitNoteManagementSettings',
+		},
     threadCategory: {
       GET: 'experimentalThreadCategorySettings',
       POST: 'experimentalThreadCategorySettings',

@@ -73,6 +73,7 @@ module.exports = async (ctx, next) => {
       });
     }
   }
+  
   //获取当前用户对动态的审核权限
   const permissions = {
     reviewed: null,

@@ -15,7 +15,6 @@ function isIncludes(arr, id, type) {
   }
   return false;
 }
-
 threadRouter
   .use('/', async (ctx, next) => {
     const {db, state, data} = ctx;
@@ -1462,6 +1461,7 @@ threadRouter
 	})
 	.post('/:tid', async (ctx, next) => {
     // 社区文章发表评论
+    
 		const {
 			data, nkcModules, params, db, body, state, address: ip
 		} = ctx;

@@ -396,11 +396,13 @@ schema.statics.createMomentComment = async (props) => {
 *   @param {[String]} resourcesId 资源 ID 组成的数组
 * */
 schema.methods.modifyMoment = async function(props) {
+
   const {content, resourcesId} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const time = new Date();
   const newResourcesId = await MomentModel.replaceMomentResourcesId(resourcesId);
+
   await DocumentModel.updateDocumentByDid(this.did, {
     content,
     tlm: time,
@@ -702,6 +704,7 @@ schema.methods.checkBeforePublishing = async function() {
 * 发布当前动态或评论
 * */
 schema.methods.publish = async function() {
+
   const DocumentModel = mongoose.model('documents');
   await this.checkBeforePublishing();
   const time = new Date();

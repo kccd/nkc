@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
+   
     const {query, db, data, state, nkcModules, permission} = ctx;
     const {user} = data;
     const {from, page, mid} = query;

@@ -11,11 +11,19 @@ const schema = new Schema({
     index: 1
   },
   // 当审核对象为 document 时，此字段为 document innerId
+  // 当审核对象为 note时,此字段为note innerId
   docId: {
     type: Number,
     default: null,
     index: 1
   },
+  // doc,note
+  // source:{
+  //   type: string,
+  //   default: null,
+  //   index: 1
+  // },
+  
   pid: {
     type: String,
     default: "",
@@ -45,6 +53,16 @@ const schema = new Schema({
     default: '',
     index: 1
   },
+  source:{
+    type:String,
+    default:'',
+    index:1
+  },
+  sid:{
+    type: String,
+    default: null,
+    index: 1
+  },
 
 },{
   collection: "reviews"
@@ -56,7 +74,8 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-schema.statics.newReview = async (type, post, user, reason, document) => {
+//type,uid,handlerId,source,sid,reason
+schema.statics.newReview = async (type, post, user, reason, document,source) => {
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
@@ -151,6 +170,7 @@ schema.statics.matchKeywords = async (content, groups) => {
     const hitWordsCount = contentFilterValue.words.length;
     // 总命中次数
     let hitCount = 0;
+    
     contentFilterValue.words.forEach(word => {
       hitCount += (content.match(new RegExp(word, "g")) || []).length;
     });
@@ -163,7 +183,9 @@ schema.statics.matchKeywords = async (content, groups) => {
         results = results.concat(matchedKeywords);
       }
     }
+    
   }
+ 
   return [...new Set(results)];
 }
 // 文章内容是否触发了敏感词送审条件

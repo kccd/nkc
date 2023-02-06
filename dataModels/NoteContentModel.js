@@ -55,6 +55,11 @@ const schema = new Schema({
     type: Date,
     default: null,
     index: 1
+  },
+  status:{
+    type: String,
+    default: 'normal',
+    index: 1
   }
 }, {
   collection: "noteContent"

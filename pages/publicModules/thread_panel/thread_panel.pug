@@ -1,14 +1,13 @@
 include ../../publicModules/mixin
 -const aTarget = threadPanelATarget || '_self';
 if data.singleThread
-  -thread = data.singleThread;
+    -thread = data.singleThread;
 mixin threadCover(klass)
   if (thread.firstPost && thread.firstPost.cover) || (thread.document && thread.document.cover)
     .thread-panel-cover-big.hidden-xs.hidden-sm(class=klass)
       .thread-panel-image(
         style=`background-image: url(${tools.getUrl('postCover', (thread.firstPost?thread.firstPost.cover:'' || thread.document?thread.document.cover:''))})`
       )
-
 mixin minThreadCover(klass)
   if (thread.firstPost && thread.firstPost.cover) || (thread.document && thread.document.cover)
     .thread-panel-cover.hidden-md.hidden-lg(class=klass)

@@ -53,6 +53,7 @@ const fundRouter = require('./fund');
 const complaintRouter = require('./complaint');
 const documentPostRouter = require('./documentPost');
 const oauth = require('./oauth');
+const noteRouter = require('./note');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -113,4 +114,5 @@ settingRouter
   .use('/threadCategory', threadCategoryRouter.routes(), threadCategoryRouter.allowedMethods())
   .use('/documentPost', documentPostRouter.routes(), documentPostRouter.allowedMethods())
 	.use('/oauth', oauth.routes(), oauth.allowedMethods())
+	.use('/note',noteRouter .routes(),noteRouter .allowedMethods())
 module.exports = settingRouter;

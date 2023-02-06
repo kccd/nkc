@@ -16,7 +16,8 @@ const settingSchema = new Schema({
   c: {
     type: Schema.Types.Mixed,
     default: {}
-  }
+  },
+  
 },
 {toObject: {
   getters: true,
