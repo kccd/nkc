@@ -76,6 +76,9 @@ const schema = new Schema({
 * */
 //type, post, user, reason, document  ----之前的数据
 schema.statics.newReview = async (type,sid,uid,reason,handlerId,source, ) => {
+  if(source==='docId'){
+    sid = Number(sid)
+  }
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
