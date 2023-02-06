@@ -37,9 +37,9 @@ router
       //审核权限
       if(permission('review')) {
         optionStatus.reviewed = moment.status;
-        if(moment.status === 'normal') optionStatus.disable = true;
+        optionStatus.disable = true;
       }
-      if(!optionStatus.disable && isAuthor && moment.status !== deleted) {
+      if(isAuthor && moment.status !== deleted) {
         optionStatus.delete = true;
       }
 

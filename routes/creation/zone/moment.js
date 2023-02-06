@@ -37,7 +37,7 @@ router
     const match = {
       uid: state.uid,
       parent: '',
-      status: normalStatus,
+      status: {$ne: "deleted"},
       quoteType: {
         $in: [
           '',

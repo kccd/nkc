@@ -57,7 +57,7 @@ export default {
       const self = this;
       self.$refs.disabledPost.open(function(data) {
         const body = {
-          postsId: pid,
+          postsId: [pid],
           reason: data.reason,
           remindUser: data.remindUser,
           violation: data.violation
