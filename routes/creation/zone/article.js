@@ -11,11 +11,11 @@ router
     } = ctx;
     const {page = 0} = query;
     const {zone: zoneSource} = await db.ArticleModel.getArticleSources();
-    const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+    // const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
     const match = {
       uid: state.uid,
       source: zoneSource,
-      status: normalStatus
+      status: {$ne:"deleted"}
     };
     const count = await db.ArticleModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);

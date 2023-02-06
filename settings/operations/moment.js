@@ -5,6 +5,9 @@ module.exports = {
     recovery: {
      POST: 'managementMoment'
     },
+    disable: {
+      POST: 'managementMoment'
+    },
     options: {
       GET: "getMomentOption"
     },

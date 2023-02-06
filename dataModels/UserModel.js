@@ -858,6 +858,7 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function() {
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
   const ColumnPostModel = mongoose.model('columnPosts');
+  await this.updateUserMessage()
   const {zone: zoneSource} = await ArticleModel.getArticleSources();
   const {normal, disabled} = await ArticleModel.getArticleStatus();
   const momentStatus = await MomentModel.getMomentStatus();

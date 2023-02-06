@@ -94,11 +94,9 @@ router
   const user = await db.UserModel.findOnly({uid: data.document.uid});
   const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
   data.user = {...user.toObject(), avatarUrl};
-  if(data.document.origin !== 0){
-    const originDesc = nkcModules.apiFunction.getOriginLevel(data.document.origin);
-    data.document = {...data.document.toObject(), originDesc};
-  }else {
-    data.document = data.document.toObject();
+  if(data.document.originState !== 0){
+    const originDesc = nkcModules.apiFunction.getOriginLevel(data.document.originState);
+    data.document.originDesc = originDesc;
   }
   await next()
 })
@@ -162,6 +160,14 @@ router
   });
   // let editorUrl = {_id: data.document._id}
   data.urlComponent = {_id: data.document._id, source, did: data.document.did, page, desTypeId};
+  // 查询文章作者
+  const user = await db.UserModel.findOnly({uid: data.document.uid});
+  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+  data.user = {...user.toObject(), avatarUrl};
+  if(data.document.originState !== 0){
+    const originDesc = nkcModules.apiFunction.getOriginLevel(data.document.originState);
+    data.document.originDesc = originDesc;
+  }
   await next()
 })
 .post('/history/:_id/edit', async (ctx, next)=>{

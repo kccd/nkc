@@ -46,6 +46,7 @@ router
         status: momentStatus.normal
       }
     ];
+    // 当前人物自己的动态
     if(state.uid) {
       $or.push({
         uid: state.uid,

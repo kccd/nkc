@@ -16,7 +16,7 @@
       .checkbox(v-if="managementBtn" )
         label
           input(type="checkbox" :value="post.pid" v-model="checkboxPosts")
-      single-post(ref="singlePost" :post="post")
+      single-post(ref="singlePost" :post="post" :type="type")
 </template>
 <style lang="less" scoped>
 @import "../../../publicModules/base";
@@ -45,7 +45,7 @@ import Blank from "../../../spa/components/Blank";
 import {nkcAPI} from "../../js/netAPI";
 import SinglePost from "../publicVue/postModel/SinglePost";
 export default {
-  props: ['posts', 'permissions'],
+  props: ['posts', 'permissions','type'],
   data: () => ({
     managementBtn: false,
     checkboxPosts: [],

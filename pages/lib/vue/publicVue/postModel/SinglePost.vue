@@ -19,7 +19,7 @@
       .post-cover-img(:style="`background-image: url('${getUrl('postCover', post.cover)}')`")
     .post-content
       a(:href="post.link").single-post-content {{post.abstract || post.content}}
-  .operations
+  .operations(v-if="type === 'creation'" )
     .single-post-bottom-item(
       data-global-click='showSharePanel'
       :data-global-data="objToStr({type: post.editType, id: getShareId})"
@@ -124,6 +124,10 @@ export default {
       type: Object,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    }
   },
   data: () => ({
   }),
