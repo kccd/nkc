@@ -75,7 +75,16 @@ router
         });
         await delLog.save();
         // 如果文章之前未审核 则生成审核记录
-        if(!thread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, reason);
+        if(!thread.reviewed) await db.ReviewModel.newReview(
+          {
+            type: "disabledThread",
+            sid:post.pid,
+            uid:post.uid,
+            reason,
+            handlerId:user.uid,
+            source:'post'
+          }
+         );
       } else {
         // 批量屏蔽回复
         if(post.disabled) continue;
@@ -99,7 +108,16 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(!post.reviewed) await db.ReviewModel.newReview("disabledPost", post, targetUser, reason);
+        if(!post.reviewed) await db.ReviewModel.newReview(
+          {
+            type:"disabledPost",
+            sid:post.pid,
+            uid:post.uid,
+            reason,
+            handlerId:targetUser.uid,
+            source:'post'
+          }
+         );
       }
       // 标记为违规
       if(violation) {

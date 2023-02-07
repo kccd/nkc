@@ -225,7 +225,15 @@ router
       //更新文章信息
       await thread.updateThreadMessage(false);
       //生成审核记录
-      await db.ReviewModel.newReview(type, post, data.user);
+      await db.ReviewModel.newReview(
+        {
+          type,
+        sid:post.pid,
+        uid:post.uid,
+        reason:'',
+        handlerId:user.uid,
+        source:'post'}
+       );
       //生成通知消息
       message = await db.MessageModel({
         _id: await db.SettingModel.operateSystemID("messages", 1),
@@ -266,7 +274,16 @@ router
           })
             .catch(console.error);
         }
-        await db.ReviewModel.newReview('passDocument', '', data.user, reason, document);
+        await db.ReviewModel.newReview(
+          {
+            type:'passDocument',
+            sid:document._id,
+            uid:document.uid,
+            reason,
+            handlerId:data.user.uid,
+            source:'doc'
+          }
+          );
         let passType;
         if(document.source === 'article') {
           passType = "documentPassReview";

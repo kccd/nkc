@@ -55,7 +55,16 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(!thread.reviewed) await db.ReviewModel.newReview("returnThread", post, user, reason);
+        if(!thread.reviewed) await db.ReviewModel.newReview(
+          {
+            type:"returnThread",
+            sid:post.pid,
+            uid:post.uid,
+            reason,
+            handlerId:user.uid,
+            source:'post'
+          }
+          );
       } else {
         // 退修回复
         if(post.disabled) continue;
@@ -65,7 +74,15 @@ router
           threadsId.push(thread.tid);
         }
         await post.updateOne({toDraft: true, disabled: false, reviewed: true});
-        if(!post.reviewed) await db.ReviewModel.newReview("returnPost", post, data.user, reason);
+        if(!post.reviewed) await db.ReviewModel.newReview({
+            type:"returnPost",
+            sid:post.pid,
+            uid:post.uid,
+            reason,
+            handlerId:data.user.uid,
+            source:'post'
+           }
+        );
         const firstPost = await db.PostModel.findOnly({pid: thread.oc});
         const delLog = db.DelPostLogModel({
           delUserId: post.uid,

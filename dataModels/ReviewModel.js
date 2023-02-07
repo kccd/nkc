@@ -269,6 +269,7 @@ schema.statics.autoPushToReview = async function(post) {
         uid:post.uid,
         reason:'黑名单中的用户',
         handlerId:user.uid,
+        source:'post'
       });
       return true
     }
@@ -311,7 +312,16 @@ schema.statics.autoPushToReview = async function(post) {
     // 满足的用户所发表的文章 需要审核
     if(foreign.status && userPersonal.nationCode !== "86") {
       if(foreign.type === "all" || foreign.count > passedCount) {
-        await ReviewModel.newReview("foreign", post, user, "海外手机号用户，审核通过的文章数量不足");
+        await ReviewModel.newReview(
+          {
+            type:"foreign",
+            sid:post.pid,
+            uid:post.uid,
+            reason:"海外手机号用户，审核通过的文章数量不足",
+            handlerId:user.uid,
+            source:'post',
+          }
+         );
         return true
       }
     }
@@ -322,7 +332,16 @@ schema.statics.autoPushToReview = async function(post) {
     // 满足以上的用户所发表的文章 需要审核
     if(notPassedA.status && !user.volumeA) {
       if(notPassedA.type === "all" || notPassedA.count > passedCount) {
-        await ReviewModel.newReview("notPassedA", post, user, "用户没有通过A卷考试，审核通过的文章数量不足");
+        await ReviewModel.newReview(
+          {
+            type: "notPassedA",
+            sid:post.pid,
+            uid:post.uid,
+            reason:"用户没有通过A卷考试，审核通过的文章数量不足",
+            handlerId:user.uid,
+            source:'post',
+          }
+         );
         return true;
       }
     }
@@ -337,7 +356,16 @@ schema.statics.autoPushToReview = async function(post) {
     if(grade.status) {
       // 目前调取的地方都在发表相应内容之后，所以用户已发表内容的数量需要-1
       if(grade.type === "all" || grade.count > passedCount - 1) {
-        await ReviewModel.newReview("grade", post, user, "因用户等级限制，审核通过的文章数量不足");
+        await ReviewModel.newReview(
+          {
+            type:  "grade",
+            sid:post.pid,
+            uid:post.uid,
+            reason:"因用户等级限制，审核通过的文章数量不足",
+            handlerId:user.uid,
+            source:'post',
+          }
+        );
         return true;
       }
     }
@@ -346,7 +374,16 @@ schema.statics.autoPushToReview = async function(post) {
     if(await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
       const authSettings = await SettingModel.getSettings('auth');
       if(authSettings.verifyPhoneNumber.type === 'reviewPost') {
-        await ReviewModel.newReview("unverifiedPhone", post, user, "用户未验证手机号");
+        await ReviewModel.newReview(
+          {
+            type:  "unverifiedPhone",
+            sid:post.pid,
+            uid:post.uid,
+            reason:"用户未验证手机号",
+            handlerId:user.uid,
+            source:'post',
+          }
+          );
         return true;
       }
     }
@@ -374,7 +411,16 @@ schema.statics.autoPushToReview = async function(post) {
       useKeywordGroups = wordGroup.filter(g => useKeywordGroups.includes(g.id));
       const matchedKeywords = await ReviewModel.matchKeywords(post.t + post.c, useKeywordGroups);
       if(matchedKeywords.length > 0) {
-        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${matchedKeywords.join("、")}`);
+        await ReviewModel.newReview(
+          {
+            type:  "includesKeyword",
+            sid:post.pid,
+            uid:post.uid,
+            reason:`内容中包含敏感词 ${matchedKeywords.join("、")}`,
+            handlerId:user.uid,
+            source:'post',
+          }
+           );
         return true;
       }
       /*if(await ReviewModel.includesKeyword({   content: post.t + post.c,   useGroups: useKeywordGroups })) {
@@ -392,7 +438,16 @@ schema.statics.autoPushToReview = async function(post) {
       let roleList = [], gradeList = [], relationship = "or";
       if(currentPostType === "thread") {
         if(forumContentSettings.rule.thread.anyone) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid:post.pid,
+              uid:post.uid,
+              reason:`此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+              handlerId:user.uid,
+              source:'post',
+            }
+           );
           return true;
         }
         roleList = forumContentSettings.rule.thread.roles;
@@ -401,7 +456,16 @@ schema.statics.autoPushToReview = async function(post) {
       }
       if(currentPostType === "post") {
         if(forumContentSettings.rule.reply.anyone) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置了回复/评论一律送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid:post.pid,
+              uid:post.uid,
+              reason:`此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+              handlerId:user.uid,
+              source:'post',
+            }
+           );
           return true;
         }
         roleList = forumContentSettings.rule.reply.roles;
@@ -415,12 +479,30 @@ schema.statics.autoPushToReview = async function(post) {
       const userGrade = user.grade._id;
       if(relationship === "and") {
         if(includesArrayElement(userCerts, roleList) && gradeList.includes(userGrade)) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid:post.pid,
+              uid:post.uid,
+              reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
+              handlerId:user.uid,
+              source:'post',
+            }
+           );
           return true;
         }
       } else if(relationship === "or") {
         if(includesArrayElement(userCerts, roleList) || gradeList.includes(userGrade)) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid:post.pid,
+              uid:post.uid,
+              reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
+              handlerId:user.uid,
+              source:'post',
+            }
+           );
           return true;
         }
       }
