@@ -281,7 +281,7 @@ router
             uid:document.uid,
             reason,
             handlerId:data.user.uid,
-            source:'doc'
+            source:'document'
           }
           );
         let passType;

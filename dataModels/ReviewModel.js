@@ -74,9 +74,23 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-//type, post, user, reason, document  ----之前的数据
+//type, post, user, reason, document  ----之前的数据形式,
+//pid，tid,uid,已经废弃，添加了，sid作为公共的id，以及source标注sid来源
+// schema.statics.newReview = async (type, post, user, reason, document,source) => {
+//   await mongoose.model("reviews")({
+//     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
+//     type,
+//     reason,
+//     docId: document?document._id:'',
+//     pid: post?post.pid:'',
+//     tid: post?post.tid:'',
+//     uid: post?post.uid:document.uid,
+//     handlerId: user.uid
+//   }).save();
+// };
+//敏感词检测---新
 schema.statics.newReview = async ({type,sid,uid,reason,handlerId,source}) => {
-  if(source==='docId'){
+  if(source==='document'){
     sid = sid.toString()
   }
   await mongoose.model("reviews")({
@@ -91,15 +105,17 @@ schema.statics.newReview = async ({type,sid,uid,reason,handlerId,source}) => {
 };
 
 //生成新的document审核
-schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
+schema.statics.newDocumentReview = async (type, sid, uid, reason) => {
   const ReviewModel = mongoose.model('reviews');
   const SettingModel = mongoose.model('settings');
   const review = ReviewModel({
     _id: await SettingModel.operateSystemID('reviews', 1),
     type,
     reason,
-    docId: documentId,
+    sid,
     uid,
+    source:'document'
+    
   });
   await review.save();
 }
@@ -376,7 +392,7 @@ schema.statics.autoPushToReview = async function(post) {
       if(authSettings.verifyPhoneNumber.type === 'reviewPost') {
         await ReviewModel.newReview(
           {
-            type:  "unverifiedPhone",
+            type:"unverifiedPhone",
             sid:post.pid,
             uid:post.uid,
             reason:"用户未验证手机号",
