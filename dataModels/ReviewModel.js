@@ -88,7 +88,7 @@ const schema = new Schema({
 //     handlerId: user.uid
 //   }).save();
 // };
-//敏感词检测---新
+//生成审核记录---新
 schema.statics.newReview = async ({type,sid,uid,reason,handlerId,source}) => {
   if(source==='document'){
     sid = sid.toString()
@@ -115,7 +115,6 @@ schema.statics.newDocumentReview = async (type, sid, uid, reason) => {
     sid,
     uid,
     source:'document'
-    
   });
   await review.save();
 }
@@ -129,7 +128,7 @@ schema.statics.reviewDocument = async (props) => {
     type
   } = props;
   const review = await ReviewModel.findOne({
-    docId: documentId,
+    sid: documentId,
     handlerId: ''
   }).sort({toc: -1});
   if(!review) return;

@@ -402,7 +402,7 @@ threadRouter
       const _post = posts[i];
       _postsId.push(_post.pid);
     }
-    const reviewRecords = await db.ReviewModel.find({pid: {$in: _postsId}}).sort({toc: -1});
+    const reviewRecords = await db.ReviewModel.find({sid: {$in: _postsId}}).sort({toc: -1});
     const reviewRecordsObj = {};
     for(let i = 0; i < reviewRecords.length; i ++) {
       const reviewRecord = reviewRecords[i];
@@ -1097,7 +1097,7 @@ threadRouter
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(data.posts.map(async (post) => {
-      const reviewRecord = await db.ReviewModel.findOne({pid: post.pid}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid}).sort({toc: -1});
       post.reviewReason = reviewRecord? reviewRecord.reason : "";
       return post;
     }));

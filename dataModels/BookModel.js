@@ -361,7 +361,7 @@ schema.methods.extendArticlesById = async function(articlesId) {
     const {title, status, _id: docId} = document;
     let review;
     if(status === 'faulty' || status === 'disabled') {
-      review = await ReviewModel.findOne({docId}).sort({toc: -1}).limit(1);
+      review = await ReviewModel.findOne({sid:docId}).sort({toc: -1}).limit(1);
     }
     const result = {
       _id,

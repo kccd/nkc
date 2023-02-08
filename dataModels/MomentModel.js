@@ -1630,7 +1630,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if(status === unknown) {
-      const review = await ReviewModel.findOne({docId: stableDocument._id});
+      const review = await ReviewModel.findOne({sid: stableDocument._id});
       if(review) data.reason = review.reason;
     }
     commentsData.push(data);

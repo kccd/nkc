@@ -21,13 +21,19 @@ router
         $in: fid
       }
     }
-    const {article: articleSource, comment: commentSource, moment: momentSource} = await db.DocumentModel.getDocumentSources();
-    const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource, momentSource]}};
+    const {article: articleSource, comment: commentSource, moment: momentSource} = await db.DocumentModel.getDocumentSources(); //post
+    const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource, momentSource]}}; // document
+    const n = {status: 'unknown', type: 'post'} //note
     //查找出 未审核 未禁用 未退修的post和document的数量
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
+    const noteCount = await db.NoteContentModel.countDocuments(n);
+    
+    
     //获取审核列表分页
-    const paging = nkcModules.apiFunction.paging(page, postCount > documentCount?postCount:documentCount, 30);
+    
+    const paging = nkcModules.apiFunction.paging(page, (postCount>documentCount?(postCount>noteCount ?postCount:noteCount):documentCount>noteCount?documentCount:noteCount ), 30);
+   
     data.results = [];
     //获取需要审核的post
     const tid = new Set(), postUid = new Set();
@@ -81,7 +87,7 @@ router
         link = await db.PostModel.getUrl(post);
       }
       // 从reviews表中读出送审原因
-      const reviewRecord = await db.ReviewModel.findOne({ pid: post.pid }).sort({ toc: -1 }).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({ sid: post.pid }).sort({ toc: -1 }).limit(1);
       data.results.push({
         post,
         user,
@@ -152,7 +158,8 @@ router
       let user = usersObj[document.uid];
       if(!user) continue;
       //获取送审原因
-      const reviewRecord = await  db.ReviewModel.findOne({docId: document._id}).sort({toc: -1}).limit(1);
+      const reviewRecord = await  db.ReviewModel.findOne({sid: document._id}).sort({toc: -1}).limit(1);
+      console.log(reviewRecord,'reviewRecord')
       data.results.push({
         type: 'document',
         document,
@@ -161,6 +168,7 @@ router
         reason: reviewRecord?reviewRecord.reason : '',
       })
     }
+    
     data.reviewType = reviewType;
     data.paging = paging;
     await next();
