@@ -6,11 +6,11 @@
       a.option(v-if="moment.url" @click="toMoment(moment.url)" target="_blank")
         .fa.fa-newspaper-o
         span 查看详情
-      a.option(@click="deleteMoment")
-        .fa.fa-remove
+      a.option(v-if="options.delete" @click="deleteMoment")
+        .fa.fa-trash
         span 删除
       a.option(v-if="options.disable" @click="disableMoment")
-        .fa.fa-remove
+        .fa.fa-ban
         span 屏蔽
       .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
         .fa.fa-check-circle-o
