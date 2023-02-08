@@ -14,22 +14,15 @@
 
 ## 安装并运行 nkc
 ### 准备
-1. 安装运行环境，并将 ImageMagick、Ghostscript、QPDF 以及 FFmpeg 的执行程序添加到环境变量\
-   （对于 MongoDB，Redis 和 ElasticSearch ，也可使用 `docker compose` 直接在容器中运行（试验阶段），请自行查看、调整 `docker-compose.yml` ）
-2. 安装并运行 **[nkc-media](https://github.com/kccd/nkc-media)**
-3. 将 `/defaultData/config` 文件夹复制到根目录 `/config`
+1. 安装运行环境，并将 ImageMagick、Ghostscript、QPDF 以及 FFmpeg 的执行程序添加到系统环境变量中；
+2. 安装并运行依赖服务 **[nkc-reverse-proxy](https://github.com/kccd/nkc-reverse-proxy)**、**[nkc-media](https://github.com/kccd/nkc-media)**、**[nkc-render](https://github.com/kccd/nkc-render)**、**[nkc-websocket](https://github.com/kccd/nkc-websocket)**；
 
 ### 从源代码安装
-1. 拉取当前仓库到本地
-2. 执行 `npm i` 安装依赖
-3. 执行 `npm run build` 初始化目录
-4. 执行 `npm run init` 初始化缓存
-5. 执行 `npm run build-pages-p` 使用生产环境编译前端文件\
-   （`npm run build-pages` 开发环境）
-6. 根据需要调整项目根目录 `config` 文件夹下的配置文件
-7. 执行 `pm2 start pm2.config.js` 启动项目\
-   （如果遇到启动错误或无限弹框，请在另一个控制台中运行 `pm2 log` 查看输出）
-8. 浏览器访问 `localhost:9000`
-
-### 从 Docker 安装
-1. 咕咕咕。
+1. 拉取当前仓库到本地；
+2. 执行 `npm i` 安装依赖；
+3. 执行 `npm run build` 初始化目录；
+4. 执行 `npm run init` 初始化缓存；
+5. 执行 `npm run build-pages-p` 编译前端文件；
+6. 根据需要调整项目根目录 `config` 文件夹下的配置文件；
+7. 执行 `pm2 start pm2.config.js` 启动项目；
+8. 浏览器访问 `localhost:9000`（由于 nkc-websocket 服务使用的是非 9000 端口，所以需要借助 nkc-reverse-proxy 或其他反向代理软件才能连接短消息服务）；
