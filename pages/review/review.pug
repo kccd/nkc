@@ -162,10 +162,44 @@ block content
                         textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document._id}'].reason`)
                     .m-t-1
                       button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}', 'document')`) 提交
-            //else if r.type === 'note'
-            //  .review-panel
-            //    .review-time
-            //      input(type='checkbox' value=r.note._id)
+            else if r.type === 'note'
+              .review-panel
+                .review-time
+                  input(type='checkbox' value=r.note._id v-model=`selectedNid`)
+                .review-info 时间:
+                .review-time=`${format("YYYY/MM/DD HH:mm:ss", r.note.toc)}`
+                .review-info 用户:
+                .review-user
+                  a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
+                  .review-info 类型:
+                  .review-time 笔记
+                if r.reason
+                   .review-info 理由:
+                   span(v-pre)= r.reason
+                .review-post-content!=r.content
+                  .review-input-div
+                    .m-b-1
+                      input(type='radio' :value='true' v-model=`review['${r.note._id}'].pass` )
+                      span.m-r-1 通过
+                      input(type='radio' :value='false' v-model=`review['${r.note._id}'].pass` )
+                      span 不通过
+                    div(v-if=`!review['${r.note._id}'].pass`)
+                      input(type='radio' value='disabled' v-model=`review['${r.note._id}'].delType`)
+                      span.m-r-1 屏蔽
+                      .m-t-1
+                        input(type='checkbox' :value='true' v-model=`review['${r.note._id}'].noticeType`)
+                        span.m-r-1 通知用户
+                        input(type='checkbox' :value='true' v-model=`review['${r.note._id}'].illegalType`)
+                        span.m-r-1 标记为违规
+                      .m-t-1
+                        textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.note._id}'].reason` )
+                    .m-t-1
+                      button.btn.btn-sm.btn-primary(@click=`submit('${r.note._id}','note')`,) 提交
+
+
+
+
+
 
 
 

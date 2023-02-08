@@ -1,6 +1,7 @@
 var data = NKC.methods.getDataById("data");
 var pid = [];
 var did = [];
+var nid = [];
 var review = {};
 var reviewType = data.reviewType;
 for(var i = 0; i < data.results.length; i++) {
@@ -19,7 +20,9 @@ for(var i = 0; i < data.results.length; i++) {
       illegalType: [],
       threadId: tid
     };
-  } else if(data.results[i].type === 'document') {
+  }
+  
+    else if(data.results[i].type === 'document') {
     let d = data.results[i].document.did;
     let documentId = data.results[i].document._id;
     let source = data.results[i].document.source;
@@ -37,6 +40,18 @@ for(var i = 0; i < data.results.length; i++) {
       resetPostCount: '',
     };
   }
+    else if(data.results[i].type === 'note'){
+      let n = data.results[i].note._id;
+      nid.push(n);
+      review[n] ={
+        notId:n,
+        pass:true,
+        reason:"",
+        delType:'disabled',
+        noticeType:[true],
+        illegalType:false,
+      }
+  }
 }
 
 var app = new Vue({
@@ -44,9 +59,11 @@ var app = new Vue({
   data: {
     selectedPid:[],
     selectedDid: [],
+    selectedNid:[],
     showInputPid: [],
     pid: pid,
     did: did,
+    nid: nid,
     review: review,
   },
   mounted() {
@@ -63,6 +80,12 @@ var app = new Vue({
       } else {
         this.selectedDid = [].concat(this.did);
       }
+      if(this.selectedNid.length === this.nid.length) {
+        this.selectedNid = []
+      } else {
+        this.selectedNid = [].concat(this.nid);
+      }
+      
     },
     //提交document审核
     document(arr, index) {
@@ -145,7 +168,7 @@ var app = new Vue({
           method = "POST";
         }
       }
-
+      
       return nkcAPI(url, method, d)
         .then(function() {
           screenTopAlert("PID: " + data.postId + " 处理成功!");
@@ -156,6 +179,11 @@ var app = new Vue({
           console.log(data);
           app.post(arr, index+1);
         });
+    },
+    
+    //提交note审核
+    note: function (arr,index){
+    
     },
     submit: function(id, type) {
       const self = this;
@@ -184,7 +212,7 @@ var app = new Vue({
             }
             return self.post(arr, 0);
           }
-          return;
+          // return;
         })
         .then(() => {
           if(self.selectedDid.length !== 0 || (id && type === 'document')) {
@@ -211,19 +239,52 @@ var app = new Vue({
             self.document(arr, 0);
           }
         })
+        .then(()=>{
+          if(self.selectedNid.length !== 0 || (id && type === 'note')) {
+            
+            let nidArr;
+            if(typeof id === 'string'){//提交单个
+              nidArr = [id];
+            }else {
+              nidArr = self.selectedNid;
+            }
+            let arr = [];
+            for(let i = 0; i < nidArr.length; i++) {
+              let reviewData = self.review[nidArr[i]];
+              arr.push({
+                notId: reviewData.notId,
+                pass: reviewData.pass,
+                reason: reviewData.reason,
+                delType: reviewData.delType,
+                articleId: reviewData.articleId,
+                noticeType: reviewData.noticeType.length > 0,
+                illegalType: reviewData.illegalType.length > 0
+              });
+            }
+            self.note(arr, 0);
+            
+          }
+        })
         .catch((err) => {
           sweetError(err);
         })
     },
     chooseAll: function(type) {
+    
       for(var i = 0; i < this.selectedPid.length; i++) {
         var p = this.selectedPid[i];
         var reviewData = this.review[p];
+        console.log(reviewData )
         reviewData.pass = type;
       }
       for(var i = 0; i < this.selectedDid.length; i++) {
         var d = this.selectedDid[i];
         var reviewData = this.review[d];
+        reviewData.pass = type;
+      }
+      for(var i = 0; i < this.selectedNid.length; i++) {
+        var n = this.selectedNid[i];
+        var reviewData = this.review[n];
         reviewData.pass = type;
       }
     },
