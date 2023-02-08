@@ -87,7 +87,7 @@ router
         link = await db.PostModel.getUrl(post);
       }
       // 从reviews表中读出送审原因
-      const reviewRecord = await db.ReviewModel.findOne({ sid: post.pid }).sort({ toc: -1 }).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({ sid: post.pid ,source:'post' }).sort({ toc: -1 }).limit(1);
       data.results.push({
         post,
         user,
@@ -158,7 +158,7 @@ router
       let user = usersObj[document.uid];
       if(!user) continue;
       //获取送审原因
-      const reviewRecord = await  db.ReviewModel.findOne({sid: document._id}).sort({toc: -1}).limit(1);
+      const reviewRecord = await  db.ReviewModel.findOne({sid: document._id,source:'document'}).sort({toc: -1}).limit(1);
       console.log(reviewRecord,'reviewRecord')
       data.results.push({
         type: 'document',

@@ -129,7 +129,8 @@ schema.statics.reviewDocument = async (props) => {
   } = props;
   const review = await ReviewModel.findOne({
     sid: documentId,
-    handlerId: ''
+    handlerId: '',
+    source:'document'
   }).sort({toc: -1});
   if(!review) return;
   await review.updateOne({

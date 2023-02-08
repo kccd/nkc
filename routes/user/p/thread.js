@@ -136,7 +136,7 @@ module.exports = async (ctx, next) => {
     } else if (result.disabled) {
       threadLogOne = await db.DelPostLogModel.findOne({"threadId": thread.tid, "postType": "thread", "modifyType": false}).sort({toc: -1});
     } else {
-      threadLogOne = await db.ReviewModel.findOne({sid: thread.firstPost.pid}).sort({toc: -1});
+      threadLogOne = await db.ReviewModel.findOne({sid: thread.firstPost.pid,source:'post'}).sort({toc: -1});
     }
     if(threadLogOne && (haveReviewPermission || result.toDraft)) {
       result.reviewReason = threadLogOne.reason;

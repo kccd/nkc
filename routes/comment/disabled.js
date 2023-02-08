@@ -12,7 +12,7 @@ module.exports = async (ctx, next) => {
   if(status === 'faulty' && document.status === 'faulty') return ctx.throw(401, '评论已被退修');
   if(status === 'disabled' && document.status === 'disabled') return ctx.throw(401, '评论已被禁用');
   //查找当前document的审核记录
-  let review = await db.ReviewModel.findOne({sid: document._id}).sort({toc: -1}).limit(1);
+  let review = await db.ReviewModel.findOne({sid: document._id,source:'document'}).sort({toc: -1}).limit(1);
   //如果不存在审核记录就创建一条记录
   if(!review) {
     review = await db.ReviewModel({

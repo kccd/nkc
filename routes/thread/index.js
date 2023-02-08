@@ -313,7 +313,7 @@ threadRouter
     thread.firstPost = firstPost;
     // 加载文章待审原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid,source:'post'}).sort({toc: -1});
       threadReviewReason = reviewRecord? reviewRecord.reason : "";
     }
 
@@ -1097,7 +1097,7 @@ threadRouter
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(data.posts.map(async (post) => {
-      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid,source:'post'}).sort({toc: -1});
       post.reviewReason = reviewRecord? reviewRecord.reason : "";
       return post;
     }));
@@ -1230,7 +1230,7 @@ threadRouter
 
     // 如果是待审核，取出审核原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid,source:'post'}).sort({toc: -1});
       data.threadReviewReason = reviewRecord? reviewRecord.reason : "";
     }
 
