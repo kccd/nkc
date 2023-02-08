@@ -548,6 +548,17 @@ schema.methods.updateReview = async function(props) {
     }
   });
 }
+//返回source数据来源
+const  sources = {
+  post:'post',
+  document:'document',
+  note:'note'
+}
+schema.statics.getDocumentSources = async ()=>{
+  return {...sources}
+}
+
+
 
 module.exports = mongoose.model("reviews", schema);
 

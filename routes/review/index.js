@@ -28,6 +28,7 @@ router
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
     const noteCount = await db.NoteContentModel.countDocuments(n);
+    console.log(noteCount)
     
     
     //获取审核列表分页
@@ -159,7 +160,6 @@ router
       if(!user) continue;
       //获取送审原因
       const reviewRecord = await  db.ReviewModel.findOne({sid: document._id,source:'document'}).sort({toc: -1}).limit(1);
-      console.log(reviewRecord,'reviewRecord')
       data.results.push({
         type: 'document',
         document,
@@ -169,6 +169,21 @@ router
       })
     }
     
+    //查找出需要审核的note
+    let notes = await  db.NoteContentModel.find(n).sort({toc:-1}).skip(paging.start).limit(paging.perpage)
+     for (const note of notes){
+       //获取送审核的原因
+        const reviewRecord = await db.ReviewModel.findOne({sid: note._id.toString(),source:'note'});
+        data.results.push({
+          type:'note',
+          note,
+          content:note.content,
+          user,
+          reason: reviewRecord?reviewRecord.reason:''
+        })
+     
+     }
+     
     data.reviewType = reviewType;
     data.paging = paging;
     await next();

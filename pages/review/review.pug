@@ -162,6 +162,17 @@ block content
                         textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document._id}'].reason`)
                     .m-t-1
                       button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}', 'document')`) 提交
+            //else if r.type === 'note'
+            //  .review-panel
+            //    .review-time
+            //      input(type='checkbox' value=r.note._id)
+
+
+
+
+
+
+
         .p-t-1
           include ../publicModules/paging/paging_input
           .paging-button.pointer
