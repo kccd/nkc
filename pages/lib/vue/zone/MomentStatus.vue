@@ -45,7 +45,6 @@ export default {
   data: () => ({
   }),
   mounted() {
-    console.log(this.moment);
   },
   methods: {
     //动态审核通过
