@@ -16,8 +16,8 @@ for(var i = 0; i < data.results.length; i++) {
       reason: "",
       delType: "toDraft",
       isThread: isThread,
-      noticeType: [true],
-      illegalType: [],
+      noticeType: true,
+      illegalType: false,
       threadId: tid
     };
   }
@@ -34,7 +34,7 @@ for(var i = 0; i < data.results.length; i++) {
       pass: true,
       reason: "",
       delType: source !== 'moment'?"faulty":"deleted",
-      noticeType: [true],
+      noticeType: true,
       illegalType: false,
       articleId: aid,
       resetPostCount: '',
@@ -44,12 +44,12 @@ for(var i = 0; i < data.results.length; i++) {
       let n = data.results[i].note._id;
       nid.push(n);
       review[n] ={
-        notId:n,
+        noteId:n,
         pass:true,
         reason:"",
         delType:'disabled',
-        noticeType:[true],
-        illegalType:false,
+        noticeType: true,
+        illegalType: false,
       }
   }
 }
@@ -181,9 +181,41 @@ var app = new Vue({
         });
     },
     
-    //提交note审核
+   // 提交note审核
     note: function (arr,index){
-    
+      let data = arr[index]
+      if(!data)return ;
+      let d,url,method = 'PUT';
+      if(data.pass){
+         d = {
+           pass:  data.pass,
+           noteId: data.noteId,
+           type: 'note',
+         }
+         url = "/review";
+      }else {
+        d = {
+           type: 'note',
+           pass: data.pass,
+           noteId: data.noteId,
+           reason: data.reason,
+           delType: data.delType,
+           remindUser: data.noticeType,
+           violation: data.illegalType,
+        };
+        method = 'PUT';
+        url = "/review";
+      }
+      nkcAPI(url,method,d)
+        .then(function (){
+          screenTopAlert("noteId: " + data.noteId + "处理成功");
+          app.note(arr,index+1);
+        })
+        .catch(function (data){
+          screenTopWarning("noteId: " + data.noteId + "处理失败! error: " + data.error || data );
+          console.log(data);
+          app.note(arr,index+1);
+        })
     },
     submit: function(id, type) {
       const self = this;
@@ -206,8 +238,8 @@ var app = new Vue({
                 postType: reviewData.isThread?"thread":"post",
                 threadId: reviewData.threadId,
                 postId: reviewData.pid,
-                noticeType: reviewData.noticeType.length > 0,
-                illegalType: reviewData.illegalType.length > 0
+                noticeType: reviewData.noticeType,
+                illegalType: reviewData.illegalType
               });
             }
             return self.post(arr, 0);
@@ -232,8 +264,8 @@ var app = new Vue({
                 reason: reviewData.reason,
                 delType: reviewData.delType,
                 articleId: reviewData.articleId,
-                noticeType: reviewData.noticeType.length > 0,
-                illegalType: reviewData.illegalType.length > 0
+                noticeType: reviewData.noticeType,
+                illegalType: reviewData.illegalType,
               });
             }
             self.document(arr, 0);
@@ -241,7 +273,6 @@ var app = new Vue({
         })
         .then(()=>{
           if(self.selectedNid.length !== 0 || (id && type === 'note')) {
-            
             let nidArr;
             if(typeof id === 'string'){//提交单个
               nidArr = [id];
@@ -252,29 +283,27 @@ var app = new Vue({
             for(let i = 0; i < nidArr.length; i++) {
               let reviewData = self.review[nidArr[i]];
               arr.push({
-                notId: reviewData.notId,
+                noteId: reviewData.noteId,
                 pass: reviewData.pass,
                 reason: reviewData.reason,
                 delType: reviewData.delType,
-                articleId: reviewData.articleId,
-                noticeType: reviewData.noticeType.length > 0,
-                illegalType: reviewData.illegalType.length > 0
+                noticeType: reviewData.noticeType,
+                illegalType: reviewData.illegalType,
               });
             }
+          
             self.note(arr, 0);
-            
           }
         })
         .catch((err) => {
           sweetError(err);
         })
     },
-    chooseAll: function(type) {
     
+    chooseAll: function(type) {
       for(var i = 0; i < this.selectedPid.length; i++) {
         var p = this.selectedPid[i];
         var reviewData = this.review[p];
-        console.log(reviewData )
         reviewData.pass = type;
       }
       for(var i = 0; i < this.selectedDid.length; i++) {

@@ -28,9 +28,7 @@ router
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
     const noteCount = await db.NoteContentModel.countDocuments(n);
-    console.log(noteCount)
-    
-    
+   
     //获取审核列表分页
     
     const paging = nkcModules.apiFunction.paging(page, (postCount>documentCount?(postCount>noteCount ?postCount:noteCount):documentCount>noteCount?documentCount:noteCount ), 30);
@@ -192,23 +190,26 @@ router
     //审核post和document
     const {data, db, body, state} = ctx;
     const {user} = data;
-    let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
+    let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType,noteId} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     if(!reviewType) {
       if(pid) {
         reviewType = 'post';
-      } else {
+      }
+      else if(docId) {
         reviewType = 'document';
+      }
+      else if(noteId){
+        reviewType = 'note';
       }
     }
     let message;
     const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
+    const noteContentStatus = await  db.NoteContentModel.getNoteContentStatus()
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
-
       if(!post) ctx.throw(404, `未找到ID为${pid}的post`);
       if(post.reviewed) ctx.throw(400, "内容已经被审核过了，请刷新");
-
       const forums = await db.ForumModel.find({fid: {$in: post.mainForumsId}});
       //自己的专业自己可以审核
       let isModerator = ctx.permission('superModerator');
@@ -267,7 +268,8 @@ router
           pid: post.pid
         }
       });
-    } else {
+    }
+    else if(reviewType === 'document') {
       const documentStatus = await db.ArticleModel.getArticleStatus();
       if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
       const document = await db.DocumentModel.findOne({_id: docId});
@@ -282,7 +284,7 @@ router
           handlerId: state.uid,
           reason,
           documentId: document._id,
-          type: 'passDocument'
+          type: 'passDocument',
         });
         const {source} = document;
         if(momentQuoteTypes[source] && source !== 'moment') {
@@ -394,8 +396,81 @@ router
               reason,
             }
           });
-        };
+        }
       }
+    }
+    else if(reviewType === 'note'){
+       const note = await db.NoteContentModel.findOne({_id:noteId});
+       if(!note) ctx.throw(404,`未找到ID为${noteId}的note`)
+       if(note.status === noteContentStatus.normal) ctx.throw(400,'内容已经被审核通过了，请刷新')
+       if(note.status === noteContentStatus.disabled) ctx.throw(400,'内容已经被屏蔽，请刷新')
+      const noteUser = await db.UserModel.findOne({uid:note.uid})
+      if(pass){
+         //note为通过的状态
+        await db.NoteContentModel.updateOne({_id:noteId},{
+          $set:{
+            status:noteContentStatus.normal
+          }
+        })
+        //生成新的审核记录
+        await db.ReviewModel.newReview(
+          {
+            type:'passNote',
+            sid:note._id,
+            uid:note.uid,
+            reason:'',
+            handlerId:user.uid,
+            source:'note',
+          }
+        )
+      }
+      else {
+        //note为屏蔽状态
+        await db.NoteContentModel.updateOne({_id:noteId},{
+          $set:{
+            status:noteContentStatus.disabled
+          }
+        })
+        //更新审核记录状态
+        await db.ReviewModel.updateOne({sid:note._id,source:'note'},{
+          $set:{
+            handlerId:user.uid,
+            reason:reason?reason:'出现了敏感词'
+          }
+        })
+       //如果标记用户违规就给该用户新增违规记录
+ 
+       if(violation){
+         //新增违规记录
+         await db.UsersScoreLogModel.insertLog({
+           user:noteUser,
+           type:'score',
+           typeIdOfScoreChange: "violation",
+           port: ctx.port,
+           delType,
+           ip: ctx.address,
+           key: 'violationCount',
+           description: reason || '笔记出现敏感词并标记违规',
+           noteId:note._id,
+         })
+       }
+       //如果要提醒用户
+        if(remindUser){
+          message = db.MessageModel({
+            _id: await db.SettingModel.operateSystemID("messages",1) ,
+            r: note.uid,
+            ty: 'STU',
+            c:{
+              delType,
+              violation,
+              type: 'noteDisabled',
+              noteId: note._id,
+              reason
+            }
+          })
+        }
+      }
+      
     }
     if(message) {
       await message.save();

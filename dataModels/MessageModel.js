@@ -2,6 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require("../nkcModules/tools");
+const {htmlToPlain} = require("../nkcModules/nkcRender");
 const messageSchema = new Schema({
 
   // 消息id
@@ -114,6 +115,7 @@ messageSchema.statics.getSystemLimitInfo = async (uid, tUid) => {
   const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
   const messageSettings = await SettingModel.getSettings("message");
+
   const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
 
   const limitInfo = mandatoryLimitInfo;
@@ -339,6 +341,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const MomentModel = mongoose.model('moments');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const NoteContentModel = mongoose.model('noteContent')
   const apiFunction = require("../nkcModules/apiFunction");
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const {getUrl, getAnonymousInfo} = require('../nkcModules/tools');
@@ -849,7 +852,17 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reviewLink: await PostModel.getUrl(post)
     };
-  } else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview", "momentDelete", "momentPass"].includes(type)) {
+  }
+  else if(type === 'noteDisabled'){
+    const {noteId,reason} = message.c
+    const note = await  NoteContentModel.findOne({_id:noteId})
+    if(!note) return null;
+    parameters = {
+      reason: reason?reason:'未知',
+      content: htmlToPlain(note.content, 100),
+    };
+  }
+  else if(["documentFaulty", "documentDisabled", "documentPassReview", "commentFaulty", "commentDisabled", "commentPassReview", "momentDelete", "momentPass"].includes(type)) {
     //独立文章article 和 评论comment 审核
     const {docId, reason} = message.c;
     const document = await DocumentModel.findOne({_id: docId});
@@ -864,7 +877,8 @@ messageSchema.statics.getParametersData = async (message) => {
         reason: reason?reason:'未知',
         title: document.title + article[0].url?'':'[文章已被删除]',
       };
-    } else if (document.source === 'comment') {
+    }
+    else if (document.source === 'comment') {
       const comment = await CommentModel.findOnly({_id: document.sid});
       if(!comment) return;
       const _comment = await CommentModel.extendReviewComments([comment]);
@@ -1519,7 +1533,9 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
 };
 
 messageSchema.statics.extendMessage = async (message) => {
+  
   const messages = await mongoose.model("messages").extendMessages([message]);
+
   for(const m of messages) {
     if(m.contentType !== 'time') {
       return m;
@@ -1543,6 +1559,7 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
   const {c} = message;
   const {type} = c;
   const template = templatesObj[type];
+ 
   let content = plainEscaper(template.content);
   const parametersData = await MessageModel.getParametersData(message);
   if(parametersData === null) {
@@ -1564,7 +1581,7 @@ messageSchema.statics.getSTUMessageContent = async (message) => {
 * 拓展消息对象，用于reactNativeAPP，web端调整后公用
 * */
 messageSchema.statics.extendMessages = async (messages = []) => {
-
+  
   // contentType: html, file, video, voice, img, time
   // status: sent, sending, error
 
@@ -1592,7 +1609,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
 
     const m = messages[i];
     const {r, s, ty, tc, c, _id, withdrawn} = m;
-
+    
     const message = {
       r,
       s,
@@ -1674,6 +1691,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
     }
 
     if(message.contentType === 'html') {
+    
       message.content = message.content || "";
       if(['STE', 'UTU'].includes(ty)) {
         // 系统通知、用户间消息
@@ -1691,6 +1709,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
       }
     }
     _messages.push(message);
+
   }
 
   return _messages;

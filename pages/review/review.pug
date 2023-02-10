@@ -195,18 +195,6 @@ block content
                         textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.note._id}'].reason` )
                     .m-t-1
                       button.btn.btn-sm.btn-primary(@click=`submit('${r.note._id}','note')`,) 提交
-
-
-
-
-
-
-
-
-
-
-
-
         .p-t-1
           include ../publicModules/paging/paging_input
           .paging-button.pointer
