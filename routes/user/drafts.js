@@ -139,9 +139,10 @@ draftsRouter
     if (parentPostId) {
       const parentPost = await db.PostModel.findOnly({pid: parentPostId});
       if (!parentPost) ctx.throw(400, 'parentPostId不存在'); 
-    };
+    }
+    const draftTypes = (await db.DraftModel.getType());
     if(draftId) {
-      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
+      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid, type: draftTypes.beta});
     }
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
@@ -156,7 +157,7 @@ draftsRouter
     if(draft) { // 存在草稿
       // 更新草稿
       await draft.updateOne(draftObj);
-      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
+      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid, type: draftTypes.beta});
       if (saveType === 'timing') {
         // 定时保存
         await draft.checkContentAndCopyToBetaHistory();
@@ -216,7 +217,7 @@ draftsRouter
     }
     // 将数据库中的内容长度发送给前端，用于内容减少时提示用户是否需要保存
     data.contentLength = contentLength;
-    data.draft = await db.DraftModel.findOne({did: draft.did});
+    data.draft = await db.DraftModel.findOne({did: draftId, uid: user.uid, type: draftTypes.beta});
     await next();
   });
   /*.post('/', async(ctx, next) => {

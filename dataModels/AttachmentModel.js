@@ -376,7 +376,8 @@ schema.statics.saveDraftCover = async (did, file) => {
   const DraftModel = mongoose.model('drafts');
   const AttachmentModel = mongoose.model('attachments');
   const FILE = require('../nkcModules/file');
-  const draft = await DraftModel.findOne({did});
+  const draftTypes = await DraftModel.getType();
+  const draft = await DraftModel.findOne({did, type: draftTypes.beta});
   if(!draft) return;
   const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
   const time = new Date();
