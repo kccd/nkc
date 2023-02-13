@@ -1,3 +1,5 @@
+import {detailedTime} from "../../lib/js/time";
+
 function initTime() {
   $('.time').datetimepicker({
     language:  'zh-CN',
@@ -118,9 +120,11 @@ window.app = new Vue({
   el: '#app',
   data: {
     originOperations: data.operations,
+    startTime: data.startTime,
     sortType: 'count'
   },
   methods: {
+    detailedTime,
     clearData() {
       return sweetQuestion(`确定要清除记录？`)
         .then(() => {
@@ -144,6 +148,13 @@ window.app = new Vue({
       return originOperations.sort(function(v1, v2) {
         return v2[sortType] - v1[sortType];
       });
+    },
+    startTimeString() {
+      if(this.startTime > 0) {
+        return this.detailedTime(this.startTime);
+      } else {
+        return '未知'
+      }
     }
   },
 });
