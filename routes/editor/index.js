@@ -496,7 +496,8 @@ router
       if(_id){
         draft = await db.DraftModel.findOne({_id, uid: user.uid});
       }else{
-        draft = await db.DraftModel.findOne({did: id, uid: user.uid});
+        const draftTypes = await db.DraftModel.getType();
+        draft = await db.DraftModel.findOne({did: id, uid: user.uid, type: draftTypes.beta});
       }
       if(!draft) ctx.throw(400, "草稿不存在或已被删除");
       draft = draft.toObject();
