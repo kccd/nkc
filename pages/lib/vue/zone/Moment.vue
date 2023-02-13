@@ -32,7 +32,7 @@
               @complaint="complaint"
             )
         //- 动态内容
-        .single-moment-content.pointer(v-if="type === 'details'" v-html="momentData.content")
+        .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
         .single-moment-content.pointer(v-else v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
 
         //- 图片视频
