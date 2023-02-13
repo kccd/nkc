@@ -14,6 +14,7 @@ export default {
   data: () => ({
   }),
   mounted() {
+    console.log(this.management,'management')
   },
   methods: {
   }
