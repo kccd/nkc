@@ -19,7 +19,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
             ul
               li(@click="modifyNoteContent(n)") 编辑
               li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
-              li(@click="deleteNoteContent(n, 'disable')" v-if=`managementNote`) {{n.disabled?"解除屏蔽":"屏蔽"}}
+              li(@click="deleteNoteContent(n, 'disable')" v-if=`managementNote`) {{n.status === 'disabled' ?"解除屏蔽":"屏蔽"}}
         .note-panel-content-body
           .note-panel-content(v-if="!n.edit" v-html="n.html || '笔记内容已丢失'")
           .note-panel-content(v-else)

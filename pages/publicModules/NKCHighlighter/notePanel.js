@@ -147,7 +147,6 @@ NKC.modules.NotePanel = class {
             } else {
               return nkcAPI(`/note/${id}`, "GET")
                 .then(data => {
-                  console.log(data)
                   self.app.extendNoteContent(data.note);
                   self.app.note = data.note;
                   self.app.managementNote = data.managementNote;
@@ -182,7 +181,7 @@ NKC.modules.NotePanel = class {
           } else {
             method = "POST";
             url = `/nkc/note`;
-            if(n.disabled) {
+            if(n.status === 'disabled') {
               data.type = "cancelDisable";
             } else {
               data.type = "disable";

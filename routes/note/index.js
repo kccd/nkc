@@ -35,16 +35,16 @@ router
     await next();
   })
   .get("/:_id", async (ctx, next) => {
-    const {data, db} = ctx;
+    
+    const {data, db,state:{uid}} = ctx;
     const {note} = data;
     const options = {};
+  
     if(!ctx.permission("managementNote")) {
-      options.disabled = false;
-      options.deleted = false;
-      options.status  = 'disabled'
+      options.uid = uid;
+      options.type = 'member'
     }
     data.managementNote = ctx.permission('managementNote');
-  
     data.note = await db.NoteModel.extendNote(note, options);
     ctx.template = "note/note.pug";
     await next();
@@ -90,10 +90,10 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-
+    
     // 选区不存在：新建选区、存储笔记内容
     // 选区存在：存储笔记内容
-    const {db, body, data, nkcModules} = ctx;
+    const {db, body, data, nkcModules,state:{uid}} = ctx;
     const {checkString, checkNumber} = nkcModules.checkData;
     const {_id, targetId, content, type, node,} = body;
     const {user} = data;
@@ -112,7 +112,6 @@ router
          appear =true
       }
     }
-    
     let cv = null;
     if(type === "post") {
       const post = await db.PostModel.findOnly({pid: targetId}, {cv: 1});
@@ -196,8 +195,8 @@ router
     data.noteContent.edit = false;
     const options = {};
     if(!ctx.permission("managementNote")) {
-      options.disabled = false;
-      options.deleted = false;
+      options.uid = uid;
+      options.type = 'member'
     }
     data.note = await db.NoteModel.extendNote(note, options);
     data.managementNote = ctx.permission('managementNote');

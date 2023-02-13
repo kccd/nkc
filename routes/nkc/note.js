@@ -4,7 +4,7 @@ router
     const {data, db, query, nkcModules} = ctx;
     const {page} = query;
     const match = {
-
+   
     };
     const count = await db.NoteContentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -37,12 +37,12 @@ router
     } else if(type === "disable"&& status!== 'deleted') {
       await noteContent.updateOne({disabled: true,status:'disabled'});
     } else if(type === "cancelDisable"&& status!== 'deleted' ) {
-      await noteContent.updateOne({disabled: false,status:'unknown'});
+      await noteContent.updateOne({disabled: false,status:'normal'});
     }
-    
     else if(type === "disable" && status === 'deleted'){
        ctx.throw(400,`用户已经删除`)
     }
+    
     
     await next();
   });
