@@ -123,7 +123,7 @@ const app = new Vue({
       } else {
         method = "POST";
         url = `/nkc/note`;
-        if(n.disabled) {
+        if(n.status === 'disabled') {
           data.type = "cancelDisable";
         } else {
           data.type = "disable";

@@ -124,7 +124,8 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
 /*
 * 复制一份到数据库，添加cid字段表示该数据为cid对应内容的历史
 * */
-schema.methods.cloneAndUpdateContent = async function(content) {
+//appear为新创建的字段，主要是为了检测笔记编辑过后的敏感词
+schema.methods.cloneAndUpdateContent = async function(content,appear) {
   if(this.content === content) return;
   const NoteContentModel = mongoose.model("noteContent");
   const nc = this.toObject();
@@ -135,12 +136,23 @@ schema.methods.cloneAndUpdateContent = async function(content) {
   nc.cid = this._id;
   nc.tlm = tlm;
   nc.deleted = true;
+  nc.status = 'deleted'
   const newNodeContent = NoteContentModel(nc);
   await newNodeContent.save();
-  await this.updateOne({
-    content,
-    tlm
-  });
+  if(appear){
+    await this.updateOne({
+      content,
+      tlm,
+      status:'unknown'
+    });
+  }
+  else {
+    await this.updateOne({
+      content,
+      tlm,
+      status:'normal'
+    });
+  }
 };
 //获取笔记的引用类型
 schema.statics.getNoteContentStatus = async () =>{

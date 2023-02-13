@@ -50,7 +50,6 @@ router
     await next();
   })
   .use("/:_id/c/:cid", async (ctx, next) => {
-   
     const {params, db, data} = ctx;
     const {cid} = params;
     const {user, note} = data;
@@ -58,8 +57,8 @@ router
     if(!noteContent) ctx.throw(400, `笔记不存在，cid: ${noteContent._id}`);
     if(note.originId !== noteContent.noteId) ctx.throw(400, `划词选区与笔记内容无法对应`);
     if(user.uid !== noteContent.uid) ctx.throw(403, "权限不足");
-    if(noteContent.disabled) ctx.throw(400, "笔记已被屏蔽");
-    if(noteContent.deleted) ctx.throw(400, "笔记已被删除");
+    // if(noteContent.status === 'disabled') ctx.throw(400, "笔记已被屏蔽");
+    // if(noteContent.status === 'deleted') ctx.throw(400, "笔记已被删除");
     data.noteContent = noteContent;
     await next();
   })
@@ -69,13 +68,25 @@ router
     const {noteContent} = data;
     const {checkString} = nkcModules.checkData;
     const {content} = body;
-
+    const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
+    const note = await db.NoteContentModel.findOne({_id:noteContent._id})
+    if(note.status === 'disabled'){
+       ctx.throw(400,'您的笔记已经被屏蔽')
+    }
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
       maxLength: 1000
     });
-    const test = await noteContent.cloneAndUpdateContent(content);
+    let appear =false; //是否出现了敏感词
+    if(enabled){
+      const {keyWordGroup}= await db.SettingModel.getSettings('note')//笔记勾选敏感词组id
+      const  result= await  db.ReviewModel.matchKeywordsByGroupsId(content,keyWordGroup)//敏感词检测
+      if(result.length!==0){
+        appear =true
+      }
+    }
+    const test = await noteContent.cloneAndUpdateContent(content,appear);
     noteContent.content = content;
     const nc = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContentHTML = nc.html;

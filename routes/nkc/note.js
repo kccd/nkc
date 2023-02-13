@@ -4,7 +4,6 @@ router
     const {data, db, query, nkcModules} = ctx;
     const {page} = query;
     const match = {
-   
     };
     const count = await db.NoteContentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -34,14 +33,22 @@ router
       noteContent.content = content;
       const nc = await db.NoteContentModel.extendNoteContent(noteContent);
       data.noteContentHTML = nc.html;
-    } else if(type === "disable"&& status!== 'deleted') {
+    }
+    else if(type === "disable" && status === 'deleted'){
+      ctx.throw(400,`用户已经删除`)
+    }
+    else if(type === "disable" && status === 'disabled'){
+      ctx.throw(400,`已经屏蔽用户`)
+    }
+    else if(type === "cancelDisable"&& status === 'normal' ) {
+      ctx.throw(400,`已经取消屏蔽用户`)
+    }
+    else if(type === "disable"&& status!== 'deleted') {
       await noteContent.updateOne({disabled: true,status:'disabled'});
     } else if(type === "cancelDisable"&& status!== 'deleted' ) {
       await noteContent.updateOne({disabled: false,status:'normal'});
     }
-    else if(type === "disable" && status === 'deleted'){
-       ctx.throw(400,`用户已经删除`)
-    }
+    
     
     
     await next();
