@@ -12,6 +12,12 @@ NKC.modules.NotePanel = class {
         submitting: false,
         // 新添加的笔记内容
         content: "",
+        noteStatus:{
+          disabled : "disabled",//屏蔽
+          unknown  : "unknown",//未审核
+          normal   : "normal", //正常状态
+          deleted  : "deleted", //删除状态
+        },
         // 显示笔记
         note: "",
           /* note的数据结构
@@ -141,6 +147,7 @@ NKC.modules.NotePanel = class {
             } else {
               return nkcAPI(`/note/${id}`, "GET")
                 .then(data => {
+                  console.log(data)
                   self.app.extendNoteContent(data.note);
                   self.app.note = data.note;
                   self.app.managementNote = data.managementNote;

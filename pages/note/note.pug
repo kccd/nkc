@@ -4,6 +4,7 @@ block title
   +includeCSS("/note/note.css")
 block content
   #note(v-cloak)
+
     .origin-content {{note.content}}
     .notes
       .note(v-for="n in note.notes")
@@ -11,7 +12,7 @@ block content
           a.note-user-avatar(@click="visitUrl('/u/' + n.user.uid, true)")
             img(:src="getUrl('userAvatar', n.user.avatar)")
           a(@click="visitUrl('/u/' + n.user.uid, true)").note-user-username {{n.user.username}}
-          .note-time {{fromNow(n.toc)}} {{n.disabled?"已屏蔽":""}} {{n.deleted?"已删除":""}}
+          .note-time {{fromNow(n.toc)}} {{n.status === noteStatus.disabled ?"已屏蔽":""}} {{n.status === noteStatus.unknown ?"正在审核":""}} {{n.status === noteStatus.deleted ?'已删除':''}}
           .note-options(v-if=`n.user.uid === uid || ${permission('managementNote')}`)
             .note-options-icon.fa.fa-ellipsis-v(@click="openOptions(n)")
             ul(v-if="n.options")

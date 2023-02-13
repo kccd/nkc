@@ -24,6 +24,7 @@ router
     await next();
   })
   .use("/:_id", async (ctx, next) => {
+    
     const {params, db, data} = ctx;
     const {_id} = params;
     const note = await db.NoteModel.findOne({
@@ -40,13 +41,16 @@ router
     if(!ctx.permission("managementNote")) {
       options.disabled = false;
       options.deleted = false;
+      options.status  = 'disabled'
     }
     data.managementNote = ctx.permission('managementNote');
+  
     data.note = await db.NoteModel.extendNote(note, options);
     ctx.template = "note/note.pug";
     await next();
   })
   .use("/:_id/c/:cid", async (ctx, next) => {
+   
     const {params, db, data} = ctx;
     const {cid} = params;
     const {user, note} = data;
@@ -65,7 +69,7 @@ router
     const {noteContent} = data;
     const {checkString} = nkcModules.checkData;
     const {content} = body;
-    const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
+
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
@@ -78,13 +82,15 @@ router
     await next();
   })
   .del("/:_id/c/:cid", async (ctx, next) => {
+    
     // 用户删除
     const {data} = ctx;
     const {noteContent} = data;
-    await noteContent.updateOne({deleted: true});
+    await noteContent.updateOne({deleted: true,status:'deleted'});
     await next();
   })
   .post("/", async (ctx, next) => {
+
     // 选区不存在：新建选区、存储笔记内容
     // 选区存在：存储笔记内容
     const {db, body, data, nkcModules} = ctx;

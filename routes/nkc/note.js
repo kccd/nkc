@@ -21,6 +21,7 @@ router
     const {body, db, nkcModules, data} = ctx;
     const {noteContentId, type, content} = body;
     const noteContent = await db.NoteContentModel.findOne({_id: noteContentId});
+    const {status} =noteContent
     if(!noteContent) ctx.throw(400, `未找到ID为${noteContentId}的笔记`);
     if(type === "modify") {
       const {checkString} = nkcModules.checkData;
@@ -33,11 +34,16 @@ router
       noteContent.content = content;
       const nc = await db.NoteContentModel.extendNoteContent(noteContent);
       data.noteContentHTML = nc.html;
-    } else if(type === "disable") {
-      await noteContent.updateOne({disabled: true});
-    } else if(type === "cancelDisable") {
-      await noteContent.updateOne({disabled: false});
+    } else if(type === "disable"&& status!== 'deleted') {
+      await noteContent.updateOne({disabled: true,status:'disabled'});
+    } else if(type === "cancelDisable"&& status!== 'deleted' ) {
+      await noteContent.updateOne({disabled: false,status:'unknown'});
     }
+    
+    else if(type === "disable" && status === 'deleted'){
+       ctx.throw(400,`用户已经删除`)
+    }
+    
     await next();
   });
 module.exports = router;

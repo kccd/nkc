@@ -13,7 +13,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
           a(@click="visitUrl('/u/' + n.user.uid, true)").note-panel-user-avatar
             img(:src="getUrl('userAvatar', n.user.avatar)")
           a(@click="visitUrl('/u/' + n.user.uid, true)").note-panel-username {{n.user.username}}
-          .note-panel-time {{fromNow(n.toc)}} {{n.disabled?"已屏蔽":""}} {{n.deleted?"已删除":""}}
+          .note-panel-time {{fromNow(n.toc)}} {{n.status === noteStatus.disabled ?"已屏蔽":""}} {{n.status === noteStatus.unknown ?"正在审核":""}} {{n.status === noteStatus.deleted ?'已删除':''}}
           .note-panel-options(v-if=`n.user.uid === uid || managementNote`)
             .fa.fa-ellipsis-v
             ul

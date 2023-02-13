@@ -9,7 +9,13 @@ const app = new Vue({
     uid: NKC.configs.uid,
     note: data.note,
     submitting: false,
-    content: ""
+    content: "",
+    noteStatus:{
+      disabled : "disabled",//屏蔽
+      unknown  : "unknown",//未审核
+      normal   : "normal", //正常状态
+      deleted  : "deleted", //删除状态
+    }
   },
   mounted() {
     document.body.addEventListener("click", (e) => {
