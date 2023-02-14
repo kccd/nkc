@@ -1,5 +1,5 @@
-const data = NKC.methods.getDataById("data");
 import {scrollPageToElement} from  '../lib/js/pageSwitch'
+const data = NKC.methods.getDataById("data");
 data.note.notes.map(note => {
   note.edit = false;
   note.options = false;
@@ -19,20 +19,16 @@ const app = new Vue({
       deleted  : "deleted", //删除状态
     },
     noteHighlighting:'noteHighlighting',
-   
   },
   mounted() {
     document.body.addEventListener("click", (e) => {
       if(e.target.classList.contains("note-options-icon")) return;
       app.note.notes.map(note => note.options = false);
     });
-   
-    const element = $(`#${data.query.n}`)
-    scrollPageToElement(element) //滚动
-
-    
-    
-    
+    if(data.query.n){
+      const element = $(`#${data.query.n}`)
+      scrollPageToElement(element) //滚动
+    }
   },
   methods: {
     visitUrl: NKC.methods.visitUrl,

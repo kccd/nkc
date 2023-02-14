@@ -17,7 +17,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
           .note-panel-options(v-if=`n.user.uid === uid || managementNote`)
             .fa.fa-ellipsis-v
             ul
-              li(@click="modifyNoteContent(n)" v-if=`!managementNote`) 编辑
+              li(@click="modifyNoteContent(n)" v-if=`n.user.uid === uid` :class="n.status === 'disabled'?'disabled':''"  ) 编辑
               li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
               li(@click="deleteNoteContent(n, 'disable')" v-if=`managementNote`) {{n.status === 'disabled' ?"解除屏蔽":"屏蔽"}}
         .note-panel-content-body
