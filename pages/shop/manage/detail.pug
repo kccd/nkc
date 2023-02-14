@@ -152,17 +152,23 @@ block name
             span 订单信息
           p
             span.infoCaption 收货地址：
-            span.infoListLiDd!=`${order.receiveName}, ${order.receiveMobile}, ${order.receiveAddress}`
+            span.infoListLiDd=`${order.receiveName}, ${order.receiveMobile}, ${order.receiveAddress}`
           p
             span.infoCaption 订单编号：
-            span.infoListLiDd!=`${order.orderId}`
+            span.infoListLiDd=`${order.orderId}`
           p
             span.infoCaption 买家昵称：
-            span.infoListLiDd!=`${order.buyUser.username}`
+            a.infoListLiDd(
+              href=tools.getUrl('userHome', order.buyUser.uid)
+              target="_blank"
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: order.buyUser.uid})
+              )=`${order.buyUser.username}`
           p
             span.infoCaption 运单编号：
             if order.trackNumber
-              span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackNumber}`
+              span.infoListLiDd-noneWidth#trakcNumText=`${order.trackNumber}`
             else
               span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
             //- if order.orderStatus == "unSign"
@@ -172,13 +178,13 @@ block name
           p
             span.infoCaption 运单公司：
             if order.trackName
-              span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackName}`
+              span.infoListLiDd-noneWidth#trakcNumText=`${order.trackName}`
             else
               span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
           p
             span.infoCaption 运费模板：
             if order.freightName
-              span.infoListLiDd-noneWidth#trakcNumText!=`${order.freightName}`
+              span.infoListLiDd-noneWidth#trakcNumText=`${order.freightName}`
             else
               span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
 
