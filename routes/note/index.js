@@ -1,6 +1,7 @@
 const router = require("koa-router")();
 router
   .get("/", async (ctx, next) => {
+  
     const {data, query, nkcModules} = ctx;
     const {
       content, offset, length, type, targetId
@@ -36,9 +37,10 @@ router
   })
   .get("/:_id", async (ctx, next) => {
     
-    const {data, db,state:{uid}} = ctx;
+    const {data, db,state:{uid},request:{query}} = ctx;
     const {note} = data;
     const options = {};
+
   
     if(!ctx.permission("managementNote")) {
       options.uid = uid;
@@ -46,6 +48,7 @@ router
     }
     data.managementNote = ctx.permission('managementNote');
     data.note = await db.NoteModel.extendNote(note, options);
+    data.query = query; 
     ctx.template = "note/note.pug";
     await next();
   })

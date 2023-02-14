@@ -1,4 +1,5 @@
 const data = NKC.methods.getDataById("data");
+
 data.note.notes.map(note => {
   note.edit = false;
   note.options = false;
@@ -8,6 +9,7 @@ const app = new Vue({
   data: {
     uid: NKC.configs.uid,
     note: data.note,
+    query: Number(data.query.n),
     submitting: false,
     content: "",
     noteStatus:{
@@ -15,13 +17,20 @@ const app = new Vue({
       unknown  : "unknown",//未审核
       normal   : "normal", //正常状态
       deleted  : "deleted", //删除状态
-    }
+    },
+    noteHighlighting:'noteHighlighting',
+   
   },
   mounted() {
     document.body.addEventListener("click", (e) => {
       if(e.target.classList.contains("note-options-icon")) return;
       app.note.notes.map(note => note.options = false);
     });
+  
+
+    
+    
+    
   },
   methods: {
     visitUrl: NKC.methods.visitUrl,

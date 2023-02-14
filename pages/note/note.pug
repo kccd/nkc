@@ -7,7 +7,7 @@ block content
 
     .origin-content {{note.content}}
     .notes
-      .note(v-for="n in note.notes")
+      .note(v-for="n in note.notes" :id="n._id" :class="query===n._id?noteHighlighting:''" )
         .note-user
           a.note-user-avatar(@click="visitUrl('/u/' + n.user.uid, true)")
             img(:src="getUrl('userAvatar', n.user.avatar)")
@@ -35,7 +35,8 @@ block content
           button.btn-block.btn.btn-primary(:disabled="!content" v-if="submitting") 保存中...
           button.btn-block.btn.btn-primary(:disabled="!content" @click="saveNewNote" v-else) 保存
 
-  .hidden#data=objToStr({note: data.note})
+
+  .hidden#data=objToStr({note: data.note,query:data.query})
 block scripts
   include ../publicModules/moment
   +includeJS("/note/note.js")

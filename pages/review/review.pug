@@ -176,7 +176,7 @@ block content
                  .review-time 笔记
                 .review-info 链接:
                   .review-thread-title
-                    a(href = `${r.content.url}` target = '_blank' ) 点击跳转
+                    a(href = `${r.content.url}?n=${r.note._id}` target = '_blank' ) 点击跳转
                 if r.reason
                    .review-info 理由:
                    span(v-pre)= r.reason
