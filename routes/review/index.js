@@ -185,10 +185,14 @@ router
        //获取送审核的原因
         const reviewRecord = await db.ReviewModel.findOne({sid: note._id.toString(),source:'note'});
         const  user  = noteObj[note.uid]
+        const  content = {
+          note:note.content,
+          url:`/note/${note.noteId}`
+        }
         data.results.push({
           type:'note',
           note,
-          content:note.content,
+          content,
           user,
           reason: reviewRecord?reviewRecord.reason:''
         })

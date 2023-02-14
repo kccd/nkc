@@ -134,6 +134,7 @@ block content
                       .review-thread-title
                         a(href=`${r.content.url}` target="_blank") 点击跳转
 
+
                 if r.reason
                   .review-info 理由：
                   span(v-pre)= r.reason
@@ -171,12 +172,15 @@ block content
                 .review-info 用户:
                 .review-user
                   a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
-                  .review-info 类型:
-                  .review-time 笔记
+                .review-info 类型:
+                 .review-time 笔记
+                .review-info 链接:
+                  .review-thread-title
+                    a(href = `${r.content.url}` target = '_blank' ) 点击跳转
                 if r.reason
                    .review-info 理由:
                    span(v-pre)= r.reason
-                .review-post-content!=r.content
+                .review-post-content!=r.note.content
                   .review-input-div
                     .m-b-1
                       input(type='radio' :value='true' v-model=`review['${r.note._id}'].pass` )
