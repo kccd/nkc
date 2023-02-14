@@ -32,7 +32,8 @@
               @complaint="complaint"
             )
         //- 动态内容
-        .single-moment-content.pointer(v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
+        .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
+        .single-moment-content.pointer(v-else v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
 
         //- 图片视频
         .single-moment-files
@@ -333,8 +334,9 @@
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
     * prop {String} focus 高亮的评论ID
+    * prop {String} type 当前组件在哪里，详情页（details）或者动态列表
     * */
-    props: ['data', 'focus', 'permissions', 'mode'],
+    props: ['data', 'focus', 'permissions', 'mode', 'type'],
     data: () => ({
       logged: !!state.uid,
       momentData: null,

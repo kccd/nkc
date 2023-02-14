@@ -17,6 +17,18 @@ router
     await moment.deleteMoment();
     await next();
   })
+  .post('/:mid/disable', async (ctx, next) => {
+    //删除动态
+    const {params, db, state, data, permission} = ctx;
+    const {mid} = params;
+    const {uid} = state;
+    const moment = await db.MomentModel.findOnly({_id: mid});
+    if(!moment) ctx.throw(400, '未找到动态，请刷新');
+    if(moment.uid !== uid && !permission('managementMoment'))  return ctx.throw(401, '权限不足');
+    //将当前动态标记为删除
+    await moment.disableMoment();
+    await next();
+  })
   .post('/:mid/recovery', async (ctx, next) => {
     const {params, db} = ctx;
     const {mid} = params;

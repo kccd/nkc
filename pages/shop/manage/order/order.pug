@@ -1,7 +1,19 @@
 extends ../../shop
 block shopTitle
   title 订单管理
+  style.
+    .order-info{
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    .order-info .checkbox{
+      position: absolute;
+      margin: 0;
+      top: 0;
+      left: 0;
+    }
 block shopContent
+  .hidden#data=objToStr({orders: data.orders})
   .order-navs
     a(class=!data.t || data.t === "all" ? "active" : "" href=`/shop/manage/order`).order-nav 全部
     a(class=data.t === "unCost" ? "active" : "" href=`/shop/manage/order?t=unCost`).order-nav 待付款
@@ -23,6 +35,9 @@ block shopContent
     if !data.orders.length
       .null 空空如也~
     else
+      .paging-button
+        a.button.radius-left(onclick='selectAllOrder()') 全选
+        a.button.radius-right(onclick='exportData()') 导出
       .table-responsive
         table.table.table-bordered
           thead
@@ -38,6 +53,9 @@ block shopContent
               tr
                 td(colspan="11").order-infos
                   .order-info
+                    .checkbox
+                      label
+                        input(type='checkbox' value=order.orderId)
                     .value.time=format("YYYY/MM/DD HH:mm:ss", order.orderToc)
                   .order-info
                     .name 订单号：

@@ -3,8 +3,11 @@ const {ThrowForbiddenResponseTypeError} = require('../nkcModules/error');
 const {ResponseTypes} = require('../settings/response');
 
 async function permission(ctx, next){
-  const {data} = ctx;
-	if(!data.userOperationsId.includes(data.operationId)) {
+  const {data, isAPIRoute} = ctx;
+	// 这里判断了请求的是否为API路由
+	// 如果是API路由则绕过全局的权限判断
+	// API路由需要在路由中间件中进行权限判断
+	if(!isAPIRoute && !data.userOperationsId.includes(data.operationId)) {
 		ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 	}
 	await next();
@@ -21,7 +24,7 @@ function OnlyVisitor() {
 
 function OnlyUser() {
 	return async (ctx, next) => {
-		if(!ctx.static.uid) {
+		if(!ctx.state.uid) {
 			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_UN_LOGGED);
 		}
 		await next();
@@ -46,6 +49,16 @@ function OnlyBannedUser() {
 	}
 }
 
+function OnlyCurrentPermission() {
+	return async (ctx, next) => {
+		const operationId = ctx.data.operationId;
+		if(!ctx.data.userOperationsId.includes(operationId)) {
+			ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
+		}
+		await next();
+	}
+}
+
 function OnlyPermission(operation) {
 	return OnlyPermissionsAnd([operation]);
 }
@@ -53,7 +66,7 @@ function OnlyPermission(operation) {
 function OnlyPermissionsOr(operations) {
 	return async (ctx, next) => {
 		for(const operation of operations) {
-			if(ctx.data.userOperations.includes(operation)) {
+			if(ctx.data.userOperationsId.includes(operation)) {
 				return await next();
 			}
 		}
@@ -64,7 +77,7 @@ function OnlyPermissionsOr(operations) {
 function OnlyPermissionsAnd(operations) {
 	return async (ctx, next) => {
 		for(const operation of operations) {
-			if(!ctx.data.userOperations.includes(operation)) {
+			if(!ctx.data.userOperationsId.includes(operation)) {
 				ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
 			}
 		}

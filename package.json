@@ -164,9 +164,10 @@
     "vue-contextmenu": "^1.5.11",
     "vue-router": "^3.5.3",
     "vue-simple-spinner": "^1.2.10",
-    "vuetify": "^2.5.10",
+    "vuetify": "^2.6.10",
     "vuex": "^3.6.2",
     "xbbcode-parser": "^0.1.2",
+    "xlsx": "^0.18.5",
     "xss": "^1.0.3"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
       blank(v-if="(!posts || posts.length === 0) && !loading")
       .user-list-warning(v-if="loading") 加载中~
-      post-list(ref="postList" :posts="posts" :permissions="permissions")
+      post-list(ref="postList" :posts="posts" :permissions="permissions" type="creation")
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 <script>

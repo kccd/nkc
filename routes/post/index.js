@@ -32,6 +32,12 @@ router
     await next();
   })
   .get('/:pid', async (ctx, next) => {
+    // 设置 referer 策略
+    // 解决分享回复时附件链接跨域无法读取referer中token的问题
+    ctx.set('Referrer-Policy', 'unsafe-url');
+    await next();
+  })
+  .get('/:pid', async (ctx, next) => {
     const {nkcModules, data, db, query, state} = ctx;
 		const {token, page=0, highlight, redirect} = query;
     const {pid} = ctx.params;

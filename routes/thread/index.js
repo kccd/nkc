@@ -174,6 +174,12 @@ threadRouter
     await next();
   })
   .get('/:tid', async (ctx, next) => {
+    // 设置 referer 策略
+    // 解决分享文章时附件链接跨域无法读取referer中token的问题
+    ctx.set('Referrer-Policy', 'unsafe-url');
+    await next();
+  })
+  .get('/:tid', async (ctx, next) => {
     const {
       data, db, query, nkcModules, state, internalData
     } = ctx;

@@ -1,3 +1,7 @@
+import {getDataById} from "../../../lib/js/dataConversion";
+import {getUrl} from "../../../lib/js/tools";
+
+const data = getDataById('refundDetailData');
 var app = new Vue({
   el: '#app',
   data: {
@@ -54,8 +58,6 @@ var app = new Vue({
     },
   },
   mounted: function() {
-    var data = document.getElementById('data');
-    data = JSON.parse(data.innerHTML);
     this.order = data.order;
     this.user = data.user;
     this.refunds = data.refunds;
@@ -66,6 +68,7 @@ var app = new Vue({
     }
   },
   methods: {
+    getUrl,
     format: NKC.methods.format,
     clearInfo: function() {
       this.error = "";
@@ -84,9 +87,9 @@ var app = new Vue({
       if(agree === false) {
         if(reason === "") return this.error = "请输入拒绝理由";
       }
-      
+
       agree = agree? "agree": "disagree";
-      
+
       nkcAPI("/e/settings/shop/refunds/" + agree, "POST", {
         orderId: this.order.orderId,
         reason: this.reason,
@@ -134,4 +137,4 @@ var app = new Vue({
       }[t];
     }
   }
-});   
+});

@@ -26,7 +26,7 @@ draftsRouter
           url: `/t/${thread.tid}`,
           title: firstPost.t
         };
-      } 
+      }
       else if (desType === draftDesType.modifyThread) {
         const thread = await db.ThreadModel.findOne({tid: post.tid});
         if (!thread) continue;
@@ -68,7 +68,7 @@ draftsRouter
           };
           d.type = "modifyPost";
         }
-      } */ 
+      } */
       /* else {
         if(desType === 'forumDeclare') {
           d.type = 'modifyForumDeclare';
@@ -126,7 +126,7 @@ draftsRouter
       draftId, // 草稿ID
       saveType
     } = body;
-    if (!['newThread', 'modifyThread', 'newPost', 'modifyPost', 'newComment', 'modifyComment'].includes(desType)) 
+    if (!['newThread', 'modifyThread', 'newPost', 'modifyPost', 'newComment', 'modifyComment'].includes(desType))
       ctx.throw(500, '草稿类型错误');
     let {
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
@@ -138,10 +138,11 @@ draftsRouter
     let contentLength;
     if (parentPostId) {
       const parentPost = await db.PostModel.findOnly({pid: parentPostId});
-      if (!parentPost) ctx.throw(400, 'parentPostId不存在'); 
-    };
+      if (!parentPost) ctx.throw(400, 'parentPostId不存在');
+    }
+    const draftTypes = (await db.DraftModel.getType());
     if(draftId) {
-      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
+      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid, type: draftTypes.beta}).sort({tlm: -1});
     }
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
@@ -156,7 +157,7 @@ draftsRouter
     if(draft) { // 存在草稿
       // 更新草稿
       await draft.updateOne(draftObj);
-      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
+      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid, type: draftTypes.beta}).sort({tlm: -1});
       if (saveType === 'timing') {
         // 定时保存
         await draft.checkContentAndCopyToBetaHistory();
@@ -173,7 +174,7 @@ draftsRouter
           const surveyDB = await db.SurveyModel.createSurvey(survey, false);
           await draft.updateOne({surveyId: surveyDB._id});
         }
-      } 
+      }
       // else if(desType === "forum" && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
         else if(desType === draftDesType.newThread && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
         await draft.updateOne({surveyId: null});
@@ -183,12 +184,12 @@ draftsRouter
       // "forumDeclare", 'forumLatestNotice'
       // if(!["forum", "thread", "post"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
       if(!Object.values(draftDesType).includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
-      
+
       // if(desType === "thread") {
       //   await db.ThreadModel.findOnly({tid: desTypeId});
       // } else if(desType === "post") {
       //   await db.PostModel.findOnly({pid: desTypeId});
-      // } 
+      // }
       // else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
       //   await db.ForumModel.findOnly({fid: desTypeId});
       // }
@@ -216,7 +217,7 @@ draftsRouter
     }
     // 将数据库中的内容长度发送给前端，用于内容减少时提示用户是否需要保存
     data.contentLength = contentLength;
-    data.draft = await db.DraftModel.findOne({did: draft.did});
+    data.draft = await db.DraftModel.findOne({_id: draft._id, uid: user.uid});
     await next();
   });
   /*.post('/', async(ctx, next) => {

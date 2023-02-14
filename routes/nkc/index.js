@@ -184,6 +184,7 @@ router
       }
       // 获取统计
       const keysString = await nkcModules.getRedisKeys('operationStatistics', '*');
+      const startTimeKey = await nkcModules.getRedisKeys('operationStatisticsStartTime');
       const keys = await redisClient.keysAsync(keysString);
       const operationArray = await redisClient.mgetAsync(keys);
       const statisticsOperation = [];
@@ -207,6 +208,8 @@ router
         });
       }
       data.statisticsOperation = statisticsOperation;
+      const startTime = await redisClient.getAsync(startTimeKey);
+      data.statisticsStartTime = startTime? Number(startTime): 0;
       ctx.template = "nkc/status/status.pug";
     }
     await next();
@@ -216,9 +219,12 @@ router
     const {type} = body;
     const {redisClient} = settings;
     if(type === 'removeStatisticsOperation') {
+      const startTimeKey = await nkcModules.getRedisKeys('operationStatisticsStartTime');
       const keysString = await nkcModules.getRedisKeys('operationStatistics', '*');
       const keys = await redisClient.keysAsync(keysString);
       await redisClient.delAsync(keys);
+      const now = Date.now();
+      await redisClient.setAsync(startTimeKey, now);
     }
     await next();
   })

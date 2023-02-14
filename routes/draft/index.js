@@ -49,15 +49,16 @@ router
   //获取文档历史版本
   ctx.template = 'draft/history/document.pug'
   const {db, data, state, query, permission, nkcModules} = ctx;
-  const {desTypeId, source, page=0} = query;
+  const {draftId, desTypeId, source, page=0} = query;
   data.type = source;
   const {betaHistory, stableHistory} = await db.DraftModel.getType();
   const queryCriteria = { desTypeId, desType: source, type: {$in: [betaHistory, stableHistory]}, uid: state.uid };
-  const {newThread} = await db.DraftModel.getDesType();
-
+  const {newThread,newPost} = await db.DraftModel.getDesType();
   if (source === newThread) {
     queryCriteria.did = desTypeId;
     delete queryCriteria.desTypeId;
+  }else if(source === newPost){
+    queryCriteria.did = draftId;
   }
   //  获取列表
   // 返回分页信息
@@ -85,20 +86,18 @@ router
     });
     // 包含了将此版本改为编辑版的url 组成
     data.urlComponent = {_id: data.document._id, did: data.document.did, source, page, desTypeId};
+    // 查询文章作者
+    const user = await db.UserModel.findOnly({uid: data.document.uid});
+    const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+    data.user = {...user.toObject(), avatarUrl};
   }else{
     data.document = '';
     // data.bookId = ''
     data.urlComponent = ''
   }
-  // 查询文章作者
-  const user = await db.UserModel.findOnly({uid: data.document.uid});
-  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
-  data.user = {...user.toObject(), avatarUrl};
-  if(data.document.origin !== 0){
-    const originDesc = nkcModules.apiFunction.getOriginLevel(data.document.origin);
-    data.document = {...data.document.toObject(), originDesc};
-  }else {
-    data.document = data.document.toObject();
+  if(data.document.originState !== 0){
+    const originDesc = nkcModules.apiFunction.getOriginLevel(data.document.originState);
+    data.document.originDesc = originDesc;
   }
   await next()
 })
@@ -162,6 +161,13 @@ router
   });
   // let editorUrl = {_id: data.document._id}
   data.urlComponent = {_id: data.document._id, source, did: data.document.did, page, desTypeId};
+  // 查询文章作者
+  const user = await db.UserModel.findOnly({uid: data.document.uid});
+  const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
+  data.user = {...user.toObject(), avatarUrl};
+  if(data.document.originState !== 0){
+    data.document.originDesc = nkcModules.apiFunction.getOriginLevel(data.document.originState);
+  }
   await next()
 })
 .post('/history/:_id/edit', async (ctx, next)=>{

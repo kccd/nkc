@@ -83,6 +83,10 @@ fundRouter
         { // 已终止的申请
           'status.adminSupport': true,
           useless: 'stop'
+        },
+        {
+          'status.usersSupport': true,
+          useless: 'refuse'
         }
       ]
 

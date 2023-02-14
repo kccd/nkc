@@ -59,8 +59,84 @@ router
     if(refund) {
       refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
     }
+    let canModifyAddressInfo;
+    try{
+      await db.ShopOrdersModel.checkModifyAddressInfoPermission(data.order.orderId);
+      canModifyAddressInfo = true;
+    } catch(err) {
+      canModifyAddressInfo = false;
+    }
+    data.canModifyAddressInfo = canModifyAddressInfo;
     data.refund = refund;
     ctx.template = 'shop/order/detail.pug';
+    await next();
+  })
+  .put('/delivery', async (ctx, next) => {
+    const {state, db, body, nkcModules, data} = ctx;
+    const {checkString} = nkcModules.checkData;
+    if(state.uid !== data.order.buyUid) {
+      ctx.throw(403, '权限不足');
+    }
+    await db.ShopOrdersModel.checkModifyAddressInfoPermission(data.order.orderId);
+    const {receiveMobile, receiveName, receiveAddress} = body;
+    checkString(receiveName, {
+      name: '收件人',
+      minLength: 1,
+      maxLength: 20,
+    });
+    checkString(receiveMobile, {
+      name: '收件人手机号',
+      minLength: 1,
+      maxLength: 20
+    });
+    checkString(receiveAddress, {
+      name: '收货地址',
+      minLength: 1,
+      maxLength: 500
+    });
+    await db.ShopOrdersModel.updateOne({orderId: data.order.orderId}, {
+      $set: {
+        receiveAddress,
+        receiveName,
+        receiveMobile
+      }
+    });
+    const time = new Date();
+    const sources = await db.ShopOperationModel.getOperationSources();
+    const types = await db.ShopOperationModel.getOperationTypes();
+    if(data.order.receiveName !== body.receiveName) {
+      await db.ShopOperationModel.saveOperation({
+        toc: time,
+        type: types.modify_order_receive_name,
+        source: sources.order,
+        sid: data.order.orderId,
+        uid: state.uid,
+        oldData: data.order.receiveName,
+        newData: body.receiveName,
+      });
+    }
+    if(data.order.receiveMobile !== body.receiveMobile) {
+      await db.ShopOperationModel.saveOperation({
+        toc: time,
+        type: types.modify_order_receive_mobile,
+        source: sources.order,
+        sid: data.order.orderId,
+        uid: state.uid,
+        oldData: data.order.receiveMobile,
+        newData: body.receiveMobile,
+      });
+    }
+    if(data.order.receiveAddress !== body.receiveAddress) {
+      await db.ShopOperationModel.saveOperation({
+        toc: time,
+        type: types.modify_order_receive_address,
+        source: sources.order,
+        sid: data.order.orderId,
+        uid: state.uid,
+        oldData: data.order.receiveAddress,
+        newData: body.receiveAddress,
+      });
+    }
     await next();
   })
   .use('/refund', refundRouter.routes(), refundRouter.allowedMethods());

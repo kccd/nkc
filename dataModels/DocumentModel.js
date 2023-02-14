@@ -14,6 +14,7 @@ const documentStatus = {
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
   cancelled: 'cancelled', // 取消发布
+  deleted: 'deleted', // 已删除
 };
 
 const documentTypes = {

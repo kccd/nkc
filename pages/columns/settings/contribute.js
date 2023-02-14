@@ -68,7 +68,7 @@ var app = new Vue({
         if(cid.length === 0) return screenTopWarning("请选择文章分类");
       }
       nkcAPI("/m/" + this.column._id + "/settings/contribute", "POST", {
-        contributesId: [c._id],
+        contributes: [{_id: c._id, source: c.source}],
         reason: reason,
         mainCategoriesId: cid,
         minorCategoriesId: mcid,

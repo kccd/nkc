@@ -54,7 +54,7 @@ block baseColumnContent
         vote: article.vote,
         permissions: data.permissions,
       })
-  .hidden#data=objToStr({type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
+  .hidden#data=objToStr({allCategories: data.allCategories, type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   span.move-article-category#moveCategoryBoxAppInColumns(v-cloak)
     move-box(
       ref='moveCategoryBox'
@@ -66,20 +66,24 @@ block baseColumnContent
           div(style=`margin: 0.5rem 0 0 0;${article.status === 'faulty' ? 'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;' : ''}`)
             .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
             p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${article.reason}`
-            if permission('review')
+            if data.permissions.review
             +thread
         else if article.status === 'disabled'
           div(style=`margin: 0.5rem 0 0 0;${article.status === 'disabled' ? 'border: 1px solid #666;padding: 0.5rem;border-radius: 5px;background-color: #fff;' : ''}`)
             .h4.text-center(style='color: #666;') 本文已被封禁，不可查看
-            if permission('review')
+            if data.permissions.review
               .text-center
                 a(onclick="unblock()") 点击解封
             p.text-center(style='border-bottom: 1px solid #666; padding-bottom: 1rem;color: #666;')= `封禁原因：${article.reason}`
-            if permission('review')
+            if data.permissions.review
               +thread
         else if article.status === 'unknown'
-          -let reviewData = article
           include ./article/module_review
+          +module_review({
+            reason: article && article.reason,
+            permissions: {review: data.permissions && data.permissions.review}
+          })
+
           +thread
         else if article.status === 'deleted'
           .h4.text-center(style='color: #666;') 文章已被删除，不可查看

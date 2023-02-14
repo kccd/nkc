@@ -29,10 +29,9 @@ block settingsContent
           .p-t-3.p-b-3.text-center 空空如也~
         div(v-else)
           .contribute-list-li(v-for="c in contributes")
-            span.anonymous-name(v-if="c.thread.firstPost.anonymous")=anonymousInfo.username
-            a(v-else :href="'/u/' + c.uid" target="_blank") {{c.user.username}}
+            a(:href="c.user && c.user.url" target="_blank") {{c.user && c.user.username}}
             span &nbsp;&nbsp;{{fromNow(c.toc)}}&nbsp;&nbsp;投稿文章&nbsp;&nbsp;
-            a(:href="'/t/' + c.tid" target="_blank") {{c.thread.firstPost.t}}
+            a(:href="c.thread && c.thread.url" target="_blank") {{c.thread && c.thread.t}}
             .m-t-05(v-if="c.description")
               p 补充说明：{{c.description}}
             .m-t-05(v-if="c.reason")

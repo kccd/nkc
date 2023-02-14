@@ -1,7 +1,7 @@
 <template lang="pug">
   .module-dialog-body
-    .module-dialog-header(ref="draggableHandle")
-      .module-dialog-title 投诉或举报
+    .module-dialog-header
+      .module-dialog-title(ref="draggableHandle") 投诉或举报
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
@@ -51,6 +51,7 @@
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
+    padding-right: 3rem;
     .module-dialog-close{
       cursor: pointer;
       color: #aaa;

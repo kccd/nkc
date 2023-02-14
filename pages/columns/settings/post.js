@@ -1,7 +1,12 @@
+import ArticleSelectorDialog from "../../lib/vue/publicVue/selectorArticleOrThread/ArticleSelectorDialog";
+
 var data = NKC.methods.getDataById("data");
 
 var app = new Vue({
   el: "#app",
+  components:{
+    'article-selector-dialog': ArticleSelectorDialog,
+  },
   data: {
     column: data.column,
     mainCategories: [],
@@ -23,10 +28,7 @@ var app = new Vue({
     selectMul: true,
   },
   mounted: function() {
-    this.init();
-    this.getCategories();
-    this.getPosts(0);
-    moduleToColumn.init();
+    this.initAllData()
   },
   computed: {
     category: function() {
@@ -59,6 +61,12 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    initAllData: function() {
+      this.init();
+      this.getCategories();
+      this.getPosts(0);
+      moduleToColumn.init();
+    },
     moveSelected: function() {
       var selectedColumnPostsId = this.selectedColumnPostsId;
       if(selectedColumnPostsId.length === 0) return screenTopWarning("请勾选需要处理的文章");
@@ -235,6 +243,42 @@ var app = new Vue({
       if(!disableGetPosts) {
         this.getPosts(0);
       }
+    },
+    chooseArticles: function(articles) {
+      const _this = this;
+      const threadsId = [];
+      const articlesId = [];
+      for(let i = 0; i < articles.length; i++) {
+        if(articles[i].source === 'thread'){
+          threadsId.push(articles[i].tid);
+        }else {
+          articlesId.push(articles[i].tid);
+        }
+      }
+      moduleToColumn.show(function(data) {
+        var mainCategoriesId = data.mainCategoriesId;
+        var minorCategoriesId = data.minorCategoriesId;
+        var columnId = data.columnId;
+        nkcAPI("/api/v1/column/" + columnId + "/articles", "POST", {
+          threadsId,
+          articlesId,
+          mainCategoriesId: mainCategoriesId,
+          minorCategoriesId: minorCategoriesId,
+        })
+          .then(function() {
+            screenTopAlert("操作成功");
+            moduleToColumn.hide();
+            _this.initAllData();
+          })
+          .catch(function(data) {
+            screenTopWarning(data);
+          })
+      }, {
+        selectMul: true
+      })
+    },
+    openSelector: function (){
+      this.$refs.articleSelectorDialog.open(this.chooseArticles, {articleSource:['zone']})
     }
   }
 });

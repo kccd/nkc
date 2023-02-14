@@ -92,6 +92,7 @@ const app = new Vue({
       const masters = $('.thread-category-master');
       const articles = $('.article-category-master');
       const nodes = $('.thread-category-node');
+      const articleNodes = $('.article-category-node');
       const categories = [];
       for(let i = 0; i < masters.length; i++) {
         const m = masters.eq(i);
@@ -111,6 +112,13 @@ const app = new Vue({
       }
       for(let i = 0; i < nodes.length; i++) {
         const n = nodes.eq(i);
+        categories.push({
+          cid: Number(n.attr('data-cid')),
+          order: i
+        });
+      }
+      for(let i = 0; i < articleNodes.length; i++) {
+        const n = articleNodes.eq(i);
         categories.push({
           cid: Number(n.attr('data-cid')),
           order: i

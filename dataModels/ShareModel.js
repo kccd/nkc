@@ -473,11 +473,7 @@ shareSchema.statics.getShareContent = async function(props) {
     throwErr(400, `未知的分享类型`);
   }
   if(type === shareTypes.post) {
-    const post = await PostModel.findOnly({pid: id}, {
-      t: 1,
-      cover: 1,
-      c: 1,
-    });
+    const post = await PostModel.findOnly({pid: id});
     const thread = await post.extendThread();
     const firstPost = await thread.extendFirstPost();
     await thread.ensurePermission(userRoles, userGrade, user);

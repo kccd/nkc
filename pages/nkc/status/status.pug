@@ -3,7 +3,7 @@ block nkcTitle
   title 网站总览 - 前台管理
   +includeCSS("/bootstrap/css/bootstrap-datetimepicker.min.css")
 block nkcContent
-  #data.hidden=objToStr({operations: data.statisticsOperation})
+  #data.hidden=objToStr({operations: data.statisticsOperation, startTime: data.statisticsStartTime})
   .col-xs-12.col-md-12.m-b-1
     .e-panel
       button.btn.btn-default(onclick="getResults({type: 'today'})") 今日
@@ -36,7 +36,7 @@ block nkcContent
             data-global-data=objToStr({uid: targetUser.uid})
             )=targetUser.username
   .col-xs-12.col-md-12.m-b-1#app(v-cloak)
-    h5 操作统计
+    h5 操作统计（开始时间：{{startTimeString}}）
     .m-b-1
       span 排序：
       button.btn.btn-default(:class='{"btn-primary": sortType === "count"}' @click='changeSortType("count")') 访问次数

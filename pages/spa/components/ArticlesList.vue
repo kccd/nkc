@@ -1,8 +1,9 @@
 <template lang="pug">
   .articles-list
     .article-item-container(v-for="(article, index) in articles")
-      .article-item-status(:class="articleStatus(article.status)")
-        .article-status-content(v-if="articleStatusContent(article.status)" ) {{articleStatusContent(article.status)}}
+      .row
+        .article-item-status.col-md-6(:class="articleStatus(article.status)")
+          .article-status-content(v-if="articleStatusContent(article.status)" ) {{articleStatusContent(article.status)}}
       article-item(:article="article" @delete="deleteItem(index)")
 </template>
 

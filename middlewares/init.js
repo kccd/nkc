@@ -105,6 +105,7 @@ module.exports = async (ctx, next) => {
 
     let errorData;
     let errorPage;
+    let responseType = 'ERROR';
 
     try{
       const {type, args} = JSON.parse(errorMessageString);
@@ -112,6 +113,7 @@ module.exports = async (ctx, next) => {
       switch (type) {
         case ErrorTypes.RESPONSE_TYPE: {
           errorData = translateResponseType(ctx.acceptLanguage, args.responseType, args.args);
+          responseType = args.responseType;
           break;
         }
         case ErrorTypes.ERROR_PAGE: {
@@ -135,12 +137,22 @@ module.exports = async (ctx, next) => {
 
     ctx.template = `error/${errorPage}.pug`;
 
-    // 出错时的小提示
-    ctx.data.errorTips = errorTips;
-    // 错误信息，字符串或对象
-    ctx.data.error = errorData;
-	  ctx.data.status = ctx.status;
-	  ctx.data.url = ctx.url;
+    if(ctx.isAPIRoute) {
+      ctx.apiData = {
+        code: 0,
+        type: responseType,
+        message: errorData,
+        data: {}
+      };
+    } else {
+      // 出错时的小提示
+      ctx.data.errorTips = errorTips;
+      // 错误信息，字符串或对象
+      ctx.data.error = errorData;
+      ctx.data.status = ctx.status;
+      ctx.data.url = ctx.url;
+    }
+
 		ctx.type = ctx.type || 'application/json';
 		if(ctx.filePath) ctx.filePath = "";
     if(ctx.remoteFile) ctx.remoteFile = null;

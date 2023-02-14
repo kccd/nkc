@@ -1029,7 +1029,7 @@ schema.statics.getCommentsInfo = async function(comments) {
     const commentDocument = commentDocumentsObj[did] || null;
     if(!articlePost) continue;
     const articleDocument = articleDocumentObj[articlePost.sid] || null;
-    if(!articlePost) continue;
+    if(!articleDocument) continue;
     const columnPost = columnPostsObj[articlePost.sid];
     if(articlePost.source === columnSource) {
       if(!columnPost) continue;

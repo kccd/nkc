@@ -266,6 +266,7 @@
       modifyUploadedResources() {
         const {socketHandleResources} = this;
         if(socketHandleResources.length === 0) return;
+        let changed = false;
         const content = this.getContent();
         const container = $('<div></div>');
         container.html(content);
@@ -274,6 +275,7 @@
           const images = container.find(
             `img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`
           );
+          if(images.length === 0) continue;
           if(success) {
             const imageSrc = getUrl('resource', rid);
             images
@@ -288,9 +290,12 @@
               .removeAttr('data-type')
               .removeAttr('data-id')
           }
+          changed = true;
         }
         this.socketHandleResources.length = 0;
-        this.setContent(container.html());
+        if(changed) {
+          this.setContent(container.html());
+        }
       },
       clearSocketHandleTimer() {
         clearTimeout(this.socketHandleTimer);

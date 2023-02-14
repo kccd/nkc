@@ -95,8 +95,10 @@
         v-else
         :class="watchType === 'select'?'':'min-length'")
         .resources-loading.resources-list-placeholder(v-if="loading")
-          .fa.fa-spinner.fa-spin.fa-fw
-          .loading-text 加载中...
+          .resource-padding-container(v-for="item in quota" :class="watchType === 'select'?'resource-select':'resource-category'")
+          .loading-container
+            .fa.fa-spinner.fa-spin.fa-fw
+            .loading-text 加载中...
         .resource-info.resources-list-placeholder(v-else-if="resources.length === 0") 空空如也~
         //- 资源显示
         .resource-padding-container(
@@ -106,7 +108,7 @@
           )
           .resource
             span(v-if='r.state === "usable"')
-              .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
+              .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(' + getUrl('resourceCover', r.rid) + ')'")
               .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url('+getUrl('fileCover', 'mp3')+')'")
@@ -277,8 +279,8 @@
         .resources-loading {
           width: 100%;
           height: 100%;
-          font-size: 1.2rem;
-          text-align: center;
+          //font-size: 1.2rem;
+          //text-align: center;
           .loading-text {
           }
         }
@@ -661,7 +663,16 @@
   .size-limit .fa{
     color: #555;
   }
-  .resources-list-placeholder{
+  .loading-container{
+    font-size: 1.2rem;
+    padding-top: 20%;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  /*.resources-list-placeholder{
     min-height: 40rem;
     padding-top: 15rem;
   }
@@ -670,7 +681,7 @@
       min-height: 19rem;
       padding-top: 8rem;
     }
-  }
+  }*/
 </style>
 <script>
 import 'cropperjs/dist/cropper.css';
@@ -689,7 +700,7 @@ import CommonModal from "./CommonModal";
 import SelectCategory from "./SelectCategory";
 import {openImageViewer} from "../js/imageViewer";
 
-const {isApp} = getState();
+const {isApp, fileDomain} = getState();
 import {
   RNTakePictureAndUpload,
   RNTakeAudioAndUpload,
@@ -712,7 +723,6 @@ export default {
     uid: "",
     user: "",
     pageType: "list", // list: 资源列表, uploader: 上传
-    quota: 16,
     pageNumber: "",
     allowedExt: ['all', 'audio', 'video', 'attachment', 'picture'],
     countLimit: 100,
@@ -763,6 +773,9 @@ export default {
     this.disableDragUploadEvent();
   },
   computed: {
+    quota() {
+      return this.watchType === 'category'? 18: 16
+    },
     fileSizeLimit: function() {
       var sizeLimit = this.sizeLimit;
       if(!sizeLimit) return '';
@@ -1098,8 +1111,6 @@ export default {
         category,
         resourceCategories
       } = this;
-      //当选择资源时每页16个，否则为18个
-      if(this.watchType === 'category') quota = 18;
       // quota 每页数据量 skip 第几页 resource Type '全部 已上传 未上传' category 资源类型
       const url = `/me/media?quota=${quota}&skip=${skip}&type=${resourceType}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}&reqType=${reqType}`;
       const self = this;
@@ -1172,7 +1183,11 @@ export default {
             var formData = new FormData();
             formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
             formData.append('cid', self.resourceCategories);
-            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+            let url = '/r';
+            /*if(fileDomain) {
+              url = fileDomain + url;
+            }*/
+            return nkcUploadFile(url, "POST", formData, function(e, progress) {
               f.progress = progress;
             }, 60 * 60 * 1000);
           }

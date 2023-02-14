@@ -7,6 +7,7 @@ module.exports = async (ctx, next) => {
     normal: normalMoment,
     faulty: faultyMoment,
     unknown: unknownMoment,
+    disabled: disabledMoment,
   } = await db.MomentModel.getMomentStatus();
 
   // const {moment: momentType, article: articleType} = await db.MomentModel.getMomentQuoteTypes();
@@ -25,6 +26,7 @@ module.exports = async (ctx, next) => {
             normalMoment,
             faultyMoment,
             unknownMoment,
+            disabledMoment,
           ]
         }
       }
