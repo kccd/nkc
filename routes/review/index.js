@@ -169,9 +169,22 @@ router
     
     //查找出需要审核的note
     let notes = await  db.NoteContentModel.find(n).sort({toc:-1}).skip(paging.start).limit(paging.perpage)
+    const noteUid = new Set();
+    for (const note of notes) {
+      noteUid.add(note.uid)
+    }
+    const noteUsers = await db.UserModel.find({uid: {$in: [...noteUid]}});
+    const noteObj = {}
+    noteUsers.map(user=>{
+      noteObj[user.uid] = user
+    })
+   
+    
+
      for (const note of notes){
        //获取送审核的原因
         const reviewRecord = await db.ReviewModel.findOne({sid: note._id.toString(),source:'note'});
+        const  user  = noteObj[note.uid]
         data.results.push({
           type:'note',
           note,
