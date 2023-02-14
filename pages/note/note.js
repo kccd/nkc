@@ -1,5 +1,5 @@
 const data = NKC.methods.getDataById("data");
-
+import {scrollPageToElement} from  '../lib/js/pageSwitch'
 data.note.notes.map(note => {
   note.edit = false;
   note.options = false;
@@ -26,7 +26,9 @@ const app = new Vue({
       if(e.target.classList.contains("note-options-icon")) return;
       app.note.notes.map(note => note.options = false);
     });
-  
+   
+    const element = $(`#${data.query.n}`)
+    scrollPageToElement(element) //滚动
 
     
     
