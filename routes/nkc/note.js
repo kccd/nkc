@@ -17,10 +17,11 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {body, db, nkcModules, data} = ctx;
+    const {body, db, nkcModules, data,} = ctx;
     const {noteContentId, type, content} = body;
     const noteContent = await db.NoteContentModel.findOne({_id: noteContentId});
-    const {status} =noteContent
+    const {status,uid} =noteContent
+    let message ={}
     if(!noteContent) ctx.throw(400, `未找到ID为${noteContentId}的笔记`);
     if(type === "modify") {
       const {checkString} = nkcModules.checkData;
@@ -44,6 +45,23 @@ router
       ctx.throw(400,`已经取消屏蔽用户`)
     }
     else if(type === "disable"&& status!== 'deleted') {
+     message =await db.MessageModel({
+        _id:await db.SettingModel.operateSystemID("messages",1),
+        r: uid,
+        ty:'STU',
+        c:{
+          delType:'disabled',
+          violation:false,
+          type:'noteDisabled',
+          noteId:noteContentId,
+          reason:'测试测试',
+        }
+      })
+      if(message) {
+        await message.save();
+        //通过socket通知作者
+        await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      }
       await noteContent.updateOne({disabled: true,status:'disabled'});
     } else if(type === "cancelDisable"&& status!== 'deleted' ) {
       await noteContent.updateOne({disabled: false,status:'normal'});

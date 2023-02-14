@@ -473,7 +473,7 @@ router
        }
        //如果要提醒用户
         if(remindUser){
-          message = db.MessageModel({
+          message =await db.MessageModel({
             _id: await db.SettingModel.operateSystemID("messages",1) ,
             r: note.uid,
             ty: 'STU',
@@ -489,6 +489,8 @@ router
       }
       
     }
+  
+    console.log(message)
     if(message) {
       await message.save();
       //通过socket通知作者

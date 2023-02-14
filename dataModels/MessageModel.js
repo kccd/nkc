@@ -854,6 +854,7 @@ messageSchema.statics.getParametersData = async (message) => {
     };
   }
   else if(type === 'noteDisabled'){
+   
     const {noteId,reason} = message.c
     const note = await  NoteContentModel.findOne({_id:noteId})
     if(!note) return null;
