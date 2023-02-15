@@ -18,12 +18,11 @@ router
   })
   .post("/", async (ctx, next) => {
     const {body, db, nkcModules, data,} = ctx;
-    const {noteContentId, type, content} = body;
+    const {noteContentId, type, content,remindUser,reason,violation } = body;
     const noteContent = await db.NoteContentModel.findOne({_id: noteContentId});
     const {status,uid} =noteContent
     let message ={}
     if(!noteContent) ctx.throw(400, `未找到ID为${noteContentId}的笔记`);
-
     if(type === "modify") {
       const {checkString} = nkcModules.checkData;
       checkString(content, {
@@ -46,18 +45,22 @@ router
       ctx.throw(400,`已经取消屏蔽用户`)
     }
     else if(type === "disable"&& status!== 'deleted') {
-     message =await db.MessageModel({
-        _id:await db.SettingModel.operateSystemID("messages",1),
-        r: uid,
-        ty:'STU',
-        c:{
-          delType:'disabled',
-          violation:false,
-          type:'noteDisabled',
-          noteId:noteContentId,
-          reason:'测试测试',
-        }
-      })
+      
+      if(remindUser){
+        message =await db.MessageModel({
+          _id:await db.SettingModel.operateSystemID("messages",1),
+          r: uid,
+          ty:'STU',
+          c:{
+            delType:'disabled',
+            violation,
+            type:'noteDisabled',
+            noteId:noteContentId,
+            reason,
+          }
+        })
+      }
+     
       if(message) {
         await message.save();
         //通过socket通知作者

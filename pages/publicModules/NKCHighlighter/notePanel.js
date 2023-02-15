@@ -213,7 +213,9 @@ NKC.modules.NotePanel = class {
                 data.type = "disable";
                 data.noteId = note._id;
                 data.noteContentId = n._id;
+                data.remindUser = obj.remindUser
                 data.reason = obj.reason;
+                data.violation = obj.violation
                 nkcAPI(url, method, data)
                   .then(function() {
                     n.disabled = !n.disabled;
