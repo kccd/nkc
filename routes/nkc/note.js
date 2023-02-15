@@ -45,7 +45,7 @@ router
       ctx.throw(400,`已经取消屏蔽用户`)
     }
     else if(type === "disable"&& status!== 'deleted') {
-      
+    
       if(remindUser){
         message =await db.MessageModel({
           _id:await db.SettingModel.operateSystemID("messages",1),
@@ -53,15 +53,12 @@ router
           ty:'STU',
           c:{
             delType:'disabled',
-            violation,
+            violation:violation?violation:false,
             type:'noteDisabled',
             noteId:noteContentId,
             reason,
           }
         })
-      }
-     
-      if(message) {
         await message.save();
         //通过socket通知作者
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
