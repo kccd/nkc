@@ -20,6 +20,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
               li(@click="modifyNoteContent(n)" v-if=`n.user.uid === uid` :class="n.status === 'disabled'?'disabled':''"  ) 编辑
               li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
               li(@click="deleteNoteContent(n, 'disable')" v-if=`managementNote`) {{n.status === 'disabled' ?"解除屏蔽":"屏蔽"}}
+
         .note-panel-content-body
           .note-panel-content(v-if="!n.edit" v-html="n.html || '笔记内容已丢失'")
           .note-panel-content(v-else)
@@ -31,6 +32,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
         span 我也是有底线的
 
     .form.p-t-05
+      disabled(ref='disabled')
       textarea.note-panel-textarea.create-textarea(rows=4 placeholder="添加笔记（公开、500字限制）" v-model="content" @input="autoResize" @keyup.ctrl.enter="saveNewNote")
       .m-b-05(v-if="content")
         button.btn.btn-xs.btn-primary(v-if="submitting") 保存中...
@@ -38,5 +40,8 @@ include ../../publicModules/unfixedPanel/unfixedPanel
 
 
 
+
 include ../moment
 +includeJS("/publicModules/NKCHighlighter/notePanel.js")
+
+

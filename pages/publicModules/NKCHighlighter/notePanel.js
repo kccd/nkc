@@ -1,3 +1,5 @@
+import disabledNote from '../../lib/vue/post/DisabledPost.vue'
+import reject from "@icon-park/vue/lib/icons/Reject";
 NKC.modules.NotePanel = class {
   constructor() {
     const self = this;
@@ -20,6 +22,7 @@ NKC.modules.NotePanel = class {
         },
         // 显示笔记
         note: "",
+
           /* note的数据结构
           {
             _id: Number,
@@ -178,31 +181,53 @@ NKC.modules.NotePanel = class {
           if(type === "delete") {
             url = `/note/${note._id}/c/${n._id}`;
             method = "DELETE";
+            sweetQuestion("确定要执行此操作？")
+              .then(() => {
+                return nkcAPI(url, method, data);
+              })
+              .then(function() {
+                  n.deleted = true;
+                sweetSuccess("操作成功");
+              })
+              .catch(sweetError)
           } else {
             method = "POST";
             url = `/nkc/note`;
             if(n.status === 'disabled') {
               data.type = "cancelDisable";
+              data.noteId = note._id;
+              data.noteContentId = n._id;
+              sweetQuestion("确定要执行此操作？")
+                .then(() => {
+                  return nkcAPI(url, method, data);
+                })
+                .then(function() {
+                  n.deleted = true;
+                  sweetSuccess("操作成功");
+                })
+                .catch(sweetError)
             } else {
-              data.type = "disable";
+              this.$refs.disabled.open(function fn(obj){
+                method = "POST";
+                url = `/nkc/note`;
+                data.type = "disable";
+                data.noteId = note._id;
+                data.noteContentId = n._id;
+                data.reason = obj.reason;
+                nkcAPI(url, method, data)
+                  .then(function() {
+                    n.disabled = !n.disabled;
+                    sweetSuccess("操作成功");
+                  })
+                  .catch(sweetError)
+              },true)
             }
-            data.noteId = note._id;
-            data.noteContentId = n._id;
           }
-          sweetQuestion("确定要执行此操作？")
-            .then(() => {
-              return nkcAPI(url, method, data);
-            })
-            .then(function() {
-              if(type === "delete") {
-                n.deleted = true;
-              } else {
-                n.disabled = !n.disabled;
-              }
-              sweetSuccess("操作成功");
-            })
-            .catch(sweetError)
-        }
+        },
+      
+      },
+      components: {
+        disabled:disabledNote
       }
     });
     self.open = self.app.open;

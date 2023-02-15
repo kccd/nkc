@@ -23,6 +23,7 @@ router
     const {status,uid} =noteContent
     let message ={}
     if(!noteContent) ctx.throw(400, `未找到ID为${noteContentId}的笔记`);
+
     if(type === "modify") {
       const {checkString} = nkcModules.checkData;
       checkString(content, {
