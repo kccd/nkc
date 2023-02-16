@@ -62,7 +62,7 @@ schema.statics.createTokenString = async () => {
   let count = 0;
   while(true) {
     count ++;
-    const newToken = getRandomString('a0', 64);
+    const newToken = getRandomString('Aa0', 64);
     if(!await OAuthTokenModel.findOne({token: newToken},  {_id: 1})) {
       token = newToken;
       break;
