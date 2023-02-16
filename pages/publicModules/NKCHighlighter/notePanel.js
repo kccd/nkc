@@ -1,5 +1,4 @@
 import disabledNote from '../../lib/vue/post/DisabledPost.vue'
-import reject from "@icon-park/vue/lib/icons/Reject";
 NKC.modules.NotePanel = class {
   constructor() {
     const self = this;

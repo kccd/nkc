@@ -17,7 +17,7 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {body, db, nkcModules, data,} = ctx;
+    const {body, db, nkcModules, data,state} = ctx;
     const {noteContentId, type, content,remindUser,reason,violation } = body;
     const noteContent = await db.NoteContentModel.findOne({_id: noteContentId});
     const {status,uid} =noteContent
@@ -45,7 +45,18 @@ router
       ctx.throw(400,`已经取消屏蔽用户`)
     }
     else if(type === "disable"&& status!== 'deleted') {
-    
+  
+      //更新笔记状态
+      await noteContent.updateOne({disabled: true,status:'disabled'});
+      
+      //更新笔记审核记录状态
+      await db.ReviewModel.updateOne({sid:noteContentId,source:'note'},{
+        $set:{
+          handlerId:state.uid,
+          reason:reason?reason:'出现了敏感词'
+        }
+      })
+      //选择是否提醒作者
       if(remindUser){
         message =await db.MessageModel({
           _id:await db.SettingModel.operateSystemID("messages",1),
@@ -63,7 +74,7 @@ router
         //通过socket通知作者
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
-      await noteContent.updateOne({disabled: true,status:'disabled'});
+    
     } else if(type === "cancelDisable"&& status!== 'deleted' ) {
       await noteContent.updateOne({disabled: false,status:'normal'});
     }

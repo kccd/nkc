@@ -489,8 +489,6 @@ router
       }
       
     }
-  
-    console.log(message)
     if(message) {
       await message.save();
       //通过socket通知作者
