@@ -21,6 +21,7 @@ router
     const {noteContentId, type, content,remindUser,reason,violation } = body;
     const noteContent = await db.NoteContentModel.findOne({_id: noteContentId});
     const {status,uid} =noteContent
+    const noteUser = await db.UserModel.findOne({uid})
     let message ={}
     if(!noteContent) ctx.throw(400, `未找到ID为${noteContentId}的笔记`);
     if(type === "modify") {
@@ -56,6 +57,23 @@ router
           reason:reason?reason:'出现了敏感词'
         }
       })
+      //如果标记用户违规就给该用户新增违规记录
+      if(violation){
+        //新增违规记录
+        await db.UsersScoreLogModel.insertLog({
+          user:noteUser ,
+          type:'score',
+          typeIdOfScoreChange: "violation",
+          port: ctx.port,
+          delType:'disabled',
+          ip: ctx.address,
+          key: 'violationCount',
+          description: reason || '笔记出现敏感词并标记违规',
+          noteId:noteContentId,
+        })
+      }
+      
+      
       //选择是否提醒作者
       if(remindUser){
         message =await db.MessageModel({
@@ -74,6 +92,7 @@ router
         //通过socket通知作者
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
+     
     
     } else if(type === "cancelDisable"&& status!== 'deleted' ) {
       await noteContent.updateOne({disabled: false,status:'normal'});

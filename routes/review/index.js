@@ -456,7 +456,6 @@ router
           }
         })
        //如果标记用户违规就给该用户新增违规记录
- 
        if(violation){
          //新增违规记录
          await db.UsersScoreLogModel.insertLog({
