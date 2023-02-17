@@ -8,7 +8,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
   .note-panel-body(v-if="note")
     .note-panel-quote(:title="note.content") {{note.content}}
     .note-panel-notes
-      .note-panel-note(v-for="n in note.notes")
+      .note-panel-note(v-for="n in note.notes" )
         .note-panel-user
           a(@click="visitUrl('/u/' + n.user.uid, true)").note-panel-user-avatar
             img(:src="getUrl('userAvatar', n.user.avatar)")

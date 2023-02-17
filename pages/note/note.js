@@ -165,7 +165,7 @@ const app = new Vue({
             data.violation = obj.violation
             nkcAPI(url, method, data)
               .then(function() {
-                n.disabled = !n.disabled;
+                n.status = self.app.noteStatus.disabled;
                 sweetSuccess("操作成功");
               })
               .catch(sweetError)
