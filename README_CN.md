@@ -23,6 +23,6 @@
 3. 执行 `npm run build` 初始化目录；
 4. 执行 `npm run init` 初始化缓存；
 5. 执行 `npm run build-pages-p` 编译前端文件；
-6. 根据需要调整项目根目录 `config` 文件夹下的配置文件；
+6. 根据需要调整项目根目录 `config` 文件夹下的配置文件（默认账号信息在文件 `config/account.json` 中）；
 7. 执行 `pm2 start pm2.config.js` 启动项目；
-8. 浏览器访问 `localhost:9000`（由于 nkc-websocket 服务使用的是非 9000 端口，所以需要借助 nkc-reverse-proxy 或其他反向代理软件才能连接短消息服务）；
+8. 浏览器访问 `localhost:9000`（由于 `nkc-websocket` 服务使用的是非 `9000` 端口，所以需要借助 `nkc-reverse-proxy` 或其他反向代理软件才能连接短消息服务）；
