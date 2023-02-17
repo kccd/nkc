@@ -205,7 +205,7 @@ NKC.modules.NotePanel = class {
                 })
                 .catch(sweetError);
             } else {
-              this.$refs.disabled.open(function fn(obj){
+              this.$refs.disabled.open((obj)=>{
                 method = "POST";
                 url = `/nkc/note`;
                 data.type = "disable";
@@ -220,6 +220,7 @@ NKC.modules.NotePanel = class {
                     sweetSuccess("操作成功");
                   })
                   .catch(sweetError);
+                this.$refs.disabled.close()
               },true)
             }
           }

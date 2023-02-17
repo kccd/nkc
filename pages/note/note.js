@@ -169,6 +169,7 @@ const app = new Vue({
                 sweetSuccess("操作成功");
               })
               .catch(sweetError)
+            this.$refs.disabled.close()
           },true)
         }
       }
