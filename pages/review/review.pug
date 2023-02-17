@@ -165,12 +165,12 @@ block content
             else if r.type === 'note'
               .review-panel
                 .review-time
-                  input(type='checkbox' value=r.note._id v-model=`selectedNid`)
+                  input(type='checkbox' value = r.note._id v-model=`selectedNid`)
                 .review-info 时间:
                 .review-time=`${format("YYYY/MM/DD HH:mm:ss", r.note.toc)}`
                 .review-info 用户:
                 .review-user
-                  a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
+                  a(href=`/u/${r.user.uid}` target = "_blank")=r.user.username
                 .review-info 类型:
                  .review-time 笔记
                 .review-info 链接:

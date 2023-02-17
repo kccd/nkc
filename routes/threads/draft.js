@@ -57,12 +57,12 @@ router
         await delLog.save();
         if(!thread.reviewed) await db.ReviewModel.newReview(
           {
-            type:"returnThread",
-            sid:post.pid,
-            uid:post.uid,
+            type: "returnThread",
+            sid: post.pid,
+            uid: post.uid,
             reason,
-            handlerId:user.uid,
-            source:'post'
+            handlerId: user.uid,
+            source: 'post'
           }
           );
       } else {
@@ -75,12 +75,12 @@ router
         }
         await post.updateOne({toDraft: true, disabled: false, reviewed: true});
         if(!post.reviewed) await db.ReviewModel.newReview({
-            type:"returnPost",
-            sid:post.pid,
-            uid:post.uid,
+            type: "returnPost",
+            sid: post.pid,
+            uid: post.uid,
             reason,
-            handlerId:data.user.uid,
-            source:'post'
+            handlerId: data.user.uid,
+            source: 'post'
            }
         );
         const firstPost = await db.PostModel.findOnly({pid: thread.oc});

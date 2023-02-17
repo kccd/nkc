@@ -28,11 +28,8 @@ router
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
     const noteCount = await db.NoteContentModel.countDocuments(n);
-   
     //获取审核列表分页
-    
     const paging = nkcModules.apiFunction.paging(page, (postCount>documentCount?(postCount>noteCount ?postCount:noteCount):documentCount>noteCount?documentCount:noteCount ), 30);
-   
     data.results = [];
     //获取需要审核的post
     const tid = new Set(), postUid = new Set();
@@ -86,7 +83,7 @@ router
         link = await db.PostModel.getUrl(post);
       }
       // 从reviews表中读出送审原因
-      const reviewRecord = await db.ReviewModel.findOne({ sid: post.pid ,source:'post' }).sort({ toc: -1 }).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: 'post' }).sort({ toc: -1 }).limit(1);
       data.results.push({
         post,
         user,
@@ -157,7 +154,7 @@ router
       let user = usersObj[document.uid];
       if(!user) continue;
       //获取送审原因
-      const reviewRecord = await  db.ReviewModel.findOne({sid: document._id,source:'document'}).sort({toc: -1}).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({sid: document._id, source: 'document'}).sort({toc: -1}).limit(1);
       data.results.push({
         type: 'document',
         document,
@@ -178,14 +175,12 @@ router
     noteUsers.map(user=>{
       noteObj[user.uid] = user
     })
-   
     
-
      for (const note of notes){
        //获取送审核的原因
-        const reviewRecord = await db.ReviewModel.findOne({sid: note._id.toString(),source:'note'});
-        const  user  = noteObj[note.uid]
-        const  content = {
+        const reviewRecord = await db.ReviewModel.findOne({sid: note._id.toString(), source: 'note'});
+        const user = noteObj[note.uid]
+        const content = {
           note:note.content,
           url:`/note/${note.noteId}`
         }
@@ -198,7 +193,6 @@ router
         })
      
      }
-     
     data.reviewType = reviewType;
     data.paging = paging;
     await next();
@@ -268,12 +262,12 @@ router
       //生成审核记录
       await db.ReviewModel.newReview(
         {
-          type,
-        sid:post.pid,
-        uid:post.uid,
-        reason:'',
-        handlerId:user.uid,
-        source:'post'}
+        type,
+        sid: post.pid,
+        uid: post.uid,
+        reason: '',
+        handlerId: user.uid,
+        source: 'post'}
        );
       //生成通知消息
       message = await db.MessageModel({
@@ -318,12 +312,12 @@ router
         }
         await db.ReviewModel.newReview(
           {
-            type:'passDocument',
-            sid:document._id,
-            uid:document.uid,
+            type: 'passDocument',
+            sid: document._id,
+            uid: document.uid,
             reason,
-            handlerId:data.user.uid,
-            source:'document'
+            handlerId: data.user.uid,
+            source: 'document'
           }
           );
         let passType;
@@ -426,18 +420,18 @@ router
          //note为通过的状态
         await db.NoteContentModel.updateOne({_id:noteId},{
           $set:{
-            status:noteContentStatus.normal
+            status: noteContentStatus.normal
           }
         })
         //生成新的审核记录
         await db.ReviewModel.newReview(
           {
-            type:'passNote',
-            sid:note._id,
-            uid:note.uid,
-            reason:'',
-            handlerId:user.uid,
-            source:'note',
+            type: 'passNote',
+            sid: note._id,
+            uid: note.uid,
+            reason: '',
+            handlerId: user.uid,
+            source: 'note',
           }
         )
       }
@@ -445,29 +439,29 @@ router
         //note为屏蔽状态
         await db.NoteContentModel.updateOne({_id:noteId},{
           $set:{
-            status:noteContentStatus.disabled
+            status: noteContentStatus.disabled
           }
         })
         //更新审核记录状态
-        await db.ReviewModel.updateOne({sid:note._id,source:'note'},{
+        await db.ReviewModel.updateOne({sid: note._id, source: 'note'},{
           $set:{
-            handlerId:user.uid,
-            reason:reason?reason:'出现了敏感词'
+            handlerId: user.uid,
+            reason: reason?reason:'出现了敏感词'
           }
         })
        //如果标记用户违规就给该用户新增违规记录
        if(violation){
          //新增违规记录
          await db.UsersScoreLogModel.insertLog({
-           user:noteUser,
-           type:'score',
+           user: noteUser,
+           type: 'score',
            typeIdOfScoreChange: "violation",
            port: ctx.port,
            delType,
            ip: ctx.address,
            key: 'violationCount',
            description: reason || '笔记出现敏感词并标记违规',
-           noteId:note._id,
+           noteId: note._id,
          })
        }
        //如果要提醒用户

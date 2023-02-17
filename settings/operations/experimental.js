@@ -6,8 +6,8 @@ module.exports = {
   },
 	settings: {
 		note: {
-			GET: 'visitNoteManagementSettings',
-			PUT: 'submitNoteManagementSettings',
+			GET: 'experimentalNoteSettings',
+			PUT: 'experimentalNoteSettings',
 		},
     threadCategory: {
       GET: 'experimentalThreadCategorySettings',

@@ -319,13 +319,11 @@ threadRouter
     thread.firstPost = firstPost;
     // 加载文章待审原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid,source:'post'}).sort({toc: -1});
-      threadReviewReason = reviewRecord? reviewRecord.reason : "";
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: 'post'}).sort({toc: -1});
+      threadReviewReason = reviewRecord ? reviewRecord.reason : "";
     }
-
     // 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     anonymous = firstPost.anonymous;
-
     // 构建回复的查询条件
     const match = {
       tid: thread.tid,
@@ -1103,8 +1101,8 @@ threadRouter
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(data.posts.map(async (post) => {
-      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid,source:'post'}).sort({toc: -1});
-      post.reviewReason = reviewRecord? reviewRecord.reason : "";
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: 'post'}).sort({toc: -1});
+      post.reviewReason = reviewRecord ? reviewRecord.reason : "";
       return post;
     }));
     // 获取置顶文章
@@ -1236,18 +1234,15 @@ threadRouter
 
     // 如果是待审核，取出审核原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid,source:'post'}).sort({toc: -1});
-      data.threadReviewReason = reviewRecord? reviewRecord.reason : "";
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: 'post'}).sort({toc: -1});
+      data.threadReviewReason = reviewRecord ? reviewRecord.reason : "";
     }
-
 		data.thread = thread;
 		data.forums = forums;
-
 		data.replyTarget = `t/${tid}`;
 		// const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		// data.ads = homeSettings.c.ads;
 		ctx.template = 'thread/index.pug';
-
 		// 【待改】如果当前文章为商品贴
 		if(thread.type === "product") {
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})

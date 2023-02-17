@@ -46,10 +46,8 @@ router
       ctx.throw(400,`已经取消屏蔽用户`)
     }
     else if(type === "disable"&& status!== 'deleted') {
-  
       //更新笔记状态
       await noteContent.updateOne({disabled: true,status:'disabled'});
-      
       //更新笔记审核记录状态
       await db.ReviewModel.updateOne({sid:noteContentId,source:'note'},{
         $set:{
@@ -62,29 +60,28 @@ router
         //新增违规记录
         await db.UsersScoreLogModel.insertLog({
           user:noteUser ,
-          type:'score',
+          type: 'score',
           typeIdOfScoreChange: "violation",
           port: ctx.port,
-          delType:'disabled',
+          delType: 'disabled',
           ip: ctx.address,
           key: 'violationCount',
           description: reason || '笔记出现敏感词并标记违规',
-          noteId:noteContentId,
+          noteId: noteContentId,
         })
       }
-      
       
       //选择是否提醒作者
       if(remindUser){
         message =await db.MessageModel({
-          _id:await db.SettingModel.operateSystemID("messages",1),
+          _id: await db.SettingModel.operateSystemID("messages",1),
           r: uid,
-          ty:'STU',
+          ty: 'STU',
           c:{
-            delType:'disabled',
-            violation:violation?violation:false,
-            type:'noteDisabled',
-            noteId:noteContentId,
+            delType: 'disabled',
+            violation: violation?violation:false,
+            type: 'noteDisabled',
+            noteId: noteContentId,
             reason,
           }
         })
@@ -92,14 +89,10 @@ router
         //通过socket通知作者
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
-     
-    
-    } else if(type === "cancelDisable"&& status!== 'deleted' ) {
+    }
+    else if(type === "cancelDisable" && status !== 'deleted' ) {
       await noteContent.updateOne({disabled: false,status:'normal'});
     }
-    
-    
-    
     await next();
   });
 module.exports = router;

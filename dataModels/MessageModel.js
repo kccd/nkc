@@ -115,18 +115,13 @@ messageSchema.statics.getSystemLimitInfo = async (uid, tUid) => {
   const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
   const messageSettings = await SettingModel.getSettings("message");
-
   const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
-
   const limitInfo = mandatoryLimitInfo;
-
   const notLimitInfo = null;
-
   const targetUser = await UserModel.findOnly({uid: tUid});
   // 判断用户是否正在售卖商品且勾选在售卖商品时允许任何人向自己发送消息
   const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
   if(allowAllMessage) return notLimitInfo;
-
   await targetUser.extendGrade();
   // 处于等级黑名单的目标用户不受保护
   if(mandatoryLimitGradeProtect.includes(targetUser.grade._id)) return notLimitInfo;
@@ -855,12 +850,11 @@ messageSchema.statics.getParametersData = async (message) => {
     };
   }
   else if(type === 'noteDisabled'){
-   
     const {noteId,reason} = message.c
-    const note = await  NoteContentModel.findOne({_id:noteId})
+    const note = await NoteContentModel.findOne({_id: noteId}, {content: 1});
     if(!note) return null;
     parameters = {
-      reason: reason?reason:'未知',
+      reason: reason ? reason: '未知',
       content: htmlToPlain(note.content, 100),
     };
   }

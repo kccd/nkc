@@ -1248,7 +1248,7 @@ schema.statics.getArticlesInfo = async function(articles) {
       const {status} = document;
       let delLog;
       if(status === unknownStatus) {
-        delLog = await ReviewModel.findOne({sid: document._id,source:'document'}).sort({toc: -1});
+        delLog = await ReviewModel.findOne({sid: document._id, source: 'document'}).sort({toc: -1});
       } else if(status === disabledStatus) {
         delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
       } else if(status === faultyStatus) {

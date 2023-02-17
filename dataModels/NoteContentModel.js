@@ -69,12 +69,11 @@ const schema = new Schema({
 
 
 const noteContentStatus = {
-
   disabled : "disabled",//屏蔽
   unknown  : "unknown",//未审核
   normal   : "normal", //正常状态
   deleted  :  "deleted" , //管理员只操作前面三种状态，最后一种仅限于提供给用户使用
-}
+};
 
 
 /*
@@ -125,7 +124,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
 * 复制一份到数据库，添加cid字段表示该数据为cid对应内容的历史
 * */
 //appear为新创建的字段，主要是为了检测笔记编辑过后的敏感词
-schema.methods.cloneAndUpdateContent = async function(content,appear) {
+schema.methods.cloneAndUpdateContent = async function(content, appear) {
   if(this.content === content) return;
   const NoteContentModel = mongoose.model("noteContent");
   const nc = this.toObject();
@@ -143,20 +142,22 @@ schema.methods.cloneAndUpdateContent = async function(content,appear) {
     await this.updateOne({
       content,
       tlm,
-      status:'unknown'
+      status: 'unknown'
     });
   }
   else {
     await this.updateOne({
       content,
       tlm,
-      status:'normal'
+      status: 'normal'
     });
   }
 };
 //获取笔记的引用类型
-schema.statics.getNoteContentStatus = async () =>{
-  return  noteContentStatus
+schema.statics.getNoteContentStatus = async () => {
+  return {
+    ...noteContentStatus
+  };
 }
 
 schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {

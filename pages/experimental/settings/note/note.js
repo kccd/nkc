@@ -6,10 +6,10 @@ let data = getDataById("data");  //读取所获取到的敏感词组
 const app = new Vue({
   el:'#app',
   data:{
-     msg:'测试数据',
+     msg: '测试数据',
      enabled: data.enabled , //是否开启敏感词检测
-     keyWordGroup:data.keyWordGroup,//敏感词组
-     keyWordGroupChecked:data.keyWordGroupChecked ,//被勾选上的敏感词组
+     keyWordGroup: data.keyWordGroup,//敏感词组
+     keyWordGroupChecked: data.keyWordGroupChecked ,//被勾选上的敏感词组
      checkAllBoolean: false//全选的状态
   },
   computed: {
@@ -42,12 +42,10 @@ const app = new Vue({
       else {
         const {keyWordGroupChecked,enabled,keyWordGroup} = this
         nkcAPI('/e/settings/note','PUT',{keyWordGroupChecked,enabled,keyWordGroup})
-           .then(()=>{
+           .then(() => {
              sweetSuccess('提交成功');
-           }).catch(({error})=>{
-          console.log(error)
-          sweetError(`提交失败`)
-         })
+           })
+          .catch(sweetError)
       }
     },
   },

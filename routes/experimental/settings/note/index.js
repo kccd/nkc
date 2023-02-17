@@ -7,10 +7,9 @@ router.get('/',async (ctx,next) => {
    const keyWordGroupChecked = await db.SettingModel.getSettings('note')
    data.keyWordGroup = keyWordGroup.keyword.wordGroup//已经设置好了的敏感词库
    data.keyWordGroupChecked = keyWordGroupChecked.keyWordGroup //获取note敏感词库中已经勾选的数据
-   data.enabled=keyWordGroupChecked.enabled //获取note中的开启敏感词检测状态
+   data.enabled = keyWordGroupChecked.enabled //获取note中的开启敏感词检测状态
    ctx.template = 'experimental/settings/note/note.pug'
    await  next();
-   
 })
   .put('/',async (ctx,next) => {
     const {db,body:{enabled,keyWordGroup,keyWordGroupChecked}} = ctx;
@@ -33,6 +32,5 @@ router.get('/',async (ctx,next) => {
     })
     await  db.SettingModel.saveSettingsToRedis('note') //更新缓存
   })
-
 
 module.exports = router;

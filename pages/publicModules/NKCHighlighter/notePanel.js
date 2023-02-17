@@ -21,7 +21,6 @@ NKC.modules.NotePanel = class {
         },
         // 显示笔记
         note: "",
-
           /* note的数据结构
           {
             _id: Number,
@@ -185,10 +184,10 @@ NKC.modules.NotePanel = class {
                 return nkcAPI(url, method, data);
               })
               .then(function() {
-                  n.deleted = true;
+                n.status = self.app.noteStatus.deleted;
                 sweetSuccess("操作成功");
               })
-              .catch(sweetError)
+              .catch(sweetError);
           } else {
             method = "POST";
             url = `/nkc/note`;
@@ -204,7 +203,7 @@ NKC.modules.NotePanel = class {
                   n.deleted = true;
                   sweetSuccess("操作成功");
                 })
-                .catch(sweetError)
+                .catch(sweetError);
             } else {
               this.$refs.disabled.open(function fn(obj){
                 method = "POST";
@@ -220,7 +219,7 @@ NKC.modules.NotePanel = class {
                     n.status = self.app.noteStatus.disabled;
                     sweetSuccess("操作成功");
                   })
-                  .catch(sweetError)
+                  .catch(sweetError);
               },true)
             }
           }
@@ -228,7 +227,7 @@ NKC.modules.NotePanel = class {
       
       },
       components: {
-        disabled:disabledNote
+        disabled : disabledNote
       }
     });
     self.open = self.app.open;

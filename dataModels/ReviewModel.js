@@ -1,6 +1,13 @@
 const mongoose = require("../settings/database");
 const Mint = require('mint-filter').default
 
+const reviewSources = {
+  document: 'document',
+  note: 'note',
+  post: 'post',
+  thread: 'thread',
+};
+
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
@@ -53,20 +60,27 @@ const schema = new Schema({
     default: '',
     index: 1
   },
-  source:{
-    type:String,
-    default:'',
-    index:1
+  source: {
+    type: String,
+    required: true,
+    index: 1
   },
   sid:{
     type: String,
-    default: null,
+    required: true,
     index: 1
   },
 
 },{
   collection: "reviews"
 });
+
+schema.statics.getReviewSources = async () => {
+  return {
+    ...reviewSources
+  };
+};
+
 /*
 * 生成审核记录
 * @param {String} type 审核类型
@@ -89,8 +103,8 @@ const schema = new Schema({
 //   }).save();
 // };
 //生成审核记录---新
-schema.statics.newReview = async ({type,sid,uid,reason,handlerId,source}) => {
-  if(source==='document'){
+schema.statics.newReview = async ({type, sid, uid, reason, handlerId, source}) => {
+  if(source === 'document'){
     sid = sid.toString()
   }
   await mongoose.model("reviews")({
@@ -114,7 +128,7 @@ schema.statics.newDocumentReview = async (type, sid, uid, reason) => {
     reason,
     sid,
     uid,
-    source:'document'
+    source: 'document'
   });
   await review.save();
 }
@@ -270,37 +284,36 @@ schema.statics.autoPushToReview = async function(post) {
   if(!user) throwErr(500, "在判断内容是否需要审核的时候，发现未知的uid");
   const reviewSettings = await SettingModel.getSettings('review');
   const review = reviewSettings[type];
-
   const needReview = await (async () => {
     // 一、特殊限制
     const {whitelistUid, blacklistUid} = review.special;
     // 1. 白名单
     if(whitelistUid.includes(uid)) {
-      return false
+      return false;
     }
     // 2. 黑名单
     if(blacklistUid.includes(uid)) {
       await ReviewModel.newReview({
-        type:'blacklist',
-        sid:post.pid,
-        uid:post.uid,
-        reason:'黑名单中的用户',
-        handlerId:user.uid,
-        source:'post'
+        type: 'blacklist',
+        sid: post.pid,
+        uid: post.uid,
+        reason: '黑名单中的用户',
+        handlerId: user.uid,
+        source: 'post'
       });
-      return true
+      return true;
     }
 
     // 二、白名单（用户证书和用户等级）
     const {gradesId, certsId} = review.whitelist;
     await user.extendGrade();
     if(gradesId.includes(user.grade._id)) {
-      return false
+      return false;
     }
     await user.extendRoles();
     for(const role of user.roles) {
       if(certsId.includes(role._id)) {
-        return false
+        return false;
       }
     }
 
@@ -331,15 +344,15 @@ schema.statics.autoPushToReview = async function(post) {
       if(foreign.type === "all" || foreign.count > passedCount) {
         await ReviewModel.newReview(
           {
-            type:"foreign",
-            sid:post.pid,
-            uid:post.uid,
-            reason:"海外手机号用户，审核通过的文章数量不足",
-            handlerId:user.uid,
-            source:'post',
+            type: "foreign",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "海外手机号用户，审核通过的文章数量不足",
+            handlerId: user.uid,
+            source: 'post',
           }
          );
-        return true
+        return true;
       }
     }
 
@@ -352,11 +365,11 @@ schema.statics.autoPushToReview = async function(post) {
         await ReviewModel.newReview(
           {
             type: "notPassedA",
-            sid:post.pid,
-            uid:post.uid,
-            reason:"用户没有通过A卷考试，审核通过的文章数量不足",
-            handlerId:user.uid,
-            source:'post',
+            sid: post.pid,
+            uid: post.uid,
+            reason: "用户没有通过A卷考试，审核通过的文章数量不足",
+            handlerId: user.uid,
+            source: 'post',
           }
          );
         return true;
@@ -375,12 +388,12 @@ schema.statics.autoPushToReview = async function(post) {
       if(grade.type === "all" || grade.count > passedCount - 1) {
         await ReviewModel.newReview(
           {
-            type:  "grade",
-            sid:post.pid,
-            uid:post.uid,
-            reason:"因用户等级限制，审核通过的文章数量不足",
-            handlerId:user.uid,
-            source:'post',
+            type: "grade",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "因用户等级限制，审核通过的文章数量不足",
+            handlerId: user.uid,
+            source: 'post',
           }
         );
         return true;
@@ -393,12 +406,12 @@ schema.statics.autoPushToReview = async function(post) {
       if(authSettings.verifyPhoneNumber.type === 'reviewPost') {
         await ReviewModel.newReview(
           {
-            type:"unverifiedPhone",
-            sid:post.pid,
-            uid:post.uid,
-            reason:"用户未验证手机号",
-            handlerId:user.uid,
-            source:'post',
+            type: "unverifiedPhone",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "用户未验证手机号",
+            handlerId: user.uid,
+            source: 'post',
           }
           );
         return true;
@@ -430,12 +443,12 @@ schema.statics.autoPushToReview = async function(post) {
       if(matchedKeywords.length > 0) {
         await ReviewModel.newReview(
           {
-            type:  "includesKeyword",
-            sid:post.pid,
-            uid:post.uid,
-            reason:`内容中包含敏感词 ${matchedKeywords.join("、")}`,
-            handlerId:user.uid,
-            source:'post',
+            type: "includesKeyword",
+            sid: post.pid,
+            uid: post.uid,
+            reason: `内容中包含敏感词 ${matchedKeywords.join("、")}`,
+            handlerId: user.uid,
+            source: 'post',
           }
            );
         return true;
@@ -458,11 +471,11 @@ schema.statics.autoPushToReview = async function(post) {
           await ReviewModel.newReview(
             {
               type: "forumSettingReview",
-              sid:post.pid,
-              uid:post.uid,
-              reason:`此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
-              handlerId:user.uid,
-              source:'post',
+              sid: post.pid,
+              uid: post.uid,
+              reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+              handlerId: user.uid,
+              source: 'post',
             }
            );
           return true;
@@ -476,11 +489,11 @@ schema.statics.autoPushToReview = async function(post) {
           await ReviewModel.newReview(
             {
               type: "forumSettingReview",
-              sid:post.pid,
-              uid:post.uid,
-              reason:`此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
-              handlerId:user.uid,
-              source:'post',
+              sid: post.pid,
+              uid: post.uid,
+              reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+              handlerId: user.uid,
+              source: 'post',
             }
            );
           return true;
@@ -499,11 +512,11 @@ schema.statics.autoPushToReview = async function(post) {
           await ReviewModel.newReview(
             {
               type: "forumSettingReview",
-              sid:post.pid,
-              uid:post.uid,
+              sid: post.pid,
+              uid: post.uid,
               reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
-              handlerId:user.uid,
-              source:'post',
+              handlerId: user.uid,
+              source: 'post',
             }
            );
           return true;
@@ -513,11 +526,11 @@ schema.statics.autoPushToReview = async function(post) {
           await ReviewModel.newReview(
             {
               type: "forumSettingReview",
-              sid:post.pid,
-              uid:post.uid,
+              sid: post.pid,
+              uid: post.uid,
               reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
-              handlerId:user.uid,
-              source:'post',
+              handlerId: user.uid,
+              source: 'post',
             }
            );
           return true;
@@ -551,9 +564,9 @@ schema.methods.updateReview = async function(props) {
 }
 //返回source数据来源
 const  sources = {
-  post:'post',
-  document:'document',
-  note:'note'
+  post: 'post',
+  document: 'document',
+  note: 'note'
 }
 schema.statics.getDocumentSources = async ()=>{
   return {...sources}

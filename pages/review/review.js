@@ -44,10 +44,10 @@ for(var i = 0; i < data.results.length; i++) {
       let n = data.results[i].note._id;
       nid.push(n);
       review[n] ={
-        noteId:n,
-        pass:true,
-        reason:"",
-        delType:'disabled',
+        noteId: n,
+        pass: true,
+        reason: "",
+        delType: 'disabled',
         noticeType: true,
         illegalType: false,
       }
@@ -57,9 +57,9 @@ for(var i = 0; i < data.results.length; i++) {
 var app = new Vue({
   el: "#app",
   data: {
-    selectedPid:[],
+    selectedPid: [],
     selectedDid: [],
-    selectedNid:[],
+    selectedNid: [],
     showInputPid: [],
     pid: pid,
     did: did,
@@ -188,7 +188,7 @@ var app = new Vue({
       let d,url,method = 'PUT';
       if(data.pass){
          d = {
-           pass:  data.pass,
+           pass: data.pass,
            noteId: data.noteId,
            type: 'note',
          }
@@ -213,7 +213,6 @@ var app = new Vue({
         })
         .catch(function (data){
           screenTopWarning("noteId: " + data.noteId + "处理失败! error: " + data.error || data );
-          console.log(data);
           app.note(arr,index+1);
         })
     },
@@ -291,7 +290,6 @@ var app = new Vue({
                 illegalType: reviewData.illegalType,
               });
             }
-          
             self.note(arr, 0);
           }
         })

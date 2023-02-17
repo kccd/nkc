@@ -13,9 +13,7 @@ export default {
   props: ['management'],
   data: () => ({
   }),
-  mounted() {
-    console.log(this.management,'management')
-  },
+  mounted() {},
   methods: {
   }
 }

@@ -19,7 +19,7 @@ const app = new Vue({
       normal   : "normal", //正常状态
       deleted  : "deleted", //删除状态
     },
-    noteHighlighting:'noteHighlighting',
+    noteHighlighting : 'noteHighlighting', //高亮
   },
   mounted() {
     document.body.addEventListener("click", (e) => {
@@ -27,8 +27,8 @@ const app = new Vue({
       app.note.notes.map(note => note.options = false);
     });
     if(data.query.n){
-      const element = $(`#${data.query.n}`)
-      scrollPageToElement(element) //滚动
+      const element = $(`#${data.query.n}`);
+      scrollPageToElement(element); //滚动
     }
   },
   methods: {
@@ -133,10 +133,10 @@ const app = new Vue({
             return nkcAPI(url, method, data);
           })
           .then(function() {
-            n.deleted = true;
+            n.status = app.noteStatus.deleted;
             sweetSuccess("操作成功");
           })
-          .catch(sweetError)
+          .catch(sweetError);
       } else {
         method = "POST";
         url = `/nkc/note`;
@@ -152,7 +152,7 @@ const app = new Vue({
               n.deleted = true;
               sweetSuccess("操作成功");
             })
-            .catch(sweetError)
+            .catch(sweetError);
         } else {
           this.$refs.disabled.open(function fn(obj){
             method = "POST";
@@ -165,7 +165,7 @@ const app = new Vue({
             data.violation = obj.violation
             nkcAPI(url, method, data)
               .then(function() {
-                n.status = self.app.noteStatus.disabled;
+                n.status = app.noteStatus.disabled;
                 sweetSuccess("操作成功");
               })
               .catch(sweetError)
@@ -175,7 +175,7 @@ const app = new Vue({
     }
   },
   components: {
-    disabled:disabledNote
+    disabled : disabledNote
   },
 });
 

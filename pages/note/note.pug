@@ -7,7 +7,7 @@ block content
 
     .origin-content {{note.content}}
     .notes
-      .note(v-for="n in note.notes" :id="n._id" :class="query===n._id?noteHighlighting:''" )
+      .note(v-for="n in note.notes" :id="n._id" v-if=`(!${permission('managementNote')} && n.status === 'deleted')?false:true`   :class="query===n._id?noteHighlighting:''"  )
         .note-user
           a.note-user-avatar(@click="visitUrl('/u/' + n.user.uid, true)")
             img(:src="getUrl('userAvatar', n.user.avatar)")

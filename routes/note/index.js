@@ -1,7 +1,6 @@
 const router = require("koa-router")();
 router
   .get("/", async (ctx, next) => {
-  
     const {data, query, nkcModules} = ctx;
     const {
       content, offset, length, type, targetId
@@ -40,7 +39,6 @@ router
     const {data, db,state:{uid},request:{query}} = ctx;
     const {note} = data;
     const options = {};
-
   
     if(!ctx.permission("managementNote")) {
       options.uid = uid;
@@ -48,7 +46,7 @@ router
     }
     data.managementNote = ctx.permission('managementNote');
     data.note = await db.NoteModel.extendNote(note, options);
-    data.query = query; 
+    data.query = query;
     ctx.template = "note/note.pug";
     await next();
   })
@@ -86,10 +84,10 @@ router
       const {keyWordGroup}= await db.SettingModel.getSettings('note')//笔记勾选敏感词组id
       const  result= await  db.ReviewModel.matchKeywordsByGroupsId(content,keyWordGroup)//敏感词检测
       if(result.length!==0){
-        appear =true
+        appear = true;
       }
     }
-    const test = await noteContent.cloneAndUpdateContent(content,appear);
+    await noteContent.cloneAndUpdateContent(content,appear);
     noteContent.content = content;
     const nc = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContentHTML = nc.html;
@@ -104,7 +102,6 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    
     // 选区不存在：新建选区、存储笔记内容
     // 选区存在：存储笔记内容
     const {db, body, data, nkcModules,state:{uid}} = ctx;
@@ -112,18 +109,22 @@ router
     const {_id, targetId, content, type, node,} = body;
     const {user} = data;
     const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
+    let reason;
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
       maxLength: 1000
     });
     //检测是否开启笔记敏感词检测
-    let appear =false; //是否出现了敏感词
+    let appear = false; //是否出现了敏感词
     if(enabled){
-      const {keyWordGroup}= await db.SettingModel.getSettings('note')//笔记勾选敏感词组id
-      const  result= await  db.ReviewModel.matchKeywordsByGroupsId(content,keyWordGroup)//敏感词检测
+      const {keyWordGroup}= await db.SettingModel.getSettings('note');//笔记勾选敏感词组id
+      const result= await  db.ReviewModel.matchKeywordsByGroupsId(content,keyWordGroup);//敏感词检测
       if(result.length!==0){
-         appear =true
+         appear = true;
+      }
+      if(result){
+        reason = result.join(',');
       }
     }
     let cv = null;
@@ -197,12 +198,12 @@ router
     if(appear){
       db.ReviewModel.newReview(
         {
-          type:'sensitiveWord',
-          sid:noteContent._id,
-          uid:noteContent.uid,
-          reason:'出现了敏感词',
-          handlerId:'',
-          source:'note'
+          type: 'sensitiveWord',
+          sid: noteContent._id,
+          uid: noteContent.uid,
+          reason: `出现了敏感词:${reason}`,
+          handlerId: '',
+          source: 'note'
         })
     }
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
@@ -210,7 +211,7 @@ router
     const options = {};
     if(!ctx.permission("managementNote")) {
       options.uid = uid;
-      options.type = 'member'
+      options.type = 'member';
     }
     data.note = await db.NoteModel.extendNote(note, options);
     data.managementNote = ctx.permission('managementNote');

@@ -9,9 +9,9 @@
         .form-group
           label 方式
           .moduleDisabledPostType
-            .col-xs-6(@click="type = 'toDraft'" :class="{'active':type === 'toDraft'}" v-if="!note" ) 退回修改
-            .col-xs-6(@click="type = 'toRecycle'" :class="{'active':type === 'toRecycle'}" v-if="!note") 删除
-            .col-xs-6(@click="type = 'toDisabled'" :class="{'active':type === 'toDisabled'}" v-if="note") 屏蔽
+            .col-xs-6(@click="type = 'toDraft'" :class="{'active':type === 'toDraft'}" v-if = "!note" ) 退回修改
+            .col-xs-6(@click="type = 'toRecycle'" :class="{'active':type === 'toRecycle'}" v-if = "!note") 删除
+            .col-xs-6(@click="type = 'toDisabled'" :class="{'active':type === 'toDisabled'}" v-if = "note") 屏蔽
         .form-group
           label 原因
           textarea.form-control(rows=5 placeholder="请输入原因..." v-model="reason")
@@ -104,7 +104,7 @@ export default {
     reason: "",
     remindUser: true,
     violation: true,
-    note:false,
+    note: false,
   }),
   watch: {
     type: function() {
