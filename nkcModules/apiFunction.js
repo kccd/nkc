@@ -33,6 +33,10 @@ fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
   }
 };
 
+fn.getDefaultPaging = () => {
+  return fn.paging(0, 0);
+}
+
 fn.getQueryObj = (query, match) => {
   const {digest, cat, sortby, page = 0} = query;
   const $match = Object.assign({}, match);
