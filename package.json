@@ -61,7 +61,7 @@
     "axios": "^0.25.0",
     "base64-js": "^1.5.1",
     "big.js": "^6.0.1",
-    "bluebird": "^3.5.3",
+    "bluebird": "^3.7.2",
     "canvas": "^2.7.0",
     "chart.js": "^2.7.2",
     "check-disk-space": "^3.3.1",
