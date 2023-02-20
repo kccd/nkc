@@ -20,6 +20,8 @@ const layout = {
 };
 
 log4js.configure({
+  pm2: true,
+  disableClustering: true,
   appenders: {
     stdout: {
       type: 'stdout',
@@ -33,14 +35,14 @@ log4js.configure({
       type: 'file',
       layout,
       filename: 'logs/nkc/all',
-      pattern: 'yyyy-MM-dd.log',
+      pattern: `yyyy-MM-dd.pid-${process.pid}.log`,
       alwaysIncludePattern: true,
     },
     internalServerError: {
       type: 'file',
       layout,
-      filename: 'logs/nkc/internal-server-error',
-      pattern: 'yyyy-MM-dd.log',
+      filename: 'logs/nkc/error',
+      pattern: `yyyy-MM-dd.pid-${process.pid}.log`,
       alwaysIncludePattern: true,
     },
   },
