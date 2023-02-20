@@ -326,6 +326,7 @@ schema.methods.extendArticlesById = async function(articlesId) {
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const articles = await ArticleModel.find({_id: {$in: articlesId}});
   const {article: documentSource} = await DocumentModel.getDocumentSources();
+  const source = ReviewModel.getDocumentSources()
   const documents = await DocumentModel.find({
     type: {
       $in: ['beta', 'stable']
@@ -361,7 +362,7 @@ schema.methods.extendArticlesById = async function(articlesId) {
     const {title, status, _id: docId} = document;
     let review;
     if(status === 'faulty' || status === 'disabled') {
-      review = await ReviewModel.findOne({sid: docId, source: 'document'}).sort({toc: -1}).limit(1);
+      review = await ReviewModel.findOne({sid: docId, source: source.document}).sort({toc: -1}).limit(1);
     }
     const result = {
       _id,

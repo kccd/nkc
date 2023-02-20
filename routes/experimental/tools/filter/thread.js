@@ -89,6 +89,7 @@ function thread() {
           await db.ThreadModel.updateOne({tid: post.tid}, {$set: {reviewed: false}});
         }
         await db.PostModel.updateOne({pid: post.pid}, {$set: {reviewed: false}});
+        const source = await db.ReviewModel.getDocumentSources();
         await db.ReviewModel.newReview(
           {
             type: "includesKeyword",
@@ -96,7 +97,7 @@ function thread() {
             uid: post.uid,
             reason: `内容中包含敏感词 ${matchedKeywords.join("、")}`,
             handlerId: "",
-            source: 'post',
+            source: source.post,
           }
          );
         // 更改状态为 待审核

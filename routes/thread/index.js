@@ -231,10 +231,8 @@ threadRouter
 
 
     const {thread} = internalData;
-
     const tid = thread.tid;
-
-
+    const source = await db.ReviewModel.getDocumentSources();
     // 拓展文章属性
     await thread.extendThreadCategories();
     const authorId = thread.uid;
@@ -319,7 +317,7 @@ threadRouter
     thread.firstPost = firstPost;
     // 加载文章待审原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: 'post'}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: source.post}).sort({toc: -1});
       threadReviewReason = reviewRecord ? reviewRecord.reason : "";
     }
     // 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
@@ -928,6 +926,7 @@ threadRouter
     await thread.extendThreadCategories();
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    const source = await db.ReviewModel.getDocumentSources();
     if(forums.length) data.forum = forums[0];
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
@@ -1101,7 +1100,7 @@ threadRouter
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(data.posts.map(async (post) => {
-      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: 'post'}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: source.post}).sort({toc: -1});
       post.reviewReason = reviewRecord ? reviewRecord.reason : "";
       return post;
     }));
@@ -1234,7 +1233,7 @@ threadRouter
 
     // 如果是待审核，取出审核原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: 'post'}).sort({toc: -1});
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: source.post}).sort({toc: -1});
       data.threadReviewReason = reviewRecord ? reviewRecord.reason : "";
     }
 		data.thread = thread;

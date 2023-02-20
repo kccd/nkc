@@ -1568,6 +1568,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const localAddr = await IPModel.getLocalAddr();
   const momentStatus = await MomentModel.getMomentStatus();
   const {getUrl, timeFormat} = require('../nkcModules/tools');
+  const source = ReviewModel.getDocumentSources()
   const usersId = [];
   const commentsId = [];
   // 拓展回复的上级评论
@@ -1640,7 +1641,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if(status === unknown) {
-      const review = await ReviewModel.findOne({sid: stableDocument._id, source: 'document'});
+      const review = await ReviewModel.findOne({sid: stableDocument._id, source: source.document});
       if(review) data.reason = review.reason;
     }
     commentsData.push(data);

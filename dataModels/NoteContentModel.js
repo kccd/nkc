@@ -75,7 +75,6 @@ const noteContentStatus = {
   deleted  :  "deleted" , //管理员只操作前面三种状态，最后一种仅限于提供给用户使用
 };
 
-
 /*
 * 拓展笔记的创建者、渲染内容。
 * @param {[Object]} noteContent 笔记内容对象组成的数组
@@ -135,21 +134,21 @@ schema.methods.cloneAndUpdateContent = async function(content, appear) {
   nc.cid = this._id;
   nc.tlm = tlm;
   nc.deleted = true;
-  nc.status = 'deleted'
+  nc.status = noteContentStatus.deleted;
   const newNodeContent = NoteContentModel(nc);
   await newNodeContent.save();
   if(appear){
     await this.updateOne({
       content,
       tlm,
-      status: 'unknown'
+      status: noteContentStatus.unknown
     });
   }
   else {
     await this.updateOne({
       content,
       tlm,
-      status: 'normal'
+      status: noteContentStatus.normal
     });
   }
 };

@@ -21,6 +21,7 @@ router
         $in: fid
       }
     }
+    const source = await db.ReviewModel.getDocumentSources();
     const {article: articleSource, comment: commentSource, moment: momentSource} = await db.DocumentModel.getDocumentSources(); //post
     const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource, momentSource]}}; // document
     const n = {status: 'unknown', type: 'post'} //note
@@ -83,7 +84,7 @@ router
         link = await db.PostModel.getUrl(post);
       }
       // 从reviews表中读出送审原因
-      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: 'post' }).sort({ toc: -1 }).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: source.post}).sort({ toc: -1 }).limit(1);
       data.results.push({
         post,
         user,
@@ -154,7 +155,7 @@ router
       let user = usersObj[document.uid];
       if(!user) continue;
       //获取送审原因
-      const reviewRecord = await db.ReviewModel.findOne({sid: document._id, source: 'document'}).sort({toc: -1}).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({sid: document._id, source: source.document}).sort({toc: -1}).limit(1);
       data.results.push({
         type: 'document',
         document,
@@ -216,7 +217,8 @@ router
     let message;
     const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
-    const noteContentStatus = await  db.NoteContentModel.getNoteContentStatus()
+    const noteContentStatus = await  db.NoteContentModel.getNoteContentStatus();
+    const source = await db.ReviewModel.getDocumentSources();
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
       if(!post) ctx.throw(404, `未找到ID为${pid}的post`);
@@ -267,7 +269,7 @@ router
         uid: post.uid,
         reason: '',
         handlerId: user.uid,
-        source: 'post'}
+        source: source.post}
        );
       //生成通知消息
       message = await db.MessageModel({
@@ -317,7 +319,7 @@ router
             uid: document.uid,
             reason,
             handlerId: data.user.uid,
-            source: 'document'
+            source: source.document
           }
           );
         let passType;
@@ -431,7 +433,7 @@ router
             uid: note.uid,
             reason: '',
             handlerId: user.uid,
-            source: 'note',
+            source: source.note,
           }
         )
       }

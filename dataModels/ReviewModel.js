@@ -1,13 +1,5 @@
 const mongoose = require("../settings/database");
 const Mint = require('mint-filter').default
-
-const reviewSources = {
-  document: 'document',
-  note: 'note',
-  post: 'post',
-  thread: 'thread',
-};
-
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
@@ -74,12 +66,18 @@ const schema = new Schema({
 },{
   collection: "reviews"
 });
+//返回source数据来源
+const  source = {
+  post: 'post',
+  document: 'document',
+  note: 'note'
+}
 
-schema.statics.getReviewSources = async () => {
-  return {
-    ...reviewSources
-  };
-};
+//返回数据来源
+schema.statics.getDocumentSources = async ()=>{
+  return {...source}
+}
+
 
 /*
 * 生成审核记录
@@ -144,7 +142,7 @@ schema.statics.reviewDocument = async (props) => {
   const review = await ReviewModel.findOne({
     sid: documentId,
     handlerId: '',
-    source:'document'
+    source: reviewSources.document
   }).sort({toc: -1});
   
   if(!review) return;
@@ -299,7 +297,7 @@ schema.statics.autoPushToReview = async function(post) {
         uid: post.uid,
         reason: '黑名单中的用户',
         handlerId: user.uid,
-        source: 'post'
+        source: source.post
       });
       return true;
     }
@@ -349,7 +347,7 @@ schema.statics.autoPushToReview = async function(post) {
             uid: post.uid,
             reason: "海外手机号用户，审核通过的文章数量不足",
             handlerId: user.uid,
-            source: 'post',
+            source: source.post,
           }
          );
         return true;
@@ -369,7 +367,7 @@ schema.statics.autoPushToReview = async function(post) {
             uid: post.uid,
             reason: "用户没有通过A卷考试，审核通过的文章数量不足",
             handlerId: user.uid,
-            source: 'post',
+            source: source.post,
           }
          );
         return true;
@@ -393,7 +391,7 @@ schema.statics.autoPushToReview = async function(post) {
             uid: post.uid,
             reason: "因用户等级限制，审核通过的文章数量不足",
             handlerId: user.uid,
-            source: 'post',
+            source: source.post,
           }
         );
         return true;
@@ -411,7 +409,7 @@ schema.statics.autoPushToReview = async function(post) {
             uid: post.uid,
             reason: "用户未验证手机号",
             handlerId: user.uid,
-            source: 'post',
+            source: source.post,
           }
           );
         return true;
@@ -448,7 +446,7 @@ schema.statics.autoPushToReview = async function(post) {
             uid: post.uid,
             reason: `内容中包含敏感词 ${matchedKeywords.join("、")}`,
             handlerId: user.uid,
-            source: 'post',
+            source: source.post,
           }
            );
         return true;
@@ -475,7 +473,7 @@ schema.statics.autoPushToReview = async function(post) {
               uid: post.uid,
               reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
               handlerId: user.uid,
-              source: 'post',
+              source: source.post,
             }
            );
           return true;
@@ -493,7 +491,7 @@ schema.statics.autoPushToReview = async function(post) {
               uid: post.uid,
               reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
               handlerId: user.uid,
-              source: 'post',
+              source: source.post,
             }
            );
           return true;
@@ -516,7 +514,7 @@ schema.statics.autoPushToReview = async function(post) {
               uid: post.uid,
               reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
               handlerId: user.uid,
-              source: 'post',
+              source: source.post,
             }
            );
           return true;
@@ -530,7 +528,7 @@ schema.statics.autoPushToReview = async function(post) {
               uid: post.uid,
               reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
               handlerId: user.uid,
-              source: 'post',
+              source: source.post,
             }
            );
           return true;
@@ -562,15 +560,7 @@ schema.methods.updateReview = async function(props) {
     }
   });
 }
-//返回source数据来源
-const  sources = {
-  post: 'post',
-  document: 'document',
-  note: 'note'
-}
-schema.statics.getDocumentSources = async ()=>{
-  return {...sources}
-}
+
 
 
 

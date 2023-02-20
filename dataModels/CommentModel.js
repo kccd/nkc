@@ -516,6 +516,7 @@ schema.statics.extendSingleComment = async (comment) => {
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
+  const source = ReviewModel.getDocumentSources()
   const user = await UserModel.findOnly({uid: comment.uid});
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();
@@ -526,7 +527,7 @@ schema.statics.extendSingleComment = async (comment) => {
   let reason;
   //获取评论状态不正常的审核原因
   if(document.status === unknownStatus) {
-    delLog = await ReviewModel.findOne({sid: document._id, source: 'document'}).sort({toc: -1});
+    delLog = await ReviewModel.findOne({sid: document._id, source: source.document}).sort({toc: -1});
   } else if(document.status === disabledStatus) {
     delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
   } else if(document.status === faultyStatus) {
