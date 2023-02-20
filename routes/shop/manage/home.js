@@ -50,18 +50,30 @@ homeRouter
 		let orderUnSignCount = 0;
 		let orderFinishCount = 0;
 		let orderRefundCount = 0;
+		let orderClosedCount = 0;
 		for(let o of orders) {
-			if(o.orderStatus == "unCost") orderUnCostCount += 1;
-			if(o.orderStatus == "unShip") orderUnShipCount += 1;
-			if(o.orderStatus == "unSign") orderUnSignCount += 1;
-			if(o.orderStatus == "finish") orderFinishCount += 1;
-			if(o.refundStatus == "ing") orderRefundCount += 1;
+			if(o.closeStatus) {
+				// 订单已被关闭
+				orderClosedCount += 1;
+			} else {
+				// 待付款
+				if(o.orderStatus == "unCost") orderUnCostCount += 1;
+				// 待发货
+				if(o.orderStatus == "unShip") orderUnShipCount += 1;
+				// 待收货
+				if(o.orderStatus == "unSign") orderUnSignCount += 1;
+				// 已完成
+				if(o.orderStatus == "finish") orderFinishCount += 1;
+				// 退款中
+				if(o.refundStatus == "ing") orderRefundCount += 1;
+			}
 		}
 		statistics.orderUnCostCount = orderUnCostCount;
 		statistics.orderUnShipCount = orderUnShipCount;
 		statistics.orderUnSignCount = orderUnSignCount;
 		statistics.orderFinishCount = orderFinishCount;
 		statistics.orderRefundCount = orderRefundCount;
+		statistics.orderClosedCount = orderClosedCount;
     data.statistics = statistics;
     data.navType = "manage";
 		ctx.template = 'shop/manage/home.pug';

@@ -90,6 +90,11 @@ block shopContent
                   a(style="color:red")!=statistics.orderFinishCount
                   | &nbsp;个
               tr
+                td 已关闭订单
+                td
+                  a(style="color:red")!=statistics.orderClosedCount
+                  | &nbsp;个
+              tr
                 td 退款中订单
                 td
                   a(style="color:red")!=statistics.orderRefundCount

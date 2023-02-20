@@ -70,7 +70,7 @@ router
     const subColumnArticlesId = [];
     let subs = [];
     let count;
-    let paging;
+    let paging = nkcModules.apiFunction.getDefaultPaging();
     let posts;
     const pageSettings = await db.SettingModel.getSettings('page');
     const {thread: threadType, article: articleType, post: postType} = await db.ColumnPostModel.getColumnPostTypes();
@@ -293,7 +293,147 @@ router
         }
       ]
     };
-    if(type !== 'thread') {
+    if(type === 'thread') {
+      for(const sub of subs) {
+        if(sub.type === 'thread') {
+          const a = extendPost(sub);
+          if(a) {
+            activity.push(a);
+          }
+        } else if(sub.type === 'article') {
+          const {
+            toc,
+            type,
+            status,
+            _id,
+            document,
+            user,
+            url,
+          } = sub;
+          const {uid, username, avatar, id} = user;
+          const {title, content, cover} = document;
+          activity.push({
+            toc,
+            type,
+            from: '发表专栏文章',
+            title,
+            content: nkcRender.htmlToPlain(content, 200),
+            url,
+            cover: nkcModules.tools.getUrl('postCover', cover),
+            user: {
+              uid,
+              avatar: nkcModules.tools.getUrl('userAvatar', avatar),
+              username,
+              homeUrl: nkcModules.tools.getUrl('userHome', uid),
+              id,
+            }
+          });
+        }
+      }
+    } else if(type === 'column') {
+      posts = await db.PostModel.find(match, {
+        pid: 1,
+        tid: 1,
+        uid: 1,
+        toc: 1,
+        type: 1,
+        c: 1,
+        t: 1,
+        anonymous: 1,
+        cover: 1,
+        mainForumsId: 1,
+        columnsId: 1
+      })
+        .sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage)
+      posts = await db.PostModel.extendActivityPosts(posts);
+      const postObj = {};
+      const articleObj = {};
+      for(const post of posts) {
+        postObj[post.pid] = post;
+      }
+      const {normal: normalStatus} = await db.ArticleModel.getArticleStatus();
+      let articles = await db.ArticleModel.find({_id: {$in: subColumnArticlesId}, status: normalStatus});
+      articles = await db.ArticleModel.getArticlesInfo(articles);
+      for(const article of articles) {
+        articleObj[article._id] = article;
+      }
+      for(const sc of subColumnPosts) {
+        let t;
+        let thread;
+        if(sc.type === threadType) {
+          t = postObj[sc.pid];
+          if(t) {
+            thread = extendPost(t);
+          }
+        } else if(sc.type === articleType) {
+          t = articleObj[sc.pid];
+          if(t) {
+            const {toc, user, document, url} = t;
+            //获取当前引用的专栏信息
+            const column = await sc.extendColumnPost();
+            thread = {
+              toc,
+              form: '添加专栏文章',
+              type: 'article',
+              user: {
+                id: column._id,
+                name: column.name,
+                avatar: nkcModules.tools.getUrl('columnAvatar', column.avatar),
+                homeUrl: nkcModules.tools.getUrl('columnHome', column._id),
+              },
+              quote: {
+                user: {
+                  uid: user.uid,
+                  avatar: nkcModules.tools.getUrl('userAvatar', user.avatar),
+                  username: user.username,
+                  banned: user.certs.includes('banned'),
+                  homeUrl: nkcModules.tools.getUrl('userHome', user.uid),
+                  name: user.username,
+                  id: user.uid,
+                },
+                title: document.title,
+                content: nkcModules.nkcRender.htmlToPlain(document.content, 200),
+                cover: nkcModules.tools.getUrl('postCover', document.cover),
+                toc: document.toc,
+                url,
+              },
+            };
+          }
+        }
+        if(thread) {
+          activity.push(thread);
+        }
+      }
+    } else {
+      count = await db.PostModel.countDocuments(match);
+      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+      posts = await db.PostModel.find(match, {
+        pid: 1,
+        tid: 1,
+        uid: 1,
+        toc: 1,
+        type: 1,
+        c: 1,
+        t: 1,
+        anonymous: 1,
+        cover: 1,
+        mainForumsId: 1,
+        columnsId: 1
+      })
+        .sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage)
+      posts = await db.PostModel.extendActivityPosts(posts);
+
+      for(let i = 0; i < posts.length; i++) {
+        const post = posts[i];
+        const a = extendPost(post);
+        activity.push(a);
+      }
+    }
+    /*if(type !== 'thread') {
       if(type !== 'column') {
         count = await db.PostModel.countDocuments(match);
         paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
@@ -434,7 +574,7 @@ router
           });
         }
       }
-    }
+    }*/
     data.paging = paging;
     data.activity = activity;
     ctx.template = `subscribe/post.pug`;

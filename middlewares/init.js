@@ -163,6 +163,6 @@ module.exports = async (ctx, next) => {
     // 记录日志
     // 在控制台打印日志
     // 向web后台管理控制台推送日志
-    await logger(ctx);
+    await logger.saveLogToDB(ctx);
   }
 };

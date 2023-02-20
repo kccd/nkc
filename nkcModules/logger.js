@@ -1,6 +1,70 @@
-const moment = require('moment');
-const languages = require("../languages");
-module.exports = async (ctx) => {
+const log4js = require('log4js');
+
+const logger = {
+  error,
+  info,
+  warn,
+  debug,
+  internalServerError,
+  saveLogToDB,
+};
+
+const layout = {
+  type: 'pattern',
+  pattern: '%d{yyyy/MM/dd hh:mm:ss} %x{pid} [%p] %m',
+  tokens: {
+    pid() {
+      return process.pid
+    }
+  }
+};
+
+log4js.configure({
+  appenders: {
+    stdout: {
+      type: 'stdout',
+      layout,
+    },
+    stderr: {
+      type: 'stderr',
+      layout,
+    },
+    common: {
+      type: 'file',
+      layout,
+      filename: 'logs/nkc/all',
+      pattern: 'yyyy-MM-dd.log',
+      alwaysIncludePattern: true,
+    },
+    internalServerError: {
+      type: 'file',
+      layout,
+      filename: 'logs/nkc/internal-server-error',
+      pattern: 'yyyy-MM-dd.log',
+      alwaysIncludePattern: true,
+    },
+  },
+  categories: {
+    internalServerError: {
+      appenders: [
+        'internalServerError'
+      ],
+      level: 'trace'
+    },
+    default: {
+      appenders: [
+        'stdout',
+        'common'
+      ],
+      level: 'trace'
+    }
+  }
+});
+
+const commonLogger = log4js.getLogger();
+const internalServerErrorLogger = log4js.getLogger('internalServerError');
+
+async function saveLogToDB(ctx) {
   ctx.status = ctx.response.status;
   const passed = Date.now() - ctx.reqTime;
   ctx.set('X-Response-Time', passed);
@@ -54,42 +118,29 @@ module.exports = async (ctx) => {
     address: log.ip,
   };
 
-  const operationName = languages['zh_cn'].operations[operationId] || operationId;
-
   // （body中间件控制着是否在控制台打印，如果未文件则不打印）
   if(ctx.logIt) {
+    const logContent =
+      (log.uid || "visitor") + ' ' +
+      log.method + ' ' +
+      log.path + ' ' +
+      '<' + processTime + 'ms> ' +
+      log.status + ' ' +
+      address + ' ' +
+      operationId + ' ';
     if(d.error) {
-      // 控制台打印请求记录
-      console.error(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
-        `${(' ' + global.NKC.processId + ' ').grey} `+
-        `${' Error '.bgRed} ${log.uid.bgCyan} `+
-        `${log.method.green} ${log.path.bgBlue} `+
-        `<${processTime.green}ms> `+
-        `${String(log.status).red} `+
-        `${address} ` +
-        `${operationName.grey}`
-      );
+      logger.error(logContent)
       // 非线上环境打印错误详细信息
       if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
     } else {
-      // 控制台打印请求记录
-      console.log(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
-        `${(' ' + global.NKC.processId + ' ').grey} `+
-        `${' Info '.bgGreen} `+
-        `${log.uid.bgCyan} `+
-        `${log.method.green} `+
-        `${log.path.bgBlue} `+
-        `<${processTime.green}ms> `+
-        `${String(log.status).green} `+
-        `${address} ` +
-        `${operationName.grey}`
-      );
+      logger.info(logContent)
     }
-    // 网站后台控制台监看请求记录
-    // ctx.nkcModules.socket.sendConsoleMessage(d);
+
+    if(log.status === 500) {
+      internalServerError(`${logContent} \n ${log.error}`)
+    }
+
   }
   // 统计请求
   try{
@@ -110,4 +161,26 @@ module.exports = async (ctx) => {
       console.log(err)
     }
   }
-};
+}
+
+function internalServerError(content) {
+  internalServerErrorLogger.error(content);
+}
+
+function debug(content) {
+  commonLogger.debug(content);
+}
+
+function info(content) {
+  commonLogger.info(content);
+}
+
+function error(content) {
+  commonLogger.error(content);
+}
+
+function warn(content) {
+  commonLogger.warn(content);
+}
+
+module.exports = logger;
