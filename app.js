@@ -4,10 +4,12 @@ require('colors');
 const path = require('path');
 const koaBody = require('koa-body');
 const koaCompress = require('koa-compress');
+const koaRewrite = require('koa-rewrite');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
 const {getCookieKeys} = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
+const {getUrl} = require('./nkcModules/tools');
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response, path, stats) {
@@ -66,6 +68,7 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
+  .use(koaRewrite('/favicon.ico', getUrl('siteIcon', 'ico')))
   .use(initAddress)
   .use(init)
   .use(initState)
