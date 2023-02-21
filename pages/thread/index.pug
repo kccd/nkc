@@ -485,7 +485,7 @@ block content
                           a(href=`/protocol` target="_blank") 查看协议
                   .form-group
                     button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
-                    button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
+                    button#draft.btn.btn-primary(onclick=`saveDraft("${thread.tid}","${data.user.uid}")`) 保存草稿
                     button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
               //- 主题已关闭
               if thread.closed
