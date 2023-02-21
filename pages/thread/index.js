@@ -434,7 +434,7 @@ function autoSaveDraft() {
 				var data = {
 					post: post,
 					draftId: draftId,
-					desType: "thread",
+					desType: "newPost",
 					desTypeId: $("#threadId").text()
 				};
 				return nkcAPI(url, method, data);

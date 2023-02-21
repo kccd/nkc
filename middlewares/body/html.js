@@ -18,6 +18,6 @@ module.exports = async (ctx) => {
     }
     ctx.body = ctx.nkcModules.render(templatePath, ctx.data, ctx.state, ctx.remoteState);
   } else {
-    ctx.throw(500, `未指定 Pug 模板文件`);
+    ctx.throw(400, '请求数据的类型不匹配');
   }
 };
