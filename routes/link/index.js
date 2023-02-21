@@ -2,15 +2,14 @@ const Router = require("koa-router");
 const router = new Router();
 const OffsiteLinkModel = require("../../dataModels/OffsiteLinkModel");
 const SettingModel = require("../../dataModels/SettingModel");
-const base64js = require("base64-js");
 
 router
   .get("/", async (ctx, next) => {
     const { data, header } = ctx;
-    const { t } = ctx.query;
+    const { t = '' } = ctx.query;
     const { user } = data;
-    const byteArray = base64js.toByteArray(t);
-    const url = String.fromCharCode(...byteArray);
+    const url = Buffer.from(t, 'base64').toString();
+    if(!url) ctx.throw(400, '目标链接不能为空');
     const doc = await OffsiteLinkModel.create({
       target: url,
       referer: header.referer,
