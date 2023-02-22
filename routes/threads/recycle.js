@@ -9,6 +9,7 @@ router
     const results = [];
     const threads = [], threadsId = [];
     const recycleId = await db.SettingModel.getRecycleId();
+    const source = db.ReviewModel.getDocumentSources();
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
@@ -75,7 +76,16 @@ router
         });
         await delLog.save();
         // 如果文章之前未审核 则生成审核记录
-        if(!thread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, reason);
+        if(!thread.reviewed) await db.ReviewModel.newReview(
+          {
+            type: "disabledThread",
+            sid:post.pid,
+            uid:post.uid,
+            reason,
+            handlerId:user.uid,
+            source: source.post
+          }
+         );
       } else {
         // 批量屏蔽回复
         if(post.disabled) continue;
@@ -99,7 +109,16 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(!post.reviewed) await db.ReviewModel.newReview("disabledPost", post, targetUser, reason);
+        if(!post.reviewed) await db.ReviewModel.newReview(
+          {
+            type:"disabledPost",
+            sid:post.pid,
+            uid:post.uid,
+            reason,
+            handlerId:targetUser.uid,
+            source: source.post
+          }
+         );
       }
       // 标记为违规
       if(violation) {

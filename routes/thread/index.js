@@ -15,7 +15,6 @@ function isIncludes(arr, id, type) {
   }
   return false;
 }
-
 threadRouter
   .use('/', async (ctx, next) => {
     const {db, state, data} = ctx;
@@ -232,10 +231,8 @@ threadRouter
 
 
     const {thread} = internalData;
-
     const tid = thread.tid;
-
-
+    const source = await db.ReviewModel.getDocumentSources();
     // 拓展文章属性
     await thread.extendThreadCategories();
     const authorId = thread.uid;
@@ -320,13 +317,11 @@ threadRouter
     thread.firstPost = firstPost;
     // 加载文章待审原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});
-      threadReviewReason = reviewRecord? reviewRecord.reason : "";
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: source.post}).sort({toc: -1});
+      threadReviewReason = reviewRecord ? reviewRecord.reason : "";
     }
-
     // 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     anonymous = firstPost.anonymous;
-
     // 构建回复的查询条件
     const match = {
       tid: thread.tid,
@@ -409,7 +404,7 @@ threadRouter
       const _post = posts[i];
       _postsId.push(_post.pid);
     }
-    const reviewRecords = await db.ReviewModel.find({pid: {$in: _postsId}}).sort({toc: -1});
+    const reviewRecords = await db.ReviewModel.find({sid: {$in: _postsId}}).sort({toc: -1});
     const reviewRecordsObj = {};
     for(let i = 0; i < reviewRecords.length; i ++) {
       const reviewRecord = reviewRecords[i];
@@ -931,6 +926,7 @@ threadRouter
     await thread.extendThreadCategories();
     // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
+    const source = await db.ReviewModel.getDocumentSources();
     if(forums.length) data.forum = forums[0];
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
@@ -1104,8 +1100,8 @@ threadRouter
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(data.posts.map(async (post) => {
-      const reviewRecord = await db.ReviewModel.findOne({pid: post.pid}).sort({toc: -1});
-      post.reviewReason = reviewRecord? reviewRecord.reason : "";
+      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: source.post}).sort({toc: -1});
+      post.reviewReason = reviewRecord ? reviewRecord.reason : "";
       return post;
     }));
     // 获取置顶文章
@@ -1237,18 +1233,15 @@ threadRouter
 
     // 如果是待审核，取出审核原因
     if(!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});
-      data.threadReviewReason = reviewRecord? reviewRecord.reason : "";
+      const reviewRecord = await db.ReviewModel.findOne({sid: firstPost.tid, source: source.post}).sort({toc: -1});
+      data.threadReviewReason = reviewRecord ? reviewRecord.reason : "";
     }
-
 		data.thread = thread;
 		data.forums = forums;
-
 		data.replyTarget = `t/${tid}`;
 		// const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		// data.ads = homeSettings.c.ads;
 		ctx.template = 'thread/index.pug';
-
 		// 【待改】如果当前文章为商品贴
 		if(thread.type === "product") {
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
@@ -1468,6 +1461,7 @@ threadRouter
 	})
 	.post('/:tid', async (ctx, next) => {
     // 社区文章发表评论
+    
 		const {
 			data, nkcModules, params, db, body, state, address: ip
 		} = ctx;

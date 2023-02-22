@@ -13,8 +13,7 @@ export default {
   props: ['management'],
   data: () => ({
   }),
-  mounted() {
-  },
+  mounted() {},
   methods: {
   }
 }

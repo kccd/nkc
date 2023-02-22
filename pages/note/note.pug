@@ -4,20 +4,21 @@ block title
   +includeCSS("/note/note.css")
 block content
   #note(v-cloak)
+
     .origin-content {{note.content}}
     .notes
-      .note(v-for="n in note.notes")
+      .note(v-for="n in note.notes" :id="n._id" v-if=`(!${permission('managementNote')} && n.status === 'deleted')?false:true`   :class="query===n._id?noteHighlighting:''"  )
         .note-user
           a.note-user-avatar(@click="visitUrl('/u/' + n.user.uid, true)")
             img(:src="getUrl('userAvatar', n.user.avatar)")
           a(@click="visitUrl('/u/' + n.user.uid, true)").note-user-username {{n.user.username}}
-          .note-time {{fromNow(n.toc)}} {{n.disabled?"已屏蔽":""}} {{n.deleted?"已删除":""}}
+          .note-time {{fromNow(n.toc)}} {{n.status === noteStatus.disabled ?"已屏蔽":""}} {{n.status === noteStatus.unknown ?"正在审核":""}} {{n.status === noteStatus.deleted ?'已删除':''}}
           .note-options(v-if=`n.user.uid === uid || ${permission('managementNote')}`)
             .note-options-icon.fa.fa-ellipsis-v(@click="openOptions(n)")
             ul(v-if="n.options")
-              li(@click="modifyNoteContent(n)") 编辑
+              li(@click="modifyNoteContent(n)" v-if=`n.user.uid === uid` :class="n.status === 'disabled'?'disabled':''") 编辑
               li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
-              li(@click="deleteNoteContent(n, 'disable')" v-if=`${permission('managementNote')}`) {{n.disabled?"解除屏蔽":"屏蔽"}}
+              li(@click="deleteNoteContent(n, 'disable')" v-if=`${permission('managementNote')}`) {{n.status === 'disabled' ?"解除屏蔽":"屏蔽"}}
         .note-content-body
           .note-content(v-if="!n.edit" v-html="n.html || '笔记内容已丢失'")
           .note-content(v-else)
@@ -26,6 +27,7 @@ block content
               button.btn.btn-sm.btn-primary(@click="saveNote(n)" :disabled="n.content === n._content") 保存
               button.btn.btn-sm.btn-default(@click="modifyNoteContent(n)") 取消
       .m-t-05.form
+        disabled(ref='disabled')
         textarea.form-control(ref="newNote" v-model="content" placeholder="添加笔记（公开、500字限制）" @keyup.ctrl.enter="saveNewNote"
           @input="resetTextarea(null)"
           @focus="resetTextarea(null)"
@@ -33,8 +35,7 @@ block content
         .m-t-05.m-b-1
           button.btn-block.btn.btn-primary(:disabled="!content" v-if="submitting") 保存中...
           button.btn-block.btn.btn-primary(:disabled="!content" @click="saveNewNote" v-else) 保存
-
-  .hidden#data=objToStr({note: data.note})
+  .hidden#data=objToStr({note: data.note,query:data.query})
 block scripts
   include ../publicModules/moment
   +includeJS("/note/note.js")

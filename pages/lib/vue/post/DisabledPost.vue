@@ -9,8 +9,9 @@
         .form-group
           label 方式
           .moduleDisabledPostType
-            .col-xs-6(@click="type = 'toDraft'" :class="{'active':type === 'toDraft'}") 退回修改
-            .col-xs-6(@click="type = 'toRecycle'" :class="{'active':type === 'toRecycle'}") 删除
+            .col-xs-6(@click="type = 'toDraft'" :class="{'active':type === 'toDraft'}" v-if = "!note" ) 退回修改
+            .col-xs-6(@click="type = 'toRecycle'" :class="{'active':type === 'toRecycle'}" v-if = "!note") 删除
+            .col-xs-6(@click="type = 'toDisabled'" :class="{'active':type === 'toDisabled'}" v-if = "note") 屏蔽
         .form-group
           label 原因
           textarea.form-control(rows=5 placeholder="请输入原因..." v-model="reason")
@@ -99,14 +100,18 @@ export default {
   data: () => ({
     show: false,
     submitting: false,
-    type: "toDraft", // toDraft, toRecycle
+    type: "toDraft", // toDraft, toRecycle,toDisabled
     reason: "",
     remindUser: true,
-    violation: true
+    violation: true,
+    note: false,
   }),
   watch: {
     type: function() {
       if(this.type === "toDraft") {
+        this.remindUser = true;
+      }
+      else if(this.type === "toDisabled"){
         this.remindUser = true;
       }
     }
@@ -131,10 +136,15 @@ export default {
         violation: this.violation
       });
     },
-    open(callback) {
+    //为了方便笔记的屏蔽添加了一个note字段，不影响之前的功能
+    open(callback,note) {
       this.callback = callback;
       this.draggableElement.show();
       this.show = true;
+      if(note){
+         this.note = note;
+         this.type = 'toDisabled';
+      }
     },
     close() {
       this.draggableElement.hide();

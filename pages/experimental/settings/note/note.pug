@@ -1,0 +1,39 @@
+extends  ../../experimental
+block eTitle
+  title 笔记
+block eContent
+  .hidden#data=objToStr({keyWordGroup: data.keyWordGroup,enabled:data.enabled,keyWordGroupChecked:data.keyWordGroupChecked},)
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        div#app(v-cloak)
+          div()
+            label
+              span 启用笔记敏感词检测
+              input(type='checkbox'  @change="keyWordSwitch" :checked='enabled')
+          br
+          .keyWordGroup()
+            div()
+              table.table.table-bordered
+                thead
+                  tr
+                    th
+                     input(type='checkbox' @click='checkAll' :checked="selectedAll" )
+                    th 词组ID
+                    th 词组名称
+                    th 词数
+                    th 送审条件
+                tbody
+                  tr(v-for='item in keyWordGroup' :key='item.id')
+                    td
+                      input(  type='checkbox'  v-model="keyWordGroupChecked"  :value='item.id'  )
+                    td {{item.id}}
+                    td {{item.name}}
+                    td {{item.keywords.length}}
+                    td {{`命中至少${item.conditions.count}个敏感词，${item.conditions.logic=='or'?'或者':'并且' }至少${item.conditions.times}次敏感词`}}
+              div()
+                button.btn.btn-primary(@click='submitKeyWordGroup') 点击提交
+
+block scripts
+  +includeJS('/experimental/settings/note/note.js')
+  +includeCSS('/experimental/settings/note/note.css')

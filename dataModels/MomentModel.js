@@ -396,11 +396,13 @@ schema.statics.createMomentComment = async (props) => {
 *   @param {[String]} resourcesId 资源 ID 组成的数组
 * */
 schema.methods.modifyMoment = async function(props) {
+
   const {content, resourcesId} = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const time = new Date();
   const newResourcesId = await MomentModel.replaceMomentResourcesId(resourcesId);
+
   await DocumentModel.updateDocumentByDid(this.did, {
     content,
     tlm: time,
@@ -712,6 +714,7 @@ schema.methods.checkBeforePublishing = async function() {
 * 发布当前动态或评论
 * */
 schema.methods.publish = async function() {
+
   const DocumentModel = mongoose.model('documents');
   await this.checkBeforePublishing();
   const time = new Date();
@@ -1565,6 +1568,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const localAddr = await IPModel.getLocalAddr();
   const momentStatus = await MomentModel.getMomentStatus();
   const {getUrl, timeFormat} = require('../nkcModules/tools');
+  const source = ReviewModel.getDocumentSources()
   const usersId = [];
   const commentsId = [];
   // 拓展回复的上级评论
@@ -1637,7 +1641,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if(status === unknown) {
-      const review = await ReviewModel.findOne({docId: stableDocument._id});
+      const review = await ReviewModel.findOne({sid: stableDocument._id, source: source.document});
       if(review) data.reason = review.reason;
     }
     commentsData.push(data);

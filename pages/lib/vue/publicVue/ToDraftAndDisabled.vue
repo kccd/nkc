@@ -7,7 +7,6 @@
 </style>
 <script>
 import DisabledPost from "../post/DisabledPost";
-
 export const contentType = {
   post: 'post',
   document: 'document'
