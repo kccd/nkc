@@ -110,7 +110,7 @@ router
     const {_id, targetId, content, type, node,} = body;
     const {user} = data;
     const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
-    const source = db.ReviewModel.getDocumentSources();
+    const source = await db.ReviewModel.getDocumentSources();
     let reason;
     checkString(content, {
       name: "笔记内容",
@@ -198,15 +198,14 @@ router
     await noteContent.save();   //保存笔记内容
     //出现了敏感词，就创建审核记录
     if(appear){
-      db.ReviewModel.newReview(
-        {
-          type: 'sensitiveWord',
-          sid: noteContent._id,
-          uid: noteContent.uid,
-          reason: `出现了敏感词:${reason}`,
-          handlerId: '',
-          source: source.note
-        })
+      await db.ReviewModel.newReview({
+        type: 'sensitiveWord',
+        sid: noteContent._id,
+        uid: noteContent.uid,
+        reason: `出现了敏感词:${reason}`,
+        handlerId: '',
+        source: source.note
+      });
     }
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContent.edit = false;

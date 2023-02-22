@@ -1,7 +1,7 @@
 module.exports = {
   _id: 'note',
   c: {
-    enabled:false,
+    enabled: false,
     keyWordGroup: [],
   }
 };

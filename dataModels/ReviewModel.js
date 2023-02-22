@@ -74,7 +74,7 @@ const  source = {
 }
 
 //返回数据来源
-schema.statics.getDocumentSources = async ()=>{
+schema.statics.getDocumentSources = async () => {
   return {...source}
 }
 
