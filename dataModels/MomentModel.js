@@ -1568,7 +1568,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const localAddr = await IPModel.getLocalAddr();
   const momentStatus = await MomentModel.getMomentStatus();
   const {getUrl, timeFormat} = require('../nkcModules/tools');
-  const source = ReviewModel.getDocumentSources()
+  const source = await ReviewModel.getDocumentSources()
   const usersId = [];
   const commentsId = [];
   // 拓展回复的上级评论

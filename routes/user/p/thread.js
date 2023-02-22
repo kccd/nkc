@@ -3,7 +3,7 @@ module.exports = async (ctx, next) => {
   const {user, targetUser} = data;
   const {page = 0} = query;
   const {pageSettings} = state;
-  const source = db.ReviewModel.getDocumentSources();
+  const source = await db.ReviewModel.getDocumentSources();
   // 获取用户能够访问的专业ID
   const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
   let canManageFid = [];

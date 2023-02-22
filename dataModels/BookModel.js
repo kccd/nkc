@@ -326,7 +326,7 @@ schema.methods.extendArticlesById = async function(articlesId) {
   const {timeFormat, getUrl} = require('../nkcModules/tools');
   const articles = await ArticleModel.find({_id: {$in: articlesId}});
   const {article: documentSource} = await DocumentModel.getDocumentSources();
-  const source = ReviewModel.getDocumentSources()
+  const source = await ReviewModel.getDocumentSources()
   const documents = await DocumentModel.find({
     type: {
       $in: ['beta', 'stable']
