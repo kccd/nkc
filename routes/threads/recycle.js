@@ -9,6 +9,7 @@ router
     const results = [];
     const threads = [], threadsId = [];
     const recycleId = await db.SettingModel.getRecycleId();
+    const source = db.ReviewModel.getDocumentSources();
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
@@ -82,7 +83,7 @@ router
             uid:post.uid,
             reason,
             handlerId:user.uid,
-            source:'post'
+            source: source.post
           }
          );
       } else {
@@ -115,7 +116,7 @@ router
             uid:post.uid,
             reason,
             handlerId:targetUser.uid,
-            source:'post'
+            source: source.post
           }
          );
       }

@@ -354,6 +354,7 @@ schema.statics.extendPostComments = async (props) => {
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
+  const source = ReviewModel.getDocumentSources();
   const didArr = [];
   const uidArr = [];
   const quoteIdArr = [];
@@ -403,7 +404,7 @@ schema.statics.extendPostComments = async (props) => {
     let reason;
     //获取评论状态不正常的审核原因
     if(d.status === unknownStatus) {
-      delLog = await ReviewModel.findOne({sid: d._id, source: 'document'}).sort({toc: -1});
+      delLog = await ReviewModel.findOne({sid: d._id, source: source.document}).sort({toc: -1});
     } else if(d.status === disabledStatus) {
       delLog = await DelPostLogModel.findOne({postType: d.source, delType: disabledStatus, postId: d._id, delUserId: d.uid}).sort({toc: -1});
     } else if(d.status === faultyStatus) {

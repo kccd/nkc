@@ -126,7 +126,7 @@ schema.statics.newDocumentReview = async (type, sid, uid, reason) => {
     reason,
     sid,
     uid,
-    source: 'document'
+    source: source.document
   });
   await review.save();
 }

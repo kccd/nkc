@@ -71,6 +71,7 @@ router
     const {content} = body;
     const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
     const note = await db.NoteContentModel.findOne({_id:noteContent._id})
+   
     if(note.status === 'disabled'){
        ctx.throw(400,'您的笔记已经被屏蔽')
     }
@@ -109,6 +110,7 @@ router
     const {_id, targetId, content, type, node,} = body;
     const {user} = data;
     const {enabled}= await db.SettingModel.getSettings('note') //获取是否开启敏感词检测状态
+    const source = db.ReviewModel.getDocumentSources();
     let reason;
     checkString(content, {
       name: "笔记内容",
@@ -203,7 +205,7 @@ router
           uid: noteContent.uid,
           reason: `出现了敏感词:${reason}`,
           handlerId: '',
-          source: 'note'
+          source: source.note
         })
     }
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
