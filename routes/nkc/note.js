@@ -3,8 +3,7 @@ router
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {page} = query;
-    const match = {
-    };
+    const match = {};
     const count = await db.NoteContentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const noteContent = await db.NoteContentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -20,6 +19,8 @@ router
     const {body, db, nkcModules, data,state} = ctx;
     const {noteContentId, type, content,remindUser,reason,violation } = body;
     const noteContent = await db.NoteContentModel.findOne({_id: noteContentId});
+    const noteContentStatus = await db.NoteContentModel.getNoteContentStatus();
+    const reviewSources = await db.ReviewModel.getDocumentSources();
     const {status,uid} =noteContent
     const noteUser = await db.UserModel.findOne({uid})
     let message ={}
@@ -35,31 +36,31 @@ router
       noteContent.content = content;
       const nc = await db.NoteContentModel.extendNoteContent(noteContent);
       data.noteContentHTML = nc.html;
-    }
-    else if(type === "disable" && status === 'deleted'){
-      ctx.throw(400,`用户已经删除`)
-    }
-    else if(type === "disable" && status === 'disabled'){
-      ctx.throw(400,`已经屏蔽用户`)
-    }
-    else if(type === "cancelDisable"&& status === 'normal' ) {
-      ctx.throw(400,`已经取消屏蔽用户`)
-    }
-    else if(type === "disable"&& status!== 'deleted') {
+    } else if(type === 'disabled') {
+      if (status === noteContentStatus.deleted) ctx.throw(400, '内容已被用户删除，无法执行此操作');
+      if (status === noteContentStatus.disabled) ctx.throw(400, '内容已被屏蔽');
       //更新笔记状态
-      await noteContent.updateOne({disabled: true,status:'disabled'});
+      await noteContent.updateOne({status: noteContentStatus.disabled});
       //更新笔记审核记录状态
-      await db.ReviewModel.updateOne({sid:noteContentId,source:'note'},{
-        $set:{
-          handlerId:state.uid,
-          reason:reason?reason:'出现了敏感词'
+      await db.ReviewModel.newReview({
+        type: 'disabledNote',
+        sid: noteContentId,
+        source: reviewSources.note,
+        reason: reason || '',
+        handlerId: state.uid,
+      });
+      /*await db.ReviewModel.updateOne({sid: noteContentId, source: 'note'}, {
+        $set: {
+          handlerId: state.uid,
+          reason: reason ? reason : '出现了敏感词',
+          type: 'disabledNote',
         }
-      })
+      }).sort({toc: -1});*/
       //如果标记用户违规就给该用户新增违规记录
-      if(violation){
+      if (violation) {
         //新增违规记录
         await db.UsersScoreLogModel.insertLog({
-          user:noteUser ,
+          user: noteUser,
           type: 'score',
           typeIdOfScoreChange: "violation",
           port: ctx.port,
@@ -70,16 +71,16 @@ router
           noteId: noteContentId,
         })
       }
-      
+
       //选择是否提醒作者
-      if(remindUser){
-        message =await db.MessageModel({
-          _id: await db.SettingModel.operateSystemID("messages",1),
+      if (remindUser) {
+        message = await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID("messages", 1),
           r: uid,
           ty: 'STU',
-          c:{
+          c: {
             delType: 'disabled',
-            violation: violation?violation:false,
+            violation: violation ? violation : false,
             type: 'noteDisabled',
             noteId: noteContentId,
             reason,
@@ -89,9 +90,10 @@ router
         //通过socket通知作者
         await ctx.nkcModules.socket.sendMessageToUser(message._id);
       }
-    }
-    else if(type === "cancelDisable" && status !== 'deleted' ) {
-      await noteContent.updateOne({disabled: false,status:'normal'});
+    } else if(type === 'cancelDisable') {
+      if(status === 'deleted') ctx.throw(400, '内容已被删除，无法执行此操作');
+      if(status !== 'disabled') ctx.throw(400, '内容未被屏蔽，无法执行此操作');
+      await noteContent.updateOne({disabled: false, status: 'normal'});
     }
     await next();
   });

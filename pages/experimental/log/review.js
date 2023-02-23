@@ -14,12 +14,14 @@ var app = new Vue({
         "disabledThread": "删除",
         'disabledDocument': "删除",
         'deleteDocument': '删除',
+        'disabledNote': '删除',
         "returnPost": "退修",
         "returnThread": "退修",
         'returnDocument': '退修',
         "passPost": "通过审核",
         "passThread": "通过审核",
-        'passDocument': '通过审核'
+        'passDocument': '通过审核',
+        'passNote': '通过审核',
       }[t]
     }
   }

@@ -267,6 +267,9 @@ var Tools = function() {
       case 'activity': {
         return '/activity/single/' + id
       }
+      case 'noteContent': {
+        return '/note/' + id + '?n=' + size
+      }
     }
   };
   self.getAnonymousInfo = function() {
