@@ -411,20 +411,20 @@ router
           });
         }
       }
-    }
-    else if(reviewType === 'note'){
-       const note = await db.NoteContentModel.findOne({_id:noteId});
-       if(!note) ctx.throw(404,`未找到ID为${noteId}的note`)
-       if(note.status === noteContentStatus.normal) ctx.throw(400,'内容已经被审核通过了，请刷新')
-       if(note.status === noteContentStatus.disabled) ctx.throw(400,'内容已经被屏蔽，请刷新')
-      const noteUser = await db.UserModel.findOne({uid:note.uid})
+    } else if(reviewType === 'note'){
+      const note = await db.NoteContentModel.findOne({_id: noteId});
+      if(!note) ctx.throw(404,`未找到ID为${noteId}的note`)
+      if(note.status === noteContentStatus.normal) ctx.throw(400,'内容已经被审核通过了，请刷新');
+      if(note.status === noteContentStatus.disabled) ctx.throw(400,'内容已经被屏蔽，请刷新');
+      if(note.status === noteContentStatus.deleted) ctx.throw(400,'内容已经被删除，请刷新');
+      const noteUser = await db.UserModel.findOne({uid: note.uid})
       if(pass){
          //note为通过的状态
-        await db.NoteContentModel.updateOne({_id:noteId},{
+        await db.NoteContentModel.updateOne({_id: noteId},{
           $set:{
             status: noteContentStatus.normal
           }
-        })
+        });
         //生成新的审核记录
         await db.ReviewModel.newReview(
           {
@@ -432,25 +432,26 @@ router
             sid: note._id,
             uid: note.uid,
             reason: '',
-            handlerId: user.uid,
+            handlerId: state.uid,
             source: source.note,
           }
-        )
-      }
-      else {
+        );
+      } else {
         //note为屏蔽状态
-        await db.NoteContentModel.updateOne({_id:noteId},{
+        await db.NoteContentModel.updateOne({_id: noteId},{
           $set:{
             status: noteContentStatus.disabled
           }
-        })
+        });
         //更新审核记录状态
-        await db.ReviewModel.updateOne({sid: note._id, source: 'note'},{
-          $set:{
-            handlerId: user.uid,
-            reason: reason?reason:'出现了敏感词'
-          }
-        })
+        await db.ReviewModel.newReview({
+          type: 'disabledNote',
+          sid: note._id,
+          source: source.note,
+          reason: reason || '',
+          uid: note.uid,
+          handlerId: state.uid,
+        });
        //如果标记用户违规就给该用户新增违规记录
        if(violation){
          //新增违规记录

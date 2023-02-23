@@ -36,7 +36,7 @@ router
       noteContent.content = content;
       const nc = await db.NoteContentModel.extendNoteContent(noteContent);
       data.noteContentHTML = nc.html;
-    } else if(type === 'disabled') {
+    } else if(type === 'disable') {
       if (status === noteContentStatus.deleted) ctx.throw(400, '内容已被用户删除，无法执行此操作');
       if (status === noteContentStatus.disabled) ctx.throw(400, '内容已被屏蔽');
       //更新笔记状态
@@ -47,15 +47,9 @@ router
         sid: noteContentId,
         source: reviewSources.note,
         reason: reason || '',
+        uid: noteContent.uid,
         handlerId: state.uid,
       });
-      /*await db.ReviewModel.updateOne({sid: noteContentId, source: 'note'}, {
-        $set: {
-          handlerId: state.uid,
-          reason: reason ? reason : '出现了敏感词',
-          type: 'disabledNote',
-        }
-      }).sort({toc: -1});*/
       //如果标记用户违规就给该用户新增违规记录
       if (violation) {
         //新增违规记录
@@ -93,7 +87,7 @@ router
     } else if(type === 'cancelDisable') {
       if(status === 'deleted') ctx.throw(400, '内容已被删除，无法执行此操作');
       if(status !== 'disabled') ctx.throw(400, '内容未被屏蔽，无法执行此操作');
-      await noteContent.updateOne({disabled: false, status: 'normal'});
+      await noteContent.updateOne({disabled: false, status: noteContentStatus.normal});
     }
     await next();
   });
