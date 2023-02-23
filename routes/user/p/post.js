@@ -4,7 +4,7 @@ module.exports = async (ctx, next) => {
   const {targetUser, user} = data;
   const {pageSettings} = state;
   const {uid} = params;
-  const source = db.ReviewModel.getDocumentSources();
+  const source = await db.ReviewModel.getDocumentSources();
   let canManageFid = [];
   if(data.user) {
     canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
