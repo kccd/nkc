@@ -354,7 +354,7 @@ schema.statics.extendPostComments = async (props) => {
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
-  const source = ReviewModel.getDocumentSources();
+  const source = await ReviewModel.getDocumentSources();
   const didArr = [];
   const uidArr = [];
   const quoteIdArr = [];
@@ -517,7 +517,7 @@ schema.statics.extendSingleComment = async (comment) => {
   const {htmlToPlain} = require("../nkcModules/nkcRender");
   const CommentModel = mongoose.model('comments');
   const {getUrl} = require('../nkcModules/tools');
-  const source = ReviewModel.getDocumentSources()
+  const source = await ReviewModel.getDocumentSources()
   const user = await UserModel.findOnly({uid: comment.uid});
   const {comment: commentSource} = await DocumentModel.getDocumentSources();
   const {stable: stableType} = await DocumentModel.getDocumentTypes();

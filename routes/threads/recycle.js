@@ -9,7 +9,7 @@ router
     const results = [];
     const threads = [], threadsId = [];
     const recycleId = await db.SettingModel.getRecycleId();
-    const source = db.ReviewModel.getDocumentSources();
+    const source = await db.ReviewModel.getDocumentSources();
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
