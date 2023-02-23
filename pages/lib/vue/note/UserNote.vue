@@ -1,6 +1,7 @@
 <template lang="pug">
   .user-note(v-if="!loading")
-    paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
+    span(v-if="pageButtons.length > 0")
+      paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .paging-button
       a.button.radius-left(
         :class="!t?'active':''"
@@ -277,7 +278,7 @@ export default {
     getUserNotes(page=0, t='') {
       this.loading = true;
       const self = this;
-      let url = `/u/${self.uid}/profile/note?page=${page}`;
+      let url = `/u/${self.uid}/profile/noteData?page=${page}`;
       if(t) {
         url += `&t=${t}`;
       }
