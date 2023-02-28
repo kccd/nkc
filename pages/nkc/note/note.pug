@@ -20,9 +20,9 @@ block nkcContent
         tbody
           for n in data.noteContent
             -let klass = "";
-            if n.disabled
+            if n.status === 'disabled'
               -klass += "disabled ";
-            if n.deleted
+            else if n.status === 'deleted'
               -klass += "deleted"
             tr(class=klass)
               th=n._id
@@ -40,17 +40,19 @@ block nkcContent
               th
                 if n.cid
                   span=`${n.cid}历史 `
-                else if !n.disabled && !n.deleted
+                else if n.status === "normal"
                   span 正常
-                if n.disabled
+                else if n.status === "disabled"
                   span 已屏蔽&nbsp;
-                if n.deleted
+                else if n.status === 'deleted'
                   span 已删除
+                else
+                  span 审核中
               th
                 a(href=n.url target="_blank") 链接
               th
                 button.btn.btn-xs.btn-default.btn-sm(onclick=`editNote(${n._id}, '${objToStr({content: n.content})}')`) 编辑
-                if n.disabled
+                if n.status === 'disabled'
                   button.btn.btn-xs.btn-sm.btn-danger(onclick=`disableNote(${n._id}, false)`) 解除屏蔽
                 else
                   button.btn.btn-xs.btn-default.btn-sm(onclick=`disableNote(${n._id}, true)`) 屏蔽

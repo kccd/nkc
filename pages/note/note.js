@@ -1,3 +1,5 @@
+import {scrollPageToElement} from  '../lib/js/pageSwitch'
+import disabledNote from '../lib/vue/post/DisabledPost'
 const data = NKC.methods.getDataById("data");
 data.note.notes.map(note => {
   note.edit = false;
@@ -8,14 +10,26 @@ const app = new Vue({
   data: {
     uid: NKC.configs.uid,
     note: data.note,
+    query: Number(data.query.n),
     submitting: false,
-    content: ""
+    content: "",
+    noteStatus:{
+      disabled : "disabled",//屏蔽
+      unknown  : "unknown",//未审核
+      normal   : "normal", //正常状态
+      deleted  : "deleted", //删除状态
+    },
+    noteHighlighting : 'noteHighlighting', //高亮
   },
   mounted() {
     document.body.addEventListener("click", (e) => {
       if(e.target.classList.contains("note-options-icon")) return;
       app.note.notes.map(note => note.options = false);
     });
+    if(data.query.n){
+      const element = $(`#${data.query.n}`);
+      scrollPageToElement(element); //滚动
+    }
   },
   methods: {
     visitUrl: NKC.methods.visitUrl,
@@ -114,32 +128,56 @@ const app = new Vue({
       if(type === "delete") {
         url = `/note/${note._id}/c/${n._id}`;
         method = "DELETE";
+        sweetQuestion("确定要执行此操作？")
+          .then(() => {
+            return nkcAPI(url, method, data);
+          })
+          .then(function() {
+            n.status = app.noteStatus.deleted;
+            sweetSuccess("操作成功");
+          })
+          .catch(sweetError);
       } else {
         method = "POST";
         url = `/nkc/note`;
-        if(n.disabled) {
+        if(n.status === 'disabled') {
           data.type = "cancelDisable";
+          data.noteId = note._id;
+          data.noteContentId = n._id;
+          sweetQuestion("确定要执行此操作？")
+            .then(() => {
+              return nkcAPI(url, method, data);
+            })
+            .then(function() {
+              n.deleted = true;
+              sweetSuccess("操作成功");
+            })
+            .catch(sweetError);
         } else {
-          data.type = "disable";
+          this.$refs.disabled.open(function fn(obj){
+            method = "POST";
+            url = `/nkc/note`;
+            data.type = "disable";
+            data.noteId = note._id;
+            data.noteContentId = n._id;
+            data.remindUser = obj.remindUser
+            data.reason = obj.reason;
+            data.violation = obj.violation
+            nkcAPI(url, method, data)
+              .then(function() {
+                n.status = app.noteStatus.disabled;
+                sweetSuccess("操作成功");
+              })
+              .catch(sweetError)
+            this.$refs.disabled.close()
+          },true)
         }
-        data.noteId = note._id;
-        data.noteContentId = n._id;
       }
-      sweetQuestion("确定要执行此操作？")
-        .then(() => {
-          return nkcAPI(url, method, data);
-        })
-        .then(function() {
-          if(type === "delete") {
-            n.deleted = true;
-          } else {
-            n.disabled = !n.disabled;
-          }
-          sweetSuccess("操作成功");
-        })
-        .catch(sweetError)
     }
-  }
+  },
+  components: {
+    disabled : disabledNote
+  },
 });
 
 window.app = app;

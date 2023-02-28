@@ -621,6 +621,14 @@ module.exports = {
       ],
       content: '用户[url=userUrl(username)]在电文中@了你，[url=momentUrl(查看)]。',
       type: 'momentAt',
-    }
+    },
+    {
+      parameters: [
+        "reason",
+        "content"
+      ],
+      content: "您发布的笔记[text=content]由于[text=reason]等原因已被屏蔽，内容仅自己可见，该操作不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记为违规。",
+      type: "noteDisabled"
+    },
   ]
 };

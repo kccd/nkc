@@ -126,24 +126,41 @@ schema.statics.extendNote = async (note, options) => {
   return notes[0];
 };
 schema.statics.extendNotes = async (notes_, options = {}) => {
-  const {disabled, deleted} = options;
+  const {type, uid} = options;
   const NoteContentModel = mongoose.model("noteContent");
+  const status = await NoteContentModel.getNoteContentStatus();
   const notes = [], notesId = [];
+  let match = {};
   notes_.map(n => {
     if(n.toObject) n = n.toObject();
     notes.push(n);
     notesId.push(n.originId);
   });
-  const match = {
-    noteId: {$in: notesId},
-    // notesId: {$in: notesId},
-    cid: null
-  };
-  if(disabled !== undefined) {
-    match.disabled = disabled;
-  }
-  if(deleted !== undefined) {
-    match.deleted = deleted;
+  
+  if (type === 'member'){
+    match = {
+      $or: [
+        {
+          noteId: {
+            $in: notesId
+          },
+          status: {
+            $ne: status.deleted,
+          },
+          uid,
+          cid: null,
+        },
+        {
+          noteId: {$in: notesId},
+          status: status.normal
+        }
+     ]
+    };
+  } else {
+     match = {
+      noteId: {$in: notesId},
+      cid: null
+    };
   }
   let noteContent = await NoteContentModel.find(match).sort({toc: 1});
   noteContent = await NoteContentModel.extendNoteContent(noteContent);

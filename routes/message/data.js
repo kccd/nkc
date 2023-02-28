@@ -3,6 +3,7 @@ const router = new Router();
 
 router
   .get("/", async (ctx, next) => {
+    
     const {db, query, data, state, nkcModules} = ctx;
     const {user} = data;
     const {type, firstMessageId} = query;
@@ -84,6 +85,7 @@ router
         home: null
       }
     } else if(type === "STU") {
+     
       const {user} = data;
       const q = {
         ty: 'STU',
@@ -134,7 +136,6 @@ router
       name: user.username || user.uid
     }
     data.messages = await db.MessageModel.extendMessages(data.messages);
-
     const messageSettings = await db.SettingModel.getSettings('message');
     data.sizeLimit = messageSettings.sizeLimit;
 

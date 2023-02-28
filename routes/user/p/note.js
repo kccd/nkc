@@ -5,10 +5,13 @@ module.exports = async (ctx, next) => {
   const {targetUser} = data;
   data.t = t;
   // 查看自己的笔记时，只需要排除自己已删除的笔记
+  const noteContentStatus = await db.NoteContentModel.getNoteContentStatus();
   const match = {
-    deleted: false,
-    type: "post",
     uid: targetUser.uid,
+    status: {
+      $ne: noteContentStatus.deleted,
+    },
+    type: "post",
   };
   let noteContent = await db.NoteContentModel.find(match).sort({toc: 1});
   noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
@@ -127,15 +130,17 @@ module.exports = async (ctx, next) => {
     // 需要排除自己已删除的笔记和别人已删除和被屏蔽的笔记
     const ncMatch = {
       type: "post",
-      deleted: false,
       noteId: {$in: notesId},
       $or: [
         {
-          uid: targetUser.uid
+          uid: targetUser.uid,
+          status: {
+            $ne: noteContentStatus.deleted,
+          }
         },
         {
           uid: {$ne: targetUser.uid},
-          disabled: false
+          status: noteContentStatus.normal,
         }
       ]
     };

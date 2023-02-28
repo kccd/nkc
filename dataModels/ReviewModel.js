@@ -1,6 +1,5 @@
 const mongoose = require("../settings/database");
 const Mint = require('mint-filter').default
-
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
@@ -11,11 +10,19 @@ const schema = new Schema({
     index: 1
   },
   // 当审核对象为 document 时，此字段为 document innerId
+  // 当审核对象为 note时,此字段为note innerId
   docId: {
     type: Number,
     default: null,
     index: 1
   },
+  // doc,note
+  // source:{
+  //   type: string,
+  //   default: null,
+  //   index: 1
+  // },
+  
   pid: {
     type: String,
     default: "",
@@ -45,10 +52,33 @@ const schema = new Schema({
     default: '',
     index: 1
   },
+  source: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  sid:{
+    type: String,
+    required: true,
+    index: 1
+  },
 
 },{
   collection: "reviews"
 });
+//返回source数据来源
+const  source = {
+  post: 'post',
+  document: 'document',
+  note: 'note'
+}
+
+//返回数据来源
+schema.statics.getDocumentSources = async () => {
+  return {...source}
+}
+
+
 /*
 * 生成审核记录
 * @param {String} type 审核类型
@@ -56,30 +86,47 @@ const schema = new Schema({
 * @param {Object} user 处理人ID
 * @author pengxiguaa 2019-6-3
 * */
-
-schema.statics.newReview = async (type, post, user, reason, document) => {
+//type, post, user, reason, document  ----之前的数据形式,
+//pid，tid,uid,已经废弃，添加了，sid作为公共的id，以及source标注sid来源
+// schema.statics.newReview = async (type, post, user, reason, document,source) => {
+//   await mongoose.model("reviews")({
+//     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
+//     type,
+//     reason,
+//     docId: document?document._id:'',
+//     pid: post?post.pid:'',
+//     tid: post?post.tid:'',
+//     uid: post?post.uid:document.uid,
+//     handlerId: user.uid
+//   }).save();
+// };
+//生成审核记录---新
+schema.statics.newReview = async ({type, sid, uid, reason, handlerId, source}) => {
+  if(source === 'document'){
+    sid = sid.toString()
+  }
   await mongoose.model("reviews")({
     _id: await mongoose.model("settings").operateSystemID("reviews", 1),
     type,
+    sid,
+    uid,
     reason,
-    docId: document?document._id:'',
-    pid: post?post.pid:'',
-    tid: post?post.tid:'',
-    uid: post?post.uid:document.uid,
-    handlerId: user.uid
+    handlerId,
+    source,
   }).save();
 };
 
 //生成新的document审核
-schema.statics.newDocumentReview = async (type, documentId, uid, reason) => {
+schema.statics.newDocumentReview = async (type, sid, uid, reason) => {
   const ReviewModel = mongoose.model('reviews');
   const SettingModel = mongoose.model('settings');
   const review = ReviewModel({
     _id: await SettingModel.operateSystemID('reviews', 1),
     type,
     reason,
-    docId: documentId,
+    sid,
     uid,
+    source: source.document
   });
   await review.save();
 }
@@ -90,12 +137,14 @@ schema.statics.reviewDocument = async (props) => {
     documentId,
     handlerId,
     reason,
-    type
+    type,
   } = props;
   const review = await ReviewModel.findOne({
-    docId: documentId,
-    handlerId: ''
+    sid: documentId,
+    handlerId: '',
+    source: reviewSources.document
   }).sort({toc: -1});
+  
   if(!review) return;
   await review.updateOne({
     $set: {
@@ -152,6 +201,7 @@ schema.statics.matchKeywords = async (content, groups) => {
     const hitWordsCount = contentFilterValue.words.length;
     // 总命中次数
     let hitCount = 0;
+    
     contentFilterValue.words.forEach(word => {
       hitCount += (content.match(new RegExp(word, "g")) || []).length;
     });
@@ -164,7 +214,9 @@ schema.statics.matchKeywords = async (content, groups) => {
         results = results.concat(matchedKeywords);
       }
     }
+    
   }
+ 
   return [...new Set(results)];
 }
 // 文章内容是否触发了敏感词送审条件
@@ -230,30 +282,36 @@ schema.statics.autoPushToReview = async function(post) {
   if(!user) throwErr(500, "在判断内容是否需要审核的时候，发现未知的uid");
   const reviewSettings = await SettingModel.getSettings('review');
   const review = reviewSettings[type];
-
   const needReview = await (async () => {
     // 一、特殊限制
     const {whitelistUid, blacklistUid} = review.special;
     // 1. 白名单
     if(whitelistUid.includes(uid)) {
-      return false
+      return false;
     }
     // 2. 黑名单
     if(blacklistUid.includes(uid)) {
-      await ReviewModel.newReview("blacklist", post, user, "黑名单中的用户");
-      return true
+      await ReviewModel.newReview({
+        type: 'blacklist',
+        sid: post.pid,
+        uid: post.uid,
+        reason: '黑名单中的用户',
+        handlerId: user.uid,
+        source: source.post
+      });
+      return true;
     }
 
     // 二、白名单（用户证书和用户等级）
     const {gradesId, certsId} = review.whitelist;
     await user.extendGrade();
     if(gradesId.includes(user.grade._id)) {
-      return false
+      return false;
     }
     await user.extendRoles();
     for(const role of user.roles) {
       if(certsId.includes(role._id)) {
-        return false
+        return false;
       }
     }
 
@@ -282,8 +340,17 @@ schema.statics.autoPushToReview = async function(post) {
     // 满足的用户所发表的文章 需要审核
     if(foreign.status && userPersonal.nationCode !== "86") {
       if(foreign.type === "all" || foreign.count > passedCount) {
-        await ReviewModel.newReview("foreign", post, user, "海外手机号用户，审核通过的文章数量不足");
-        return true
+        await ReviewModel.newReview(
+          {
+            type: "foreign",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "海外手机号用户，审核通过的文章数量不足",
+            handlerId: user.uid,
+            source: source.post,
+          }
+         );
+        return true;
       }
     }
 
@@ -293,7 +360,16 @@ schema.statics.autoPushToReview = async function(post) {
     // 满足以上的用户所发表的文章 需要审核
     if(notPassedA.status && !user.volumeA) {
       if(notPassedA.type === "all" || notPassedA.count > passedCount) {
-        await ReviewModel.newReview("notPassedA", post, user, "用户没有通过A卷考试，审核通过的文章数量不足");
+        await ReviewModel.newReview(
+          {
+            type: "notPassedA",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "用户没有通过A卷考试，审核通过的文章数量不足",
+            handlerId: user.uid,
+            source: source.post,
+          }
+         );
         return true;
       }
     }
@@ -308,7 +384,16 @@ schema.statics.autoPushToReview = async function(post) {
     if(grade.status) {
       // 目前调取的地方都在发表相应内容之后，所以用户已发表内容的数量需要-1
       if(grade.type === "all" || grade.count > passedCount - 1) {
-        await ReviewModel.newReview("grade", post, user, "因用户等级限制，审核通过的文章数量不足");
+        await ReviewModel.newReview(
+          {
+            type: "grade",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "因用户等级限制，审核通过的文章数量不足",
+            handlerId: user.uid,
+            source: source.post,
+          }
+        );
         return true;
       }
     }
@@ -317,7 +402,16 @@ schema.statics.autoPushToReview = async function(post) {
     if(await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
       const authSettings = await SettingModel.getSettings('auth');
       if(authSettings.verifyPhoneNumber.type === 'reviewPost') {
-        await ReviewModel.newReview("unverifiedPhone", post, user, "用户未验证手机号");
+        await ReviewModel.newReview(
+          {
+            type: "unverifiedPhone",
+            sid: post.pid,
+            uid: post.uid,
+            reason: "用户未验证手机号",
+            handlerId: user.uid,
+            source: source.post,
+          }
+          );
         return true;
       }
     }
@@ -345,7 +439,16 @@ schema.statics.autoPushToReview = async function(post) {
       useKeywordGroups = wordGroup.filter(g => useKeywordGroups.includes(g.id));
       const matchedKeywords = await ReviewModel.matchKeywords(post.t + post.c, useKeywordGroups);
       if(matchedKeywords.length > 0) {
-        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${matchedKeywords.join("、")}`);
+        await ReviewModel.newReview(
+          {
+            type: "includesKeyword",
+            sid: post.pid,
+            uid: post.uid,
+            reason: `内容中包含敏感词 ${matchedKeywords.join("、")}`,
+            handlerId: user.uid,
+            source: source.post,
+          }
+           );
         return true;
       }
       /*if(await ReviewModel.includesKeyword({   content: post.t + post.c,   useGroups: useKeywordGroups })) {
@@ -363,7 +466,16 @@ schema.statics.autoPushToReview = async function(post) {
       let roleList = [], gradeList = [], relationship = "or";
       if(currentPostType === "thread") {
         if(forumContentSettings.rule.thread.anyone) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid: post.pid,
+              uid: post.uid,
+              reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+              handlerId: user.uid,
+              source: source.post,
+            }
+           );
           return true;
         }
         roleList = forumContentSettings.rule.thread.roles;
@@ -372,7 +484,16 @@ schema.statics.autoPushToReview = async function(post) {
       }
       if(currentPostType === "post") {
         if(forumContentSettings.rule.reply.anyone) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置了回复/评论一律送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid: post.pid,
+              uid: post.uid,
+              reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+              handlerId: user.uid,
+              source: source.post,
+            }
+           );
           return true;
         }
         roleList = forumContentSettings.rule.reply.roles;
@@ -386,12 +507,30 @@ schema.statics.autoPushToReview = async function(post) {
       const userGrade = user.grade._id;
       if(relationship === "and") {
         if(includesArrayElement(userCerts, roleList) && gradeList.includes(userGrade)) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid: post.pid,
+              uid: post.uid,
+              reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
+              handlerId: user.uid,
+              source: source.post,
+            }
+           );
           return true;
         }
       } else if(relationship === "or") {
         if(includesArrayElement(userCerts, roleList) || gradeList.includes(userGrade)) {
-          await ReviewModel.newReview("forumSettingReview", post, user, `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`);
+          await ReviewModel.newReview(
+            {
+              type: "forumSettingReview",
+              sid: post.pid,
+              uid: post.uid,
+              reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
+              handlerId: user.uid,
+              source: source.post,
+            }
+           );
           return true;
         }
       }
@@ -421,6 +560,9 @@ schema.methods.updateReview = async function(props) {
     }
   });
 }
+
+
+
 
 module.exports = mongoose.model("reviews", schema);
 

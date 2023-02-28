@@ -1236,6 +1236,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
   const DocumentModel = mongoose.model('documents');
   //用户是否满足后台设置的需要审核的设置
   let reviewStatus = await this.getGlobalPostReviewStatus();
+ 
   if(!reviewStatus.needReview) {
     //获取用户是否验证手机号
     reviewStatus = await this.getVerifyPhoneNumberReviewStatus();
@@ -1245,6 +1246,7 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function() {
     reviewStatus = await this.getKeywordsReviewStatus();
   }
   let {needReview, reason, type} = reviewStatus;
+ 
   //如果需要审核，就生成审核记录
   if(needReview) {
     await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);

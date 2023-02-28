@@ -7,23 +7,23 @@ router
     const count = await db.ReviewModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     const documentSources = await db.DocumentModel.getDocumentSources();
+    const reviewSources = await db.ReviewModel.getDocumentSources();
     const reviews = await db.ReviewModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    const uids = new Set()
-    const pids = new Set()
+    const uids = new Set();
+    const pids = new Set();
     const tids = new Set();
     const documentsId = new Set();
+    const notesId = new Set();
 
     reviews.map(r => {
       uids.add(r.uid);
       uids.add(r.handlerId);
-      if(r.pid) {
-        pids.add(r.pid);
-      }
-      if(r.tid) {
-        tids.add(r.tid);
-      }
-      if(r.docId) {
-        documentsId.add(r.docId);
+      if(r.source === reviewSources.post) {
+        pids.add(r.sid);
+      } else if(r.source === reviewSources.document) {
+        documentsId.add(r.sid);
+      } else if(r.source === reviewSources.note) {
+        notesId.add(r.sid);
       }
     });
     const users = await db.UserModel.find({uid: {$in: [...uids]}});
@@ -33,8 +33,12 @@ router
         $in: [...documentsId]
       }
     });
+    const noteContents = await db.NoteContentModel.find({_id: {$in: [...notesId]}}, {noteId: 1, _id: 1});
+    const noteIdForNoteContentIdObj = {};
+    for(const noteContent of noteContents) {
+      noteIdForNoteContentIdObj[noteContent._id] = noteContent.noteId;
+    }
     const documentsUrl = await db.DocumentModel.getDocumentsUrlByDocumentsId([...documentsId]);
-    let threads = await db.ThreadModel.find({tid: {$in: [...tids]}});
     const usersObj = {};
     const postsObj = {};
     const threadsObj = {};
@@ -47,7 +51,9 @@ router
     });
     posts.map(post => {
       postsObj[post.pid] = post;
+      tids.add(post.tid);
     });
+    let threads = await db.ThreadModel.find({tid: {$in: [...tids]}});
     threads = await db.ThreadModel.extendThreads(threads, {
       category: false,
       lastPost: false,
@@ -60,21 +66,23 @@ router
     });
     data.reviews = [];
     for(let review of reviews) {
-      const {uid, handlerId, pid, tid, docId} = review;
+      const {uid, handlerId, pid, source, sid} = review;
       review = review.toObject();
 
       review.time = nkcModules.tools.timeFormat(review.toc);
 
       review.typeInfo = '未知';
-      const type = review.type.toLowerCase();
-      if(type.includes('post')) {
-        review.typeInfo = '社区回复/评论';
-        review.link = await db.PostModel.getUrl(pid);
-      } else if(type.includes('thread')) {
-        review.typeInfo = '社区文章';
-        review.link = await db.PostModel.getUrl(pid);
-      } else if(type.includes('document')) {
-        const document = documentsObj[docId];
+      if(source === reviewSources.post) {
+        const post = postsObj[sid];
+        if(!post) continue;
+        if(post.type === 'thread') {
+          review.typeInfo = '社区文章';
+        } else {
+          review.typeInfo = '社区回复/评论';
+        }
+        review.link = await db.PostModel.getUrl(sid);
+      } else if(source === reviewSources.document) {
+        const document = documentsObj[sid];
         switch(document.source) {
           case documentSources.article: {
             review.typeInfo = '独立文章';
@@ -91,6 +99,10 @@ router
           default: break;
         }
         review.link = documentsUrl[document._id];
+      } else if(source === reviewSources.note) {
+        review.typeInfo = '笔记';
+        const noteId = noteIdForNoteContentIdObj[sid];
+        review.link = nkcModules.tools.getUrl("noteContent", noteId, sid);
       }
 
       if(review.uid) {
@@ -109,27 +121,29 @@ router
         };
       }
 
-      if(review.pid) {
+      if(review.source === reviewSources.post) {
         const post = postsObj[pid];
-        review.post = {
-          pid: post.pid,
-          t: post.t,
-          c: post.c,
-          toc: post.toc,
-          tid: post.tid
-        };
-      }
-
-      if(review.tid) {
-        const thread = threadsObj[tid];
-        review.thread = {
-          tid: thread.tid,
-          toc: thread.toc,
-          firstPost: {
-            t: thread.firstPost.t,
-            c: thread.firstPost.c
-          }
-        };
+        if(!post) continue;
+        const thread = threadsObj[post.tid];
+        if(!thread) continue;
+        if(post.type === 'thread') {
+          review.thread = {
+            tid: thread.tid,
+            toc: thread.toc,
+            firstPost: {
+              t: thread.firstPost.t,
+              c: thread.firstPost.c
+            }
+          };
+        } else {
+          review.post = {
+            pid: post.pid,
+            t: post.t,
+            c: post.c,
+            toc: post.toc,
+            tid: post.tid
+          };
+        }
       }
 
 

@@ -237,6 +237,7 @@ async function sendEventUpdateChat(type, uid, tUid) {
 * 发送普通消息
 * */
 async function sendMessageToUser(messageId, localId) {
+ 
   const MessageModel = require('../dataModels/MessageModel');
   const UserModel = require('../dataModels/UserModel');
   const CreatedChatModel = require('../dataModels/CreatedChatModel');

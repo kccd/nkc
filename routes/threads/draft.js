@@ -9,6 +9,7 @@ router
     const results = [];
     const threads = [], threadsId = [];
     const recycleId = await db.SettingModel.getRecycleId();
+    const source = await db.ReviewModel.getDocumentSources();
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
@@ -55,7 +56,16 @@ router
           noticeType: remindUser
         });
         await delLog.save();
-        if(!thread.reviewed) await db.ReviewModel.newReview("returnThread", post, user, reason);
+        if(!thread.reviewed) await db.ReviewModel.newReview(
+          {
+            type: "returnThread",
+            sid: post.pid,
+            uid: post.uid,
+            reason,
+            handlerId: user.uid,
+            source: source.post
+          }
+          );
       } else {
         // 退修回复
         if(post.disabled) continue;
@@ -65,7 +75,15 @@ router
           threadsId.push(thread.tid);
         }
         await post.updateOne({toDraft: true, disabled: false, reviewed: true});
-        if(!post.reviewed) await db.ReviewModel.newReview("returnPost", post, data.user, reason);
+        if(!post.reviewed) await db.ReviewModel.newReview({
+            type: "returnPost",
+            sid: post.pid,
+            uid: post.uid,
+            reason,
+            handlerId: data.user.uid,
+            source: source.post
+           }
+        );
         const firstPost = await db.PostModel.findOnly({pid: thread.oc});
         const delLog = db.DelPostLogModel({
           delUserId: post.uid,

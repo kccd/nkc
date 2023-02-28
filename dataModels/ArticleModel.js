@@ -1164,6 +1164,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const {getOriginLevel} = require('../nkcModules/apiFunction');
+  const source  = await ReviewModel.getDocumentSources()
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1173,6 +1174,7 @@ schema.statics.getArticlesInfo = async function(articles) {
   const userObj = {};
   const columnObj = {};
   const {column: columnSource, zone: zoneSource} = await ArticleModel.getArticleSources();
+
   for(const article of articles) {
     if(article.source === columnSource) {
       columnArticlesId.push(article._id);
@@ -1248,7 +1250,7 @@ schema.statics.getArticlesInfo = async function(articles) {
       const {status} = document;
       let delLog;
       if(status === unknownStatus) {
-        delLog = await ReviewModel.findOne({docId: document._id}).sort({toc: -1});
+        delLog = await ReviewModel.findOne({sid: document._id, source:source.document}).sort({toc: -1});
       } else if(status === disabledStatus) {
         delLog = await DelPostLogModel.findOne({postType: document.source, delType: disabledStatus, postId: document._id, delUserId: document.uid}).sort({toc: -1});
       } else if(status === faultyStatus) {
