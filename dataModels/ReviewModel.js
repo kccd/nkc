@@ -133,6 +133,7 @@ schema.statics.newDocumentReview = async (type, sid, uid, reason) => {
 
 schema.statics.reviewDocument = async (props) => {
   const ReviewModel = mongoose.model('reviews');
+  const reviewSources = await ReviewModel.getDocumentSources();
   const {
     documentId,
     handlerId,

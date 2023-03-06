@@ -218,7 +218,7 @@ router
     const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     const noteContentStatus = await  db.NoteContentModel.getNoteContentStatus();
-    const source = await db.ReviewModel.getDocumentSources();
+    const reviewSources = await db.ReviewModel.getDocumentSources();
     if(reviewType === 'post') {
       const post = await db.PostModel.findOne({pid});
       if(!post) ctx.throw(404, `未找到ID为${pid}的post`);
@@ -269,7 +269,7 @@ router
         uid: post.uid,
         reason: '',
         handlerId: user.uid,
-        source: source.post}
+        source: reviewSources.post}
        );
       //生成通知消息
       message = await db.MessageModel({
@@ -319,7 +319,7 @@ router
             uid: document.uid,
             reason,
             handlerId: data.user.uid,
-            source: source.document
+            source: reviewSources.document
           }
           );
         let passType;
@@ -433,7 +433,7 @@ router
             uid: note.uid,
             reason: '',
             handlerId: state.uid,
-            source: source.note,
+            source: reviewSources.note,
           }
         );
       } else {
@@ -447,7 +447,7 @@ router
         await db.ReviewModel.newReview({
           type: 'disabledNote',
           sid: note._id,
-          source: source.note,
+          source: reviewSources.note,
           reason: reason || '',
           uid: note.uid,
           handlerId: state.uid,
