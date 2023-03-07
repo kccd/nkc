@@ -55,7 +55,8 @@ class NKCRender {
       const links = $("a");
       for(let i = 0; i < links.length; i++) {
         const a = links.eq(i);
-        const href = a.attr("href");
+        this.replaceExternalLink(a);
+        /*const href = a.attr("href");
         // 外链在新标签页打开
         if(href && !domainWhitelistReg.test(href)) {
           a.attr("target", "_blank");
@@ -64,7 +65,7 @@ class NKCRender {
           a.attr("href", "/l?t=" + url);
           // a.attr('data-type', 'nkc-url');
           // a.attr('data-url', url);
-        }
+        }*/
       }
 
       // 文章中的图片
@@ -308,6 +309,32 @@ class NKCRender {
   URLifyHTML(c) {
     return URLifyHTML(c);
   }
+
+  // 将html中的外链替换成外链中转页的链接
+  replaceHTMLExternalLink(html = '') {
+    const $ = cheerio.load(html);
+    const aElements = $('a');
+    for(let i = 0; i < aElements.length; i ++) {
+      const aElement = aElements.eq(i);
+      this.replaceExternalLink(aElement)
+    }
+    return $('body').html();
+  }
+  // 将a标签实例中的外链替换成外链中转页的链接
+  replaceExternalLink(aElement) {
+    if(!aElement) return;
+    const href = aElement.attr("href");
+    // 外链在新标签页打开
+    if(href && !domainWhitelistReg.test(href)) {
+      aElement.attr("target", "_blank");
+      // 通过提示页代理外链的访问
+      const url = encodeURIComponent(Buffer.from(href).toString('base64'));
+      aElement.attr("href", "/l?t=" + url);
+      // a.attr('data-type', 'nkc-url');
+      // a.attr('data-url', url);
+    }
+  }
+
   htmlToPlain(html = "", count) {
     const $ = cheerio.load(html);
     $(`[data-tag="nkcsource"]`).remove();
