@@ -691,24 +691,28 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   });
   // 如果存在引用并且不需要审核，则给被引用者发送引用通知
   if(quotePost) {
-    const messageId = await SettingModel.operateSystemID('messages', 1);
-    const message = MessageModel({
-      _id: messageId,
-      r: quotePost.uid,
-      ty: 'STU',
-      c: {
-        type: 'replyPost',
-        targetPid: pid+'',
-        pid: quotePost.pid+''
+
+    // 如果引用的不是自己的回复
+    if(quotePost.uid !== user.uid) {
+      const messageId = await SettingModel.operateSystemID('messages', 1);
+      const message = MessageModel({
+        _id: messageId,
+        r: quotePost.uid,
+        ty: 'STU',
+        c: {
+          type: 'replyPost',
+          targetPid: pid+'',
+          pid: quotePost.pid+''
+        }
+      });
+
+      await message.save();
+
+      await socket.sendMessageToUser(message._id);
+      // 如果引用作者的回复，则作者将只会收到 引用提醒
+      if(quotePost.uid === this.uid) {
+        _post.hasQuote = true;
       }
-    });
-
-    await message.save();
-
-    await socket.sendMessageToUser(message._id);
-    // 如果引用作者的回复，则作者将只会收到 引用提醒
-    if(quotePost.uid === this.uid) {
-      _post.hasQuote = true;
     }
   }
   // 红包奖励判断
