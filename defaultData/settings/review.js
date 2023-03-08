@@ -145,15 +145,31 @@ module.exports = {
         relationship: "or"
       },
     },
-    user: {
+    username: {
       keyword: {
         enable: false,
+        desc: '用户名包含敏感词',
         groupIds: []
       }
     },
-    column: {
+    userDesc: {
       keyword: {
         enable: false,
+        desc: '用户简介包含敏感词',
+        groupIds: []
+      }
+    },
+    columnName: {
+      keyword: {
+        enable: false,
+        desc: '专栏名称包含敏感词',
+        groupIds: []
+      }
+    },
+    columnDesc: {
+      keyword: {
+        enable: false,
+        desc: '专栏简介包含敏感词',
         groupIds: []
       }
     }
