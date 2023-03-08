@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'auth',
+  _id: settingIds.auth,
   c: {
     auditorId: [],
     auditorCerts: [],

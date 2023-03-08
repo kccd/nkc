@@ -143,6 +143,18 @@ module.exports = {
         leastKeywordTimes: 1,
         leastKeywordCount: 1,
         relationship: "or"
+      },
+    },
+    user: {
+      keyword: {
+        enable: false,
+        groupIds: []
+      }
+    },
+    column: {
+      keyword: {
+        enable: false,
+        groupIds: []
       }
     }
   }
