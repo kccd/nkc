@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "column",
+  _id: settingIds.column,
   c: {
     xsfCount: 1,
     digestCount: 1,

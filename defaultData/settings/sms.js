@@ -1,5 +1,7 @@
+
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'sms',
+  _id: settingIds.sms,
   c: {
     status: false,
     platform: 'tencent', // ali, tencent

@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'post',
+  _id: settingIds.post,
   c: {
     postToForum: {
       authLevelMin: 0,

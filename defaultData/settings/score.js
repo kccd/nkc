@@ -1,5 +1,7 @@
+
+const {settingIds} = require('../../settings/serverSettings');
 const data = {
-  _id: 'score',
+  _id: settingIds.score,
   c: {
     // 鼓励转账金额限制
     creditMin: 1, // 最小金额

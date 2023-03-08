@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'kcb',
+  _id: settingIds.kcb,
   c: {
     // 银行总金额
     totalMoney: 100000000,

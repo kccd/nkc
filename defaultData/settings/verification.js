@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'verification',
+  _id: settingIds.verification,
   c: {
     enabledTypes: [],
     countLimit: {

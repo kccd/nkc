@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'share',
+  _id: settingIds.share,
   c: {
     forum: {
       status: true, // 是否开启分享

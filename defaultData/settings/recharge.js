@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'recharge',
+  _id: settingIds.recharge,
   c: {
     withdraw: {
       enabled: false,

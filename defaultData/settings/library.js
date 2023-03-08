@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'library',
+  _id: settingIds.library,
   c: {
     authLevelMin: 1,
     exam: {

@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "topping",
+  _id: settingIds.topping,
   c: {
     rolesId: [],
     defaultRoleGradesId: []

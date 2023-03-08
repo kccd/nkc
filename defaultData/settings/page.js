@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'page',
+  _id: settingIds.page,
   c: {
     userCardThreadList: 30,
     userCardUserList: 50,

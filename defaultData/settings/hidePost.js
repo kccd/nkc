@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "hidePost",
+  _id: settingIds.hidePost,
   c: {
     postHeight: {
       xs: 300,
