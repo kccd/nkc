@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'email',
+  _id: settingIds.email,
   c: {
     status: false,
     from: '"科创论坛"<blabla@blabla.com>',

@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "upload",
+  _id: settingIds.upload,
   c: {
     extensionLimit: {
       defaultBlacklist: ['exe', 'bat'],
@@ -54,12 +55,12 @@ module.exports = {
       buyNoWatermark: 2000     // 购买去水印功能所需积分，默认2积分
     },
     videoVBRControl : {
-      configs : [ 
+      configs : [
           {
             from : 0,
             to : 921600,
             bv : 0.6
-          }, 
+          },
           {
             from : 921600,
             to : 2073600,

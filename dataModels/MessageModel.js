@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const cheerio = require("cheerio");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require("../nkcModules/tools");
@@ -1692,9 +1693,23 @@ messageSchema.statics.extendMessages = async (messages = []) => {
       if(['STE', 'UTU'].includes(ty)) {
         // 系统通知、用户间消息
         // 替换空格
-        message.content = message.content.replace(/ /g, '&nbsp;');
+        const replaceSpace = "replaceSpace"
+        message.content = message.content.replace(/ /g, `<span data-type="${replaceSpace}"></span>`);
         // 处理链接
         message.content = nkcRender.URLifyHTML(message.content);
+
+        const $ = cheerio.load(message.content);
+
+        const spaceElements = $(`span[data-type="${replaceSpace}"]`);
+        for(let i = 0; i < spaceElements.length; i ++) {
+          const spaceElement = spaceElements.eq(i);
+          spaceElement.replaceWith(function() {
+            return "&nbsp;"
+          });
+        }
+
+        message.content = $('body').html();
+
         // 过滤标签 仅保留标签 a['href']
         message.content = filterMessageContent(message.content);
         // 替换换行符

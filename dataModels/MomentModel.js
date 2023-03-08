@@ -1150,6 +1150,7 @@ schema.statics.renderContent = async (content) => {
   // content = content.replace(/ /g, '&nbsp;');
   // 处理链接
   content = nkcRender.URLifyHTML(content);
+  content = nkcRender.replaceHTMLExternalLink(content);
   // 过滤标签 仅保留标签 a['href']
   content = filterMessageContent(content);
   // 替换换行符

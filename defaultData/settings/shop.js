@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'shop',
+  _id: settingIds.shop,
   c: {
     refund: {
       agree: 48,

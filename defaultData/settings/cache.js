@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "cache",
+  _id: settingIds.cache,
   c: {
     visitorPageCacheTime: 180
   }

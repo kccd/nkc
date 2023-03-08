@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'register',
+  _id: settingIds.register,
   c: {
     defaultSubscribeForumsId: ["81"],
     recommendUsers: {

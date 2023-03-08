@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'fund',
+  _id: settingIds.fund,
   c: {
     enableFund: false,
     fundName: '科创基金',

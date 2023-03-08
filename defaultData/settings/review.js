@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "review",
+  _id: settingIds.review,
   c: {
     certsId: [],
     thread: {
@@ -143,6 +144,34 @@ module.exports = {
         leastKeywordTimes: 1,
         leastKeywordCount: 1,
         relationship: "or"
+      },
+    },
+    username: {
+      keyword: {
+        enable: false,
+        desc: '用户名包含敏感词',
+        groupIds: []
+      }
+    },
+    userDesc: {
+      keyword: {
+        enable: false,
+        desc: '用户简介包含敏感词',
+        groupIds: []
+      }
+    },
+    columnName: {
+      keyword: {
+        enable: false,
+        desc: '专栏名称包含敏感词',
+        groupIds: []
+      }
+    },
+    columnDesc: {
+      keyword: {
+        enable: false,
+        desc: '专栏简介包含敏感词',
+        groupIds: []
       }
     }
   }

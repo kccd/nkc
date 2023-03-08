@@ -19,6 +19,8 @@ var app = new Vue({
   el: '#app',
   data: {
     keywordSetting: keywordSetting,
+    userInfoKeywordSettings: data.userInfoKeywordSettings,
+    columnInfoKeywordSettings: data.columnInfoKeywordSettings,
     form: {
       groupName: "",
       keywords: null,
@@ -268,6 +270,46 @@ var app = new Vue({
       var number = parseInt(target.innerText, 10);
       group.conditions[key] = number;
       this.updateReviewCondition(group)
+    },
+    saveKeywordSettings(type, value) {
+      nkcAPI('/e/settings/review/keyword', 'PUT', {
+        type,
+        value,
+      })
+        .then(() => {
+          sweetSuccess('保存成功')
+        })
+        .catch(sweetError)
+    },
+    saveUserInfoKeywordSettings() {
+      const {username, userDesc} = this.userInfoKeywordSettings;
+      this.saveKeywordSettings('modifyUserInfoKeywordSettings', {
+        usernameKeyword: {
+          enable: !!username.keyword.enable,
+          groupIds: username.keyword.groupIds,
+          desc: username.keyword.desc,
+        },
+        userDescKeyword: {
+          enable: !!userDesc.keyword.enable,
+          groupIds: userDesc.keyword.groupIds,
+          desc: userDesc.keyword.desc,
+        }
+      });
+    },
+    saveColumnInfoKeywordSettings() {
+      const {columnName, columnDesc} = this.columnInfoKeywordSettings;
+      this.saveKeywordSettings('modifyColumnInfoKeywordSettings', {
+        columnNameKeyword: {
+          enable: !!columnName.keyword.enable,
+          groupIds: columnName.keyword.groupIds,
+          desc: columnName.keyword.desc,
+        },
+        columnDescKeyword: {
+          enable: !!columnDesc.keyword.enable,
+          groupIds: columnDesc.keyword.groupIds,
+          desc: columnDesc.keyword.desc,
+        }
+      });
     }
   }
 });

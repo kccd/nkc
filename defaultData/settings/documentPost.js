@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'documentPost',
+  _id: settingIds.documentPost,
   c: {
     article: {
       postPermission: {

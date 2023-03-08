@@ -231,6 +231,38 @@ router
           "reviewSettings.keyword.rule.reply.useGroups": value
         }
       });
+    } else if(type === 'modifyUserInfoKeywordSettings') {
+      const {usernameKeyword, userDescKeyword} = body.value;
+      await db.SettingModel.updateOne({_id: 'review'}, {
+        $set: {
+          'c.username.keyword': {
+            enable: usernameKeyword.enable,
+            groupIds: usernameKeyword.groupIds,
+            desc: usernameKeyword.desc
+          },
+          'c.userDesc.keyword': {
+            enable: userDescKeyword.enable,
+            groupIds: userDescKeyword.groupIds,
+            desc: userDescKeyword.desc
+          }
+        }
+      });
+    } else if(type === 'modifyColumnInfoKeywordSettings') {
+      const {columnNameKeyword, columnDescKeyword} = body.value;
+      await db.SettingModel.updateOne({_id: 'review'}, {
+        $set: {
+          'c.columnName.keyword': {
+            enable: columnNameKeyword.enable,
+            groupIds: columnNameKeyword.groupIds,
+            desc: columnNameKeyword.desc
+          },
+          'c.columnDesc.keyword': {
+            enable: columnDescKeyword.enable,
+            groupIds: columnDescKeyword.groupIds,
+            desc: columnDescKeyword.desc
+          }
+        }
+      });
     } else {
       ctx.throw(403, "参数不正确");
     }

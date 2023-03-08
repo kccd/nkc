@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'subscribe',
+  _id: settingIds.subscribe,
   c: {
     // 关注用户数量限制
     subUserCountLimit: 1000,

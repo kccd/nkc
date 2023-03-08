@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'redEnvelope',
+  _id: settingIds.redEnvelope,
   c: {
     random: {
       close: true,

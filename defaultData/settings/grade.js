@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'grade',
+  _id: settingIds.grade,
   c: {
     coefficients: {
       postToThread: 0.2,
