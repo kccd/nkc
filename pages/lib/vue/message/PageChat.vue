@@ -254,6 +254,12 @@
         left: auto;
       }
     }
+    &.right .message-body .message-content .html{
+      & /deep/ a{
+        text-decoration: underline;
+        color: #fff;
+      }
+    }
     .timestamp{
       height: 1px;
       width: 1px;

@@ -1693,21 +1693,20 @@ messageSchema.statics.extendMessages = async (messages = []) => {
       if(['STE', 'UTU'].includes(ty)) {
         // 系统通知、用户间消息
         // 替换空格
-        message.content = message.content.replace(/ /g, '<span data-type="space"></span>');
+        const replaceSpace = "replaceSpace"
+        message.content = message.content.replace(/ /g, `<span data-type="${replaceSpace}"></span>`);
         // 处理链接
         message.content = nkcRender.URLifyHTML(message.content);
 
         const $ = cheerio.load(message.content);
 
-        const spaceElements = $('span[data-type="space"]');
+        const spaceElements = $(`span[data-type="${replaceSpace}"]`);
         for(let i = 0; i < spaceElements.length; i ++) {
           const spaceElement = spaceElements.eq(i);
           spaceElement.replaceWith(function() {
             return "&nbsp;"
           });
         }
-
-
 
         message.content = $('body').html();
 
