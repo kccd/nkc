@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'server',
+  _id: settingIds.server,
   c: {
     websiteName: '科创',
     websiteAbbr: '科创',

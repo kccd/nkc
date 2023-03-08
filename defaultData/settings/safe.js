@@ -1,5 +1,7 @@
+
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'safe',
+  _id: settingIds.safe,
   c: {
     experimentalVerifyPassword: false,
     experimentalTimeout: 30, // 超时时间30分钟

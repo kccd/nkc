@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "review",
+  _id: settingIds.review,
   c: {
     certsId: [],
     thread: {

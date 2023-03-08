@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'forum',
+  _id: settingIds.forum,
   c: {
     recycle: 'recycle',
     openNewForumCert: [],

@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "username",
+  _id: settingIds.username,
   c: {
     free: false,
     freeCount: 2,

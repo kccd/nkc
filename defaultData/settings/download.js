@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'download',
+  _id: settingIds.download,
   c: {
     visitorAccess: {
       mediaPicture: true,

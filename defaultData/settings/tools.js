@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'tools',
+  _id: settingIds.tools,
   c: {
     enabled: true
   }

@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "thread",
+  _id: settingIds.thread,
   c: {
     displayPostAttachments: {
       gradesId: [],

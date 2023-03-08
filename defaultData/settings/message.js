@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: "message",
+  _id: settingIds.message,
   c: {
     customizeLimitInfo: "【防骚扰系统】对方设置了智能拦截，请通过发文回帖等公开途径交流。拦截原因包括但不限于：未通过A/B卷考试；发表的数量不足或没有任何文章被列入精选；没有学术分；注册时间太短等。如需联系网管，请使用“报告问题”功能。",
     systemLimitInfo: "【防骚扰系统】对方没有义务查看和回复您的消息。新用户通过短消息联系他人很不友好，如果发送提问、求助、求加微信之类则属于恶意骚扰，若被举报将会锁定账号。强烈建议你通过发文回帖等不具有强迫性的公开途径交流。 ",

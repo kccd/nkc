@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'home',
+  _id: settingIds.home,
   c: {
     recommendThreads: {
       fixed: {

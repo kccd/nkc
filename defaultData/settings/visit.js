@@ -1,5 +1,6 @@
+const {settingIds} = require('../../settings/serverSettings');
 module.exports = {
-  _id: 'visit',
+  _id: settingIds.visit,
   c: {
     globalAccessLimit: {
       status: false,
