@@ -4,7 +4,7 @@ const {default: Mint} = require("mint-filter");
 
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 
-class SensitiveWordService {
+class SensitiveDetectionService {
 
   #relationShip = {
     or: 'or',
@@ -14,6 +14,11 @@ class SensitiveWordService {
   async getContentSensitiveWordsByKeywordGroupIds(content, keywordGroupIds) {
     const keywordGroups = await this.#getKeywordGroupsByIds(keywordGroupIds);
     return await this.#getContentSensitiveWordsByKeywordGroups(content, keywordGroups)
+  }
+
+  async isSensitiveContent(content, keywordGroupIds) {
+    const words = await this.getContentSensitiveWordsByKeywordGroupIds(content, keywordGroupIds);
+    return words.length > 0
   }
 
   async #getKeywordGroupsByIds(groupIds) {
@@ -67,5 +72,5 @@ class SensitiveWordService {
 }
 
 module.exports = {
-  sensitiveWordService: new SensitiveWordService(),
+  sensitiveDetectionService: new SensitiveDetectionService(),
 };

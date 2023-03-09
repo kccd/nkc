@@ -1,3 +1,4 @@
+const {ResponseTypes} = require('../settings/response');
 // 响应类型类型对应的状态码
 const HttpErrorCodes = {
   OK: 200,
@@ -52,6 +53,9 @@ function ThrowErrorCore(type, status, args = []) {
 }
 
 function ThrowResponseTypeError(status, responseType, args = []) {
+  if(!Array.isArray(args)) {
+    args = [args];
+  }
   ThrowErrorCore(ErrorTypes.RESPONSE_TYPE, status, {
     responseType,
     args
@@ -71,11 +75,16 @@ function ThrowCommonError(status, message) {
   });
 }
 
+function ThrowServerInternalError(content) {
+  ThrowResponseTypeError(HttpErrorCodes.InternalServerError, ResponseTypes.ERROR_TEMPLATE, content);
+}
+
 function ThrowForbiddenResponseTypeError(responseType, args = []) {
-  if(!Array.isArray(args)) {
-    args = [args];
-  }
   ThrowResponseTypeError(HttpErrorCodes.Forbidden, responseType, args);
+}
+
+function ThrowBadRequestResponseTypeError(responseType, args = []) {
+  ThrowResponseTypeError(HttpErrorCodes.BadRequest, responseType, args);
 }
 
 function ThrowForbiddenErrorPageError(errorPage, errorData) {
@@ -126,5 +135,7 @@ module.exports = {
   ThrowErrorToRenderFullErrorPage,
   ThrowErrorToRenderStaticErrorPage,
   ThrowForbiddenResponseTypeError,
+  ThrowBadRequestResponseTypeError,
+  ThrowServerInternalError,
   ThrowForbiddenErrorPageError,
 };

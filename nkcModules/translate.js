@@ -13,7 +13,12 @@ function translateResponseType(languageName, value, args = []) {
   return translate(languageName, 'response', value, args);
 }
 
+function translateSensitiveSettingName(languageName, value, args = []) {
+  return translate(languageName, 'sensitiveSettings', value, args);
+}
+
 module.exports = {
   translate,
   translateResponseType,
+  translateSensitiveSettingName,
 };

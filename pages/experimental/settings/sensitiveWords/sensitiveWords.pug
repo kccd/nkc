@@ -6,8 +6,7 @@ block eContent
     var obj = {
       keywordSetting: data.keywordSetting ? data.keywordSetting : null,
       users: data.users,
-      userInfoKeywordSettings: data.userInfoKeywordSettings,
-      columnInfoKeywordSettings: data.columnInfoKeywordSettings
+      sensitiveSettings: data.sensitiveSettings,
     };
 
   .hidden#data=objToStr(obj)
@@ -104,135 +103,41 @@ block eContent
                             .view-container(v-if="!group.searchInputText")
                               span.keyword(v-for="(word, wordIndex) in group.keywords" @click="deleteKeyword(groupIndex, wordIndex)") {{word}}
                               //span.keyword.add-keyword(@click="addKeyword(groupIndex)") +
-          .row
-            .col-xs-12.col-md-6
-              .panel.panel-default
-                .panel-heading#user
-                  .panel-title 用户信息检测
-                .panel-body
-                  .form-horizontal.m-b-2
-                    .form-group
-                      label.col-sm-2.control-label
-                      .col-sm-10
-                        h4 用户名
-                    .form-group
-                      label.col-sm-2.control-label 状态
-                      .col-sm-10
-                        .radio
-                          label.m-r-1
-                            input(type='radio' :value="true" v-model="userInfoKeywordSettings.username.keyword.enable")
-                            span 开启
-                          label
-                            input(type='radio' :value="false" v-model='userInfoKeywordSettings.username.keyword.enable')
-                            span 关闭
-                    .form-group
-                      label.col-sm-2.control-label 词组
-                      .col-sm-10
-                        .checkbox
-                          label(v-for='group in keywordSetting.wordGroup').m-r-1
-                            input(type='checkbox' :value="group.id" v-model='userInfoKeywordSettings.username.keyword.groupIds')
-                            span {{group.name}}
-                    .form-group
-                      label.col-sm-2.control-label 提示
-                      .col-sm-10
-                        textarea.form-control(rows=3 v-model="userInfoKeywordSettings.username.keyword.desc")
-
-                  .form-horizontal.m-b-1
-                    .form-group
-                      label.col-sm-2.control-label
-                      .col-sm-10
-                        h4 用户简介
-                    .form-group
-                      label.col-sm-2.control-label 状态
-                      .col-sm-10
-                        .radio
-                          label.m-r-1
-                            input(type='radio' :value="true" v-model="userInfoKeywordSettings.userDesc.keyword.enable")
-                            span 开启
-                          label
-                            input(type='radio' :value="false" v-model='userInfoKeywordSettings.userDesc.keyword.enable')
-                            span 关闭
-                    .form-group
-                      label.col-sm-2.control-label 词组
-                      .col-sm-10
-                        .checkbox
-                          label(v-for='group in keywordSetting.wordGroup').m-r-1
-                            input(type='checkbox' :value="group.id" v-model='userInfoKeywordSettings.userDesc.keyword.groupIds')
-                            span {{group.name}}
-                    .form-group
-                      label.col-sm-2.control-label 提示
-                      .col-sm-10
-                        textarea.form-control(rows=3 v-model="userInfoKeywordSettings.userDesc.keyword.desc")
-                  .form-horizontal
-                    .form-group
-                      .col-sm-2.control-label
-                      .col-sm-10
-                        button.btn.btn-primary(@click='saveUserInfoKeywordSettings') 提交
-
-            .col-xs-12.col-md-6
-              .panel.panel-default
-                .panel-heading#colume
-                  .panel-title 专栏信息检测
-                .panel-body
-                  .form-horizontal.m-b-2
-                    .form-group
-                      label.col-sm-2.control-label
-                      .col-sm-10
-                        h4 专栏名
-                    .form-group
-                      label.col-sm-2.control-label 状态
-                      .col-sm-10
-                        .radio
-                          label.m-r-1
-                            input(type='radio' :value="true" v-model="columnInfoKeywordSettings.columnName.keyword.enable")
-                            span 开启
-                          label
-                            input(type='radio' :value="false" v-model='columnInfoKeywordSettings.columnName.keyword.enable')
-                            span 关闭
-                    .form-group
-                      label.col-sm-2.control-label 词组
-                      .col-sm-10
-                        .checkbox
-                          label(v-for='group in keywordSetting.wordGroup').m-r-1
-                            input(type='checkbox' :value="group.id" v-model='columnInfoKeywordSettings.columnName.keyword.groupIds')
-                            span {{group.name}}
-                    .form-group
-                      label.col-sm-2.control-label 提示
-                      .col-sm-10
-                        textarea.form-control(rows=3 v-model="columnInfoKeywordSettings.columnName.keyword.desc")
-
-                  .form-horizontal.m-b-1
-                    .form-group
-                      label.col-sm-2.control-label
-                      .col-sm-10
-                        h4 专栏简介
-                    .form-group
-                      label.col-sm-2.control-label 状态
-                      .col-sm-10
-                        .radio
-                          label.m-r-1
-                            input(type='radio' :value="true" v-model="columnInfoKeywordSettings.columnDesc.keyword.enable")
-                            span 开启
-                          label
-                            input(type='radio' :value="false" v-model='columnInfoKeywordSettings.columnDesc.keyword.enable')
-                            span 关闭
-                    .form-group
-                      label.col-sm-2.control-label 词组
-                      .col-sm-10
-                        .checkbox
-                          label(v-for='group in keywordSetting.wordGroup').m-r-1
-                            input(type='checkbox' :value="group.id" v-model='columnInfoKeywordSettings.columnDesc.keyword.groupIds')
-                            span {{group.name}}
-                    .form-group
-                      label.col-sm-2.control-label 提示
-                      .col-sm-10
-                        textarea.form-control(rows=3 v-model="columnInfoKeywordSettings.columnDesc.keyword.desc")
-                  .form-horizontal
-                    .form-group
-                      .col-sm-2.control-label
-                      .col-sm-10
-                        button.btn.btn-primary(@click='saveColumnInfoKeywordSettings') 提交
-
+          .panel.panel-default
+            .panel-heading
+              .panel-title 敏感词设置
+            .panel-body
+              .form-horizontal(v-for='setting in sensitiveSettings')
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-10
+                    h4 {{setting.name}}
+                .form-group
+                  label.col-sm-2.control-label 状态
+                  .col-sm-10
+                    .radio
+                      label.m-r-1
+                        input(type='radio' :value="true" v-model="setting.enabled")
+                        span 开启
+                      label
+                        input(type='radio' :value="false" v-model='setting.enabled')
+                        span 关闭
+                .form-group
+                  label.col-sm-2.control-label 词组
+                  .col-sm-10
+                    .checkbox
+                      label(v-for='group in keywordSetting.wordGroup').m-r-1
+                        input(type='checkbox' :value="group.id" v-model='setting.groupIds')
+                        span {{group.name}}
+                .form-group
+                  label.col-sm-2.control-label 提示
+                  .col-sm-10
+                    textarea.form-control(rows=3 v-model="setting.desc")
+              .form-horizontal.m-b-2
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-10
+                    button.btn.btn-primary(@click='saveSensitiveSettings') 提交
 
 block scripts
   +includeJS('/experimental/settings/sensitiveWords/sensitiveWords.js')

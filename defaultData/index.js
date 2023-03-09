@@ -354,6 +354,30 @@ async function initAccessControl() {
   }
 }
 
+async function initSensitiveSettings() {
+  const defaultSettings = require('./sensitiveWordSettings');
+  const {sensitiveSettingService} = require('../services/review/sensitiveSetting.service');
+  const dbSettings = await sensitiveSettingService.getAllSettings();
+  const dbSettingIds = dbSettings.map(ds => ds.iid);
+  for(const setting of defaultSettings) {
+    if(!dbSettingIds.includes(setting.iid)) {
+      const {
+        iid,
+        enabled,
+        desc,
+        groupIds,
+      } = setting;
+      await sensitiveSettingService.createSetting({
+        iid,
+        enabled,
+        desc,
+        groupIds,
+      });
+      console.log(`Insert sensitive setting "${iid}"`);
+    }
+  }
+}
+
 async function init() {
   await initConfig();
   await initSettings();
@@ -372,6 +396,7 @@ async function init() {
   await initUsersOnlineStatus();
   await initShopSettings();
   await initAccessControl();
+  await initSensitiveSettings();
 }
 
 module.exports = {
