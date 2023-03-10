@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.upload,
   c: {
@@ -11,9 +11,9 @@ module.exports = {
           type: 'role-dev',
           using: 'blacklist',
           blacklist: [],
-          whitelist: []
-        }
-      ]
+          whitelist: [],
+        },
+      ],
     },
     countLimit: {
       default: 10,
@@ -21,21 +21,21 @@ module.exports = {
         {
           type: 'role-dev',
           count: 100,
-        }
-      ]
+        },
+      ],
     },
     sizeLimit: {
       default: 10 * 1024,
       others: [
         {
           ext: 'mp4',
-          size: 200 * 1024
+          size: 200 * 1024,
         },
         {
           ext: 'gif',
-          size: 5 * 1024
-        }
-      ]
+          size: 5 * 1024,
+        },
+      ],
     },
     watermark: {
       picture: {
@@ -52,22 +52,22 @@ module.exports = {
         minWidth: 799,
         flex: 8,
       },
-      buyNoWatermark: 2000     // 购买去水印功能所需积分，默认2积分
+      buyNoWatermark: 2000, // 购买去水印功能所需积分，默认2积分
     },
-    videoVBRControl : {
-      configs : [
-          {
-            from : 0,
-            to : 921600,
-            bv : 0.6
-          },
-          {
-            from : 921600,
-            to : 2073600,
-            bv : 1.16
-          }
+    videoVBRControl: {
+      configs: [
+        {
+          from: 0,
+          to: 921600,
+          bv: 0.6,
+        },
+        {
+          from: 921600,
+          to: 2073600,
+          bv: 1.16,
+        },
       ],
-      defaultBV : 1.16
-    }
-  }
+      defaultBV: 1.16,
+    },
+  },
 };

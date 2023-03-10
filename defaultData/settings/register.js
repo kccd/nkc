@@ -1,8 +1,8 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.register,
   c: {
-    defaultSubscribeForumsId: ["81"],
+    defaultSubscribeForumsId: ['81'],
     recommendUsers: {
       usersCount: 16, // 用户数
       lastVisitTime: 180, // 最后活动180天内
@@ -17,6 +17,7 @@ module.exports = {
     mobileCountLimit: 3, // 手机号使用次数限制
     emailCountLimit: 3, // 邮箱使用次数限制
     //注销说明
-    noticeForDestroy: "1、注销账号会删除用户名，解除手机、邮箱绑定。\\n2、依据相关法律法规和政策，注销账号后，用户的历史行为依然可以被追溯。\\n3、为保证回复、评论等他人发表的内容不因你的注销行为而失效或受到破坏，依据用户协议，你的发言将会被保留，不可清除。",
-  }
+    noticeForDestroy:
+      '1、注销账号会删除用户名，解除手机、邮箱绑定。\\n2、依据相关法律法规和政策，注销账号后，用户的历史行为依然可以被追溯。\\n3、为保证回复、评论等他人发表的内容不因你的注销行为而失效或受到破坏，依据用户协议，你的发言将会被保留，不可清除。',
+  },
 };

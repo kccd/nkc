@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.hidePost,
   c: {
@@ -6,13 +6,13 @@ module.exports = {
       xs: 300,
       sm: 250,
       md: 200,
-      float: 0.5
+      float: 0.5,
     },
     rolesId: [],
     defaultRoleGradesId: [],
     voteUpCount: 10,
     hideDigestPost: false,
     allowedAuthor: false,
-    allowedRolesId: []
-  }
+    allowedRolesId: [],
+  },
 };

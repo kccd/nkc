@@ -1,8 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
 const globby = require('globby');
+// const ESLintPlugin = require('eslint-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 // 输出文件夹
 const DIST_DIR = 'dist';
@@ -34,19 +36,36 @@ const scriptFiles = globby.sync(SCRIPTS_PATTERNS);
 const styleFiles = globby.sync(STYLES_PATTERNS);
 const spaFiles = globby.sync(SPA_PATTERNS);
 
-function getFilePathMap(filePaths) {
-  const map = {};
-  for (const filePath of filePaths) {
-    map[filePath] = filePath;
-  }
+/**
+ * 生成id到entry的映射关系图
+ * path/to/bundle.js => /path/to/entry.js
+ */
+function makeEntryMap(files, query = '') {
+  const map = Object.create(null);
+  files.forEach((file) => (map[file] = file + query));
+  console.log({ map });
   return map;
 }
 
-console.log({
-  ...getFilePathMap(scriptFiles),
-  ...getFilePathMap(styleFiles),
-  ...getFilePathMap(spaFiles),
-});
+function makeFilename(info) {
+  const file = info.chunk.name;
+  const dir = path.dirname(file);
+  const ext = path.extname(file);
+  const basename = path.basename(file, ext);
+  // 如果是 mini-css-extract-plugin 插件产生的无用脚本，就在文件名后加个标志，防止误用
+  const outputExt = ['.less', '.css'].includes(ext) ? '.css' : '.js';
+  let outputFilename = `${dir}/${basename}${outputExt}`;
+  if ('css/mini-extract' in info.chunk.contentHash) {
+    outputFilename += '.css_mini_extract';
+  }
+  console.log({ basename, ext, dir, outputFilename });
+  return outputFilename;
+
+  /*if ('css/mini-extract' in info.chunk.contentHash) {
+    return `${dir}/${basename}${ext}${outputExt}`;
+  }
+  return `${dir}/${basename}${outputExt}`;*/
+}
 
 const baseConfig = {
   mode: process.env.NODE_ENV || 'development',
@@ -58,9 +77,9 @@ const baseConfig = {
 module.exports = {
   ...baseConfig,
   entry: {
-    ...getFilePathMap(scriptFiles),
-    ...getFilePathMap(styleFiles),
-    ...getFilePathMap(spaFiles),
+    ...makeEntryMap(scriptFiles),
+    ...makeEntryMap(styleFiles),
+    ...makeEntryMap(spaFiles),
   },
   /*output: {
     path: path.resolve(__dirname, DIST_DIR),
@@ -71,7 +90,7 @@ module.exports = {
   },*/
   output: {
     path: __dirname + '/dist',
-    filename: '[name]',
+    filename: '[path][name].js',
   },
   module: {
     rules: [
@@ -209,16 +228,25 @@ module.exports = {
       extensions: '.vue',
     }),*/
     new webpack.ProgressPlugin(),
-    // new MiniCssExtractPlugin(),
     new MiniCssExtractPlugin({
+      filename: '[path][name].css',
+    }),
+    /*new MiniCssExtractPlugin({
       filename: (info) => {
         const file = info.chunk.name;
         const dir = path.dirname(file);
         const ext = path.extname(file);
         const basename = path.basename(file, ext);
-        return `${dir}/${basename}.css`;
+        console.log({
+          file,
+        });
+        if (['.css'].includes(ext)) {
+          return `${dir}/${basename}.css`;
+        } else {
+          return `${dir}/${basename}${ext}.css`;
+        }
       },
-    }),
+    }),*/
   ],
   externals: {
     vue: 'Vue',

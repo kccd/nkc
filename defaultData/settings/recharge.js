@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.recharge,
   c: {
@@ -15,8 +15,8 @@ module.exports = {
       },
       weChat: {
         enabled: false,
-        fee: 0
-      }
+        fee: 0,
+      },
     },
     recharge: {
       enabled: false,
@@ -28,8 +28,8 @@ module.exports = {
       },
       weChat: {
         enabled: false,
-        fee: 0
-      }
-    }
-  }
-}
+        fee: 0,
+      },
+    },
+  },
+};

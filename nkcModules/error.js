@@ -1,4 +1,4 @@
-const {ResponseTypes} = require('../settings/response');
+const { ResponseTypes } = require('../settings/response');
 // 响应类型类型对应的状态码
 const HttpErrorCodes = {
   OK: 200,
@@ -35,7 +35,7 @@ const HttpErrorTypes = {
 // 2. 指定错误页面；
 // 3. 常规错误；
 const ErrorTypes = {
-  RESPONSE_TYPE: "RESPONSE_TYPE",
+  RESPONSE_TYPE: 'RESPONSE_TYPE',
   ERROR_PAGE: 'ERROR_PAGE',
   COMMON: 'COMMON',
 };
@@ -43,29 +43,31 @@ const ErrorTypes = {
 // 抛出错误
 // 会将错误类型、状态码以及错误对应参数以JSON形式存入错误信息中
 function ThrowErrorCore(type, status, args = []) {
-  const error = new Error(JSON.stringify({
-    type,
-    args,
-    status,
-  }));
+  const error = new Error(
+    JSON.stringify({
+      type,
+      args,
+      status,
+    }),
+  );
   error.status = status;
   throw error;
 }
 
 function ThrowResponseTypeError(status, responseType, args = []) {
-  if(!Array.isArray(args)) {
+  if (!Array.isArray(args)) {
     args = [args];
   }
   ThrowErrorCore(ErrorTypes.RESPONSE_TYPE, status, {
     responseType,
-    args
+    args,
   });
 }
 
 function ThrowErrorPageError(status, errorPage, errorData) {
   ThrowErrorCore(ErrorTypes.ERROR_PAGE, status, {
     errorPage,
-    errorData
+    errorData,
   });
 }
 
@@ -76,7 +78,11 @@ function ThrowCommonError(status, message) {
 }
 
 function ThrowServerInternalError(content) {
-  ThrowResponseTypeError(HttpErrorCodes.InternalServerError, ResponseTypes.ERROR_TEMPLATE, content);
+  ThrowResponseTypeError(
+    HttpErrorCodes.InternalServerError,
+    ResponseTypes.ERROR_TEMPLATE,
+    content,
+  );
 }
 
 function ThrowForbiddenResponseTypeError(responseType, args = []) {
@@ -98,7 +104,11 @@ function ThrowError(code, type, message) {
   throw error;
 }
 
-function ThrowErrorToRenderErrorPage(status = HttpErrorCodes.InternalServerError, template, props) {
+function ThrowErrorToRenderErrorPage(
+  status = HttpErrorCodes.InternalServerError,
+  template,
+  props,
+) {
   let {
     title = '',
     abstract = '',
@@ -121,7 +131,6 @@ function ThrowErrorToRenderFullErrorPage(status, props) {
 function ThrowErrorToRenderStaticErrorPage(status, props) {
   ThrowErrorToRenderErrorPage(status, 'errorPageStatic', props);
 }
-
 
 module.exports = {
   ErrorTypes,

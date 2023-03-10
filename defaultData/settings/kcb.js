@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.kcb,
   c: {
@@ -19,6 +19,6 @@ module.exports = {
     withdrawCount: 3,
     // 允许提现的时间段
     withdrawTimeBegin: Number,
-    withdrawTimeEnd: Number
-  }
+    withdrawTimeEnd: Number,
+  },
 };

@@ -1,5 +1,4 @@
-
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.safe,
   c: {
@@ -8,11 +7,11 @@ module.exports = {
     experimentalPassword: {
       hash: '',
       salt: '',
-      secret: ''
+      secret: '',
     },
     phoneVerify: {
       enable: false,
-      interval: 90 * 24
-    }
-  }
+      interval: 90 * 24,
+    },
+  },
 };

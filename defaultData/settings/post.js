@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.post,
   c: {
@@ -10,14 +10,14 @@ module.exports = {
         notPass: {
           status: true,
           countLimit: 5,
-          unlimited: true
-        }
+          unlimited: true,
+        },
       },
       anonymous: {
         status: false,
         defaultCertGradesId: [],
         rolesId: [],
-        uid: []
+        uid: [],
       },
       survey: {
         status: false,
@@ -25,14 +25,14 @@ module.exports = {
         deadlineMax: 30,
         ignoredRolesId: [],
         rolesId: [],
-        uid: []
+        uid: [],
       },
       // 原创申明 字数最小值
       originalWordLimit: 500,
       // 专业分类辅分类数量
       minorForumCount: {
         min: 0,
-        max: 1
+        max: 1,
       },
     },
     postToThread: {
@@ -43,14 +43,14 @@ module.exports = {
         notPass: {
           status: true,
           unlimited: true,
-          countLimit: 5
-        }
+          countLimit: 5,
+        },
       },
       anonymous: {
         status: false,
         defaultCertGradesId: [],
         rolesId: [],
-        uid: []
+        uid: [],
       },
       survey: {
         status: false,
@@ -58,8 +58,8 @@ module.exports = {
         rolesId: [],
         deadlineMax: 30,
         ignoredRolesId: [],
-        uid: []
-      }
-    }
-  }
+        uid: [],
+      },
+    },
+  },
 };
