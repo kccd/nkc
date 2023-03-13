@@ -34,19 +34,35 @@ const scriptFiles = globby.sync(SCRIPTS_PATTERNS);
 const styleFiles = globby.sync(STYLES_PATTERNS);
 const spaFiles = globby.sync(SPA_PATTERNS);
 
-function getFilePathMap(filePaths) {
+function getFilePathMap(filePaths, query = '') {
   const map = {};
   for (const filePath of filePaths) {
-    map[filePath] = filePath;
+    map[filePath] = filePath + query;
   }
   return map;
 }
 
-console.log({
-  ...getFilePathMap(scriptFiles),
-  ...getFilePathMap(styleFiles),
-  ...getFilePathMap(spaFiles),
-});
+function makeFilename(info) {
+  const file = info.chunk.name;
+  const dir = path.dirname(file);
+  const ext = path.extname(file).toLowerCase();
+  const basename = path.basename(file, ext);
+  // 如果是 mini-css-extract-plugin 插件产生的无用脚本，就在文件名后加个标志，防止误用
+
+  let filename;
+
+  if (['.less', '.css'].includes(ext)) {
+    if ('css/mini-extract' in info.chunk.contentHash) {
+      filename = `${dir}/${basename}.mini_css_cache.js`;
+    } else {
+      filename = `${dir}/${basename}.css.js`;
+    }
+  } else {
+    filename = `${dir}/${basename}.js`;
+  }
+
+  return filename;
+}
 
 const baseConfig = {
   mode: process.env.NODE_ENV || 'development',
@@ -59,19 +75,15 @@ module.exports = {
   ...baseConfig,
   entry: {
     ...getFilePathMap(scriptFiles),
-    ...getFilePathMap(styleFiles),
+    ...getFilePathMap(styleFiles, '?css_assets'),
     ...getFilePathMap(spaFiles),
   },
-  /*output: {
+  output: {
     path: path.resolve(__dirname, DIST_DIR),
     filename: makeFilename,
     libraryTarget: 'umd',
     globalObject: 'this',
     publicPath: '/',
-  },*/
-  output: {
-    path: __dirname + '/dist',
-    filename: '[name]',
   },
   module: {
     rules: [
@@ -88,35 +100,6 @@ module.exports = {
       },
 
       {
-        test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              url: false, // 不打包css中的外部资源(如字体、background-image: url(xxx))
-            },
-          },
-        ],
-      },
-
-      {
-        test: /\.less$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              url: false, // 不打包css中的外部资源(如字体、background-image: url(xxx))
-            },
-          },
-          {
-            loader: 'less-loader',
-          },
-        ],
-      },
-
-      /*{
         test: /\.(le|c)ss?$/,
         oneOf: [
           // 这里匹配独立打包的less文件 (styleFiles数组内的文件)
@@ -154,7 +137,7 @@ module.exports = {
             use: ['vue-style-loader', 'css-loader', 'less-loader'],
           },
         ],
-      },*/
+      },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|ico)(\?\S*)?$/,
         loader: 'file-loader',
@@ -214,9 +197,13 @@ module.exports = {
       filename: (info) => {
         const file = info.chunk.name;
         const dir = path.dirname(file);
-        const ext = path.extname(file);
+        const ext = path.extname(file).toLowerCase();
         const basename = path.basename(file, ext);
-        return `${dir}/${basename}.css`;
+        if (['.less', '.css'].includes(ext)) {
+          return `${dir}/${basename}.css`;
+        } else {
+          return `${dir}/${basename}${ext}.mini_css_out`;
+        }
       },
     }),
   ],
