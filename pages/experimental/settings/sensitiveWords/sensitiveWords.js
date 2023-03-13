@@ -1,21 +1,31 @@
-import {getDataById} from "../../../lib/js/dataConversion";
+import { getDataById } from '../../../lib/js/dataConversion';
+import {
+  sweetQuestion,
+  sweetError,
+  sweetAlert,
+  sweetConfirm,
+  sweetWarning,
+  sweetInfo,
+  sweetSuccess,
+} from '../../../lib/js/sweetAlert';
+import { nkcAPI } from '../../../lib/js/netAPI';
 
-const data = getDataById("data");
+const data = getDataById('data');
 
 var keywordSetting = data.keywordSetting || {
   enable: false,
-  wordGroup: []
+  wordGroup: [],
 };
 
 function initGroup(group) {
   group.rename = false;
   group.keywordView = false;
   group.pageIndex = 0;
-  group.searchInputText = "";
+  group.searchInputText = '';
   group.searchedWords = [];
 }
 var wordGroup = keywordSetting.wordGroup;
-wordGroup.map(function(group) {
+wordGroup.map(function (group) {
   initGroup(group);
 });
 
@@ -24,267 +34,300 @@ var app = new Vue({
   data: {
     keywordSetting: keywordSetting,
     form: {
-      groupName: "",
+      groupName: '',
       keywords: null,
     },
     add: false,
 
     sensitiveSettings: data.sensitiveSettings,
-
   },
   methods: {
     // 启停关键词功能
-    triggerKeyword: function(val) {
-      nkcAPI("/e/settings/review/keyword", "PUT", {
-        type: "enable",
-        value: val
+    triggerKeyword: function (val) {
+      nkcAPI('/e/settings/review/keyword', 'PUT', {
+        type: 'enable',
+        value: val,
       })
-      .then(function() {
-        sweetAlert(val ? "已启用" : "已禁用")
-      })
-      .catch(sweetError)
+        .then(function () {
+          sweetAlert(val ? '已启用' : '已禁用');
+        })
+        .catch(sweetError);
     },
     // 删除关键词组
-    deleteWordGroup: function(index) {
+    deleteWordGroup: function (index) {
       var self = this;
       var id = self.keywordSetting.wordGroup[index].id;
-      sweetConfirm("确定要删除这个关键词组吗?")
-        .then(function() {
-          return nkcAPI("/e/settings/review/keyword", "PUT", {
-            type: "deleteWordGroup",
-            value: id
+      sweetConfirm('确定要删除这个关键词组吗?')
+        .then(function () {
+          return nkcAPI('/e/settings/review/keyword', 'PUT', {
+            type: 'deleteWordGroup',
+            value: id,
           });
         })
-        .then(function() {
+        .then(function () {
           self.keywordSetting.wordGroup.splice(index, 1);
-        })
+        });
     },
     // 添加关键词组
-    addWordGroup: function() {
+    addWordGroup: function () {
       var self = this;
-      if(!self.form.keywords) return;
+      if (!self.form.keywords) {
+        return;
+      }
       var newWordGroup = {
         name: self.form.groupName,
         keywords: self.form.keywords,
         conditions: {
           count: 1,
           times: 1,
-          logic: "or"
-        }
+          logic: 'or',
+        },
       };
       initGroup(newWordGroup);
-      sweetConfirm("确认添加新敏感词词组:" + newWordGroup.name + "吗？共包含关键词: " + newWordGroup.keywords.length + "个关键词。")
-        .then(function() {
-          return nkcAPI("/e/settings/review/keyword", "PUT", {
-            type: "addWordGroup",
-            value: newWordGroup
-          })
+      sweetConfirm(
+        '确认添加新敏感词词组:' +
+          newWordGroup.name +
+          '吗？共包含关键词: ' +
+          newWordGroup.keywords.length +
+          '个关键词。',
+      )
+        .then(function () {
+          return nkcAPI('/e/settings/review/keyword', 'PUT', {
+            type: 'addWordGroup',
+            value: newWordGroup,
+          });
         })
-        .then(function(data) {
+        .then(function (data) {
           newWordGroup.id = data.id;
           self.keywordSetting.wordGroup.push(newWordGroup);
-          sweetAlert("已添加");
+          sweetAlert('已添加');
         })
         .catch(sweetError)
-        .then(function() {
-          self.form.groupName = "";
+        .then(function () {
+          self.form.groupName = '';
           self.form.keywords = null;
-        })
+        });
     },
     // 重命名关键词组
-    renameGroup: function(index) {
+    renameGroup: function (index) {
       var self = this;
       var group = self.keywordSetting.wordGroup[index];
       var newName = group.name;
-      return nkcAPI("/e/settings/review/keyword", "PUT", {
-        type: "renameWordGroup",
+      return nkcAPI('/e/settings/review/keyword', 'PUT', {
+        type: 'renameWordGroup',
         value: {
           id: group.id,
-          newName: newName
-        }
+          newName: newName,
+        },
       })
-      .then(function() {
-        group.rename = false;
-      })
-      .catch(sweetError)
+        .then(function () {
+          group.rename = false;
+        })
+        .catch(sweetError);
     },
     // 更新送审条件
-    updateReviewCondition: function(group) {
-      nkcAPI("/e/settings/review/keyword", "PUT", {
-        type: "reviewCondition",
+    updateReviewCondition: function (group) {
+      nkcAPI('/e/settings/review/keyword', 'PUT', {
+        type: 'reviewCondition',
         value: {
           id: group.id,
-          conditions: group.conditions
-        }
-      })
-      .catch(sweetError)
+          conditions: group.conditions,
+        },
+      }).catch(sweetError);
     },
     // 选择了关键词文件
-    keywordFile: function(file) {
-      var breakFilename = file.name.split(".");
-      if(breakFilename.length > 1) breakFilename.pop();
-      var groupName = breakFilename.join(".");
+    keywordFile: function (file) {
+      var breakFilename = file.name.split('.');
+      if (breakFilename.length > 1) {
+        breakFilename.pop();
+      }
+      var groupName = breakFilename.join('.');
       var self = this;
       var reader = new FileReader();
       reader.readAsText(file);
-      reader.onload = function() {
+      reader.onload = function () {
         var keywords = reader.result.split(/[\r]{0,1}\n/);
-        if(!keywords.length) {
-          return sweetWarning("无新的关键字");
+        if (!keywords.length) {
+          return sweetWarning('无新的关键字');
         }
-        self.form.keywords = keywords.filter(function(keyword) {
+        self.form.keywords = keywords.filter(function (keyword) {
           return !!keyword;
         });
-        if(!self.form.groupName) {
+        if (!self.form.groupName) {
           self.form.groupName = groupName;
         }
-      }
+      };
     },
     // 添加关键词
-    addKeyword: function(groupIndex) {
+    addKeyword: function (groupIndex) {
       var wordGroup = this.keywordSetting.wordGroup;
       var group = wordGroup[groupIndex];
-      var keyword = window.prompt("请输入一个关键词(中、英(不区分大小)、数字)", "");
-      if(!keyword) return;
+      var keyword = window.prompt(
+        '请输入一个关键词(中、英(不区分大小)、数字)',
+        '',
+      );
+      if (!keyword) {
+        return;
+      }
       var shouldAddKeyword = keyword.toLowerCase();
-      nkcAPI("/e/settings/review/keyword", "PUT", {
-        type: "addKeywords",
+      nkcAPI('/e/settings/review/keyword', 'PUT', {
+        type: 'addKeywords',
         value: {
           groupId: group.id,
-          keyword: shouldAddKeyword
-        }
+          keyword: shouldAddKeyword,
+        },
       })
-      .then(function(data) {
-        var added = data.added;
-        if(added) {
-          sweetAlert("已添加");
-          group.keywords.push(shouldAddKeyword);
-        } else {
-          sweetWarning("重复添加");
-        }
-      })
-      .catch(sweetError);
+        .then(function (data) {
+          var added = data.added;
+          if (added) {
+            sweetAlert('已添加');
+            group.keywords.push(shouldAddKeyword);
+          } else {
+            sweetWarning('重复添加');
+          }
+        })
+        .catch(sweetError);
     },
     // 删除关键词
-    deleteKeyword: function(groupIndex, wordIndex) {
+    deleteKeyword: function (groupIndex, wordIndex) {
       var wordGroup = this.keywordSetting.wordGroup;
       var group = wordGroup[groupIndex];
       var word = group.keywords[wordIndex];
-      sweetConfirm("确认删除词组 \""+ group.name +"\" 中的 \""+ word +"\" 关键词吗?")
-        .then(function() {
-          return nkcAPI("/e/settings/review/keyword", "PUT", {
-            type: "deleteKeywords",
+      sweetConfirm(
+        '确认删除词组 "' + group.name + '" 中的 "' + word + '" 关键词吗?',
+      )
+        .then(function () {
+          return nkcAPI('/e/settings/review/keyword', 'PUT', {
+            type: 'deleteKeywords',
             value: {
               groupId: group.id,
               keyword: word,
-            }
-          })
+            },
+          });
         })
-        .then(function() {
-          sweetAlert("已删除");
+        .then(function () {
+          sweetAlert('已删除');
           group.keywords.splice(wordIndex, 1);
         })
         .catch(sweetError);
     },
     // 导出一个组的所有敏感词
-    exportWordGroup: function(groupIndex) {
+    exportWordGroup: function (groupIndex) {
       var group = this.keywordSetting.wordGroup[groupIndex];
-      var content = group.keywords.join("\n");
-      var downloader = document.createElement("a");
+      var content = group.keywords.join('\n');
+      var downloader = document.createElement('a');
       downloader.style.display = 'none';
       var blob = new Blob([content]);
       // downloader.setAttribute("href", "data:text/plain;charset=utf-8," + content);
-      downloader.setAttribute("href", URL.createObjectURL(blob));
-      downloader.setAttribute("download", "敏感词组_" + group.name + ".txt");
+      downloader.setAttribute('href', URL.createObjectURL(blob));
+      downloader.setAttribute('download', '敏感词组_' + group.name + '.txt');
       document.body.appendChild(downloader);
       downloader.click();
       document.body.removeChild(downloader);
     },
     // 应用到所有专业
-    applyAllForums: function(groupIndex) {
+    applyAllForums: function (groupIndex) {
       var id = self.keywordSetting.wordGroup[groupIndex].id;
-      sweetQuestion("确定要将这个词组应用到所有专业吗?")
-      .then(function() {
-        return nkcAPI("/e/settings/review/keyword", "PUT", {
-          type: "applyAllForums",
-          value: id
+      sweetQuestion('确定要将这个词组应用到所有专业吗?')
+        .then(function () {
+          return nkcAPI('/e/settings/review/keyword', 'PUT', {
+            type: 'applyAllForums',
+            value: id,
+          });
         })
-      })
-      .then(function() {
-        sweetSuccess("执行成功");
-      })
-      .catch(sweetError);
+        .then(function () {
+          sweetSuccess('执行成功');
+        })
+        .catch(sweetError);
     },
-    cancelApplyAllForums: function(groupIndex) {
+    cancelApplyAllForums: function (groupIndex) {
       const id = self.keywordSetting.wordGroup[groupIndex].id;
       sweetQuestion(`确定要取消应用到所有专业吗？`)
-        .then(function() {
+        .then(function () {
           return nkcAPI(`/e/settings/review/keyword`, 'PUT', {
             type: 'cancelApplyAllForums',
-            value: id
-          })
+            value: id,
+          });
         })
-        .then(function() {
+        .then(function () {
           sweetSuccess('执行成功');
         })
         .catch(sweetError);
     },
     // 关键字搜索框
-    searchWordInputChange: function(el, groupIndex) {
+    searchWordInputChange: function (el, groupIndex) {
       var group = this.keywordSetting.wordGroup[groupIndex];
       group.searchedWords.length = 0;
-      if(!group.searchInputText) return;
-      group.keywords.forEach(function(keyword) {
-        if(keyword.indexOf(el.value.toLowerCase()) !== -1) {
+      if (!group.searchInputText) {
+        return;
+      }
+      group.keywords.forEach(function (keyword) {
+        if (keyword.indexOf(el.value.toLowerCase()) !== -1) {
           group.searchedWords.push(keyword);
         }
       });
     },
     // 删除搜索到的关键字
-    deleteSearchedKeyword: function(groupIndex, word) {
+    deleteSearchedKeyword: function (groupIndex, word) {
       var group = this.keywordSetting.wordGroup[groupIndex];
       var wordIndex = group.keywords.indexOf(word);
-      if(wordIndex < 0) {
-        return sweetWarning("删除异常，此词组中不存在此关键字");
+      if (wordIndex < 0) {
+        return sweetWarning('删除异常，此词组中不存在此关键字');
       }
-      sweetConfirm("确认删除词组 \""+ group.name +"\" 中的 \""+ word +"\" 关键词吗?")
-        .then(function() {
-          return nkcAPI("/e/settings/review/keyword", "PUT", {
-            type: "deleteKeywords",
+      sweetConfirm(
+        '确认删除词组 "' + group.name + '" 中的 "' + word + '" 关键词吗?',
+      )
+        .then(function () {
+          return nkcAPI('/e/settings/review/keyword', 'PUT', {
+            type: 'deleteKeywords',
             value: {
               groupId: group.id,
               keyword: word,
-            }
-          })
+            },
+          });
         })
-        .then(function() {
-          sweetAlert("已删除");
+        .then(function () {
+          sweetAlert('已删除');
           group.keywords.splice(wordIndex, 1);
-          group.searchInputText = "";
+          group.searchInputText = '';
           group.searchedWords.length = 0;
         })
         .catch(sweetError);
     },
 
     // 打开送审条件编辑
-    startEdit: function(target) {
-      
-    },
+    startEdit: function () {},
     // 关闭送审条件编辑
-    endEdit: function(target, group, key) {
+    endEdit: function (target, group, key) {
       group.conditions[key] = parseInt(target.innerText, 10);
-      this.updateReviewCondition(group)
+      this.updateReviewCondition(group);
     },
     saveSensitiveSettings() {
       nkcAPI('/e/settings/sensitiveWords', 'PUT', {
-        sensitiveSettings: this.sensitiveSettings
+        sensitiveSettings: this.sensitiveSettings,
       })
         .then(() => {
-          sweetSuccess('保存成功')
+          sweetSuccess('保存成功');
         })
-        .catch(sweetError)
+        .catch(sweetError);
     },
-  }
+    runSensitiveChecker(setting) {
+      sweetQuestion(
+        `您正在执行【${setting.name}】敏感词检测，当前操作会检测数据库中所有的${setting.name}且无法撤销，确定要继续吗？`,
+      )
+        .then(() => {
+          return nkcAPI(`/e/settings/sensitiveWords/checker`, 'POST', {
+            type: setting.iid,
+          });
+        })
+        .then(() => {
+          sweetInfo(
+            '敏感词检测已在后台运行，您可以在敏感词检测日志页查看检测进度。',
+          );
+        })
+        .catch(sweetError);
+    },
+  },
 });
 
 Object.assign(window, {

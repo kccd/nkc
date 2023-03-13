@@ -3,7 +3,7 @@ const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
 const {
   sensitiveDetectionService,
-} = require('../review/sensitiveDetection.service');
+} = require('../sensitive/sensitiveDetection.service');
 
 class UserDescCheckerService {
   async #checkUserDescFormat(desc = '') {

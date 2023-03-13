@@ -15,5 +15,6 @@
   "COLUMN_NAME_LENGTH_ERROR": "专栏名不能为空且长度不能超度{v2}个字符",
   "COLUMN_NAME_FORMAT_ERROR": "专栏名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始",
   "COLUMN_DESC_LENGTH_ERROR": "专栏简介不能超过{v2}个字符",
-  "COLUMN_NAME_EXISTS_ERROR": "专栏名已被使用"
+  "COLUMN_NAME_EXISTS_ERROR": "专栏名已被使用",
+  "SENSITIVE_TYPE_ERROR": "敏感词类型错误(type={v1})"
 }

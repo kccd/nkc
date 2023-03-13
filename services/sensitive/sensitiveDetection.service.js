@@ -3,7 +3,7 @@ const { settingIds } = require('../../settings/serverSettings');
 const { default: Mint } = require('mint-filter');
 const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
-const { sensitiveSettingIds } = require('../../settings/sensitiveSetting');
+const { sensitiveTypes } = require('../../settings/sensitiveSetting');
 const { sensitiveSettingService } = require('./sensitiveSetting.service');
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 
@@ -21,7 +21,7 @@ class SensitiveDetectionService {
     );
   }
 
-  async #isSensitiveContent(content, keywordGroupIds) {
+  async isSensitiveContent(content, keywordGroupIds) {
     const words = await this.#getContentSensitiveWordsByKeywordGroupIds(
       content,
       keywordGroupIds,
@@ -102,9 +102,9 @@ class SensitiveDetectionService {
 
   async #contentDetection(iid, content) {
     const { enabled, desc, groupIds } =
-      await sensitiveSettingService.getSettingById(iid);
+      await sensitiveSettingService.getSettingByIdFromCache(iid);
     if (enabled && groupIds.length > 0) {
-      const isSensitiveContent = await this.#isSensitiveContent(
+      const isSensitiveContent = await this.isSensitiveContent(
         content,
         groupIds,
       );
@@ -117,20 +117,30 @@ class SensitiveDetectionService {
     }
   }
 
+  async isSensitiveContentByType(type, content) {
+    const { enabled, groupIds } =
+      await sensitiveSettingService.getSettingByIdFromCache(type);
+    let isSensitiveContent = false;
+    if (enabled && groupIds.length > 0) {
+      isSensitiveContent = await this.isSensitiveContent(content, groupIds);
+    }
+    return isSensitiveContent;
+  }
+
   async usernameDetection(content) {
-    await this.#contentDetection(sensitiveSettingIds.username, content);
+    await this.#contentDetection(sensitiveTypes.username, content);
   }
 
   async userDescDetection(content) {
-    await this.#contentDetection(sensitiveSettingIds.userDesc, content);
+    await this.#contentDetection(sensitiveTypes.userDesc, content);
   }
 
   async columnNameDetection(content) {
-    await this.#contentDetection(sensitiveSettingIds.columnName, content);
+    await this.#contentDetection(sensitiveTypes.columnName, content);
   }
 
-  async columnDescDetection(content) {
-    await this.#contentDetection(sensitiveSettingIds.columnDesc, content);
+  async columnAbbrDetection(content) {
+    await this.#contentDetection(sensitiveTypes.columnDesc, content);
   }
 }
 

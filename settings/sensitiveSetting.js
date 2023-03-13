@@ -1,4 +1,4 @@
-const sensitiveSettingIds = {
+const sensitiveTypes = {
   username: 'username',
   userDesc: 'userDesc',
   columnName: 'columnName',
@@ -6,5 +6,5 @@ const sensitiveSettingIds = {
 };
 
 module.exports = {
-  sensitiveSettingIds,
+  sensitiveTypes,
 };

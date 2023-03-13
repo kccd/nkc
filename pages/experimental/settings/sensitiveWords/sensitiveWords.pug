@@ -6,7 +6,7 @@ block eContent
     var obj = {
       keywordSetting: data.keywordSetting ? data.keywordSetting : null,
       users: data.users,
-      sensitiveSettings: data.sensitiveSettings,
+      sensitiveSettings: data.sensitiveSettings
     };
 
   .hidden#data=objToStr(obj)
@@ -112,6 +112,7 @@ block eContent
                   label.col-sm-2.control-label
                   .col-sm-10
                     h4 {{setting.name}}
+                      button.btn.btn-sm.btn-default(@click='runSensitiveChecker(setting)') 手动检测
                 .form-group
                   label.col-sm-2.control-label 状态
                   .col-sm-10
