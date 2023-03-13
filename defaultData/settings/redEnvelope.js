@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.redEnvelope,
   c: {
@@ -7,36 +7,36 @@ module.exports = {
       chance: 50,
       awards: [
         {
-          "name" : "特等奖",
-          "kcb" : 500,
-          "chance" : 1,
-          "float" : 20
+          name: '特等奖',
+          kcb: 500,
+          chance: 1,
+          float: 20,
         },
         {
-          "name" : "一等奖",
-          "kcb" : 50,
-          "chance" : 5,
-          "float" : 20
+          name: '一等奖',
+          kcb: 50,
+          chance: 5,
+          float: 20,
         },
         {
-          "name" : "二等奖",
-          "kcb" : 20,
-          "chance" : 14,
-          "float" : 20
+          name: '二等奖',
+          kcb: 20,
+          chance: 14,
+          float: 20,
         },
         {
-          "name" : "鼓励奖",
-          "kcb" : 5,
-          "chance" : 80,
-          "float" : 20
-        }
-      ]
+          name: '鼓励奖',
+          kcb: 5,
+          chance: 80,
+          float: 20,
+        },
+      ],
     },
     draftFee: {
       close: true,
       defaultCount: 1,
       minCount: 1,
-      maxCount: 5
+      maxCount: 5,
     },
     share: {
       column: {
@@ -45,7 +45,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       forum: {
         order: 1,
@@ -53,7 +53,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       thread: {
         order: 2,
@@ -61,15 +61,15 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       post: {
         order: 3,
         name: '回复',
         status: false,
-         kcb: 1,
+        kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       article: {
         order: 2,
@@ -77,7 +77,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       comment: {
         order: 3,
@@ -85,7 +85,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       fundlist: {
         order: 4,
@@ -93,7 +93,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       fundapply: {
         order: 5,
@@ -101,7 +101,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       user: {
         order: 6,
@@ -109,7 +109,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       activity: {
         order: 7,
@@ -117,7 +117,7 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
+        count: 5,
       },
       register: {
         order: 8,
@@ -125,8 +125,8 @@ module.exports = {
         status: false,
         kcb: 1,
         maxKcb: 5,
-        count: 5
-      }
-    }
-  }
+        count: 5,
+      },
+    },
+  },
 };

@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.page,
   c: {
@@ -23,24 +23,24 @@ module.exports = {
     articlePanelStyle: {
       common: {
         type: 'abstract',
-        cover: 'left'
+        cover: 'left',
       },
       latestCommunity: {
         type: 'abstract',
-        cover: 'left'
+        cover: 'left',
       },
       latestCommunityTopped: {
         type: 'minimalist',
-        cover: 'left'
+        cover: 'left',
       },
       latestZone: {
         type: 'abstract',
-        cover: 'left'
+        cover: 'left',
       },
       latestColumn: {
         type: 'abstract',
-        cover: 'left'
-      }
+        cover: 'left',
+      },
     },
-  }
+  },
 };

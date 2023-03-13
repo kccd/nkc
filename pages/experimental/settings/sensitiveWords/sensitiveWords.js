@@ -1,8 +1,12 @@
-var data = NKC.methods.getDataById("data");
+import {getDataById} from "../../../lib/js/dataConversion";
+
+const data = getDataById("data");
+
 var keywordSetting = data.keywordSetting || {
   enable: false,
   wordGroup: []
 };
+
 function initGroup(group) {
   group.rename = false;
   group.keywordView = false;
@@ -19,13 +23,14 @@ var app = new Vue({
   el: '#app',
   data: {
     keywordSetting: keywordSetting,
-    userInfoKeywordSettings: data.userInfoKeywordSettings,
-    columnInfoKeywordSettings: data.columnInfoKeywordSettings,
     form: {
       groupName: "",
       keywords: null,
     },
     add: false,
+
+    sensitiveSettings: data.sensitiveSettings,
+
   },
   methods: {
     // 启停关键词功能
@@ -267,50 +272,18 @@ var app = new Vue({
     },
     // 关闭送审条件编辑
     endEdit: function(target, group, key) {
-      var number = parseInt(target.innerText, 10);
-      group.conditions[key] = number;
+      group.conditions[key] = parseInt(target.innerText, 10);
       this.updateReviewCondition(group)
     },
-    saveKeywordSettings(type, value) {
-      nkcAPI('/e/settings/review/keyword', 'PUT', {
-        type,
-        value,
+    saveSensitiveSettings() {
+      nkcAPI('/e/settings/sensitiveWords', 'PUT', {
+        sensitiveSettings: this.sensitiveSettings
       })
         .then(() => {
           sweetSuccess('保存成功')
         })
         .catch(sweetError)
     },
-    saveUserInfoKeywordSettings() {
-      const {username, userDesc} = this.userInfoKeywordSettings;
-      this.saveKeywordSettings('modifyUserInfoKeywordSettings', {
-        usernameKeyword: {
-          enable: !!username.keyword.enable,
-          groupIds: username.keyword.groupIds,
-          desc: username.keyword.desc,
-        },
-        userDescKeyword: {
-          enable: !!userDesc.keyword.enable,
-          groupIds: userDesc.keyword.groupIds,
-          desc: userDesc.keyword.desc,
-        }
-      });
-    },
-    saveColumnInfoKeywordSettings() {
-      const {columnName, columnDesc} = this.columnInfoKeywordSettings;
-      this.saveKeywordSettings('modifyColumnInfoKeywordSettings', {
-        columnNameKeyword: {
-          enable: !!columnName.keyword.enable,
-          groupIds: columnName.keyword.groupIds,
-          desc: columnName.keyword.desc,
-        },
-        columnDescKeyword: {
-          enable: !!columnDesc.keyword.enable,
-          groupIds: columnDesc.keyword.groupIds,
-          desc: columnDesc.keyword.desc,
-        }
-      });
-    }
   }
 });
 

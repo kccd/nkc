@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.documentPost,
   c: {
@@ -10,71 +10,71 @@ module.exports = {
         examNotPass: {
           status: true,
           limited: false,
-          count: 1
+          count: 1,
         },
         defaultInterval: {
           limited: false,
-          interval: 1
+          interval: 1,
         },
         defaultCount: {
           limited: false,
-          count: 1
+          count: 1,
         },
         intervalLimit: [
           {
             id: 'role-dev',
             limited: false,
-            interval: 1
+            interval: 1,
           },
           {
             id: 'grade-0',
             limited: true,
-            interval: 1
-          }
+            interval: 1,
+          },
         ],
         countLimit: [
           {
             id: 'role-dev',
             limited: false,
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-0',
             limited: true,
-            count: 100
-          }
-        ]
+            count: 100,
+          },
+        ],
       },
       postReview: {
         whitelist: ['role-dev'],
         notPassVolumeA: {
           type: 'none',
-          count: 1
+          count: 1,
         },
         foreign: {
           nationCode: '86',
           type: 'none',
-          count: 1
+          count: 1,
         },
         blacklist: [
           {
             id: 'role-dev',
             type: 'none',
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-1',
             type: 'count',
-            count: 10
+            count: 10,
           },
           {
             id: 'grade-0',
             type: 'all',
-            count: 1
-          }
+            count: 1,
+          },
         ],
-        keywordGroupId: []
-      }
+        keywordGroupId: [],
+      },
     },
     comment: {
       postPermission: {
@@ -84,71 +84,71 @@ module.exports = {
         examNotPass: {
           status: true,
           limited: false,
-          count: 1
+          count: 1,
         },
         defaultInterval: {
           limited: false,
-          interval: 1
+          interval: 1,
         },
         defaultCount: {
           limited: false,
-          count: 1
+          count: 1,
         },
         intervalLimit: [
           {
             id: 'role-dev',
             limited: false,
-            interval: 1
+            interval: 1,
           },
           {
             id: 'grade-0',
             limited: true,
-            interval: 1
-          }
+            interval: 1,
+          },
         ],
         countLimit: [
           {
             id: 'role-dev',
             limited: false,
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-0',
             limited: true,
-            count: 100
-          }
-        ]
+            count: 100,
+          },
+        ],
       },
       postReview: {
         whitelist: ['role-dev'],
         notPassVolumeA: {
           type: 'none',
-          count: 1
+          count: 1,
         },
         foreign: {
           nationCode: '86',
           type: 'none',
-          count: 1
+          count: 1,
         },
         blacklist: [
           {
             id: 'role-dev',
             type: 'none',
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-1',
             type: 'count',
-            count: 10
+            count: 10,
           },
           {
             id: 'grade-0',
             type: 'all',
-            count: 1
-          }
+            count: 1,
+          },
         ],
-        keywordGroupId: []
-      }
+        keywordGroupId: [],
+      },
     },
     moment: {
       postPermission: {
@@ -158,71 +158,71 @@ module.exports = {
         examNotPass: {
           status: true,
           limited: false,
-          count: 1
+          count: 1,
         },
         defaultInterval: {
           limited: false,
-          interval: 1
+          interval: 1,
         },
         defaultCount: {
           limited: false,
-          count: 1
+          count: 1,
         },
         intervalLimit: [
           {
             id: 'role-dev',
             limited: false,
-            interval: 1
+            interval: 1,
           },
           {
             id: 'grade-0',
             limited: true,
-            interval: 1
-          }
+            interval: 1,
+          },
         ],
         countLimit: [
           {
             id: 'role-dev',
             limited: false,
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-0',
             limited: true,
-            count: 100
-          }
-        ]
+            count: 100,
+          },
+        ],
       },
       postReview: {
         whitelist: ['role-dev'],
         notPassVolumeA: {
           type: 'none',
-          count: 1
+          count: 1,
         },
         foreign: {
           nationCode: '86',
           type: 'none',
-          count: 1
+          count: 1,
         },
         blacklist: [
           {
             id: 'role-dev',
             type: 'none',
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-1',
             type: 'count',
-            count: 10
+            count: 10,
           },
           {
             id: 'grade-0',
             type: 'all',
-            count: 1
-          }
+            count: 1,
+          },
         ],
-        keywordGroupId: []
-      }
+        keywordGroupId: [],
+      },
     },
     draft: {
       postPermission: {
@@ -232,71 +232,71 @@ module.exports = {
         examNotPass: {
           status: true,
           limited: false,
-          count: 1
+          count: 1,
         },
         defaultInterval: {
           limited: false,
-          interval: 1
+          interval: 1,
         },
         defaultCount: {
           limited: false,
-          count: 1
+          count: 1,
         },
         intervalLimit: [
           {
             id: 'role-dev',
             limited: false,
-            interval: 1
+            interval: 1,
           },
           {
             id: 'grade-0',
             limited: false,
-            interval: 1
-          }
+            interval: 1,
+          },
         ],
         countLimit: [
           {
             id: 'role-dev',
             limited: false,
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-0',
             limited: false,
-            count: 100
-          }
-        ]
+            count: 100,
+          },
+        ],
       },
       postReview: {
         whitelist: ['role-dev'],
         notPassVolumeA: {
           type: 'none',
-          count: 1
+          count: 1,
         },
         foreign: {
           nationCode: '86',
           type: 'none',
-          count: 1
+          count: 1,
         },
         blacklist: [
           {
             id: 'role-dev',
             type: 'none',
-            count: 1
+            count: 1,
           },
           {
             id: 'grade-1',
             type: 'none',
-            count: 10
+            count: 10,
           },
           {
             id: 'grade-0',
             type: 'none',
-            count: 1
-          }
+            count: 1,
+          },
         ],
-        keywordGroupId: []
-      }
+        keywordGroupId: [],
+      },
     },
-  }
-}
+  },
+};

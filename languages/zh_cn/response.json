@@ -1,8 +1,19 @@
 {
+  "ERROR_TEMPLATE": "{v1}",
   "FORBIDDEN_BECAUSE_LOGGED": "权限不足，当前资源不允许已登录用户访问。",
   "FORBIDDEN_BECAUSE_UN_LOGGED": "权限不足，当前资源不允许游客访问。",
   "FORBIDDEN_BECAUSE_BANNED": "权限不足，当前资源不允许开除学籍的用户访问。",
   "FORBIDDEN_BECAUSE_UN_BANNED": "权限不足，当前资源仅允许开除学籍的用户访问。",
   "FORBIDDEN_WITH_MESSAGE": "权限不足：{v1}",
-  "FORBIDDEN": "权限不足"
+  "FORBIDDEN": "权限不足",
+  "IS_SENSITIVE_CONTENT": "{v1}",
+  "USERNAME_LENGTH_ERROR": "用户名不能为空且长度不能超过{v2}个字符",
+  "USERNAME_FORMAT_ERROR": "用户名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始",
+  "USERNAME_EXISTS_ERROR": "用户名已被使用",
+
+  "USER_DESC_LENGTH_ERROR": "用户简介不能超过{v2}个字符",
+  "COLUMN_NAME_LENGTH_ERROR": "专栏名不能为空且长度不能超度{v2}个字符",
+  "COLUMN_NAME_FORMAT_ERROR": "专栏名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始",
+  "COLUMN_DESC_LENGTH_ERROR": "专栏简介不能超过{v2}个字符",
+  "COLUMN_NAME_EXISTS_ERROR": "专栏名已被使用"
 }

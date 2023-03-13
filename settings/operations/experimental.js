@@ -346,7 +346,8 @@ module.exports = {
 			PUT: 'experimentalRechargeSettings',
 		},
 		sensitiveWords: {
-			GET: "sensitiveWords"
+			GET: "sensitiveWords",
+			PUT: 'sensitiveWords'
 		},
     fund: {
 	    GET: 'experimentalFundSettings',

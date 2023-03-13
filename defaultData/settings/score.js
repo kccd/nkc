@@ -1,5 +1,4 @@
-
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 const data = {
   _id: settingIds.score,
   c: {
@@ -104,7 +103,7 @@ const data = {
         other2score: false,
         weight: 1,
       },
-    ]
-  }
+    ],
+  },
 };
 module.exports = data;

@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.home,
   c: {
@@ -11,13 +11,14 @@ module.exports = {
         count: 6,
         automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
         automaticCount: 20, // 自动选择推荐文章的数量
-        timeOfPost: { // 文章的发表时间限制
+        timeOfPost: {
+          // 文章的发表时间限制
           min: 0, // 距离当前最短一天
-          max: 365 // 距离当前最长365天
+          max: 365, // 距离当前最长365天
         },
         countOfPost: {
           min: 0,
-          max: 30
+          max: 30,
         },
         timeInterval: 1, // 自动更新的间隔时间（小时）
         digest: false, // 文章是否必须是精选
@@ -37,13 +38,14 @@ module.exports = {
         count: 8,
         automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
         automaticCount: 20, // 自动选择推荐文章的数量
-        timeOfPost: { // 文章的发表时间限制
+        timeOfPost: {
+          // 文章的发表时间限制
           min: 0, // 距离当前最短一天
-          max: 365 // 距离当前最长365天
+          max: 365, // 距离当前最长365天
         },
         countOfPost: {
           min: 0,
-          max: 30
+          max: 30,
         },
         timeInterval: 1, // 自动更新的间隔时间（小时）
         digest: false, // 文章是否必须是精选
@@ -54,50 +56,50 @@ module.exports = {
         original: false, // 文章是否必须为原创
         flowControl: false, // 是否包含流控文章
         otherThreads: true, // 是否包含普通文章（未加精、非原创、未流控、未举报且未处理）
-      }
+      },
     },
     ads: {
       movable: [], // 手动 轮播
       fixed: [], // 手动 固定
-      fixedOrder: "random",
-      movableOrder: "random",
+      fixedOrder: 'random',
+      movableOrder: 'random',
     },
     toppedThreadsId: [], // 顶置社区文章ID
     recommendForumsId: [],
-    showShopGoods: true,    // 是否显示热销商品板块，默认显示，可以在前台设置中修改
+    showShopGoods: true, // 是否显示热销商品板块，默认显示，可以在前台设置中修改
     shopGoodsId: [],
     columnsId: [],
     logos: [],
-    logo: "",
-    smallLogo: "",
+    logo: '',
+    smallLogo: '',
     homeBigLogo: [],
     noticeThreadsId: [],
     list: {
       topic: true,
-      discipline: true
+      discipline: true,
     },
     watermarkTransparency: 30,
     waterLimit: {
       minWidth: 799,
-      minHeight: 479
+      minHeight: 479,
     },
     // 游客默认显示 推荐、最新
-    visitorThreadList: "home",
+    visitorThreadList: 'home',
     // 热门文章 条件
     hotThreads: {
       postCount: 50,
-      postUserCount: 20
+      postUserCount: 20,
     },
     recommend: {
       featuredThreads: true, // 精选文章
       hotThreads: true, // 热门文章
       voteUpTotal: 20, // 总点赞数
       voteUpMax: 10, // 最高点赞数
-      encourageTotal: 10 // 总鼓励数
+      encourageTotal: 10, // 总鼓励数
     },
-    originalThreadDisplayMode: "simple",     // 首页上“最新原创”板块文章的显示方式， “simple” 简略显示， “full” 完整显示
-    subscribesDisplayMode: "row",            // 首页上“关注的专业”板块的显示方式，  “row” 横排， “column” 竖排
-    showActivityEnter: true,                  // 显示活动入口
+    originalThreadDisplayMode: 'simple', // 首页上“最新原创”板块文章的显示方式， “simple” 简略显示， “full” 完整显示
+    subscribesDisplayMode: 'row', // 首页上“关注的专业”板块的显示方式，  “row” 横排， “column” 竖排
+    showActivityEnter: true, // 显示活动入口
     latestToppedThreadsId: [],
     communityToppedThreadsId: [],
     columnListPosition: 'side', // 专栏显示位置 main: 中间, side: 侧边, null: 不显示
@@ -113,6 +115,6 @@ module.exports = {
       minSubscriptionCount: 0,
     },
     toppedColumnsId: [],
-    latestFirst: 'reply' //首页最新点击进入的项目
-  }
+    latestFirst: 'reply', //首页最新点击进入的项目
+  },
 };

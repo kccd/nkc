@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.share,
   c: {
@@ -18,7 +18,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     post: {
       status: true,
@@ -27,7 +27,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     user: {
       status: true,
@@ -36,7 +36,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     column: {
       status: true,
@@ -45,7 +45,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     activity: {
       status: true,
@@ -54,7 +54,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     fund: {
       status: true,
@@ -63,7 +63,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     fundForm: {
       status: true,
@@ -72,7 +72,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     comment: {
       status: true,
@@ -81,7 +81,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     article: {
       status: true,
@@ -90,7 +90,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
+      rewardCount: 0,
     },
     moment: {
       status: true,
@@ -99,7 +99,7 @@ module.exports = {
       rewardStatus: false,
       kcb: 0,
       maxKcb: 0,
-      rewardCount: 0
-    }
-  }
+      rewardCount: 0,
+    },
+  },
 };
