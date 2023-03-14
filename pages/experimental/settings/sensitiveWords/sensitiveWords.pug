@@ -19,9 +19,9 @@ block eContent
             li
               a(href='#groups') 敏感词词组
             li
-              a(href='#user') 用户信息检测
+              a(href='#username') 用户信息检测
             li
-              a(href='#column') 专栏信息检测
+              a(href='#columnName') 专栏信息检测
           .panel.panel-default
             .panel-heading#groups
               .panel-title 敏感词词组
@@ -107,7 +107,7 @@ block eContent
             .panel-heading
               .panel-title 敏感词设置
             .panel-body
-              .form-horizontal(v-for='setting in sensitiveSettings')
+              .form-horizontal.p-t-5(v-for='setting in sensitiveSettings' :id="setting.iid")
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-10
