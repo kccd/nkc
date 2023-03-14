@@ -5,7 +5,6 @@ const koaBody = require('koa-body');
 const router = require('./routes');
 const fs = require('fs');
 const path = require('path');
-const logger = require('../../nkcModules/logger');
 const tempPath = path.resolve(__dirname, `./temp`);
 
 try {
@@ -27,7 +26,6 @@ if (!attachment || attachment.length === 0) {
 const app = new koa();
 
 app.on('error', (err) => {
-  logger.error(`koa error: ${err.stack}`);
   // console.log(`koa error:`, err);
 });
 
@@ -51,5 +49,5 @@ app.use(body);
 const server = http.createServer(app.callback());
 
 server.listen(port, () => {
-  logger.info(`store service is running at ${port}`);
+  console.log(`store service is running at ${port}`.green);
 });
