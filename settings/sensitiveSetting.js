@@ -2,7 +2,7 @@ const sensitiveTypes = {
   username: 'username',
   userDesc: 'userDesc',
   columnName: 'columnName',
-  columnDesc: 'columnDesc',
+  columnAbbr: 'columnAbbr',
 };
 
 module.exports = {

@@ -26,8 +26,8 @@ async function main(data) {
         await columnNameChecker(checkerLog);
         break;
       }
-      case sensitiveTypes.columnDesc: {
-        await columnDescChecker(checkerLog);
+      case sensitiveTypes.columnAbbr: {
+        await columnAbbrChecker(checkerLog);
         break;
       }
       default: {
@@ -72,7 +72,7 @@ async function columnNameChecker(checkerLog) {
   });
 }
 
-async function columnDescChecker(checkerLog) {
+async function columnAbbrChecker(checkerLog) {
   return checker({
     checkerLog,
     limit: 100,

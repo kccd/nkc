@@ -397,6 +397,10 @@ module.exports = {
     sensitive: {
       GET: 'experimentalFilterLogs',
       POST: 'experimentalFilterLogs',
+      PARAMETER: {
+        GET: 'experimentalFilterLogs',
+        POST: 'experimentalFilterLogs',
+      },
     },
     resource: {
       GET: 'experimentalResourceLogs',

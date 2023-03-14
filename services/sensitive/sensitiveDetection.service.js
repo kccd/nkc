@@ -140,7 +140,7 @@ class SensitiveDetectionService {
   }
 
   async columnAbbrDetection(content) {
-    await this.#contentDetection(sensitiveTypes.columnDesc, content);
+    await this.#contentDetection(sensitiveTypes.columnAbbr, content);
   }
 }
 

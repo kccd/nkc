@@ -60,7 +60,7 @@ schema.methods.updateLogStatusToFailed = async function (error) {
     $set: {
       status: sensitiveCheckerStatus.failed,
       error,
-      tlv: new Date(),
+      tlm: new Date(),
     },
   });
 };
@@ -69,7 +69,7 @@ schema.methods.updateLogStatusToSucceeded = async function () {
   await this.updateOne({
     $set: {
       status: sensitiveCheckerStatus.succeeded,
-      tlv: new Date(),
+      tlm: new Date(),
     },
   });
 };
@@ -81,7 +81,7 @@ schema.methods.updateLogProgress = async function (
   await this.updateOne({
     $set: {
       status: sensitiveCheckerStatus.running,
-      tlv: new Date(),
+      tlm: new Date(),
       progress,
     },
     $addToSet: {

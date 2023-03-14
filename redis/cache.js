@@ -7,6 +7,9 @@ const cacheForums = require('./cacheForums');
 const {
   sensitiveSettingService,
 } = require('../services/sensitive/sensitiveSetting.service');
+const {
+  sensitiveCheckerService,
+} = require('../services/sensitive/sensitiveChecker.service');
 module.exports = async () => {
   // 清空redis数据库
   // await client.flushdbAsync();
@@ -42,4 +45,5 @@ module.exports = async () => {
   await db.AccessControlModel.saveToCache();
   // 敏感词设置
   await sensitiveSettingService.saveAllSettingsToCache();
+  await sensitiveCheckerService.setAllCheckerLogStatusToFailed();
 };

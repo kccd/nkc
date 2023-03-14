@@ -1,11 +1,12 @@
 /*
-* 定时任务 独立进程执行
-* */
+ * 定时任务 独立进程执行
+ * */
 
 require('colors');
 require('./global');
 
-const updateDate = require("./settings/updateDate");
+const logger = require('./nkcModules/logger');
+const updateDate = require('./settings/updateDate');
 
 const jobs = require('./timedTasks/scheduleJob');
 const timedTasks = require('./timedTasks/timedTasks');
@@ -34,22 +35,23 @@ const run = async () => {
   await timedTasks.modifyProjectCycle();
   await timedTasks.initHomeBlocksTimeout();
   await timedTasks.updateShopStatus();
-  if(process.connected) process.send('ready');
-  process.on('message', function(msg) {
+  if (process.connected) {
+    process.send('ready');
+  }
+  process.on('message', function (msg) {
     if (msg === 'shutdown') {
-      console.log(`timed task service ${global.NKC.processId} stopped`.green);
+      logger.error(`timed task service ${global.NKC.processId} stopped`);
       process.exit(0);
     }
   });
 };
 
-
 run()
   .then(() => {
-    console.log(`timed task is running`.green);
+    logger.info(`timed task is running`);
   })
-  .catch(err => {
-    console.log(`timed task stopped`.red);
-    console.log((err.stack || err.message || err).red);
+  .catch((err) => {
+    logger.error(`timed task stopped`);
+    logger.error(err.stack || err.message || err);
     process.exit(1);
-  })
+  });
