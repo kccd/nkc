@@ -349,7 +349,7 @@ module.exports = {
       GET: 'sensitiveWords',
       PUT: 'sensitiveWords',
       checker: {
-        POST: 'modifyUserSensitiveInfo',
+        POST: 'sensitiveWords',
       },
     },
     fund: {
