@@ -1,37 +1,32 @@
 require('colors');
-const moment = require("moment");
+const moment = require('moment');
 const PATH = require('path');
 const schedule = require('node-schedule');
 const archiver = require('archiver');
 const fs = require('fs');
-const {spawn} = require('child_process');
-const {
-  folder,
-  time,
-} = require('../../config/backup.json');
+const { spawn } = require('child_process');
+const { folder, time } = require('../../config/backup.json');
 const {
   database: dbName,
   username: dbUsername,
   password: dbPassword,
   address: dbAddress,
-  port: dbPort
+  port: dbPort,
 } = require('../../config/mongodb.json');
 
-if(folder && time) {
+if (folder && time) {
   schedule.scheduleJob(time, backupDatabase);
   console.log(`数据库自动备份服务已启动`);
 } else {
   console.error(`未启用数据库自动备份`.red);
 }
 
-
-
-
 async function backupDatabase() {
   const now = new Date();
   const folderPath = getDataFolderByDate(now);
   console.log(`${getTimestamp()} 开始备份数据库 ${dbName} ...`);
-  let data = '', error = '';
+  let data = '',
+    error = '';
   const command = [
     '--gzip',
     '--host',
@@ -42,19 +37,19 @@ async function backupDatabase() {
     `${folderPath}`,
   ];
 
-  if(dbUsername && dbPassword) {
+  if (dbUsername && dbPassword) {
     command.push('-u');
     command.push(dbUsername);
     command.push('-p');
     command.push(dbPassword);
   }
 
-  const day = Number(moment().format("DD"));
-  if(day % 4 !== 0) {
+  const day = Number(moment().format('DD'));
+  if (day % 4 !== 0) {
     command.push(`--excludeCollection`);
     command.push(`logs`);
   }
-  if(day % 12 !== 0) {
+  if (day % 12 !== 0) {
     command.push(`--excludeCollection`);
     command.push(`visitorLogs`);
   }
@@ -62,15 +57,15 @@ async function backupDatabase() {
   process.stdout.on('data', (d) => {
     d = d.toString();
     console.log(d);
-    data += (d+'\n');
+    data += d + '\n';
   });
   process.stderr.on('data', (d) => {
     d = d.toString();
     console.log(d);
-    error += (d+'\n');
+    error += d + '\n';
   });
   process.on('close', (code) => {
-    if(code !== 0) {
+    if (code !== 0) {
       return console.log(`${getTimestamp()} 备份失败\n${error}`);
     }
     console.log(`${getTimestamp()} 备份完成 开始压缩...`);
@@ -79,19 +74,18 @@ async function backupDatabase() {
       .then(() => {
         console.log(`${getTimestamp()} 压缩完成 ${zipFilePath}`);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(`${getTimestamp()} 压缩失败 ${err.message || err}`);
       });
   });
 }
 
 async function compressedDir(dirPath, zipFilePath) {
-
   return new Promise((resolve, reject) => {
-    try{
+    try {
       const targetDirPath = PATH.dirname(zipFilePath);
       fs.mkdirSync(targetDirPath, {
-        recursive: true
+        recursive: true,
       });
 
       const zipFile = fs.createWriteStream(zipFilePath);
@@ -104,9 +98,9 @@ async function compressedDir(dirPath, zipFilePath) {
       });
 
       const archive = archiver('zip', {
-        zlib: {level: 9}
+        zlib: { level: 9 },
       });
-      archive.on('warning', function(err) {
+      archive.on('warning', function (err) {
         if (err.code === 'ENOENT') {
           console.log(err);
         } else {
@@ -114,7 +108,7 @@ async function compressedDir(dirPath, zipFilePath) {
         }
       });
 
-      archive.on('error', function(err) {
+      archive.on('error', function (err) {
         reject(err);
       });
 
@@ -125,17 +119,21 @@ async function compressedDir(dirPath, zipFilePath) {
     } catch (err) {
       reject(err);
     }
-  })
-
+  });
 }
 
 function getDataFolderByDate(t) {
   t = moment(t);
-  const folderPath =  PATH.resolve(folder, `./${dbName}/${t.format('YYYY')}/${t.format('MM')}/${dbName}_${t.format(`YYYYMMDD`)}_cache`);
+  const folderPath = PATH.resolve(
+    folder,
+    `./${dbName}/${t.format('YYYY')}/${t.format('MM')}/${dbName}_${t.format(
+      `YYYYMMDD`,
+    )}_cache`,
+  );
   fs.mkdirSync(folderPath, {
-    recursive: true
+    recursive: true,
   });
-  return folderPath
+  return folderPath;
 }
 
 function getZipFilePathByDate(t) {

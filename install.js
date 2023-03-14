@@ -1,1 +1,1 @@
-require('./install/index.js')
+require('./install/index.js');
