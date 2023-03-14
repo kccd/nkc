@@ -1,5 +1,6 @@
 const db = require('../dataModels');
 const tasks = require('../tasks');
+const logger = require('../nkcModules/logger');
 const func = {};
 /*
  * 定时更新活跃用户的信息 主要是头像
@@ -9,7 +10,7 @@ func.cacheActiveUsers = async () => {
     try {
       await tasks.saveActiveUsersToCache();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
       await func.cacheActiveUsers();
     }
@@ -23,7 +24,7 @@ func.cacheNewUsers = async () => {
     try {
       await tasks.saveNewUsersToCache();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
       await func.cacheNewUsers();
     }
@@ -32,11 +33,11 @@ func.cacheNewUsers = async () => {
 func.clearTimeoutPageCache = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在清除过期页面缓存...`);
+      logger.info(`正在清除过期页面缓存...`);
       await tasks.clearTimeoutPageCache();
-      console.log(`过期页面缓存清理完成`);
+      logger.info(`过期页面缓存清理完成`);
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     } finally {
       await func.clearTimeoutPageCache();
     }
@@ -52,12 +53,12 @@ func.updateFixedRecommendThreads = async () => {
   setTimeout(async () => {
     try {
       if (homeSettings.recommendThreads.fixed.displayType !== 'manual') {
-        console.log(`开始更新首页推荐文章（固定图）...`);
+        logger.info(`开始更新首页推荐文章（固定图）...`);
         await tasks.updateHomeRecommendThreadsByType('fixed');
-        console.log(`首页推荐文章（固定图）更新完成`);
+        logger.info(`首页推荐文章（固定图）更新完成`);
       }
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
       await func.updateFixedRecommendThreads();
     }
@@ -72,12 +73,12 @@ func.updateMovableRecommendThreads = async () => {
   setTimeout(async () => {
     try {
       if (homeSettings.recommendThreads.movable.displayType !== 'manual') {
-        console.log(`开始更新首页推荐文章（轮播图）...`);
+        logger.info(`开始更新首页推荐文章（轮播图）...`);
         await tasks.updateHomeRecommendThreadsByType('movable');
-        console.log(`首页推荐文章（轮播图）更新完成`);
+        logger.info(`首页推荐文章（轮播图）更新完成`);
       }
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
       await func.updateMovableRecommendThreads();
     }
@@ -98,12 +99,12 @@ func.updateHomeHotColumns = async () => {
   const homeSettings = await db.SettingModel.getSettings('home');
   setTimeout(async () => {
     try {
-      console.log(`正在更新主页热门专栏...`);
+      logger.info(`正在更新主页热门专栏...`);
       await db.ColumnModel.updateHomeHotColumns();
     } catch (err) {
       console.error(err);
     } finally {
-      console.log(`主页热门专栏更新完成`);
+      logger.info(`主页热门专栏更新完成`);
       await func.updateHomeHotColumns();
     }
   }, homeSettings.columnPool.updateInterval * 60 * 1000);
@@ -115,12 +116,12 @@ func.updateHomeHotColumns = async () => {
 func.clearResourceState = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在处理异常资源上传状态...`);
+      logger.info(`正在处理异常资源上传状态...`);
       await tasks.clearResourceState();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`异常资源上传状态处理完成`);
+      logger.info(`异常资源上传状态处理完成`);
       await func.clearResourceState();
     }
   }, 3 * 60 * 60 * 1000);
@@ -132,12 +133,12 @@ func.clearResourceState = async () => {
 func.updateAllForumLatestThread = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在更新专业最新文章...`);
+      logger.info(`正在更新专业最新文章...`);
       await tasks.saveAllForumLatestThreadToRedis();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`专业最新文章更新完成`);
+      logger.info(`专业最新文章更新完成`);
       await func.updateAllForumLatestThread();
     }
   }, 6 * 60 * 1000);
@@ -150,12 +151,12 @@ func.updateAllForumLatestThread = async () => {
 func.updateForumsMessage = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在更新专业文章、回复数...`);
+      logger.info(`正在更新专业文章、回复数...`);
       await tasks.updateForumsMessage();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`专业文章、回复数更新完成`);
+      logger.info(`专业文章、回复数更新完成`);
       await func.updateForumsMessage();
     }
   }, 30 * 60 * 1000);
@@ -167,12 +168,12 @@ func.updateForumsMessage = async () => {
 func.modifyTimeoutApplicationForm = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在更改基金修改超时的申请表状态...`);
+      logger.info(`正在更改基金修改超时的申请表状态...`);
       await db.FundModel.modifyTimeoutApplicationForm();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`更改基金修改超时的申请表状态完成`);
+      logger.info(`更改基金修改超时的申请表状态完成`);
       await func.modifyTimeoutApplicationForm();
     }
   }, 60 * 60 * 1000);
@@ -184,12 +185,12 @@ func.modifyTimeoutApplicationForm = async () => {
 func.modifyProjectCycle = async () => {
   setTimeout(async () => {
     try {
-      console.log('正在处理超时未结题的基金申请...');
+      logger.info('正在处理超时未结题的基金申请...');
       await db.MessageModel.sendFinishProject();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log('处理完成');
+      logger.info('处理完成');
       await func.modifyProjectCycle();
     }
   }, 12 * 60 * 60 * 1000);
@@ -202,7 +203,7 @@ const initHomeBlocksId = [];
 func.initHomeBlocksTimeout = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在处理首页自定义文章列表...`);
+      logger.info(`正在处理首页自定义文章列表...`);
       const blocks = await db.HomeBlockModel.find(
         {
           _id: {
@@ -216,9 +217,9 @@ func.initHomeBlocksTimeout = async () => {
         initHomeBlocksId.push(block._id);
       }
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`首页自定义文章列表处理完成`);
+      logger.info(`首页自定义文章列表处理完成`);
       await func.initHomeBlocksTimeout();
     }
   }, 60 * 1000);
@@ -231,12 +232,12 @@ func.initHomeBlockTimeout = async (blockId) => {
   }
   setTimeout(async () => {
     try {
-      console.log(`正在更新首页自定义文章列表...`);
+      logger.info(`正在更新首页自定义文章列表...`);
       await block.updateThreadsId();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`首页自定义文章列表更新完成`);
+      logger.info(`首页自定义文章列表更新完成`);
       await func.initHomeBlockTimeout(blockId);
     }
   }, block.updateInterval * 60 * 60 * 1000);
@@ -248,12 +249,12 @@ func.initHomeBlockTimeout = async (blockId) => {
 func.initVerifiedUploadState = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在处理身份认证处理状态...`);
+      logger.info(`正在处理身份认证处理状态...`);
       await tasks.updateVerifiedUpdateState();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`异常身份认证状态状态处理完成`);
+      logger.info(`异常身份认证状态状态处理完成`);
       await func.initVerifiedUploadState();
     }
   }, 3.5 * 60 * 60 * 1000);
@@ -265,12 +266,12 @@ func.initVerifiedUploadState = async () => {
 func.updateShopStatus = async () => {
   setTimeout(async () => {
     try {
-      console.log(`正在更新商城数据状态...`);
+      logger.info(`正在更新商城数据状态...`);
       await tasks.updateShopStatus();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
     } finally {
-      console.log(`商城数据状态更新完成`);
+      logger.info(`商城数据状态更新完成`);
       await func.updateShopStatus();
     }
   }, 70 * 1000);

@@ -201,6 +201,9 @@ function info(content) {
 }
 
 function error(content) {
+  if (typeof content === 'object') {
+    content = content.stack || content.toString();
+  }
   commonLogger.error(content);
 }
 

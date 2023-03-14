@@ -28,6 +28,7 @@ router
         groupIds,
       });
     }
+    await sensitiveSettingService.saveAllSettingsToCache();
     await next();
   })
   .post('/checker', async (ctx, next) => {
