@@ -2,9 +2,9 @@ const router = require('koa-router')();
 const thread = require('./thread');
 router
   .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
-    const reviewSettings = await db.SettingModel.getSettings("review");
-    data.groups = reviewSettings.keyword.wordGroup.map(w => {
+    const { db, data } = ctx;
+    const reviewSettings = await db.SettingModel.getSettings('review');
+    data.groups = reviewSettings.keyword.wordGroup.map((w) => {
       delete w.keywords;
       return w;
     });
@@ -12,38 +12,40 @@ router
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {state, body, data, db, nkcModules} = ctx;
-    const {checkNumber} = nkcModules.checkData;
+    const { state, body, db, nkcModules } = ctx;
+    const { checkNumber } = nkcModules.checkData;
     const {
       groups,
       markAsUnReviewed,
       timeLimit,
       conditions,
       time,
-      keywords = []
+      keywords = [],
     } = body;
     const reviewSettings = await db.SettingModel.getSettings('review');
     const wordGroup = reviewSettings.keyword.wordGroup;
     const wordGroupObj = {};
-    for(const wg of wordGroup) {
+    for (const wg of wordGroup) {
       wordGroupObj[wg.id] = wg;
     }
 
     const selectGroups = [];
 
-    for(const g of groups) {
-      const {count, times, logic} = g.conditions;
+    for (const g of groups) {
+      const { count, times, logic } = g.conditions;
       const wg = wordGroupObj[g.id];
-      if(!wg) ctx.throw(400, `分组 ID ${g.id} 不存在`);
+      if (!wg) {
+        ctx.throw(400, `分组 ID ${g.id} 不存在`);
+      }
       checkNumber(count, {
         name: `词组命中个数`,
         min: 1,
       });
       checkNumber(times, {
         name: `词组命中次数`,
-        min: 1
+        min: 1,
       });
-      if(!['and', 'or'].includes(logic)) {
+      if (!['and', 'or'].includes(logic)) {
         ctx.throw(400, `词组命中关系设置错误`);
       }
       selectGroups.push({
@@ -53,28 +55,27 @@ router
         conditions: {
           count,
           times,
-          logic
-        }
+          logic,
+        },
       });
     }
 
-
     let startingTime;
     let endTime;
-    if(timeLimit === 'custom') {
+    if (timeLimit === 'custom') {
       startingTime = new Date(`${time[0]} 00:00:00`);
       endTime = new Date(`${time[1]} 00:00:00`);
     }
-    if(keywords.length > 0) {
+    if (keywords.length > 0) {
       checkNumber(conditions.count, {
         name: `自定义词组命中个数`,
         min: 1,
       });
       checkNumber(conditions.times, {
         name: `自定义词组命中次数`,
-        min: 1
+        min: 1,
       });
-      if(!['and', 'or'].includes(conditions.logic)) {
+      if (!['and', 'or'].includes(conditions.logic)) {
         ctx.throw(400, `自定义词组命中关系设置错误`);
       }
       selectGroups.push({
@@ -84,12 +85,12 @@ router
         conditions: {
           count: conditions.count,
           times: conditions.times,
-          logic: conditions.logic
-        }
+          logic: conditions.logic,
+        },
       });
     }
 
-    if(selectGroups.length === 0) {
+    if (selectGroups.length === 0) {
       ctx.throw(400, `敏感词词组不能为空`);
     }
     const filterLog = db.FilterLogModel({
@@ -98,10 +99,10 @@ router
       groups: selectGroups,
       markUnReview: markAsUnReviewed,
       timeLimit: {
-        type: timeLimit
-      }
+        type: timeLimit,
+      },
     });
-    if(filterLog.timeLimit.type === 'custom') {
+    if (filterLog.timeLimit.type === 'custom') {
       filterLog.timeLimit.start = startingTime;
       filterLog.timeLimit.end = endTime;
     }
@@ -112,7 +113,7 @@ router
       groups: selectGroups,
       startingTime,
       endTime,
-      markAsUnReviewed
+      markAsUnReviewed,
     });
 
     await next();

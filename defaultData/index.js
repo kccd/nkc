@@ -377,7 +377,7 @@ async function initSensitiveSettings() {
   const defaultSettings = require('./sensitiveSettings');
   const {
     sensitiveSettingService,
-  } = require('../services/review/sensitiveSetting.service');
+  } = require('../services/sensitive/sensitiveSetting.service');
   const dbSettings = await sensitiveSettingService.getAllSettings();
   const dbSettingIds = dbSettings.map((ds) => ds.iid);
   for (const setting of defaultSettings) {

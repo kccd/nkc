@@ -4,7 +4,7 @@ const { ResponseTypes } = require('../../settings/response');
 const { usernameRegex } = require('../../settings/regex');
 const {
   sensitiveDetectionService,
-} = require('../review/sensitiveDetection.service');
+} = require('../sensitive/sensitiveDetection.service');
 const {
   ForumModel,
   UserModel,

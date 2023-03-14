@@ -3369,4 +3369,52 @@ userSchema.methods.getCertsNameString = async function () {
   return certsName.join(' ');
 };
 
+userSchema.statics.getDefaultUsernameById = async function (uid) {
+  const SettingModel = mongoose.model('settings');
+  const serverSettings = await SettingModel.getSettings('server');
+  return `${serverSettings.websiteCode}-${uid}`;
+};
+
+userSchema.statics.clearUsername = async function (props) {
+  const SecretBehaviorModel = mongoose.model('secretBehaviors');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const { uid, ip, port } = props;
+  const UserModel = mongoose.model('users');
+  const targetUser = await UserModel.findOnly({ uid });
+  const newUsername = await UserModel.getDefaultUsernameById(targetUser.uid);
+  const newUsernameLowerCase = newUsername.toLowerCase();
+  await SecretBehaviorModel({
+    operationId: 'modifyUsername',
+    type: 'modifyUsername',
+    uid,
+    ip,
+    port,
+    oldUsername: targetUser.username,
+    oldUsernameLowerCase: targetUser.usernameLowerCase,
+    newUsername: newUsername,
+    newUsernameLowerCase: newUsernameLowerCase,
+  }).save();
+  await UserModel.updateOne(
+    { uid },
+    {
+      $set: {
+        username: newUsername,
+        usernameLowerCase: newUsernameLowerCase,
+      },
+    },
+  );
+  targetUser.username = newUsername;
+  targetUser.usernameLowerCase = newUsernameLowerCase;
+  await elasticSearch.save('user', targetUser);
+};
+
+userSchema.statics.clearUserDescription = async function (uid) {
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const UserModel = mongoose.model('users');
+  const targetUser = await UserModel.findOnly({ uid });
+  await UserModel.updateOne({ uid }, { $set: { description: '' } });
+  targetUser.description = '';
+  await elasticSearch.save('user', targetUser);
+};
+
 module.exports = mongoose.model('users', userSchema);

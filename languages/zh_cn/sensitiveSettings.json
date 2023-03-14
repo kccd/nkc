@@ -2,5 +2,5 @@
   "username": "用户名",
   "userDesc": "用户简介",
   "columnName": "专栏名称",
-  "columnDesc": "专栏简介"
+  "columnAbbr": "专栏简介"
 }

@@ -17,8 +17,13 @@ function translateSensitiveSettingName(languageName, value, args = []) {
   return translate(languageName, 'sensitiveSettings', value, args);
 }
 
+function translateSensitiveCheckerStatus(languageName, value, args = []) {
+  return translate(languageName, 'sensitiveCheckerStatus', value, args);
+}
+
 module.exports = {
   translate,
   translateResponseType,
   translateSensitiveSettingName,
+  translateSensitiveCheckerStatus,
 };

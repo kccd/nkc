@@ -1,6 +1,13 @@
 const SensitiveSettingModel = require('../../dataModels/SensitiveSettingModel');
+const redisClient = require('../../settings/redisClient');
 const { translateSensitiveSettingName } = require('../../nkcModules/translate');
-const { ThrowServerInternalError } = require('../../nkcModules/error');
+const {
+  ThrowServerInternalError,
+  ThrowBadRequestResponseTypeError,
+} = require('../../nkcModules/error');
+const { sensitiveTypes } = require('../../settings/sensitiveSetting');
+const { ResponseTypes } = require('../../settings/response');
+const getRedisKeys = require('../../nkcModules/getRedisKeys');
 
 class SensitiveSettingService {
   async createSetting(props) {
@@ -15,18 +22,27 @@ class SensitiveSettingService {
     return setting;
   }
 
-  async getSettingById(id) {
-    const setting = await SensitiveSettingModel.findOne({ iid: id });
-    if (!setting) {
-      ThrowServerInternalError(`sensitiveSetting id error. (id=${id})`);
+  async getSettingByIdFromCache(id) {
+    const settings = await this.getAllSettingsFromCache();
+    for (const setting of settings) {
+      if (setting.iid === id) {
+        return setting;
+      }
     }
-    return setting;
+    ThrowServerInternalError(`sensitiveSetting id error. (id=${id})`);
   }
 
-  async getSettingsByIds(ids) {
-    return SensitiveSettingModel.find({ iid: { $in: ids } });
+  async saveAllSettingsToCache() {
+    const settings = await this.getAllSettings();
+    const key = getRedisKeys('sensitiveSettings');
+    await redisClient.setAsync(key, JSON.stringify(settings));
   }
 
+  async getAllSettingsFromCache() {
+    const key = getRedisKeys('sensitiveSettings');
+    let settings = await redisClient.getAsync(key);
+    return JSON.parse(settings);
+  }
   async getAllSettings(match = {}, filter = {}) {
     return SensitiveSettingModel.find(match, filter).sort({ _id: 1 });
   }
@@ -65,6 +81,16 @@ class SensitiveSettingService {
         },
       },
     );
+  }
+
+  async checkSensitiveType(type) {
+    const types = Object.values(sensitiveTypes);
+    if (!types.includes(type)) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.SENSITIVE_TYPE_ERROR,
+        type,
+      );
+    }
   }
 }
 

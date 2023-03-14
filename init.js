@@ -6,14 +6,17 @@ async function InitDefaultData() {
   console.log(`完成`);
 }
 
-async function InitOperations () {
+async function InitOperations() {
   console.log('初始化管理员权限...');
-  const permission = require("./nkcModules/permission");
+  const permission = require('./nkcModules/permission');
   // 运维包含所有的操作权限
   const operationsId = permission.getOperationsId();
-  const {RoleModel, ForumModel} = require('./dataModels');
-  await RoleModel.updateOne({_id: 'dev'}, {$set: {operationsId: operationsId}});
-  await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
+  const { RoleModel, ForumModel } = require('./dataModels');
+  await RoleModel.updateOne(
+    { _id: 'dev' },
+    { $set: { operationsId: operationsId } },
+  );
+  await ForumModel.updateMany({}, { $addToSet: { rolesId: 'dev' } });
   console.log(`完成`);
 }
 
@@ -23,7 +26,6 @@ async function InitCache() {
   await cacheBaseInfo();
   console.log(`完成`);
 }
-
 
 InitDefaultData()
   .then(() => {
@@ -36,7 +38,7 @@ InitDefaultData()
     console.log(`初始化完成`);
     process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err);
     console.error('初始化失败');
   });

@@ -1,6 +1,6 @@
 const {
   sensitiveDetectionService,
-} = require('../review/sensitiveDetection.service');
+} = require('../sensitive/sensitiveDetection.service');
 const { contentLength } = require('../../tools/checkString');
 const {
   UserModel,
@@ -37,7 +37,7 @@ class UsernameCheckerService {
    @param {string} username - 要检查的用户名。
    @returns {Promise<void>}
    */
-  async #checkUsernameSensitiveContent(username) {
+  async checkUsernameSensitiveContent(username) {
     await sensitiveDetectionService.usernameDetection(username);
   }
 
@@ -85,7 +85,7 @@ class UsernameCheckerService {
    */
   async checkNewUsername(username, ignoredUid = '') {
     await this.#checkUsernameFormat(username);
-    await this.#checkUsernameSensitiveContent(username);
+    await this.checkUsernameSensitiveContent(username);
     await this.#checkSameUsername(username, ignoredUid);
   }
 }
