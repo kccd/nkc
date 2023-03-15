@@ -1,4 +1,5 @@
 const SensitiveCheckerLogModel = require('../../dataModels/SensitiveCheckerLogModel');
+const { defaultCerts } = require('../../settings/userCerts');
 const UserModel = require('../../dataModels/UserModel');
 const ColumnModel = require('../../dataModels/ColumnModel');
 const { userInfoService } = require('../user/userInfo.service');
@@ -103,6 +104,7 @@ class SensitiveCheckerService {
         const users = await this.getLogUsersByTargetIds(targetIds);
         for (const user of users) {
           results.push({
+            targetBanned: user.banned,
             targetUrl: getUrl('userHome', user.uid),
             targetId: user.uid,
             targetContent:
@@ -119,6 +121,7 @@ class SensitiveCheckerService {
         const columns = await this.getLogColumnsByTargetIds(targetIds);
         for (const column of columns) {
           results.push({
+            targetBanned: false,
             targetUrl: getUrl('columnHome', column._id),
             targetId: column._id,
             targetContent:
@@ -163,12 +166,14 @@ class SensitiveCheckerService {
         uid: 1,
         username: 1,
         description: 1,
+        certs: 1,
       },
     );
     return users.map((u) => ({
       uid: u.uid,
       username: u.username,
       description: u.description,
+      banned: u.certs.includes(defaultCerts.banned),
     }));
   }
 

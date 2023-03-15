@@ -20,6 +20,18 @@ new Vue({
     selectedAll() {
       return this.selectedIds.length === this.results.length;
     },
+    targetType() {
+      switch (this.log.type) {
+        case 'username':
+        case 'userDesc':
+          return 'user';
+        case 'columnName':
+        case 'columnAbbr':
+          return 'column';
+        default:
+          return 'null';
+      }
+    },
   },
   methods: {
     getUrl,
@@ -76,6 +88,36 @@ new Vue({
           }, 1000);*/
         })
         .catch(sweetError);
+    },
+    banUsers(userIds, banned) {
+      Promise.resolve()
+        .then(() => {
+          if (banned) {
+            return sweetQuestion(
+              '您正在执行封禁用户操作，该操作不可逆，是否继续？',
+            );
+          }
+        })
+        .then(() => {
+          return nkcAPI('/e/log/sensitive', 'POST', {
+            type: 'banUsers',
+            banned,
+            userIds,
+          });
+        })
+        .then(() => {
+          sweetSuccess('提交成功');
+          /*setTimeout(() => {
+            window.location.reload();
+          }, 1000);*/
+        })
+        .catch(sweetError);
+    },
+    banSelectedUsers() {
+      if (this.targetType !== 'user') {
+        return;
+      }
+      this.banUsers(this.selectedIds, true);
     },
   },
 });

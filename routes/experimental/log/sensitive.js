@@ -2,6 +2,7 @@ const router = require('koa-router')();
 const {
   sensitiveCheckerService,
 } = require('../../../services/sensitive/sensitiveChecker.service');
+const { userBanService } = require('../../../services/user/userBan.service');
 router
   .get('/', async (ctx, next) => {
     const { query, data } = ctx;
@@ -14,10 +15,11 @@ router
     await next();
   })
   .get('/:id', async (ctx, next) => {
-    const { params, data } = ctx;
+    const { params, data, query } = ctx;
+    const { page = 0 } = query;
     const { id } = params;
     const { log, paging, results } =
-      await sensitiveCheckerService.getSensitiveCheckerLogResultById(id);
+      await sensitiveCheckerService.getSensitiveCheckerLogResultById(id, page);
     data.log = log;
     data.paging = paging;
     data.results = results;
@@ -29,7 +31,7 @@ router
   })
   .post('/', async (ctx, next) => {
     const { body } = ctx;
-    const { type, targets, logId } = body;
+    const { type, targets, logId, userIds, banned } = body;
     switch (type) {
       case 'clearInfo': {
         await sensitiveCheckerService.clearSensitiveContentByTargetIds({
@@ -46,6 +48,13 @@ router
           logId,
         });
         break;
+      }
+      case 'banUsers': {
+        if (banned) {
+          await userBanService.banUsersByUserIds(userIds);
+        } else {
+          await userBanService.unBanUsersByUserIds(userIds);
+        }
       }
     }
     await next();
