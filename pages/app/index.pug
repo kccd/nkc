@@ -1,36 +1,37 @@
-doctype html
-html(lang='zh-CN')
-  head
-    meta(charset='UTF-8')
-    meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
-    meta(name="viewport" content="width=device-width, initial-scale=1")
-    link(href="/bootstrap/css/bootstrap.css" rel='stylesheet' type='text/css')
-    link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
-    link(rel='shortcut icon' href=(state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico'))
-    link(href="/app/index.css" rel='stylesheet' type='text/css')
-    title=state.serverSettings.websiteName
-  body
-    mixin logo
-      div.logo-bottom
-        img(src=(remoteState.logoICO? remoteState.logoICO : '/favicon.ico'))
-        span= state.serverSettings.websiteName
-    .container#app(v-cloak)
-      .row(v-if='toBrowser')
-        .col-xs-12.col-md-12
-          div.info 请点击右上角选择在浏览器打开
-          +logo
-      .row(v-else)
-        .col-xs-12.col-md-12.text-center
-          //.logo(@click="toHome")= state.serverSettings.websiteName
-          if data.stable
-            a.link(href=`/app/${data.stable.appPlatForm}/${data.stable.hash}`) 点击下载
-          else
-            span.link 下载通道已关闭
-          +logo
-
-    script(src='/jquery/jquery-ui.1.11.4.min.js')
-    script(src='/bootstrap/js/bootstrap.min.js')
-    script(src='/Promise/promise.min.js')
-    script(src='/vue/dist/vue.js')
-    script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-    script(src=`/app/index.js?v=${global.NKC.startTime}`)
+extends ../bootstrap_base
+block title
+  title 应用下载
+  +includeCSS('/app/index.css')
+block content
+  #data.hidden=objToStr({app: data.stable})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12.text-center
+        .m-b-1
+          img.logo(src=tools.getUrl('siteIcon', 'MD'))
+        .m-b-2
+          h4=`${remoteState.serverSettings.websiteName}`
+        .m-b-2(v-if='inApp')
+          .info 请点击右上角选择在浏览器打开
+        div(v-else)
+          .m-b-2
+            a.btn.btn-primary.m-b-1(
+              :href=`appInfo.android.url`
+              :title="appInfo.android.title"
+              :disabled="appInfo.android.disabled"
+              )
+              i.m-r-05.fa.fa-android
+              span Android {{appInfo.android.version}}
+            button.m-b-1.btn.btn-default(
+              :disabled="appInfo.ios.disabled"
+              :title='appInfo.ios.title'
+              )
+              i.m-r-05.fa.fa-apple
+              span IOS {{appInfo.ios.version}}
+          .m-b-1(v-if="appInfo.android.desc")
+            .app-desc.bg-info.pre-wrap.p-a-1.text-left
+              span Android {{appInfo.android.version}} <br>-----<br>
+              span {{appInfo.android.desc}}
+block footer
+block scripts
+  +includeJS('/app/index.js')

@@ -29,9 +29,6 @@ const etag = require('koa-etag');
 app.on('error', (err) => {
   loggerModule.error(`KOA ERROR:`);
   loggerModule.error(err);
-  /*if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED', 'write ECONNRESET'].includes(err.message)) {
-		logger.info(err);
-	}*/
 });
 
 const {

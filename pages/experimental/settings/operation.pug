@@ -1,9 +1,8 @@
 extends ../../bootstrap_base
 
 block title
-  -const mainContainer1400 = true;
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
-  link(href='/experimental/index.css' rel='stylesheet')
+  +includeCSS('/icheck/skins/minimal/red.css')
+  +includeCSS('/experimental/index.css')
   title 操作设置
 block content
 
@@ -80,10 +79,9 @@ block content
 
 
 block scripts
-
-  script(src=`/icheck/icheck.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/settings/operation.js?v=${global.NKC.startTime}`)
+  +includeJS(`/icheck/icheck.js`)
+  +includeJS(`/interface_common.js`)
+  +includeJS(`/experimental/settings/operation.js`)
 
 
 
