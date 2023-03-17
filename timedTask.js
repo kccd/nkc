@@ -3,11 +3,10 @@
  * */
 
 require('colors');
-require('./global');
 
 const logger = require('./nkcModules/logger');
 const updateDate = require('./settings/updateDate');
-
+const { processId } = require('./settings/env');
 const jobs = require('./timedTasks/scheduleJob');
 const timedTasks = require('./timedTasks/timedTasks');
 const dbStatus = require('./settings/dbStatus');
@@ -40,7 +39,7 @@ const run = async () => {
   }
   process.on('message', function (msg) {
     if (msg === 'shutdown') {
-      logger.error(`timed task service ${global.NKC.processId} stopped`);
+      logger.error(`timed task service ${processId} stopped`);
       process.exit(0);
     }
   });
