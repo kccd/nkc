@@ -8,27 +8,22 @@ process.on('uncaughtException', function (err) {
 require('colors');
 const http = require('http');
 const dbStatus = require('./settings/dbStatus');
-const serverConfig = require('./config/server');
-let server;
 
-const NKCPort = Number(serverConfig.port) + processId;
-const NKCAddress = serverConfig.address;
+const { port: NKCPort, host: NKCHost } = require('./nkcModules/config');
 
 const start = async () => {
   try {
     const comm = require('./comm');
     const elasticSearch = require('./nkcModules/elasticSearch');
     await dbStatus.database();
-    await comm.StartBroker();
     logger.info(`database connected`);
+    await comm.StartBroker();
     await elasticSearch.init();
     const app = require('./app');
-    server = http.createServer(app);
+    const server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;
     server.listen(NKCPort, async () => {
-      logger.info(
-        `nkc service ${processId} is running at ${NKCAddress}:${NKCPort}`,
-      );
+      logger.info(`nkc service is running at ${NKCHost}:${NKCPort}`);
       if (process.connected) {
         process.send('ready');
       }
@@ -51,7 +46,7 @@ const start = async () => {
 
     process.on('warning', (e) => console.warn(e.stack));
   } catch (err) {
-    logger.error(`error occured when initialize the server.\n${err.stack}`);
+    logger.error(`error occurred when initialize the server.\n${err.stack}`);
     process.exit(-1);
   }
 };

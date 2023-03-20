@@ -4,7 +4,7 @@ const NODE_ENV =
 const isProduction = NODE_ENV === 'production';
 const isDevelopment = !isProduction;
 
-const processId = Number(process.env.PROCESS_ID) || 0;
+const processId = Number(process.pid) || 0;
 
 module.exports = {
   NODE_ENV,
