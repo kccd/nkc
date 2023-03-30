@@ -2,7 +2,7 @@ extends ../../bootstrap_base
 
 block title
   -const mainContainer1400 = true;
-  link(href='/experimental/index.css' rel='stylesheet')
+  +includeCSS('/experimental/index.css')
   title 学术分设置
 block content
 
@@ -31,7 +31,7 @@ block content
 
 
 block scripts
-  script(src=`/experimental/settings/xsf.js?v=${global.NKC.startTime}`)
+  +includeJS(`/experimental/settings/xsf.js`)
 
 
 

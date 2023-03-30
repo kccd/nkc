@@ -1,4 +1,3 @@
-require('./global');
 const logger = require('./nkcModules/logger');
 async function InitDefaultData() {
   logger.info(`初始化默认数据...`);

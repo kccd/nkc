@@ -8,6 +8,7 @@ const koaCompress = require('koa-compress');
 const koaRewrite = require('koa-rewrite');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
+const { isProduction } = require('./settings/env');
 const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
 const { getUrl } = require('./nkcModules/tools');
@@ -16,9 +17,7 @@ const staticServe = (path) => {
     setHeaders: function (response) {
       response.setHeader(
         'Cache-Control',
-        `public, ${
-          global.NKC.NODE_ENV === 'production' ? 'max-age=604800' : 'no-cache'
-        }`,
+        `public, ${isProduction ? 'max-age=604800' : 'no-cache'}`,
       );
     },
   });
@@ -29,9 +28,6 @@ const etag = require('koa-etag');
 app.on('error', (err) => {
   loggerModule.error(`KOA ERROR:`);
   loggerModule.error(err);
-  /*if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED', 'write ECONNRESET'].includes(err.message)) {
-		logger.info(err);
-	}*/
 });
 
 const {

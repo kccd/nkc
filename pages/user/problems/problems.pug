@@ -1,9 +1,8 @@
 extends ../../bootstrap_base
 block title
   title 问题列表
-  link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${startTime}`)
-  link(rel='stylesheet' href=`/user/problems/problem.css?v=${startTime}`)
-  -const mainContainer1400 = true;
+  +includeCSS("/mdui/css/mdui.min.css")
+  +includeCSS("/user/problems/problem.css")
 block content
   .container-fluid.max-width.box-shadow-panel#app(style="min-height: calc(100vh - 345px)")
     
@@ -32,7 +31,7 @@ block content
         br
         include ../../publicModules/paging/paging.pug
 block scripts
-  script(src=`/mdui/js/mdui.min.js?v=${startTime}`)
-  script(src=`/vue/dist/vue.min.js?v=${startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/user/problems/problems.js?v=${global.NKC.startTime}`)
+  +includeJS(`/mdui/js/mdui.min.js`)
+  +includeJS(`/vue/dist/vue.min.js`)
+  +includeJS(`/interface_common.js`)
+  +includeJS(`/user/problems/problems.js`)

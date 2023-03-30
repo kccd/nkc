@@ -2,7 +2,7 @@ extends ../bootstrap_base
 block title
   link(rel='stylesheet', href='/fund.css')
   title 科创活动
-  link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+  +includeCSS('/mdui/css/mdui.css')
 
   -const mainContainer1400 = true
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
@@ -196,8 +196,8 @@ block scripts
     include ../publicModules/selectResource/selectResource
     include ../publicModules/sticker/selectSticker
     include ../ueditor/ueditorBase
-    script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
+    +includeJS("/activity/activityCommon.js")
     include ../publicModules/crop/crop
-    script(src=`/activity/activityModify.js?v=${global.NKC.startTime}` charset="UTF-8")
+    +includeJS("/activity/activityModify.js")
   if data.modifyType === "manage"
     +includeJS("/activity/activityManage.js")

@@ -1,35 +1,41 @@
-const cookieConfig = require("../config/cookie");
+const cookieConfig = require('../config/cookie');
+const { isProduction } = require('../settings/env');
 module.exports = async (ctx, next) => {
   // 权限判断
   // @param {String} o 操作名
   ctx.permission = (o) => {
-    if(!ctx.data.userOperationsId) ctx.data.userOperationsId = [];
+    if (!ctx.data.userOperationsId) {
+      ctx.data.userOperationsId = [];
+    }
     return ctx.data.userOperationsId.includes(o);
   };
   ctx.permissionsOr = (operationsId) => {
     ctx.data.userOperationsId = ctx.data.userOperationsId || [];
-    for(const id of operationsId) {
-      if(ctx.data.userOperationsId.includes(id)) return true;
+    for (const id of operationsId) {
+      if (ctx.data.userOperationsId.includes(id)) {
+        return true;
+      }
     }
     return false;
   };
   ctx.permissionsAnd = (operationsId) => {
     ctx.data.userOperationsId = ctx.data.userOperationsId || [];
-    for(const id of operationsId) {
-      if(!ctx.data.userOperationsId.includes(id)) return false;
+    for (const id of operationsId) {
+      if (!ctx.data.userOperationsId.includes(id)) {
+        return false;
+      }
     }
     return true;
   };
 
   let cookieDomain = '';
-  try{
+  try {
     cookieDomain = ctx.nkcModules.domain.getRootDomainByHost(ctx.host);
-  } catch(err) {
-    if(global.NKC.isDevelopment) {
+  } catch (err) {
+    if (!isProduction) {
       console.log(err);
     }
   }
-
 
   // 设置cookie
   // @param {String} key cookie名
@@ -42,18 +48,14 @@ module.exports = async (ctx, next) => {
       overwrite: true,
       maxAge: cookieConfig.maxAge,
     };
-    if(cookieDomain) {
+    if (cookieDomain) {
       options.domain = cookieDomain;
     }
-    // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-    /*if(global.NKC.isDevelopment) {
-      delete options.domain;
-    }*/
-    if(o) {
+    if (o) {
       options = Object.assign(options, o);
     }
     let valueStr = JSON.stringify(value);
-    valueStr = Buffer.from(valueStr).toString("base64");
+    valueStr = Buffer.from(valueStr).toString('base64');
     ctx.cookies.set(key, valueStr, options);
   };
 
@@ -64,15 +66,11 @@ module.exports = async (ctx, next) => {
       overwrite: true,
       maxAge: 0,
     };
-    if(cookieDomain) {
+    if (cookieDomain) {
       options.domain = cookieDomain;
     }
-    // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-    /*if(global.NKC.isDevelopment) {
-      delete options.domain;
-    }*/
     ctx.cookies.set(key, '', options);
-  }
+  };
 
   // 设置cookie
   // @param {String} key cookie名
@@ -82,24 +80,20 @@ module.exports = async (ctx, next) => {
     let options = {
       signed: true,
     };
-    if(cookieDomain) {
+    if (cookieDomain) {
       options.domain = cookieDomain;
     }
-    // 开发模式 为了兼容多个调试域名而取消设置 cookie 域
-    /*if(global.NKC.isDevelopment) {
-      delete options.domain;
-    }*/
-    if(o) {
+    if (o) {
       options = Object.assign(options, o);
     }
     let valueStr = '';
     try {
       valueStr = ctx.cookies.get(key, options);
-      valueStr = Buffer.from(valueStr, "base64").toString();
+      valueStr = Buffer.from(valueStr, 'base64').toString();
       return JSON.parse(valueStr);
-    } catch(err) {
+    } catch (err) {
       return valueStr;
     }
   };
   await next();
-}
+};
