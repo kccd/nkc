@@ -3,7 +3,7 @@ const { program } = require('commander');
 
 program
   .option(
-    '-p, --port <number>',
+    '--port <number>',
     `Server port(default ${serverConfig.port})`,
     serverConfig.port,
   )
@@ -19,5 +19,5 @@ const options = program.opts();
 
 module.exports = {
   host: options.host,
-  port: Number(options.port),
+  port: options.port,
 };
