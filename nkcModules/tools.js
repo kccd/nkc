@@ -126,10 +126,14 @@ var Tools = function () {
       case 'resourceOrigin': {
         return '/ro/' + id + t;
       }
+      case 'resourceWithoutFileDomain': {
+        return '/r/' + id + t;
+      }
       // 用户上传的附件
       case 'resource': {
         return fileDomain + '/r/' + id + t;
       }
+
       // 用户上传的附件的下载链接
       case 'resourceDownload': {
         return fileDomain + '/r/' + id + t + '&d=attachment';

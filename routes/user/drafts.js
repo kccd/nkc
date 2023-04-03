@@ -202,7 +202,6 @@ draftsRouter
       parentPostId,
       tlm: Date.now(),
     };
-    console.log(c, 'c');
     if (draft) {
       // 存在草稿
       // 更新草稿

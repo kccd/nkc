@@ -249,7 +249,6 @@
           });
       },
       initRemoteImageDownloader() {
-        console.log('1')
         this.editor.addListener("catchRemoteImage", this.catchRemoteImage);
       },
       initSocketEvent() {
@@ -279,11 +278,10 @@
           );
           if(images.length === 0) continue;
           if(success) {
-            const imageSrc = getUrl('resource', rid);
+            const imageSrc = getUrl('resourceWithoutFileDomain', rid);
             images
               .attr('src', imageSrc)
               .attr('_src', imageSrc);
-
           } else {
             const defaultSrc = getUrl('defaultFile', 'picdefault.png');
             images
@@ -331,7 +329,6 @@
           if(isSameDomain(src) || isOutlandLink(src)) continue;
           remoteImages.push([imageJQ, src]);
         }
-        console.log(remoteImages)
         const self = this;
         if(remoteImages.length > 0) {
           Promise.all(remoteImages.map(async ([imageJQ, src]) => {
