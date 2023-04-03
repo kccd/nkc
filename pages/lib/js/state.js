@@ -1,4 +1,4 @@
-import {strToObj} from "./dataConversion";
+import { strToObj } from './dataConversion';
 export function getState() {
   const state = {
     uid: '',
@@ -13,7 +13,7 @@ export function getState() {
     column: '',
     record: [],
   };
-  try{
+  try {
     const windowDataDom = document.querySelector('meta[name="window-data"]');
     const windowData = strToObj(windowDataDom.getAttribute('content'));
     state.uid = windowData.uid;
@@ -35,7 +35,7 @@ export function getState() {
     state.copyright = windowData.copyright;
     state.record = windowData.record;
     return state;
-  } catch(err) {
+  } catch (err) {
     console.error(`获取 state 数据失败`);
     throw err;
   }

@@ -73,6 +73,7 @@
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
   import {isSameDomain} from "../js/url";
+  import {isOutlandLink} from "../js/url";
   import {
     replaceTwemojiCharWithImage,
     replaceTwemojiImageWithChar,
@@ -248,6 +249,7 @@
           });
       },
       initRemoteImageDownloader() {
+        console.log('1')
         this.editor.addListener("catchRemoteImage", this.catchRemoteImage);
       },
       initSocketEvent() {
@@ -281,6 +283,7 @@
             images
               .attr('src', imageSrc)
               .attr('_src', imageSrc);
+
           } else {
             const defaultSrc = getUrl('defaultFile', 'picdefault.png');
             images
@@ -325,9 +328,10 @@
           const imageJQ = images.eq(i);
           if(imageJQ.attr('data-tag') === 'nkcsource') continue;
           const src = imageJQ.attr('src');
-          if(isSameDomain(src)) continue;
+          if(isSameDomain(src) || isOutlandLink(src)) continue;
           remoteImages.push([imageJQ, src]);
         }
+        console.log(remoteImages)
         const self = this;
         if(remoteImages.length > 0) {
           Promise.all(remoteImages.map(async ([imageJQ, src]) => {
