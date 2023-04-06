@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 const recycleBinRouter = require('./recycleBin');
 router.use(
-  '/recycle',
+  '/recycle-bin',
   recycleBinRouter.routes(),
   recycleBinRouter.allowedMethods(),
 );

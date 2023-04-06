@@ -12,7 +12,7 @@
       )
         .common-socket-header.draggable-handle.theme-primary
           span.m-r-05.fa.fa-comments
-          span.m-r-1.app-name {{appName}}
+          span.m-r-1.app-name
           span(v-if='containerMode !== "maximize"')
             button.options-switch(
               @click='changeSize'
@@ -201,7 +201,7 @@
       mouseOver: false,
       repeatOver: false,
       showLottery: false,
-      appName: '喵喵',
+      // appName: '喵喵',
 
       containerInfo: {
         left: 0,
@@ -300,9 +300,13 @@
     watch: {
       async showPanel() {
         const app = this;
+        console.log(this.mode,'mode')
         if(this.showPanel) {
         this.$nextTick(()=>{
           this.draggableElement = new DraggableElement(this.$refs.socketContainer, '.draggable-handle', this.onContainerPositionChange);
+          const JQRoot = this.draggableElement.getJQRoot();
+          JQRoot.draggable('disable'); // 禁用拖动功能
+          // this.draggableElement = this.$refs.socketContainer
           const localValue = getFromLocalStorage(localStorageKey);
           if (!(localValue && localValue.left && localValue.top)){
             this.draggableElement.setPositionCenter()

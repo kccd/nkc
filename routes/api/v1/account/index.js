@@ -5,5 +5,5 @@ const drawerRouter = require('./drawer');
 router
   .use('/drawer', drawerRouter.routes(), drawerRouter.allowedMethods())
   .use('/card', cardRouter.routes(), cardRouter.allowedMethods())
-  .use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+  .use('/info', infoRouter.routes(), infoRouter.allowedMethods());
 module.exports = router;
