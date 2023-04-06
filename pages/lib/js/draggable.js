@@ -158,8 +158,4 @@ export class DraggableElement {
       width: rootElementWidth,
     });
   }
-
-  getJQRoot() {
-    return this.JQRoot;
-  }
 }

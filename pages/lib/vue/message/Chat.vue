@@ -301,11 +301,10 @@
       async showPanel() {
         const app = this;
         console.log(this.mode,'mode')
+        console.log(this.showPanel, 'showPanel')
         if(this.showPanel) {
         this.$nextTick(()=>{
           this.draggableElement = new DraggableElement(this.$refs.socketContainer, '.draggable-handle', this.onContainerPositionChange);
-          const JQRoot = this.draggableElement.getJQRoot();
-          JQRoot.draggable('disable'); // 禁用拖动功能
           // this.draggableElement = this.$refs.socketContainer
           const localValue = getFromLocalStorage(localStorageKey);
           if (!(localValue && localValue.left && localValue.top)){
