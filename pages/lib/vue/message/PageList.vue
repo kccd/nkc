@@ -86,7 +86,7 @@
   }
   .page-list-container{
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
   }
   .list-info{
     height: 2rem;

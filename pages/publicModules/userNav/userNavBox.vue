@@ -25,7 +25,7 @@
         a(href=`/column/apply` target='_blank' v-else-if="user.uid && user.columnPermission").col-xs-6.nav-user-link
           .fa.fa-columns
           | 开设专栏
-        .col-xs-6.nav-user-link(onclick='RootApp.openChatPanel()')
+        .col-xs-6.nav-user-link(@click='openMessageCenter')
           .fa.fa-envelope-o
           | 消息中心
           .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}
@@ -80,6 +80,16 @@ export default {
     "user-score": UserScoresVue,
   },
   methods: {
+    openMessageCenter(){
+      const width = localStorage.getItem('windowWidth')?localStorage.getItem('windowWidth'):600;
+      const height = localStorage.getItem('windowHeight')?localStorage.getItem('windowHeight'):500;
+      console.log(width, height)
+      window.open(
+        '/message',
+        'Message',
+        `location=no,width=${width},height=${height}`,
+      );
+    }
   }
 }
 </script>
