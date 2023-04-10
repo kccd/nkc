@@ -1,5 +1,5 @@
-import {openCreditPanel} from "../../global/methods";
-import {creditTypes, contentTypes} from '../../lib/vue/Credit'
+import { openCreditPanel } from '../../global/methods';
+import { creditTypes, contentTypes } from '../../lib/vue/Credit';
 
 window.PostOption = new Vue({
   el: '#modulePostOptions',
@@ -22,7 +22,7 @@ window.PostOption = new Vue({
     // 作者
     author: {
       username: '',
-      uid: ''
+      uid: '',
     },
 
     top: 300,
@@ -51,29 +51,31 @@ window.PostOption = new Vue({
     ipInfo: null,
     reviewed: null,
     commentControl: null,
-    editType: ''
+    editType: '',
   },
   computed: {
     position() {
-      const {direction, jqDOM, domHeight, domWidth} = this;
-      if(jqDOM === null) return {
-        left: 0,
-        top: 0,
-      };
-      const {top, left} = jqDOM.offset();
-      if(direction === 'up') {
-        const position =  {
+      const { direction, jqDOM, domHeight, domWidth } = this;
+      if (jqDOM === null) {
+        return {
+          left: 0,
+          top: 0,
+        };
+      }
+      const { top, left } = jqDOM.offset();
+      if (direction === 'up') {
+        const position = {
           top: top - domHeight,
-          left: left - domWidth + jqDOM.width()
-        }
+          left: left - domWidth + jqDOM.width(),
+        };
         return position;
       } else {
         return {
           top: top + jqDOM.height(),
-          left: left + jqDOM.width() - domWidth
-        }
+          left: left + jqDOM.width() - domWidth,
+        };
       }
-    }
+    },
   },
   mounted() {
     const self = this;
@@ -97,24 +99,33 @@ window.PostOption = new Vue({
       this.show = false;
     },
     open(props) {
-      const {pid, direction, jqDOM} = props;
+      const { pid, direction, jqDOM } = props;
       this.jqDOM = jqDOM;
       this.direction = direction;
       const self = this;
       self.show = true;
       self.loading = true;
       nkcAPI(`/p/${pid}/option`, 'GET')
-        .then(data => {
-          const {tid, pid, toc, options, userColumnId, postType, postUserId, isComment} = data;
+        .then((data) => {
+          const {
+            tid,
+            pid,
+            toc,
+            options,
+            userColumnId,
+            postType,
+            postUserId,
+            isComment,
+          } = data;
           if (postType === 'thread') {
             // console.log('修改文章')
-            this.editType = 'modifyThread'
+            this.editType = 'modifyThread';
           } else if (postType === 'post' && isComment) {
             // console.log('修改评论')
-            this.editType = 'modifyComment'
+            this.editType = 'modifyComment';
           } else if (postType === 'post' && !isComment) {
             // console.log('修改回复')
-            this.editType = 'modifyPost'
+            this.editType = 'modifyPost';
           }
           self.isComment = isComment;
           self.anonymous = options.anonymous;
@@ -148,13 +159,13 @@ window.PostOption = new Vue({
 
           self.loading = false;
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
         });
     },
     toColumn() {
-      const {inColumn, pid, userColumnId} = this;
-      if(inColumn) {
+      const { inColumn, pid, userColumnId } = this;
+      if (inColumn) {
         removeToColumn(pid, userColumnId);
       } else {
         addToColumn(pid, userColumnId);
@@ -162,39 +173,38 @@ window.PostOption = new Vue({
     },
     setAnonymous() {
       const self = this;
-      const {anonymous, pid} = this;
-      nkcAPI("/p/" + pid + "/anonymous", "POST", {
-        anonymous: !anonymous
+      const { anonymous, pid } = this;
+      nkcAPI('/p/' + pid + '/anonymous', 'POST', {
+        anonymous: !anonymous,
       })
-        .then(function(data) {
+        .then(function (data) {
           self.anonymous = data.anonymous;
-          if(self.anonymous) {
+          if (self.anonymous) {
             sweetSuccess(`内容已匿名`);
           } else {
             sweetSuccess(`内容已取消匿名`);
           }
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
-
+        });
     },
     viewAuthorInfo() {
-      if(!window.UserInfo) {
+      if (!window.UserInfo) {
         window.UserInfo = new NKC.modules.UserInfo();
       }
       window.UserInfo.open({
-        type: "showUserByPid",
-        pid: this.pid
+        type: 'showUserByPid',
+        pid: this.pid,
       });
     },
     collectionThread() {
-      const {tid, collection} = this;
+      const { tid, collection } = this;
       const self = this;
       SubscribeTypes.collectionThreadPromise(tid, !collection)
         .then(() => {
           self.collection = !collection;
-          if(collection) {
+          if (collection) {
             sweetSuccess(`已取消收藏`);
           } else {
             sweetSuccess(`已加入收藏`);
@@ -203,47 +213,50 @@ window.PostOption = new Vue({
         .catch(sweetError);
     },
     subscribeThread() {
-      const {tid, subscribe} = this;
+      const { tid, subscribe } = this;
       SubscribeTypes.subscribeThread(tid, !subscribe);
     },
     replyPost() {
       window.quotePost(this.pid);
     },
     hidePostContent() {
-      const {pid, hidePost} = this;
-      if(!window.hidePostPanel) {
+      const { pid, hidePost } = this;
+      if (!window.hidePostPanel) {
         window.hidePostPanel = new NKC.modules.HidePost();
       }
-      window.hidePostPanel.open(function() {
-        sweetSuccess('执行成功');
-      }, {
-        pid: pid,
-        hide: hidePost
-      });
+      window.hidePostPanel.open(
+        function () {
+          sweetSuccess('执行成功');
+        },
+        {
+          pid: pid,
+          hide: hidePost,
+        },
+      );
     },
     postTopped() {
-      const {pid, topped} = this;
+      const { pid, topped } = this;
       const self = this;
-      nkcAPI("/p/" + pid + "/topped", "POST", {topped: !topped})
-        .then(function() {
-          sweetSuccess("操作成功");
+      nkcAPI('/p/' + pid + '/topped', 'POST', { topped: !topped })
+        .then(function () {
+          sweetSuccess('操作成功');
           self.topped = !topped;
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
         });
     },
     addKCB() {
-      const {pid} = this;
+      const { pid } = this;
       openCreditPanel(creditTypes.kcb, contentTypes.post, pid);
     },
     addXSF() {
-      const {pid} = this;
+      const { pid } = this;
       openCreditPanel(creditTypes.xsf, contentTypes.post, pid);
     },
     postDigest() {
-      const {pid, digest} = this;
-      if(digest) {
+      const { pid, digest } = this;
+      if (digest) {
         unDigestPost(pid);
       } else {
         digestPost(pid);
@@ -256,18 +269,18 @@ window.PostOption = new Vue({
       disabledThreadPost(this.pid);
     },
     viewViolationRecord() {
-      NKC.modules.violationRecord.open({uid: this.postUserId});
+      NKC.modules.violationRecord.open({ uid: this.postUserId });
     },
     complaintPost() {
-      if(this.postType === 'thread') {
-        moduleComplaint.open("thread", this.tid);
+      if (this.postType === 'thread') {
+        moduleComplaint.open('thread', this.tid);
       } else {
-        moduleComplaint.open("post", this.pid);
+        moduleComplaint.open('post', this.pid);
       }
     },
     userBlacklist() {
-      const {blacklist, postUserId} = this;
-      if(blacklist) {
+      const { blacklist, postUserId } = this;
+      if (blacklist) {
         NKC.methods.removeUserFromBlacklist(postUserId);
       } else {
         NKC.methods.addUserToBlacklist(postUserId, 'post', this.pid);
@@ -277,39 +290,41 @@ window.PostOption = new Vue({
       NKC.methods.getIpInfo(this.ipInfo);
     },
     reviewPost() {
-      const {pid} = this;
-      reviewPost(pid)
+      const { pid } = this;
+      reviewPost(pid);
     },
     toCommentControl() {
-      const {pid} = this;
-      if(!window.commentControl) {
+      const { pid } = this;
+      if (!window.commentControl) {
         window.commentControl = new NKC.modules.CommentControl();
       }
       window.commentControl.open(pid);
     },
-    complaintSelector(){
+    complaintSelector() {
       var self = this;
-      if(!window.complaintSelector)
-          window.complaintSelector = new NKC.modules.ComplaintSelector();
-      if(this.postType === 'thread') {
-        complaintSelector.open("thread", this.tid)
+      if (!window.complaintSelector) {
+        window.complaintSelector = new NKC.modules.ComplaintSelector();
+      }
+      if (this.postType === 'thread') {
+        complaintSelector.open('thread', this.tid);
       } else {
-        complaintSelector.open("post", this.pid)
+        complaintSelector.open('post', this.pid);
       }
       self.close();
-    }
-  }
+    },
+  },
 });
-
 
 NKC.methods.initPostOption = () => {
   const options = $('[data-type="postOption"]');
-  for(let i = 0; i < options.length; i++) {
+  for (let i = 0; i < options.length; i++) {
     const dom = options.eq(i);
     const init = dom.attr('data-init');
-    if(init === 'true') continue;
+    if (init === 'true') {
+      continue;
+    }
     dom.on('click', (e) => {
-      let {left, top} = dom.offset();
+      let { left, top } = dom.offset();
       const pid = dom.attr('data-pid');
       const direction = dom.attr('data-direction') || 'up';
       PostOption.open({
@@ -324,6 +339,6 @@ NKC.methods.initPostOption = () => {
   }
 };
 
-$(function() {
+$(function () {
   NKC.methods.initPostOption();
-})
+});

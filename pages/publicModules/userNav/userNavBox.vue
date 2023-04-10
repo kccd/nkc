@@ -61,6 +61,8 @@
 
 <script>
 import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
+import {openMessageCenter} from "../../lib/js/chat";
+
 export default {
   props: ['user'],
   data: () => ({
@@ -80,15 +82,8 @@ export default {
     "user-score": UserScoresVue,
   },
   methods: {
-    openMessageCenter(){
-      const width = localStorage.getItem('windowWidth')?localStorage.getItem('windowWidth'):600;
-      const height = localStorage.getItem('windowHeight')?localStorage.getItem('windowHeight'):500;
-      console.log(width, height)
-      window.open(
-        '/message',
-        'Message',
-        `location=no,width=${width},height=${height}`,
-      );
+    openMessageCenter() {
+      openMessageCenter(); // 调用外部方法
     }
   }
 }

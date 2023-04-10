@@ -10,6 +10,7 @@ import Sticker from '../lib/vue/Sticker';
 import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
+import {openMessageCenter} from '../lib/js/chat';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -76,7 +77,15 @@ window.RootApp = new Vue({
           type: type,
         });
       } else {
-        this.$refs.chat.showMessagePanel(uid);
+        // const width = localStorage.getItem('windowWidth');
+        // const height = localStorage.getItem('windowHeight');
+        // window.open(
+        //   `/message?uid=${uid}`,
+        //   'Message',
+        //   `location=no,width=${width},height=${height}`,
+        // );
+        openMessageCenter(uid);
+        // this.$refs.chat.showMessagePanel(uid);
       }
     },
     //打开右侧抽屉

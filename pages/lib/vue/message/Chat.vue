@@ -310,8 +310,10 @@
       //     left
       //   };
       // },
-      showMessagePanel(uid) {
+      showMessagePanel() {
         this.showPanel = true;
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid');
         const app = this;
         if(uid) {
           setTimeout(() => {
@@ -453,14 +455,14 @@
         };
       },
       // 检测屏幕宽度，如果比经典模式socket面板宽度窄，则跳转到message页
-      toChat(uid) {
-        if($(window).width() >= this.defaultInfo.wideWidth + 100) {
-          this.showMessagePanel(uid);
-        } else {
-          const uid = uid? `?uid=${uid}`: '';
-          window.open(`/message${uid}`);
-        }
-      },
+      // toChat(uid) {
+      //   if($(window).width() >= this.defaultInfo.wideWidth + 100) {
+      //     this.showMessagePanel(uid);
+      //   } else {
+      //     const uid = uid? `?uid=${uid}`: '';
+      //     window.open(`/message${uid}`);
+      //   }
+      // },
       toMessagePage() {
         window.open(`/message`);
       },

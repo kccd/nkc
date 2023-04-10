@@ -1,41 +1,43 @@
-import {getSocket} from "../lib/js/socket";
+import { getSocket } from '../lib/js/socket';
 import Share from '../lib/vue/Share';
-import {RNSetSharePanelStatus} from "../lib/js/reactNative";
-import {shareTypes} from "../lib/js/shareTypes";
-var data = NKC.methods.getDataById("data");
+import { RNSetSharePanelStatus } from '../lib/js/reactNative';
+import { shareTypes } from '../lib/js/shareTypes';
+var data = NKC.methods.getDataById('data');
 
-$(function() {
+$(function () {
   RNSetSharePanelStatus(true, shareTypes.post, data.pid);
 });
 
 const socket = getSocket();
 
-function disabledThreadPost (pid){
+function disabledThreadPost(pid) {
   NKC.methods.disabledPosts(pid);
 }
-$(".dropdown-menu.stop-propagation").on("click",function (e) {
+$('.dropdown-menu.stop-propagation').on('click', function (e) {
   e.stopPropagation();
 });
 //- var preview = new Preview({
 //-     imgWrap: 'wrap' // 指定该容器里的图片点击预览
 //- })
 var UserInfo;
-$(document).ready(function() {
-  if(NKC.modules.UserInfo) UserInfo = new NKC.modules.UserInfo();
-  NKC.methods.markDom($(".highlight-dom>.highlight"));
-  NKC.methods.scrollToDom($(".highlight-dom"));
-})
+$(document).ready(function () {
+  if (NKC.modules.UserInfo) {
+    UserInfo = new NKC.modules.UserInfo();
+  }
+  NKC.methods.markDom($('.highlight-dom>.highlight'));
+  NKC.methods.scrollToDom($('.highlight-dom'));
+});
 
 function getPostAuthor(pid) {
   UserInfo.open({
-    type: "showUserByPid",
-    pid: pid
+    type: 'showUserByPid',
+    pid: pid,
   });
 }
 
 $(function () {
   const rootElement = $('[data-type="nkc-render-content"]').eq(0)[0];
-  NKC.oneAfter("mathJaxRendered", function(_data, next) {
+  NKC.oneAfter('mathJaxRendered', function (_data, next) {
     if (data.notes && data.notes.length) {
       for (var i = 0; i < data.notes.length; i++) {
         var n = data.notes[i];
@@ -47,19 +49,23 @@ $(function () {
         });
       }
     }
-  })
-  NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
+  });
+  NKC.methods.highlightBlockBySelector(
+    "[data-tag='nkcsource'][data-type='pre']",
+  );
 
-  NKC.methods.showPostComment(data.pid, data.page, {highlightCommentId: data.highlight});
+  NKC.methods.showPostComment(data.pid, data.page, {
+    highlightCommentId: data.highlight,
+  });
 
-  if(NKC.configs.uid && socket) {
+  if (NKC.configs.uid && socket) {
     window.bulletComments = new NKC.modules.BulletComments({
-      offsetTop: NKC.configs.isApp ? 20 : 60
+      offsetTop: NKC.configs.isApp ? 20 : 60,
     });
     if (socket.connected) {
       joinPostRoom();
     } else {
-      socket.on('connect', joinPostRoom)
+      socket.on('connect', joinPostRoom);
     }
     socket.on('commentMessage', function (data) {
       if (NKC.configs.uid !== data.comment.uid) {
@@ -68,7 +74,7 @@ $(function () {
       NKC.methods.insertComment(
         data.parentCommentId,
         data.parentPostId,
-        data.html
+        data.html,
       );
     });
   }
@@ -78,8 +84,8 @@ function joinPostRoom() {
   socket.emit('joinRoom', {
     type: 'post',
     data: {
-      postId: data.firstPostId
-    }
+      postId: data.firstPostId,
+    },
   });
 }
 
@@ -88,18 +94,17 @@ if (NKC.configs.platform === 'reactNative') {
 }
 
 const postShareElement = document.getElementById('postShare');
-if(postShareElement) {
+if (postShareElement) {
   const app = new Vue({
     el: postShareElement,
     components: {
-      share: Share
-    }
-  })
+      share: Share,
+    },
+  });
 }
-
 
 Object.assign(window, {
   joinPostRoom,
   getPostAuthor,
-  disabledThreadPost
-})
+  disabledThreadPost,
+});
