@@ -1,11 +1,11 @@
 if !isIncluded('singlePostWarningInfo')
   mixin singlePostWarningInfo(props)
     -var {draft, disabled, pid, reviewed, reviewReason} = props;
-    if draft
+    if (draft&&!disabled)
       .single-post-header
         .reture 当前内容已被退回修改，请作者点击编辑按钮修改
         span=`原因：${draft.reason}`
-    else if disabled
+    if disabled
       .single-post-header
         .disabled
           span.m-r-05 内容已被屏蔽

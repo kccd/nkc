@@ -1,14 +1,14 @@
 module.exports = {
-  preview:{
-    GET:'previewDocument'
+  preview: {
+    GET: 'previewDocument',
   },
-  history:{
-    GET:'viewHistoryDocument',
-    PARAMETER:{
-      GET:'viewHistoryDocument',
-      edit:{
-        POST:'historyEditDocument',
-      }
-    }
-  }
-}
+  history: {
+    GET: 'viewHistoryDocument',
+    PARAMETER: {
+      GET: 'viewHistoryDocument',
+      edit: {
+        POST: 'historyEditDocument',
+      },
+    },
+  },
+};

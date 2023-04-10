@@ -391,6 +391,7 @@ export default {
           Object.assign(submitData, vue && vue.getData());
         }
       }
+      // console.log(submitData, 'submitData')
       // this.pageData.post?._id
         // 请求前一截url
       // 添加 草稿id 和 parentPostId

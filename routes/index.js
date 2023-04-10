@@ -97,106 +97,179 @@ const apiRouter = routers.api;
 // 多维分裂
 const tcRouter = routers.tc;
 
-router
-  .use('/', async (ctx, next) => {
-    const {db, state, data, settings} = ctx;
-    const {operationId, user} = data;
-    const isWhitelistOperation = settings.operationsType.whitelistOfGlobalAccessControl.includes(operationId);
-    const isResourceOperation = settings.operationsType.fileDownload.includes(operationId);
-    if(
-      !isWhitelistOperation &&
-      (
-        !user ||
-        !user.certs ||
-        !user.certs.includes('dev')
-      )
+router.use('/', async (ctx, next) => {
+  const { db, state, data, settings } = ctx;
+  const { operationId, user } = data;
+  const isWhitelistOperation =
+    settings.operationsType.whitelistOfGlobalAccessControl.includes(
+      operationId,
+    );
+  const isResourceOperation =
+    settings.operationsType.fileDownload.includes(operationId);
+  if (
+    !isWhitelistOperation &&
+    (!user || !user.certs || !user.certs.includes('dev'))
+  ) {
+    // 非白名单操作且非管理员需要进行全局权限判断
+    const sources = await db.AccessControlModel.getSources();
+    let permissionChecker =
+      db.AccessControlModel.checkAccessControlPermissionWithThrowError;
+    if (
+      isResourceOperation ||
+      (ctx.request.accepts('json', 'html') === 'json' &&
+        ctx.request.get('FROM') === 'nkcAPI')
     ) {
-      // 非白名单操作且非管理员需要进行全局权限判断
-      const sources = await db.AccessControlModel.getSources();
-      let permissionChecker = db.AccessControlModel.checkAccessControlPermissionWithThrowError;
-      if(
-        isResourceOperation ||
-        (ctx.request.accepts('json', 'html') === 'json' && ctx.request.get('FROM') === 'nkcAPI')
-      ) {
-        permissionChecker = db.AccessControlModel.checkAccessControlPermission;
-      }
-      await permissionChecker({
-        isApp: state.isApp,
-        uid: state.uid,
-        rolesId: data.userRoles.map(role => role._id),
-        gradeId: state.uid? data.userGrade._id: undefined,
-        source: sources.global,
-      });
+      permissionChecker = db.AccessControlModel.checkAccessControlPermission;
     }
-    await next();
-  });
+    await permissionChecker({
+      isApp: state.isApp,
+      uid: state.uid,
+      rolesId: data.userRoles.map((role) => role._id),
+      gradeId: state.uid ? data.userGrade._id : undefined,
+      source: sources.global,
+    });
+  }
+  await next();
+});
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
-router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
-router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());
-router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
+router.use('/library', libraryRouter.routes(), libraryRouter.allowedMethods());
+router.use(
+  '/libraries',
+  librariesRouter.routes(),
+  librariesRouter.allowedMethods(),
+);
+router.use('/editor', editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
-router.use("/search", searchRouter.routes(), searchRouter.allowedMethods());
+router.use('/search', searchRouter.routes(), searchRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
 router.use('/me', meRouter.routes(), meRouter.allowedMethods());
 router.use('/t', threadRouter.routes(), threadRouter.allowedMethods());
 router.use('/p', postRouter.routes(), postRouter.allowedMethods());
 router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());
-router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods());
-router.use("/nkc", nkcRouter.routes(), nkcRouter.allowedMethods());
+router.use(
+  '/e',
+  experimentalRouter.routes(),
+  experimentalRouter.allowedMethods(),
+);
+router.use('/nkc', nkcRouter.routes(), nkcRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
-router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
-router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
+router.use(
+  '/register',
+  registerRouter.routes(),
+  registerRouter.allowedMethods(),
+);
+router.use(
+  '/download',
+  downloadRouter.routes(),
+  downloadRouter.allowedMethods(),
+);
 router.use('/problem', problemRouter.routes(), problemRouter.allowedMethods());
 router.use('/login', loginRouter.routes(), loginRouter.allowedMethods());
 router.use('/message', messageRouter.routes(), messageRouter.allowedMethods());
-router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods());
+router.use(
+  '/activity',
+  activityRouter.routes(),
+  activityRouter.allowedMethods(),
+);
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
-router.use("/complaint" ,complaintRouter.routes(), complaintRouter.allowedMethods());
+router.use(
+  '/complaint',
+  complaintRouter.routes(),
+  complaintRouter.allowedMethods(),
+);
 router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
-router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());
+router.use(
+  '/forgotPassword',
+  forgotPasswordRouter.routes(),
+  forgotPasswordRouter.allowedMethods(),
+);
 router.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
-router.use("/review", reviewRouter.routes(), reviewRouter.allowedMethods());
-router.use("/m", columnsRouter.routes(), columnsRouter.allowedMethods());
-router.use("/column", columnRouter.routes(), columnRouter.allowedMethods());
-router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
-router.use("/threads", threadsRouter.routes(), threadsRouter.allowedMethods());
-router.use("/avatar", userAvatarRouter.routes(), userAvatarRouter.allowedMethods());
-router.use("/survey", surveyRouter.routes(), surveyRouter.allowedMethods());
-router.use("/rs", resourcesRouter.routes(), resourcesRouter.allowedMethods());
-router.use("/reader", readerRouter.routes(), readerRouter.allowedMethods());
-router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
-router.use("/stickers", stickersRouter.routes(), stickersRouter.allowedMethods());
-router.use("/note", noteRouter.routes(), noteRouter.allowedMethods());
-router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
-router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
-router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
-router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
+router.use('/review', reviewRouter.routes(), reviewRouter.allowedMethods());
+router.use('/m', columnsRouter.routes(), columnsRouter.allowedMethods());
+router.use('/column', columnRouter.routes(), columnRouter.allowedMethods());
+router.use(
+  '/protocol',
+  protocolRouter.routes(),
+  protocolRouter.allowedMethods(),
+);
+router.use('/threads', threadsRouter.routes(), threadsRouter.allowedMethods());
+router.use(
+  '/avatar',
+  userAvatarRouter.routes(),
+  userAvatarRouter.allowedMethods(),
+);
+router.use('/survey', surveyRouter.routes(), surveyRouter.allowedMethods());
+router.use('/rs', resourcesRouter.routes(), resourcesRouter.allowedMethods());
+router.use('/reader', readerRouter.routes(), readerRouter.allowedMethods());
+router.use(
+  '/banner',
+  userBannerRouter.routes(),
+  userBannerRouter.allowedMethods(),
+);
+router.use(
+  '/stickers',
+  stickersRouter.routes(),
+  stickersRouter.allowedMethods(),
+);
+router.use('/note', noteRouter.routes(), noteRouter.allowedMethods());
+router.use('/sticker', stickerRouter.routes(), stickerRouter.allowedMethods());
+router.use(
+  '/tools',
+  siteToolsRouter.routes(),
+  siteToolsRouter.allowedMethods(),
+);
+router.use('/ipinfo', ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
+router.use(
+  '/blacklist',
+  blacklistRouter.routes(),
+  blacklistRouter.allowedMethods(),
+);
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
-router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
+router.use(
+  '/verifications',
+  verificationsRouter.routes(),
+  verificationsRouter.allowedMethods(),
+);
 router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
 router.use('/c', communityRouter.routes(), communityRouter.allowedMethods());
 router.use('/pim', pimRouter.routes(), pimRouter.allowedMethods());
-router.use("/l", linkRouter.routes(), linkRouter.allowedMethods());
-router.use("/wm", watermarkRouter.routes(), watermarkRouter.allowedMethods());
+router.use('/l', linkRouter.routes(), linkRouter.allowedMethods());
+router.use('/wm', watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
-router.use('/creation', creationRouter.routes(), creationRouter.allowedMethods());
+router.use(
+  '/creation',
+  creationRouter.routes(),
+  creationRouter.allowedMethods(),
+);
 router.use('/draw', drawDataRouter.routes(), drawDataRouter.allowedMethods());
 router.use('/mathJax', mathJaxRouter.routes(), mathJaxRouter.allowedMethods());
 router.use('/book', bookRouter.routes(), bookRouter.allowedMethods());
-router.use('/document', documentRouter.routes(), documentRouter.allowedMethods());
+router.use(
+  '/document',
+  documentRouter.routes(),
+  documentRouter.allowedMethods(),
+);
 router.use('/draft', draftRouter.routes(), draftRouter.allowedMethods());
-router.use('/rc', resourceCategoryRouter.routes(), resourceCategoryRouter.allowedMethods());
+router.use(
+  '/rc',
+  resourceCategoryRouter.routes(),
+  resourceCategoryRouter.allowedMethods(),
+);
 router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
 router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
-router.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods());
+router.use(
+  '/settings',
+  settingsRouter.routes(),
+  settingsRouter.allowedMethods(),
+);
 router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 router.use('/oauth', oauthRouter.routes(), oauthRouter.allowedMethods());
 router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());

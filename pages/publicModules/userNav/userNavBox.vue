@@ -25,7 +25,7 @@
         a(href=`/column/apply` target='_blank' v-else-if="user.uid && user.columnPermission").col-xs-6.nav-user-link
           .fa.fa-columns
           | 开设专栏
-        .col-xs-6.nav-user-link(onclick='RootApp.openChatPanel()')
+        .col-xs-6.nav-user-link(@click='openMessageCenter')
           .fa.fa-envelope-o
           | 消息中心
           .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}
@@ -61,6 +61,8 @@
 
 <script>
 import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
+import {openMessageCenter} from "../../lib/js/chat";
+
 export default {
   props: ['user'],
   data: () => ({
@@ -80,6 +82,9 @@ export default {
     "user-score": UserScoresVue,
   },
   methods: {
+    openMessageCenter() {
+      openMessageCenter(); // 调用外部方法
+    }
   }
 }
 </script>
