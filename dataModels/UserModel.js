@@ -1063,6 +1063,24 @@ userSchema.methods.ensureUserInfo = async function () {
   }
 };
 
+/*
+ * 获取用户未读消息总数
+ * */
+userSchema.methods.getUnreadMessageCount = async function () {
+  const {
+    newSystemInfoCount,
+    newApplicationsCount,
+    newReminderCount,
+    newUsersMessagesCount,
+  } = await this.getNewMessagesCount();
+  return (
+    newSystemInfoCount +
+    newApplicationsCount +
+    newReminderCount +
+    newUsersMessagesCount
+  );
+};
+
 userSchema.methods.getNewMessagesCount = async function () {
   const MessageModel = mongoose.model('messages');
   const FriendsApplicationModel = mongoose.model('friendsApplications');
