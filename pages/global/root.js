@@ -1,4 +1,4 @@
-import Chat from '../lib/vue/message/Chat';
+// import Chat from '../lib/vue/message/Chat';
 import Login from '../lib/vue/Login';
 import { RNOpenLoginPage, RNToChat } from '../lib/js/reactNative';
 import { getState } from '../lib/js/state';
@@ -10,7 +10,7 @@ import Sticker from '../lib/vue/Sticker';
 import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
-import {openMessageCenter} from '../lib/js/chat';
+import { openMessageCenter } from '../lib/js/chat';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -29,7 +29,7 @@ window.RootApp = new Vue({
     isReactNative: isApp && platform === 'reactNative',
   },
   components: {
-    chat: Chat,
+    // chat: Chat,
     login: Login,
     'user-draw': UserDraw,
     'user-float-panel': UserFloatPanel,

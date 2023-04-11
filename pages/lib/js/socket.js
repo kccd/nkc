@@ -1,8 +1,5 @@
-import {getState} from "./state";
-const {
-  uid,
-  refererOperationId,
-} = getState();
+import { getState } from './state';
+const { uid, refererOperationId } = getState();
 
 const hasLogged = !!uid;
 const operationId = refererOperationId;
@@ -13,53 +10,54 @@ const handlers = [];
 const events = [
   {
     type: 'connect',
-    name: '已连接'
+    name: '已连接',
   },
   {
     type: 'disconnect',
-    name: '连接已断开'
+    name: '连接已断开',
   },
   {
     type: 'error',
-    name: '连接出错'
+    name: '连接出错',
   },
   {
     type: 'connecting',
-    name: '正在连接'
+    name: '正在连接',
   },
   {
     type: 'reconnecting',
-    name: '正在重连'
+    name: '正在重连',
   },
   {
     type: 'reconnect',
-    name: '重连成功'
+    name: '重连成功',
   },
   {
     type: 'connect_failed',
-    name: '连接失败'
+    name: '连接失败',
   },
   {
     type: 'reconnect_failed',
-    name: '重连失败'
+    name: '重连失败',
   },
   {
     type: 'connect_timeout',
-    name: '连接超时'
-  }
+    name: '连接超时',
+  },
 ];
 
 const eventsObj = {};
-for(const e of events) {
+for (const e of events) {
   eventsObj[e.type] = e;
 }
 
 /*
-* 获取socket.io实例
-* */
+ * 获取socket.io实例
+ * */
 export function getSocket() {
-  if(!hasLogged) return null;
-  else if(window.socket) {
+  if (!hasLogged) {
+    return null;
+  } else if (window.socket) {
     return window.socket;
   } else {
     const query = {
@@ -75,21 +73,21 @@ export function getSocket() {
       reconnectionDelayMax: 10000,
       query: query,
       extraHeaders: {
-        "X-socket-io": "polling"
-      }
+        'X-socket-io': 'polling',
+      },
     });
 
     socket.on('connect', function () {
       console.log('socket连接成功');
     });
-    socket.on('error', function() {
+    socket.on('error', function () {
       console.log('socket连接出错');
       socket.disconnect();
     });
-    socket.on('disconnect', function() {
+    socket.on('disconnect', function () {
       console.log('socket连接已断开');
     });
-    socket.on('connect_error', function(err) {
+    socket.on('connect_error', function (err) {
       console.log(err);
     });
     socket.on('test', console.log);
@@ -100,10 +98,12 @@ export function getSocket() {
 
 function initSocketIoEvent(event, func) {
   const socket = getSocket();
-  if(!socket) return;
+  if (!socket) {
+    return;
+  }
   let index = functions.indexOf(func);
   let handlerObj;
-  if(index === -1) {
+  if (index === -1) {
     handlerObj = {};
     functions.push(func);
     handlers.push(handlerObj);
@@ -111,8 +111,10 @@ function initSocketIoEvent(event, func) {
     handlerObj = handlers[index];
   }
   let handler = handlerObj[event.type];
-  if(handler) return;
-  handler = function() {
+  if (handler) {
+    return;
+  }
+  handler = function () {
     func(event);
   };
   handlerObj[event.type] = handler;
@@ -121,33 +123,41 @@ function initSocketIoEvent(event, func) {
 
 function removeSocketIoEvent(event, func) {
   const socket = getSocket();
-  if(!socket) return;
+  if (!socket) {
+    return;
+  }
   let index = functions.indexOf(func);
-  if(index === -1) return;
+  if (index === -1) {
+    return;
+  }
   const handlerObj = handlers[index];
   const handler = handlerObj[event.type];
-  if(!handler) return;
+  if (!handler) {
+    return;
+  }
   socket.off(event.type, handler);
   handlerObj[event.type] = undefined;
 }
 
 export function addSocketStatusChangedEvent(func) {
-  for(const event of events) {
+  for (const event of events) {
     initSocketIoEvent(event, func);
   }
 }
 
 export function removeSocketStatusChangedEvent(func) {
-  for(const event of events) {
+  for (const event of events) {
     removeSocketIoEvent(event, func);
   }
 }
 
 export function getSocketStatus() {
   const socket = getSocket();
-  if(!socket) return null;
-  const {connected} = socket;
-  if(connected) {
+  if (!socket) {
+    return null;
+  }
+  const { connected } = socket;
+  if (connected) {
     return eventsObj.connect;
   } else {
     return eventsObj.disconnect;

@@ -157,8 +157,10 @@
         if(data.beep) {
           app.playAudio(data.beep);
         }
+
         app.newMessageCount += 1;
         app.updateNewMessageCount(app.newMessageCount);
+
       });
       const newMessageCount = this.getNewMessageCountFromNKC();
       this.updateNewMessageCount(newMessageCount);
@@ -185,9 +187,9 @@
         //   this.draggableElement && this.draggableElement.destroy()
         // }
       },
-      // mode() {
-      //   this.saveChatInfoToLocalStorage();
-      // },
+      mode() {
+        this.saveChatInfoToLocalStorage();
+      },
     },
     methods: {
       // 初始化 数据来源于本地或默认数据
@@ -202,42 +204,44 @@
           app.onMouseOver();
         });
       },
-      initContainer() {
-        // const {
-        //   mode,
-        //   containerMode,
-        //   narrowWidth,
-        //   narrowHeight,
-        //   wideWidth,
-        //   wideHeight,
-        //   top,
-        //   left,
-        // } = this.getChatInfoFromLocalStorage();
-        // this.setModeData(mode);
-        // this.setContainerModeData(containerMode);
-        // this.setContainerPositionData({
-        //   left, top
-        // });
-        // this.setContainerSizeData('wide', {
-        //   height: wideHeight,
-        //   width: wideWidth,
-        // });
-        // this.setContainerSizeData('narrow', {
-        //   height: narrowHeight,
-        //   width: narrowWidth,
-        // });
-      },
+      // initContainer() {
+      //   const {
+      //     mode,
+      //     containerMode,
+      //     narrowWidth,
+      //     narrowHeight,
+      //     wideWidth,
+      //     wideHeight,
+      //     top,
+      //     left,
+      //   } = this.getChatInfoFromLocalStorage();
+      //   this.setModeData(mode);
+      //   this.setContainerModeData(containerMode);
+      //   this.setContainerPositionData({
+      //     left, top
+      //   });
+      //   this.setContainerSizeData('wide', {
+      //     height: wideHeight,
+      //     width: wideWidth,
+      //   });
+      //   this.setContainerSizeData('narrow', {
+      //     height: narrowHeight,
+      //     width: narrowWidth,
+      //   });
+      // },
       getNewMessageCountFromNKC() {
         return NKC.configs.newMessageCount;
       },
       updateNewMessageCountToDom(count) {
         const documents = $('.message-count');
-        const containers = $('.message-count-container')
+        const containers = $('.message-count-container');
+        // console.log(count, 'count')
         if(count === 0) {
+          // this.newMessageCount = 0
           containers.addClass('hidden');
           documents
             .addClass('hidden')
-            .text('');
+            .text(1);
 
         } else {
           containers.removeClass('hidden');
@@ -255,35 +259,35 @@
         this.updateNewMessageCountToNKC(count);
         this.$emit('update-new-message', count);
       }, 500),
-      onContainerPositionChange: debounce(function(position) {
-        const {left, top} = position;
-        this.setContainerPositionData({left, top});
-        this.saveContainerPositionToLocalStorage({left, top});
-      }, 500),
-      saveChatInfoToLocalStorage() {
-        // 全屏模式无需更新socket面板位置以及尺寸信息
-        if(this.fixed) return;
-        const app = this;
-        const {containerInfo, mode, containerMode} = app;
-        const {
-          left,
-          top,
-          wideHeight,
-          wideWidth,
-          narrowHeight,
-          narrowWidth,
-        } = containerInfo;
-        updateInLocalStorage(localStorageKey, {
-          containerMode,
-          mode,
-          wideHeight,
-          wideWidth,
-          narrowHeight,
-          narrowWidth,
-          left,
-          top
-        });
-      },
+      // onContainerPositionChange: debounce(function(position) {
+      //   const {left, top} = position;
+      //   this.setContainerPositionData({left, top});
+      //   this.saveContainerPositionToLocalStorage({left, top});
+      // }, 500),
+      // saveChatInfoToLocalStorage() {
+      //   // 全屏模式无需更新socket面板位置以及尺寸信息
+      //   if(this.fixed) return;
+      //   const app = this;
+      //   const {containerInfo, mode, containerMode} = app;
+      //   const {
+      //     left,
+      //     top,
+      //     wideHeight,
+      //     wideWidth,
+      //     narrowHeight,
+      //     narrowWidth,
+      //   } = containerInfo;
+      //   updateInLocalStorage(localStorageKey, {
+      //     containerMode,
+      //     mode,
+      //     wideHeight,
+      //     wideWidth,
+      //     narrowHeight,
+      //     narrowWidth,
+      //     left,
+      //     top
+      //   });
+      // },
       // getChatInfoFromLocalStorage() {
       //   const {defaultInfo} = this;
       //   const windowWidth = $(window).width();
@@ -330,25 +334,25 @@
 
       },
       // 隐藏socket面板
-      hideMessagePanel() {
-        this.onMouseLeave();
-        this.showPanel = false;
-        this.setSocketInfo()
-      },
+      // hideMessagePanel() {
+      //   this.onMouseLeave();
+      //   this.showPanel = false;
+      //   this.setSocketInfo()
+      // },
       // 存储关闭前socket面板的位置
-      setSocketInfo() {
-        const {left, top} = $(this.$refs.socketContainer).offset();
-        this.containerInfo.left = left;
-        this.containerInfo.top = top - $(document).scrollTop();
-      },
+      // setSocketInfo() {
+      //   const {left, top} = $(this.$refs.socketContainer).offset();
+      //   this.containerInfo.left = left;
+      //   this.containerInfo.top = top - $(document).scrollTop();
+      // },
       // 切换socket面板的显隐状态
-      switchMessagePanel() {
-        if(this.showPanel) {
-          this.hideMessagePanel();
-        } else {
-          this.showMessagePanel();
-        }
-      },
+      // switchMessagePanel() {
+      //   if(this.showPanel) {
+      //     this.hideMessagePanel();
+      //   } else {
+      //     this.showMessagePanel();
+      //   }
+      // },
       // 取消禁止滚动
       enableScroll: debounce(function() {
         $('body').css({
@@ -400,11 +404,11 @@
         }
       },
       // 切换窗口模式 简洁模式、经典模式
-      changeSize() {
-        const mode = this.mode === 'wide'? 'narrow': 'wide';
-        this.setModeData(mode);
-        this.saveModeToLocalStorage(mode);
-      },
+      // changeSize() {
+      //   const mode = this.mode === 'wide'? 'narrow': 'wide';
+      //   this.setModeData(mode);
+      //   this.saveModeToLocalStorage(mode);
+      // },
       saveModeToLocalStorage(mode) {
         updateInLocalStorage(localStorageKey, {mode});
       },
@@ -421,9 +425,9 @@
       saveContainerPositionToLocalStorage({left, top}) {
         updateInLocalStorage(localStorageKey, {left, top});
       },
-      setContainerInfoData(containerInfo) {
-        this.containerInfo = containerInfo;
-      },
+      // setContainerInfoData(containerInfo) {
+      //   this.containerInfo = containerInfo;
+      // },
       setContainerSizeData(mode, {width, height}) {
         this.containerInfo[`${mode}Width`] = width;
         this.containerInfo[`${mode}Height`] = height;
@@ -447,13 +451,13 @@
         };
       },
       // 获取面板的位置
-      getContainerPositionFromDom() {
-        const {left, top} = $(this.$refs.socketContainer).offset();
-        return {
-          left,
-          top: top - $(document).scrollTop()
-        };
-      },
+      // getContainerPositionFromDom() {
+      //   const {left, top} = $(this.$refs.socketContainer).offset();
+      //   return {
+      //     left,
+      //     top: top - $(document).scrollTop()
+      //   };
+      // },
       // 检测屏幕宽度，如果比经典模式socket面板宽度窄，则跳转到message页
       // toChat(uid) {
       //   if($(window).width() >= this.defaultInfo.wideWidth + 100) {
@@ -525,7 +529,6 @@
     },
   }
 
-  // window.messageApp = messageApp;
 
 </script>
 
@@ -553,7 +556,7 @@
   //position: relative;
   //background-color: #fff;
   box-shadow: 0 0 7px 0 rgba(0, 0, 0, 0.3);
-  border: 1px solid #eee;
+  //border: 1px solid #eee;
   resize: both;
   border-radius: 3px;
   height: 100%;
