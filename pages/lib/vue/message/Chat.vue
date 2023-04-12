@@ -102,7 +102,6 @@
       windowWidth: 0,
       windowHeight: 0,
 
-
     }),
     components: {
       Message,
@@ -227,9 +226,9 @@
       //     width: narrowWidth,
       //   });
       // },
-      getNewMessageCountFromNKC() {
-        return NKC.configs.newMessageCount;
-      },
+      // getNewMessageCountFromNKC() {
+      //   return NKC.configs.newMessageCount;
+      // },
       // updateNewMessageCountToDom(count) {
       //   const documents = $('.message-count');
       //   const containers = $('.message-count-container');
