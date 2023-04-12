@@ -149,7 +149,7 @@
 </style>
 
 <script>
-
+  import {getSocket} from '../../js/socket';
   import PageList from './PageList.vue';
   import PageChat from './PageChat.vue';
   import PageUser from './PageUser.vue';
@@ -180,13 +180,14 @@
   import {sendNewMessageCount} from "../../../message/message.2.0";
 
   export default {
-    props: ['mode', 'socket'],
+    props: ['mode'],
     data: function() {
       return {
         // 页面名称
         activePageId: '', // PageList, PageMessage, PageSetting
         // 页面历史
         activePageIdHistories: [],
+        socket: null,
         modes: {
           narrow: 'narrow',
           wide: 'wide'
@@ -247,6 +248,7 @@
       PageSetting
     },
     mounted() {
+      this.socket = getSocket();
       this.selectPage(this.pageId.PageList);
       // this.openUserPage({type: 'UTU', uid: '74230'})
       this.initSocket(this.socket);

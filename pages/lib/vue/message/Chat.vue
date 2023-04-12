@@ -38,8 +38,6 @@
           Message(
             :mode='mode'
             ref='message'
-            :socket='socket'
-            @update-new-message-count='updateNewMessageCount'
           )
 </template>
 
@@ -54,11 +52,11 @@
   import FastClick from "fastclick";
   import Lottery from '../lottery.vue'
 
-  import {getSocket} from '../../js/socket';
+  // import {getSocket} from '../../js/socket';
 
   const localStorageKey = 'NKC_CHAT_2';
 
-  const socket = getSocket();
+  // const socket = getSocket();
 
   export default {
     data: () => ({
@@ -111,18 +109,18 @@
       Lottery
     },
     computed: {
-      boxContent() {
-        const {newMessageCount} = this;
-        if(newMessageCount === 0) {
-          return '';
-        } else {
-          return `${newMessageCount} 条新消息`;
-        }
-      },
-      modeName() {
-        const {mode} = this;
-        return mode === 'wide'? '简洁模式': '经典模式';
-      },
+      // boxContent() {
+      //   const {newMessageCount} = this;
+      //   if(newMessageCount === 0) {
+      //     return '';
+      //   } else {
+      //     return `${newMessageCount} 条新消息`;
+      //   }
+      // },
+      // modeName() {
+      //   const {mode} = this;
+      //   return mode === 'wide'? '简洁模式': '经典模式';
+      // },
       // containerStyle() {
       //   const {containerMode, mode} = this;
       //   if(containerMode === 'minimize') {
@@ -144,26 +142,26 @@
       // this.initContainer();
       window.addEventListener('resize', this.handelResize);
       this.initAudio();
-      const app = this;
-      socket.on('newMessageCountAndRedEnvelopeStatus', (data) => {
-        const {redEnvelopeStatus , newMessageCount} = data;
-        if(redEnvelopeStatus){
-          this.showLottery = true
-        }
-        app.updateNewMessageCount(newMessageCount);
-      });
-      socket.on('receiveMessage', (data) => {
-        if(data.localId) return;
-        if(data.beep) {
-          app.playAudio(data.beep);
-        }
-
-        app.newMessageCount += 1;
-        app.updateNewMessageCount(app.newMessageCount);
-
-      });
-      const newMessageCount = this.getNewMessageCountFromNKC();
-      this.updateNewMessageCount(newMessageCount);
+      // const app = this;
+      // socket.on('newMessageCountAndRedEnvelopeStatus', (data) => {
+      //   const {redEnvelopeStatus , newMessageCount} = data;
+      //   if(redEnvelopeStatus){
+      //     this.showLottery = true
+      //   }
+      //   app.updateNewMessageCount(newMessageCount);
+      // });
+      // socket.on('receiveMessage', (data) => {
+      //   if(data.localId) return;
+      //   if(data.beep) {
+      //     app.playAudio(data.beep);
+      //   }
+      //
+      //   app.newMessageCount += 1;
+      //   app.updateNewMessageCount(app.newMessageCount);
+      //
+      // });
+      // const newMessageCount = this.getNewMessageCountFromNKC();
+      // this.updateNewMessageCount(newMessageCount);
       FastClick.attach(this.$refs.messageApp);
     },
     beforeDestroy() {
@@ -187,9 +185,9 @@
         //   this.draggableElement && this.draggableElement.destroy()
         // }
       },
-      mode() {
-        this.saveChatInfoToLocalStorage();
-      },
+      // mode() {
+      //   this.saveChatInfoToLocalStorage();
+      // },
     },
     methods: {
       // 初始化 数据来源于本地或默认数据
@@ -232,33 +230,33 @@
       getNewMessageCountFromNKC() {
         return NKC.configs.newMessageCount;
       },
-      updateNewMessageCountToDom(count) {
-        const documents = $('.message-count');
-        const containers = $('.message-count-container');
-        // console.log(count, 'count')
-        if(count === 0) {
-          // this.newMessageCount = 0
-          containers.addClass('hidden');
-          documents
-            .addClass('hidden')
-            .text(1);
-
-        } else {
-          containers.removeClass('hidden');
-          documents
-            .removeClass('hidden')
-            .text(count);
-        }
-      },
-      updateNewMessageCountToNKC(count) {
-        NKC.configs.newMessageCount = count;
-      },
-      updateNewMessageCount: debounce(function(count) {
-        this.newMessageCount = count;
-        this.updateNewMessageCountToDom(count);
-        this.updateNewMessageCountToNKC(count);
-        this.$emit('update-new-message', count);
-      }, 500),
+      // updateNewMessageCountToDom(count) {
+      //   const documents = $('.message-count');
+      //   const containers = $('.message-count-container');
+      //   // console.log(count, 'count')
+      //   if(count === 0) {
+      //     // this.newMessageCount = 0
+      //     containers.addClass('hidden');
+      //     documents
+      //       .addClass('hidden')
+      //       .text(1);
+      //
+      //   } else {
+      //     containers.removeClass('hidden');
+      //     documents
+      //       .removeClass('hidden')
+      //       .text(count);
+      //   }
+      // },
+      // updateNewMessageCountToNKC(count) {
+      //   NKC.configs.newMessageCount = count;
+      // },
+      // updateNewMessageCount: debounce(function(count) {
+      //   this.newMessageCount = count;
+      //   this.updateNewMessageCountToDom(count);
+      //   this.updateNewMessageCountToNKC(count);
+      //   this.$emit('update-new-message', count);
+      // }, 500),
       // onContainerPositionChange: debounce(function(position) {
       //   const {left, top} = position;
       //   this.setContainerPositionData({left, top});
@@ -372,16 +370,16 @@
       //   }
       //   body.css(cssObj);
       // }, 200),
-      containerSizeFromDomToDataAndLocalStorage() {
-        if(this.fixed) return;
-        const {mode} = this;
-        const {width, height} = this.getContainerSizeFromDom();
-        if(width === null || height === null) return;
-        this.setContainerSizeData(mode, {
-          width, height
-        });
-        this.saveContainerSizeToLocalStorage(mode, {height, width});
-      },
+      // containerSizeFromDomToDataAndLocalStorage() {
+      //   if(this.fixed) return;
+      //   const {mode} = this;
+      //   const {width, height} = this.getContainerSizeFromDom();
+      //   if(width === null || height === null) return;
+      //   this.setContainerSizeData(mode, {
+      //     width, height
+      //   });
+      //   this.saveContainerSizeToLocalStorage(mode, {height, width});
+      // },
       delayContainerSizeFromDomToDataAndLocalStorage: debounce(function() {
         this.containerSizeFromDomToDataAndLocalStorage();
       }, 1000),
@@ -409,33 +407,33 @@
       //   this.setModeData(mode);
       //   this.saveModeToLocalStorage(mode);
       // },
-      saveModeToLocalStorage(mode) {
-        updateInLocalStorage(localStorageKey, {mode});
-      },
+      // saveModeToLocalStorage(mode) {
+      //   updateInLocalStorage(localStorageKey, {mode});
+      // },
       saveContainerModeToLocalStorage(containerMode) {
         updateInLocalStorage(localStorageKey, {containerMode});
       },
-      saveContainerSizeToLocalStorage(mode, {width, height}) {
-        const newData = {};
-        newData[`${mode}Height`] = height;
-        newData[`${mode}Width`] = width;
-        updateInLocalStorage(localStorageKey, newData);
-      },
+      // saveContainerSizeToLocalStorage(mode, {width, height}) {
+      //   const newData = {};
+      //   newData[`${mode}Height`] = height;
+      //   newData[`${mode}Width`] = width;
+      //   updateInLocalStorage(localStorageKey, newData);
+      // },
       // 仅保存面板位置到本地
-      saveContainerPositionToLocalStorage({left, top}) {
-        updateInLocalStorage(localStorageKey, {left, top});
-      },
+      // saveContainerPositionToLocalStorage({left, top}) {
+      //   updateInLocalStorage(localStorageKey, {left, top});
+      // },
       // setContainerInfoData(containerInfo) {
       //   this.containerInfo = containerInfo;
       // },
-      setContainerSizeData(mode, {width, height}) {
-        this.containerInfo[`${mode}Width`] = width;
-        this.containerInfo[`${mode}Height`] = height;
-      },
-      setContainerPositionData({left, top}) {
-        this.containerInfo.left = left;
-        this.containerInfo.top = top;
-      },
+      // setContainerSizeData(mode, {width, height}) {
+      //   this.containerInfo[`${mode}Width`] = width;
+      //   this.containerInfo[`${mode}Height`] = height;
+      // },
+      // setContainerPositionData({left, top}) {
+      //   this.containerInfo.left = left;
+      //   this.containerInfo.top = top;
+      // },
       setModeData(mode) {
         this.mode = mode;
       },
@@ -443,13 +441,13 @@
         this.containerMode = containerMode;
       },
       // 获取面板的尺寸
-      getContainerSizeFromDom() {
-        const dom = $(this.$refs.socketContainer);
-        return {
-          width: dom.outerWidth(),
-          height: dom.outerHeight()
-        };
-      },
+      // getContainerSizeFromDom() {
+      //   const dom = $(this.$refs.socketContainer);
+      //   return {
+      //     width: dom.outerWidth(),
+      //     height: dom.outerHeight()
+      //   };
+      // },
       // 获取面板的位置
       // getContainerPositionFromDom() {
       //   const {left, top} = $(this.$refs.socketContainer).offset();
@@ -467,36 +465,36 @@
       //     window.open(`/message${uid}`);
       //   }
       // },
-      toMessagePage() {
-        window.open(`/message`);
-      },
-      setMinimize() {
-        const value = 'minimize';
-        this.setContainerModeData(value);
-        this.saveContainerModeToLocalStorage(value);
-        this.enableScroll();
-      },
-      unsetMinimize() {
-        const value = 'normal';
-        this.setContainerModeData(value);
-        this.saveContainerModeToLocalStorage(value);
-        if(!this.showPanel) {
-          this.showMessagePanel();
-        }
-      },
-      onRepeatOver() {
-        if(this.repeatOver) return;
-        this.repeatOver = true;
-        this.containerSizeFromDomToDataAndLocalStorage();
-      },
-      onRepeatLeave() {
-        if(!this.repeatOver) return;
-        this.repeatOver = false;
-      },
-      setSocketContainerAsDefault() {
-        saveToLocalStorage(localStorageKey, {});
-        this.initContainer();
-      },
+      // toMessagePage() {
+      //   window.open(`/message`);
+      // },
+      // setMinimize() {
+      //   const value = 'minimize';
+      //   this.setContainerModeData(value);
+      //   this.saveContainerModeToLocalStorage(value);
+      //   this.enableScroll();
+      // },
+      // unsetMinimize() {
+      //   const value = 'normal';
+      //   this.setContainerModeData(value);
+      //   this.saveContainerModeToLocalStorage(value);
+      //   if(!this.showPanel) {
+      //     this.showMessagePanel();
+      //   }
+      // },
+      // onRepeatOver() {
+      //   if(this.repeatOver) return;
+      //   this.repeatOver = true;
+      //   this.containerSizeFromDomToDataAndLocalStorage();
+      // },
+      // onRepeatLeave() {
+      //   if(!this.repeatOver) return;
+      //   this.repeatOver = false;
+      // },
+      // setSocketContainerAsDefault() {
+      //   saveToLocalStorage(localStorageKey, {});
+      //   this.initContainer();
+      // },
       setMaximize() {
         this.setModeData('narrow');
         this.setContainerModeData('maximize');
