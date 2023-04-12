@@ -11,6 +11,7 @@ import Sticker from '../lib/vue/Sticker';
 import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
+import Lottery from '../lib/vue/lottery.vue';
 import { openMessageCenter } from '../lib/js/chat';
 import {
   initAppGlobalClickLinkEvent,
@@ -31,6 +32,7 @@ window.RootApp = new Vue({
   },
   components: {
     'message-notify': MessageNotify,
+    lottery: Lottery,
     login: Login,
     'user-draw': UserDraw,
     'user-float-panel': UserFloatPanel,

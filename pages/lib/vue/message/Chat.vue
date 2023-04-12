@@ -1,6 +1,6 @@
 <template lang="pug">
   .message-app(ref="messageApp" v-cloak)
-    Lottery(v-if = "showLottery")
+    //Lottery
     //.minimize-container.theme-primary(v-if='containerMode === "minimize"' @click='unsetMinimize')
     //  .fa.fa-comments
     //  span(v-if='boxContent') {{boxContent}}
