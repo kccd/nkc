@@ -28,17 +28,7 @@ module.exports = {
       ThrowError(HttpErrorCodes.Forbidden, HttpErrorTypes.ERR_FORBIDDEN);
     }
     const onlineStatus = await user.setOnlineStatus(os);
-    const {
-      newSystemInfoCount,
-      newApplicationsCount,
-      newReminderCount,
-      newUsersMessagesCount,
-    } = await user.getNewMessagesCount();
-    const newMessageCount =
-      newSystemInfoCount +
-      newApplicationsCount +
-      newReminderCount +
-      newUsersMessagesCount;
+    const newMessageCount = await user.getUnreadMessageCount();
     const friendsUid = await MessageModel.getUsersFriendsUid(user.uid);
 
     let {

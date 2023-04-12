@@ -30,7 +30,6 @@ window.RootApp = new Vue({
     isReactNative: isApp && platform === 'reactNative',
   },
   components: {
-    // chat: Chat,
     'message-notify': MessageNotify,
     login: Login,
     'user-draw': UserDraw,

@@ -7,6 +7,7 @@ import { getSocket } from '../../js/socket.js'
 export default {
   data: () =>({
     socket: null,
+    newMessageCount:0,
   }),
   mounted() {
     this.socket = getSocket();
@@ -15,8 +16,8 @@ export default {
   methods:{
     initSocket(){
       this.socket.on('newMessageCountAndRedEnvelopeStatus', (data) => {
-        console.log(data, 'data')
         const {redEnvelopeStatus , newMessageCount} = data;
+        this.newMessageCount = newMessageCount;
         // if(redEnvelopeStatus){
         //   this.showLottery = true
         // }

@@ -214,13 +214,20 @@ async function sendEventWithdrawn(uid, tUid, messageId) {
 }
 
 /*
- * 标记为已读
+ * 标记某个对话所有消息为已读
+ * @param type 对话类型
+ * @param uid 自己的UID
+ * @param tUid 对方的UID
  * */
 async function sendEventMarkAsRead(type, uid, tUid) {
   const roomName = GetSocketServiceRoomName('user', uid);
+  const UserModel = require('../dataModels/UserModel');
+  const user = await UserModel.findOnly({ uid });
+  const unread = await user.getUnreadMessageCount();
   await SendMessageToWebsocketServiceRoom(roomName, 'markAsRead', {
-    type,
-    uid: tUid,
+    type, // 对话类型
+    uid: tUid, // 类型对应的 ID
+    unread, // 当前用户未读消息数
   });
 }
 
