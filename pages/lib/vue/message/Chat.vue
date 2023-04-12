@@ -150,7 +150,7 @@
       //   }
       //   app.updateNewMessageCount(newMessageCount);
       // });
-      // socket.on('receiveMessage', (data) => {
+      // // socket.on('receiveMessage', (data) => {
       //   if(data.localId) return;
       //   if(data.beep) {
       //     app.playAudio(data.beep);
@@ -160,7 +160,7 @@
       //   app.updateNewMessageCount(app.newMessageCount);
       //
       // });
-      // const newMessageCount = this.getNewMessageCountFromNKC();
+      // // const newMessageCount = this.getNewMessageCountFromNKC();
       // this.updateNewMessageCount(newMessageCount);
       FastClick.attach(this.$refs.messageApp);
     },
