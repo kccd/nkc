@@ -2,11 +2,13 @@
   <div></div>
 </template>
 <script lang="ts">
+import { getSocket } from '../../js/socket.js'
 export default {
   data: () =>({
+    socket: null,
   }),
   mounted() {
-    console.log(111111);
+    this.socket = getSocket();
   }
 
 }

@@ -314,10 +314,10 @@
       //     left
       //   };
       // },
-      showMessagePanel() {
+      showMessagePanel(uid) {
         this.showPanel = true;
-        const urlParams = new URLSearchParams(window.location.search);
-        const uid = urlParams.get('uid');
+        // const urlParams = new URLSearchParams(window.location.search);
+        // const uid = urlParams.get('uid');
         const app = this;
         if(uid) {
           setTimeout(() => {

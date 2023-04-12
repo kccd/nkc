@@ -1,4 +1,5 @@
 // import Chat from '../lib/vue/message/Chat';
+import MessageNotify from '../lib/vue/message/MessageNotify.vue';
 import Login from '../lib/vue/Login';
 import { RNOpenLoginPage, RNToChat } from '../lib/js/reactNative';
 import { getState } from '../lib/js/state';
@@ -30,6 +31,7 @@ window.RootApp = new Vue({
   },
   components: {
     // chat: Chat,
+    'message-notify': MessageNotify,
     login: Login,
     'user-draw': UserDraw,
     'user-float-panel': UserFloatPanel,
