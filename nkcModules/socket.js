@@ -4,6 +4,10 @@ const {
   ServiceActionNames,
   GetSocketServiceRoomName,
 } = require('../comm/modules/comm');
+const FriendsApplicationModel = require("../dataModels/FriendsApplicationModel");
+const MessageModel = require("../dataModels/MessageModel");
+const CreatedChatModel = require("../dataModels/CreatedChatModel");
+const UserModel = require("../dataModels/UserModel");
 
 function SendMessageToWebsocketServiceRoom(roomName, eventName, data) {
   BrokerCall(ServiceActionNames.v1_websocket_send_message_to_room, {
@@ -334,7 +338,28 @@ async function sendNewFriendApplication(applicationId) {
     beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
   });
 }
-
+//因为无法区分接收者和发送者所以再写一个函数做区分
+async function sendNewFriendApplicationNew(applicationId) {
+  const FriendsApplicationModel = require('../dataModels/FriendsApplicationModel');
+  const MessageModel = require('../dataModels/MessageModel');
+  const UserModel = require('../dataModels/UserModel');
+  const CreatedChatModel = require('../dataModels/CreatedChatModel');
+  const applicationMessage =
+    await FriendsApplicationModel.getApplicationMessage(applicationId);
+  const message = await MessageModel.extendMessage(applicationMessage);
+  const chat = await CreatedChatModel.getSingleChat(
+    'newFriends',
+    applicationMessage.tUid,
+  );
+  const roomName = GetSocketServiceRoomName('user', applicationMessage.tUid);
+  await SendMessageToWebsocketServiceRoom(roomName, 'receiveMessage', {
+    localId: applicationId,
+    message,
+    chat,
+    beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
+    isUser: true,
+  });
+}
 /*
  * 获取媒体文件处理服务的信息
  * */
@@ -389,6 +414,7 @@ module.exports = {
   sendEventUpdateChat,
   sendSystemInfoToUser,
   sendNewFriendApplication,
+  sendNewFriendApplicationNew,
   getMediaServiceInfo,
   getMediaServiceUrl,
   getPageFromRenderService,

@@ -2,41 +2,41 @@ const router = require('koa-router')();
 const fsPromises = require('fs').promises;
 router
   .get('/', async (ctx, next) => {
-    const {query, db, data} = ctx;
-    const {type} = query;
-    const {user} = data;
-    if(type === 'friendsUid') {
+    const { query, db, data } = ctx;
+    const { type } = query;
+    const { user } = data;
+    if (type === 'friendsUid') {
       data.friendsUid = await db.FriendModel.getFriendsUid(user.uid);
     }
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {db, data, body, nkcModules} = ctx;
-    const {uid, type} = body;
-    const {user} = data;
-    if(!['agree', 'disagree', 'ignored'].includes(type)) {
+    const { db, data, body, nkcModules } = ctx;
+    const { uid, type } = body;
+    const { user } = data;
+    if (!['agree', 'disagree', 'ignored'].includes(type)) {
       ctx.throw(400, `type error`);
     }
     const targetUser = await db.UserModel.findOnly({
-      uid
+      uid,
     });
     const application = await db.FriendsApplicationModel.findOnly({
       respondentId: user.uid,
       applicantId: targetUser.uid,
-      agree: 'null'
+      agree: 'null',
     });
-    let {agree} = application;
-    if(type === 'agree') {
+    let { agree } = application;
+    if (type === 'agree') {
       await db.FriendModel.createFriend(user.uid, targetUser.uid);
       await nkcModules.socket.sendEventUpdateUserList(user.uid);
       await nkcModules.socket.sendEventUpdateChatList(user.uid);
       await nkcModules.socket.sendEventUpdateUserList(targetUser.uid);
       await nkcModules.socket.sendEventUpdateChatList(targetUser.uid);
       agree = 'true';
-    } else if(type === 'disagree') {
+    } else if (type === 'disagree') {
       agree = 'false';
       await nkcModules.socket.sendEventUpdateChatList(user.uid);
-    } else if(type === 'ignored') {
+    } else if (type === 'ignored') {
       agree = 'ignored';
       await nkcModules.socket.sendEventUpdateChatList(user.uid);
     }
@@ -44,65 +44,82 @@ router
       $set: {
         agree,
         tlm: new Date(),
-      }
+      },
     });
-    await nkcModules.socket.sendNewFriendApplication(application._id);
+    await nkcModules.socket.sendNewFriendApplicationNew(application._id);
     await next();
   })
   .post('/apply', async (ctx, next) => {
-    const {db, body, data} = ctx;
-    const {uid, description = ''} = body;
-    const {user} = data;
-    const targetUser = await db.UserModel.findOnly({uid});
+    const { db, body, data } = ctx;
+    const { uid, description = '' } = body;
+    const { user } = data;
+    const targetUser = await db.UserModel.findOnly({ uid });
     // 判断自己是否在对方黑名单中
-    const inBlackList = await db.BlacklistModel.inBlacklist(targetUser.uid, user.uid);
-    if(inBlackList) ctx.throw(403, `对方拒绝接收你的消息，你无法添加对方为好友`);
+    const inBlackList = await db.BlacklistModel.inBlacklist(
+      targetUser.uid,
+      user.uid,
+    );
+    if (inBlackList) {
+      ctx.throw(403, `对方拒绝接收你的消息，你无法添加对方为好友`);
+    }
     // 判断对方是否在自己的黑名单中
     await db.BlacklistModel.removeUserFromBlacklist(user.uid, targetUser.uid);
-    if(description.length > 200) ctx.throw(400, `验证信息不能超过200个字`);
+    if (description.length > 200) {
+      ctx.throw(400, `验证信息不能超过200个字`);
+    }
     const friend = await db.FriendModel.findOne({
       uid: user.uid,
-      tUid: targetUser.uid
+      tUid: targetUser.uid,
     });
-    if(friend) ctx.throw(400, `对方已在你的好友列表中，请勿重复添加`);
+    if (friend) {
+      ctx.throw(400, `对方已在你的好友列表中，请勿重复添加`);
+    }
     let applicationLog = await db.FriendsApplicationModel.findOne({
       applicantId: user.uid,
       respondentId: targetUser.uid,
-      agree: "null"
+      agree: 'null',
     });
+
     const targetApplicationLog = await db.FriendsApplicationModel.findOne({
       applicantId: targetUser.uid,
       respondentId: user.uid,
-      agree: "null"
+      agree: 'null',
     });
-    if(targetApplicationLog) ctx.throw(400, `对方已向你发起添加好友请求，请在「新朋友」处查看`);
-    if(applicationLog) {
+    if (targetApplicationLog) {
+      ctx.throw(400, `对方已向你发起添加好友请求，请在「新朋友」处查看`);
+    }
+    if (applicationLog) {
       ctx.throw(400, `你已发起添加好友请求，请勿重复提交`);
     } else {
       applicationLog = db.FriendsApplicationModel({
         _id: await db.SettingModel.operateSystemID('friendsApplications', 1),
         applicantId: user.uid,
         respondentId: targetUser.uid,
-        description
+        description,
       });
       await applicationLog.save();
     }
-    await db.UsersGeneralModel.updateOne({uid: uid}, {$set: {'messageSettings.chat.newFriends': true}});
+    await db.UsersGeneralModel.updateOne(
+      { uid: uid },
+      { $set: { 'messageSettings.chat.newFriends': true } },
+    );
 
     await ctx.nkcModules.socket.sendNewFriendApplication(applicationLog._id);
     await next();
   })
   .put('/', async (ctx, next) => {
-    const {db, body, nkcModules, data, settings, tools} = ctx;
-    const {user} = data;
-    const {fields, files} = body;
+    const { db, body, nkcModules, data, settings, tools } = ctx;
+    const { user } = data;
+    const { fields, files } = body;
     const friendData = JSON.parse(fields.friend);
     const uid = fields.uid;
     const file = files.file;
-    const {cid, name, description, image, phone, location} = friendData;
-    const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
-    if(!friend) ctx.throw(400, `你暂未与对方建立好友关系，请刷新后重试`);
-    const {checkString} = nkcModules.checkData;
+    const { cid, name, description, image, phone, location } = friendData;
+    const friend = await db.FriendModel.findOne({ uid: user.uid, tUid: uid });
+    if (!friend) {
+      ctx.throw(400, `你暂未与对方建立好友关系，请刷新后重试`);
+    }
+    const { checkString } = nkcModules.checkData;
     checkString(name, {
       name: '备注',
       minLength: 0,
@@ -119,8 +136,10 @@ router
       maxLength: 200,
     });
     const newPhone = [];
-    for(const p of phone) {
-      if(!p) continue;
+    for (const p of phone) {
+      if (!p) {
+        continue;
+      }
       checkString(p, {
         name: '电话',
         minLength: 0,
@@ -128,11 +147,14 @@ router
       });
       newPhone.push(p);
     }
-    const categories = await db.FriendsCategoryModel.find({
-      uid: user.uid,
-      _id: {$in: cid}
-    }, {_id: 1});
-    const newCid = categories.map(c => c._id);
+    const categories = await db.FriendsCategoryModel.find(
+      {
+        uid: user.uid,
+        _id: { $in: cid },
+      },
+      { _id: 1 },
+    );
+    const newCid = categories.map((c) => c._id);
     await friend.updateOne({
       $set: {
         'info.name': name,
@@ -140,20 +162,20 @@ router
         'info.phone': newPhone,
         'info.location': location,
         'info.image': !!image,
-        cid: newCid
-      }
+        cid: newCid,
+      },
     });
     await db.FriendsCategoryModel.updateFriendCategories(user.uid, uid, newCid);
-    if(file) {
-      const {friendImagePath} = settings.upload;
+    if (file) {
+      const { friendImagePath } = settings.upload;
       const targetPath = friendImagePath + '/' + user.uid;
-      try{
+      try {
         await fsPromises.access(targetPath);
-      }catch(err) {
+      } catch (err) {
         await fsPromises.mkdir(targetPath);
       }
       const targetFilePath = targetPath + '/' + uid + '.jpg';
-      const {path} = file;
+      const { path } = file;
 
       await nkcModules.file.getFileExtension(file, ['jpg', 'jpeg', 'png']);
 
@@ -165,10 +187,10 @@ router
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {nkcModules, db, query, data} = ctx;
-    const {uid} = query;
-    const {user} = data;
-    const targetUser = await db.UserModel.findOnly({uid});
+    const { nkcModules, db, query, data } = ctx;
+    const { uid } = query;
+    const { user } = data;
+    const targetUser = await db.UserModel.findOnly({ uid });
     await db.FriendModel.removeFriend(targetUser.uid, user.uid);
     await nkcModules.socket.sendEventRemoveFriend(user.uid, uid);
     await next();
