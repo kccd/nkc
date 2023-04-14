@@ -5,6 +5,7 @@
 import { getSocket } from '../../js/socket.js'
 import { getUrl } from '../../js/tools.js'
 import { initEventToGetUnreadMessageCount } from '../../js/socket.js'
+import { screenTopAlert } from '../../js/topAlert.js'
 export default {
   data: () =>({
     socket: null,
@@ -12,8 +13,9 @@ export default {
     unreadMessageCount:0,
   }),
   mounted() {
-    this.initAudio();
     this.socket = getSocket();
+    this.initAudio();
+    this.initSocket();
     //初始化拿到未读的数据
     initEventToGetUnreadMessageCount((unreadMessageCount) => {
       this.updateUnreadMessageToDom(unreadMessageCount);
@@ -32,14 +34,15 @@ export default {
     // //初始化音频
     initAudio() {
       this.audio = new Audio();
-      this.audio.src = getUrl('messageTone');
     },
     // 播放音频
     playAudio(url) {
-      this.audio.onload = function() {
-        this.audio.play();
-      };
+      this.audio.error
       this.audio.src = url;
+      this.audio.play().catch((error)=>{
+        screenTopAlert('您有一条新消息');
+      });
+
     },
     //更新导航栏未读消息
     updateUnreadMessageToDom(unreadMessageCount){
@@ -54,7 +57,6 @@ export default {
         documents.removeClass('hidden').text(unreadMessageCount);
       }
     },
-
   },
 
 }
