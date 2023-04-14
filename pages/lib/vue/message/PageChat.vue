@@ -194,6 +194,7 @@
         &.tip{
           font-size: 1rem;
           color: #777;
+          vertical-align: bottom;
         }
       }
     }
