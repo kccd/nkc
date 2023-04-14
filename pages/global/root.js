@@ -67,6 +67,9 @@ window.RootApp = new Vue({
     },
     //未读消息总数
     unreadMessageCount(count) {
+      console.log(count, 'root');
+      // this.$refs.userRightDraw.updateNewMessageCount(count);
+      // this.userPanel.updateNewMessageCount(count);
     },
     openLoginPanel(type) {
       if (this.isReactNative) {
