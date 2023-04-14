@@ -62,12 +62,11 @@
 <script>
 import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
 import { toChat } from "../../lib/js/chat";
-import { initEventToGetUnreadMessageCount } from '../../lib/js/socket.js'
+
 export default {
-  props: ['user'],
+  props: ['user','unreadMessageCount'],
   data: () => ({
     showColumnLink: true,
-    unreadMessageCount: 0,
   }),
   mounted() {
     //判断当专栏开启时退出登录不占一行
@@ -78,17 +77,12 @@ export default {
     } else if(!this.user.userInfo.columnId && (!this.user.uid || !this.user.columnPermission)) {
       this.showColumnLink = false;
     }
-    //初始化获取未读消息
-    initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
   },
   components: {
     "user-score": UserScoresVue,
   },
   methods: {
     toChat,
-    getUnreadMessageCount(unreadMessageCount){
-      this.unreadMessageCount = unreadMessageCount;
-    },
   },
 
 }

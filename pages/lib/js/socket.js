@@ -167,16 +167,7 @@ export function getSocketStatus() {
 
 export function initEventToGetUnreadMessageCount(callback) {
   const socket = getSocket();
-  const audio = new Audio();
-  audio.src = getUrl('messageTone');
   let unreadMessageCount = 0;
-
-  const playAudio = (url) => {
-    audio.onload = function () {
-      audio.play();
-    };
-    audio.src = url;
-  };
 
   const runCallback = () => {
     callback(unreadMessageCount);
@@ -191,9 +182,6 @@ export function initEventToGetUnreadMessageCount(callback) {
   socket.on('receiveMessage', (data) => {
     if (data.localId && data.chat.type === 'UTU') {
       return;
-    }
-    if (data.beep) {
-      playAudio(data.beep); // 播放音频
     }
     if (data.selfDefine) {
       unreadMessageCount -= 1;
