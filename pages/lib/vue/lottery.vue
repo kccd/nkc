@@ -16,14 +16,23 @@
 <script>
 import { nkcAPI } from "../js/netAPI";
 import { screenTopWarning } from "../js/topAlert";
+import { getSocket } from '../js/socket';
+const socket = getSocket();
 export default {
   name: "lottery",
   data: () => ({
     open: false,
     data: {},
-    lotteryClose: true,
+    lotteryClose: false,
   }),
-  mounted() {},
+  mounted() {
+    socket.on('redEnvelopeStatus', (data) => {
+      const {redEnvelopeStatus} = data;
+      if(redEnvelopeStatus){
+        this.lotteryClose = true
+      }
+    });
+  },
   methods: {
     lottery() {
       nkcAPI("/lottery", "POST", {})

@@ -1,4 +1,5 @@
-import Chat from '../lib/vue/message/Chat';
+// import Chat from '../lib/vue/message/Chat';
+import MessageNotify from '../lib/vue/message/MessageNotify.vue';
 import Login from '../lib/vue/Login';
 import { RNOpenLoginPage, RNToChat } from '../lib/js/reactNative';
 import { getState } from '../lib/js/state';
@@ -10,7 +11,8 @@ import Sticker from '../lib/vue/Sticker';
 import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
-import {openMessageCenter} from '../lib/js/chat';
+import Lottery from '../lib/vue/lottery.vue';
+import { openMessageCenter } from '../lib/js/chat';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -29,7 +31,8 @@ window.RootApp = new Vue({
     isReactNative: isApp && platform === 'reactNative',
   },
   components: {
-    chat: Chat,
+    'message-notify': MessageNotify,
+    lottery: Lottery,
     login: Login,
     'user-draw': UserDraw,
     'user-float-panel': UserFloatPanel,
@@ -61,6 +64,9 @@ window.RootApp = new Vue({
     updateNewMessageCount(count) {
       this.$refs.userRightDraw.updateNewMessageCount(count);
       this.userPanel.updateNewMessageCount(count);
+    },
+    //未读消息总数
+    unreadMessageCount(count) {
     },
     openLoginPanel(type) {
       if (this.isReactNative) {
