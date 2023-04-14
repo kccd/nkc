@@ -46,7 +46,7 @@ router
         tlm: new Date(),
       },
     });
-    await nkcModules.socket.sendNewFriendApplicationNew(application._id);
+    await nkcModules.socket.sendNewFriendApplicationToSelf(application._id);
     await next();
   })
   .post('/apply', async (ctx, next) => {

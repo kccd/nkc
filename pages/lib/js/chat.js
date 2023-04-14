@@ -1,5 +1,6 @@
 import { getState } from './state';
 import { RNToChat } from './reactNative';
+import { getFromLocalStorage } from './localStorage';
 const { isApp } = getState();
 export function toChat(uid, name, type) {
   if (isApp) {
@@ -9,8 +10,10 @@ export function toChat(uid, name, type) {
       type: type || 'UTU',
     });
   } else {
-    const defaultWidth = Number(localStorage.getItem('windowWidth')) || 600;
-    const defaultHeight = Number(localStorage.getItem('windowHeight')) || 500;
+    const defaultWidth =
+      Number(getFromLocalStorage('messagePanelSize').width) || 500;
+    const defaultHeight =
+      Number(getFromLocalStorage('messagePanelSize').height) || 600;
     const left = (screen.width - defaultWidth) / 2;
     const top = (screen.height - defaultHeight) / 2;
     if (uid) {

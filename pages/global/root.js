@@ -1,7 +1,7 @@
 // import Chat from '../lib/vue/message/Chat';
 import MessageNotify from '../lib/vue/message/MessageNotify.vue';
 import Login from '../lib/vue/Login';
-import { RNOpenLoginPage, RNToChat } from '../lib/js/reactNative';
+import { RNOpenLoginPage } from '../lib/js/reactNative';
 import { getState } from '../lib/js/state';
 import UserDraw from '../lib/vue/publicVue/userDraw/UserDraw';
 import UserFloatPanel from '../lib/vue/UserFloatPanel';
@@ -66,8 +66,6 @@ window.RootApp = new Vue({
       this.userPanel.updateNewMessageCount(count);
     },
     //未读消息总数
-    unreadMessageCount(count) {
-    },
     openLoginPanel(type) {
       if (this.isReactNative) {
         RNOpenLoginPage(type);

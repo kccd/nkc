@@ -1,4 +1,5 @@
 import { getState } from './state';
+import { getUrl } from './tools';
 const { uid, refererOperationId } = getState();
 
 const hasLogged = !!uid;
@@ -162,4 +163,37 @@ export function getSocketStatus() {
   } else {
     return eventsObj.disconnect;
   }
+}
+
+export function initEventToGetUnreadMessageCount(callback) {
+  const socket = getSocket();
+  let unreadMessageCount = 0;
+
+  const runCallback = () => {
+    callback(unreadMessageCount);
+  };
+
+  socket.on('unreadMessageCount', (data) => {
+    const { newMessageCount } = data;
+    unreadMessageCount = newMessageCount;
+    runCallback();
+  });
+  //接受到新消息
+  socket.on('receiveMessage', (data) => {
+    if (data.localId && data.chat.type === 'UTU') {
+      return;
+    }
+    if (data.selfDefine) {
+      unreadMessageCount -= 1;
+    } else {
+      unreadMessageCount += 1;
+    }
+    runCallback();
+  });
+  //读取未读消息
+  socket.on('markAsRead', (data) => {
+    const { unread } = data;
+    unreadMessageCount = unread;
+    runCallback();
+  });
 }

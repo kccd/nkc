@@ -28,7 +28,7 @@
         .col-xs-6.nav-user-link(@click='toChat')
           .fa.fa-envelope-o
           | 消息中心
-          .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}
+          .count(v-if="unreadMessageCount> 0") {{unreadMessageCount}}
         a(:href="'/u/' + user.uid + '/settings'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-cog
           | 资料设置
@@ -61,10 +61,10 @@
 
 <script>
 import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
-import {toChat} from "../../lib/js/chat";
+import { toChat } from "../../lib/js/chat";
 
 export default {
-  props: ['user'],
+  props: ['user','unreadMessageCount'],
   data: () => ({
     showColumnLink: true,
   }),
@@ -83,7 +83,8 @@ export default {
   },
   methods: {
     toChat,
-  }
+  },
+
 }
 </script>
 

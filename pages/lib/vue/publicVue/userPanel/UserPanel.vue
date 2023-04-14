@@ -1,7 +1,7 @@
 <template lang="pug">
   .user-panel(v-show="show" @click="stopEvent")
     .user-nav-container(v-if="anvState && !loading")
-      user-nav(:user="anvState")
+      user-nav(:user="anvState" :unreadMessageCount="unreadMessageCount")
     .left-draw-loading(v-else)
       .loading
         .fa.fa-spinner.fa-spin.fa-fw
@@ -20,23 +20,24 @@
 import userNav from "../../../../publicModules/userNav/userNavBox";
 import {nkcAPI} from "../../../js/netAPI";
 import {throttle} from "../../../js/execution";
+import { initEventToGetUnreadMessageCount } from "../../../js/socket";
 export default {
   data:() => ({
     show: false,
     loading: true,
-    anvState: null
+    anvState: null,
+    unreadMessageCount: 0,
   }),
   components: {
     "user-nav": userNav,
   },
   mounted() {
+    //初始化获取未读消息
+    initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
   },
   methods: {
     stopEvent(e) {
       e.stopPropagation();
-    },
-    updateNewMessageCount(count) {
-      this.anvState.newMessageCount = count;
     },
     //获取用户导航数据
     getUserNavData: throttle(function (){
@@ -68,7 +69,11 @@ export default {
       } else {
         this.showDraw();
       }
-    }
+    },
+    //获取socket的未读消息
+    getUnreadMessageCount(unreadMessageCount){
+      this.unreadMessageCount = unreadMessageCount;
+    },
   }
 }
 </script>
