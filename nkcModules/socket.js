@@ -338,8 +338,9 @@ async function sendNewFriendApplication(applicationId) {
     beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
   });
 }
+
 //因为无法区分接收者和发送者所以再写一个函数做区分
-async function sendNewFriendApplicationNew(applicationId) {
+async function sendNewFriendApplicationToSelf(applicationId) {
   const FriendsApplicationModel = require('../dataModels/FriendsApplicationModel');
   const MessageModel = require('../dataModels/MessageModel');
   const UserModel = require('../dataModels/UserModel');
@@ -357,7 +358,7 @@ async function sendNewFriendApplicationNew(applicationId) {
     message,
     chat,
     beep: await UserModel.getMessageBeep(applicationMessage.tUid, 'newFriends'),
-    isUser: true,
+    selfDefine: true,
   });
 }
 /*
@@ -414,7 +415,7 @@ module.exports = {
   sendEventUpdateChat,
   sendSystemInfoToUser,
   sendNewFriendApplication,
-  sendNewFriendApplicationNew,
+  sendNewFriendApplicationToSelf,
   getMediaServiceInfo,
   getMediaServiceUrl,
   getPageFromRenderService,

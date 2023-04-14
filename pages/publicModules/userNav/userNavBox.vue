@@ -28,7 +28,7 @@
         .col-xs-6.nav-user-link(@click='toChat')
           .fa.fa-envelope-o
           | 消息中心
-          .count(v-if="user.newMessageCount && user.newMessageCount > 0") {{user.newMessageCount}}
+          .count(v-if="unreadMessageCount> 0") {{unreadMessageCount}}
         a(:href="'/u/' + user.uid + '/settings'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-cog
           | 资料设置
@@ -61,12 +61,13 @@
 
 <script>
 import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
-import {toChat} from "../../lib/js/chat";
-
+import { toChat } from "../../lib/js/chat";
+import { initEventToGetUnreadMessageCount } from '../../lib/js/socket.js'
 export default {
   props: ['user'],
   data: () => ({
     showColumnLink: true,
+    unreadMessageCount: 0,
   }),
   mounted() {
     //判断当专栏开启时退出登录不占一行
@@ -77,13 +78,19 @@ export default {
     } else if(!this.user.userInfo.columnId && (!this.user.uid || !this.user.columnPermission)) {
       this.showColumnLink = false;
     }
+    //初始化获取未读消息
+    initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
   },
   components: {
     "user-score": UserScoresVue,
   },
   methods: {
     toChat,
-  }
+    getUnreadMessageCount(unreadMessageCount){
+      this.unreadMessageCount = unreadMessageCount;
+    },
+  },
+
 }
 </script>
 

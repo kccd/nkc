@@ -512,11 +512,9 @@
       },
       //根据用户拖动聊天弹出框，实时计算出窗口的大小
       handelResize:debounce(function (){
-        this.windowWidth = window.innerWidth;
-        this.windowHeight = window.innerHeight;
-        localStorage.setItem('windowWidth',this.windowWidth);
-        localStorage.setItem('windowHeight',this.windowHeight);
-        if(this.windowWidth<=768){
+        const data = {width:window.innerWidth,height:window.innerHeight}
+        saveToLocalStorage('messagePanelSize',data);
+        if(data.width<=768){
           this.mode = 'narrow'
         }
         else {
