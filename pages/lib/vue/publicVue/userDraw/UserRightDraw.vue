@@ -10,7 +10,7 @@
               :user="user"
               :column="drawState.userInfo.userColumn"
               :permission="drawState.columnPermission"
-              :count="drawState.newMessageCount"
+              :count="unreadMessageCount"
             )
             a(onclick="NKC.methods.logout()").nkc-drawer-exit 退出登录
         .left-draw-loading(v-else)
@@ -57,12 +57,14 @@ import userDrawCount from "./UserDrawCount";
 import userLogin from "./UserLogin";
 import userList from "./UserList";
 import {nkcAPI} from "../../../js/netAPI";
+import { initEventToGetUnreadMessageCount } from "../../../js/socket";
 export default {
   data:() => ({
     user: {},
     show: false,
     loading: true,
     drawState: {},
+    unreadMessageCount: 0,
   }),
   components: {
     "user-vue": UserVue,
@@ -71,6 +73,7 @@ export default {
     "user-list": userList,
   },
   mounted() {
+    initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
   },
   watch: {
     show(oldValue, newValue) {
@@ -90,6 +93,10 @@ export default {
   methods: {
     updateNewMessageCount(count) {
       this.drawState.newMessageCount = count;
+    },
+    //获取socket的未读消息
+    getUnreadMessageCount(unreadMessageCount){
+      this.unreadMessageCount = unreadMessageCount;
     },
     //获取用户数据面板
     getRightDrawData(){
