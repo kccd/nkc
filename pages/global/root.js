@@ -12,7 +12,7 @@ import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
 import Lottery from '../lib/vue/lottery.vue';
-import { openMessageCenter } from '../lib/js/chat';
+import { toChat } from '../lib/js/chat';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -78,24 +78,8 @@ window.RootApp = new Vue({
         this.$refs.login.open(type);
       }
     },
-    openChatPanel(uid, name = '', type = 'UTU') {
-      if (this.isReactNative) {
-        RNToChat({
-          uid: uid,
-          name: name,
-          type: type,
-        });
-      } else {
-        // const width = localStorage.getItem('windowWidth');
-        // const height = localStorage.getItem('windowHeight');
-        // window.open(
-        //   `/message?uid=${uid}`,
-        //   'Message',
-        //   `location=no,width=${width},height=${height}`,
-        // );
-        openMessageCenter(uid);
-        // this.$refs.chat.showMessagePanel(uid);
-      }
+    toChat(uid, name = '', type = 'UTU') {
+      toChat(uid, name, type);
     },
     //打开右侧抽屉
     openDraw(type) {

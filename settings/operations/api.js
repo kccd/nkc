@@ -38,5 +38,8 @@ module.exports = {
         GET: 'api_get_recycle_recycleBin',
       },
     },
+    review: {
+      GET: 'api_get_review_data',
+    },
   },
 };
