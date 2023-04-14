@@ -28,17 +28,19 @@ block title
     }
 block content
   #targetUserId.hidden=data.targetUserId
-  .message-status-container
-    .message-status
+  .message-status-container#App
+    chat(ref="chat" )
+    .message-status(v-show="messageStatus" )
       .fa.fa-spinner.fa-spin.fa-2x
       .m-t-05 加载中
 block scripts
-  script.
-    var targetUserId = document.getElementById('targetUserId').innerText;
-    var messageApp = RootApp.$refs.chat;
-    messageApp.showMessagePanel(targetUserId || '');
-    if($(window).width() <= 768) {
-      messageApp.setMaximize();
-    } else {
-      $('.message-status').hide();
-    }
+  +includeJS('/message/messageApp.js')
+  //script.
+  //  var targetUserId = document.getElementById('targetUserId').innerText;
+  //  var messageApp = RootApp.$refs.chat;
+  //  messageApp.showMessagePanel(targetUserId || '');
+  //  if($(window).width() <= 768) {
+  //    messageApp.setMaximize();
+  //  } else {
+  //    $('.message-status').hide();
+  //  }
