@@ -3,7 +3,6 @@
 </template>
 <script lang="ts">
 import { getSocket } from '../../js/socket.js'
-import { getUrl } from '../../js/tools.js'
 import { initEventToGetUnreadMessageCount } from '../../js/socket.js'
 import { screenTopAlert } from '../../js/topAlert.js'
 export default {
@@ -37,12 +36,10 @@ export default {
     },
     // 播放音频
     playAudio(url) {
-      this.audio.error
       this.audio.src = url;
-      this.audio.play().catch((error)=>{
+      this.audio.play().catch(() => {
         screenTopAlert('您有一条新消息');
       });
-
     },
     //更新导航栏未读消息
     updateUnreadMessageToDom(unreadMessageCount){
