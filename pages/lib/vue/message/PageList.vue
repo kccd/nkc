@@ -18,7 +18,7 @@
         li(@click="clickNavItem('setting')")
           .fa.fa-cog
           .item 设置
-      .nav-left-footer NKC MESSAGE 2.0
+      .nav-left-footer NKC MESSAGE 2.1
     // 列表导航
     .list-nav-bar
       .nav-options(@click="showOptions = !showOptions")

@@ -11,9 +11,9 @@ export function toChat(uid, name, type) {
     });
   } else {
     const defaultWidth =
-      Number(getFromLocalStorage('messagePanelSize').width) || 500;
+      Number(getFromLocalStorage('messagePanelSize').width) || 820;
     const defaultHeight =
-      Number(getFromLocalStorage('messagePanelSize').height) || 600;
+      Number(getFromLocalStorage('messagePanelSize').height) || 550;
     const left = (screen.width - defaultWidth) / 2;
     const top = (screen.height - defaultHeight) / 2;
     if (uid) {

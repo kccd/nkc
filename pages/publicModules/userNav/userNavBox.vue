@@ -25,7 +25,7 @@
         a(href=`/column/apply` target='_blank' v-else-if="user.uid && user.columnPermission").col-xs-6.nav-user-link
           .fa.fa-columns
           | 开设专栏
-        .col-xs-6.nav-user-link(@click='toChat')
+        .col-xs-6.nav-user-link(@click='toChat()')
           .fa.fa-envelope-o
           | 消息中心
           .count(v-if="unreadMessageCount> 0") {{unreadMessageCount}}
