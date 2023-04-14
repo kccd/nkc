@@ -8,6 +8,7 @@ module.exports = {
     const oname = defaultFile.name || '未知';
     const { width, height } = defaultFile;
     const url = getUrl('resource', rid);
+    const lgUrl = getUrl('resource', rid, 'lg');
     if (resource.disabled) {
       return `
          <span data-tag="nkcsource" data-type="picture-is-disable" data-id="${id}" style="text-align: center">
@@ -20,7 +21,7 @@ module.exports = {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}">
           <img data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data="${objToStr(
-            { name: oname, url },
+            { name: oname, url: lgUrl },
           )}" src="${url}" alt="${oname}" data-type="view" dataimg="content">
         </span>
       `.trim();
@@ -29,7 +30,7 @@ module.exports = {
         <span data-tag="nkcsource" data-type="picture" data-id="${id}" style="width: ${width}px;">
           <span style="padding-top: ${(height * 100) / width}%">
             <img data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data="${objToStr(
-              { name: oname, url },
+              { name: oname, url: lgUrl },
             )}" data-src="${url}" alt="${oname}" data-type="view" dataimg="content" class="lazyload">
           </span>
         </span>
