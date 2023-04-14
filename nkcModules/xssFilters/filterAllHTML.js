@@ -4,8 +4,8 @@ module.exports = (html) => {
   html = xss(html, {
     whiteList: {},
     css: {
-      whiteList: {}
-    }
+      whiteList: {},
+    },
   });
   return html;
 };
