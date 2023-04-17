@@ -379,9 +379,9 @@
       //   });
       //   this.saveContainerSizeToLocalStorage(mode, {height, width});
       // },
-      delayContainerSizeFromDomToDataAndLocalStorage: debounce(function() {
-        this.containerSizeFromDomToDataAndLocalStorage();
-      }, 1000),
+      // delayContainerSizeFromDomToDataAndLocalStorage: debounce(function() {
+      //   this.containerSizeFromDomToDataAndLocalStorage();
+      // }, 1000),
       // 鼠标离开socket面板
       onMouseLeave() {
         if(!this.mouseOver) return;
