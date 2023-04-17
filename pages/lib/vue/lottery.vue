@@ -1,5 +1,5 @@
 <template lang="pug">
-.lottery.text-right(ref="lottery", v-if="lotteryClose")
+.lottery.text-right(ref="lottery", v-if="!lotteryClose")
   .lottery-close(v-if="!open")
     .lottery-body.text-left
       .lottery-header
@@ -23,13 +23,13 @@ export default {
   data: () => ({
     open: false,
     data: {},
-    lotteryClose: false,
+    lotteryClose: true,
   }),
   mounted() {
     socket.on('redEnvelopeStatus', (data) => {
       const {redEnvelopeStatus} = data;
       if(redEnvelopeStatus){
-        this.lotteryClose = true
+        this.lotteryClose = false
       }
     });
   },
@@ -50,11 +50,11 @@ export default {
     },
     closeLottery() {
       if (this.data.result && this.open) {
-        return (this.lotteryClose = false);
+        return (this.lotteryClose = true);
       }
       nkcAPI("/lottery", "DELETE", {})
         .then(() => {
-          this.lotteryClose = false;
+          this.lotteryClose = true;
         })
         .catch(function (data) {
           screenTopWarning(data.error || data);
