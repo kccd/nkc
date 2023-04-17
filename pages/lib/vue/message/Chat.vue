@@ -168,7 +168,7 @@
     },
     watch: {
       async showPanel() {
-        const app = this;
+        /*const app = this;
         if(this.showPanel) {
         this.$nextTick(()=>{
           // this.draggableElement = new DraggableElement(this.$refs.socketContainer, '.draggable-handle', this.onContainerPositionChange);
@@ -179,7 +179,7 @@
           // }
           app.initSocketContainerMouseEvent();
           })
-        }
+        }*/
         // else{
         //   this.draggableElement && this.draggableElement.destroy()
         // }
@@ -191,7 +191,7 @@
     methods: {
       // 初始化 数据来源于本地或默认数据
       getUrl: NKC.methods.tools.getUrl,
-      initSocketContainerMouseEvent() {
+      /*initSocketContainerMouseEvent() {
         const app = this;
         const socketContainerElement = $(this.$refs.socketContainer);
         socketContainerElement.on('mouseleave', () => {
@@ -200,7 +200,7 @@
         socketContainerElement.on('mouseover', () => {
           app.onMouseOver();
         });
-      },
+      },*/
       // initContainer() {
       //   const {
       //     mode,
@@ -369,37 +369,37 @@
       //   }
       //   body.css(cssObj);
       // }, 200),
-      // containerSizeFromDomToDataAndLocalStorage() {
-      //   if(this.fixed) return;
-      //   const {mode} = this;
-      //   const {width, height} = this.getContainerSizeFromDom();
-      //   if(width === null || height === null) return;
-      //   this.setContainerSizeData(mode, {
-      //     width, height
-      //   });
-      //   this.saveContainerSizeToLocalStorage(mode, {height, width});
-      // },
-      // delayContainerSizeFromDomToDataAndLocalStorage: debounce(function() {
-      //   this.containerSizeFromDomToDataAndLocalStorage();
-      // }, 1000),
-      // 鼠标离开socket面板
-      // onMouseLeave() {
-      //   if(!this.mouseOver) return;
-      //   this.mouseOver = false;
-      //   this.enableScroll();
-      //   if(!this.fixed) {
-      //     this.delayContainerSizeFromDomToDataAndLocalStorage();
-      //   }
-      // },
+      /*containerSizeFromDomToDataAndLocalStorage() {
+        if(this.fixed) return;
+        const {mode} = this;
+        const {width, height} = this.getContainerSizeFromDom();
+        if(width === null || height === null) return;
+        this.setContainerSizeData(mode, {
+          width, height
+        });
+        this.saveContainerSizeToLocalStorage(mode, {height, width});
+      },*/
+      /*delayContainerSizeFromDomToDataAndLocalStorage: debounce(function() {
+        this.containerSizeFromDomToDataAndLocalStorage();
+      }, 1000),*/
+      /*// 鼠标离开socket面板
+      onMouseLeave() {
+        if(!this.mouseOver) return;
+        this.mouseOver = false;
+        this.enableScroll();
+        if(!this.fixed) {
+          this.delayContainerSizeFromDomToDataAndLocalStorage();
+        }
+      },
       // 鼠标悬浮于socket面板之上
-      // onMouseOver() {
-      //   if(this.mouseOver) return;
-      //   this.mouseOver = true;
-      //   // this.disableScroll();
-      //   if(!this.fixed) {
-      //     this.delayContainerSizeFromDomToDataAndLocalStorage();
-      //   }
-      // },
+      onMouseOver() {
+        if(this.mouseOver) return;
+        this.mouseOver = true;
+        // this.disableScroll();
+        if(!this.fixed) {
+          this.delayContainerSizeFromDomToDataAndLocalStorage();
+        }
+      },*/
       // 切换窗口模式 简洁模式、经典模式
       // changeSize() {
       //   const mode = this.mode === 'wide'? 'narrow': 'wide';

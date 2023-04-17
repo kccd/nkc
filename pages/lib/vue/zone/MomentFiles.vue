@@ -179,7 +179,7 @@
         for(const fileData of filesData) {
           if(fileData.type !== 'picture') continue;
           images.push({
-            url: fileData.url,
+            url: fileData.urlLG || fileData.url,
             name: fileData.filename
           });
         }
