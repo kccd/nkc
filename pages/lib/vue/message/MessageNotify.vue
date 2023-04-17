@@ -4,7 +4,7 @@
 <script lang="ts">
 import { getSocket } from '../../js/socket.js'
 import { initEventToGetUnreadMessageCount } from '../../js/socket.js'
-import { screenTopAlert } from '../../js/topAlert.js'
+import { screenTopWarning } from "../../js/topAlert.js";
 export default {
   data: () =>({
     socket: null,
@@ -38,7 +38,7 @@ export default {
     playAudio(url) {
       this.audio.src = url;
       this.audio.play().catch(() => {
-        screenTopAlert('您有一条新消息');
+        screenTopWarning('您有新的短消息，请及时查看。');
       });
     },
     //更新导航栏未读消息
