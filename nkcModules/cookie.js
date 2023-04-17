@@ -1,6 +1,7 @@
 const Cookies = require('cookies-string-parse');
+const { isDevelopment } = require('../settings/env');
 const cookieConfig = require('../config/cookie');
-const KeyGrip = require("keygrip");
+const KeyGrip = require('keygrip');
 
 const cookieKeys = new KeyGrip([cookieConfig.secret], 'sha256');
 
@@ -10,35 +11,34 @@ function getCookieKeys() {
 
 function getCookieInfo(cookie = '', key) {
   let keyInfo = null;
-  try{
+  try {
     const cookies = new Cookies(cookie, {
-      keys: getCookieKeys()
+      keys: getCookieKeys(),
     });
     let result = cookies.get(key, {
       signed: true,
     });
-    if(result) {
+    if (result) {
       keyInfo = result;
     }
-  } catch(err) {
-    if(global.NKC.isDevelopment) {
+  } catch (err) {
+    if (isDevelopment) {
       console.error(err);
     }
   }
   return keyInfo;
 }
 
-
 function getUserInfo(cookie) {
   let userInfo = null;
-  try{
+  try {
     let result = getCookieInfo(cookie, 'userInfo');
-    if(result) {
+    if (result) {
       result = Buffer.from(result, 'base64').toString();
       userInfo = JSON.parse(result);
     }
-  } catch(err) {
-    if(global.NKC.isDevelopment) {
+  } catch (err) {
+    if (isDevelopment) {
       console.error(err);
     }
   }
@@ -48,5 +48,5 @@ function getUserInfo(cookie) {
 module.exports = {
   getCookieInfo,
   getCookieKeys,
-  getUserInfo
-}
+  getUserInfo,
+};

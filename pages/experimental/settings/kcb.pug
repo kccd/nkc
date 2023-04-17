@@ -2,7 +2,7 @@ extends ../../bootstrap_base
 
 block title
   -const mainContainer1400 = true;
-  link(href='/experimental/index.css' rel='stylesheet')
+  +includeCSS('/experimental/index.css')
   title 科创币设置
 block content
   div(style='background-color: red;color: #fff;font-size: 2rem;height: 5rem;line-height: 5rem;text-align: center;')
@@ -114,7 +114,7 @@ block content
 
 
 block scripts
-  script(src=`/experimental/settings/kcb.js?v=${global.NKC.startTime}`)
+  +includeJS('/experimental/settings/kcb.js')
 
 
 

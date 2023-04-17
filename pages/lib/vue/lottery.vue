@@ -1,5 +1,5 @@
 <template lang="pug">
-.lottery.text-right(ref="lottery", v-if="lotteryClose")
+.lottery.text-right(ref="lottery", v-if="!lotteryClose")
   .lottery-close(v-if="!open")
     .lottery-body.text-left
       .lottery-header
@@ -16,6 +16,8 @@
 <script>
 import { nkcAPI } from "../js/netAPI";
 import { screenTopWarning } from "../js/topAlert";
+import { getSocket } from '../js/socket';
+const socket = getSocket();
 export default {
   name: "lottery",
   data: () => ({
@@ -23,7 +25,14 @@ export default {
     data: {},
     lotteryClose: true,
   }),
-  mounted() {},
+  mounted() {
+    socket.on('redEnvelopeStatus', (data) => {
+      const {redEnvelopeStatus} = data;
+      if(redEnvelopeStatus){
+        this.lotteryClose = false
+      }
+    });
+  },
   methods: {
     lottery() {
       nkcAPI("/lottery", "POST", {})
@@ -41,11 +50,11 @@ export default {
     },
     closeLottery() {
       if (this.data.result && this.open) {
-        return (this.lotteryClose = false);
+        return (this.lotteryClose = true);
       }
       nkcAPI("/lottery", "DELETE", {})
         .then(() => {
-          this.lotteryClose = false;
+          this.lotteryClose = true;
         })
         .catch(function (data) {
           screenTopWarning(data.error || data);

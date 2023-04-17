@@ -1,100 +1,133 @@
-const Router = require("koa-router");
+const Router = require('koa-router');
 const router = new Router();
 router
-  .get("/", async (ctx, next) => {
-    ctx.template = "review/review.pug";
-    const {nkcModules, data, db, query} = ctx;
-    const {page=0, reviewType = 'post'} = query;
+  .get('/', async (ctx, next) => {
+    ctx.template = 'review/review.pug';
+    const { nkcModules, data, db, query } = ctx;
+    const { page = 0, reviewType = 'post' } = query;
     // if(!['post', 'document'].includes(reviewType)) ctx.throw(400, `不存在参数 ${reviewType}`);
-    const {user} = data;
+    const { user } = data;
     const recycleId = await db.SettingModel.getRecycleId();
     const q = {
       reviewed: false,
       disabled: false,
-      mainForumsId: {$ne: recycleId}
+      mainForumsId: { $ne: recycleId },
     };
     //superModerator 专家权限
-    if(!ctx.permission("superModerator")) {
-      const forums = await db.ForumModel.find({moderators: user.uid});
-      const fid = forums.map(f => f.fid);
+    if (!ctx.permission('superModerator')) {
+      const forums = await db.ForumModel.find({ moderators: user.uid });
+      const fid = forums.map((f) => f.fid);
       q.mainForumsId = {
-        $in: fid
-      }
+        $in: fid,
+      };
     }
     const source = await db.ReviewModel.getDocumentSources();
-    const {article: articleSource, comment: commentSource, moment: momentSource} = await db.DocumentModel.getDocumentSources(); //post
-    const m = {status: 'unknown', type: 'stable', source: {$in: [articleSource, commentSource, momentSource]}}; // document
-    const n = {status: 'unknown', type: 'post'} //note
+    const {
+      article: articleSource,
+      comment: commentSource,
+      moment: momentSource,
+    } = await db.DocumentModel.getDocumentSources(); //post
+    const m = {
+      status: 'unknown',
+      type: 'stable',
+      source: { $in: [articleSource, commentSource, momentSource] },
+    }; // document
+    const n = { status: 'unknown', type: 'post' }; //note
     //查找出 未审核 未禁用 未退修的post和document的数量
     const postCount = await db.PostModel.countDocuments(q);
     const documentCount = await db.DocumentModel.countDocuments(m);
     const noteCount = await db.NoteContentModel.countDocuments(n);
     //获取审核列表分页
-    const paging = nkcModules.apiFunction.paging(page, (postCount>documentCount?(postCount>noteCount ?postCount:noteCount):documentCount>noteCount?documentCount:noteCount ), 30);
+    const paging = nkcModules.apiFunction.paging(
+      page,
+      postCount > documentCount
+        ? postCount > noteCount
+          ? postCount
+          : noteCount
+        : documentCount > noteCount
+        ? documentCount
+        : noteCount,
+      30,
+    );
     data.results = [];
     //获取需要审核的post
-    const tid = new Set(), postUid = new Set();
-    let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const tid = new Set(),
+      postUid = new Set();
+    let posts = await db.PostModel.find(q)
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, {
-      uid: data.user?data.user.uid: '',
-      visitor: data.user
+      uid: data.user ? data.user.uid : '',
+      visitor: data.user,
     });
-    for(const post of posts) {
+    for (const post of posts) {
       tid.add(post.tid);
       postUid.add(post.uid);
     }
-    let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false});
+    let threads = await db.ThreadModel.find({
+      tid: { $in: [...tid] },
+      disabled: false,
+    });
     threads = await db.ThreadModel.extendThreads(threads, {
       lastPost: false,
       lastPostUser: false,
       forum: true,
       category: false,
-      firstPostResource: false
+      firstPostResource: false,
     });
-    const postUsers = await db.UserModel.find({uid: {$in: [...postUid]}});
+    const postUsers = await db.UserModel.find({ uid: { $in: [...postUid] } });
     const postUsersObj = {};
     const threadsObj = {};
-    postUsers.map(user => {
+    postUsers.map((user) => {
       postUsersObj[user.uid] = user;
     });
-    threads.map(thread => {
+    threads.map((thread) => {
       threadsObj[thread.tid] = thread;
     });
-    for(const post of posts) {
+    for (const post of posts) {
       const thread = threadsObj[post.tid];
-      if(!thread) continue;
+      if (!thread) {
+        continue;
+      }
       let user;
-      if(post.anonymous) {
-        thread.uid = "";
-        post.uid = "";
-        post.uidlm = "";
+      if (post.anonymous) {
+        thread.uid = '';
+        post.uid = '';
+        post.uidlm = '';
       } else {
         user = postUsersObj[post.uid];
-        if(!user) continue;
-      }
-      let type, link;
-      if(thread.oc === post.pid) {
-        if(thread.recycleMark) {
+        if (!user) {
           continue;
         }
-        type = "thread";
+      }
+      let type, link;
+      if (thread.oc === post.pid) {
+        if (thread.recycleMark) {
+          continue;
+        }
+        type = 'thread';
         link = `/t/${thread.tid}`;
       } else {
-        type = "post";
+        type = 'post';
         link = await db.PostModel.getUrl(post);
       }
       // 从reviews表中读出送审原因
-      const reviewRecord = await db.ReviewModel.findOne({sid: post.pid, source: source.post}).sort({ toc: -1 }).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({
+        sid: post.pid,
+        source: source.post,
+      })
+        .sort({ toc: -1 })
+        .limit(1);
       data.results.push({
         post,
         user,
         thread,
         type,
         link,
-        reason: reviewRecord? reviewRecord.reason : "",
+        reason: reviewRecord ? reviewRecord.reason : '',
       });
     }
-
 
     //先查找出需要审核的document
     let documents = await db.DocumentModel.find(m, {
@@ -106,7 +139,10 @@ router
       content: 1,
       sid: 1,
       source: 1,
-    }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    })
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
     // documents = await db.DocumentModel.extendDocuments(documents, {
     //   uid: data.user?data.user.uid:'',
     //   visitor: data.user,
@@ -115,130 +151,185 @@ router
     const commentDocId = new Set();
     const momentDocId = new Set();
     const uid = new Set();
-    for(const document of documents) {
-      document.content = await nkcModules.apiFunction.obtainPureText(document.content, true, 100);
-      if(document.source === articleSource) articleDocId.add(document.did);
-      if(document.source === commentSource) commentDocId.add(document.did);
-      if(document.source === momentSource) momentDocId.add(document.did);
+    for (const document of documents) {
+      document.content = await nkcModules.apiFunction.obtainPureText(
+        document.content,
+        true,
+        100,
+      );
+      if (document.source === articleSource) {
+        articleDocId.add(document.did);
+      }
+      if (document.source === commentSource) {
+        commentDocId.add(document.did);
+      }
+      if (document.source === momentSource) {
+        momentDocId.add(document.did);
+      }
       uid.add(document.uid);
     }
     //拓展动态内容
-    let moments = await db.MomentModel.find({did: {$in: [...momentDocId]}});
+    let moments = await db.MomentModel.find({ did: { $in: [...momentDocId] } });
     moments = await db.MomentModel.extendMomentsData(moments, '', 'did');
-    let articles = await db.ArticleModel.find({did: {$in: [...articleDocId]}});
+    let articles = await db.ArticleModel.find({
+      did: { $in: [...articleDocId] },
+    });
     //拓展article内容
     articles = await db.ArticleModel.extendArticles(articles);
-    const {article} = await db.CommentModel.getCommentSources();
+    const { article } = await db.CommentModel.getCommentSources();
     //查找评论
-    let comments = await db.CommentModel.find({did: {$in: [...commentDocId]}});
+    let comments = await db.CommentModel.find({
+      did: { $in: [...commentDocId] },
+    });
     comments = await db.CommentModel.extendReviewComments(comments);
-    const users = await db.UserModel.find({uid: {$in: [...uid]}});
+    const users = await db.UserModel.find({ uid: { $in: [...uid] } });
     const usersObj = {};
     const articleObj = {};
     const commentObj = {};
-    users.map(user => {
+    users.map((user) => {
       usersObj[user.uid] = user;
-    })
-    articles.map(article => {
+    });
+    articles.map((article) => {
       articleObj[article.did] = article;
-    })
-    comments.map(comment => {
+    });
+    comments.map((comment) => {
       commentObj[comment.did] = comment;
-    })
-    for(const document of documents) {
-      const article =  articleObj[document.did];
-      if(!article && document.source === 'article') continue;
+    });
+    for (const document of documents) {
+      const article = articleObj[document.did];
+      if (!article && document.source === 'article') {
+        continue;
+      }
       const comment = commentObj[document.did];
-      if(!comment && document.source === 'comment') continue;
+      if (!comment && document.source === 'comment') {
+        continue;
+      }
       const moment = moments[document.did];
-      if(!moment && document.source === 'moment') continue;
+      if (!moment && document.source === 'moment') {
+        continue;
+      }
       let user = usersObj[document.uid];
-      if(!user) continue;
+      if (!user) {
+        continue;
+      }
       //获取送审原因
-      const reviewRecord = await db.ReviewModel.findOne({sid: document._id, source: source.document}).sort({toc: -1}).limit(1);
+      const reviewRecord = await db.ReviewModel.findOne({
+        sid: document._id,
+        source: source.document,
+      })
+        .sort({ toc: -1 })
+        .limit(1);
       data.results.push({
         type: 'document',
         document,
         content: article || comment || moment,
         user,
-        reason: reviewRecord?reviewRecord.reason : '',
-      })
+        reason: reviewRecord ? reviewRecord.reason : '',
+      });
     }
-    
+
     //查找出需要审核的note
-    let notes = await  db.NoteContentModel.find(n).sort({toc:-1}).skip(paging.start).limit(paging.perpage)
+    let notes = await db.NoteContentModel.find(n)
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
     const noteUid = new Set();
     for (const note of notes) {
-      noteUid.add(note.uid)
+      noteUid.add(note.uid);
     }
-    const noteUsers = await db.UserModel.find({uid: {$in: [...noteUid]}});
-    const noteObj = {}
-    noteUsers.map(user=>{
-      noteObj[user.uid] = user
-    })
-    
-     for (const note of notes){
-       //获取送审核的原因
-        const reviewRecord = await db.ReviewModel.findOne({sid: note._id.toString(), source: 'note'});
-        const user = noteObj[note.uid]
-        const content = {
-          note:note.content,
-          url:`/note/${note.noteId}`
-        }
-        data.results.push({
-          type:'note',
-          note,
-          content,
-          user,
-          reason: reviewRecord?reviewRecord.reason:''
-        })
-     
-     }
+    const noteUsers = await db.UserModel.find({ uid: { $in: [...noteUid] } });
+    const noteObj = {};
+    noteUsers.map((user) => {
+      noteObj[user.uid] = user;
+    });
+
+    for (const note of notes) {
+      //获取送审核的原因
+      const reviewRecord = await db.ReviewModel.findOne({
+        sid: note._id.toString(),
+        source: 'note',
+      });
+      const user = noteObj[note.uid];
+      const content = {
+        note: note.content,
+        url: `/note/${note.noteId}`,
+      };
+      data.results.push({
+        type: 'note',
+        note,
+        content,
+        user,
+        reason: reviewRecord ? reviewRecord.reason : '',
+      });
+    }
     data.reviewType = reviewType;
     data.paging = paging;
     await next();
   })
-  .put("/", async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     //审核post和document
-    const {data, db, body, state} = ctx;
-    const {user} = data;
-    let {pid, type: reviewType, docId, pass, reason, remindUser, violation, delType,noteId} = body;//remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
-    if(!reviewType) {
-      if(pid) {
+    const { data, db, body, state } = ctx;
+    const { user } = data;
+    let {
+      pid,
+      type: reviewType,
+      docId,
+      pass,
+      reason,
+      remindUser,
+      violation,
+      delType,
+      noteId,
+    } = body; //remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
+    if (!reviewType) {
+      if (pid) {
         reviewType = 'post';
-      }
-      else if(docId) {
+      } else if (docId) {
         reviewType = 'document';
-      }
-      else if(noteId){
+      } else if (noteId) {
         reviewType = 'note';
       }
     }
     let message;
-    const {normal: normalStatus, faulty: faultyStatus, unknown: unknownStatus, disabled: disabledStatus} = await db.DocumentModel.getDocumentStatus();
+    const {
+      normal: normalStatus,
+      faulty: faultyStatus,
+      unknown: unknownStatus,
+      disabled: disabledStatus,
+    } = await db.DocumentModel.getDocumentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
-    const noteContentStatus = await  db.NoteContentModel.getNoteContentStatus();
+    const noteContentStatus = await db.NoteContentModel.getNoteContentStatus();
     const reviewSources = await db.ReviewModel.getDocumentSources();
-    if(reviewType === 'post') {
-      const post = await db.PostModel.findOne({pid});
-      if(!post) ctx.throw(404, `未找到ID为${pid}的post`);
-      if(post.reviewed) ctx.throw(400, "内容已经被审核过了，请刷新");
-      const forums = await db.ForumModel.find({fid: {$in: post.mainForumsId}});
+    if (reviewType === 'post') {
+      const post = await db.PostModel.findOne({ pid });
+      if (!post) {
+        ctx.throw(404, `未找到ID为${pid}的post`);
+      }
+      if (post.reviewed) {
+        ctx.throw(400, '内容已经被审核过了，请刷新');
+      }
+      const forums = await db.ForumModel.find({
+        fid: { $in: post.mainForumsId },
+      });
       //自己的专业自己可以审核
       let isModerator = ctx.permission('superModerator');
-      if(!isModerator) {
-        for(const f of forums) {
-          isModerator = await f.isModerator(data.user?data.user.uid: '');
-          if(isModerator) break;
+      if (!isModerator) {
+        for (const f of forums) {
+          isModerator = await f.isModerator(data.user ? data.user.uid : '');
+          if (isModerator) {
+            break;
+          }
         }
       }
 
-      if(!isModerator) ctx.throw(403, `您没有权限审核该内容，pid: ${pid}`);
+      if (!isModerator) {
+        ctx.throw(403, `您没有权限审核该内容，pid: ${pid}`);
+      }
 
-      let type = "passPost";
+      let type = 'passPost';
       //将post标记为已审核
       await post.updateOne({
-        reviewed: true
+        reviewed: true,
       });
       //通知作者文章/回复,被回复/评论了
       await post.noticeAuthorReply();
@@ -248,48 +339,51 @@ router
         ip,
         uid: post.uid,
         quoteType: momentQuoteTypes.post,
-        quoteId: post.pid
-      })
-        .catch(console.error);
-      const thread = await db.ThreadModel.findOnly({tid: post.tid});
-      if(thread.oc === post.pid) {
+        quoteId: post.pid,
+      }).catch(console.error);
+      const thread = await db.ThreadModel.findOnly({ tid: post.tid });
+      if (thread.oc === post.pid) {
         //将文章标记为已审核
         await thread.updateOne({
-          reviewed: true
+          reviewed: true,
         });
-        type = "passThread";
+        type = 'passThread';
       }
       //更新文章信息
       await thread.updateThreadMessage(false);
       //生成审核记录
-      await db.ReviewModel.newReview(
-        {
+      await db.ReviewModel.newReview({
         type,
         sid: post.pid,
         uid: post.uid,
         reason: '',
         handlerId: user.uid,
-        source: reviewSources.post}
-       );
+        source: reviewSources.post,
+      });
       //生成通知消息
       message = await db.MessageModel({
-        _id: await db.SettingModel.operateSystemID("messages", 1),
+        _id: await db.SettingModel.operateSystemID('messages', 1),
         r: post.uid,
-        ty: "STU",
+        ty: 'STU',
         c: {
-          type: "passReview",
-          pid: post.pid
-        }
+          type: 'passReview',
+          pid: post.pid,
+        },
       });
-    }
-    else if(reviewType === 'document') {
+    } else if (reviewType === 'document') {
       const documentStatus = await db.ArticleModel.getArticleStatus();
-      if(delType && !documentStatus[delType]) ctx.throw(400, '状态错误');
-      const document = await db.DocumentModel.findOne({_id: docId});
-      if(!document) ctx.throw(404, `未找到_ID为 ${docId}的文档`);
-      const targetUser = await db.UserModel.findOne({uid: document.uid});
-      if(pass) {
-        if(document.status === normalStatus) ctx.throw(400, '内容已经审核, 请刷新后重试');
+      if (delType && !documentStatus[delType]) {
+        ctx.throw(400, '状态错误');
+      }
+      const document = await db.DocumentModel.findOne({ _id: docId });
+      if (!document) {
+        ctx.throw(404, `未找到_ID为 ${docId}的文档`);
+      }
+      const targetUser = await db.UserModel.findOne({ uid: document.uid });
+      if (pass) {
+        if (document.status === normalStatus) {
+          ctx.throw(400, '内容已经审核, 请刷新后重试');
+        }
         //将document状态改为已审核状态
         await document.setStatus(normalStatus);
         //生成审核记录
@@ -299,8 +393,8 @@ router
           documentId: document._id,
           type: 'passDocument',
         });
-        const {source} = document;
-        if(momentQuoteTypes[source] && source !== 'moment') {
+        const { source } = document;
+        if (momentQuoteTypes[source] && source !== 'moment') {
           //生成一条新的动态
           const ip = await db.IPModel.getIpByIpId(document.ip);
           db.MomentModel.createQuoteMomentAndPublish({
@@ -308,60 +402,61 @@ router
             port: document.port,
             uid: document.uid,
             quoteType: momentQuoteTypes[source],
-            quoteId: document.sid
-          })
-            .catch(console.error);
+            quoteId: document.sid,
+          }).catch(console.error);
         }
-        await db.ReviewModel.newReview(
-          {
-            type: 'passDocument',
-            sid: document._id,
-            uid: document.uid,
-            reason,
-            handlerId: data.user.uid,
-            source: reviewSources.document
-          }
-          );
+        await db.ReviewModel.newReview({
+          type: 'passDocument',
+          sid: document._id,
+          uid: document.uid,
+          reason,
+          handlerId: data.user.uid,
+          source: reviewSources.document,
+        });
         let passType;
-        if(document.source === 'article') {
-          passType = "documentPassReview";
-        } else if(document.source === 'comment') {
-          passType = "commentPassReview";
+        if (document.source === 'article') {
+          passType = 'documentPassReview';
+        } else if (document.source === 'comment') {
+          passType = 'commentPassReview';
           //如果审核的内容是comment,并且是第一次审核，即判断document的状态是否为unknown,就通知文章作者文章被评论
-          const comment = await db.CommentModel.findOnly({_id: document.sid});
-          if(comment.status === normalStatus) {
+          const comment = await db.CommentModel.findOnly({ _id: document.sid });
+          if (comment.status === normalStatus) {
             //通知作者
             await comment.noticeAuthorComment();
           }
-        } else if(document.source === 'moment') {
-          passType = "momentPass";
+        } else if (document.source === 'moment') {
+          passType = 'momentPass';
         }
         message = await db.MessageModel({
-          _id: await db.SettingModel.operateSystemID("messages", 1),
+          _id: await db.SettingModel.operateSystemID('messages', 1),
           r: document.uid,
-          ty: "STU",
+          ty: 'STU',
           c: {
             type: passType,
             docId: document._id,
-          }
-        })
+          },
+        });
         await document.sendMessageToAtUsers('article');
       } else {
-        if(document.status === delType) ctx.throw(400, '内容已经退修/禁用, 请刷新后重试');
-        if(!delType) ctx.throw(400, '请选择审核状态');
+        if (document.status === delType) {
+          ctx.throw(400, '内容已经退修/禁用, 请刷新后重试');
+        }
+        if (!delType) {
+          ctx.throw(400, '请选择审核状态');
+        }
         //将document状态改为已审核状态
         await document.setStatus(delType);
         //生成退修或删除记录
         const delLog = db.DelPostLogModel({
           delUserId: document.uid,
           userId: user.uid,
-          delPostTitle: document?document.title : "",
+          delPostTitle: document ? document.title : '',
           reason,
           postType: document.source,
           threadId: document.sid,
           postId: document._id,
           delType: delType,
-          noticeType: remindUser
+          noticeType: remindUser,
         });
         await delLog.save();
         // await db.ReviewModel.reviewDocument({
@@ -372,7 +467,7 @@ router
         // });
         // await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
         //如果标记用户违规了就给该用户新增违规记录
-        if(violation) {
+        if (violation) {
           //新增违规记录
           await db.UsersScoreLogModel.insertLog({
             user: targetUser,
@@ -384,65 +479,83 @@ router
             key: 'violationCount',
             description: reason || '屏蔽文档并标记为违规',
           });
-          await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
+          await db.KcbsRecordModel.insertSystemRecord(
+            'violation',
+            targetUser,
+            ctx,
+          );
           //如果用户违规了就将用户图书中的reviewedCount.article设置为后台设置违规需要发的贴数，用户每发帖一次就将该数量减一，为零时不需要审核
           // await db.UserGeneralModel.resetReviewedCount(document.uid, ['article', 'comment']);
         }
-        if(remindUser) {
+        if (remindUser) {
           let messageType;
-          if(document.source === 'article') {
-            messageType = delType === 'faulty'?"documentFaulty":"documentDisabled";
-          } else if(document.source === 'comment') {
-            messageType = delType === 'faulty'?"commentFaulty":"commentDisabled";
-          } else if(document.source === 'moment') {
+          if (document.source === 'article') {
+            messageType =
+              delType === 'faulty' ? 'documentFaulty' : 'documentDisabled';
+          } else if (document.source === 'comment') {
+            messageType =
+              delType === 'faulty' ? 'commentFaulty' : 'commentDisabled';
+          } else if (document.source === 'moment') {
             messageType = 'momentDelete';
           }
           message = db.MessageModel({
-            _id: await db.SettingModel.operateSystemID("messages", 1),
+            _id: await db.SettingModel.operateSystemID('messages', 1),
             r: document.uid,
-            ty: "STU",
+            ty: 'STU',
             c: {
               delType,
-              violation,//是否违规
+              violation, //是否违规
               type: messageType,
               docId: document._id,
               reason,
-            }
+            },
           });
         }
       }
-    } else if(reviewType === 'note'){
-      const note = await db.NoteContentModel.findOne({_id: noteId});
-      if(!note) ctx.throw(404,`未找到ID为${noteId}的note`)
-      if(note.status === noteContentStatus.normal) ctx.throw(400,'内容已经被审核通过了，请刷新');
-      if(note.status === noteContentStatus.disabled) ctx.throw(400,'内容已经被屏蔽，请刷新');
-      if(note.status === noteContentStatus.deleted) ctx.throw(400,'内容已经被删除，请刷新');
-      const noteUser = await db.UserModel.findOne({uid: note.uid})
-      if(pass){
-         //note为通过的状态
-        await db.NoteContentModel.updateOne({_id: noteId},{
-          $set:{
-            status: noteContentStatus.normal
-          }
-        });
-        //生成新的审核记录
-        await db.ReviewModel.newReview(
+    } else if (reviewType === 'note') {
+      const note = await db.NoteContentModel.findOne({ _id: noteId });
+      if (!note) {
+        ctx.throw(404, `未找到ID为${noteId}的note`);
+      }
+      if (note.status === noteContentStatus.normal) {
+        ctx.throw(400, '内容已经被审核通过了，请刷新');
+      }
+      if (note.status === noteContentStatus.disabled) {
+        ctx.throw(400, '内容已经被屏蔽，请刷新');
+      }
+      if (note.status === noteContentStatus.deleted) {
+        ctx.throw(400, '内容已经被删除，请刷新');
+      }
+      const noteUser = await db.UserModel.findOne({ uid: note.uid });
+      if (pass) {
+        //note为通过的状态
+        await db.NoteContentModel.updateOne(
+          { _id: noteId },
           {
-            type: 'passNote',
-            sid: note._id,
-            uid: note.uid,
-            reason: '',
-            handlerId: state.uid,
-            source: reviewSources.note,
-          }
+            $set: {
+              status: noteContentStatus.normal,
+            },
+          },
         );
+        //生成新的审核记录
+        await db.ReviewModel.newReview({
+          type: 'passNote',
+          sid: note._id,
+          uid: note.uid,
+          reason: '',
+          handlerId: state.uid,
+          source: reviewSources.note,
+        });
       } else {
         //note为屏蔽状态
-        await db.NoteContentModel.updateOne({_id: noteId},{
-          $set:{
-            status: noteContentStatus.disabled
-          }
-        });
+        await db.NoteContentModel.updateOne(
+          { _id: noteId },
+          {
+            $set: {
+              status: noteContentStatus.disabled,
+            },
+          },
+        );
         //更新审核记录状态
         await db.ReviewModel.newReview({
           type: 'disabledNote',
@@ -452,40 +565,39 @@ router
           uid: note.uid,
           handlerId: state.uid,
         });
-       //如果标记用户违规就给该用户新增违规记录
-       if(violation){
-         //新增违规记录
-         await db.UsersScoreLogModel.insertLog({
-           user: noteUser,
-           type: 'score',
-           typeIdOfScoreChange: "violation",
-           port: ctx.port,
-           delType,
-           ip: ctx.address,
-           key: 'violationCount',
-           description: reason || '笔记出现敏感词并标记违规',
-           noteId: note._id,
-         })
-       }
-       //如果要提醒用户
-        if(remindUser){
-          message =await db.MessageModel({
-            _id: await db.SettingModel.operateSystemID("messages",1) ,
+        //如果标记用户违规就给该用户新增违规记录
+        if (violation) {
+          //新增违规记录
+          await db.UsersScoreLogModel.insertLog({
+            user: noteUser,
+            type: 'score',
+            typeIdOfScoreChange: 'violation',
+            port: ctx.port,
+            delType,
+            ip: ctx.address,
+            key: 'violationCount',
+            description: reason || '笔记出现敏感词并标记违规',
+            noteId: note._id,
+          });
+        }
+        //如果要提醒用户
+        if (remindUser) {
+          message = await db.MessageModel({
+            _id: await db.SettingModel.operateSystemID('messages', 1),
             r: note.uid,
             ty: 'STU',
-            c:{
+            c: {
               delType,
               violation,
               type: 'noteDisabled',
               noteId: note._id,
-              reason
-            }
-          })
+              reason,
+            },
+          });
         }
       }
-      
     }
-    if(message) {
+    if (message) {
       await message.save();
       //通过socket通知作者
       await ctx.nkcModules.socket.sendMessageToUser(message._id);

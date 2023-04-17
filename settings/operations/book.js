@@ -4,11 +4,11 @@ module.exports = {
     member: {
       invitation: {
         GET: 'bookInvitation',
-        POST: 'bookInvitation'
-      }
+        POST: 'bookInvitation',
+      },
     },
     options: {
-      GET: "getBook"
-    }
-  }
-}
+      GET: 'getBook',
+    },
+  },
+};

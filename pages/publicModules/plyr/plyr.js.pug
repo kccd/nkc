@@ -94,7 +94,7 @@ if !isIncluded('plyr')
             ratio: '4:3',
             title: title,
             controls: videoControls,
-            settings: ['quality'],
+            settings: ['quality', 'speed'],
             quality: {default: 720, options: [1080, 720, 480]},
             blankVideo: "/external_pkgs/plyr/blank.mp4",
             autopause: true,
@@ -115,7 +115,7 @@ if !isIncluded('plyr')
           NKC.methods.initAttachmentMask(attachment);
         }
       }
-     
+
       NKC.methods.initVideo = function() {
         NKC.methods.initNKCAudio();
         NKC.methods.initNKCVideo();

@@ -1,17 +1,16 @@
-import UserPanel from "../lib/vue/publicVue/userPanel/UserPanel";
+import UserPanel from '../lib/vue/publicVue/userPanel/UserPanel';
 //创建用户导航栏vue实例
 export const initUserPanel = function () {
-  if($('#userNav').length === 0) return;
+  if ($('#userNav').length === 0) return;
   return new Vue({
     el: '#userNav',
-    data: {
-    },
-    mounted(){
+    data: {},
+    mounted() {
       this.initUserNavAvatar();
       this.initCloseEvent();
     },
     components: {
-      "user-panel": UserPanel
+      'user-panel': UserPanel,
     },
     methods: {
       initUserNavAvatar() {
@@ -40,7 +39,7 @@ export const initUserPanel = function () {
       },
       switchDraw() {
         this.$refs.userPanel.switchDraw();
-      }
-    }
-  })
-}
+      },
+    },
+  });
+};

@@ -1,9 +1,9 @@
-import disabledNote from '../../lib/vue/post/DisabledPost.vue'
+import disabledNote from '../../lib/vue/post/DisabledPost.vue';
 NKC.modules.NotePanel = class {
   constructor() {
     const self = this;
     self.app = new Vue({
-      el: "#moduleNotePanel",
+      el: '#moduleNotePanel',
       data: {
         managementNote: false,
         uid: NKC.configs.uid,
@@ -12,16 +12,16 @@ NKC.modules.NotePanel = class {
         edit: false,
         submitting: false,
         // 新添加的笔记内容
-        content: "",
-        noteStatus:{
-          disabled : "disabled",//屏蔽
-          unknown  : "unknown",//未审核
-          normal   : "normal", //正常状态
-          deleted  : "deleted", //删除状态
+        content: '',
+        noteStatus: {
+          disabled: 'disabled', //屏蔽
+          unknown: 'unknown', //未审核
+          normal: 'normal', //正常状态
+          deleted: 'deleted', //删除状态
         },
         // 显示笔记
-        note: "",
-          /* note的数据结构
+        note: '',
+        /* note的数据结构
           {
             _id: Number,
             type,
@@ -49,39 +49,42 @@ NKC.modules.NotePanel = class {
         getUrl: NKC.methods.tools.getUrl,
         visitUrl: NKC.methods.visitUrl,
         setTextareaSize(size) {
-          const textarea = this.$el.getElementsByClassName("create-textarea")[0];
+          const textarea =
+            this.$el.getElementsByClassName('create-textarea')[0];
           textarea.style.height = size;
         },
         resetTextarea() {
-          this.content = "";
-          this.setTextareaSize("2.5rem");
+          this.content = '';
+          this.setTextareaSize('2.5rem');
         },
         autoResize(e) {
           const textArea = e.target;
           const num = 2.5 * 12;
           textArea.style.height = '2.5rem';
-          if(num < textArea.scrollHeight) {
+          if (num < textArea.scrollHeight) {
             textArea.style.height = textArea.scrollHeight + 'px';
           }
         },
         saveNewNote() {
           // 创建新的
-          const {content, note} = this;
+          const { content, note } = this;
           Promise.resolve()
             .then(() => {
-              if(!content) throw "请输入笔记内容";
-              const {type, targetId, node, _id} = note;
+              if (!content) {
+                throw '请输入笔记内容';
+              }
+              const { type, targetId, node, _id } = note;
               self.app.submitting = true;
-              return nkcAPI("/note", "POST", {
+              return nkcAPI('/note', 'POST', {
                 _id,
                 type,
                 targetId,
                 content,
-                node
+                node,
               });
             })
-            .then(data => {
-              self.app.content = "";
+            .then((data) => {
+              self.app.content = '';
               self.app.resetTextarea();
               self.app.resetDom();
               self.callback(data.note);
@@ -91,39 +94,43 @@ NKC.modules.NotePanel = class {
               self.app.submitting = false;
               setTimeout(() => {
                 self.app.scrollToBottom();
-              }, 200)
+              }, 200);
             })
-            .catch(err => {
+            .catch((err) => {
               sweetError(err);
               self.app.submitting = false;
             });
         },
         modifyNoteContent(n) {
-          if(n.edit) {
+          if (n.edit) {
             n.edit = false;
           } else {
             n.edit = true;
-            if(!n._content) n._content = n.content;
+            if (!n._content) {
+              n._content = n.content;
+            }
           }
         },
         extendNoteContent(note) {
-          note.notes.map(n => {
+          note.notes.map((n) => {
             n.edit = false;
-            n._content = "";
+            n._content = '';
           });
         },
         saveNote(n) {
           // 保存编辑
-          const {note, uid} = this;
-          let url, method, data = {};
-          if(n.uid === uid) {
+          const { note, uid } = this;
+          let url,
+            method,
+            data = {};
+          if (n.uid === uid) {
             url = `/note/${note._id}/c/${n._id}`;
-            method = "PUT";
+            method = 'PUT';
             data.content = n._content;
           } else {
             url = `/nkc/note`;
-            method = "POST";
-            data.type = "modify";
+            method = 'POST';
+            data.type = 'modify';
             data.noteId = note._id;
             data.noteContentId = n._id;
             data.content = n._content;
@@ -141,19 +148,19 @@ NKC.modules.NotePanel = class {
           new Promise((resolve, reject) => {
             self.app.resetDom();
             self.callback = callback;
-            const {id, note} = options;
-            if(note) {
+            const { id, note } = options;
+            if (note) {
               self.app.note = note;
               resolve();
             } else {
-              return nkcAPI(`/note/${id}`, "GET")
-                .then(data => {
+              return nkcAPI(`/note/${id}`, 'GET')
+                .then((data) => {
                   self.app.extendNoteContent(data.note);
                   self.app.note = data.note;
                   self.app.managementNote = data.managementNote;
                   resolve();
                 })
-                .catch(reject)
+                .catch(reject);
             }
           })
             .then(() => {
@@ -167,74 +174,75 @@ NKC.modules.NotePanel = class {
         },
         resetDom() {
           const dom = this.$el;
-          dom.style.height = "auto";
+          dom.style.height = 'auto';
         },
         scrollToBottom() {
-          const dom = this.$el.getElementsByClassName("note-panel-notes")[0];
+          const dom = this.$el.getElementsByClassName('note-panel-notes')[0];
           dom.scrollTop = dom.scrollHeight + 10000;
         },
         deleteNoteContent(n, type) {
-          const {note} = this;
-          let url, method, data = {};
-          if(type === "delete") {
+          const { note } = this;
+          let url,
+            method,
+            data = {};
+          if (type === 'delete') {
             url = `/note/${note._id}/c/${n._id}`;
-            method = "DELETE";
-            sweetQuestion("确定要执行此操作？")
+            method = 'DELETE';
+            sweetQuestion('确定要执行此操作？')
               .then(() => {
                 return nkcAPI(url, method, data);
               })
-              .then(function() {
+              .then(function () {
                 n.status = self.app.noteStatus.deleted;
-                sweetSuccess("操作成功");
+                sweetSuccess('操作成功');
               })
               .catch(sweetError);
           } else {
-            method = "POST";
+            method = 'POST';
             url = `/nkc/note`;
-            if(n.status === 'disabled') {
-              data.type = "cancelDisable";
+            if (n.status === 'disabled') {
+              data.type = 'cancelDisable';
               data.noteId = note._id;
               data.noteContentId = n._id;
-              sweetQuestion("确定要执行此操作？")
+              sweetQuestion('确定要执行此操作？')
                 .then(() => {
                   return nkcAPI(url, method, data);
                 })
-                .then(function() {
+                .then(function () {
                   n.deleted = true;
-                  sweetSuccess("操作成功");
+                  sweetSuccess('操作成功');
                 })
                 .catch(sweetError);
             } else {
-              this.$refs.disabled.open((obj)=>{
-                method = "POST";
+              this.$refs.disabled.open((obj) => {
+                method = 'POST';
                 url = `/nkc/note`;
-                data.type = "disable";
+                data.type = 'disable';
                 data.noteId = note._id;
                 data.noteContentId = n._id;
-                data.remindUser = obj.remindUser
+                data.remindUser = obj.remindUser;
                 data.reason = obj.reason;
-                data.violation = obj.violation
+                data.violation = obj.violation;
                 nkcAPI(url, method, data)
-                  .then(function() {
+                  .then(function () {
                     n.status = self.app.noteStatus.disabled;
-                    sweetSuccess("操作成功");
+                    sweetSuccess('操作成功');
                   })
                   .catch(sweetError);
-                this.$refs.disabled.close()
-              },true)
+                this.$refs.disabled.close();
+              }, true);
             }
           }
         },
-      
       },
       components: {
-        disabled : disabledNote
-      }
+        disabled: disabledNote,
+      },
     });
     self.open = self.app.open;
     self.close = self.app.close;
     self.isOpen = () => {
       return !!this.app.show;
-    }
+    };
   }
 };

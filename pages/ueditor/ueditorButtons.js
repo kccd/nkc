@@ -1,100 +1,111 @@
-;(function(){
-  UE.registerUI('draftSelector',function(editor,uiName){
-    if(NKC.modules.SelectDraft && !window.SelectDraft) {
+(function () {
+  UE.registerUI('draftSelector', function (editor, uiName) {
+    if (NKC.modules.SelectDraft && !window.SelectDraft) {
       window.SelectDraft = new NKC.modules.SelectDraft();
     }
     return new UE.ui.Button({
-      name:'draftSelector',
-      title:'草稿箱',
+      name: 'draftSelector',
+      title: '草稿箱',
       // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
       // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
       className: 'edui-default edui-for-draft edui-icon',
-      onclick:function () {
-        if(window.SelectDraft) {
-          window.SelectDraft.open(function(res) {
-            editor.execCommand('inserthtml', res.content || "");
+      onclick: function () {
+        if (window.SelectDraft) {
+          window.SelectDraft.open(function (res) {
+            editor.execCommand('inserthtml', res.content || '');
             // editor.methods.selectedDraft(res);
           });
         } else {
-          return sweetError("未初始化草稿选择模块");
+          return sweetError('未初始化草稿选择模块');
         }
-      }
+      },
     });
   });
 
   // 插入表情
-  UE.registerUI('stickerSelector',function(editor,uiName){
-    if(NKC.modules.SelectSticker && !window.SelectSticker) {
+  UE.registerUI('stickerSelector', function (editor, uiName) {
+    if (NKC.modules.SelectSticker && !window.SelectSticker) {
       window.SelectSticker = new NKC.modules.SelectSticker();
     }
     return new UE.ui.Button({
-      name:'stickerSelector',
-      title:'插入表情',
+      name: 'stickerSelector',
+      title: '插入表情',
       // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
       // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
       className: 'edui-default edui-for-emotion edui-icon',
-      onclick:function () {
-        if(window.SelectSticker) {
-          window.SelectSticker.open(function(res) {
-            if(res.type === "emoji") {
-              editor.execCommand('inserthtml', NKC.methods.resourceToHtml("twemoji", res.data));
-            }else if(res.type === "sticker") {
-              editor.execCommand('inserthtml', NKC.methods.resourceToHtml("sticker", res.data.rid));
+      onclick: function () {
+        if (window.SelectSticker) {
+          window.SelectSticker.open(function (res) {
+            if (res.type === 'emoji') {
+              editor.execCommand(
+                'inserthtml',
+                NKC.methods.resourceToHtml('twemoji', res.data),
+              );
+            } else if (res.type === 'sticker') {
+              editor.execCommand(
+                'inserthtml',
+                NKC.methods.resourceToHtml('sticker', res.data.rid),
+              );
             }
           });
         } else {
-          return sweetError("未初始化表情选择模块");
+          return sweetError('未初始化表情选择模块');
         }
-      }
-    })
+      },
+    });
   });
 
   // 插入图片
-  UE.registerUI('imageSelector',function(editor,uiName){
-    if(NKC.modules.SelectResource && !window.SelectResource) {
+  UE.registerUI('imageSelector', function (editor, uiName) {
+    if (NKC.modules.SelectResource && !window.SelectResource) {
       window.SelectResource = new NKC.modules.SelectResource();
     }
     return new UE.ui.Button({
-      name:'imageSelector',
-      title:'插入图片和附件',
+      name: 'imageSelector',
+      title: '插入图片和附件',
       // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
       // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
       className: 'edui-default edui-for-image-selector edui-icon',
-      onclick:function () {
-        if(window.SelectResource) {
-          window.SelectResource.open(function(data) {
-            if(data.resources) {
-              data = data.resources;
-            } else {
-              data = [data];
-            }
-            for(var i = 0; i < data.length; i++) {
-              var source = data[i];
-              var type = source.mediaType;
-              type = type.substring(5);
-              type = type[0].toLowerCase() + type.substring(1);
-              // if(type === "video") {
-              //   editor.execCommand("insertvideo", {
-              //     //视频地址
-              //     url: "/r/"+ source.rid,
-              //     //视频宽高值， 单位px
-              //     width: 200,
-              //     height: 100
-              //   });
-              //   continue;
-              // }
-              editor.execCommand('inserthtml', NKC.methods.resourceToHtml(type, source.rid, source.oname));
-            }
-          }, {
-            fastSelect: true
-          });
+      onclick: function () {
+        if (window.SelectResource) {
+          window.SelectResource.open(
+            function (data) {
+              if (data.resources) {
+                data = data.resources;
+              } else {
+                data = [data];
+              }
+              for (var i = 0; i < data.length; i++) {
+                var source = data[i];
+                var type = source.mediaType;
+                type = type.substring(5);
+                type = type[0].toLowerCase() + type.substring(1);
+                // if(type === "video") {
+                //   editor.execCommand("insertvideo", {
+                //     //视频地址
+                //     url: "/r/"+ source.rid,
+                //     //视频宽高值， 单位px
+                //     width: 200,
+                //     height: 100
+                //   });
+                //   continue;
+                // }
+                editor.execCommand(
+                  'inserthtml',
+                  NKC.methods.resourceToHtml(type, source.rid, source.oname),
+                );
+              }
+            },
+            {
+              fastSelect: true,
+            },
+          );
         } else {
-          return sweetError("未初始化资源选择模块");
+          return sweetError('未初始化资源选择模块');
         }
-      }
-    })
+      },
+    });
   });
-
 
   // 插入附件
   // UE.registerUI('resourceSelector',function(editor,uiName){
@@ -202,9 +213,14 @@
   // 判断是否为pc
   function IsPC() {
     var userAgentInfo = navigator.userAgent;
-    var Agents = ["Android", "iPhone",
-      "SymbianOS", "Windows Phone",
-      "iPad", "iPod"];
+    var Agents = [
+      'Android',
+      'iPhone',
+      'SymbianOS',
+      'Windows Phone',
+      'iPad',
+      'iPod',
+    ];
     var flag = true;
     for (var v = 0; v < Agents.length; v++) {
       if (userAgentInfo.indexOf(Agents[v]) > 0) {
@@ -215,10 +231,8 @@
     return flag;
   }
 
-
-
-  UE.registerUI('mathFormulaV2',function(editor,uiName){
-    if(NKC.modules.insertMathformula && !window.insertMathformula) {
+  UE.registerUI('mathFormulaV2', function (editor, uiName) {
+    if (NKC.modules.insertMathformula && !window.insertMathformula) {
       window.insertMathformula = new NKC.modules.insertMathformula();
     }
 
@@ -245,65 +259,75 @@
     // });
 
     return new UE.ui.Button({
-      name:'mathFormulaV2',
-      title:'插入公式',
+      name: 'mathFormulaV2',
+      title: '插入公式',
       className: 'edui-default edui-for-mathformula edui-icon',
-      onclick:function () {
-        if(window.insertMathformula) {
-          window.insertMathformula.open(function(formula) {
-            editor.execCommand("inserthtml", formula)
+      onclick: function () {
+        if (window.insertMathformula) {
+          window.insertMathformula.open(function (formula) {
+            editor.execCommand('inserthtml', formula);
           });
         } else {
-          return sweetError("未初始化公式组件");
+          return sweetError('未初始化公式组件');
         }
-      }
-    })
+      },
+    });
   });
 
-
-
-
   // 注册一个隐藏区域功能
-  UE.registerUI('hideContent',function(editor,uiName){
-    if(NKC.modules.insertHideContent && !window.insertHideContent) {
+  UE.registerUI('hideContent', function (editor, uiName) {
+    if (NKC.modules.insertHideContent && !window.insertHideContent) {
       window.insertHideContent = new NKC.modules.insertHideContent();
     }
 
-    editor.ready(function() {
+    editor.ready(function () {
       var editDoc = editor.document;
-      var handle = function(e) {
+      var handle = function (e) {
         var target = e.target;
-        if(target.dataset.tag !== "nkcsource") return;
+        if (target.dataset.tag !== 'nkcsource') {
+          return;
+        }
         var type = target.dataset.type;
         var score = target.dataset.id;
-        if(type !== "xsf") return;
-        window.insertHideContent.open(function(newscore) {
-         target.dataset.id = newscore;
-         target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
-       }, parseFloat(score));
+        if (type !== 'xsf') {
+          return;
+        }
+        window.insertHideContent.open(function (newscore) {
+          target.dataset.id = newscore;
+          target.dataset.message =
+            '浏览这段内容需要' + newscore + '学术分(双击修改)';
+        }, parseFloat(score));
       };
       var count = 0;
-      editDoc.addEventListener("dblclick", handle);
-      editDoc.addEventListener("touchend", function(e) {   // 手机端模拟双击
+      editDoc.addEventListener('dblclick', handle);
+      editDoc.addEventListener('touchend', function (e) {
+        // 手机端模拟双击
         ++count;
-        if(count == 2) return handle(e);
-        setTimeout(function(){ count = 0; }, 700);
+        if (count == 2) {
+          return handle(e);
+        }
+        setTimeout(function () {
+          count = 0;
+        }, 700);
       });
     });
 
     return new UE.ui.Button({
-      name:'hideContent',
-      title:'学术分隐藏',
+      name: 'hideContent',
+      title: '学术分隐藏',
       className: 'edui-default edui-for-hide-content edui-icon',
-      onclick:function () {
-        if(window.insertHideContent) {
-          window.insertHideContent.open(function(score) {
-            editor.execCommand("inserthtml", NKC.methods.resourceToHtml("xsf", score))
+      onclick: function () {
+        if (window.insertHideContent) {
+          window.insertHideContent.open(function (score) {
+            editor.execCommand(
+              'inserthtml',
+              NKC.methods.resourceToHtml('xsf', score),
+            );
           });
         } else {
-          return sweetError("未初始化资源选择模块");
+          return sweetError('未初始化资源选择模块');
         }
-      }
-    })
+      },
+    });
   });
-}());
+})();

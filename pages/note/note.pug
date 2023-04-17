@@ -16,7 +16,7 @@ block content
           .note-options(v-if=`n.user.uid === uid || ${permission('managementNote')}`)
             .note-options-icon.fa.fa-ellipsis-v(@click="openOptions(n)")
             ul(v-if="n.options")
-              li(@click="modifyNoteContent(n)" v-if=`n.user.uid === uid` :class="n.status === 'disabled'?'disabled':''") 编辑
+              li(@click="modifyNoteContent(n)" v-if=`n.user.uid === uid` :class="n.status === 'disabled'?'editDisabled':''") 编辑
               li(@click="deleteNoteContent(n, 'delete')" v-if="n.user.uid === uid") 删除
               li(@click="deleteNoteContent(n, 'disable')" v-if=`${permission('managementNote')}`) {{n.status === 'disabled' ?"解除屏蔽":"屏蔽"}}
         .note-content-body

@@ -1,4 +1,6 @@
 const log4js = require('log4js');
+const { isDevelopment } = require('../settings/env');
+const { processId } = require('../settings/env');
 
 const logger = {
   error,
@@ -89,7 +91,7 @@ async function saveLogToDB(ctx) {
   const log = {
     error,
     method,
-    path: global.NKC.isProduction ? path : url,
+    path: !isDevelopment ? path : url,
     query: _body,
     status,
     ip: address,
@@ -119,7 +121,7 @@ async function saveLogToDB(ctx) {
     reqTime: log.reqTime,
     resTime: log.processTime,
     consoleType: 'http',
-    processId: global.NKC.processId,
+    processId: processId,
     error: log.error,
     from: log.referer,
     address: log.ip,
@@ -146,7 +148,7 @@ async function saveLogToDB(ctx) {
     if (d.error) {
       logger.error(logContent);
       // 非线上环境打印错误详细信息
-      if (global.NKC.NODE_ENV !== 'production') {
+      if (isDevelopment) {
         console.error(log.error);
       }
     } else {
@@ -182,7 +184,7 @@ async function saveLogToDB(ctx) {
       JSON.stringify(operationStatistics),
     );
   } catch (err) {
-    if (global.NKC.isDevelopment) {
+    if (isDevelopment) {
       console.log(err);
     }
   }

@@ -1,10 +1,12 @@
-const imgHeight = 40, imgWidth = 300; // 主尺图片高宽
+const imgHeight = 40,
+  imgWidth = 300; // 主尺图片高宽
 const fontSize = 10; // 文字大小
 const backgroundColor = '#ddd'; // 背景颜色
 const fontColor = '#000'; // 字体颜色、刻度颜色
 const fontInfo = `${fontSize}px Sans`;
 const paddingLeft = 5; // 主尺刻度距离左边的距离
-const {createCanvas, loadImage} = require('canvas');
+const { createCanvas } = require('canvas');
+const { isDevelopment } = require('../../settings/env');
 const unit = 'mm';
 function create() {
   // 主尺刻度范围 最小值在0到50，最大值在最小值的基础上增加30到35
@@ -29,7 +31,7 @@ function create() {
   const width2 = unitWidth * 9 + 20;
 
   // 副尺单位 像素宽度
-  const unitWidth2 = unitWidth * 9 / 10;
+  const unitWidth2 = (unitWidth * 9) / 10;
 
   // 副尺刻度距离左边的距离
   const paddingLeft2 = Math.round(Math.random() * (imgWidth - width2));
@@ -44,7 +46,7 @@ function create() {
   ctx2.fillStyle = backgroundColor;
 
   // 渲染背景
-  ctx.fillRect(0, 0, imgWidth, imgHeight)
+  ctx.fillRect(0, 0, imgWidth, imgHeight);
   // 向右移动一点点画布，避免第一个刻度与图片左边框重合导致看不清刻度的问题
   ctx.translate(paddingLeft, 0);
 
@@ -52,17 +54,18 @@ function create() {
 
   let showUnit = false; // 是否已显示过刻度单位
 
-  for(let i = 0; i <= numberCount; i ++) {
+  for (let i = 0; i <= numberCount; i++) {
     const x = i * unitWidth;
     let lineHeight = 8; // 默认刻度高度
     let number = i + minNumber; // 实际刻度值需要当前值加上最小刻度值
     let numberStr; // 显示的刻度信息
-    if(number % 5 === 0) {
+    if (number % 5 === 0) {
       lineHeight = 11;
-      if(number % 10 === 0) {
+      if (number % 10 === 0) {
         lineHeight = 14;
         numberStr = number;
-        if(!showUnit) { // 第一个刻度数字显示单位
+        if (!showUnit) {
+          // 第一个刻度数字显示单位
           showUnit = true;
           numberStr += unit;
         }
@@ -72,7 +75,7 @@ function create() {
     ctx.beginPath();
     ctx.moveTo(x, height);
     ctx.lineTo(x, height - lineHeight); // 画刻度
-    if(numberStr) {
+    if (numberStr) {
       ctx.font = fontInfo;
       ctx.fillText(numberStr, x, fontSize + 10);
     }
@@ -80,16 +83,16 @@ function create() {
   }
 
   // 画副尺 同上-----------------------------------
-  ctx2.fillRect(0, 0, imgWidth, imgHeight)
+  ctx2.fillRect(0, 0, imgWidth, imgHeight);
 
   ctx2.translate(paddingLeft2 + paddingLeft, 0);
-  for(let i = minNumber2; i <= maxNumber2; i++) {
+  for (let i = minNumber2; i <= maxNumber2; i++) {
     const x = i * unitWidth2;
     let lineHeight = 8;
     let showNumber = false;
-    if(i % 5 === 0) {
+    if (i % 5 === 0) {
       lineHeight = 11;
-      if(i % 10 === 0) {
+      if (i % 10 === 0) {
         lineHeight = 14;
         showNumber = true;
       }
@@ -98,15 +101,18 @@ function create() {
     ctx2.fillStyle = fontColor;
     ctx2.moveTo(x, 0);
     ctx2.lineTo(x, lineHeight);
-    if(showNumber) {
+    if (showNumber) {
       ctx2.font = fontInfo;
       ctx2.fillText(i, x, fontSize + lineHeight);
     }
     ctx2.stroke();
   }
 
-  const {question, answer} = getQuestion({
-    minNumber, maxNumber, unitWidth, paddingLeft2
+  const { question, answer } = getQuestion({
+    minNumber,
+    maxNumber,
+    unitWidth,
+    paddingLeft2,
   });
 
   return {
@@ -115,39 +121,37 @@ function create() {
     backgroundColor,
     mainImageBase64: canvas.toDataURL(),
     secondaryImageBase64: canvas2.toDataURL(),
-  }
+  };
 }
 
 function verify(data, dataDB) {
-  if(global.NKC.NODE_ENV !== 'production') {
+  if (isDevelopment) {
     console.log(`上传：${data.answer}px 精准：${dataDB.answer}px`);
   }
-  return data.answer <= dataDB.answer + 1 && data.answer >= dataDB.answer - 1
+  return data.answer <= dataDB.answer + 1 && data.answer >= dataDB.answer - 1;
 }
 
 function getQuestion(options) {
-  const {
-    maxNumber,
-    minNumber,
-    unitWidth,
-    paddingLeft2
-  } = options;
+  const { maxNumber, minNumber, unitWidth, paddingLeft2 } = options;
   // 目标值
-  let question = Math.random() * (maxNumber - 15 - minNumber - 4) + minNumber + 4;
+  let question =
+    Math.random() * (maxNumber - 15 - minNumber - 4) + minNumber + 4;
 
-  const answer = Number(((question - minNumber) * unitWidth - paddingLeft2).toFixed(1));
+  const answer = Number(
+    ((question - minNumber) * unitWidth - paddingLeft2).toFixed(1),
+  );
 
-  if(answer >= -3 && answer <= 3) {
+  if (answer >= -3 && answer <= 3) {
     return getQuestion(options);
   } else {
     return {
       question: question.toFixed(1) + unit,
       answer,
-    }
+    };
   }
 }
 
 module.exports = {
-  create, verify
+  create,
+  verify,
 };
-

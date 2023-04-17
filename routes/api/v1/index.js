@@ -5,11 +5,13 @@ const accountRouter = require('./account');
 const articlesRouter = require('./articles');
 const threadsRouter = require('./threads');
 const columnRouter = require('./column');
+const recycleRouter = require('./recycle');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
   .use('/user', userRouter.routes(), userRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/threads', threadsRouter.routes(), threadsRouter.allowedMethods())
-  .use('/column', columnRouter.routes(), columnRouter.allowedMethods());
+  .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
+  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods());
 module.exports = router;

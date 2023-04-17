@@ -1,9 +1,9 @@
 extends ../experimental
 block eTitle
-  link(href='/experimental/index.css' rel='stylesheet')
-  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
-  link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  +includeCSS('/experimental/index.css')
+  +includeCSS('/jquery/jquery.minicolors.css')
+  +includeCSS('/jcrop/css/jquery.Jcrop.min.css')
+  +includeCSS('/icheck/skins/minimal/red.css')
   title 网站首页设置
 block eContent
 
@@ -159,9 +159,9 @@ block eContent
 
 
 block scripts
-  script(src=`/jcrop/js/jquery.Jcrop.min.js?v=${global.NKC.startTime}`)
-  script(src=`/jquery/jquery.minicolors.js?v=${NKC.startTime}`)
-  script(src='/icheck/icheck.js')
+  +includeJS(`/jcrop/js/jquery.Jcrop.min.js`)
+  +includeJS(`/jquery/jquery.minicolors.js`)
+  +includeJS('/icheck/icheck.js')
   +includeJS('/experimental/settings/home.js')
 
 

@@ -3,8 +3,8 @@ mongo()
   .then(() => {
     // console.log(`MongoDB connected`);
   })
-  .catch(err => {
+  .catch((err) => {
     console.log(err);
     process.exit(1);
-  })
+  });
 module.exports = require('mongoose');
