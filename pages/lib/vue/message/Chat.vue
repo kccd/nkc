@@ -383,23 +383,23 @@
       //   this.containerSizeFromDomToDataAndLocalStorage();
       // }, 1000),
       // 鼠标离开socket面板
-      onMouseLeave() {
-        if(!this.mouseOver) return;
-        this.mouseOver = false;
-        this.enableScroll();
-        if(!this.fixed) {
-          this.delayContainerSizeFromDomToDataAndLocalStorage();
-        }
-      },
+      // onMouseLeave() {
+      //   if(!this.mouseOver) return;
+      //   this.mouseOver = false;
+      //   this.enableScroll();
+      //   if(!this.fixed) {
+      //     this.delayContainerSizeFromDomToDataAndLocalStorage();
+      //   }
+      // },
       // 鼠标悬浮于socket面板之上
-      onMouseOver() {
-        if(this.mouseOver) return;
-        this.mouseOver = true;
-        // this.disableScroll();
-        if(!this.fixed) {
-          this.delayContainerSizeFromDomToDataAndLocalStorage();
-        }
-      },
+      // onMouseOver() {
+      //   if(this.mouseOver) return;
+      //   this.mouseOver = true;
+      //   // this.disableScroll();
+      //   if(!this.fixed) {
+      //     this.delayContainerSizeFromDomToDataAndLocalStorage();
+      //   }
+      // },
       // 切换窗口模式 简洁模式、经典模式
       // changeSize() {
       //   const mode = this.mode === 'wide'? 'narrow': 'wide';
