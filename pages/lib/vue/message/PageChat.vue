@@ -88,7 +88,7 @@
                 span(v-if="message.progress !== 100") 发送中...{{message.progress}}%
                 span(v-else) 发送成功，处理中...
     //- 输入面板 仅在与用户对话时显示
-    .chat-form(v-if="showForm")
+    .chat-form(v-if="showForm" ref="chatForm" )
       // 警告信息展示面板
       .warning-info-panel(v-if="warningContent")
         .warning-content {{warningContent}}
@@ -99,7 +99,7 @@
         .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
           img(:src="e.url")
       //- 输入框容器
-      .textarea-container
+      .textarea-container(@mousedown="changeBoxHeightOnClick" @mouseup="stopChangeBoxHeightOnClick" @mousemove="calculateHeightOnMouseOver" @mouseleave="calculateHeightOnMouseout")
         //- 输入框
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
@@ -113,374 +113,6 @@
         .button.send(@click="sendTextMessage")
           span 发送
 </template>
-
-<style scoped lang="less">
-  @import "../../../publicModules/base";
-  @headerHeight: 3.4rem;
-  @textareaContainerHeight: 6rem;
-  @buttonContainerHeight: 3rem;
-  @bgColor: #eee;
-  @bubbleBgColor: #fff;
-  @bubbleBgColorRight: @primary;
-  .re-edit{
-    color: @primary!important;
-    user-select: none;
-    cursor: pointer;
-    &:hover{
-      opacity: 0.7;
-    }
-  }
-  .chat-message-info{
-    height: 2rem;
-    line-height: 2rem;
-    text-align: center;
-    font-size: 1rem;
-    color: #555;
-  }
-  .chat-container{
-    width: 100%;
-    background-color: @bgColor;
-    position: absolute;
-    top: @headerHeight;
-    bottom: 0;
-    left: 0;
-    overflow-y: auto;
-    &[data-type='UTU']{
-      bottom: @textareaContainerHeight + @buttonContainerHeight;
-    }
-  }
-  .chat{
-    position: relative;
-  }
-  .chat-form{
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: @textareaContainerHeight + @buttonContainerHeight;
-    background-color: #fff;
-    &>div{
-      height: 100%;
-    }
-    .textarea-container{
-      height: @textareaContainerHeight;
-      box-sizing: border-box;
-      border: 1px solid #e7e7e7;
-      width: 100%;
-    }
-    .button-container{
-      height: @buttonContainerHeight;
-      width: 100%;
-      padding-left: 1rem;
-      .button{
-        cursor: pointer;
-        display: inline-block;
-        height: @buttonContainerHeight;
-        line-height: @buttonContainerHeight;
-        font-size: 1.6rem;
-        margin-right: 1rem;
-        user-select: none;
-        &.send{
-          float: right;
-          margin-right: 0;
-          font-size: 1.25rem;
-          color: #444;
-          cursor: pointer;
-          padding: 0 1rem;
-          &:hover, &:active{
-            color: @primary;
-          }
-        }
-        &.tip{
-          font-size: 1rem;
-          color: #777;
-          vertical-align: bottom;
-        }
-      }
-    }
-    textarea{
-      overflow-x: hidden;
-      overflow-y: auto;
-      width: 100%;
-      resize: none;
-      height: 100%;
-      padding: 0.5rem 1rem;
-      border: none;
-      &:focus{
-        outline: none;
-      }
-    }
-    //box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
-  }
-  .message-time, .message-withdrawn{
-    text-align: center;
-    & span{
-      @height: 1.8rem;
-      margin: auto;
-      height: @height;
-      line-height: @height;
-      display: inline-block;
-      padding: 0 0.5rem;
-      background-color: #e7e7e7;
-      color: #555;
-      font-size: 1rem;
-      text-align: center;
-      border-radius: 3px;
-      border: 1px solid #e2e2e2;
-    }
-  }
-  .chat-message-item>div{
-    margin: 1rem 0;
-  }
-  .message{
-    @iconHeight: 3rem;
-    position: relative;
-    padding: 0 @iconHeight + 2rem;
-    .icon{
-      height: @iconHeight;
-      width: @iconHeight;
-      overflow: hidden;
-      position: absolute;
-      top: 0;
-      left: 0.8rem;
-      img{
-        height: 100%;
-        width: 100%;
-        border-radius: 50%;
-      }
-    }
-    &.right{
-      .icon{
-        right: 0.8rem;
-        left: auto;
-      }
-    }
-    &.right .message-body .message-content .html{
-      & /deep/ a{
-        text-decoration: underline;
-        color: #fff;
-      }
-    }
-    .timestamp{
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
-      color: #fff;
-      position: absolute;
-      top: 0;
-      left: -10rem;
-    }
-    .message-body{
-      background-color: @bubbleBgColor;
-      color: #333;
-      min-height: 3rem;
-      padding: 0.7rem 0.7rem;
-      font-size: 1.17rem;
-      position: relative;
-      border-radius: 5px;
-      display: inline-block;
-      max-width: 30rem;
-      .sending-progress{
-        margin-top: 0.2rem;
-        height: 1.8rem;
-        width: 100%;
-        padding: 0 0.5rem;
-        text-align: center;
-        line-height: 1.8rem;
-        font-size: 1rem;
-        background-color: #f4f4f4;
-        border-radius: 3px;
-        border: 1px solid #e2e2e2;
-        color: #888;
-        .fa{
-          margin-right: 0.2rem;
-        }
-      }
-      &.nkc-media{
-        padding: 0;
-        .smart{
-          display: none;
-        }
-        .image{
-          cursor: pointer;
-          img{
-            max-width: 100%;
-            max-height: 20rem;
-          }
-        }
-        .video{
-          font-size: 0;
-          video{
-            max-width: 100%;
-            max-height: 20rem;
-          }
-        }
-      }
-      .audio{
-        audio{
-          max-width: 100%;
-        }
-        .filename{
-          font-size: 1.2rem;
-        }
-        .left, .right{
-          &>*{
-            display: inline-block;
-          }
-          img{
-            height: 2rem;
-            width: 2rem;
-          }
-        }
-        .left img{
-          margin-right: 2rem;
-        }
-        .right img{
-          margin-left: 2rem;
-        }
-      }
-      .smart{
-        position: absolute;
-        top: 0;
-        left: -8px;
-        height: 20px;
-        width: 8px;
-        border-radius: 0 0 0 15px;
-        background-color: @bubbleBgColor;
-        &:after {
-          content: '';
-          display: block;
-          height: 18px;
-          width: 16px;
-          position: absolute;
-          top: -5px;
-          left: -8px;
-          border-radius: 0 0 0 20px;
-          background-color: @bgColor;
-        }
-      }
-      .status{
-        position: absolute;
-        top: 0;
-        font-size: 1.6rem;
-        width: 2rem;
-        left: -2rem;
-        text-align: center;
-        &.error{
-          color: @accent;
-        }
-        &.sending{
-          color: #ccc;
-          font-size: 1.5rem;
-        }
-        &.withdrawn{
-          color: #ccc;
-          font-size: 1.4rem;
-          cursor: pointer;
-        }
-      }
-      .message-content{
-        text-align: left;
-        word-break: break-all;
-        font-size: 1.2rem;
-        .html{
-          & /deep/ a{
-            //text-decoration: none;
-          }
-          & /deep/ .message-emoji{
-              width: 2rem;
-          }
-        }
-        .file{
-          a{
-            color: #333;
-            text-decoration: none;
-            &:hover, &:active{
-              text-decoration: none;
-            }
-            button{
-              margin-top: 0.5rem;
-              color: #fff;
-              border-radius: 3px;
-              height: 2rem;
-              display: block;
-              line-height: 2rem;
-              background-color: @primary;
-              text-align: center;
-              font-size: 1rem;
-              outline: none;
-              border: none;
-              &:hover, &:active{
-                opacity: 0.7;
-              }
-            }
-          }
-        }
-      }
-    }
-    &.right{
-      text-align: right;
-      .message-body{
-        text-align: left;
-        background-color: @bubbleBgColorRight;
-        color: #fff;
-        .smart{
-          right: -8px;
-          left: auto;
-          border-radius: 0 0 15px 0;
-          background-color: @bubbleBgColorRight;
-          &:after {
-            height: 17px;
-            width: 18px;
-            left: auto;
-            right: -10px;
-            border-radius: 0 0 20px 0;
-          }
-        }
-      }
-    }
-  }
-  .chat{
-    position: relative;
-  }
-  .chat-twemoji{
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding: 0.5rem 0;
-    z-index: 500;
-    .icon{
-      cursor: pointer;
-      height: 2rem;
-      width: 2rem;
-      display: inline-block;
-      margin: 0.2rem;
-      img{
-        height: 100%;
-        width: 100%;
-      }
-    }
-  }
-  .warning-info-panel{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow-y: auto;
-    padding: 0.5rem;
-    z-index: 600;
-    background-color: rgba(200, 200, 200, 0.94);
-    color: #000;
-    .warning-button{
-      text-align: center;
-      padding-top: 0.5rem;
-      button{
-
-      }
-    }
-  }
-</style>
 
 <script>
   const CHAT_CONTENT_ID = `NKC_CHAT_CONTENT`;
@@ -525,7 +157,13 @@
       warningContent: '',
 
       listContentBottom: 0,
-
+      isHandel: false,
+      initialHeightOnClick: 0,
+      heightDuringMove: 0,
+      initialBoxHeight: 0,
+      initialChatFormBottom: 0,
+      finalBoxHeight: 0,
+      finalChatFormBottom: 0,
     }),
     watch: {
       content() {
@@ -657,6 +295,43 @@
       getUrl: getUrl,
       getSize: getSize,
       timeFormat: timeFormat,
+      //手动改变盒子高度
+      changeBoxHeightOnClick(event){
+        if(event.target === event.currentTarget){
+          this.isHandel = true;  //是否开始拖动
+          this.initialBoxHeight = event.target.offsetHeight; //盒子未拖动前的高度
+          this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
+          const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);//获取刚拖动的时候的bottom偏移量
+          if(num !==null){
+            this.initialChatFormBottom =Number(num[0]);
+          }
+          else {
+            this.initialChatFormBottom = 0;
+          }
+        }
+      },
+      //鼠标松开停止改变
+      stopChangeBoxHeightOnClick(event){
+          this.isHandel = false
+      },
+      //计算鼠标的移动的高度
+      calculateHeightOnMouseOver(event){
+        if(this.isHandel){
+          this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
+          this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
+          this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
+          if( this.finalChatFormBottom>0){
+            this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
+          }
+          event.target.style.height = `${this.finalBoxHeight}px`;
+          console.log(this.heightDuringMove, this.finalBoxHeight ,this.finalChatFormBottom, 'test');
+        }
+      },
+      //鼠标移出
+      calculateHeightOnMouseout(event){
+        this.isHandel = false;
+        this.heightDuringMove = 0;
+      },
       clearWarningContent() {
         this.warningContent = ''
       },
@@ -969,3 +644,375 @@
     }
   }
 </script>
+
+<style scoped lang="less">
+@import "../../../publicModules/base";
+@headerHeight: 3.4rem;
+@textareaContainerHeight: 6rem;
+@buttonContainerHeight: 3rem;
+@bgColor: #eee;
+@bubbleBgColor: #fff;
+@bubbleBgColorRight: @primary;
+.re-edit{
+  color: @primary!important;
+  user-select: none;
+  cursor: pointer;
+  &:hover{
+    opacity: 0.7;
+  }
+}
+.chat-message-info{
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+}
+.chat-container{
+  width: 100%;
+  background-color: @bgColor;
+  position: absolute;
+  top: @headerHeight;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  &[data-type='UTU']{
+    bottom: @textareaContainerHeight + @buttonContainerHeight;
+  }
+}
+.chat{
+  position: relative;
+}
+.chat-form{
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: @textareaContainerHeight + @buttonContainerHeight;
+  background-color: #fff;
+  &>div{
+    height: 100%;
+  }
+  .textarea-container{
+    height: @textareaContainerHeight;
+    box-sizing: border-box;
+    border: 1px solid #e7e7e7;
+    width: 100%;
+    padding: 5px 0;
+    background-color: rgb(204, 232, 207);
+    position: relative;
+  }
+  .button-container{
+    height: @buttonContainerHeight;
+    width: 100%;
+    padding-left: 1rem;
+    .button{
+      cursor: pointer;
+      display: inline-block;
+      height: @buttonContainerHeight;
+      line-height: @buttonContainerHeight;
+      font-size: 1.6rem;
+      margin-right: 1rem;
+      user-select: none;
+      &.send{
+        float: right;
+        margin-right: 0;
+        font-size: 1.25rem;
+        color: #444;
+        cursor: pointer;
+        padding: 0 1rem;
+        &:hover, &:active{
+          color: @primary;
+        }
+      }
+      &.tip{
+        font-size: 1rem;
+        color: #777;
+        vertical-align: bottom;
+      }
+    }
+  }
+  textarea{
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    resize: none;
+    height: 100%;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: rgb(204, 232, 207);
+    &:focus{
+      outline: none;
+    }
+  }
+  //box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
+}
+.message-time, .message-withdrawn{
+  text-align: center;
+  & span{
+    @height: 1.8rem;
+    margin: auto;
+    height: @height;
+    line-height: @height;
+    display: inline-block;
+    padding: 0 0.5rem;
+    background-color: #e7e7e7;
+    color: #555;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 3px;
+    border: 1px solid #e2e2e2;
+  }
+}
+.chat-message-item>div{
+  margin: 1rem 0;
+}
+.message{
+  @iconHeight: 3rem;
+  position: relative;
+  padding: 0 @iconHeight + 2rem;
+  .icon{
+    height: @iconHeight;
+    width: @iconHeight;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0.8rem;
+    img{
+      height: 100%;
+      width: 100%;
+      border-radius: 50%;
+    }
+  }
+  &.right{
+    .icon{
+      right: 0.8rem;
+      left: auto;
+    }
+  }
+  &.right .message-body .message-content .html{
+    & /deep/ a{
+      text-decoration: underline;
+      color: #fff;
+    }
+  }
+  .timestamp{
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    color: #fff;
+    position: absolute;
+    top: 0;
+    left: -10rem;
+  }
+  .message-body{
+    background-color: @bubbleBgColor;
+    color: #333;
+    min-height: 3rem;
+    padding: 0.7rem 0.7rem;
+    font-size: 1.17rem;
+    position: relative;
+    border-radius: 5px;
+    display: inline-block;
+    max-width: 30rem;
+    .sending-progress{
+      margin-top: 0.2rem;
+      height: 1.8rem;
+      width: 100%;
+      padding: 0 0.5rem;
+      text-align: center;
+      line-height: 1.8rem;
+      font-size: 1rem;
+      background-color: #f4f4f4;
+      border-radius: 3px;
+      border: 1px solid #e2e2e2;
+      color: #888;
+      .fa{
+        margin-right: 0.2rem;
+      }
+    }
+    &.nkc-media{
+      padding: 0;
+      .smart{
+        display: none;
+      }
+      .image{
+        cursor: pointer;
+        img{
+          max-width: 100%;
+          max-height: 20rem;
+        }
+      }
+      .video{
+        font-size: 0;
+        video{
+          max-width: 100%;
+          max-height: 20rem;
+        }
+      }
+    }
+    .audio{
+      audio{
+        max-width: 100%;
+      }
+      .filename{
+        font-size: 1.2rem;
+      }
+      .left, .right{
+        &>*{
+          display: inline-block;
+        }
+        img{
+          height: 2rem;
+          width: 2rem;
+        }
+      }
+      .left img{
+        margin-right: 2rem;
+      }
+      .right img{
+        margin-left: 2rem;
+      }
+    }
+    .smart{
+      position: absolute;
+      top: 0;
+      left: -8px;
+      height: 20px;
+      width: 8px;
+      border-radius: 0 0 0 15px;
+      background-color: @bubbleBgColor;
+      &:after {
+        content: '';
+        display: block;
+        height: 18px;
+        width: 16px;
+        position: absolute;
+        top: -5px;
+        left: -8px;
+        border-radius: 0 0 0 20px;
+        background-color: @bgColor;
+      }
+    }
+    .status{
+      position: absolute;
+      top: 0;
+      font-size: 1.6rem;
+      width: 2rem;
+      left: -2rem;
+      text-align: center;
+      &.error{
+        color: @accent;
+      }
+      &.sending{
+        color: #ccc;
+        font-size: 1.5rem;
+      }
+      &.withdrawn{
+        color: #ccc;
+        font-size: 1.4rem;
+        cursor: pointer;
+      }
+    }
+    .message-content{
+      text-align: left;
+      word-break: break-all;
+      font-size: 1.2rem;
+      .html{
+        & /deep/ a{
+          //text-decoration: none;
+        }
+        & /deep/ .message-emoji{
+          width: 2rem;
+        }
+      }
+      .file{
+        a{
+          color: #333;
+          text-decoration: none;
+          &:hover, &:active{
+            text-decoration: none;
+          }
+          button{
+            margin-top: 0.5rem;
+            color: #fff;
+            border-radius: 3px;
+            height: 2rem;
+            display: block;
+            line-height: 2rem;
+            background-color: @primary;
+            text-align: center;
+            font-size: 1rem;
+            outline: none;
+            border: none;
+            &:hover, &:active{
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.right{
+    text-align: right;
+    .message-body{
+      text-align: left;
+      background-color: @bubbleBgColorRight;
+      color: #fff;
+      .smart{
+        right: -8px;
+        left: auto;
+        border-radius: 0 0 15px 0;
+        background-color: @bubbleBgColorRight;
+        &:after {
+          height: 17px;
+          width: 18px;
+          left: auto;
+          right: -10px;
+          border-radius: 0 0 20px 0;
+        }
+      }
+    }
+  }
+}
+.chat{
+  position: relative;
+}
+.chat-twemoji{
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  z-index: 500;
+  .icon{
+    cursor: pointer;
+    height: 2rem;
+    width: 2rem;
+    display: inline-block;
+    margin: 0.2rem;
+    img{
+      height: 100%;
+      width: 100%;
+    }
+  }
+}
+.warning-info-panel{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding: 0.5rem;
+  z-index: 600;
+  background-color: rgba(200, 200, 200, 0.94);
+  color: #000;
+  .warning-button{
+    text-align: center;
+    padding-top: 0.5rem;
+    button{
+
+    }
+  }
+}
+</style>
