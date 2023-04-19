@@ -99,7 +99,8 @@
         .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
           img(:src="e.url")
       //- 输入框容器
-      .textarea-container(@mousedown="changeBoxHeightOnClick" @mouseup="stopChangeBoxHeightOnClick" @mousemove="calculateHeightOnMouseOver" @mouseleave="calculateHeightOnMouseout")
+      .textarea-container(ref="textareaContainer" )
+        .boxStretch(@mousedown="changeBoxHeightOnClick" @mouseup="stopChangeBoxHeightOnClick" @mousemove="calculateHeightOnMouseOver" @mouseleave="calculateHeightOnMouseLeave")
         //- 输入框
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
@@ -297,9 +298,8 @@
       timeFormat: timeFormat,
       //手动改变盒子高度
       changeBoxHeightOnClick(event){
-        if(event.target === event.currentTarget){
           this.isHandel = true;  //是否开始拖动
-          this.initialBoxHeight = event.target.offsetHeight; //盒子未拖动前的高度
+          this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
           this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
           const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);//获取刚拖动的时候的bottom偏移量
           if(num !==null){
@@ -308,11 +308,6 @@
           else {
             this.initialChatFormBottom = 0;
           }
-        }
-      },
-      //鼠标松开停止改变
-      stopChangeBoxHeightOnClick(event){
-          this.isHandel = false
       },
       //计算鼠标的移动的高度
       calculateHeightOnMouseOver(event){
@@ -320,16 +315,23 @@
           this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
           this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
           this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
-          if( this.finalChatFormBottom>0){
+          if( this.finalBoxHeight >= 72 && this.finalBoxHeight <=300){
+            this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
+          }
+          if( this.finalChatFormBottom >= 0 && this.finalBoxHeight <=300){
             this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
           }
-          event.target.style.height = `${this.finalBoxHeight}px`;
-          console.log(this.heightDuringMove, this.finalBoxHeight ,this.finalChatFormBottom, 'test');
+
         }
       },
       //鼠标移出
-      calculateHeightOnMouseout(event){
+      calculateHeightOnMouseLeave(){
         this.isHandel = false;
+        this.heightDuringMove = 0;
+      },
+      //鼠标松开停止改变
+      stopChangeBoxHeightOnClick(){
+        this.isHandel = false
         this.heightDuringMove = 0;
       },
       clearWarningContent() {
@@ -693,12 +695,18 @@
   &>div{
     height: 100%;
   }
+  .boxStretch{
+    height: 14px;
+  }
+  .boxStretch:hover{
+    cursor: s-resize;
+  }
+
   .textarea-container{
     height: @textareaContainerHeight;
     box-sizing: border-box;
     border: 1px solid #e7e7e7;
     width: 100%;
-    padding: 5px 0;
     background-color: rgb(204, 232, 207);
     position: relative;
   }
@@ -737,9 +745,10 @@
     overflow-y: auto;
     width: 100%;
     resize: none;
-    height: 100%;
-    padding: 0.5rem 1rem;
+    height: 80%;
+    padding: 0 1rem 0.5rem 1rem;
     border: none;
+    z-index: 3;
     background-color: rgb(204, 232, 207);
     &:focus{
       outline: none;
