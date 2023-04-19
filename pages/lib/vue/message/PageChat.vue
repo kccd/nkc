@@ -205,6 +205,9 @@
         app.toHideTwemoji();
       });
       this.initAudio();
+      this.$nextTick(()=>{
+        this.initChatDialogOffset();
+      })
     },
     computed: {
       leftIcon() {
@@ -338,13 +341,39 @@
       },
       //鼠标移出
       calculateHeightOnMouseLeave(){
-        this.isHandel = false;
-        this.heightDuringMove = 0;
-      },
+        if(this.isHandel){
+          this.isHandel = false;
+          this.heightDuringMove = 0;
+          const data = {
+            initialBoxHeight:this.finalBoxHeight === 0? this.initialBoxHeight:this.finalBoxHeight ,
+            initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom === 0 ? this.initialChatContainerPaddingBottom :this.finalChatContainerPaddingBottom,
+            initialChatFormBottom:this.finalChatFormBottom === 0 ? this.initialChatFormBottom : this.finalChatFormBottom}
+          saveToLocalStorage('chatDialogOffset',data);
+          this.isHandel = false
+        }
+       },
       //鼠标松开停止改变
       stopChangeBoxHeightOnClick(){
-        this.isHandel = false
-        this.heightDuringMove = 0;
+        if(this.isHandel){
+          this.heightDuringMove = 0;
+          const data = {
+            initialBoxHeight:this.finalBoxHeight === 0? this.initialBoxHeight:this.finalBoxHeight ,
+            initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom === 0 ? this.initialChatContainerPaddingBottom :this.finalChatContainerPaddingBottom,
+            initialChatFormBottom:this.finalChatFormBottom === 0 ? this.initialChatFormBottom : this.finalChatFormBottom}
+          saveToLocalStorage('chatDialogOffset',data);
+          this.isHandel = false
+        }
+      },
+      //获取缓存的伸缩量并初始化
+      initChatDialogOffset(){
+        const data =  getFromLocalStorage('chatDialogOffset')
+        this.initialBoxHeight = data.initialBoxHeight;
+        this.initialChatContainerPaddingBottom = data.initialChatContainerPaddingBottom;
+        this.initialChatFormBottom = data.initialChatFormBottom;
+        // this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
+        // this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
+        // this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
+        console.log(this.initialBoxHeight,this.initialChatContainerPaddingBottom,this.initialChatFormBottom);
       },
       clearWarningContent() {
         this.warningContent = ''
