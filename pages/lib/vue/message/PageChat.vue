@@ -162,9 +162,11 @@
       initialHeightOnClick: 0,
       heightDuringMove: 0,
       initialBoxHeight: 0,
+      initialChatContainerPaddingBottom: 0,
       initialChatFormBottom: 0,
       finalBoxHeight: 0,
       finalChatFormBottom: 0,
+      finalChatContainerPaddingBottom: 0,
     }),
     watch: {
       content() {
@@ -303,9 +305,16 @@
         }
         this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
         this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
-        const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);//获取刚拖动的时候的bottom偏移量
-        if(num !==null){
-          this.initialChatFormBottom =Number(num[0]);
+        const bottom = (this.$refs.listContent.style.paddingBottom).match(/^\d+/);
+        if(bottom !== null){
+          this.initialChatContainerPaddingBottom = Number(bottom[0]);//聊天对话框的初始paddingBottom
+        }
+        else {
+          this.initialChatContainerPaddingBottom = 0;
+        }
+        const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);
+        if(num !== null){
+          this.initialChatFormBottom =Number(num[0]);//获取刚拖动的时候的bottom偏移量
         }
         else {
           this.initialChatFormBottom = 0;
@@ -317,11 +326,13 @@
           this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
           this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
           this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
+          this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
           if( this.finalBoxHeight >= 72 && this.finalBoxHeight <=300){
             this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
           }
           if( this.finalChatFormBottom >= 0 && this.finalBoxHeight <=300){
             this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
+            this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
           }
         }
       },
