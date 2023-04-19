@@ -1,5 +1,5 @@
 <template lang="pug">
-  .chat.message-container
+  .chat.message-container( @mousedown="changeBoxHeightOnClick" @mouseup="stopChangeBoxHeightOnClick" @mousemove="calculateHeightOnMouseOver" @mouseleave="calculateHeightOnMouseLeave")
     //- 通用header组件
     ModuleHeader(
       :title="tUser? (tUser.friendName||tUser.name): '加载中...'"
@@ -100,7 +100,7 @@
           img(:src="e.url")
       //- 输入框容器
       .textarea-container(ref="textareaContainer" )
-        .boxStretch(@mousedown="changeBoxHeightOnClick" @mouseup="stopChangeBoxHeightOnClick" @mousemove="calculateHeightOnMouseOver" @mouseleave="calculateHeightOnMouseLeave")
+        .boxStretch(ref="boxStretch")
         //- 输入框
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
@@ -298,16 +298,18 @@
       timeFormat: timeFormat,
       //手动改变盒子高度
       changeBoxHeightOnClick(event){
+        if(event.target === this.$refs.boxStretch){
           this.isHandel = true;  //是否开始拖动
-          this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
-          this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
-          const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);//获取刚拖动的时候的bottom偏移量
-          if(num !==null){
-            this.initialChatFormBottom =Number(num[0]);
-          }
-          else {
-            this.initialChatFormBottom = 0;
-          }
+        }
+        this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
+        this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
+        const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);//获取刚拖动的时候的bottom偏移量
+        if(num !==null){
+          this.initialChatFormBottom =Number(num[0]);
+        }
+        else {
+          this.initialChatFormBottom = 0;
+        }
       },
       //计算鼠标的移动的高度
       calculateHeightOnMouseOver(event){
@@ -321,7 +323,6 @@
           if( this.finalChatFormBottom >= 0 && this.finalBoxHeight <=300){
             this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
           }
-
         }
       },
       //鼠标移出
