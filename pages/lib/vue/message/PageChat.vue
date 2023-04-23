@@ -9,7 +9,7 @@
       @onClickRightButton="openUserHome"
     )
     //- 对话列表容器 固定高度 内容可滚动
-    .chat-container(ref='listContent' :data-type="type")
+    .chat-container(ref='listContent' :data-type="type" :style="{paddingBottom:initialChatContainerPaddingBottom + 'px'}")
       //- 对话列表容器 长度无限制
       .chat-messages
         //- 加载消息时的状态显示
@@ -88,7 +88,7 @@
                 span(v-if="message.progress !== 100") 发送中...{{message.progress}}%
                 span(v-else) 发送成功，处理中...
     //- 输入面板 仅在与用户对话时显示
-    .chat-form(v-if="showForm" ref="chatForm" )
+    .chat-form(v-if="showForm" ref="chatForm" :style="{bottom:initialChatFormBottom + 'px'}")
       // 警告信息展示面板
       .warning-info-panel(v-if="warningContent")
         .warning-content {{warningContent}}
@@ -99,11 +99,12 @@
         .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
           img(:src="e.url")
       //- 输入框容器
-      .textarea-container(ref="textareaContainer" )
+      .textarea-container(ref="textareaContainer" :style="{height:initialBoxHeight === 0 ?  '6rem' : `${initialBoxHeight}px`}" )
         .boxStretch(ref="boxStretch")
         //- 输入框
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
+
       .button-container
         .button(@click="toShowTwemoji" title="表情")
           .fa.fa-smile-o
@@ -205,9 +206,7 @@
         app.toHideTwemoji();
       });
       this.initAudio();
-      this.$nextTick(()=>{
-        this.initChatDialogOffset();
-      })
+      this.initChatDialogOffset();
     },
     computed: {
       leftIcon() {
@@ -327,16 +326,17 @@
       calculateHeightOnMouseOver(event){
         if(this.isHandel){
           this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
-          this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
-          this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
-          this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
-          if( this.finalBoxHeight >= 72 && this.finalBoxHeight <=300){
-            this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
+          if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
+            this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
+            this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
+            this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
           }
-          if( this.finalChatFormBottom >= 0 && this.finalBoxHeight <=300){
-            this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
-            this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
+          else {
+            return;
           }
+          this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
+          this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
+          this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
         }
       },
       //鼠标移出
@@ -345,9 +345,9 @@
           this.isHandel = false;
           this.heightDuringMove = 0;
           const data = {
-            initialBoxHeight:this.finalBoxHeight === 0? this.initialBoxHeight:this.finalBoxHeight ,
-            initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom === 0 ? this.initialChatContainerPaddingBottom :this.finalChatContainerPaddingBottom,
-            initialChatFormBottom:this.finalChatFormBottom === 0 ? this.initialChatFormBottom : this.finalChatFormBottom}
+            initialBoxHeight:this.finalBoxHeight,
+            initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom,
+            initialChatFormBottom:this.finalChatFormBottom}
           saveToLocalStorage('chatDialogOffset',data);
           this.isHandel = false
         }
@@ -370,10 +370,6 @@
         this.initialBoxHeight = data.initialBoxHeight;
         this.initialChatContainerPaddingBottom = data.initialChatContainerPaddingBottom;
         this.initialChatFormBottom = data.initialChatFormBottom;
-        // this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
-        // this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
-        // this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
-        console.log(this.initialBoxHeight,this.initialChatContainerPaddingBottom,this.initialChatFormBottom);
       },
       clearWarningContent() {
         this.warningContent = ''
