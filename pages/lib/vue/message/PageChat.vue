@@ -1,5 +1,14 @@
 <template lang="pug">
-  .chat.message-container( @mousedown="changeBoxHeightOnClick" @mouseup="stopChangeBoxHeightOnClick" @mousemove="calculateHeightOnMouseOver" @mouseleave="calculateHeightOnMouseLeave")
+  .chat.message-container(
+    @mousedown="changeBoxHeightOnClick"
+    @mouseup="stopChangeBoxHeightOnClick"
+    @mousemove="calculateHeightOnMouseOver"
+    @mouseleave="calculateHeightOnMouseLeave"
+    @touchstart="changeBoxHeightOnClick"
+    @touchend="stopChangeBoxHeightOnClick"
+    @touchmove="calculateHeightOnMouseOver"
+    @touchcancel="calculateHeightOnMouseLeave"
+    )
     //- 通用header组件
     ModuleHeader(
       :title="tUser? (tUser.friendName||tUser.name): '加载中...'"
@@ -302,6 +311,7 @@
       timeFormat: timeFormat,
       //手动改变盒子高度
       changeBoxHeightOnClick(event){
+        event.preventDefault();
         if(event.target === this.$refs.boxStretch){
           this.isHandel = true;  //是否开始拖动
         }
@@ -340,7 +350,8 @@
         }
       },
       //鼠标移出
-      calculateHeightOnMouseLeave(){
+      calculateHeightOnMouseLeave(event){
+
         if(this.isHandel){
           this.isHandel = false;
           this.heightDuringMove = 0;
@@ -353,7 +364,7 @@
         }
        },
       //鼠标松开停止改变
-      stopChangeBoxHeightOnClick(){
+      stopChangeBoxHeightOnClick(event){
         if(this.isHandel){
           this.heightDuringMove = 0;
           const data = {
