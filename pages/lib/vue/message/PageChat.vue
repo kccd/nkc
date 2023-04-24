@@ -310,76 +310,77 @@
       getUrl: getUrl,
       getSize: getSize,
       timeFormat: timeFormat,
+      //鼠标开始点击
       changeBoxHeightOnClick(event){
-        if(event.target === this.$refs.boxStretch){
-          this.isHandel = true;  //是否开始拖动
-        }
-        this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
-        this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
-        const bottom = (this.$refs.listContent.style.paddingBottom).match(/^\d+/);
-        if(bottom !== null){
-          this.initialChatContainerPaddingBottom = Number(bottom[0]);//聊天对话框的初始paddingBottom
-        }
-        else {
-          this.initialChatContainerPaddingBottom = 0;
-        }
-        const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);
-        if(num !== null){
-          this.initialChatFormBottom =Number(num[0]);//获取刚拖动的时候的bottom偏移量
-        }
-        else {
-          this.initialChatFormBottom = 0;
-        }
+        // if(event.target === this.$refs.boxStretch){
+        //   this.isHandel = true;  //是否开始拖动
+        // }
+        // this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
+        // this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
+        // const bottom = (this.$refs.listContent.style.paddingBottom).match(/^\d+/);
+        // if(bottom !== null){
+        //   this.initialChatContainerPaddingBottom = Number(bottom[0]);//聊天对话框的初始paddingBottom
+        // }
+        // else {
+        //   this.initialChatContainerPaddingBottom = 0;
+        // }
+        // const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);
+        // if(num !== null){
+        //   this.initialChatFormBottom =Number(num[0]);//获取刚拖动的时候的bottom偏移量
+        // }
+        // else {
+        //   this.initialChatFormBottom = 0;
+        // }
       },
       //计算鼠标的移动的高度
       calculateHeightOnMouseOver(event){
-        if(this.isHandel){
-          this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
-          if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
-            this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
-            this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
-            this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
-          }
-          else {
-            return;
-          }
-          this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
-          this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
-          this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
-        }
+        // if(this.isHandel){
+        //   this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
+        //   if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
+        //     this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
+        //     this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
+        //     this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
+        //   }
+        //   else {
+        //     return;
+        //   }
+        //   this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
+        //   this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
+        //   this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
+        // }
       },
       //鼠标移出
       calculateHeightOnMouseLeave(event){
 
-        if(this.isHandel){
-          this.isHandel = false;
-          this.heightDuringMove = 0;
-          const data = {
-            initialBoxHeight:this.finalBoxHeight,
-            initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom,
-            initialChatFormBottom:this.finalChatFormBottom}
-          saveToLocalStorage('chatDialogOffset',data);
-          this.isHandel = false
-        }
+        // if(this.isHandel){
+        //   this.isHandel = false;
+        //   this.heightDuringMove = 0;
+        //   const data = {
+        //     initialBoxHeight:this.finalBoxHeight,
+        //     initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom,
+        //     initialChatFormBottom:this.finalChatFormBottom}
+        //   saveToLocalStorage('chatDialogOffset',data);
+        //   this.isHandel = false
+        // }
        },
       //鼠标松开停止改变
       stopChangeBoxHeightOnClick(event){
-        if(this.isHandel){
-          this.heightDuringMove = 0;
-          const data = {
-            initialBoxHeight:this.finalBoxHeight === 0? this.initialBoxHeight:this.finalBoxHeight ,
-            initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom === 0 ? this.initialChatContainerPaddingBottom :this.finalChatContainerPaddingBottom,
-            initialChatFormBottom:this.finalChatFormBottom === 0 ? this.initialChatFormBottom : this.finalChatFormBottom}
-          saveToLocalStorage('chatDialogOffset',data);
-          this.isHandel = false
-        }
+        // if(this.isHandel){
+        //   this.heightDuringMove = 0;
+        //   const data = {
+        //     initialBoxHeight:this.finalBoxHeight === 0? this.initialBoxHeight:this.finalBoxHeight ,
+        //     initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom === 0 ? this.initialChatContainerPaddingBottom :this.finalChatContainerPaddingBottom,
+        //     initialChatFormBottom:this.finalChatFormBottom === 0 ? this.initialChatFormBottom : this.finalChatFormBottom}
+        //   saveToLocalStorage('chatDialogOffset',data);
+        //   this.isHandel = false
+        // }
       },
       //获取缓存的伸缩量并初始化
       initChatDialogOffset(){
-        const data =  getFromLocalStorage('chatDialogOffset')
-        this.initialBoxHeight = data.initialBoxHeight;
-        this.initialChatContainerPaddingBottom = data.initialChatContainerPaddingBottom;
-        this.initialChatFormBottom = data.initialChatFormBottom;
+        // const data =  getFromLocalStorage('chatDialogOffset')
+        // this.initialBoxHeight = data.initialBoxHeight;
+        // this.initialChatContainerPaddingBottom = data.initialChatContainerPaddingBottom;
+        // this.initialChatFormBottom = data.initialChatFormBottom;
       },
       clearWarningContent() {
         this.warningContent = ''
