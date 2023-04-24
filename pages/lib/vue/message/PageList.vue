@@ -30,6 +30,11 @@
       ) {{l.name}}
     // socket 状态
     .list-socket-status(v-if="socketStatus") {{socketStatus}}
+    // 搜索框
+    .list-search-input
+      search-icon.search-icon
+      input(placeholder="用户名、KCID" ref="keywordInput" v-model='inputContent')
+      span.fa.fa-remove.clear-icon(v-if="inputContent.length > 0" title="清空" @click="clearKeyword")
     // 对话列表
     .list-container(:class="{'socket-status': !!socketStatus}")
       .list-item-container(v-show="activeListId === listId.chat")
@@ -76,6 +81,7 @@
 <style lang="less" scoped>
   @import "../../../publicModules/base";
   @headerHeight: 3.4rem;
+  @listSearchInputHeight: 2.5rem;
   @listHeight: 3rem;
   @listPaddingTop: 0.8rem;
   @listRightTopHeight: 1.8rem;
@@ -218,6 +224,45 @@
     font-size: 1rem;
     text-align: center;
   }
+  .list-search-input{
+    height: @listSearchInputHeight;
+    width: 100%;
+    position: relative;
+    border-bottom: 1px solid #e7e7e7;
+    input{
+      padding: 0 2.5rem 0 2.5rem;
+      border: none;
+      height: 100%;
+      width: 100%;
+      border-radius: 3px;
+      font-size: 1rem;
+      //background-color: #f0f0f0;
+      &:focus{
+        outline: #0b5ba2;
+      }
+    }
+    .clear-icon{
+      position: absolute;
+      top: 0.4rem;
+      right: 0.7rem;
+      height: 1.6rem;
+      width: 1.6rem;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 1.6rem;
+      color: #9b9b9b;
+      cursor: pointer;
+      &:hover{
+        color: #333;
+      }
+    }
+    .search-icon{
+      position: absolute;
+      top: 0.5rem;
+      left: 0.8rem;
+      color: #555;
+    }
+  }
   .list-nav-bar{
     @height: @headerHeight;
     height: @height;
@@ -260,13 +305,13 @@
   }
   .list-container{
     position: absolute;
-    top: @headerHeight;
+    top: @headerHeight + @listSearchInputHeight;
     bottom: 0;
     left: 0;
     width: 100%;
     overflow-y: auto;
     &.socket-status{
-      top: @headerHeight + @listSocketStatusHeight;
+      top: @headerHeight + @listSearchInputHeight + @listSocketStatusHeight;
     }
   }
   .list-item{
@@ -396,8 +441,13 @@
   import {briefTime} from '../../js/time.js';
   import {nkcAPI} from '../../js/netAPI';
   import {sweetError} from "../../js/sweetAlert";
+  import {Search as SearchIcon} from "@icon-park/vue";
+  import { debounce } from "../../js/execution";
 
   export default {
+    components: {
+      'search-icon': SearchIcon,
+    },
     data: () => ({
       showOptions: false,
       chatListData: [],
@@ -421,14 +471,28 @@
       mUser: null,
 
       socketStatus: '',
+
+      // 搜索输入框绑定的值
+      inputContent: '',
+      // 搜索输入框绑定的值副本（防抖）
+      keyword: '',
     }),
     computed: {
       chatListDataShow() {
-        const {chatListData} = this;
-        return chatListData.map(chat => {
-          chat.timeStr = briefTime(chat.time);
-          return chat
-        });
+        const {chatListData, keyword} = this;
+        const arr = [];
+        const keywordLowerCase = keyword.toLowerCase().trim();
+        for(const chat of chatListData) {
+          if(
+            !keyword ||
+            chat.name.toLowerCase().trim().includes(keywordLowerCase) ||
+            chat.uid === keyword
+          ) {
+            chat.timeStr = briefTime(chat.time);
+            arr.push(chat);
+          }
+        }
+        return arr;
       },
       newMessageCount() {
         const {chatListData} = this;
@@ -449,12 +513,24 @@
     watch: {
       newMessageCount() {
         sendNewMessageCount(this, this.newMessageCount);
+      },
+      inputContent() {
+        this.onInputKeyword();
       }
     },
     mounted() {
       this.getList();
     },
     methods: {
+      // 输入内容时触发的检索方法
+      onInputKeyword: debounce(function() {
+        this.keyword = this.inputContent;
+        console.log(this.keyword)
+      }, 200) ,
+      // 清空搜索关键词
+      clearKeyword() {
+        this.inputContent = '';
+      },
       // 格式化时间
       setSocketStatus(socketStatus) {
         this.socketStatus = socketStatus;
