@@ -1039,6 +1039,8 @@
   overflow-y: auto;
   padding: 0.5rem 0;
   z-index: 500;
+  position: absolute;
+  background-color: rgb(255,255,255);
   .icon{
     cursor: pointer;
     height: 2rem;
