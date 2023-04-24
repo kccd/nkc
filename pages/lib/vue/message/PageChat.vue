@@ -755,7 +755,6 @@
     box-sizing: border-box;
     border: 1px solid #e7e7e7;
     width: 100%;
-    background-color: rgb(204, 232, 207);
     position: relative;
   }
   .button-container{
@@ -797,7 +796,6 @@
     padding: 0 1rem 0.5rem 1rem;
     border: none;
     z-index: 3;
-    background-color: rgb(204, 232, 207);
     &:focus{
       outline: none;
     }
