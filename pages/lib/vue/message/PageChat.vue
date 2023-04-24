@@ -5,9 +5,10 @@
     @mousemove="calculateHeightOnMouseOver"
     @mouseleave="calculateHeightOnMouseLeave"
     @touchstart="changeBoxHeightOnClick"
-    @touchend="stopChangeBoxHeightOnClick"
     @touchmove="calculateHeightOnMouseOver"
+    @touchend="stopChangeBoxHeightOnClick"
     @touchcancel="calculateHeightOnMouseLeave"
+    ref="chatMessageContainer"
     )
     //- 通用header组件
     ModuleHeader(
@@ -309,9 +310,7 @@
       getUrl: getUrl,
       getSize: getSize,
       timeFormat: timeFormat,
-      //手动改变盒子高度
       changeBoxHeightOnClick(event){
-        event.preventDefault();
         if(event.target === this.$refs.boxStretch){
           this.isHandel = true;  //是否开始拖动
         }
@@ -692,6 +691,7 @@
         this.content += content;
       }
     }
+
   }
 </script>
 
