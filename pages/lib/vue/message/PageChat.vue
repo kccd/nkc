@@ -18,8 +18,16 @@
       @onClickLeftButton="closePage"
       @onClickRightButton="openUserHome"
     )
+    // 警告信息展示面板
+    .warning-info-panel(v-if="warningContent")
+      .centered-container
+       .warning-content {{warningContent}}
+       .warning-button(v-if="canSendMessage")
+         button.btn.btn-default(@click="clearWarningContent") 关闭
+       .warning-button(v-if="!canSendMessage")
+         button.btn.btn-default(@click="closePage") 关闭
     //- 对话列表容器 固定高度 内容可滚动
-    .chat-container(ref='listContent' :data-type="type" :style="{paddingBottom:initialChatContainerPaddingBottom + 'px'}")
+    .chat-container(ref='listContent' :data-type="type" :style="{paddingBottom:finalChatContainerPaddingBottom + 'px'}")
       //- 对话列表容器 长度无限制
       .chat-messages
         //- 加载消息时的状态显示
@@ -98,32 +106,27 @@
                 span(v-if="message.progress !== 100") 发送中...{{message.progress}}%
                 span(v-else) 发送成功，处理中...
     //- 输入面板 仅在与用户对话时显示
-    .chat-form(v-if="showForm" ref="chatForm" :style="{bottom:initialChatFormBottom + 'px'}")
-      // 警告信息展示面板
-      .warning-info-panel(v-if="warningContent")
-        .warning-content {{warningContent}}
-        .warning-button(v-if="canSendMessage")
-          button(@click="clearWarningContent") 关闭
+    .chat-form(v-if="showForm" ref="chatForm" :style="{bottom:finalChatFormBottom + 'px'}")
       // 表情面板
       .chat-twemoji(ref="twemojiContainer" v-if="showTwemoji")
         .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
           img(:src="e.url")
       //- 输入框容器
-      .textarea-container(ref="textareaContainer" :style="{height:initialBoxHeight === 0 ?  '6rem' : `${initialBoxHeight}px`}" )
+      .textarea-container(ref="textareaContainer" :style="{height:finalBoxHeight === 0 ?  '6rem' : `${finalBoxHeight}px`}" )
         .boxStretch(ref="boxStretch")
         //- 输入框
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
 
-      .button-container
-        .button(@click="toShowTwemoji" title="表情")
-          .fa.fa-smile-o
-        .button(@click="selectFile" title="文件")
-          input.hidden(ref="fileInput" type="file" @change="selectedFile" multiple="multiple")
-          .fa.fa-file-o
-        .button.tip Ctrl + Enter 快捷发送
-        .button.send(@click="sendTextMessage")
-          span 发送
+    footer.button-container()
+      .button(@click="toShowTwemoji" title="表情")
+        .fa.fa-smile-o
+      .button(@click="selectFile" title="文件")
+        input.hidden(ref="fileInput" type="file" @change="selectedFile" multiple="multiple")
+        .fa.fa-file-o
+      .button.tip Ctrl + Enter 快捷发送
+      .button.send(@click="sendTextMessage")
+        span 发送
 </template>
 
 <script>
@@ -312,75 +315,68 @@
       timeFormat: timeFormat,
       //鼠标开始点击
       changeBoxHeightOnClick(event){
-        // if(event.target === this.$refs.boxStretch){
-        //   this.isHandel = true;  //是否开始拖动
-        // }
-        // this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
-        // this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
-        // const bottom = (this.$refs.listContent.style.paddingBottom).match(/^\d+/);
-        // if(bottom !== null){
-        //   this.initialChatContainerPaddingBottom = Number(bottom[0]);//聊天对话框的初始paddingBottom
-        // }
-        // else {
-        //   this.initialChatContainerPaddingBottom = 0;
-        // }
-        // const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);
-        // if(num !== null){
-        //   this.initialChatFormBottom =Number(num[0]);//获取刚拖动的时候的bottom偏移量
-        // }
-        // else {
-        //   this.initialChatFormBottom = 0;
-        // }
+        if(event.target === this.$refs.boxStretch){
+          this.isHandel = true;  //是否开始拖动
+        }
+        this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
+        this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
+        const bottom = (this.$refs.listContent.style.paddingBottom).match(/^\d+/);
+        if(bottom !== null){
+          this.initialChatContainerPaddingBottom = Number(bottom[0]);//聊天对话框的初始paddingBottom
+        }
+        else {
+          this.initialChatContainerPaddingBottom = 0;
+        }
+        const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);
+        if(num !== null){
+          this.initialChatFormBottom =Number(num[0]);//获取刚拖动的时候的bottom偏移量
+        }
+        else {
+          this.initialChatFormBottom = 0;
+        }
       },
       //计算鼠标的移动的高度
       calculateHeightOnMouseOver(event){
-        // if(this.isHandel){
-        //   this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
-        //   if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
-        //     this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
-        //     this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
-        //     this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
-        //   }
-        //   else {
-        //     return;
-        //   }
-        //   this.$refs.textareaContainer.style.height = `${this.finalBoxHeight}px`;
-        //   this.$refs.chatForm.style.bottom = `${this.finalChatFormBottom}px`;
-        //   this.$refs.listContent.style.paddingBottom = `${this.finalChatContainerPaddingBottom}px`
-        // }
+        if(this.isHandel){
+          this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
+          if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
+            this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
+            this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
+            this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
+          }
+        }
       },
       //鼠标移出
       calculateHeightOnMouseLeave(event){
-
-        // if(this.isHandel){
-        //   this.isHandel = false;
-        //   this.heightDuringMove = 0;
-        //   const data = {
-        //     initialBoxHeight:this.finalBoxHeight,
-        //     initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom,
-        //     initialChatFormBottom:this.finalChatFormBottom}
-        //   saveToLocalStorage('chatDialogOffset',data);
-        //   this.isHandel = false
-        // }
+        if(this.isHandel){
+          this.isHandel = false;
+          this.heightDuringMove = 0;
+          const data = {
+            finalBoxHeight:this.finalBoxHeight,
+            finalChatContainerPaddingBottom:this.finalChatContainerPaddingBottom,
+            finalChatFormBottom:this.finalChatFormBottom}
+          saveToLocalStorage('chatDialogOffset',data);
+          this.isHandel = false
+        }
        },
       //鼠标松开停止改变
       stopChangeBoxHeightOnClick(event){
-        // if(this.isHandel){
-        //   this.heightDuringMove = 0;
-        //   const data = {
-        //     initialBoxHeight:this.finalBoxHeight === 0? this.initialBoxHeight:this.finalBoxHeight ,
-        //     initialChatContainerPaddingBottom:this.finalChatContainerPaddingBottom === 0 ? this.initialChatContainerPaddingBottom :this.finalChatContainerPaddingBottom,
-        //     initialChatFormBottom:this.finalChatFormBottom === 0 ? this.initialChatFormBottom : this.finalChatFormBottom}
-        //   saveToLocalStorage('chatDialogOffset',data);
-        //   this.isHandel = false
-        // }
+        if(this.isHandel){
+          this.heightDuringMove = 0;
+          const data = {
+            finalBoxHeight:this.finalBoxHeight  ,
+            finalChatContainerPaddingBottom:this.finalChatContainerPaddingBottom ,
+            finalChatFormBottom:this.finalChatFormBottom  }
+          saveToLocalStorage('chatDialogOffset',data);
+          this.isHandel = false
+        }
       },
       //获取缓存的伸缩量并初始化
       initChatDialogOffset(){
-        // const data =  getFromLocalStorage('chatDialogOffset')
-        // this.initialBoxHeight = data.initialBoxHeight;
-        // this.initialChatContainerPaddingBottom = data.initialChatContainerPaddingBottom;
-        // this.initialChatFormBottom = data.initialChatFormBottom;
+        const data =  getFromLocalStorage('chatDialogOffset')
+        this.finalBoxHeight = data.finalBoxHeight;
+        this.finalChatContainerPaddingBottom = data.finalChatContainerPaddingBottom;
+        this.finalChatFormBottom = data.finalChatFormBottom;
       },
       clearWarningContent() {
         this.warningContent = ''
@@ -758,36 +754,7 @@
     width: 100%;
     position: relative;
   }
-  .button-container{
-    height: @buttonContainerHeight;
-    width: 100%;
-    padding-left: 1rem;
-    .button{
-      cursor: pointer;
-      display: inline-block;
-      height: @buttonContainerHeight;
-      line-height: @buttonContainerHeight;
-      font-size: 1.6rem;
-      margin-right: 1rem;
-      user-select: none;
-      &.send{
-        float: right;
-        margin-right: 0;
-        font-size: 1.25rem;
-        color: #444;
-        cursor: pointer;
-        padding: 0 1rem;
-        &:hover, &:active{
-          color: @primary;
-        }
-      }
-      &.tip{
-        font-size: 1rem;
-        color: #777;
-        vertical-align: bottom;
-      }
-    }
-  }
+
   textarea{
     overflow-x: hidden;
     overflow-y: auto;
@@ -802,6 +769,38 @@
     }
   }
   //box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
+}
+.button-container{
+  height: @buttonContainerHeight;
+  width: 100%;
+  padding-left: 1rem;
+  position: absolute;
+  bottom: 0;
+  .button{
+    cursor: pointer;
+    display: inline-block;
+    height: @buttonContainerHeight;
+    line-height: @buttonContainerHeight;
+    font-size: 1.6rem;
+    margin-right: 1rem;
+    user-select: none;
+    &.send{
+      float: right;
+      margin-right: 0;
+      font-size: 1.25rem;
+      color: #444;
+      cursor: pointer;
+      padding: 0 1rem;
+      &:hover, &:active{
+        color: @primary;
+      }
+    }
+    &.tip{
+      font-size: 1rem;
+      color: #777;
+      vertical-align: bottom;
+    }
+  }
 }
 .message-time, .message-withdrawn{
   text-align: center;
@@ -1061,8 +1060,17 @@
   overflow-y: auto;
   padding: 0.5rem;
   z-index: 600;
-  background-color: rgba(200, 200, 200, 0.94);
+  background-color: rgba(0, 0, 0, 0.2);
   color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+   .centered-container{
+     background-color: rgb(255,255,255);
+     width: 30rem;
+     max-width: 100%;
+     padding: 1rem;
+   }
   .warning-button{
     text-align: center;
     padding-top: 0.5rem;
