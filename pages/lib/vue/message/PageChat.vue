@@ -27,7 +27,7 @@
        .warning-button(v-if="!canSendMessage")
          button.btn.btn-default(@click="closePage") 关闭
     //- 对话列表容器 固定高度 内容可滚动
-    .chat-container(ref='listContent' :data-type="type" :style="{paddingBottom:finalChatContainerPaddingBottom + 'px'}")
+    .chat-container(ref='listContent' :data-type="type" :style="{bottom:finalChatContainerBottom === 0 ? '9rem' : `${finalChatContainerBottom}px`}")
       //- 对话列表容器 长度无限制
       .chat-messages
         //- 加载消息时的状态显示
@@ -118,7 +118,7 @@
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
 
-    footer.button-container()
+    footer.button-container(ref="footer" )
       .button(@click="toShowTwemoji" title="表情")
         .fa.fa-smile-o
       .button(@click="selectFile" title="文件")
@@ -180,7 +180,7 @@
       initialChatFormBottom: 0,
       finalBoxHeight: 0,
       finalChatFormBottom: 0,
-      finalChatContainerPaddingBottom: 0,
+      finalChatContainerBottom: 0,
     }),
     watch: {
       content() {
@@ -320,13 +320,7 @@
         }
         this.initialBoxHeight = this.$refs.textareaContainer.offsetHeight; //盒子未拖动前的高度
         this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
-        const bottom = (this.$refs.listContent.style.paddingBottom).match(/^\d+/);
-        if(bottom !== null){
-          this.initialChatContainerPaddingBottom = Number(bottom[0]);//聊天对话框的初始paddingBottom
-        }
-        else {
-          this.initialChatContainerPaddingBottom = 0;
-        }
+        this.initalFooterHeright = this.$refs.footer.offsetHeight; //盒子未拖动前的初始高度
         const num = (this.$refs.chatForm.style.bottom).match(/^\d+/);
         if(num !== null){
           this.initialChatFormBottom =Number(num[0]);//获取刚拖动的时候的bottom偏移量
@@ -342,7 +336,7 @@
           if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
             this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
             this.finalChatFormBottom = this.initialChatFormBottom + this.heightDuringMove; //最终的盒子偏移量
-            this.finalChatContainerPaddingBottom = this.initialChatContainerPaddingBottom +  this.heightDuringMove;//盒子的paddingBottom变化量
+            this.finalChatContainerBottom = this.initalFooterHeright +  this.finalBoxHeight;//盒子的paddingBottom变化量
           }
         }
       },
@@ -353,7 +347,7 @@
           this.heightDuringMove = 0;
           const data = {
             finalBoxHeight:this.finalBoxHeight,
-            finalChatContainerPaddingBottom:this.finalChatContainerPaddingBottom,
+            finalChatContainerBottom:this.finalChatContainerBottom,
             finalChatFormBottom:this.finalChatFormBottom}
           saveToLocalStorage('chatDialogOffset',data);
           this.isHandel = false
@@ -365,7 +359,7 @@
           this.heightDuringMove = 0;
           const data = {
             finalBoxHeight:this.finalBoxHeight  ,
-            finalChatContainerPaddingBottom:this.finalChatContainerPaddingBottom ,
+            finalChatContainerBottom:this.finalChatContainerBottom ,
             finalChatFormBottom:this.finalChatFormBottom  }
           saveToLocalStorage('chatDialogOffset',data);
           this.isHandel = false
@@ -375,7 +369,7 @@
       initChatDialogOffset(){
         const data =  getFromLocalStorage('chatDialogOffset')
         this.finalBoxHeight = data.finalBoxHeight;
-        this.finalChatContainerPaddingBottom = data.finalChatContainerPaddingBottom;
+        this.finalChatContainerBottom = data.finalChatContainerBottom;
         this.finalChatFormBottom = data.finalChatFormBottom;
       },
       clearWarningContent() {
