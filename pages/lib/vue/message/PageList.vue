@@ -443,7 +443,7 @@
   import {sweetError} from "../../js/sweetAlert";
   import {Search as SearchIcon} from "@icon-park/vue";
   import { debounce } from "../../js/execution";
-
+  
   export default {
     components: {
       'search-icon': SearchIcon,

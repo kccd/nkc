@@ -31,7 +31,7 @@ router
   })
   .post('/', async (ctx, next) => {
     const { body } = ctx;
-    const { type, targets, logId, userIds, banned } = body;
+    const { type, targets, logId, userIds, banned, reason = '' } = body;
     switch (type) {
       case 'clearInfo': {
         await sensitiveCheckerService.clearSensitiveContentByTargetIds({
@@ -51,9 +51,21 @@ router
       }
       case 'banUsers': {
         if (banned) {
-          await userBanService.banUsersByUserIds(userIds);
+          await userBanService.banUsersByUserIds({
+            adminId: ctx.state.uid,
+            userIds,
+            reason,
+            ip: ctx.address,
+            port: ctx.port,
+          });
         } else {
-          await userBanService.unBanUsersByUserIds(userIds);
+          await userBanService.unBanUsersByUserIds({
+            adminId: ctx.state.uid,
+            userIds,
+            reason,
+            ip: ctx.address,
+            port: ctx.port,
+          });
         }
       }
     }

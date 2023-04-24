@@ -6,6 +6,7 @@ import {
   sweetSuccess,
   sweetError,
   sweetQuestion,
+  sweetPrompt,
 } from '../../../lib/js/sweetAlert';
 
 const data = getDataById('data');
@@ -99,10 +100,14 @@ new Vue({
           }
         })
         .then(() => {
+          return sweetPrompt('请输入原因');
+        })
+        .then((reason) => {
           return nkcAPI('/e/log/sensitive', 'POST', {
             type: 'banUsers',
             banned,
             userIds,
+            reason,
           });
         })
         .then(() => {
