@@ -739,9 +739,37 @@
     width: 100%;
     position: absolute;
     top: -7px;
+    //background-color: #0b5ba2;
   }
   .boxStretch:hover{
     cursor: s-resize;
+  }
+  .boxStretch::before {
+    content: "";
+    position: absolute;
+    top: 2.5px;
+    left: 50%;
+    margin-left: -10px;
+    width: 30px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 3px;
+    border: 1px solid rgb(204, 204, 204) ;
+  }
+  .boxStretch:hover::before {
+    background-color: rgb(238, 238, 238);
+  }
+
+
+  .boxStretch::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    margin-left: -5px;
+    width: 20px;
+    height: 1px;
+    background-color:  rgb(204, 204, 204);
   }
 
   .textarea-container{
