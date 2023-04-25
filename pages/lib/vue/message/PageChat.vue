@@ -736,6 +736,9 @@
   }
   .boxStretch{
     height: 14px;
+    width: 100%;
+    position: absolute;
+    top: -7px;
   }
   .boxStretch:hover{
     cursor: s-resize;
@@ -754,10 +757,11 @@
     overflow-y: auto;
     width: 100%;
     resize: none;
-    height: 80%;
-    padding: 0 1rem 0.5rem 1rem;
+    height: 100%;
+    padding: 7px 1rem 0.5rem 1rem;
     border: none;
     z-index: 3;
+    background-color: rgb(255,255,255);
     &:focus{
       outline: none;
     }
