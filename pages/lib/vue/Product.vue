@@ -135,36 +135,50 @@ export default Vue.extend({
     'speaker-one-icon': SpeakerOneIcon,
   },
   data: () => ({
+    // 已选择的图片索引
     mainImageIndex: 0,
+    // 已选择的规格索引
     selectedProductParamIndex: 0,
     timer: null,
+    // 是否显示完整的商品简介
     showFullAbstract: false,
+    // 用户选择的地址
     selectedUserAddress: '',
+    // 用户输入的购买数量
     userSelectedCount: 1,
+    // 用户选择的快递索引
     userSelectedFreightIndex: 0,
   }),
   computed: {
+    // 商品停售时是否显示价格
     showPriceWhenStopSale() {
       return this.store.product.productSettings.priceShowAfterStop;
     },
+    // 正常的规格（已排除被屏蔽的规格）
     enabledParams() {
       return this.store.product.productParams.filter(param => param.isEnable);
     },
+    // 库存是否不足
     isInventoryShortage() {
       return this.selectedProductParam.stocksSurplus <= 0;
     },
+    // 用户权限  banProduct：是否能禁售商品
     permissions() {
       return this.store.permissions;
     },
+    // 是否已经被管理员禁售
     isAdminBan() {
       return this.store.product.adminBan;
     },
+    // 每人限购的数量，-1为不限购
     purchaseLimitCount() {
       return this.store.product.purchaseLimitCount;
     },
+    // 是否免运费
     isFreePost() {
       return this.store.product.isFreePost
     },
+    // 运费价格总计
     shippingCost() {
       if(this.isFreePost) {
         return 0;
@@ -172,9 +186,11 @@ export default Vue.extend({
       const targetFreight = this.store.product.freightTemplates[this.userSelectedFreightIndex];
       return this.transferPrice(targetFreight.firstPrice + (this.userSelectedCount - 1) * targetFreight.addPrice);
     },
+    // 最终用户的地址
     userAddress() {
       return this.selectedUserAddress || this.store.userAddress;
     },
+    // 发货地址
     productAddress() {
       const addressArr = this.store.product.dealInfo.address.split('/');
       let province = '';
@@ -193,33 +209,41 @@ export default Vue.extend({
       address = province + '/' + city;
       return address;
     },
+    // 原价
     originPrice() {
       return this.transferPrice(this.selectedProductParam.originPrice)
     },
+    // 会员折扣价
     vipPrice() {
       return {
         enabled: this.store.vipDiscount,
         price: this.transferPrice(this.selectedProductParam.price * this.store.vipDisNum / 100)
       }
     },
+    // 优惠价
     discountedPrice() {
       return {
         enabled: this.selectedProductParam.originPrice !== this.selectedProductParam.price,
         price: this.transferPrice(this.selectedProductParam.price)
       }
     },
+    // 是否已停售
     isStopSale() {
       return this.store.product.productStatus === "stopsale"
     },
+    // 是否限制查看价格
     limitVisitor() {
       return !logged && !this.store.product.productSettings.priceShowToVisit
     },
+    // 已选择的规格
     selectedProductParam() {
       return this.enabledParams[this.selectedProductParamIndex]
     },
+    // 商品简介文字是否超长
     abstractIsLong() {
       return this.store.abstract.length > 50;
     },
+    // 截取后的商品简介
     abstractShort() {
       let shortContent = this.store.abstract.slice(0, 50);
       if(this.abstractIsLong) {
@@ -227,6 +251,7 @@ export default Vue.extend({
       }
       return shortContent;
     },
+    // 用户显示的商品简介
     abstract() {
       if(this.showFullAbstract) {
         return this.store.abstract;
@@ -234,6 +259,7 @@ export default Vue.extend({
         return this.abstractShort;
       }
     },
+    // 用于显示的商品图
     images() {
       const imageIds = this.store.product.imgIntroductions;
       const urls = [];
@@ -246,6 +272,7 @@ export default Vue.extend({
       }
       return urls;
     },
+    // 用于显示商品大图
     mainImage() {
       return this.images[this.mainImageIndex];
     },
@@ -259,9 +286,11 @@ export default Vue.extend({
     this.clearTimeoutForSwitchImage();
   },
   methods: {
+    // 禁售
     disableProduct() {
       banSale(this.store.product.productId, !this.isAdminBan);
     },
+    // 立即购买
     buyNow() {
       if(!logged) return toLogin();
       submitProductToBill({
@@ -270,6 +299,7 @@ export default Vue.extend({
         freightId: this.userSelectedFreightIndex,
       });
     },
+    // 添加到购物车
     addToCar() {
       if(!logged) return toLogin();
       addProductToCart({
@@ -278,6 +308,7 @@ export default Vue.extend({
         freightId: this.userSelectedFreightIndex,
       });
     },
+    // 限制用户购买的数量
     fixUserSelectedCount() {
       if(this.userSelectedCount < 1) {
         this.userSelectedCount = 1;
