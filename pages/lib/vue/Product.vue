@@ -251,7 +251,7 @@ export default Vue.extend({
     },
   },
   mounted() {
-    console.log(this.store)
+    // console.log(this.store)
     // 启动轮播图
     // this.setTimeoutToSwitchImage();
   },
