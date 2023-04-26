@@ -1,6 +1,8 @@
 import { getSocket } from '../lib/js/socket';
 import { RNSetSharePanelStatus } from '../lib/js/reactNative';
 import { shareTypes } from '../lib/js/shareTypes';
+import Product from '../lib/vue/Product.vue';
+import { getDataById } from '../lib/js/dataConversion';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -1475,6 +1477,19 @@ function pushBlock(tid) {
     .catch((err) => {
       sweetError(err);
     });
+}
+
+if ($('#productAppRoot').length > 0) {
+  const { store } = getDataById('productAppData');
+  new Vue({
+    el: '#productAppRoot',
+    components: {
+      product: Product,
+    },
+    data: {
+      store,
+    },
+  });
 }
 
 Object.assign(window, {

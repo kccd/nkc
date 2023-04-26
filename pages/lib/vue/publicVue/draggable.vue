@@ -1,5 +1,5 @@
 <template lang="pug">
-  .module-dialog-body(ref="draggableBox")
+  .module-dialog-body(ref="draggableBox" :style="style")
     .module-dialog-header
       .module-dialog-title(ref="draggableHandle") {{title}}
       .module-dialog-close(@click="close")
@@ -63,11 +63,31 @@ export default {
     title:{
       type: String || Number,
       default: ''
+    },
+    maxWidth: {
+      type: String || Number,
+      default: ''
+    },
+    maxHeight: {
+      type: String || Number,
+      default: ''
     }
   },
   data: ()=>{
     return {
       mouseOver: false,
+    }
+  },
+  computed: {
+    style() {
+      let style = '';
+      if(this.maxWidth) {
+        style = `max-width: ${this.maxWidth};`;
+      }
+      if(this.maxHeight) {
+        style += `max-height: ${this.maxHeight};`
+      }
+      return style;
     }
   },
   mounted() {
@@ -123,7 +143,7 @@ export default {
       this.draggableElement.setPositionCenter();
       this.initContainerMouseEvent()
     },
-    open(callback, options) {
+    open() {
       const self = this;
       self.draggableElement.show();
     },
