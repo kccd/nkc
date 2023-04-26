@@ -27,7 +27,7 @@
        .warning-button(v-if="!canSendMessage")
          button.btn.btn-default(@click="closePage") 关闭
     //- 对话列表容器 固定高度 内容可滚动
-    .chat-container(ref='listContent' :data-type="type" :style="{bottom: `${finalChatContainerBottom}px`}")
+    .chat-container(ref='listContent' :data-type="type" :style="chatContainerStyle")
       //- 对话列表容器 长度无限制
       .chat-messages
         //- 加载消息时的状态显示
@@ -118,7 +118,7 @@
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
 
-    footer.button-container( :style="{height:`${initialFooterHeight}px`}")
+    footer.button-container(v-if="showForm" :style="{height:`${initialFooterHeight}px`}")
       .button(@click="toShowTwemoji" title="表情")
         .fa.fa-smile-o
       .button(@click="selectFile" title="文件")
@@ -222,6 +222,13 @@
       this.initChatDialogOffset();
     },
     computed: {
+      chatContainerStyle() {
+        if(this.showForm) {
+          return `bottom:${this.finalChatContainerBottom}px`;
+        } else {
+          return '';
+        }
+      },
       leftIcon() {
         return 'fa fa-angle-left';
       },
