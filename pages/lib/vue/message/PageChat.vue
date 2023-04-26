@@ -224,7 +224,7 @@
     computed: {
       chatContainerStyle() {
         if(this.showForm) {
-          return `bottom:${this.finalChatContainerBottom}px`;
+          return `bottom:${this.initialFooterHeight + this.finalBoxHeight}px`;
         } else {
           return '';
         }
@@ -363,7 +363,7 @@
       //获取缓存的伸缩量并初始化
       initChatDialogOffset(){
         const data =  getFromLocalStorage('chatDialogOffset')
-        this.finalBoxHeight = data.finalBoxHeight === 0 ? 72: data.finalBoxHeight;
+        this.finalBoxHeight = data.finalBoxHeight || 72;
         this.finalChatContainerBottom = this.finalBoxHeight + this.initialFooterHeight;
       },
       clearWarningContent() {
@@ -711,9 +711,9 @@
   bottom: 0;
   left: 0;
   overflow-y: auto;
-  &[data-type='UTU']{
+  /*&[data-type='UTU']{
     bottom: @textareaContainerHeight + @buttonContainerHeight;
-  }
+  }*/
 }
 .chat{
   position: relative;
