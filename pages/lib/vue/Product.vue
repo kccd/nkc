@@ -21,7 +21,7 @@
               span(v-if="!showFullAbstract") 展开
               span(v-else) 收起
           .product-keywords(v-if="store.keywords.length > 0")
-            a(:href="'/search?c=' + keyword" v-for="keyword in store.keywords") {{keyword}}
+            a(:href="'/search?c=' + keyword" v-for="keyword in store.keywords" target="_blank") {{keyword}}
           .product-price.m-b-1
             .user-price(v-if="limitVisitor")
               .new-price 售价：
