@@ -1,11 +1,71 @@
 const Router = require('koa-router');
 const router = new Router();
+
 router.get('/', async (ctx, next) => {
   const { data, db, query, nkcModules } = ctx;
-  const { page = 0 } = query;
-  const count = await db.ManageBehaviorModel.countDocuments({});
+  const { page = 0, c = '' } = query;
+
+  const match = {};
+
+  data.source = 'name';
+  data.sourceContent = '';
+  data.targetSource = 'name';
+  data.targetSourceContent = '';
+
+  if (c) {
+    console.log({ aaa: decodeURIComponent(c) });
+
+    let { source, sourceContent, targetSource, targetSourceContent } =
+      JSON.parse(decodeURIComponent(c));
+
+    console.log({
+      source,
+      sourceContent,
+      targetSource,
+      targetSourceContent,
+    });
+
+    if (sourceContent) {
+      if (source === 'name') {
+        const sourceUser = await db.UserModel.findOne(
+          {
+            usernameLowerCase: sourceContent.toLowerCase(),
+          },
+          {
+            uid: 1,
+          },
+        );
+        match.uid = sourceUser ? sourceUser.uid : null;
+      } else {
+        match.uid = sourceContent;
+      }
+    }
+
+    if (targetSourceContent) {
+      if (targetSource === 'name') {
+        const targetSourceUser = await db.UserModel.findOne(
+          {
+            usernameLowerCase: targetSourceContent.toLowerCase(),
+          },
+          {
+            uid: 1,
+          },
+        );
+        match.toUid = targetSourceUser ? targetSourceUser.uid : null;
+      } else {
+        match.toUid = targetSourceContent;
+      }
+    }
+
+    data.source = source;
+    data.sourceContent = sourceContent;
+    data.targetSource = targetSource;
+    data.targetSourceContent = targetSourceContent;
+  }
+
+  const count = await db.ManageBehaviorModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
-  const logs = await db.ManageBehaviorModel.find({})
+  const logs = await db.ManageBehaviorModel.find(match)
     .sort({ toc: -1 })
     .skip(paging.start)
     .limit(paging.perpage);
@@ -35,44 +95,18 @@ router.get('/', async (ctx, next) => {
     };
   }
 
-  const operations = await db.OperationModel.find(
-    { _id: { $in: operationsId } },
-    {
-      _id: 1,
-      description: 1,
-    },
-  );
-
-  const operationsObj = {};
-  for (const operation of operations) {
-    operationsObj[operation._id] = operation;
-  }
-
   for (const log of logs) {
     const user = usersObj[log.uid];
     const targetUser = usersObj[log.toUid];
-    const operation = operationsObj[log.operationId];
     data.logs.push({
       toc: log.toc,
       user,
       targetUser,
-      operationName: operation.description,
+      operationName: ctx.state.lang('operations', log.operationId),
       desc: log.desc,
     });
   }
-  /*data.result = await Promise.all(logs.map(async behavior => {
-      if(behavior.operationId === "disabledPost" && behavior.para && behavior.para.disabled){
-        behavior.manageName = "屏蔽回复"
-      }else if(behavior.operationId === "disabledPost" && behavior.para && !behavior.para.disabled){
-        behavior.manageName = "解除屏蔽回复"
-      }else{
-        behavior.manageName = "";
-      }
-      await behavior.extendUser();
-      await behavior.extendToUser();
-      await behavior.extendOperationName();
-			return behavior;
-    }));*/
+
   data.paging = paging;
   ctx.template = 'experimental/log/manage.pug';
   await next();
