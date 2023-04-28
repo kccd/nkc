@@ -64,7 +64,7 @@ router
       'status.submitted': true,
       fundId: fund._id
     };
-    if(!fund.ensureOperatorPermission('admin', user)) {
+    if(!await fund.ensureOperatorPermission('admin', user)) {
       query.disabled = false;
     }
 

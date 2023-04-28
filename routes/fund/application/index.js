@@ -336,7 +336,7 @@ applicationRouter
 		const {operation} = body;
 		const {applicationForm} = data;
 		const {fund} = applicationForm;
-		if(!fund.ensureOperatorPermission('admin', data.user)) {
+		if(!await fund.ensureOperatorPermission('admin', data.user)) {
 			ctx.throw(403, '权限不足');
 		}
 		if(operation === 'restore' && applicationForm.useless === 'giveUp') {

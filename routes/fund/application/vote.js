@@ -7,7 +7,7 @@ voteRouter
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
-		if(!applicationForm.fund.ensureOperatorPermission('voter', user)) ctx.throw(403,'抱歉！您没有资格进行投票。');
+		if(!await applicationForm.fund.ensureOperatorPermission('voter', user)) ctx.throw(403,'抱歉！您没有资格进行投票。');
 		const {fund, members, supportersId, objectorsId, status} = applicationForm;
 		if(!status.submitted) ctx.throw(400, '申请表未提交，暂不能投票。');
 		const membersId = members.map(m => m.uid);

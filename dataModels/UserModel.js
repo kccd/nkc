@@ -3367,6 +3367,11 @@ userSchema.statics.getUserCertsNameByCerts = async (
   return names;
 };
 
+userSchema.methods.getRolesId = async function () {
+  const roles = await this.extendRoles();
+  return roles.map((role) => role._id);
+};
+
 userSchema.methods.getCertsName = async function () {
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const UserModel = mongoose.model('users');

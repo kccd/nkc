@@ -33,7 +33,7 @@ reportRouter
 		const {applicationForm, user} = data;
 		const {type} = query;
 		const {reportId} = params;
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您不是该基金项目的管理员，无法完成此操作。');
+		if(!await applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您不是该基金项目的管理员，无法完成此操作。');
 		const report = await db.FundDocumentModel.findOnly({_id: reportId});
 		report.disabled = type;
 		await report.save();
