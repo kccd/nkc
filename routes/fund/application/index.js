@@ -418,7 +418,7 @@ applicationRouter
       await fundOperationService.createFundOperation({
         uid: user.uid,
         formId: applicationForm._id,
-        type: fundOperationTypes.refuse,
+        type: fundOperationTypes.expertRefuse,
         status: fundOperationStatus.normal,
       });
       /*const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);

@@ -75,6 +75,10 @@ class FundOperationService {
       fundOperationTypes.disbursementNotApproved,
       fundOperationTypes.disbursementFailed,
       fundOperationTypes.finalReportNotApproved,
+      fundOperationTypes.expertRefuse,
+      fundOperationTypes.adminRefuse,
+      fundOperationTypes.modificationTimeout,
+      fundOperationTypes.terminated,
     ];
     const successTypes = [
       fundOperationTypes.userInfoApproved,
@@ -122,6 +126,7 @@ class FundOperationService {
       case fundOperationTypes.projectInfoApproved:
       case fundOperationTypes.budgetApproved:
       case fundOperationTypes.finalReportNotApproved:
+      case fundOperationTypes.expertRefuse:
       case fundOperationTypes.finalReportApproved: {
         operator.uid = '';
         operator.name = '审核专家';
@@ -133,7 +138,7 @@ class FundOperationService {
       case fundOperationTypes.notApprovedByAdmin:
       case fundOperationTypes.disbursementApproved:
       case fundOperationTypes.disbursementNotApproved:
-      case fundOperationTypes.refuse:
+      case fundOperationTypes.adminRefuse:
       case fundOperationTypes.cancelRefuse:
       case fundOperationTypes.terminated:
       case fundOperationTypes.adminWithdrawn:

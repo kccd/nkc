@@ -23,7 +23,8 @@ const fundOperationTypes = {
   voteAgainst: 'voteAgainst', // 用户反对
   refund: 'refund', // 申请人退款
   applicantAbandoned: 'applicantAbandoned', // 申请人放弃申报
-  refuse: 'refuse', // 已被永久拒绝
+  expertRefuse: 'expertRefuse', // 专家永久拒绝
+  adminRefuse: 'adminRefuse', // 管理员永久拒绝
   cancelRefuse: 'cancelRefuse', // 取消永久拒绝
   modificationTimeout: 'modificationTimeout', // 申请人修改超时
   terminated: 'terminated', // 项目已被终止
