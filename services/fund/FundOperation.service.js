@@ -75,10 +75,6 @@ class FundOperationService {
       fundOperationTypes.disbursementNotApproved,
       fundOperationTypes.disbursementFailed,
       fundOperationTypes.finalReportNotApproved,
-      fundOperationTypes.applicantAbandoned,
-      fundOperationTypes.refuse,
-      fundOperationTypes.modificationTimeout,
-      fundOperationTypes.terminated,
     ];
     const successTypes = [
       fundOperationTypes.userInfoApproved,

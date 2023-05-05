@@ -62,17 +62,10 @@ router
     ctx.template = 'fund/manage/audit/audit.pug';
     await next();
   })
-  .get('/project', async (ctx, next) => {
-    const { db, data } = ctx;
+  .get(['/project', '/info'], async (ctx, next) => {
+    const { data } = ctx;
     const { applicationForm } = data;
-    data.expertAudit = await db.FundDocumentModel.find({
-      applicationFormId: applicationForm._id,
-      type: {
-        $in: ['userInfoAudit', 'projectAudit', 'moneyAudit'],
-      },
-    })
-      .sort({ toc: -1 })
-      .limit(3);
+    data.auditComments = await applicationForm.getLastAuditComment();
     await next();
   })
   .post('/project', async (ctx, next) => {
@@ -165,15 +158,6 @@ router
 
     await applicationForm.save();
 
-    await next();
-  })
-  .get('/info', async (ctx, next) => {
-    const { data, db } = ctx;
-    const { applicationForm } = data;
-    data.adminAudit = await db.FundDocumentModel.findOne({
-      applicationFormId: applicationForm._id,
-      type: 'adminAudit',
-    }).sort({ toc: -1 });
     await next();
   })
   .post('/info', async (ctx, next) => {

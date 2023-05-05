@@ -1,6 +1,5 @@
 const settings = require('../settings');
 const moment = require('moment');
-const { fundOperationTypes } = require('../settings/fundOperation');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema(
@@ -1544,6 +1543,61 @@ fundApplicationFormSchema.methods.extendApplicationForm = async function () {
   await this.extendFund();
   await this.extendThreads();
   await this.extendForum();
+};
+
+/*
+ * 审核界面，加载上一次审核时的评语
+ * */
+fundApplicationFormSchema.methods.getLastAuditComment = async function () {
+  const FundOperationModel = mongoose.model('fundOperations');
+  const {
+    fundOperationTypes,
+    fundOperationStatus,
+  } = require('../settings/fundOperation');
+  const obj = {
+    userInfoAudit: [
+      fundOperationTypes.userInfoApproved,
+      fundOperationTypes.userInfoNotApproved,
+    ],
+    projectAudit: [
+      fundOperationTypes.projectInfoApproved,
+      fundOperationTypes.projectInfoNotApproved,
+    ],
+    moneyAudit: [
+      fundOperationTypes.budgetApproved,
+      fundOperationTypes.budgetNotApproved,
+    ],
+    adminAudit: [
+      fundOperationTypes.approvedByAdmin,
+      fundOperationTypes.notApprovedByAdmin,
+    ],
+  };
+
+  const getReport = async ([supportOperationType, unsupportOperationType]) => {
+    let operation = await FundOperationModel.findOne(
+      {
+        status: fundOperationStatus.normal,
+        formId: this._id,
+        type: {
+          $in: [supportOperationType, unsupportOperationType],
+        },
+      },
+      {
+        type: 1,
+        desc: 1,
+      },
+    ).sort({ toc: -1 });
+
+    return operation
+      ? { support: operation.type === supportOperationType, c: operation.desc }
+      : null;
+  };
+  return {
+    userInfoAudit: await getReport(obj.userInfoAudit),
+    projectAudit: await getReport(obj.projectAudit),
+    moneyAudit: await getReport(obj.moneyAudit),
+    adminAudit: await getReport(obj.adminAudit),
+  };
 };
 /*
  * 根据申请表状态获取审核评语
