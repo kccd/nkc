@@ -1,5 +1,6 @@
 const settings = require('../settings');
 const moment = require('moment');
+const { fundOperationTypes } = require('../settings/fundOperation');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema(
@@ -685,7 +686,7 @@ fundApplicationFormSchema.methods.extendReportThreads = async function () {
   const threadsId = [];
   for (let r of this.remittance) {
     if (r.threads && r.threads.length !== 0) {
-      for (tid of r.threads) {
+      for (const tid of r.threads) {
         if (!threadsId.includes(tid)) {
           threadsId.push(tid);
         }
@@ -958,10 +959,16 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 fundApplicationFormSchema.statics.publishByApplicationFormId = async (
   applicationFormId,
 ) => {
+  const {
+    fundOperationStatus,
+    fundOperationTypes,
+  } = require('../settings/fundOperation');
+  const {
+    fundOperationService,
+  } = require('../services/fund/FundOperation.service');
   const FundModel = mongoose.model('funds');
   const FundApplicationFormModel = mongoose.model('fundApplicationForms');
   const MessageModel = mongoose.model('messages');
-  const SettingModel = mongoose.model('settings');
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
@@ -1097,7 +1104,14 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (
   });
   await newHistory.save();
 
-  await form.createReport('system', '提交申请表');
+  await fundOperationService.createFundOperation({
+    toc: now,
+    uid: form.uid,
+    formId: form._id,
+    type: fundOperationTypes.submitApplication,
+    status: fundOperationStatus.normal,
+  });
+  // await form.createReport('system', '提交申请表');
 };
 fundApplicationFormSchema.statics.extendAsApplicationFormList = async (
   applicationForms,
@@ -1535,11 +1549,58 @@ fundApplicationFormSchema.methods.extendApplicationForm = async function () {
  * 根据申请表状态获取审核评语
  * */
 fundApplicationFormSchema.methods.extendAuditComments = async function () {
-  const FundDocumentModel = mongoose.model('fundDocuments');
+  // const FundDocumentModel = mongoose.model('fundDocuments');
+  const FundOperationModel = mongoose.model('fundOperations');
+  const {
+    fundOperationTypes,
+    fundOperationStatus,
+  } = require('../settings/fundOperation');
   const auditComments = {};
   const form = this;
-  const getReport = async (type) => {
-    return await FundDocumentModel.findOne(
+
+  const obj = {
+    userInfoAudit: [
+      fundOperationTypes.userInfoApproved,
+      fundOperationTypes.userInfoNotApproved,
+    ],
+    projectAudit: [
+      fundOperationTypes.projectInfoApproved,
+      fundOperationTypes.projectInfoNotApproved,
+    ],
+    moneyAudit: [
+      fundOperationTypes.budgetApproved,
+      fundOperationTypes.budgetNotApproved,
+    ],
+    adminAudit: [
+      fundOperationTypes.approvedByAdmin,
+      fundOperationTypes.notApprovedByAdmin,
+    ],
+    completedAudit: [
+      fundOperationTypes.finalReportApproved,
+      fundOperationTypes.finalReportNotApproved,
+    ],
+  };
+
+  const getReport = async ([supportOperationType, unsupportOperationType]) => {
+    let operation = await FundOperationModel.findOne(
+      {
+        status: fundOperationStatus.normal,
+        formId: form._id,
+        type: {
+          $in: [supportOperationType, unsupportOperationType],
+        },
+      },
+      {
+        type: 1,
+        desc: 1,
+      },
+    ).sort({ toc: -1 });
+
+    return operation
+      ? { support: operation.type === supportOperationType, c: operation.desc }
+      : null;
+
+    /*return await FundDocumentModel.findOne(
       {
         type,
         applicationFormId: form._id,
@@ -1549,19 +1610,19 @@ fundApplicationFormSchema.methods.extendAuditComments = async function () {
         support: 1,
         c: 1,
       },
-    ).sort({ toc: -1 });
+    ).sort({ toc: -1 });*/
   };
 
   if (this.status.projectPassed === false) {
-    auditComments.userInfoAudit = await getReport('userInfoAudit');
-    auditComments.projectAudit = await getReport('projectAudit');
-    auditComments.moneyAudit = await getReport('moneyAudit');
+    auditComments.userInfoAudit = await getReport(obj.userInfoAudit);
+    auditComments.projectAudit = await getReport(obj.projectAudit);
+    auditComments.moneyAudit = await getReport(obj.moneyAudit);
   }
   if (this.status.adminSupport === false) {
-    auditComments.adminAudit = await getReport('adminAudit');
+    auditComments.adminAudit = await getReport(obj.adminAudit);
   }
   if (this.status.completed === false) {
-    auditComments.completedAudit = await getReport('completedAudit');
+    auditComments.completedAudit = await getReport(obj.completedAudit);
   }
   return (this.auditComments = auditComments);
 };
@@ -1855,12 +1916,26 @@ fundApplicationFormSchema.methods.hideApplicationFormInfoByUserId =
 fundApplicationFormSchema.methods.setUselessAsTimeout = async function (
   operatorId,
 ) {
-  await this.createReport(
+  const {
+    fundOperationTypes,
+    fundOperationStatus,
+  } = require('../settings/fundOperation');
+  const {
+    fundOperationService,
+  } = require('../services/fund/FundOperation.service');
+
+  await fundOperationService.createFundOperation({
+    uid: operatorId,
+    formId: this._id,
+    type: fundOperationTypes.modificationTimeout,
+    status: fundOperationStatus.normal,
+  });
+  /*await this.createReport(
     'system',
     `申请人修改超时，已视为放弃`,
     operatorId,
     false,
-  );
+  );*/
   await this.updateOne({
     $set: {
       useless: 'timeout',
@@ -1878,6 +1953,13 @@ fundApplicationFormSchema.methods.withdraw = async function (
   reason,
   applicant,
 ) {
+  const {
+    fundOperationStatus,
+    fundOperationTypes,
+  } = require('../settings/fundOperation');
+  const {
+    fundOperationService,
+  } = require('../services/fund/FundOperation.service');
   const { checkString } = require('../nkcModules/checkData');
   const { fund, uid: formUid } = this;
   checkString(reason, {
@@ -1905,13 +1987,25 @@ fundApplicationFormSchema.methods.withdraw = async function (
     'status.adminSupport': null,
     remittance: this.remittance,
   });
-  const name = applicant ? '申请人' : '管理员';
-  await this.createReport(
+  // const name = applicant ? '申请人' : '管理员';
+
+  const operationType = applicant
+    ? fundOperationTypes.applicantWithdrawn
+    : fundOperationTypes.adminWithdrawn;
+
+  await fundOperationService.createFundOperation({
+    uid: uid,
+    formId: this._id,
+    type: operationType,
+    status: fundOperationStatus.normal,
+  });
+
+  /*await this.createReport(
     'system',
     `申请已被${name}撤回\n原因：${reason}`,
     uid,
     false,
-  );
+  );*/
 };
 
 /*
@@ -1942,6 +2036,13 @@ fundApplicationFormSchema.methods.getRefundMoney = async function () {
 fundApplicationFormSchema.statics.updateRefundStatusByBillId = async (
   billId,
 ) => {
+  const {
+    fundOperationStatus,
+    fundOperationTypes,
+  } = require('../settings/fundOperation');
+  const {
+    fundOperationService,
+  } = require('../services/fund/FundOperation.service');
   const FundApplicationFormModel = mongoose.model('fundApplicationForms');
   const form = await FundApplicationFormModel.findOne({
     'status.refund': false,
@@ -1955,12 +2056,19 @@ fundApplicationFormSchema.statics.updateRefundStatusByBillId = async (
       'status.refund': true,
     },
   });
-  await form.createReport(
+  await fundOperationService.createFundOperation({
+    uid: form.uid,
+    formId: form._id,
+    type: fundOperationTypes.refund,
+    status: fundOperationStatus.normal,
+    money: form.refundMoney,
+  });
+  /*await form.createReport(
     'system',
     `申请人已退款 ${form.refundMoney} 元`,
     form.uid,
     null,
-  );
+  );*/
 };
 /*
  * 人工设置基金申请退款状态

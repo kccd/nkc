@@ -28,6 +28,7 @@ const fundOperationTypes = {
   modificationTimeout: 'modificationTimeout', // 申请人修改超时
   terminated: 'terminated', // 项目已被终止
   applicantWithdrawn: 'applicantWithdrawn', // 已被申请人撤回
+  adminWithdrawn: 'adminWithdrawn', // 已被管理员撤回
 };
 
 const fundOperationStatus = {

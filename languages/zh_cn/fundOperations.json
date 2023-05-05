@@ -27,5 +27,6 @@
   "cancelRefuse": "申请表已恢复",
   "modificationTimeout": "申请人修改超时，已视为放弃",
   "terminated": "申请已被终止",
-  "applicantWithdrawn": "申请已被撤回"
+  "applicantWithdrawn": "申请已被撤回",
+  "adminWithdrawn": "申请已被撤回"
 }

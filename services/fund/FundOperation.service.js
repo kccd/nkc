@@ -11,7 +11,19 @@ const {
 } = require('../../settings/fundOperation');
 class FundOperationService {
   async createFundOperation(props) {
-    const { toc, uid, formId, type, desc, installment, status, money } = props;
+    const {
+      // 必要
+      uid,
+      formId,
+      type,
+      status,
+
+      // 非必要
+      toc,
+      desc = '',
+      installment = 0,
+      money = 0,
+    } = props;
     const operation = new FundOperationModel({
       toc: toc || new Date(),
       uid,
@@ -128,6 +140,7 @@ class FundOperationService {
       case fundOperationTypes.refuse:
       case fundOperationTypes.cancelRefuse:
       case fundOperationTypes.terminated:
+      case fundOperationTypes.adminWithdrawn:
       case fundOperationTypes.approvedByAdmin: {
         operator.uid = '';
         operator.name = '管理员';

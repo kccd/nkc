@@ -1,6 +1,12 @@
 const Router = require('koa-router');
+const {
+  fundOperationService,
+} = require('../../../../services/fund/FundOperation.service');
 const mongoose = require('mongoose');
-const { fundOperationStatus } = require('../../../../settings/fundOperation');
+const {
+  fundOperationStatus,
+  fundOperationTypes,
+} = require('../../../../settings/fundOperation');
 const auditRouter = require('./audit');
 const reportRouter = new Router();
 reportRouter
@@ -40,7 +46,19 @@ reportRouter
     if (applicationForm.status.completed) {
       ctx.throw(400, '项目已经结题，无法再提交报告');
     }
-    await applicationForm.createReport('report', c, state.uid);
+
+    await fundOperationService.createFundOperation({
+      toc: Date.now(),
+      uid: state.uid,
+      formId: applicationForm._id,
+      type: fundOperationTypes.report,
+      desc: c,
+      installment: 0,
+      status: fundOperationStatus.normal,
+      money: 0,
+    });
+
+    // await applicationForm.createReport('report', c, state.uid);
     await next();
   })
 
