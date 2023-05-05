@@ -3,7 +3,7 @@ class UserInfoService {
   async getUsersBaseInfoObjectByUserIds(userIds) {
     const users = await UserModel.find(
       { uid: { $in: userIds } },
-      { uid: 1, username: 1 },
+      { uid: 1, username: 1, avatar: 1 },
     );
     const usersObj = {};
     for (const user of users) {

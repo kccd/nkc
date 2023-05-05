@@ -12,7 +12,6 @@ const excellentRouter = require('./excellent');
 const disabledRouter = require('./disabled');
 const refundRouter = require('./refund');
 const applicationRouter = new Router();
-const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
 	.use('/:_id', async (ctx, next) => {
 		const {params, data, db, state} = ctx;
