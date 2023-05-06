@@ -20,18 +20,20 @@ block fundContent
   -var type = data.type;
 
   //- 上一次未通过审核的原因
-  -var oldReason = {};
-  if data.expertAudit && data.expertAudit.length !== 0
-    for r in data.expertAudit
-      if !r.support
-        -oldReason[r.type] = r.c;
-  if data.adminAudit
-    -oldReason['adminAudit'] = data.adminAudit.c;
+  -
+    var oldCommentDesc = {};
+    for(var auditCommentType in data.auditComments) {
+      var targetComment = data.auditComments[auditCommentType];
+      if(targetComment && !targetComment.support) {
+        oldCommentDesc[auditCommentType] = targetComment.c;
+      }
+    }
+
   mixin reasonForm(type)
     .form(data-type=type)
-      if oldReason[type]
+      if oldCommentDesc[type]
         h5 上一次未通过审核的原因：
-        p.text-danger.pre-wrap= oldReason[type]
+        p.text-danger.pre-wrap= oldCommentDesc[type]
       textarea.form-control(rows='12' placeholder='审核评语')
       .radio
         label.m-r-1

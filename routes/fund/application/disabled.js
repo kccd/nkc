@@ -4,7 +4,7 @@ disabledRouter
 	.put('/', async (ctx, next) => {
 		const {data, body, db} = ctx;
 		const {applicationForm, user} = data;
-		if(!applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您没有权限进行屏蔽操作。');
+		if(!await applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！您没有权限进行屏蔽操作。');
 		const {type} = body;
 		applicationForm.disabled = type;
 		await applicationForm.save();

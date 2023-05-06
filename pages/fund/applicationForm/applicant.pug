@@ -8,6 +8,25 @@ if !isIncluded('applicant')
       max-width: 100%;
       margin-bottom: 0.5rem;
     }
+    .form-life-photos .form-life-photo{
+      position: relative;
+      display: inline-block;
+      width: 16rem;
+      max-width: 100%;
+      padding-top: 15rem;
+      border: 1px solid #e0e0e0;
+    }
+    .form-life-photos .form-life-photo img{
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      left: 0;
+      max-height: 100%;
+      max-width: 100%;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+    }
   include ./formThread
   include ./formWarning
   mixin applicant(form)
@@ -18,8 +37,22 @@ if !isIncluded('applicant')
       .row
         .col-xs-12
           +formWarning(auditComments.userInfoAudit)
+        if applicant.idCardNumber
+          .col-xs-12
+            .form-secret-info.m-b-1
+              .m-b-1
+                strong 隐私信息
+              .h5.m-b-1.m-t-0=`身份证号码：${applicant.idCardNumber}`
+              .h5.m-b-1.m-t-0=`联系方式：${applicant.mobile}`
+              if account.paymentType === 'alipay'
+                .h5.m-b-1.m-t-0=`收款方式：支付宝`
+              else
+                .h5.m-b-1.m-t-0=`收款方式：银行卡`
+                .h5.m-b-1.m-t-0=`银行全称：${account.bankName}`
+              .h5.m-b-1.m-t-0=`户名：${account.name}`
+              .h5.m-b-1.m-t-0=`收款账号：${account.number}`
         .col-xs-12.col-sm-6.col-md-6
-          .h5 申请人ID：
+          .h5.m-b-1.m-t-0 申请人ID：
             a(
               href=applicant.userHome
               target='_blank'
@@ -27,22 +60,12 @@ if !isIncluded('applicant')
               data-global-mouseout="hideUserPanel"
               data-global-data=objToStr({uid: applicant.uid})
               )=applicant.user.username
-          .h5=`真实姓名：${applicant.name}`
-          if applicant.idCardNumber
-            .form-secret-info
-              .h5=`身份证号码：${applicant.idCardNumber}`
-              .h5=`联系方式：${applicant.mobile}`
-              if account.paymentType === 'alipay'
-                .h5=`收款方式：支付宝`
-              else
-                .h5=`收款方式：银行卡`
-                .h5=`银行全称：${account.bankName}`
-              .h5=`户名：${account.name}`
-              .h5=`收款账号：${account.number}`
-          .h5=`自我介绍：${applicant.description}`
+          .h5.m-b-1.m-t-0=`真实姓名：${applicant.name}`
+
+        .col-xs-12.col-sm-6.col-md-6
           if from === 'team'
-            .h5=`申请方式：团队`
-            .h5=`组员ID：`
+            .h5.m-b-1.m-t-0=`申请方式：团队`
+            .h5.m-b-1.m-t-0=`组员ID：`
               for m, index in members
                 if index !== 0
                   span ，
@@ -51,17 +74,32 @@ if !isIncluded('applicant')
                   target='_blank'
                   data-global-mouseover="showUserPanel"
                   data-global-mouseout="hideUserPanel"
-                  data-global-data=objToStr({uid: m.uid})
-                  )=m.user.username
+                  data-global-data=objToStr({ uid: m.uid })
+                )=m.user.username
           else
-            .h5=`申请方式：个人`
-        .col-xs-12.col-sm-6.col-md-6
-          .h5 申请人照片
+            .h5.m-b-1.m-t-0=`申请方式：个人`
+        .col-xs-12.col-sm-12.col-md-12
+          .h5.m-b-1.m-t-0=`自我介绍：${applicant.description}`
+        .col-xs-12.col-sm-12.col-md-12.m-b-1
+          .h5.m-b-1.m-t-0 申请人照片：
           .form-life-photos
-            for p in applicant.lifePhotos
-              img(src=p.url)
+            -
+              var images = applicant.lifePhotos.map(photo => {
+                return {
+                  name: 'photo',
+                  url: photo.url,
+                }
+              });
+
+            for photo, index in applicant.lifePhotos
+              .form-life-photo
+                img(
+                  src=photo.url
+                  data-global-click='viewImages'
+                  data-global-data=objToStr({images, index})
+                  )
         .col-xs-12.col-md-12
-          .h5 申请人曾经发表的技术文章：
+          .h5.m-b-1.m-t-0 申请人曾经发表的技术文章：
           .form-threads
             for thread in form.threads.applying
               +formThread(thread)

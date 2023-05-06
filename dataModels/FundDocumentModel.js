@@ -1,142 +1,178 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const documentSchema = new Schema({
-	_id: Number,
-	applicationFormId: { // 基金
-		type: Number,
-		default: null,
-		index: 1
-	},
-	toc: {
-		type: Date,
-		default: Date.now,
-		index: 1
-	},
-	tlm: {
-		type: Date
-	},
-	type: {
-		// project, comment, userInfoAudit, projectAudit, moneyAudit, adminAudit, report, system,  vote, reportAudit, completedAudit, remittance
-		type: String,
-		required: true,
-		index: 1
-	},
-	hasImage: {
-		type: Boolean,
-		default: false,
-		index: 1
-	},
-	uid: {
-		type: String,
-		required: true,
-		index: 1
-	},
-	support: {
-		type: Boolean,
-		default: null,
-		index: 1
-	},
-	l: {//pwbb
-		type: String,
-		default: 'html'
-	},
-	t: {
-		type: String,
-		default: null,
-		maxlength: [200, '标题不能超过50字。']
-	},
-	abstract: {
-		type: String,
-		default: null,
-		maxlength: [1000, '摘要不能超过200字。']
-	},
-  // 中文摘要
-  abstractCn: {
-    type: String,
-    default: ""
-  },
-  // 英文摘要
-  abstractEn: {
-    type: String,
-    default: ""
-  },
-  // 中文关键词
-  keyWordsCn: {
-    type: Array,
-    default: []
-  },
-  // 英文关键词
-  keyWordsEn: {
-    type: Array,
-    default: []
-  },
-	c: {
-		type: String,
-		default: '',
-		maxlength: [100000, '内容不能超过2万字。']
-	},
-	disabled: {
-		type: Boolean,
-		default: false,
-		index: 1
-	},
-	reply: {
-		type: Number,
-		default: null,
-		index: 1
-	}
-}, {
-	collection: 'fundDocuments',
-	toObject: {
-		getters: true,
-		virtuals: true
-	}
-});
 
-documentSchema.virtual('user')
-	.get(function() {
-		return this._user;
-	})
-	.set(function(user) {
-		this._user = user
-	});
+const fundDocumentTypes = {
+  project: 'project',
+  comment: 'comment',
+  userInfoAudit: 'userInfoAudit',
+  projectAudit: 'projectAudit',
+  moneyAudit: 'moneyAudit',
+  adminAudit: 'adminAudit',
+  report: 'report',
+  system: 'system',
+  vote: 'vote',
+  reportAudit: 'reportAudit',
+  completedAudit: 'completedAudit',
+  completedReport: 'completedReport',
+  remittance: 'remittance',
+  refuse: 'refuse',
+  cancelRefuse: 'cancelRefuse',
+};
 
-documentSchema.virtual('resources')
-	.get(function() {
-		return this._resources;
-	})
-	.set(function(resources) {
-		this._resources = resources
-	});
+const documentSchema = new Schema(
+  {
+    _id: Number,
+    applicationFormId: {
+      // 基金
+      type: Number,
+      default: null,
+      index: 1,
+    },
+    toc: {
+      type: Date,
+      default: Date.now,
+      index: 1,
+    },
+    tlm: {
+      type: Date,
+    },
+    type: {
+      // project, comment, userInfoAudit, projectAudit, moneyAudit, adminAudit, report, system,  vote, reportAudit, completedAudit, remittance
+      type: String,
+      required: true,
+      index: 1,
+    },
+    hasImage: {
+      type: Boolean,
+      default: false,
+      index: 1,
+    },
+    uid: {
+      type: String,
+      required: true,
+      index: 1,
+    },
+    support: {
+      type: Boolean,
+      default: null,
+      index: 1,
+    },
+    l: {
+      //pwbb
+      type: String,
+      default: 'html',
+    },
+    t: {
+      type: String,
+      default: null,
+      maxlength: [200, '标题不能超过50字。'],
+    },
+    abstract: {
+      type: String,
+      default: null,
+      maxlength: [1000, '摘要不能超过200字。'],
+    },
+    // 中文摘要
+    abstractCn: {
+      type: String,
+      default: '',
+    },
+    // 英文摘要
+    abstractEn: {
+      type: String,
+      default: '',
+    },
+    // 中文关键词
+    keyWordsCn: {
+      type: Array,
+      default: [],
+    },
+    // 英文关键词
+    keyWordsEn: {
+      type: Array,
+      default: [],
+    },
+    c: {
+      type: String,
+      default: '',
+      maxlength: [100000, '内容不能超过2万字。'],
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+      index: 1,
+    },
+    reply: {
+      type: Number,
+      default: null,
+      index: 1,
+    },
+  },
+  {
+    collection: 'fundDocuments',
+    toObject: {
+      getters: true,
+      virtuals: true,
+    },
+  },
+);
 
-documentSchema.pre('save', function(next) {
+documentSchema
+  .virtual('user')
+  .get(function () {
+    return this._user;
+  })
+  .set(function (user) {
+    this._user = user;
+  });
+
+documentSchema
+  .virtual('resources')
+  .get(function () {
+    return this._resources;
+  })
+  .set(function (resources) {
+    this._resources = resources;
+  });
+
+documentSchema.pre('save', function (next) {
   try {
-		if (!this.tlm) this.tlm = this.toc;
-  	return next()
-	} catch(e) {
-  	return next(e)
-	}
+    if (!this.tlm) {
+      this.tlm = this.toc;
+    }
+    return next();
+  } catch (e) {
+    return next(e);
+  }
 });
 
-documentSchema.methods.extendUser = async function() {
-	const UserModel = require('./UserModel');
-	const user = await UserModel.findOnly({uid: this.uid});
-	return this.user = user;
+documentSchema.statics.getFundDocumentTypes = () => {
+  return {
+    ...fundDocumentTypes,
+  };
 };
 
-documentSchema.methods.extendResources = async function() {
-	const ResourceModel = require('./ResourceModel');
-	const resources = await ResourceModel.find({references: `fund-${this._id}`});
-	return this.resources = resources;
+documentSchema.methods.extendUser = async function () {
+  const UserModel = require('./UserModel');
+  const user = await UserModel.findOnly({ uid: this.uid });
+  return (this.user = user);
 };
 
-documentSchema.pre('save', async function(next) {
-	const ResourceModel = mongoose.model('resources');
-	await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c || '');
-	return next()
+documentSchema.methods.extendResources = async function () {
+  const ResourceModel = require('./ResourceModel');
+  const resources = await ResourceModel.find({
+    references: `fund-${this._id}`,
+  });
+  return (this.resources = resources);
+};
 
-	/*try {
+documentSchema.pre('save', async function (next) {
+  const ResourceModel = mongoose.model('resources');
+  await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c || '');
+  return next();
+
+  /*try {
 
 		const oldDocument = await FundDocumentModel.findOne({_id: this.id});
 		let oldResources = [];
@@ -179,29 +215,32 @@ documentSchema.pre('save', async function(next) {
 	}*/
 });
 
-documentSchema.statics.extendUFundDocumentInfo = async function(funds) {
-	const FundDocumentModel = mongoose.model('fundDocuments');
-	const {getUrl} = require("../nkcModules/tools");
-	const applicationsIds = [];
-	for(const f of funds) {
-		applicationsIds.push(f._id);
-	}
-	const fundDocuments = await FundDocumentModel.find({applicationFormId: {$in: applicationsIds}, type: 'project'});
-	const fundDocumentObj = {};
-	for(const f of fundDocuments) {
-		const {t, toc} = f;
-		fundDocumentObj[f.applicationFormId] = {
-			t,
-			url: getUrl('fundApplicationForm', f.applicationFormId),
-			toc
-		};
-	}
-	const results = [];
-	for(const f of funds) {
-		results.push(fundDocumentObj[f._id]);
-	}
-	return results;
-}
+documentSchema.statics.extendUFundDocumentInfo = async function (funds) {
+  const FundDocumentModel = mongoose.model('fundDocuments');
+  const { getUrl } = require('../nkcModules/tools');
+  const applicationsIds = [];
+  for (const f of funds) {
+    applicationsIds.push(f._id);
+  }
+  const fundDocuments = await FundDocumentModel.find({
+    applicationFormId: { $in: applicationsIds },
+    type: 'project',
+  });
+  const fundDocumentObj = {};
+  for (const f of fundDocuments) {
+    const { t, toc } = f;
+    fundDocumentObj[f.applicationFormId] = {
+      t,
+      url: getUrl('fundApplicationForm', f.applicationFormId),
+      toc,
+    };
+  }
+  const results = [];
+  for (const f of funds) {
+    results.push(fundDocumentObj[f._id]);
+  }
+  return results;
+};
 
 const FundDocumentModel = mongoose.model('fundDocuments', documentSchema);
 module.exports = FundDocumentModel;

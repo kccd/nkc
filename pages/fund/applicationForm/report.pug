@@ -15,7 +15,94 @@ if !isIncluded('report')
     .report-time{
       color: #888;
     }
-  mixin singleReport(report, form, userFundRoles)
+    .user-info-avatar{
+      display: inline-block;
+      height: 2rem;
+      width: 2rem;
+      border-radius: 50%;
+      overflow: hidden;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+    .user-info-avatar img{
+      height: 100%;
+      width: 100%;
+    }
+    .user-info-name{
+      display: inline-block;
+      font-size: 1.2rem;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+    .user-info-header{
+      font-size: 0;
+      margin-bottom: 0.5rem;
+    }
+    .user-info-body{
+      padding: 1rem 0.5rem;
+      border-radius: 3px;
+      background-color: #f4f4f4;
+      border: 1px solid #c1c1c1;
+    }
+    .user-info-body.error {
+      background-color: #ffe2e2;
+      border: 1px solid #ffbdbd;
+    }
+    /*.user-info-body.success {*/
+    /*  background-color: #d5ffd7;*/
+    /*  border: 1px solid #9ce39b;*/
+    /*}*/
+    .user-info-time{
+      font-size: 1.2rem;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .user-info-container{
+
+    }
+    .user-info-desc{
+      margin-top: 0.5rem;
+    }
+    .user-info-title{
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .single-report-container{
+      margin-bottom: 2rem;
+    }
+    .single-report-container.disabled{
+      padding: 1rem;
+      background-color: #aaa;
+      border-radius: 3px;
+    }
+  mixin singleReport(report, form, isAdmin)
+    .single-report-container(class=report.status)
+      .user-info-container
+        .user-info-header
+          .user-info-avatar
+            img(src=report.operator.avatarUrl)
+          if report.operator.uid
+            a.user-info-name(
+              href=report.operator.homeUrl
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({ uid: report.operator.uid })
+              )=report.operator.name
+          else
+            .user-info-name=report.operator.name
+          .user-info-time
+            +fromNow(report.toc)
+          if isAdmin
+            .pull-right
+              if report.status === 'disabled'
+                button.btn.btn-xs.btn-success(onclick=`disabledReport(${form._id},"${report._id}",false)`) 解除屏蔽
+              else
+                button.btn.btn-xs.btn-default(onclick=`disabledReport(${form._id},"${report._id}",true)`) 屏蔽
+        .user-info-body(class=report.notificationType)
+          .user-info-title=report.title
+          if report.desc
+            .user-info-desc.pre-wrap=report.desc
+  mixin singleReport_old(report, form, userFundRoles)
     -var {applicant} = form;
     .form-single-report
       .user-info
@@ -89,10 +176,15 @@ if !isIncluded('report')
       .panel-header 最新进展
       .m-b-1
         for report in form.reports
-          +singleReport(report, form, userFundRoles)
+          +singleReport(report, form, userFundRoles.includes('admin'))
   script.
     function disabledReport(applicationFormId, reportId, type) {
-      nkcAPI('/fund/a/' + applicationFormId + '/report/' + reportId + '?type=' + type, 'DELETE', {})
+      return sweetQuestion('确定要执行当前操作吗？')
+        .then(function() {
+          return nkcAPI('/fund/a/' + applicationFormId + '/report/' + reportId, 'PUT', {
+            disabled: !!type
+          })
+        })
         .then(function () {
           window.location.reload();
         })

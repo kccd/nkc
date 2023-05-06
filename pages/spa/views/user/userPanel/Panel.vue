@@ -22,8 +22,7 @@
                   .account-user-subscribe(v-if="subscribeBtn" ref="subscribeBox")
                     div(:class="subscribeBtnType ? 'cancel' : 'focus'" @click.stop="userFollowType(targetUser.uid)") {{subscribeBtnType ? '取关' : '关注' }}
                     div.link.hidden-xs.hidden-sm(@click.stop="toChat(targetUser.uid)") 私信
-                    div.link.hidden-md.hidden-lg
-                      a(href=`/message` target='_blank') 私信
+                    div.link.hidden-md.hidden-lg(@click.stop="toChat(targetUser.uid)") 私信
                     //div.link(onclick="RootApp.openLoginPanel()" v-else-if="!selfUid") 私信
           .account-user-base-info.hidden-md.hidden-sm.hidden-lg.col-xs-12
             .row

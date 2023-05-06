@@ -176,6 +176,9 @@ var Tools = function () {
       case 'defaultFile': {
         return '/default/' + id;
       }
+      case 'fluentuiEmoji': {
+        return '/fluentui-emoji/' + id + '.png';
+      }
       case 'previewPDF': {
         return (
           '/reader/pdf/web/viewer?file=%2fr%2f' + id + '?time=' + Date.now()
