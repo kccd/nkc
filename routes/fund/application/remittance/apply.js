@@ -19,10 +19,10 @@ router
     await next();
   })
   .get('/', async (ctx, next) => {
-    const { data, db } = ctx;
-    data.reportAudit = await db.FundDocumentModel.findOne({
-      type: 'reportAudit',
-    }).sort({ toc: -1 });
+    const { data } = ctx;
+    data.reportAudit = (
+      await data.applicationForm.getLastAuditComment()
+    ).reportAudit;
     ctx.template = 'fund/remittance/apply.pug';
     await next();
   })

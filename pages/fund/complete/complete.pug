@@ -29,7 +29,7 @@ block fundContent
             if form.status.completed === false
               .bg-danger.text-danger.p-a-05
                 h5 结题审核未通过，请修改后重新提交
-                .pre-wrap=data.auditComments.completedAudit.c
+                .pre-wrap=data.completedAudit?data.completedAudit.c:""
             .form.m-t-1
               if !form.fixedMoney
                 .form-group

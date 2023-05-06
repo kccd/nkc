@@ -142,6 +142,7 @@ class FundOperationService {
       case fundOperationTypes.cancelRefuse:
       case fundOperationTypes.terminated:
       case fundOperationTypes.adminWithdrawn:
+      case fundOperationTypes.modificationTimeout:
       case fundOperationTypes.approvedByAdmin: {
         operator.uid = '';
         operator.name = '管理员';

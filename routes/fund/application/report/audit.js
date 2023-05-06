@@ -33,7 +33,7 @@ router
             }),
           );
         }
-        data.report = await db.FundDocumentModel.findOne({ _id: r.report });
+        data.report = await db.FundOperationModel.findOne({ _id: r.report });
         break;
       }
     }

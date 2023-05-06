@@ -1571,6 +1571,14 @@ fundApplicationFormSchema.methods.getLastAuditComment = async function () {
       fundOperationTypes.approvedByAdmin,
       fundOperationTypes.notApprovedByAdmin,
     ],
+    reportAudit: [
+      fundOperationTypes.disbursementApproved,
+      fundOperationTypes.disbursementNotApproved,
+    ],
+    completedAudit: [
+      fundOperationTypes.finalReportApproved,
+      fundOperationTypes.finalReportNotApproved,
+    ],
   };
 
   const getReport = async ([supportOperationType, unsupportOperationType]) => {
@@ -1597,6 +1605,8 @@ fundApplicationFormSchema.methods.getLastAuditComment = async function () {
     projectAudit: await getReport(obj.projectAudit),
     moneyAudit: await getReport(obj.moneyAudit),
     adminAudit: await getReport(obj.adminAudit),
+    reportAudit: await getReport(obj.reportAudit),
+    completedAudit: await getReport(obj.completedAudit),
   };
 };
 /*
@@ -2052,6 +2062,7 @@ fundApplicationFormSchema.methods.withdraw = async function (
     formId: this._id,
     type: operationType,
     status: fundOperationStatus.normal,
+    desc: reason,
   });
 
   /*await this.createReport(

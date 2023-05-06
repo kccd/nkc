@@ -31,12 +31,16 @@ router
     ) {
       ctx.throw(403, '抱歉！您没有资格进行结题审核。');
     }
-    data.report = await db.FundDocumentModel.findOne({
+    data.report = await db.FundOperationModel.findOne({
+      type: fundOperationTypes.submitFinalReport,
+      formId: applicationForm._id,
+    }).sort({ toc: -1 });
+    /*data.report = await db.FundDocumentModel.findOne({
       type: 'completedReport',
       applicationFormId: applicationForm._id,
     })
       .sort({ toc: -1 })
-      .limit(1);
+      .limit(1);*/
     data.nav = '结题审核';
     await next();
   })

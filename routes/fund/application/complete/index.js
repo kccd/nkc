@@ -6,7 +6,7 @@ const {
   fundOperationTypes,
 } = require('../../../../settings/fundOperation');
 const {
-  fundOoerationService,
+  fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
 completeRouter
   .use('/', async (ctx, next) => {
@@ -34,9 +34,16 @@ completeRouter
       ctx.throw('权限不足');
     }
     if (status.completed === false) {
-      data.auditComments = {};
-      data.auditComments.completedAudit = await db.FundDocumentModel.findOne({
-        applicationFormId: applicationForm._id,
+      data.report = await db.FundOperationModel.findOne({
+        type: fundOperationTypes.submitFinalReport,
+        formId: applicationForm._id,
+      }).sort({ toc: -1 });
+      data.completedAudit = (
+        await applicationForm.getLastAuditComment()
+      ).completedAudit;
+      /*data.auditComments = {};
+      data.auditComments.completedAudit = await db.FundOperationModel.findOne({
+        formId: applicationForm._id,
         type: 'completedAudit',
         disabled: false,
       }).sort({ toc: -1 });
@@ -44,7 +51,7 @@ completeRouter
         applicationFormId: applicationForm._id,
         type: 'completedReport',
         disabled: false,
-      }).sort({ toc: -1 });
+      }).sort({ toc: -1 });*/
     }
     ctx.template = 'fund/complete/complete.pug';
     await next();
@@ -146,7 +153,7 @@ completeRouter
     }
     const threadsId = threads.map((t) => t.tid);
 
-    await fundOoerationService.createFundOperation({
+    await fundOperationService.createFundOperation({
       uid: applicationForm.uid,
       formId: applicationForm._id,
       type: fundOperationTypes.submitFinalReport,
