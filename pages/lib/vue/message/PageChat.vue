@@ -326,12 +326,24 @@
           this.isHandel = true;  //是否开始拖动
         }
         this.initialBoxHeight = this.$refs.chatForm.offsetHeight; //盒子未拖动前的高度
-        this.initialHeightOnClick = event.pageY  ; //获取刚拖动前的高度
+        const deviceType = this.getDeviceType();
+        if(deviceType ==='PC'){
+          this.initialHeightOnClick = event.pageY  ; //
+        }
+        else {
+          this.initialHeightOnClick = event.touches[0].pageY ; //
+        }
       },
       //计算鼠标的移动的高度
       calculateHeightOnMouseOver(event){
         if(this.isHandel){
-          this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
+          const deviceType = this.getDeviceType();
+          if(deviceType ==='PC'){
+            this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
+          }
+          else {
+            this.heightDuringMove = this.initialHeightOnClick - event.touches[0].pageY;  //鼠标偏移量
+          }
           if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
             this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
             this.finalChatContainerBottom = this.initialFooterHeight +  this.finalBoxHeight;//盒子的paddingBottom变化量
@@ -368,6 +380,23 @@
       },
       clearWarningContent() {
         this.warningContent = ''
+      },
+      //检测当前设备是移动端还是ios
+      getDeviceType() {
+        const userAgent = navigator.userAgent;
+        const isAndroid = /Android/i.test(userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+        const isMobile = isAndroid || isIOS;
+
+        if (isMobile) {
+          if (isAndroid) {
+            return "Android";
+          } else if (isIOS) {
+            return "iOS";
+          }
+        } else {
+          return "PC";
+        }
       },
       initAudio() {
         const app = this;
