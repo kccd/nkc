@@ -9,14 +9,7 @@ const closeRouter = require('./close');
 const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
-function isIncludes(arr, id, type) {
-  for (const a of arr) {
-    if (a.id === id && a.type === type) {
-      return true;
-    }
-  }
-  return false;
-}
+
 threadRouter
   .use('/', async (ctx, next) => {
     const { db, state, data } = ctx;
@@ -531,24 +524,65 @@ threadRouter
     if (paging.page === 0) {
       // 获取高赞文章
       const voteUpPostSettings = await thread.forums[0].getVoteUpPostSettings();
-      const { voteUpCount, postCount, selectedPostCount } = voteUpPostSettings;
+      const { voteUpCount, postCount, selectedPostCount, voteDownRatio } =
+        voteUpPostSettings;
       voteUpPostInfo = `当不小于 ${postCount} 篇回复的点赞数 ≥ ${voteUpCount} 时，选取点赞数前 ${selectedPostCount} 的回复`;
       if (voteUpPostSettings.status === 'show') {
-        let voteUpPostsId = await db.PostModel.find(
+        let voteUpPostsId = await db.PostModel.aggregate([
           {
-            tid,
-            type: 'post',
-            parentPostId: '',
-            voteUp: {
-              $gte: voteUpCount,
+            // 查找点赞数达到设置值的回复
+            $match: {
+              tid,
+              type: 'post',
+              parentPostId: '',
+              voteUp: {
+                $gte: voteUpCount,
+              },
             },
           },
           {
-            pid: 1,
+            $project: {
+              pid: 1,
+              // 计算点踩比例
+              ratio: {
+                $divide: [
+                  '$voteDown',
+                  {
+                    $add: ['$voteUp', '$voteDown'],
+                  },
+                ],
+              },
+              // 计算有效点赞数
+              effectiveVoteUp: {
+                $subtract: ['$voteUp', '$voteDown'],
+              },
+            },
           },
-        )
-          .sort({ voteUp: -1 })
-          .limit(postCount);
+          {
+            // 排除掉点踩比例过大的回复
+            $match: {
+              ratio: {
+                $lte: voteDownRatio / 100,
+              },
+            },
+          },
+          {
+            $project: {
+              pid: 1,
+              effectiveVoteUp: 1,
+            },
+          },
+          {
+            // 按有效点赞数逆序排序
+            $sort: {
+              effectiveVoteUp: -1,
+            },
+          },
+          {
+            $limit: postCount,
+          },
+        ]);
+
         if (voteUpPostsId.length === postCount) {
           voteUpPostsId = voteUpPostsId
             .splice(0, selectedPostCount)

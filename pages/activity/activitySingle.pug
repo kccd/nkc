@@ -111,7 +111,7 @@ block content
                   .col-xs-12.col-md-12.description
                     .form-group
                       //- - let post = {c: data.activity.description,l: "html"}
-                      div.thread-content.ThreadPostBody#ThreadPostBody!=data.activity.description 
+                      div.thread-content.ThreadPostBody#ThreadPostBody!=data.activity.description
                 -if(!data.type)
                   .row.m-b-4.m-t-1
                     .col-xs-12.col-md-12
@@ -207,8 +207,8 @@ block content
                     hr
                   .col-xs-12.col-md-12.description
                     .form-group
-                      - let post = {c: data.history.description,l: "html"}
-                      div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+                      // - let post = {c: data.history.description,l: "html"}
+                      div.thread-content.ThreadPostBody#ThreadPostBody!= data.history.description
           .col-xs-12.col-md-3
             .list-group
               span

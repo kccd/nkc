@@ -26,6 +26,7 @@ module.exports = {
       status: 'hide', // show, hide
       postCount: 1,
       voteUpCount: 1,
+      voteDownRatio: 30, //百分比
       selectedPostCount: 1,
     },
   },

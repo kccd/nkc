@@ -13,17 +13,8 @@ router.get('/', async (ctx, next) => {
   data.targetSourceContent = '';
 
   if (c) {
-    console.log({ aaa: decodeURIComponent(c) });
-
     let { source, sourceContent, targetSource, targetSourceContent } =
       JSON.parse(decodeURIComponent(c));
-
-    console.log({
-      source,
-      sourceContent,
-      targetSource,
-      targetSourceContent,
-    });
 
     if (sourceContent) {
       if (source === 'name') {
