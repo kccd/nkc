@@ -9,14 +9,7 @@ const closeRouter = require('./close');
 const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
-function isIncludes(arr, id, type) {
-  for (const a of arr) {
-    if (a.id === id && a.type === type) {
-      return true;
-    }
-  }
-  return false;
-}
+
 threadRouter
   .use('/', async (ctx, next) => {
     const { db, state, data } = ctx;
