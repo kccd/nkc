@@ -68,11 +68,11 @@
   import StickerSelector from './StickerSelector';
   import MathJaxSelector from "./MathJaxSelector";
   import XsfSelector from './XsfSelector';
-  import {sweetError} from "../js/sweetAlert";
   import DraftsSelector from "./DraftsSelector";
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
   import { isFileDomain } from "../js/url";
+  import {screenTopWarning} from "../js/topAlert";
   import {
     replaceTwemojiCharWithImage,
     replaceTwemojiImageWithChar,
@@ -244,6 +244,7 @@
               self.initScrollEvent();
               self.initWindowOnResizeEvent();
               self.initRemoteImageDownloader();
+              self.initEditorPasteEvent();
             }, 500)
           });
       },
@@ -263,38 +264,52 @@
         }
         this.clearSocketHandleTimer();
       },
+
+      setImageNodeStatusIsUploading(imageNode) {
+        const loadingSrc = getUrl('defaultFile', 'picloading.png');
+        this.setImageNodeSrc(imageNode, loadingSrc);
+      },
+      setImageNodeNKCSourceInfo(imageNode, rid) {
+        imageNode.setAttribute('data-tag', 'nkcsource');
+        imageNode.setAttribute('data-type', 'picture');
+        imageNode.setAttribute('data-id', rid);
+      },
+      clearNodeNKCSourceInfo(imageNode) {
+        imageNode.removeAttribute('data-tag');
+        imageNode.removeAttribute('data-type');
+        imageNode.removeAttribute('data-id');
+      },
+      setImageNodeSrc(imageNode, src) {
+        imageNode.setAttribute('src', src);
+        imageNode.setAttribute('_src', src);
+      },
+      setImageNodeStatusIsSucceeded(imageNode, rid) {
+        const imageSrc = getUrl('resourceWithoutFileDomain', rid);
+        this.setImageNodeSrc(imageNode, imageSrc);
+      },
+      setImageNodeStatusIsFailed(imageNode) {
+        const defaultSrc = getUrl('defaultFile', 'picdefault.png');
+        this.setImageNodeSrc(imageNode, defaultSrc);
+        this.clearNodeNKCSourceInfo(imageNode);
+      },
+
       modifyUploadedResources() {
         const {socketHandleResources} = this;
         if(socketHandleResources.length === 0) return;
-        let changed = false;
-        const content = this.getContent();
-        const container = $('<div></div>');
-        container.html(content);
-        for(const r of socketHandleResources) {
-          const {success, rid} = r;
-          const images = container.find(
-            `img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`
-          );
+
+        while(true) {
+          if(socketHandleResources.length === 0) break;
+          const {success, rid} = socketHandleResources.shift();
+          const images = this.editor.document.querySelectorAll(`img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`);
           if(images.length === 0) continue;
-          if(success) {
-            const imageSrc = getUrl('resourceWithoutFileDomain', rid);
-            images
-              .attr('src', imageSrc)
-              .attr('_src', imageSrc);
-          } else {
-            const defaultSrc = getUrl('defaultFile', 'picdefault.png');
-            images
-              .attr('src', defaultSrc)
-              .attr('_src', defaultSrc)
-              .removeAttr('data-tag')
-              .removeAttr('data-type')
-              .removeAttr('data-id')
+          for(let i = 0; i < images.length; i++) {
+            const imageNode = images[i];
+            if(success) {
+              this.setImageNodeStatusIsSucceeded(imageNode, rid);
+            } else {
+              this.setImageNodeStatusIsFailed(imageNode);
+            }
           }
-          changed = true;
-        }
-        this.socketHandleResources.length = 0;
-        if(changed) {
-          this.setContent(container.html());
         }
       },
       clearSocketHandleTimer() {
@@ -316,54 +331,34 @@
         }, 2000);
       },
       catchRemoteImage() {
-        const content =  this.getContent();
-        const container = $('<div></div>');
-        container.html(content);
-        const images = container.find('img');
-        const remoteImages = [];
+        const images = this.editor.document.getElementsByTagName('img');
         for(let i = 0; i < images.length; i++) {
-          const imageJQ = images.eq(i);
-          if(imageJQ.attr('data-tag') === 'nkcsource') continue;
-          const src = imageJQ.attr('src');
+          const imageNode = images[i];
+          if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+          const src = imageNode.getAttribute('src');
           if(isFileDomain(src)) continue;
-          remoteImages.push([imageJQ, src]);
-        }
-        const self = this;
-        if(remoteImages.length > 0) {
-          Promise.all(remoteImages.map(async ([imageJQ, src]) => {
-            await self.downloadRemoteImage(imageJQ, src);
-          }))
-            .then(() => {
-              self.setContent(container.html());
-            })
-            .catch(sweetError)
+          // 外链图片
+          this.clearImageNodeStyle(imageNode);
+          this.downloadRemoteImage(imageNode, src);
         }
       },
-      downloadRemoteImage(imageJQ, url) {
-        // imageJQ.attr('src', "/default/picloading.png");
-        const loadingSrc = getUrl('defaultFile', 'picloading.png');
-        imageJQ.attr('src', loadingSrc);
-        imageJQ.attr('_src', loadingSrc);
+      clearImageNodeStyle(imageNode) {
+        imageNode.removeAttribute('style');
+      },
+      downloadRemoteImage(imageNode, url) {
+        this.setImageNodeStatusIsUploading(imageNode);
         return nkcAPI('/download', 'POST', {
           loadsrc: url
         })
-          .then((res) => {
+          .then(res => {
             const {rid} = res.r;
-            imageJQ
-              .attr('data-tag', 'nkcsource')
-              .attr('data-type', 'picture')
-              .attr('data-id', rid)
-            console.log(`外链图片（${url}）下载成功，服务端正在处理。`);
+            this.setImageNodeNKCSourceInfo(imageNode, rid);
+            console.log(`External image (${url}) downloaded successfully, server is processing.`);
           })
           .catch(err => {
-            const defaultSrc = getUrl('defaultFile', 'picdefault.png');
-            imageJQ
-              .attr('src', defaultSrc)
-              .attr('_src', defaultSrc)
-              .removeAttr('data-tag')
-              .removeAttr('data-type')
-              .removeAttr('data-id');
-          })
+            this.setImageNodeStatusIsFailed(imageNode);
+            screenTopWarning(`Image upload failed: ${err.message || err.toString()}`);
+          });
       },
       scrollEvent() {
         this.setSaveInfo(true);
@@ -373,6 +368,11 @@
         const self = this;
         self.setSaveInfo();
         window.addEventListener("scroll", this.scrollEvent);
+      },
+      initEditorPasteEvent() {
+        this.editor.addListener('beforepaste', (type, data) => {
+          // 在这里过滤掉多余的标签或标签样式
+        });
       },
       removeScrollEvent() {
         window.removeEventListener("scroll", this.scrollEvent);
@@ -406,16 +406,6 @@
         if(!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc) return;
         window.onbeforeunload = null;
       },
-      /*async initSocketEvent() {
-        const self = this;
-        window.socket.on('fileTransformProcess', (data) => {
-          self.editor.fireEvent('updateImageState', {
-            id: data.rid,
-            state: data.state === 'fileProcessFinish',
-            src: getUrl('resource', data.rid)
-          });
-        });
-      },*/
       // 设置编辑器内容
       setContent(content) {
         content = replaceTwemojiCharWithImage(content);
