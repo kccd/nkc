@@ -365,7 +365,7 @@
 <script>
 import {getUrl, timeFormat} from "../../../../lib/js/tools";
 import {nkcAPI} from "../../../../lib/js/netAPI";
-import {screenTopWarning} from "../../../../lib/js/topAlert";
+import {markdownToHTML} from '../../../../lib/js/dataConversion'
 import {getState} from "../../../../lib/js/state";
 import {objToStr} from "../../../../lib/js/tools";
 import {subUsers} from "../../../../lib/js/subscribe";
@@ -373,7 +373,6 @@ import {EventBus} from "../../../eventBus";
 import SubscribeTypes from "../../../../lib/vue/SubscribeTypes";
 import UserLevel from "./UserLevel";
 import AdminManage from "./AdminManage";
-import {marked} from 'marked'
 import FromNow from "../../../../lib/vue/FromNow";
 const state = getState();
 export default {
@@ -415,7 +414,7 @@ export default {
       }
     },
     userDescription() {
-      return marked(this.targetUser.description || '未填写');
+      return markdownToHTML(this.targetUser.description || '未填写');
     }
   },
   mounted() {
