@@ -77,7 +77,7 @@ block fundContent
             else if submittedReport === false
               if remittance[number].passed === false
                 h5 申请拨款未通过审核：
-                .bg-danger.p-a-1.text-danger.pre-wrap=data.reportAudit.c
+                .bg-danger.p-a-1.text-danger.pre-wrap=data.reportAudit?data.reportAudit.c: ""
               .hidden#data=objToStr({form, number})
               #applyApp(v-cloak)
                 .form

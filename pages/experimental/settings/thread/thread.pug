@@ -110,6 +110,12 @@ block eContent
             .col-sm-4
               input.form-control(type='text' v-model.number='settings.voteUpPost.voteUpCount')
           .form-group
+            label.col-sm-2.control-label 最大点踩比例
+            .col-sm-4
+              .input-group
+                input.form-control.form-inline(type='text' v-model.number='settings.voteUpPost.voteDownRatio')
+                span.input-group-addon %
+          .form-group
             label.col-sm-2.control-label 高赞回复数
             .col-sm-4
               input.form-control(type='text' v-model.number='settings.voteUpPost.postCount')
@@ -117,7 +123,8 @@ block eContent
             label.col-sm-2.control-label 选取高赞回复数
             .col-sm-4
               input.form-control(type='text' v-model.number='settings.voteUpPost.selectedPostCount')
-              .text-danger.m-t-1 不小于 {{settings.voteUpPost.postCount}} 篇回复的点赞数 ≥{{settings.voteUpPost.voteUpCount}} 时，选取点赞数前 {{settings.voteUpPost.selectedPostCount}} 的回复
+              .text-danger.m-t-1
+                | 当不小于 {{settings.voteUpPost.postCount}} 篇回复的点赞数 ≥{{settings.voteUpPost.voteUpCount}} 且每条回复的点踩比例不超过 {{settings.voteUpPost.voteDownRatio}}% 时，选取有效点赞数（点赞-点踩）前 {{settings.voteUpPost.selectedPostCount}} 的回复。
           .form-group
             label.col-sm-2.control-label
             .col-sm-10

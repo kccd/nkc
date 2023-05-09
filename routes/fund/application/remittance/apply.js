@@ -1,26 +1,41 @@
 const router = require('koa-router')();
+const {
+  fundOperationStatus,
+  fundOperationTypes,
+} = require('../../../../settings/fundOperation');
+const {
+  fundOperationService,
+} = require('../../../../services/fund/FundOperation.service');
 router
   .use('/', async (ctx, next) => {
-    const {state, data} = ctx;
-    const {applicationForm} = data;
-    if(state.uid !== applicationForm.uid) ctx.throw(403, `权限不足`);
-    if(applicationForm.completedAudit) ctx.throw(400, '你已经申请结题，不能再申请拨款');
+    const { state, data } = ctx;
+    const { applicationForm } = data;
+    if (state.uid !== applicationForm.uid) {
+      ctx.throw(403, `权限不足`);
+    }
+    if (applicationForm.completedAudit) {
+      ctx.throw(400, '你已经申请结题，不能再申请拨款');
+    }
     await next();
   })
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
-    data.reportAudit = await db.FundDocumentModel.findOne({type: 'reportAudit'}).sort({toc: -1});
+    const { data } = ctx;
+    data.reportAudit = (
+      await data.applicationForm.getLastAuditComment()
+    ).reportAudit;
     ctx.template = 'fund/remittance/apply.pug';
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {data, db, body} = ctx;
-    const {applicationForm} = data;
-    const {account, fund, timeToPassed, reportNeedThreads} = applicationForm;
-    const {number, c, selectedThreads, code} = body;
+    const { data, db, body } = ctx;
+    const { applicationForm } = data;
+    const { account, fund, timeToPassed, reportNeedThreads } = applicationForm;
+    const { number, c, selectedThreads, code } = body;
 
     // 申请前需验证短信验证码
-    const usersPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
+    const usersPersonal = await db.UsersPersonalModel.findOnly({
+      uid: applicationForm.uid,
+    });
 
     const option = {
       nationCode: usersPersonal.nationCode,
@@ -40,80 +55,113 @@ router
     // 当自动拨款出错，若是用户输入的用户名或账号错误则直接更改申请表为未提交的状态，用户可编辑后再提交，否则等待财务人员处理
 
     const insertReportStart = async () => {
-      await applicationForm.createReport(
+      return await fundOperationService.createFundOperation({
+        uid: applicationForm.uid,
+        formId: applicationForm._id,
+        type: fundOperationTypes.applyDisbursement,
+        status: fundOperationStatus.normal,
+        installment: number + 1,
+        desc: c,
+      });
+      /*await applicationForm.createReport(
         'system',
         `申请第 ${number + 1} 期拨款`,
         applicationForm.uid,
-        null
-      );
+        null,
+      );*/
     };
 
-    if(fund.auditType === 'system') {
-      if(account.paymentType !== 'alipay') ctx.throw(400, '系统审核只支持支付宝收款');
+    if (fund.auditType === 'system') {
+      if (account.paymentType !== 'alipay') {
+        ctx.throw(400, '系统审核只支持支付宝收款');
+      }
       await insertReportStart();
-      try{
+      try {
         await applicationForm.transfer({
           number,
           operatorId: applicationForm.uid,
           clientIp: ctx.address,
-          clientPort: ctx.port
+          clientPort: ctx.port,
         });
-        await applicationForm.createReport(
+        await fundOperationService.createFundOperation({
+          uid: applicationForm.uid,
+          formId: applicationForm._id,
+          type: fundOperationTypes.disbursementSuccess,
+          status: fundOperationStatus.normal,
+          installment: number + 1,
+        });
+        /*await applicationForm.createReport(
           'system',
           `第 ${number + 1} 期拨款成功`,
           applicationForm.uid,
-          true
-        );
-      } catch(err) {
-        await applicationForm.createReport(
+          true,
+        );*/
+      } catch (err) {
+        await fundOperationService.createFundOperation({
+          uid: applicationForm.uid,
+          formId: applicationForm._id,
+          type: fundOperationTypes.disbursementFailed,
+          status: fundOperationStatus.normal,
+          installment: number + 1,
+          desc: err.message || err.toString(),
+        });
+        /*await applicationForm.createReport(
           'system',
           `第 ${number + 1} 期拨款失败: ${err.message || err.toString()}`,
           applicationForm.uid,
-          false
-        );
+          false,
+        );*/
         throw err;
       }
-      await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+      await db.MessageModel.sendFundMessage(applicationForm._id, 'applicant');
     } else {
       await applicationForm.checkRemittanceNumber(number);
       const r = applicationForm.remittance[number];
-      const membersId = await db.FundApplicationUserModel.getMembersUidByApplicationFromId(applicationForm._id);
+      const membersId =
+        await db.FundApplicationUserModel.getMembersUidByApplicationFromId(
+          applicationForm._id,
+        );
       membersId.push(applicationForm.uid);
-      if(number !== 0 && reportNeedThreads) {
-        const threads = await db.ThreadModel.find({
-          tid: {
-            $in: selectedThreads
+      if (number !== 0 && reportNeedThreads) {
+        const threads = await db.ThreadModel.find(
+          {
+            tid: {
+              $in: selectedThreads,
+            },
+            uid: {
+              $in: membersId,
+            },
           },
-          uid: {
-            $in: membersId
-          }
-        }, {
-          toc: 1,
-          tid: 1
-        });
-        if(threads.length === 0) ctx.throw(400, `申请拨款必须附带代表中期报告的文章`);
-        for(const thread of threads) {
-          if(thread.toc < timeToPassed) {
+          {
+            toc: 1,
+            tid: 1,
+          },
+        );
+        if (threads.length === 0) {
+          ctx.throw(400, `申请拨款必须附带代表中期报告的文章`);
+        }
+        for (const thread of threads) {
+          if (thread.toc < timeToPassed) {
             ctx.throw(400, `请选择申请项目之后所发表的文章`);
           }
         }
-        r.threads = threads.map(t => t.tid);
+        r.threads = threads.map((t) => t.tid);
       }
-      await insertReportStart();
-      const report = await applicationForm.createReport(
+      const report = await insertReportStart();
+      /*const report = await applicationForm.createReport(
         'report',
         c,
         applicationForm.uid,
-        null
-      );
-      r.report = report._id;
+        null,
+      );*/
+      r.report = report._id.toString();
       r.passed = null;
       r.apply = true;
       await applicationForm.updateOne({
         $set: {
           remittance: applicationForm.remittance,
-          submittedReport: number !== 0
-        }
+          submittedReport: number !== 0,
+        },
       });
       /*// 人工审核
       // 申请第一期拨款不需要附带文章
@@ -180,8 +228,11 @@ router
           break;
         }
       }*/
-      await db.MessageModel.sendFundMessage(applicationForm._id, "financialStaff");
+      await db.MessageModel.sendFundMessage(
+        applicationForm._id,
+        'financialStaff',
+      );
     }
     await next();
-  })
+  });
 module.exports = router;

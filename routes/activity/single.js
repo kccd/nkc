@@ -9,7 +9,7 @@ singleRouter
     const {type, hid, token} = query;
     data.type = type;
     data.hid = hid;
-    // 权限判断		
+    // 权限判断
     if(token){
       let share = await db.ShareModel.findOne({"token":token});
       if(!share) ctx.throw(403, "无效的token");
@@ -67,6 +67,13 @@ singleRouter
     activity.historys = await activity.extendHistorys();
     if(data.type == 'history'){
       data.history = await db.ActivityHistoryModel.findOne({_id:hid})
+      data.history.description = nkcRender.renderHTML({
+        type: 'article',
+        post: {
+          c: data.history.description,
+          // resources
+        },
+      })
     }
     data.activity = activity.toObject();
 		ctx.template = 'activity/activitySingle.pug';
@@ -133,7 +140,7 @@ singleRouter
     if(!user){
       ctx.throw(400, "请前往注册");
     }
-    
+
     const apply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});
     await apply.updateOne({enrollInfo: post.enrollInfo})
     // if(!activity.signUser.includes(user.uid)){

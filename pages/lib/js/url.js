@@ -27,8 +27,13 @@ export function isAbsolutePath(url) {
 export function isSameDomain(url) {
   return url.indexOf(location.host) !== -1 || /(^\.)|(^\/)/.test(url);
 }
-// 判断链接是否为外域链接
-export function isOutlandLink(url) {
+
+// 判断链接是否为本站的文件链接
+export function isFileDomain(url) {
   const { fileDomain } = getState();
-  return url.indexOf(fileDomain) !== -1 || /(^\.)|(^\/)/.test(url);
+  if (fileDomain) {
+    return url.indexOf(fileDomain) !== -1;
+  } else {
+    return isSameDomain(url);
+  }
 }
