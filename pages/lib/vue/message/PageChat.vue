@@ -1,5 +1,15 @@
 <template lang="pug">
-  .chat.message-container
+  .chat.message-container(
+    @mousedown="changeBoxHeightOnClick"
+    @mouseup="stopChangeBoxHeightOnClick"
+    @mousemove="calculateHeightOnMouseOver"
+    @mouseleave="calculateHeightOnMouseLeave"
+    @touchstart="changeBoxHeightOnClick"
+    @touchmove="calculateHeightOnMouseOver"
+    @touchend="stopChangeBoxHeightOnClick"
+    @touchcancel="calculateHeightOnMouseLeave"
+    ref="chatMessageContainer"
+    )
     //- 通用header组件
     ModuleHeader(
       :title="tUser? (tUser.friendName||tUser.name): '加载中...'"
@@ -8,8 +18,16 @@
       @onClickLeftButton="closePage"
       @onClickRightButton="openUserHome"
     )
+    // 警告信息展示面板
+    .warning-info-panel(v-if="warningContent")
+      .centered-container
+       .warning-content {{warningContent}}
+       .warning-button(v-if="canSendMessage")
+         button.btn.btn-default(@click="clearWarningContent") 关闭
+       .warning-button(v-if="!canSendMessage")
+         button.btn.btn-default(@click="closePage") 关闭
     //- 对话列表容器 固定高度 内容可滚动
-    .chat-container(ref='listContent' :data-type="type")
+    .chat-container(ref='listContent' :data-type="type" :style="chatContainerStyle")
       //- 对话列表容器 长度无限制
       .chat-messages
         //- 加载消息时的状态显示
@@ -88,398 +106,28 @@
                 span(v-if="message.progress !== 100") 发送中...{{message.progress}}%
                 span(v-else) 发送成功，处理中...
     //- 输入面板 仅在与用户对话时显示
-    .chat-form(v-if="showForm")
-      // 警告信息展示面板
-      .warning-info-panel(v-if="warningContent")
-        .warning-content {{warningContent}}
-        .warning-button(v-if="canSendMessage")
-          button(@click="clearWarningContent") 关闭
+    .chat-form(v-if="showForm" ref="chatForm"  :style="{height:`${finalBoxHeight}px`}" )
       // 表情面板
       .chat-twemoji(ref="twemojiContainer" v-if="showTwemoji")
         .icon(v-for="e in twemoji" @click="selectIcon(e.code)")
           img(:src="e.url")
       //- 输入框容器
-      .textarea-container
+      .textarea-container(ref="textareaContainer" )
+        .boxStretch(ref="boxStretch")
         //- 输入框
         textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
       //- 按钮容器
-      .button-container
-        .button(@click="toShowTwemoji" title="表情")
-          .fa.fa-smile-o
-        .button(@click="selectFile" title="文件")
-          input.hidden(ref="fileInput" type="file" @change="selectedFile" multiple="multiple")
-          .fa.fa-file-o
-        .button.tip Ctrl + Enter 快捷发送
-        .button.send(@click="sendTextMessage")
-          span 发送
+
+    footer.button-container(v-if="showForm" :style="{height:`${initialFooterHeight}px`}")
+      .button(@click="toShowTwemoji" title="表情")
+        .fa.fa-smile-o
+      .button(@click="selectFile" title="文件")
+        input.hidden(ref="fileInput" type="file" @change="selectedFile" multiple="multiple")
+        .fa.fa-file-o
+      .button.tip Ctrl + Enter 快捷发送
+      .button.send(@click="sendTextMessage")
+        span 发送
 </template>
-
-<style scoped lang="less">
-  @import "../../../publicModules/base";
-  @headerHeight: 3.4rem;
-  @textareaContainerHeight: 6rem;
-  @buttonContainerHeight: 3rem;
-  @bgColor: #eee;
-  @bubbleBgColor: #fff;
-  @bubbleBgColorRight: @primary;
-  .re-edit{
-    color: @primary!important;
-    user-select: none;
-    cursor: pointer;
-    &:hover{
-      opacity: 0.7;
-    }
-  }
-  .chat-message-info{
-    height: 2rem;
-    line-height: 2rem;
-    text-align: center;
-    font-size: 1rem;
-    color: #555;
-  }
-  .chat-container{
-    width: 100%;
-    background-color: @bgColor;
-    position: absolute;
-    top: @headerHeight;
-    bottom: 0;
-    left: 0;
-    overflow-y: auto;
-    &[data-type='UTU']{
-      bottom: @textareaContainerHeight + @buttonContainerHeight;
-    }
-  }
-  .chat{
-    position: relative;
-  }
-  .chat-form{
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: @textareaContainerHeight + @buttonContainerHeight;
-    background-color: #fff;
-    &>div{
-      height: 100%;
-    }
-    .textarea-container{
-      height: @textareaContainerHeight;
-      box-sizing: border-box;
-      border: 1px solid #e7e7e7;
-      width: 100%;
-    }
-    .button-container{
-      height: @buttonContainerHeight;
-      width: 100%;
-      padding-left: 1rem;
-      .button{
-        cursor: pointer;
-        display: inline-block;
-        height: @buttonContainerHeight;
-        line-height: @buttonContainerHeight;
-        font-size: 1.6rem;
-        margin-right: 1rem;
-        user-select: none;
-        &.send{
-          float: right;
-          margin-right: 0;
-          font-size: 1.25rem;
-          color: #444;
-          cursor: pointer;
-          padding: 0 1rem;
-          &:hover, &:active{
-            color: @primary;
-          }
-        }
-        &.tip{
-          font-size: 1rem;
-          color: #777;
-        }
-      }
-    }
-    textarea{
-      overflow-x: hidden;
-      overflow-y: auto;
-      width: 100%;
-      resize: none;
-      height: 100%;
-      padding: 0.5rem 1rem;
-      border: none;
-      &:focus{
-        outline: none;
-      }
-    }
-    //box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
-  }
-  .message-time, .message-withdrawn{
-    text-align: center;
-    & span{
-      @height: 1.8rem;
-      margin: auto;
-      height: @height;
-      line-height: @height;
-      display: inline-block;
-      padding: 0 0.5rem;
-      background-color: #e7e7e7;
-      color: #555;
-      font-size: 1rem;
-      text-align: center;
-      border-radius: 3px;
-      border: 1px solid #e2e2e2;
-    }
-  }
-  .chat-message-item>div{
-    margin: 1rem 0;
-  }
-  .message{
-    @iconHeight: 3rem;
-    position: relative;
-    padding: 0 @iconHeight + 2rem;
-    .icon{
-      height: @iconHeight;
-      width: @iconHeight;
-      overflow: hidden;
-      position: absolute;
-      top: 0;
-      left: 0.8rem;
-      img{
-        height: 100%;
-        width: 100%;
-        border-radius: 50%;
-      }
-    }
-    &.right{
-      .icon{
-        right: 0.8rem;
-        left: auto;
-      }
-    }
-    &.right .message-body .message-content .html{
-      & /deep/ a{
-        text-decoration: underline;
-        color: #fff;
-      }
-    }
-    .timestamp{
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
-      color: #fff;
-      position: absolute;
-      top: 0;
-      left: -10rem;
-    }
-    .message-body{
-      background-color: @bubbleBgColor;
-      color: #333;
-      min-height: 3rem;
-      padding: 0.7rem 0.7rem;
-      font-size: 1.17rem;
-      position: relative;
-      border-radius: 5px;
-      display: inline-block;
-      max-width: 30rem;
-      .sending-progress{
-        margin-top: 0.2rem;
-        height: 1.8rem;
-        width: 100%;
-        padding: 0 0.5rem;
-        text-align: center;
-        line-height: 1.8rem;
-        font-size: 1rem;
-        background-color: #f4f4f4;
-        border-radius: 3px;
-        border: 1px solid #e2e2e2;
-        color: #888;
-        .fa{
-          margin-right: 0.2rem;
-        }
-      }
-      &.nkc-media{
-        padding: 0;
-        .smart{
-          display: none;
-        }
-        .image{
-          cursor: pointer;
-          img{
-            max-width: 100%;
-            max-height: 20rem;
-          }
-        }
-        .video{
-          font-size: 0;
-          video{
-            max-width: 100%;
-            max-height: 20rem;
-          }
-        }
-      }
-      .audio{
-        audio{
-          max-width: 100%;
-        }
-        .filename{
-          font-size: 1.2rem;
-        }
-        .left, .right{
-          &>*{
-            display: inline-block;
-          }
-          img{
-            height: 2rem;
-            width: 2rem;
-          }
-        }
-        .left img{
-          margin-right: 2rem;
-        }
-        .right img{
-          margin-left: 2rem;
-        }
-      }
-      .smart{
-        position: absolute;
-        top: 0;
-        left: -8px;
-        height: 20px;
-        width: 8px;
-        border-radius: 0 0 0 15px;
-        background-color: @bubbleBgColor;
-        &:after {
-          content: '';
-          display: block;
-          height: 18px;
-          width: 16px;
-          position: absolute;
-          top: -5px;
-          left: -8px;
-          border-radius: 0 0 0 20px;
-          background-color: @bgColor;
-        }
-      }
-      .status{
-        position: absolute;
-        top: 0;
-        font-size: 1.6rem;
-        width: 2rem;
-        left: -2rem;
-        text-align: center;
-        &.error{
-          color: @accent;
-        }
-        &.sending{
-          color: #ccc;
-          font-size: 1.5rem;
-        }
-        &.withdrawn{
-          color: #ccc;
-          font-size: 1.4rem;
-          cursor: pointer;
-        }
-      }
-      .message-content{
-        text-align: left;
-        word-break: break-all;
-        font-size: 1.2rem;
-        .html{
-          & /deep/ a{
-            //text-decoration: none;
-          }
-          & /deep/ .message-emoji{
-              width: 2rem;
-          }
-        }
-        .file{
-          a{
-            color: #333;
-            text-decoration: none;
-            &:hover, &:active{
-              text-decoration: none;
-            }
-            button{
-              margin-top: 0.5rem;
-              color: #fff;
-              border-radius: 3px;
-              height: 2rem;
-              display: block;
-              line-height: 2rem;
-              background-color: @primary;
-              text-align: center;
-              font-size: 1rem;
-              outline: none;
-              border: none;
-              &:hover, &:active{
-                opacity: 0.7;
-              }
-            }
-          }
-        }
-      }
-    }
-    &.right{
-      text-align: right;
-      .message-body{
-        text-align: left;
-        background-color: @bubbleBgColorRight;
-        color: #fff;
-        .smart{
-          right: -8px;
-          left: auto;
-          border-radius: 0 0 15px 0;
-          background-color: @bubbleBgColorRight;
-          &:after {
-            height: 17px;
-            width: 18px;
-            left: auto;
-            right: -10px;
-            border-radius: 0 0 20px 0;
-          }
-        }
-      }
-    }
-  }
-  .chat{
-    position: relative;
-  }
-  .chat-twemoji{
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding: 0.5rem 0;
-    z-index: 500;
-    .icon{
-      cursor: pointer;
-      height: 2rem;
-      width: 2rem;
-      display: inline-block;
-      margin: 0.2rem;
-      img{
-        height: 100%;
-        width: 100%;
-      }
-    }
-  }
-  .warning-info-panel{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow-y: auto;
-    padding: 0.5rem;
-    z-index: 600;
-    background-color: rgba(200, 200, 200, 0.94);
-    color: #000;
-    .warning-button{
-      text-align: center;
-      padding-top: 0.5rem;
-      button{
-
-      }
-    }
-  }
-</style>
 
 <script>
   const CHAT_CONTENT_ID = `NKC_CHAT_CONTENT`;
@@ -524,6 +172,14 @@
       warningContent: '',
 
       listContentBottom: 0,
+      isHandel: false,
+      initialHeightOnClick: 0,
+      heightDuringMove: 0,
+      initialBoxHeight: 0,
+
+      initialFooterHeight: 36,
+      finalBoxHeight: 0,
+      finalChatContainerBottom: 0,
 
     }),
     watch: {
@@ -563,8 +219,16 @@
         app.toHideTwemoji();
       });
       this.initAudio();
+      this.initChatDialogOffset();
     },
     computed: {
+      chatContainerStyle() {
+        if(this.showForm) {
+          return `bottom:${this.initialFooterHeight + this.finalBoxHeight}px`;
+        } else {
+          return '';
+        }
+      },
       leftIcon() {
         return 'fa fa-angle-left';
       },
@@ -656,8 +320,83 @@
       getUrl: getUrl,
       getSize: getSize,
       timeFormat: timeFormat,
+      //鼠标开始点击
+      changeBoxHeightOnClick(event){
+        if(event.target === this.$refs.boxStretch){
+          this.isHandel = true;  //是否开始拖动
+        }
+        this.initialBoxHeight = this.$refs.chatForm.offsetHeight; //盒子未拖动前的高度
+        const deviceType = this.getDeviceType();
+        if(deviceType ==='PC'){
+          this.initialHeightOnClick = event.pageY  ; //
+        }
+        else {
+          this.initialHeightOnClick = event.touches[0].pageY ; //
+        }
+      },
+      //计算鼠标的移动的高度
+      calculateHeightOnMouseOver(event){
+        if(this.isHandel){
+          const deviceType = this.getDeviceType();
+          if(deviceType ==='PC'){
+            this.heightDuringMove = this.initialHeightOnClick - event.pageY;  //鼠标偏移量
+          }
+          else {
+            this.heightDuringMove = this.initialHeightOnClick - event.touches[0].pageY;  //鼠标偏移量
+          }
+          if( this.initialBoxHeight + this.heightDuringMove >=72 && this.initialBoxHeight + this.heightDuringMove<= 300){
+            this.finalBoxHeight = this.initialBoxHeight + this.heightDuringMove;//盒子最终拉伸高度
+            this.finalChatContainerBottom = this.initialFooterHeight +  this.finalBoxHeight;//盒子的paddingBottom变化量
+          }
+        }
+      },
+      //鼠标移出
+      calculateHeightOnMouseLeave(event){
+        if(this.isHandel){
+          this.isHandel = false;
+          this.heightDuringMove = 0;
+          const data = {
+            finalBoxHeight: this.finalBoxHeight,
+          }
+          saveToLocalStorage('chatDialogOffset',data);
+          this.isHandel = false
+        }
+       },
+      //鼠标松开停止改变
+      stopChangeBoxHeightOnClick(event){
+        if(this.isHandel){
+          this.heightDuringMove = 0;
+          const data = {
+            finalBoxHeight:this.finalBoxHeight, }
+          saveToLocalStorage('chatDialogOffset',data);
+          this.isHandel = false
+        }
+      },
+      //获取缓存的伸缩量并初始化
+      initChatDialogOffset(){
+        const data =  getFromLocalStorage('chatDialogOffset')
+        this.finalBoxHeight = data.finalBoxHeight || 72;
+        this.finalChatContainerBottom = this.finalBoxHeight + this.initialFooterHeight;
+      },
       clearWarningContent() {
         this.warningContent = ''
+      },
+      //检测当前设备是移动端还是ios
+      getDeviceType() {
+        const userAgent = navigator.userAgent;
+        const isAndroid = /Android/i.test(userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+        const isMobile = isAndroid || isIOS;
+
+        if (isMobile) {
+          if (isAndroid) {
+            return "Android";
+          } else if (isIOS) {
+            return "iOS";
+          }
+        } else {
+          return "PC";
+        }
       },
       initAudio() {
         const app = this;
@@ -966,5 +705,428 @@
         this.content += content;
       }
     }
+
   }
 </script>
+
+<style scoped lang="less">
+@import "../../../publicModules/base";
+@headerHeight: 3.4rem;
+@textareaContainerHeight: 6rem;
+@buttonContainerHeight: 3rem;
+@bgColor: #eee;
+@bubbleBgColor: #fff;
+@bubbleBgColorRight: @primary;
+.re-edit{
+  color: @primary!important;
+  user-select: none;
+  cursor: pointer;
+  &:hover{
+    opacity: 0.7;
+  }
+}
+.chat-message-info{
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+}
+.chat-container{
+  width: 100%;
+  background-color: @bgColor;
+  position: absolute;
+  top: @headerHeight;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  /*&[data-type='UTU']{
+    bottom: @textareaContainerHeight + @buttonContainerHeight;
+  }*/
+}
+.chat{
+  position: relative;
+}
+.chat-form{
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 36px;
+  background-color: #fff;
+  &>div{
+    height: 100%;
+  }
+  .boxStretch{
+    height: 14px;
+    width: 100%;
+    position: absolute;
+    top: -7px;
+    //background-color: #0b5ba2;
+  }
+  .boxStretch:hover{
+    cursor: s-resize;
+  }
+  .boxStretch::before {
+    content: "";
+    position: absolute;
+    top: 2.5px;
+    left: 50%;
+    margin-left: -10px;
+    width: 30px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 3px;
+    border: 1px solid rgb(204, 204, 204) ;
+  }
+  .boxStretch:hover::before {
+    background-color: rgb(238, 238, 238);
+  }
+
+
+  .boxStretch::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    margin-left: -5px;
+    width: 20px;
+    height: 1px;
+    background-color:  rgb(204, 204, 204);
+  }
+
+  .textarea-container{
+    height: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e7e7e7;
+    width: 100%;
+    position: relative;
+  }
+
+  textarea{
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    resize: none;
+    height: 100%;
+    padding: 7px 1rem 0.5rem 1rem;
+    border: none;
+    z-index: 3;
+    background-color: rgb(255,255,255);
+    &:focus{
+      outline: none;
+    }
+  }
+  //box-shadow: 1px 1px 15px -7px rgba(0, 0, 0, 0.66);
+}
+.button-container{
+  height: @buttonContainerHeight;
+  width: 100%;
+  padding-left: 1rem;
+  position: absolute;
+  bottom: 0;
+  .button{
+    cursor: pointer;
+    display: inline-block;
+    height: @buttonContainerHeight;
+    line-height: @buttonContainerHeight;
+    font-size: 1.6rem;
+    margin-right: 1rem;
+    user-select: none;
+    &.send{
+      float: right;
+      margin-right: 0;
+      font-size: 1.25rem;
+      color: #444;
+      cursor: pointer;
+      padding: 0 1rem;
+      &:hover, &:active{
+        color: @primary;
+      }
+    }
+    &.tip{
+      font-size: 1rem;
+      color: #777;
+      vertical-align: bottom;
+    }
+  }
+}
+.message-time, .message-withdrawn{
+  text-align: center;
+  & span{
+    @height: 1.8rem;
+    margin: auto;
+    height: @height;
+    line-height: @height;
+    display: inline-block;
+    padding: 0 0.5rem;
+    background-color: #e7e7e7;
+    color: #555;
+    font-size: 1rem;
+    text-align: center;
+    border-radius: 3px;
+    border: 1px solid #e2e2e2;
+  }
+}
+.chat-message-item>div{
+  margin: 1rem 0;
+}
+.message{
+  @iconHeight: 3rem;
+  position: relative;
+  padding: 0 @iconHeight + 2rem;
+  .icon{
+    height: @iconHeight;
+    width: @iconHeight;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0.8rem;
+    img{
+      height: 100%;
+      width: 100%;
+      border-radius: 50%;
+    }
+  }
+  &.right{
+    .icon{
+      right: 0.8rem;
+      left: auto;
+    }
+  }
+  &.right .message-body .message-content .html{
+    & /deep/ a{
+      text-decoration: underline;
+      color: #fff;
+    }
+  }
+  .timestamp{
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    color: #fff;
+    position: absolute;
+    top: 0;
+    left: -10rem;
+  }
+  .message-body{
+    background-color: @bubbleBgColor;
+    color: #333;
+    min-height: 3rem;
+    padding: 0.7rem 0.7rem;
+    font-size: 1.17rem;
+    position: relative;
+    border-radius: 5px;
+    display: inline-block;
+    max-width: 30rem;
+    .sending-progress{
+      margin-top: 0.2rem;
+      height: 1.8rem;
+      width: 100%;
+      padding: 0 0.5rem;
+      text-align: center;
+      line-height: 1.8rem;
+      font-size: 1rem;
+      background-color: #f4f4f4;
+      border-radius: 3px;
+      border: 1px solid #e2e2e2;
+      color: #888;
+      .fa{
+        margin-right: 0.2rem;
+      }
+    }
+    &.nkc-media{
+      padding: 0;
+      .smart{
+        display: none;
+      }
+      .image{
+        cursor: pointer;
+        img{
+          max-width: 100%;
+          max-height: 20rem;
+        }
+      }
+      .video{
+        font-size: 0;
+        video{
+          max-width: 100%;
+          max-height: 20rem;
+        }
+      }
+    }
+    .audio{
+      audio{
+        max-width: 100%;
+      }
+      .filename{
+        font-size: 1.2rem;
+      }
+      .left, .right{
+        &>*{
+          display: inline-block;
+        }
+        img{
+          height: 2rem;
+          width: 2rem;
+        }
+      }
+      .left img{
+        margin-right: 2rem;
+      }
+      .right img{
+        margin-left: 2rem;
+      }
+    }
+    .smart{
+      position: absolute;
+      top: 0;
+      left: -8px;
+      height: 20px;
+      width: 8px;
+      border-radius: 0 0 0 15px;
+      background-color: @bubbleBgColor;
+      &:after {
+        content: '';
+        display: block;
+        height: 18px;
+        width: 16px;
+        position: absolute;
+        top: -5px;
+        left: -8px;
+        border-radius: 0 0 0 20px;
+        background-color: @bgColor;
+      }
+    }
+    .status{
+      position: absolute;
+      top: 0;
+      font-size: 1.6rem;
+      width: 2rem;
+      left: -2rem;
+      text-align: center;
+      &.error{
+        color: @accent;
+      }
+      &.sending{
+        color: #ccc;
+        font-size: 1.5rem;
+      }
+      &.withdrawn{
+        color: #ccc;
+        font-size: 1.4rem;
+        cursor: pointer;
+      }
+    }
+    .message-content{
+      text-align: left;
+      word-break: break-all;
+      font-size: 1.2rem;
+      .html{
+        & /deep/ a{
+          //text-decoration: none;
+        }
+        & /deep/ .message-emoji{
+          width: 2rem;
+        }
+      }
+      .file{
+        a{
+          color: #333;
+          text-decoration: none;
+          &:hover, &:active{
+            text-decoration: none;
+          }
+          button{
+            margin-top: 0.5rem;
+            color: #fff;
+            border-radius: 3px;
+            height: 2rem;
+            display: block;
+            line-height: 2rem;
+            background-color: @primary;
+            text-align: center;
+            font-size: 1rem;
+            outline: none;
+            border: none;
+            &:hover, &:active{
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.right{
+    text-align: right;
+    .message-body{
+      text-align: left;
+      background-color: @bubbleBgColorRight;
+      color: #fff;
+      .smart{
+        right: -8px;
+        left: auto;
+        border-radius: 0 0 15px 0;
+        background-color: @bubbleBgColorRight;
+        &:after {
+          height: 17px;
+          width: 18px;
+          left: auto;
+          right: -10px;
+          border-radius: 0 0 20px 0;
+        }
+      }
+    }
+  }
+}
+.chat{
+  position: relative;
+}
+.chat-twemoji{
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  z-index: 500;
+  position: absolute;
+  background-color: rgb(255,255,255);
+  .icon{
+    cursor: pointer;
+    height: 2rem;
+    width: 2rem;
+    display: inline-block;
+    margin: 0.2rem;
+    img{
+      height: 100%;
+      width: 100%;
+    }
+  }
+}
+.warning-info-panel{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding: 0.5rem;
+  z-index: 600;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+   .centered-container{
+     background-color: rgb(255,255,255);
+     width: 30rem;
+     max-width: 100%;
+     padding: 1rem;
+   }
+  .warning-button{
+    text-align: center;
+    padding-top: 0.5rem;
+    button{
+
+    }
+  }
+}
+</style>

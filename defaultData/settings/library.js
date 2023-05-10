@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.library,
   c: {
@@ -9,8 +9,8 @@ module.exports = {
       notPass: {
         status: false,
         countLimit: 5,
-        unlimited: true
-      }
+        unlimited: true,
+      },
     },
     permission: {
       roles: [],
@@ -18,11 +18,11 @@ module.exports = {
         roleId: String,
         operations: ["createFolder", ...]
       } */
-      grades: []
+      grades: [],
     },
     libraryTip: {
-      tipShow: "",
-      tipUpload: ""
-    }
-  }
+      tipShow: '',
+      tipUpload: '',
+    },
+  },
 };

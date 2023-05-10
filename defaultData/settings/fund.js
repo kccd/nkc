@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.fund,
   c: {
@@ -12,7 +12,7 @@ module.exports = {
       status: false,
       reason: '关闭原因',
       uid: '',
-      closingTime: new Date()
+      closingTime: new Date(),
     },
     donationDescription: '赞助说明',
     fundPoolDescription: '资金池介绍',
@@ -25,13 +25,13 @@ module.exports = {
       payment: {
         aliPay: {
           enabled: false,
-          fee: 0
+          fee: 0,
         },
         wechatPay: {
           enabled: false,
-          fee: 0
-        }
-      }
-    }
-  }
+          fee: 0,
+        },
+      },
+    },
+  },
 };

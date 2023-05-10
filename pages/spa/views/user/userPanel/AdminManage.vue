@@ -67,7 +67,7 @@
 import {nkcAPI} from "../../../../lib/js/netAPI";
 import {screenTopWarning} from "../../../../lib/js/topAlert";
 import {getState} from "../../../../lib/js/state";
-import {clearUserPublicProfile} from "../../../../lib/js/user";
+import { banUser, clearUserPublicProfile } from "../../../../lib/js/user";
 
 export default {
   props: ['targetUser', 'panelPermission'],
@@ -88,15 +88,7 @@ export default {
     },
     // 封禁用户,banned:false 解封，true 封禁
     bannedUser(uid, banned) {
-      let method = 'PUT';
-      if(banned) method = 'DELETE';
-      nkcAPI('/u/' + uid + '/banned', method, {})
-        .then(function() {
-          window.location.reload();
-        })
-        .catch(function(data) {
-          screenTopWarning(data.error||data);
-        });
+      return banUser(uid, banned)
     },
     // 取消屏蔽用户名片，isHidden是否隐藏用户主页
     hideUserHome(isHidden, uid) {

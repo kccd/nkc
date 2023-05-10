@@ -1,187 +1,187 @@
 module.exports = {
-	GET: 'visitFundHome',
-	add: {
-		GET: 'visitAddFund'
-	},
-	info: {
-		GET: 'visitFundInfo'
-	},
-	bills: {
-		GET: 'visitFundBills',
-		POST: 'addFundBill',
-		PARAMETER: {
-			GET: 'visitFundBill',
-			PUT: 'modifyFundBill',
-			DELETE: 'deleteFundBill'
-		}
-	},
-	bill: {
-		GET: 'visitAddFundBill'
-	},
-	me: {
-		GET: 'visitMyFund'
-	},
-  blacklist: {
-	  GET: 'visitFundBlacklist',
-    POST: 'fundBlacklistPost',
-    DELETE: 'fundBlacklistPost'
+  GET: 'visitFundHome',
+  add: {
+    GET: 'visitAddFund',
   },
-	list: {
-		GET: 'visitFundObjectList',
-		POST: 'addFund',
-		PARAMETER: {
-			DELETE: 'deleteFundObject',
-			GET: 'visitFundObjectHome',
-			settings: {
-				GET: 'singleFundSettings',
-        PUT: 'singleFundSettings'
-			},
-			add: {
-				GET: 'agreeFundTerms',
-				POST: 'submitFundApplicationForm'
-			},
-			bills: {
-				GET: 'visitFundObjectBills'
-			}
-		}
-	},
-	donation: {
-		GET: 'fundDonation',
+  info: {
+    GET: 'visitFundInfo',
+  },
+  bills: {
+    GET: 'visitFundBills',
+    POST: 'addFundBill',
+    PARAMETER: {
+      GET: 'visitFundBill',
+      PUT: 'modifyFundBill',
+      DELETE: 'deleteFundBill',
+    },
+  },
+  bill: {
+    GET: 'visitAddFundBill',
+  },
+  me: {
+    GET: 'visitMyFund',
+  },
+  blacklist: {
+    GET: 'visitFundBlacklist',
+    POST: 'fundBlacklistPost',
+    DELETE: 'fundBlacklistPost',
+  },
+  list: {
+    GET: 'visitFundObjectList',
+    POST: 'addFund',
+    PARAMETER: {
+      DELETE: 'deleteFundObject',
+      GET: 'visitFundObjectHome',
+      settings: {
+        GET: 'singleFundSettings',
+        PUT: 'singleFundSettings',
+      },
+      add: {
+        GET: 'agreeFundTerms',
+        POST: 'submitFundApplicationForm',
+      },
+      bills: {
+        GET: 'visitFundObjectBills',
+      },
+    },
+  },
+  donation: {
+    GET: 'fundDonation',
     POST: 'fundDonation',
-		return: {
-			GET: 'fundDonation'
-		},
-		verify: {
-			POST: 'fundDonation'
-		}
-	},
-	history: {
-		GET: 'visitHistoryFundList',
-		PARAMETER: {
-			GET: 'visitHistoryFund'
-		}
-	},
-	disabled: {
-		GET: 'visitDisabledFundList'
-	},
-	unsubmit: {
-		GET: 'visitUnSubmitFundApplicationList'
-	},
-	giveup: {
-		GET: 'visitGiveUpFundApplicationList'
-	},
-	a: {
-		PARAMETER: {
-			GET: 'visitFundApplicationForm',
-			POST: 'restoreFundApplicationForm',
-			PUT: 'modifyApplicationForm',
-			DELETE: 'deleteApplicationForm',
-			report: {
-				GET: 'visitFundApplicationReport',
-				POST: 'addFundApplicationReport',
-				audit: {
-					GET: 'visitFundApplicationReportAudit',
-					POST: 'submitFundApplicationReportAudit'
-				},
-				PARAMETER: {
-					DELETE: 'deleteFundApplicationReport'
-				}
-			},
-			settings: {
-				GET: 'visitFundApplicationFormSettings',
+    return: {
+      GET: 'fundDonation',
+    },
+    verify: {
+      POST: 'fundDonation',
+    },
+  },
+  history: {
+    GET: 'visitHistoryFundList',
+    PARAMETER: {
+      GET: 'visitHistoryFund',
+    },
+  },
+  disabled: {
+    GET: 'visitDisabledFundList',
+  },
+  unsubmit: {
+    GET: 'visitUnSubmitFundApplicationList',
+  },
+  giveup: {
+    GET: 'visitGiveUpFundApplicationList',
+  },
+  a: {
+    PARAMETER: {
+      GET: 'visitFundApplicationForm',
+      POST: 'restoreFundApplicationForm',
+      PUT: 'modifyApplicationForm',
+      DELETE: 'deleteApplicationForm',
+      report: {
+        GET: 'visitFundApplicationReport',
+        POST: 'addFundApplicationReport',
+        audit: {
+          GET: 'visitFundApplicationReportAudit',
+          POST: 'submitFundApplicationReportAudit',
+        },
+        PARAMETER: {
+          PUT: 'deleteFundApplicationReport',
+        },
+      },
+      settings: {
+        GET: 'visitFundApplicationFormSettings',
         POST: 'visitFundApplicationFormSettings',
         member: {
-				  POST: 'visitFundApplicationFormSettings',
-          DELETE: 'visitFundApplicationFormSettings'
+          POST: 'visitFundApplicationFormSettings',
+          DELETE: 'visitFundApplicationFormSettings',
         },
         post: {
-				  GET: 'visitFundApplicationFormSettings'
+          GET: 'visitFundApplicationFormSettings',
         },
         delete: {
-				  POST: 'visitFundApplicationFormSettings'
+          POST: 'visitFundApplicationFormSettings',
         },
         giveup: {
-				  POST: 'visitFundApplicationFormSettings'
+          POST: 'visitFundApplicationFormSettings',
         },
         withdraw: {
-          POST: 'visitFundApplicationFormSettings'
-        }
-			},
+          POST: 'visitFundApplicationFormSettings',
+        },
+      },
       manage: {
-			  audit: {
-			    project: {
+        audit: {
+          project: {
             GET: 'visitFundApplicationAudit',
-            POST: 'submitFundApplicationAudit'
+            POST: 'submitFundApplicationAudit',
           },
           info: {
             GET: 'visitFundApplicationAudit',
-            POST: 'submitFundApplicationAudit'
-          }
+            POST: 'submitFundApplicationAudit',
+          },
         },
         refuse: {
-			    POST: 'submitFundApplicationAudit'
+          POST: 'submitFundApplicationAudit',
         },
         restore: {
-			    POST: 'restoreFundApplicationForm'
+          POST: 'restoreFundApplicationForm',
         },
         stop: {
-			    POST: 'stopFundApplicationForm'
+          POST: 'stopFundApplicationForm',
         },
         timeout: {
-			    POST: 'timeoutFundApplicationForm'
+          POST: 'timeoutFundApplicationForm',
         },
         withdraw: {
-          POST: 'withdrawFundApplicationForm'
+          POST: 'withdrawFundApplicationForm',
         },
         refund: {
-          POST: 'refundFundApplicationForm'
-        }
+          POST: 'refundFundApplicationForm',
+        },
       },
-			/*comment: {
+      /*comment: {
 				POST: 'addFundApplicationComment',
 				PARAMETER: {
 					DELETE: 'deleteFundApplicationComment'
 				}
 			},*/
-			member: {
-				PUT: 'modifyFundApplicationMember'
-			},
-			vote: {
-				POST: 'submitFundApplicationVote'
-			},
-			audit: {
-				GET: 'visitFundApplicationAudit',
-				POST: 'submitFundApplicationAudit'
-			},
-			complete: {
-				GET: 'visitFundApplicationComplete',
-				POST: 'submitFundApplicationComplete',
-				audit: {
-					GET: 'visitFundApplicationCompleteAudit',
-					POST:'submitFundApplicationCompleteAudit'
-				}
-			},
-			remittance: {
-				GET: 'visitFundApplicationRemittance',
-				POST: 'submitFundApplicationRemittance',
-				apply: {
-					GET: 'visitFundApplyRemittance',
-					POST: 'submitFundApplyRemittance'
-				},
-				verify: {
-					PUT: 'confirmationFundRemittance'
-				}
-			},
-			excellent: {
-				PUT: 'fundApplicationFormExcellent'
-			},
-			disabled: {
-				PUT: 'modifyFundApplicationFormStatus'
-			},
+      member: {
+        PUT: 'modifyFundApplicationMember',
+      },
+      vote: {
+        POST: 'submitFundApplicationVote',
+      },
+      audit: {
+        GET: 'visitFundApplicationAudit',
+        POST: 'submitFundApplicationAudit',
+      },
+      complete: {
+        GET: 'visitFundApplicationComplete',
+        POST: 'submitFundApplicationComplete',
+        audit: {
+          GET: 'visitFundApplicationCompleteAudit',
+          POST: 'submitFundApplicationCompleteAudit',
+        },
+      },
+      remittance: {
+        GET: 'visitFundApplicationRemittance',
+        POST: 'submitFundApplicationRemittance',
+        apply: {
+          GET: 'visitFundApplyRemittance',
+          POST: 'submitFundApplyRemittance',
+        },
+        verify: {
+          PUT: 'confirmationFundRemittance',
+        },
+      },
+      excellent: {
+        PUT: 'fundApplicationFormExcellent',
+      },
+      disabled: {
+        PUT: 'modifyFundApplicationFormStatus',
+      },
       refund: {
         GET: 'fundApplicationFormRefund',
-        POST: 'fundApplicationFormRefund'
-      }
-		}
-	}
+        POST: 'fundApplicationFormRefund',
+      },
+    },
+  },
 };

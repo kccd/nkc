@@ -5,8 +5,8 @@ block title
 
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
-  link(rel="stylesheet", href="/external_pkgs/cropper/css/cropper.css")
-  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
+  +includeCSS("/external_pkgs/cropper/css/cropper.css")
+  +includeCSS('/external_pkgs/citySet/citySet.css')
   +includeCSS("/fund.css")
   include ../publicModules/plyr/plyr.css.pug
   style.
@@ -111,7 +111,7 @@ block content
                   .col-xs-12.col-md-12.description
                     .form-group
                       //- - let post = {c: data.activity.description,l: "html"}
-                      div.thread-content.ThreadPostBody#ThreadPostBody!=data.activity.description 
+                      div.thread-content.ThreadPostBody#ThreadPostBody!=data.activity.description
                 -if(!data.type)
                   .row.m-b-4.m-t-1
                     .col-xs-12.col-md-12
@@ -207,8 +207,8 @@ block content
                     hr
                   .col-xs-12.col-md-12.description
                     .form-group
-                      - let post = {c: data.history.description,l: "html"}
-                      div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+                      // - let post = {c: data.history.description,l: "html"}
+                      div.thread-content.ThreadPostBody#ThreadPostBody!= data.history.description
           .col-xs-12.col-md-3
             .list-group
               span
@@ -223,10 +223,10 @@ block content
 
 
 block scripts
-  script(src=`/qrcode/build/qrcode.js?v=${global.NKC.startTime}`)
+  +includeJS('/qrcode/build/qrcode.js')
   +includeJS("/publicModules/customForm/customForm.js")
-  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
-  script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)
+  +includeJS("/activity/activityCommon.js")
+  +includeJS("/activity/activitySingle.js")
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   include ../publicModules/plyr/plyr.js.pug

@@ -2,64 +2,101 @@ const Router = require('koa-router');
 const applyRouter = require('./apply');
 const verifyRouter = require('./verify');
 const remittanceRouter = new Router();
+const {
+  fundOperationStatus,
+  fundOperationTypes,
+} = require('../../../../settings/fundOperation');
+const {
+  fundOperationService,
+} = require('../../../../services/fund/FundOperation.service');
 remittanceRouter
-	.use('/', async (ctx, next) => {
-		const {applicationForm} = ctx.data;
-		if(applicationForm.disabled) ctx.throw(400, '申请表已被屏蔽');
-		if(applicationForm.useless !== null) ctx.throw(400, '申请表已失效，无法完成该操作。');
-		const {adminSupport, completed} = applicationForm.status;
-		if(!adminSupport) ctx.throw(400, '管理员复核暂未通过无法进行拨款操作');
-		if(completed) ctx.throw(400, '申请已经结题，无法执行拨款操作');
-		await next();
-	})
-	.get('/', async (ctx, next) => {
-		const {db, data} = ctx;
-		const {user, applicationForm} = data;
-		const {remittance, fund} = applicationForm;
+  .use('/', async (ctx, next) => {
+    const { applicationForm } = ctx.data;
+    if (applicationForm.disabled) {
+      ctx.throw(400, '申请表已被屏蔽');
+    }
+    if (applicationForm.useless !== null) {
+      ctx.throw(400, '申请表已失效，无法完成该操作。');
+    }
+    const { adminSupport, completed } = applicationForm.status;
+    if (!adminSupport) {
+      ctx.throw(400, '管理员复核暂未通过无法进行拨款操作');
+    }
+    if (completed) {
+      ctx.throw(400, '申请已经结题，无法执行拨款操作');
+    }
+    await next();
+  })
+  .get('/', async (ctx, next) => {
+    const { db, data } = ctx;
+    const { user, applicationForm } = data;
+    const { remittance, fund } = applicationForm;
     await fund.checkFundRole(user.uid, 'financialStaff');
     data.isAdmin = await fund.isFundRole(user.uid, 'admin');
-		const usersId = [];
-		for(const r of remittance) {
-		  if(!r.uid) continue;
-		  usersId.push(r.uid);
+    const usersId = [];
+    for (const r of remittance) {
+      if (!r.uid) {
+        continue;
+      }
+      usersId.push(r.uid);
     }
-		const users = await db.UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
-		const usersObj = {};
-		users.map(u => usersObj[u.uid] = u);
-		for(const r of remittance) {
-		  if(r.uid) r.user = usersObj[r.uid];
+    const users = await db.UserModel.find(
+      { uid: { $in: usersId } },
+      { uid: 1, avatar: 1, username: 1 },
+    );
+    const usersObj = {};
+    users.map((u) => (usersObj[u.uid] = u));
+    for (const r of remittance) {
+      if (r.uid) {
+        r.user = usersObj[r.uid];
+      }
     }
     ctx.template = 'fund/remittance/audit.pug';
-		await next();
-	})
-	.post('/', async (ctx, next) => {
-		const {data, body, db} = ctx;
-		const {applicationForm, user} = data;
-		const {number} = body;
-		const {fund, remittance} = applicationForm;
+    await next();
+  })
+  .post('/', async (ctx, next) => {
+    const { data, body, db } = ctx;
+    const { applicationForm, user } = data;
+    const { number } = body;
+    const { fund, remittance } = applicationForm;
     await fund.checkFundRole(user.uid, 'financialStaff');
-    try{
-      if(applicationForm.account.paymentType === 'alipay') {
+    try {
+      if (applicationForm.account.paymentType === 'alipay') {
         await applicationForm.transfer({
           number,
           operatorId: applicationForm.uid,
           clientIp: ctx.address,
-          clientPort: ctx.port
+          clientPort: ctx.port,
         });
       }
-      await applicationForm.createReport(
+      await fundOperationService.createFundOperation({
+        uid: applicationForm.uid,
+        formId: applicationForm._id,
+        type: fundOperationTypes.disbursementSuccess,
+        status: fundOperationStatus.normal,
+        installment: number + 1,
+      });
+      /*await applicationForm.createReport(
         'system',
         `第 ${number + 1} 期拨款成功`,
         applicationForm.uid,
-        true
-      );
-    } catch(err) {
-      await applicationForm.createReport(
+        true,
+      );*/
+    } catch (err) {
+      await fundOperationService.createFundOperation({
+        uid: applicationForm.uid,
+        formId: applicationForm._id,
+        type: fundOperationTypes.disbursementFailed,
+        status: fundOperationStatus.normal,
+        installment: number + 1,
+        desc: err.message || err.toString(),
+      });
+      /*await applicationForm.createReport(
         'system',
         `第 ${number + 1} 期拨款失败: ${err.message || err.toString()}`,
         applicationForm.uid,
-        false
-      );
+        false,
+      );*/
       throw err;
     }
 
@@ -74,13 +111,13 @@ remittanceRouter
       $set: {
         'status.remittance': true,
         submittedReport: false,
-        remittance: remittance
-      }
+        remittance: remittance,
+      },
     });
 
-    await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+    await db.MessageModel.sendFundMessage(applicationForm._id, 'applicant');
 
-		/*for(let i = 0; i < remittance.length; i++) {
+    /*for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if(i < number && !r.status) ctx.throw(400, '请依次拨款！');
 			if(i === number) {
@@ -180,9 +217,8 @@ remittanceRouter
     await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");*/
 
     await next();
-	})
-
+  })
 
   .use('/apply', applyRouter.routes(), applyRouter.allowedMethods())
-  .use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods())
+  .use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods());
 module.exports = remittanceRouter;

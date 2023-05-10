@@ -1,4 +1,4 @@
-const {Broker} = require('./broker');
+const { Broker } = require('./broker');
 
 const ServiceActionNames = {
   v1_websocket_send_message_to_rooms: 'v1.websocket.sendMessageToRooms',
@@ -12,19 +12,19 @@ function BrokerCall(serviceActionName, params) {
 }
 
 const SocketServiceRoomMap = {
-  "console": "CONSOLE",
-  "user"   : (uid) => `USER:${uid}`,
-  "forum"  : (fid) => `FORUM:${fid}`,
-  "thread" : (tid) => `THREAD:${tid}`,
-  "post"   : (pid) => `POST:${pid}`,
-  "comment": (cid) => `COMMENT:${cid}`,
-  "article": (aid) => `ARTICLE:${aid}`,
+  console: 'CONSOLE',
+  user: (uid) => `USER:${uid}`,
+  forum: (fid) => `FORUM:${fid}`,
+  thread: (tid) => `THREAD:${tid}`,
+  post: (pid) => `POST:${pid}`,
+  comment: (cid) => `COMMENT:${cid}`,
+  article: (aid) => `ARTICLE:${aid}`,
 };
 
 function GetSocketServiceRoomName(type, ...params) {
   let value = SocketServiceRoomMap[type];
   let valueType = typeof value;
-  if(valueType === "function") {
+  if (valueType === 'function') {
     return value.apply(null, params);
   } else {
     return value;
@@ -34,5 +34,5 @@ function GetSocketServiceRoomName(type, ...params) {
 module.exports = {
   ServiceActionNames,
   GetSocketServiceRoomName,
-  BrokerCall
+  BrokerCall,
 };

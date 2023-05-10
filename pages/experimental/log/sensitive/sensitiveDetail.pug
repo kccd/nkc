@@ -1,0 +1,57 @@
+extends ../../experimental
+
+block eTitle
+  title 敏感词检测详情
+  +includeCSS("/experimental/log/sensitive/sensitive.css")
+block eContent
+  #data.hidden= objToStr({log: data.log, results: data.results})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.m-b-1
+        a.m-r-05(href="/e/log/sensitive") 返回列表
+        span.m-r-05 /
+        span.m-r-05 {{log._id}}
+        span.m-r-05.status-point(:class="log.status")
+        span {{log.statusName}}
+        span(v-if="log.status === 'running'") ...{{log.progress}}%
+      mixin manageButtons
+        button.btn.btn-default(@click="clearSelectedInfo()" :disabled="selectedIds.length === 0") 清除已勾选项的敏感内容
+        button.btn.btn-default(v-if='targetType === "user"' @click="banSelectedUsers()") 封禁已勾选项的用户
+        button.btn.btn-danger(@click="clearAllInfo()") 清除本次检测全部的敏感内容
+      .col-xs-12.col-md-12
+        .m-b-1
+          +manageButtons
+        .m-b-1
+          include ../../../publicModules/paging/paging.pug
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th
+                  label.m-r-1
+                    input(type="checkbox" @click="selectAll()" v-model="selectedAll")
+                  span 检测对象
+                th 目标ID
+                th 目标内容
+                th 目标详情
+            tbody
+              tr(v-for="result in results")
+                th
+                  label.m-r-1
+                    input(type="checkbox" :value="result.targetId" v-model="selectedIds")
+                  span {{log.typeName}}
+                th {{result.targetId}}
+                th {{result.targetContent}}
+                th
+                  a.btn.btn-info.btn-xs(:href="result.targetUrl" target="_blank") 查看详情
+                  buttom.btn.btn-default.btn-xs(@click="clearInfo([result.targetId])") 清除目标内容
+                  buttom.btn.btn-danger.btn-xs(v-if="targetType === 'user' && result.targetBanned" @click="banUsers([result.targetId], false)") 解封用户
+                  buttom.btn.btn-default.btn-xs(v-if="targetType === 'user' && !result.targetBanned" @click="banUsers([result.targetId], true)") 封禁用户
+        if paging.pageCount > 1
+          .m-b-1
+            include ../../../publicModules/paging/paging_input.pug
+        .m-b-1
+          +manageButtons
+
+block scripts
+  +includeJS("/experimental/log/sensitive/sensitiveDetail.js")

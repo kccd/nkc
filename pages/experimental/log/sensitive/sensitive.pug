@@ -1,0 +1,47 @@
+extends ../../experimental
+
+block eTitle
+  title 敏感词检测
+  +includeCSS("/experimental/log/sensitive/sensitive.css")
+block eContent
+  .container-fluid.max-width
+    -
+      var dataString = objToStr({
+        logs: data.logs,
+      });
+    .hidden#data=dataString
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        include ../../../publicModules/paging/paging.pug
+        table.table.table-bordered.nkc-table
+          thead
+            tr
+              th 时间
+              th 操作者
+              th 类型对象
+              th 状态
+              th 检测结果
+          tbody
+            tr(v-for="item in logs")
+              th
+                div {{detailedTime(item.toc)}} 开始
+                div(v-if="item.tlm") {{detailedTime(item.tlm)}} 更新
+              th
+                a(
+                  target="_blank"
+                  :href="getUrl('userHome', item.user.uid)"
+                  ) {{item.user.username}}
+              th {{item.typeName}}
+              th.th-max-width
+                span.status-point(:class="item.status")
+                span.m-r-05 {{item.statusName}}
+                span(v-if='item.status === "running"') {{(item.progress * 100).toFixed(0)}}%
+                button.btn.btn-default.btn-xs( v-if="item.status === 'failed'" @click="viewErrorInfo(item)") 错误信息
+              th
+                span.m-r-1 {{item.targetCount}}
+                a.btn.btn-default.btn-xs(:href="'/e/log/sensitive/' + item._id" target="_blank") 查看详情
+
+        include ../../../publicModules/paging/paging_input.pug
+
+block scripts
+  +includeJS("/experimental/log/sensitive/sensitive.js")

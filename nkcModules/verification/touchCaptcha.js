@@ -1,4 +1,5 @@
-const fs = require('fs')
+const fs = require('fs');
+const { isDevelopment } = require('../../settings/env');
 const path = require('path');
 const { createCanvas, loadImage } = require('canvas');
 
@@ -9,29 +10,38 @@ const fontSize = 40;
 // 噪点密度
 const noiseDensity = 0.03;
 // 文字库
-const chineseChars = `天地玄黄宇宙洪荒日月辰宿列张来往秋收冬闰余成岁吕调阳云致雨结为金生丽水玉出昆冈剑号巨珠称夜光果珍菜芥海咸河淡羽翔龙师火帝鸟官人始制文字乃服衣推位让国有陶唐吊民伐罪周发汤坐朝问道拱平章臣伏戎一体率宾归王鸣凤在竹白驹食场化被草木及万方此身发四大五常恭惟养岂敢伤女贞洁男效才良知过必改得能莫忘谈彼短恃己长信使可器欲难悲丝染诗羔羊行贤克念作圣名立形表正`.split("");
+const chineseChars =
+  `天地玄黄宇宙洪荒日月辰宿列张来往秋收冬闰余成岁吕调阳云致雨结为金生丽水玉出昆冈剑号巨珠称夜光果珍菜芥海咸河淡羽翔龙师火帝鸟官人始制文字乃服衣推位让国有陶唐吊民伐罪周发汤坐朝问道拱平章臣伏戎一体率宾归王鸣凤在竹白驹食场化被草木及万方此身发四大五常恭惟养岂敢伤女贞洁男效才良知过必改得能莫忘谈彼短恃己长信使可器欲难悲丝染诗羔羊行贤克念作圣名立形表正`.split(
+    '',
+  );
 
 // 预选位置
 const predefinePosition = [
-  {x: 60, y: 60},    {x: 150, y: 80},   {x: 240, y: 60},
+  { x: 60, y: 60 },
+  { x: 150, y: 80 },
+  { x: 240, y: 60 },
 
-  {x: 70, y: 160},   {x: 140, y: 160},  {x: 210, y: 134},
-                      
-  {x: 60, y: 240},   {x: 160, y: 230},  {x: 240, y: 240},
+  { x: 70, y: 160 },
+  { x: 140, y: 160 },
+  { x: 210, y: 134 },
+
+  { x: 60, y: 240 },
+  { x: 160, y: 230 },
+  { x: 240, y: 240 },
 ];
 
 /**
  * 绘制一个验证图
  * 返回正确文字的位置信息和canvas对象
  */
-async function makeCaptchaImage(){
+async function makeCaptchaImage() {
   const canvas = createCanvas(imageSize, imageSize);
   const ctx = canvas.getContext('2d');
 
   // 绘制背景图
   let backgroundImagePath = await getRandomBackgroundImage();
   const image = await loadImage(backgroundImagePath);
-  ctx.drawImage(image, 0, 0, imageSize, imageSize)
+  ctx.drawImage(image, 0, 0, imageSize, imageSize);
 
   // 总共绘制6个文字，3个正确文字
   // 随机选取6个文字并绘制
@@ -41,15 +51,15 @@ async function makeCaptchaImage(){
   shuffleArray(predefinePosition);
   let positions = predefinePosition.slice(0, 6);
   // 取前6个
-  let textInfoList = chineseChars.slice(0, 6).map(char => {
+  let textInfoList = chineseChars.slice(0, 6).map((char) => {
     let position = positions.shift();
     return drawText({
       ctx,
       textCenterX: position.x,
       textCenterY: position.y,
       rotate: randomIn(70, -70),
-      text: char
-    })
+      text: char,
+    });
   });
 
   // 圆形框线
@@ -64,57 +74,63 @@ async function makeCaptchaImage(){
   // 生成随机噪点像素
   for (var i = 0; i < data.length; i += 4) {
     // 噪点密度控制
-    if(Math.random() > noiseDensity) continue;
+    if (Math.random() > noiseDensity) {
+      continue;
+    }
     // 随机灰度噪点
     let grayscale = Math.floor(Math.random() * (255 - 0) + 0);
-    Array(randomIn(20, 2)).fill().map(() => {
-      if(i > data.length) return;
-      data[i]     = grayscale; // red
-      data[i + 1] = grayscale; // green
-      data[i + 2] = grayscale; // blue
-      i += 1;
-    });
+    Array(randomIn(20, 2))
+      .fill()
+      .map(() => {
+        if (i > data.length) {
+          return;
+        }
+        data[i] = grayscale; // red
+        data[i + 1] = grayscale; // green
+        data[i + 2] = grayscale; // blue
+        i += 1;
+      });
   }
   ctx.putImageData(imageData, 0, 0);
 
-  if(!global.NKC) {
-    let captchaTempImagePath = path.resolve(__dirname, "../../tmp/captcha.png");
+  if (isDevelopment) {
+    let captchaTempImagePath = path.resolve(__dirname, '../../tmp/captcha.png');
     const out = fs.createWriteStream(captchaTempImagePath);
     const stream = canvas.createPNGStream();
-    stream.pipe(out)
-    out.on('finish', () =>  console.log('The PNG file was created.'));
+    stream.pipe(out);
+    out.on('finish', () => console.log('The PNG file was created.'));
   }
 
   let answerSet = textInfoList.slice(0, 3);
   return {
     answer: answerSet,
-    question: answerSet.map(ans => ans.text),
+    question: answerSet.map((ans) => ans.text),
     image: {
       base64: canvas.toDataURL(),
       width: canvas.width,
-      height: canvas.height
-    }
+      height: canvas.height,
+    },
   };
 }
 
 // 验证点击位置
 function verify(userAnswerInfo, captchaInfo) {
-  let {width: originWidth, height: originHeight} = captchaInfo.image;
+  let { width: originWidth, height: originHeight } = captchaInfo.image;
   let answerPoints = captchaInfo.answer;
   // 转换用户坐标到原始尺寸图像的坐标
-  let userPoints = userAnswerInfo.answer.map(point => {
-    let {w, h, x, y} = point;
+  let userPoints = userAnswerInfo.answer.map((point) => {
+    let { w, h, x, y } = point;
     /**
         原始x     原始宽度
         ----  =  --------
         实际x     实际宽度
      */
-    if(w !== originWidth) {
-      point.x = originWidth * x / w;
+    if (w !== originWidth) {
+      point.x = (originWidth * x) / w;
       delete point.w;
     }
-    if(h !== originHeight) {
-      point.y = originHeight * y / h;
+    if (h !== originHeight) {
+      point.y = (originHeight * y) / h;
       delete point.h;
     }
     // console.log(point);
@@ -122,32 +138,37 @@ function verify(userAnswerInfo, captchaInfo) {
   });
   // console.log(answerPoints);
   // 计算用户点击点是否依次点击在了规定范围内
-  for(let index in answerPoints) {
-    let {centerPoint, radius} = answerPoints[index];
+  for (let index in answerPoints) {
+    let { centerPoint, radius } = answerPoints[index];
     let point = userPoints[index];
-    if(point === undefined) return false;
-    let {abs, sqrt, pow} = Math;
-    let distance = pow(sqrt(abs(centerPoint.x - point.x)) + sqrt(abs(centerPoint.y - point.y)), 2);
-    if(distance === 0) return false;
-    if(distance > radius) {
+    if (point === undefined) {
+      return false;
+    }
+    let { abs, sqrt, pow } = Math;
+    let distance = pow(
+      sqrt(abs(centerPoint.x - point.x)) + sqrt(abs(centerPoint.y - point.y)),
+      2,
+    );
+    if (distance === 0) {
+      return false;
+    }
+    if (distance > radius) {
       // console.log(`点${index + 1}: 距离圆心 ${distance}，限制距离 ${radius}`)
-      return false
+      return false;
     }
   }
   return true;
 }
-
 
 // 获取范围内的随机数
 function randomIn(max, min) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-
 // 数组洗牌
 function shuffleArray(arr) {
   let len = arr.length;
-  for(let index in arr) {
+  for (let index in arr) {
     let randomIndex = randomIn(len - 1, 0);
     let elem = arr[index];
     let targetElem = arr[randomIndex];
@@ -157,16 +178,14 @@ function shuffleArray(arr) {
   return arr;
 }
 
-
 // 求圆上任意一点的坐标
 // 圆心坐标、半径、角度
-function ac({x,y}, r, angle) {
+function ac({ x, y }, r, angle) {
   return {
-    x: x + r * Math.cos(angle * Math.PI/180),
-    y: y + r * Math.sin(angle * Math.PI/180)
-  }
+    x: x + r * Math.cos((angle * Math.PI) / 180),
+    y: y + r * Math.sin((angle * Math.PI) / 180),
+  };
 }
-
 
 // 绘制文字
 function drawText({
@@ -174,7 +193,7 @@ function drawText({
   textCenterX = 0,
   textCenterY = 0,
   rotate = 0,
-  text = "字"
+  text = '字',
 }) {
   ctx.save();
 
@@ -182,7 +201,7 @@ function drawText({
   ctx.translate(textCenterX, textCenterY);
 
   // 旋转画布
-  ctx.rotate(rotate * Math.PI/180);
+  ctx.rotate((rotate * Math.PI) / 180);
 
   // 画文字
   ctx.font = `bold ${fontSize}px Sans`;
@@ -191,10 +210,10 @@ function drawText({
   let textBacjgroundH = fontSize;
   let textX = -(textBackgroundW / 2);
   let textY = -(textBacjgroundH / 2);
-  ctx.fillStyle = "#e0e0e0";
-  ctx.textBaseline = "hanging";
+  ctx.fillStyle = '#e0e0e0';
+  ctx.textBaseline = 'hanging';
   ctx.fillText(text, textX, textY);
-  ctx.strokeStyle = "#666";
+  ctx.strokeStyle = '#666';
   ctx.strokeText(text, textX, textY);
 
   ctx.restore();
@@ -203,20 +222,21 @@ function drawText({
     // 文字的中心点
     centerPoint: {
       x: textCenterX,
-      y: textCenterY
+      y: textCenterY,
     },
     // 文字的最大半径
-    radius: Math.sqrt(Math.pow(fontSize / 2, 2) + Math.pow(textBackgroundW / 2, 2)) + (fontSize * 0.74 /* 稍微给大一些检测范围 */),
-    text
-  }
+    radius:
+      Math.sqrt(Math.pow(fontSize / 2, 2) + Math.pow(textBackgroundW / 2, 2)) +
+      fontSize * 0.74 /* 稍微给大一些检测范围 */,
+    text,
+  };
 }
-
 
 // 给定圆心和半径绘制圆形标记
 function markRound(info, ctx) {
   ctx.save();
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "red";
+  ctx.strokeStyle = 'red';
   let centerPoint = info.centerPoint;
   ctx.beginPath();
   ctx.arc(centerPoint.x, centerPoint.y, info.radius, 0, 2 * Math.PI);
@@ -224,10 +244,9 @@ function markRound(info, ctx) {
   ctx.restore();
 }
 
-
 // 从public/captcha文件夹中随机获取一张图片
 async function getRandomBackgroundImage() {
-  let captchaImageDir = path.resolve(__dirname, "../../public/captcha");
+  let captchaImageDir = path.resolve(__dirname, '../../public/captcha');
   let files = await fs.promises.readdir(captchaImageDir);
   let fileName = files[randomIn(files.length - 1, 0)];
   return `${captchaImageDir}/${fileName}`;
@@ -235,5 +254,5 @@ async function getRandomBackgroundImage() {
 
 module.exports = {
   create: makeCaptchaImage,
-  verify
+  verify,
 };

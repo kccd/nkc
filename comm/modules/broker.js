@@ -1,7 +1,7 @@
 const Moleculer = require('moleculer');
 const address = require('address');
 const path = require('path');
-const {GetMoleculerConfigs} = require('./configs');
+const { GetMoleculerConfigs } = require('./configs');
 const moleculerConfigs = GetMoleculerConfigs();
 const Broker = new Moleculer.ServiceBroker({
   namespace: moleculerConfigs.namespace,
@@ -19,10 +19,10 @@ const Broker = new Moleculer.ServiceBroker({
       formatter: 'json',
       eol: '\n',
       interval: 5 * 1000,
-    }
-  }
+    },
+  },
 });
 
 module.exports = {
-  Broker
+  Broker,
 };

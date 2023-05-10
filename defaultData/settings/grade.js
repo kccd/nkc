@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.grade,
   c: {
@@ -10,7 +10,7 @@ module.exports = {
       dailyLogin: 0.02,
       xsf: 500,
       thumbsUp: 2,
-      violation: -10
-    }
-  }
-}
+      violation: -10,
+    },
+  },
+};

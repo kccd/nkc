@@ -1,11 +1,10 @@
 extends ../../bootstrap_base
 
 block title
-  -const mainContainer1400 = true;
-  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
-  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
-  link(href='/experimental/index.css' rel='stylesheet')
+  +includeCSS('/jquery/jquery.minicolors.css')
+  +includeCSS('/icheck/skins/minimal/red.css')
+  +includeCSS('/bootstrap/css/bootstrap-datetimepicker.min.css')
+  +includeCSS('/experimental/index.css')
   title 管理界面
 block content
 
@@ -26,5 +25,5 @@ block content
 
 block scripts
 
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/settings/forum.js?v=${global.NKC.startTime}`)
+  +includeJS("/interface_common.js")
+  +includeJS('/experimental/settings/forum.js')

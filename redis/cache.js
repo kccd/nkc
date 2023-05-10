@@ -1,10 +1,15 @@
 /*
-* 启动时缓存必要数据到redis
-* */
+ * 启动时缓存必要数据到redis
+ * */
 const db = require('../dataModels');
-const client = require('../settings/redisClient');
 const tasks = require('../tasks');
 const cacheForums = require('./cacheForums');
+const {
+  sensitiveSettingService,
+} = require('../services/sensitive/sensitiveSetting.service');
+const {
+  sensitiveCheckerService,
+} = require('../services/sensitive/sensitiveChecker.service');
 module.exports = async () => {
   // 清空redis数据库
   // await client.flushdbAsync();
@@ -38,4 +43,7 @@ module.exports = async () => {
   await db.IPBlacklistModel.saveIPBlacklistToRedis();
   // 访问控制
   await db.AccessControlModel.saveToCache();
-}
+  // 敏感词设置
+  await sensitiveSettingService.saveAllSettingsToCache();
+  await sensitiveCheckerService.setAllCheckerLogStatusToFailed();
+};

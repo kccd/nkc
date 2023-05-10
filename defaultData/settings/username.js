@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.username,
   c: {
@@ -9,7 +9,7 @@ module.exports = {
     sensitive: {
       words: [],
       usernameTip: '用户名不合法',
-      descTip: '个人简介不合法'
-    }
-  }
+      descTip: '个人简介不合法',
+    },
+  },
 };

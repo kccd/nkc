@@ -200,7 +200,8 @@ export function clearHighlightClass(content) {
 export function markdownToHTML(markdownContent) {
   let html = marked(markdownContent);
   html = createDOMPurify.sanitize(html, {
-    FORBID_TAGS: ['script']
+    FORBID_TAGS: ['script', 'style', 'iframe'],
+    FORBID_ATTR: ['onclick', 'onload', 'onerror']
   });
   return html;
 }

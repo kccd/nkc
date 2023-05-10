@@ -5,13 +5,13 @@ block title
   -const hiddenFooter = true;
   title 商城卖家服务控制台
   //- link(rel='stylesheet' href='/shop/manage/style.css')
-  link(rel='stylesheet' href='/shop/manage/manage.css')
-  link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+  +includeCSS("/shop/manage/manage.css")
+  +includeCSS("/mdui/css/mdui.css")
   style.
     .button {
       margin-right: 5px
     }
-  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
+  +includeCSS('/external_pkgs/citySet/citySet.css')
 block content
   .container-fluid.max-width
     .row
@@ -53,7 +53,7 @@ block content
           button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货
           button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消         
 block scripts
-  script(src='/shop/manage/manage.js')
+  +includeJS('/shop/manage/manage.js')
   script.
     var trackListDom = "";
     $.getJSON('/track.json',function(data){

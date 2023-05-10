@@ -30,7 +30,7 @@ block fundContent
           h5=`申请人申请第 ${number + 1} 期拨款`
           if number !== 0
             h5 提交的报告：
-            .bg-info.p-a-1.pre-wrap=data.report.c
+            .bg-info.p-a-1.pre-wrap=data.report?data.report.desc: "未填写报告"
             if reportNeedThreads
               h5 附带的文章：
               div

@@ -139,9 +139,8 @@ block eContent
         button.btn.btn-primary(@click='save') 保存
 
 block scripts
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/settings/redEnvelope.js?v=${global.NKC.startTime}`)
-
+  +includeJS(`/interface_common.js`)
+  +includeJS(`/experimental/settings/redEnvelope.js`)
 
 
 

@@ -1,5 +1,5 @@
 module.exports = {
-  filterAllHTML: require("./filterAllHTML"),
+  filterAllHTML: require('./filterAllHTML'),
   filterEditorContent: require('./filterEditorContent'),
-  filterMessageContent: require('./filterMessageContent')
-}
+  filterMessageContent: require('./filterMessageContent'),
+};

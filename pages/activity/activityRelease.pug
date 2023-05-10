@@ -152,7 +152,7 @@ block content
             input#inputFile(type='file' accept="image/*").hidden
 
 block scripts
-  script(src="/jquery-ui-1.10.4.custom.js")
+  +includeJS('/jquery-ui-1.10.4.custom.js')
   script(src="../bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
   script(src="../bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
   script(src='../bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
@@ -165,8 +165,8 @@ block scripts
   include ../publicModules/selectResource/selectResource
   include ../publicModules/sticker/selectSticker
   include ../ueditor/ueditorBase
-  script(src=`./activityRelease.js?v=${global.NKC.startTime}` charset="UTF-8")
-  script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
+  +includeJS('./activityRelease.js')
+  +includeJS('./activityCommon.js')
   include ../publicModules/crop/crop
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')

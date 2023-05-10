@@ -1,4 +1,4 @@
-const {settingIds} = require('../../settings/serverSettings');
+const { settingIds } = require('../../settings/serverSettings');
 module.exports = {
   _id: settingIds.login,
   c: {
@@ -11,7 +11,7 @@ module.exports = {
       ipCountLimit: 10,
       mobileCountLimit: 10,
       usernameCountLimit: 10,
-      emailCountLimit: 10
-    }
-  }
+      emailCountLimit: 10,
+    },
+  },
 };

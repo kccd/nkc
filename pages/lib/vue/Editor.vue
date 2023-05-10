@@ -72,7 +72,7 @@
   import DraftsSelector from "./DraftsSelector";
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
-  import {isSameDomain} from "../js/url";
+  import { isFileDomain } from "../js/url";
   import {
     replaceTwemojiCharWithImage,
     replaceTwemojiImageWithChar,
@@ -277,7 +277,7 @@
           );
           if(images.length === 0) continue;
           if(success) {
-            const imageSrc = getUrl('resource', rid);
+            const imageSrc = getUrl('resourceWithoutFileDomain', rid);
             images
               .attr('src', imageSrc)
               .attr('_src', imageSrc);
@@ -325,7 +325,7 @@
           const imageJQ = images.eq(i);
           if(imageJQ.attr('data-tag') === 'nkcsource') continue;
           const src = imageJQ.attr('src');
-          if(isSameDomain(src)) continue;
+          if(isFileDomain(src)) continue;
           remoteImages.push([imageJQ, src]);
         }
         const self = this;

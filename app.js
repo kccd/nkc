@@ -1,33 +1,34 @@
 const mainRouter = require('./routes');
 const Koa = require('koa');
 require('colors');
+const loggerModule = require('./nkcModules/logger');
 const path = require('path');
 const koaBody = require('koa-body');
 const koaCompress = require('koa-compress');
 const koaRewrite = require('koa-rewrite');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
-const {getCookieKeys} = require('./nkcModules/cookie');
+const { isProduction } = require('./settings/env');
+const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
-const {getUrl} = require('./nkcModules/tools');
-const staticServe = path => {
+const { getUrl } = require('./nkcModules/tools');
+const staticServe = (path) => {
   return require('koa-static')(path, {
-    setHeaders: function(response, path, stats) {
-      response.setHeader('Cache-Control', `public, ${global.NKC.NODE_ENV==='production'?'max-age=604800': 'no-cache'}`)
-    }
+    setHeaders: function (response) {
+      response.setHeader(
+        'Cache-Control',
+        `public, ${isProduction ? 'max-age=604800' : 'no-cache'}`,
+      );
+    },
   });
 };
 const app = new Koa();
 const conditional = require('koa-conditional-get');
 const etag = require('koa-etag');
-app.on('error', err => {
-  console.log(`KOA ERROR:`);
-  console.error(err);
-	/*if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED', 'write ECONNRESET'].includes(err.message)) {
-		console.log(err);
-	}*/
+app.on('error', (err) => {
+  loggerModule.error(`KOA ERROR:`);
+  loggerModule.error(err);
 });
-const favicon = require('koa-favicon');
 
 const {
   rateLimit,
@@ -54,13 +55,13 @@ app.keys = getCookieKeys();
 app
   .use(rateLimit.total)
   // gzip
-  .use(koaCompress({threshold: 2048}))
+  .use(koaCompress({ threshold: 2048 }))
   // 静态文件映射
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./public')))
   .use(staticServe(path.resolve('./node_modules')))
   .use(staticServe(path.resolve('./dist/pages')))
-  .use(awesomeStatic("./resources/tools", {route: "/tools"}))
+  .use(awesomeStatic('./resources/tools', { route: '/tools' }))
   // 请求头安全设置
   .use(helmet())
   .use(koaBody(koaBodySetting))
@@ -89,5 +90,5 @@ app
   .use(logger)
   .use(mainRouter.routes())
   .use(apiData)
-  .use(body)
+  .use(body);
 module.exports = app.callback();

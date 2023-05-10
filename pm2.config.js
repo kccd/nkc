@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'nkc',
       script: 'server.js',
-      cwd: "./",
+      cwd: './',
       shutdown_with_message: true,
       wait_ready: true,
       instances: 1,
@@ -13,7 +13,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PROCESS_ID: 0,
-      }
+      },
     },
     {
       name: 'timed task',
@@ -26,12 +26,12 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PROCESS_ID: 0,
-      }
+      },
     },
     {
       name: 'backup',
       script: 'server.js',
-      cwd: "./microServices/backup/",
+      cwd: './microServices/backup/',
       wait_ready: true,
       shutdown_with_message: true,
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
@@ -39,12 +39,12 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PROCESS_ID: 0,
-      }
+      },
     },
     {
       name: 'store',
       script: 'server.js',
-      cwd: "./microServices/store/",
+      cwd: './microServices/store/',
       wait_ready: true,
       shutdown_with_message: true,
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
@@ -52,7 +52,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PROCESS_ID: 0,
-      }
+      },
     },
-  ]
+  ],
 };

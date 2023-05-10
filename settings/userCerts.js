@@ -7,5 +7,5 @@ const defaultCerts = {
 };
 
 module.exports = {
-  defaultCerts
+  defaultCerts,
 };
