@@ -1,14 +1,14 @@
 const Router = require('koa-router');
 const userRouter = new Router();
-const PATH = require("path");
+const PATH = require('path');
 
 userRouter
   .get('/', async (ctx, next) => {
-    const {db, data, query, nkcModules} = ctx;
-    const {uid} = query;
-    const {user} = data;
+    const { db, data, query, nkcModules } = ctx;
+    const { uid } = query;
+    const { user } = data;
     let targetUser = await db.UserModel.findOnly({
-      uid
+      uid,
     });
     targetUser = await db.UserModel.extendUserInfo(targetUser);
     data.tUser = {
@@ -19,80 +19,101 @@ userRouter
       description: targetUser.description,
       certsName: targetUser.info.certsName,
       gradeIcon: nkcModules.tools.getUrl('gradeIcon', targetUser.grade._id),
-      inBlacklist: await db.BlacklistModel.inBlacklist(user.uid, targetUser.uid)
-    }
+      inBlacklist: await db.BlacklistModel.inBlacklist(
+        user.uid,
+        targetUser.uid,
+      ),
+    };
     data.friend = await db.FriendModel.findOne({
       uid: user.uid,
-      tUid: uid
+      tUid: uid,
     });
-    if(data.friend) {
+    if (data.friend) {
       await data.friend.extendCid();
     }
-    if(data.friend && data.friend.info.image) {
+    if (data.friend && data.friend.info.image) {
       data.friend = data.friend.toObject();
-      data.friend.info.imageUrl = nkcModules.tools.getUrl('messageFriendImage', targetUser.uid) + "?t=" + Date.now();
+      data.friend.info.imageUrl =
+        nkcModules.tools.getUrl('messageFriendImage', targetUser.uid) +
+        '?t=' +
+        Date.now();
     }
-    data.categories = await db.FriendsCategoryModel.find({
-      uid: user.uid,
-    }, {
-      _id: 1,
-      name: 1,
-    }).sort({toc: -1});
+    data.categories = await db.FriendsCategoryModel.find(
+      {
+        uid: user.uid,
+      },
+      {
+        _id: 1,
+        name: 1,
+      },
+    ).sort({ toc: -1 });
     await next();
   })
   .get('/:uid', async (ctx, next) => {
-    const {data, db, query, params} = ctx;
-    const {uid} = params;
-    const {user} = data;
-    const {firstMessageId} = query;
-    const targetUser = await db.UserModel.findOnly({uid});
+    const { data, db, query, params } = ctx;
+    const { uid } = params;
+    const { user } = data;
+    const { firstMessageId } = query;
+    const targetUser = await db.UserModel.findOnly({ uid });
     const q = {
       $or: [
         {
           r: user.uid,
-          s: uid
+          s: uid,
         },
         {
           r: uid,
-          s: user.uid
-        }
-      ]
+          s: user.uid,
+        },
+      ],
     };
-    if(firstMessageId) {
-      q._id = {$lt: firstMessageId};
+    if (firstMessageId) {
+      q._id = { $lt: firstMessageId };
     }
 
-    const messages = await db.MessageModel.find(q, {ip: 0, port: 0}).sort({tc: -1}).limit(30);
-    messages.map(m => {
-      if(m.withdrawn) m.c = '';
+    const messages = await db.MessageModel.find(q, { ip: 0, port: 0 })
+      .sort({ tc: -1 })
+      .limit(30);
+    messages.map((m) => {
+      if (m.withdrawn) {
+        m.c = '';
+      }
     });
     data.messages = messages.reverse();
     data.targetUser = targetUser;
-    await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
+    await db.MessageModel.updateMany(
+      { ty: 'UTU', r: user.uid, s: uid, vd: false },
+      { $set: { vd: true } },
+    );
     // 判断是否已创建聊天
     await db.CreatedChatModel.createChat(user.uid, uid);
 
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, nkcModules, fsPromise, tools} = ctx;
-    const {uid} = params;
-    const {ffmpeg} = tools;
-    const targetUser = await db.UserModel.findOnly({uid});
-    if(targetUser.destroyed) ctx.throw(403, "对方账号已注销");
-    const {user} = data;
+    const { db, body, params, data, nkcModules, fsPromise, tools } = ctx;
+    const { uid } = params;
+    const { ffmpeg } = tools;
+    const targetUser = await db.UserModel.findOnly({ uid });
+    if (targetUser.destroyed) {
+      ctx.throw(403, '对方账号已注销');
+    }
+    const { user } = data;
     // 判断是否有权限发送信息
-    const {canSendMessage, warningContent} = await db.MessageModel.getStatusOfSendingMessage(
-      user.uid,
-      targetUser.uid,
-      ctx.permission('canSendToEveryOne')
-    );
+    const { canSendMessage, warningContent } =
+      await db.MessageModel.getStatusOfSendingMessage(
+        user.uid,
+        targetUser.uid,
+        ctx.permission('canSendToEveryOne'),
+      );
 
-    if(!canSendMessage) ctx.throw(403, warningContent);
+    if (!canSendMessage) {
+      ctx.throw(403, warningContent);
+    }
 
     let file, content, voiceTime, localId, isVoice;
 
-    if(body.fields) {
+    if (body.fields) {
       content = body.fields.content;
       localId = body.fields.localId;
       isVoice = body.fields.isVoice;
@@ -102,18 +123,21 @@ userRouter
     }
 
     // 仅普通信息
-    if(!file) {
-      if(content === '') ctx.throw(400, '内容不能为空');
-    } else {
-      const messageFile = await db.MessageFileModel.createMessageFileDataAndPushFile({
-        file,
-        isVoice,
-        uid: user.uid,
-        targetUid: targetUser.uid
-      });
-      content = {
-        fileId: messageFile._id
+    if (!file) {
+      if (content === '') {
+        ctx.throw(400, '内容不能为空');
       }
+    } else {
+      const messageFile =
+        await db.MessageFileModel.createMessageFileDataAndPushFile({
+          file,
+          isVoice,
+          uid: user.uid,
+          targetUid: targetUser.uid,
+        });
+      content = {
+        fileId: messageFile._id,
+      };
       /*const {name, path} = file;
 
       // 附件尺寸限制
@@ -197,7 +221,7 @@ userRouter
       s: user.uid,
       r: uid,
       ip: ctx.address,
-      port: ctx.port
+      port: ctx.port,
     });
     await message.save();
     // 判断是否已创建聊天

@@ -115,7 +115,7 @@
       .textarea-container(ref="textareaContainer" )
         .boxStretch(ref="boxStretch")
         //- 输入框
-        textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content")
+        textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content" @paste="handlePaste" )
       //- 按钮容器
 
     footer.button-container(v-if="showForm" :style="{height:`${initialFooterHeight}px`}")
@@ -320,6 +320,20 @@
       getUrl: getUrl,
       getSize: getSize,
       timeFormat: timeFormat,
+      //用户粘贴图片行为
+      handlePaste(event) {
+        const clipboardData = event.clipboardData || window.clipboardData;
+        const items = clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.kind === "file" && item.type.indexOf("image/") !== -1) {
+            const file = item.getAsFile();
+            this.sendFileMessage(file);
+          }
+        }
+      },
+
+
       //鼠标开始点击
       changeBoxHeightOnClick(event){
         if(event.target === this.$refs.boxStretch){
