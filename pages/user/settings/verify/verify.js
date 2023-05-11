@@ -31,20 +31,31 @@ const vm = new Vue({
         return URL.createObjectURL(this.IDCardAInputFile);
       }
       const vid = this.authenticate.card.attachments[0];
-      return vid &&
-        ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
-        ? `/u/${UID}/verifiedAssets/${vid}`
-        : DEFAULT_IMAGE;
+      // return vid &&
+      //   ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
+      //   ? `/u/${UID}/verifiedAssets/${vid}`
+      //   : DEFAULT_IMAGE;
+      if(vid && this.authenticate.card.status === 'in_review'){
+        return `/u/${UID}/verifiedAssets/${vid}`
+      }else {
+        return DEFAULT_IMAGE
+      }
+
     },
     IDCardB() {
       if (this.IDCardBInputFile) {
         return URL.createObjectURL(this.IDCardBInputFile);
       }
       const vid = this.authenticate.card.attachments[1];
-      return vid &&
-        ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
-        ? `/u/${UID}/verifiedAssets/${vid}`
-        : DEFAULT_IMAGE;
+      // return vid &&
+      //   ["in_review", "passed", "fail"].includes(this.authenticate.card.status)
+      //   ? `/u/${UID}/verifiedAssets/${vid}`
+      //   : DEFAULT_IMAGE;
+      if(vid && this.authenticate.card.status === 'in_review'){
+        return `/u/${UID}/verifiedAssets/${vid}`
+      }else {
+        return DEFAULT_IMAGE
+      }
     },
     verify2ExpiryDate() {
       const date = new Date(this.authenticate.card.expiryDate || null);
@@ -56,10 +67,15 @@ const vm = new Vue({
         return URL.createObjectURL(videoInputFile);
       }
       const vid = this.authenticate.video.attachments[0];
-      return vid &&
-        ["in_review", "passed", "fail"].includes(this.authenticate.video.status)
-        ? `/u/${UID}/verifiedAssets/${vid}`
-        : DEFAULT_IMAGE;
+      // return vid &&
+      //   ["in_review", "passed", "fail"].includes(this.authenticate.video.status)
+      //   ? `/u/${UID}/verifiedAssets/${vid}`
+      //   : DEFAULT_IMAGE;
+      if(vid && this.authenticate.video.status === 'in_review'){
+        return `/u/${UID}/verifiedAssets/${vid}`
+      }else {
+        return DEFAULT_IMAGE
+      }
     },
     verify3ExpiryDate() {
       const date = new Date(this.authenticate.video.expiryDate || null);

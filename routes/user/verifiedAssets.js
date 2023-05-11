@@ -15,6 +15,11 @@ router
     if(asset.uid !== user.uid) {
       return ctx.throw(403, "你不是附件的上传者，所以无权查看此附件");
     }
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const authenticate = userPersonal.authenticate;
+    if(authenticate.card.status !== "in_review" || authenticate.video.status !== "in_review") {
+      return ctx.throw(403, "非审核阶段不能查看认证材料");
+    }
     ctx.remoteFile = await asset.getRemoteFile();
     ctx.type = asset.ext;
     return next();
