@@ -79,9 +79,10 @@
     replaceXSFInfo,
     clearHighlightClass
   } from "../js/dataConversion";
+  import { UploadResource } from "../js/resource";
 
   const state = getState();
-
+  const defaultUploadingOrder = Date.now() + Math.round(Math.random() * 10000);
   export default {
     props: ['configs', 'plugs'],
     components: {
@@ -97,6 +98,7 @@
         /*{
           rid: String,
           success: Boolean,
+          order: Number, // 上传的临时ID，非必要
         }*/
       ],
       socketHandleTimer: null,
@@ -117,6 +119,7 @@
         xsfSelector: true,
         mathJaxSelector: true,
       },
+      imageUploadingOrder: defaultUploadingOrder,
       defaultConfigs: {
         toolbars: [
           [
@@ -165,6 +168,7 @@
     },
     destroyed() {
       if(this.editor && this.editor.destroy) {
+        this.removeEditorPasteImageEvent();
         this.editor.destroy();
       }
       this.removeNoticeEvent();
@@ -173,6 +177,11 @@
       this.removeSocketEvent();
     },
     methods: {
+      getNewImageUploadingOrder() {
+        const newOrder = this.imageUploadingOrder + 1;
+        this.imageUploadingOrder = newOrder;
+        return newOrder;
+      },
       //浏览器窗口大小变化
       windowOnResizeEvent() {
         this.setSaveInfo(true);
@@ -219,8 +228,11 @@
       contentChange(){
         const  _this = this;
         return this.editor.addListener("contentChange", function () {
-          _this.$emit("content-change");
+          _this.emitContentChangeEvent();
         });
+      },
+      emitContentChangeEvent() {
+        this.$emit("content-change");
       },
       initDomId() {
         const self = this;
@@ -234,7 +246,7 @@
         const self = this;
         return new Promise((resolve, reject) => {
           const {domId, defaultConfigs, configs = {}} = self;
-          self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs));
+          self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs, {pasteImageEnabled:true}));
           self.editor.ready(resolve);
         })
           .then(() => {
@@ -244,7 +256,7 @@
               self.initScrollEvent();
               self.initWindowOnResizeEvent();
               self.initRemoteImageDownloader();
-              self.initEditorPasteEvent();
+              self.initEditorPasteImageEvent();
             }, 500)
           });
       },
@@ -266,55 +278,72 @@
       },
 
       setImageNodeStatusIsUploading(imageNode) {
-        const loadingSrc = getUrl('defaultFile', 'picloading.png');
-        this.setImageNodeSrc(imageNode, loadingSrc);
+        this.setUploadingOrderInfo(imageNode);
       },
       setImageNodeNKCSourceInfo(imageNode, rid) {
         imageNode.setAttribute('data-tag', 'nkcsource');
         imageNode.setAttribute('data-type', 'picture');
         imageNode.setAttribute('data-id', rid);
+        this.emitContentChangeEvent();
+      },
+      clearUploadingOrderInfo(imageNode) {
+        imageNode.removeAttribute('data-uploading-order');
+        this.emitContentChangeEvent();
+      },
+      setUploadingOrderInfo(imageNode) {
+        const order = this.getNewImageUploadingOrder();
+        imageNode.setAttribute('data-uploading-order', order);
+        this.emitContentChangeEvent();
       },
       clearNodeNKCSourceInfo(imageNode) {
         imageNode.removeAttribute('data-tag');
         imageNode.removeAttribute('data-type');
         imageNode.removeAttribute('data-id');
+        this.emitContentChangeEvent();
+      },
+      setPasteImageNodeNKCSourceInfoByUploadingOrder(order, rid) {
+        const imageNode = this.editor.document.querySelector(`img[data-uploading-order="${order}"]`);
+        if(!imageNode) return;
+        this.setImageNodeNKCSourceInfo(imageNode, rid);
       },
       setImageNodeSrc(imageNode, src) {
         imageNode.setAttribute('src', src);
         imageNode.setAttribute('_src', src);
+        this.emitContentChangeEvent();
       },
       setImageNodeStatusIsSucceeded(imageNode, rid) {
         const imageSrc = getUrl('resourceWithoutFileDomain', rid);
         this.setImageNodeSrc(imageNode, imageSrc);
+        this.setImageNodeNKCSourceInfo(imageNode, rid);
+        this.clearUploadingOrderInfo(imageNode);
       },
       setImageNodeStatusIsFailed(imageNode) {
         const defaultSrc = getUrl('defaultFile', 'picdefault.png');
         this.setImageNodeSrc(imageNode, defaultSrc);
         this.clearNodeNKCSourceInfo(imageNode);
+        this.clearUploadingOrderInfo(imageNode);
       },
 
-      modifyUploadedResources() {
-        const {socketHandleResources} = this;
-        if(socketHandleResources.length === 0) return;
-
-        while(true) {
-          if(socketHandleResources.length === 0) break;
-          const {success, rid} = socketHandleResources.shift();
-          const images = this.editor.document.querySelectorAll(`img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`);
-          if(images.length === 0) continue;
-          for(let i = 0; i < images.length; i++) {
-            const imageNode = images[i];
-            if(success) {
-              this.setImageNodeStatusIsSucceeded(imageNode, rid);
-            } else {
-              this.setImageNodeStatusIsFailed(imageNode);
-            }
+      modifyUploadedResourceStatus(rid, success, order) {
+        const ridMatch = rid?`img[data-tag="nkcsource"][data-type="picture"][data-id="${rid}"]`: '';
+        const orderMatch = order? `${ridMatch? ',':''}img[data-uploading-order="${order}"]`:"";
+        if(!ridMatch && !orderMatch) return;
+        const images = this.editor.document.querySelectorAll(`${ridMatch}${orderMatch}`);
+        if(images.length === 0) return;
+        for(let i = 0; i < images.length; i++) {
+          const imageNode = images[i];
+          if(success) {
+            this.setImageNodeStatusIsSucceeded(imageNode, rid);
+          } else {
+            this.setImageNodeStatusIsFailed(imageNode);
           }
         }
       },
+
       clearSocketHandleTimer() {
         clearTimeout(this.socketHandleTimer);
       },
+
       socketHandle(e) {
         const {rid, state} = e;
 
@@ -322,14 +351,9 @@
           rid,
           success: state === 'fileProcessFinish'
         });
-
-        this.clearSocketHandleTimer();
-
-        const self = this;
-        this.socketHandleTimer = setTimeout(() => {
-          self.modifyUploadedResources();
-        }, 2000);
+        this.modifyUploadedResourceStatus(rid, state === 'fileProcessFinish');
       },
+
       catchRemoteImage() {
         const images = this.editor.document.getElementsByTagName('img');
         for(let i = 0; i < images.length; i++) {
@@ -369,10 +393,53 @@
         self.setSaveInfo();
         window.addEventListener("scroll", this.scrollEvent);
       },
-      initEditorPasteEvent() {
-        this.editor.addListener('beforepaste', (type, data) => {
-          // 在这里过滤掉多余的标签或标签样式
-        });
+      editorPasteImageEventHandle(event) {
+        const items = event.clipboardData.items;
+        const files = [];
+
+        for(const item of items) {
+          if(item.kind === 'file') {
+            if(item.type.indexOf('image/') === 0) {
+              files.push(item.getAsFile())
+            }
+          } else if(item.kind === 'string') {
+            // 粘贴的符文本，本函数不做任何处理，交由ueditor自行处理
+            return;
+          }
+        }
+
+        for(let i = 0; i < files.length; i ++) {
+          const file = files[i];
+          const url = URL.createObjectURL(file);
+          const imageUploadingOrder = this.getNewImageUploadingOrder();
+          const img = $(`<img/>`);
+          img
+            .attr('src', url)
+            .attr('data-tag', 'nkcsource')
+            .attr('data-type', 'picture')
+            .attr('data-uploading-order', imageUploadingOrder)
+
+          this.insertContent(img[0]);
+          // 上传
+          UploadResource({
+            file,
+            defaultFileName: 'image.jpg'
+          })
+            .then((res) => {
+              const {rid} = res.r;
+              this.setPasteImageNodeNKCSourceInfoByUploadingOrder(imageUploadingOrder, rid);
+            })
+            .catch(err => {
+              this.modifyUploadedResourceStatus("", false, imageUploadingOrder);
+              screenTopWarning(`Image upload failed: ${err.message || err.toString()}`);
+            })
+        }
+      },
+      initEditorPasteImageEvent() {
+        this.editor.document.addEventListener('paste', this.editorPasteImageEventHandle);
+      },
+      removeEditorPasteImageEvent(){
+        this.editor.document.removeEventListener('paste', this.editorPasteImageEventHandle);
       },
       removeScrollEvent() {
         window.removeEventListener("scroll", this.scrollEvent);
@@ -526,7 +593,6 @@
                 target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
               }, parseInt(score));
             };
-            let count = 0;
             editDoc.addEventListener("dblclick", handle);
             initDblclick(editDoc, function (e){
               return handle(e);
