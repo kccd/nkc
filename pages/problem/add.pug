@@ -49,10 +49,10 @@ block content
                 a(href=`/problem/list?cid=${data.problemsType._id}`)= data.problemsType.name
         .form
           .form-group
-            label 标题
+            label 标题（选填）
             input.form-control(type='text' placeholder='请一句话概括您所遇到的问题' v-model.trim='title')
           .form-group
-            label 详细内容
+            label 详细内容（必填）
             textarea.form-control(placeholder='请详细描述您所遇到问题，如果能附上问题页面的链接那就更好了。' rows=10 v-model='content')
           .form-group
             label 页面链接（选填，多个链接以空格分隔）
