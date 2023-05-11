@@ -169,6 +169,8 @@
     destroyed() {
       if(this.editor && this.editor.destroy) {
         this.removeEditorPasteImageEvent();
+        this.removeEditorAfterPasteEvent();
+        this.removeEditorBeforePasteEvent();
         this.editor.destroy();
       }
       this.removeNoticeEvent();
@@ -256,6 +258,8 @@
               self.initScrollEvent();
               self.initWindowOnResizeEvent();
               self.initRemoteImageDownloader();
+              self.initEditorBeforePasteEvent();
+              self.initEditorAfterPasteEvent();
               self.initEditorPasteImageEvent();
             }, 500)
           });
@@ -440,6 +444,25 @@
       },
       removeEditorPasteImageEvent(){
         this.editor.document.removeEventListener('paste', this.editorPasteImageEventHandle);
+      },
+      editorBeforePasteEventHandler(v1, v2) {
+        /*console.log("v1: ", v1)
+        console.log("v2: ", v2)*/
+      },
+      editorAfterPasteEventHandler() {
+        this.catchRemoteImage();
+      },
+      initEditorBeforePasteEvent() {
+        this.editor.addListener('beforepaste', this.editorBeforePasteEventHandler)
+      },
+      removeEditorBeforePasteEvent() {
+        this.editor.removeListener('beforepaste', this.editorBeforePasteEventHandler)
+      },
+      initEditorAfterPasteEvent() {
+        this.editor.addListener('afterpaste', this.editorAfterPasteEventHandler);
+      },
+      removeEditorAfterPasteEvent() {
+        this.editor.removeListener('afterpaste', this.editorAfterPasteEventHandler);
       },
       removeScrollEvent() {
         window.removeEventListener("scroll", this.scrollEvent);

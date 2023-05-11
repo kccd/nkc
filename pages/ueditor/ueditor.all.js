@@ -23926,7 +23926,8 @@
       // 当前上传图片数量可以重新计数
       // 已上传的图片为本站图片，本站图片不予以上传至服务器
       me.options.imgCount = 0;
-      me.fireEvent("catchRemoteImage");
+      // 屏蔽此事件，在Editor.vue中监听粘贴完成事件
+      // me.fireEvent("catchRemoteImage");
     });
     // 在 Editor.vue 中监听了 catchRemoteImage 时间，替换此处
     /*me.addListener("catchRemoteImage", function () {
