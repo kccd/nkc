@@ -15303,6 +15303,10 @@
           me.execCommand('insertHtml', me.getOpt('retainOnlyLabelPasted') === true ? getPureHtml(htmlContent) : htmlContent, true);
         }
         me.fireEvent("afterpaste", html);
+      } else {
+        if (browser.gecko) {
+          me.fireEvent("afterpaste", {html:'<img></img>'});
+        }
       }
     }
 
