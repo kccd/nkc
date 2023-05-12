@@ -80,6 +80,8 @@
     clearHighlightClass
   } from "../js/dataConversion";
   import { UploadResource } from "../js/resource";
+  import { isBase64 } from "../../../nkcModules/regExp";
+  import { base64ToFile } from "../../lib/js/file";
 
   const state = getState();
   const defaultUploadingOrder = Date.now() + Math.round(Math.random() * 10000);
@@ -359,16 +361,23 @@
       },
 
       catchRemoteImage() {
-        const images = this.editor.document.getElementsByTagName('img');
-        for(let i = 0; i < images.length; i++) {
-          const imageNode = images[i];
-          if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
-          const src = imageNode.getAttribute('src');
-          if(isFileDomain(src)) continue;
-          // 外链图片
-          this.clearImageNodeStyle(imageNode);
-          this.downloadRemoteImage(imageNode, src);
-        }
+        setTimeout(()=>{
+          const images = this.editor.document.getElementsByTagName('img');
+          for(let i = 0; i < images.length; i++) {
+            const imageNode = images[i];
+            if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+            const src = imageNode.getAttribute('src');
+            if(isFileDomain(src)) continue;
+            // 外链图片
+            if(isBase64.test(src)){
+              this.editorPasteBase64ToImageEventHandle(imageNode)
+            }else{
+              this.clearImageNodeStyle(imageNode);
+              this.downloadRemoteImage(imageNode, src);
+            }
+          }
+        },10)
+
       },
       clearImageNodeStyle(imageNode) {
         imageNode.removeAttribute('style');
@@ -396,6 +405,26 @@
         const self = this;
         self.setSaveInfo();
         window.addEventListener("scroll", this.scrollEvent);
+      },
+      editorPasteBase64ToImageEventHandle(imageNode){
+        const imageUploadingOrder = this.getNewImageUploadingOrder();
+        imageNode.setAttribute('data-tag', 'nkcsource');
+        imageNode.setAttribute('data-type', 'picture');
+        imageNode.setAttribute('data-uploading-order', imageUploadingOrder);
+        const src = imageNode.getAttribute('src');
+        const file = base64ToFile(src);
+        UploadResource({
+          file,
+          defaultFileName: 'image.jpg'
+        })
+        .then((res) => {
+          const {rid} = res.r;
+          this.setPasteImageNodeNKCSourceInfoByUploadingOrder(imageUploadingOrder, rid);
+        })
+        .catch(err => {
+            this.setImageNodeStatusIsFailed(imageNode);
+            screenTopWarning(`Image upload failed: ${err.message || err.toString()}`);
+          });
       },
       editorPasteImageEventHandle(event) {
         const items = event.clipboardData.items;
