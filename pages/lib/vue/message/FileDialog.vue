@@ -98,7 +98,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: bold;
   border-bottom: 1px solid #e6e6e6;
 }

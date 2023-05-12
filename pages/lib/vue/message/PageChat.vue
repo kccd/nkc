@@ -11,9 +11,12 @@
     ref="chatMessageContainer"
     )
     //展示用户所发文件的dialog
-    FileDialog(:dialogVisible="isShowFileDialog" @updateDialogVisible="updateDialogVisible" title="文件" @confirm="confirm" )
-      .image.imgDialog()
+    FileDialog(:dialogVisible="isShowFileDialog" @updateDialogVisible="updateDialogVisible" :title="dialogTitle" @confirm="confirm" )
+      .image.imgDialog(v-if="previewPath.length !== 0" )
         img.imgInDialog(:src="src" v-for="src in previewPath" )
+      .fileDialog(v-if="previewName.length !== 0" )
+        i(class="fa fa-file-code-o" aria-hidden="true" )
+        p(v-for="fileName in previewName" ) {{fileName}}
     //- 通用header组件
     ModuleHeader(
       :title="tUser? (tUser.friendName||tUser.name): '加载中...'"
@@ -119,7 +122,7 @@
       .textarea-container(ref="textareaContainer" )
         .boxStretch(ref="boxStretch")
         //- 输入框
-        textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content" @paste="handlePaste" @drop="handleDrop")
+        textarea(ref="input" placeholder="请输入内容..." @keyup.ctrl.enter="sendTextMessage" v-model="content" @paste="handlePaste" @drop="handleDrop" )
       //- 按钮容器
 
     footer.button-container(v-if="showForm" :style="{height:`${initialFooterHeight}px`}")
@@ -182,9 +185,11 @@ export default {
     initialFooterHeight: 36,
     finalBoxHeight: 0,
     finalChatContainerBottom: 0,
-    isShowFileDialog: false,
-    previewPath: [],
-    previewFile: [],
+    isShowFileDialog: false, //打开dialog
+    previewPath: [], //预览图片的路径
+    previewFile: [], //上传文件的路径
+    previewName: [], //上传文件的名字
+    dialogTitle: '',
   }),
   watch: {
     content() {
@@ -342,30 +347,53 @@ export default {
           this.previewFile.push(file);
           const imgUrl = URL.createObjectURL(file);
           this.previewPath.push(imgUrl);
+          this.dialogTitle = '是否发送图片';
+        } else if (item.kind === 'file') {
+          this.isShowFileDialog = true;
+          const file = item.getAsFile();
+          this.previewFile.push(file);
+          this.previewName.push(file.name);
+          this.dialogTitle = '是否发送文件';
         }
-        // else if(item.kind === 'string' && item.type === 'text/html'){
-        //   item.getAsString(text => {
-        //   });
-        // }
-
       }
     },
-    handleDrop(event){
-      console.log(event, 'event');
+    handleDrop(event) {
+      event.preventDefault();
+      const clipboardData = event.dataTransfer
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+          this.isShowFileDialog = true;
+          const file = item.getAsFile();
+          this.previewFile.push(file);
+          const imgUrl = URL.createObjectURL(file);
+          this.previewPath.push(imgUrl);
+          this.dialogTitle = '是否发送图片';
+        } else if (item.kind === 'file') {
+          this.isShowFileDialog = true;
+          const file = item.getAsFile();
+          this.previewFile.push(file);
+          this.previewName.push(file.name);
+          this.dialogTitle = '是否发送文件';
+        }
+      }
     },
     //关闭dialog
     updateDialogVisible(isShowFileDialog) {
       this.isShowFileDialog = isShowFileDialog;
       this.previewFile = [];
       this.previewPath = [];
+      this.previewName = [];
     },
-    //提交图片内容
+    //提交内容
     confirm() {
-      this.previewFile.forEach((file)=>{
+      this.previewFile.forEach((file) => {
         this.sendFileMessage(file);
-      })
+      });
       this.previewFile = [];
       this.previewPath = [];
+      this.previewName = [];
     },
     //鼠标开始点击
     changeBoxHeightOnClick(event) {
@@ -1170,7 +1198,29 @@ export default {
     }
   }
 }
-.imgDialog{
+
+.fileDialog {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+
+  i {
+    font-size: 24px;
+    margin-right: 10px;
+    color: #666;
+    vertical-align:middle;
+  }
+
+  p {
+    color: #333;
+    margin: 0;
+  }
+}
+
+.imgDialog {
   height: 18rem;
   overflow-y: auto;
   display: flex;
