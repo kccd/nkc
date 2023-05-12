@@ -135,5 +135,5 @@ p{
 
 
 img[data-uploading-order]{
-  filter: blur(4px) brightness(0.5);
+  filter: blur(2px) brightness(0.6);
 }

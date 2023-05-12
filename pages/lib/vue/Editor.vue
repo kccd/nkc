@@ -81,7 +81,8 @@
   } from "../js/dataConversion";
   import { UploadResource } from "../js/resource";
   import { isBase64 } from "../../../nkcModules/regExp";
-  import { base64ToFile } from "../../lib/js/file";
+  import { base64ToFile } from "../js/file";
+  import { IsFirefox } from "../js/browser";
 
   const state = getState();
   const defaultUploadingOrder = Date.now() + Math.round(Math.random() * 10000);
@@ -173,6 +174,7 @@
         this.removeEditorPasteImageEvent();
         this.removeEditorAfterPasteEvent();
         this.removeEditorBeforePasteEvent();
+        this.removeEditorDropImageEvent();
         this.editor.destroy();
       }
       this.removeNoticeEvent();
@@ -263,6 +265,7 @@
               self.initEditorBeforePasteEvent();
               self.initEditorAfterPasteEvent();
               self.initEditorPasteImageEvent();
+              self.initEditorDropImageEvent();
             }, 500)
           });
       },
@@ -361,23 +364,20 @@
       },
 
       catchRemoteImage() {
-        setTimeout(()=>{
-          const images = this.editor.document.getElementsByTagName('img');
-          for(let i = 0; i < images.length; i++) {
-            const imageNode = images[i];
-            if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
-            const src = imageNode.getAttribute('src');
-            if(isFileDomain(src)) continue;
-            // 外链图片
-            if(isBase64.test(src)){
-              this.editorPasteBase64ToImageEventHandle(imageNode)
-            }else{
-              this.clearImageNodeStyle(imageNode);
-              this.downloadRemoteImage(imageNode, src);
-            }
+        const images = this.editor.document.getElementsByTagName('img');
+        for(let i = 0; i < images.length; i++) {
+          const imageNode = images[i];
+          if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+          const src = imageNode.getAttribute('src');
+          if(isFileDomain(src)) continue;
+          // 外链图片
+          if(isBase64.test(src)){
+            this.editorPasteBase64ToImageEventHandle(imageNode)
+          }else{
+            this.clearImageNodeStyle(imageNode);
+            this.downloadRemoteImage(imageNode, src);
           }
-        },10)
-
+        }
       },
       clearImageNodeStyle(imageNode) {
         imageNode.removeAttribute('style');
@@ -413,6 +413,8 @@
         imageNode.setAttribute('data-uploading-order', imageUploadingOrder);
         const src = imageNode.getAttribute('src');
         const file = base64ToFile(src);
+        const objectUrl = URL.createObjectURL(file);
+        imageNode.setAttribute('src', objectUrl);
         UploadResource({
           file,
           defaultFileName: 'image.jpg'
@@ -427,10 +429,28 @@
           });
       },
       editorPasteImageEventHandle(event) {
+        if(IsFirefox()) {
+          setTimeout(() => {
+            try{
+              this.catchRemoteImage();
+            } catch(err) {
+              console.log(err);
+            }
+          }, 1000);
+          return;
+        }
         const items = event.clipboardData.items;
+        this.insertImageAndUploadResourceByDataTransferItemList(items);
+      },
+      editorDropImageEventHandle(event) {
+        const items = event.dataTransfer.items;
+        this.insertImageAndUploadResourceByDataTransferItemList(items);
+        event.preventDefault();
+      },
+      insertImageAndUploadResourceByDataTransferItemList(dataTransferItemList) {
         const files = [];
 
-        for(const item of items) {
+        for(const item of dataTransferItemList) {
           if(item.kind === 'file') {
             if(item.type.indexOf('image/') === 0) {
               files.push(item.getAsFile())
@@ -473,6 +493,12 @@
       },
       removeEditorPasteImageEvent(){
         this.editor.document.removeEventListener('paste', this.editorPasteImageEventHandle);
+      },
+      initEditorDropImageEvent() {
+        this.editor.document.addEventListener('drop', this.editorDropImageEventHandle);
+      },
+      removeEditorDropImageEvent() {
+        this.editor.document.removeEventListener('drop', this.editorDropImageEventHandle);
       },
       editorBeforePasteEventHandler(v1, v2) {
         /*console.log("v1: ", v1)

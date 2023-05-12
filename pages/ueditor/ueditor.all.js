@@ -15304,9 +15304,9 @@
         }
         me.fireEvent("afterpaste", html);
       } else {
-        if (browser.gecko) {
-          me.fireEvent("afterpaste", {html:'<img></img>'});
-        }
+        /*if (browser.gecko) {
+          me.fireEvent("afterpaste", {html:''});
+        }*/
       }
     }
 
