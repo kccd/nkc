@@ -252,7 +252,7 @@
         const self = this;
         return new Promise((resolve, reject) => {
           const {domId, defaultConfigs, configs = {}} = self;
-          self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs, {pasteImageEnabled:true}));
+          self.editor = UE.getEditor(domId, Object.assign({}, defaultConfigs, configs));
           self.editor.ready(resolve);
         })
           .then(() => {
