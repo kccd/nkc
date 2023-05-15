@@ -11,16 +11,32 @@ verifyRouter
     data.boundMobile = !!userPersonal.mobile;
     const authenticate = userPersonal.authenticate;
     if(authenticate.card.status === "passed" && authenticate.card.expiryDate.getTime() < Date.now()) {
+      //身份证通过，已过期
       authenticate.card.isExpired = true;
+      authenticate.card.attachments = [];
       await userPersonal.updateOne({
         $set: { "authenticate.card.status": "unsubmit" }
       });
+    } else if(authenticate.card.status === "fail") {
+      //身份证审核失败
+      authenticate.card.attachments = [];
+    } else if(authenticate.card.status === "passed") {
+      //身份证审核成功
+      authenticate.card.attachments = [];
     }
     if(authenticate.video.status === "passed" && authenticate.video.expiryDate.getTime() < Date.now()) {
+      //身份视频通过，已过期
       authenticate.video.isExpired = true;
+      authenticate.video.attachments = [];
       await userPersonal.updateOne({
         $set: { "authenticate.video.status": "unsubmit" }
       });
+    } else if(authenticate.video.status === "fail") {
+      //身份视频审核失败
+      authenticate.card.attachments = [];
+    } else if(authenticate.video.status === "passed") {
+      //身份视频审核成功
+      authenticate.card.attachments = [];
     }
     const authSettings = await db.SettingModel.getSettings('auth');
     const verifiedUploadVideo = await db.VerifiedUploadModel.findOne({_id: userPersonal.authenticate.video.attachments[0]}, {state: 1, _id: 1}).sort({toc: -1});
