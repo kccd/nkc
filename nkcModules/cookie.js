@@ -2,6 +2,7 @@ const Cookies = require('cookies-string-parse');
 const { isDevelopment } = require('../settings/env');
 const cookieConfig = require('../config/cookie');
 const KeyGrip = require('keygrip');
+const { isBase64 } = require('./base64');
 
 const cookieKeys = new KeyGrip([cookieConfig.secret], 'sha256');
 
@@ -32,6 +33,9 @@ function getCookieInfo(cookie = '', key) {
 function getUserInfo(cookie) {
   let userInfo = null;
   try {
+    if (isBase64(cookie)) {
+      cookie = Buffer.from(cookie, 'base64').toString();
+    }
     let result = getCookieInfo(cookie, 'userInfo');
     if (result) {
       result = Buffer.from(result, 'base64').toString();
