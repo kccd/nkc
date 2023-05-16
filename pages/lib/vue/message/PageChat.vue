@@ -14,9 +14,9 @@
     FileDialog(:dialogVisible="isShowFileDialog" @updateDialogVisible="updateDialogVisible" :title="dialogTitle + fileCountTitle" @confirm="confirm" )
       .image.img-dialog(v-if="previewPath.length !== 0" )
         img.img-in-dialog(:src="src" v-for="src in previewPath" )
-      .fileDialog(v-if="previewName.length !== 0" )
+      .fileDialog(v-if="previewName.length !== 0" v-for="fileName in previewName")
         i(class="fa fa-file-code-o" aria-hidden="true" )
-        p(v-for="fileName in previewName" ) {{fileName}}
+        p {{fileName}}
     //- 通用header组件
     ModuleHeader(
       :title="tUser? (tUser.friendName||tUser.name): '加载中...'"
@@ -1194,13 +1194,13 @@ export default {
 }
 
 .fileDialog {
-  display: flex;
-  align-items: center;
+  //display: flex;
+  //align-items: center;
   padding: 10px;
   border: 1px solid #ccc;
   background-color: #f8f8f8;
   border-radius: 5px;
-
+  margin-bottom: 0.5rem;
   i {
     font-size: 24px;
     margin-right: 10px;
@@ -1214,14 +1214,12 @@ export default {
   }
 }
 
-.img-dialog {
-  height: 18rem;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
+//.img-dialog {
+//  display: flex;
+//  justify-content: center;
+//  align-items: center;
+//  flex-wrap: wrap;
+//}
 
 .img-in-dialog {
   max-width: 100%;
