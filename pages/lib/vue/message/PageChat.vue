@@ -1214,12 +1214,9 @@ export default {
   }
 }
 
-//.img-dialog {
-//  display: flex;
-//  justify-content: center;
-//  align-items: center;
-//  flex-wrap: wrap;
-//}
+.img-dialog {
+ text-align: center;
+}
 
 .img-in-dialog {
   max-width: 100%;
