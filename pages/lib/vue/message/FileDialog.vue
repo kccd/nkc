@@ -81,20 +81,20 @@ export default {
 }
 
 .dialog-content {
-  overflow: hidden;
   width: 30rem;
+  height: 25rem;
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   margin: auto;
-  height: 27.6rem;
   max-width: 100%;
   background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1200;
+
 }
 
 .dialog-header {
@@ -122,6 +122,8 @@ export default {
 
 .dialog-body {
   padding: 1rem;
+  height: 18rem;
+  overflow: auto;
 }
 
 .dialog-footer {
