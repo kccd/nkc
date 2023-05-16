@@ -82,7 +82,7 @@ export default {
 
 .dialog-content {
   width: 30rem;
-  height: 25rem;
+  height: 25.5rem;
   position: fixed;
   top: 0;
   bottom: 0;
