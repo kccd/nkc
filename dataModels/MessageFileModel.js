@@ -1,62 +1,63 @@
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
-const messageFileSchema = new Schema({
-  _id: Number,
-  // 文件类型 video, audio, voice, image, file
-  type: {
-    type: String,
-    required: true,
-    index: 1
-  },
-  // 发送者
-  uid: {
-    type: String,
-    required: true,
-    index: 1
-  },
-  // 接受者
-  targetUid: {
-    type: String,
-    required: true,
-    index: 1
-  },
-  // 文件名称
-  oname: {
-    type: String,
-    required: true
-  },
-  // 文件大小
-  size: {
-    type: Number,
-    required: true
-  },
-  // 文件格式
-  ext: {
-    type: String,
-    index: 1,
-    required: true
-  },
-  // 文件访问量
-  hits: {
-    type: Number,
-    default: 0
-  },
-  // 音频或视频的时间长度 (ms)
-  duration: {
-    type: Number,
-    default: 0,
-  },
-  // 当前数据创建时间 文件上传时间
-  toc: {
-    type: Date,
-    default: Date.now,
-    index: 1
-  },
-  files: {
-    def: Schema.Types.Mixed,
-    cover: Schema.Types.Mixed,
-    sm: Schema.Types.Mixed,
-    /*
+const messageFileSchema = new Schema(
+  {
+    _id: Number,
+    // 文件类型 video, audio, voice, image, file
+    type: {
+      type: String,
+      required: true,
+      index: 1,
+    },
+    // 发送者
+    uid: {
+      type: String,
+      required: true,
+      index: 1,
+    },
+    // 接受者
+    targetUid: {
+      type: String,
+      required: true,
+      index: 1,
+    },
+    // 文件名称
+    oname: {
+      type: String,
+      required: true,
+    },
+    // 文件大小
+    size: {
+      type: Number,
+      required: true,
+    },
+    // 文件格式
+    ext: {
+      type: String,
+      index: 1,
+      required: true,
+    },
+    // 文件访问量
+    hits: {
+      type: Number,
+      default: 0,
+    },
+    // 音频或视频的时间长度 (ms)
+    duration: {
+      type: Number,
+      default: 0,
+    },
+    // 当前数据创建时间 文件上传时间
+    toc: {
+      type: Date,
+      default: Date.now,
+      index: 1,
+    },
+    files: {
+      def: Schema.Types.Mixed,
+      cover: Schema.Types.Mixed,
+      sm: Schema.Types.Mixed,
+      /*
     {
       ext: String,
       lost: String, // 是否已丢失
@@ -68,66 +69,77 @@ const messageFileSchema = new Schema({
       disposition: String, // 下载时显示的名称
     }
     */
+    },
   },
-}, {
-  collection: 'messageFiles'
-});
+  {
+    collection: 'messageFiles',
+  },
+);
 
-messageFileSchema.virtual('defaultFile')
-  .get(function() {
+messageFileSchema
+  .virtual('defaultFile')
+  .get(function () {
     return this._defaultFile;
   })
-  .set(function(val) {
-    return this._defaultFile = val
+  .set(function (val) {
+    return (this._defaultFile = val);
   });
 
 /*
-* 根据格式判断文件类型
-* image/video/audio/voice/file
-* @param {String} extension 文件格式
-* @param {Boolean} isVoice 是否指定为音频文件
-* @return {String}
-* */
-messageFileSchema.statics.getFileTypeByExtension = async (extension, isVoice = false) => {
+ * 根据格式判断文件类型
+ * image/video/audio/voice/file
+ * @param {String} extension 文件格式
+ * @param {Boolean} isVoice 是否指定为音频文件
+ * @return {String}
+ * */
+messageFileSchema.statics.getFileTypeByExtension = async (
+  extension,
+  isVoice = false,
+) => {
   const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
   const voiceExt = ['amr', 'mp3', 'aac'];
   const audioExt = ['mp3', 'aac', 'wav', 'flac'];
-  const videoExt = ["mp4", "mov", "3gp", "avi"];
-  if(isVoice) {
-    if(voiceExt.includes(extension)) return 'voice';
+  const videoExt = ['mp4', 'mov', '3gp', 'avi'];
+  if (isVoice) {
+    if (voiceExt.includes(extension)) {
+      return 'voice';
+    }
   } else {
-    if(imageExt.includes(extension)) return 'image';
-    if(audioExt.includes(extension)) return 'audio';
-    if(videoExt.includes(extension)) return 'video';
+    if (imageExt.includes(extension)) {
+      return 'image';
+    }
+    if (audioExt.includes(extension)) {
+      return 'audio';
+    }
+    if (videoExt.includes(extension)) {
+      return 'video';
+    }
   }
   return 'file';
-}
+};
 
 /*
-* 根据文件类型获取文件夹类型
-* @param {String} type 文件类型
-* @return {String}
-* */
+ * 根据文件类型获取文件夹类型
+ * @param {String} type 文件类型
+ * @return {String}
+ * */
 messageFileSchema.statics.getFolderTypeByType = (type) => {
   let messageFileType = type.split('');
   messageFileType[0] = messageFileType[0].toUpperCase();
   return `message` + messageFileType.join('');
-}
+};
 
 messageFileSchema.statics.createMessageFileDataAndPushFile = async (props) => {
-  const {
-    file,
-    isVoice,
-    uid,
-    targetUid,
-  } = props
+  const { file, isVoice, uid, targetUid } = props;
   const MessageModel = mongoose.model('messages');
   const MessageFileModel = mongoose.model('messageFiles');
   const SettingModel = mongoose.model('settings');
   const FILE = require('../nkcModules/file');
   await MessageModel.checkFileSize(file);
   const ext = await FILE.getFileExtension(file);
-  if(['exe', 'bat'].includes(ext)) ctx.throw(403, `暂不支持上传该类型的文件`);
+  if (['exe', 'bat'].includes(ext)) {
+    ctx.throw(403, `暂不支持上传该类型的文件`);
+  }
   const type = await MessageFileModel.getFileTypeByExtension(ext, isVoice);
   const mfId = await SettingModel.operateSystemID('messageFiles', 1);
   const time = new Date();
@@ -146,12 +158,12 @@ messageFileSchema.statics.createMessageFileDataAndPushFile = async (props) => {
   return messageFile;
 };
 
-messageFileSchema.methods.pushToMediaService = async function(filePath) {
+messageFileSchema.methods.pushToMediaService = async function (filePath) {
   const FILE = require('../nkcModules/file');
   const socket = require('../nkcModules/socket');
   const mediaClient = require('../tools/mediaClient');
   const MessageFileModel = mongoose.model('messageFiles');
-  const {ext, toc, type, _id, oname} = this;
+  const { ext, toc, type, _id, oname } = this;
   const folderType = await MessageFileModel.getFolderTypeByType(type);
   const storeServiceUrl = await FILE.getStoreUrl(toc);
   const mediaServiceUrl = await socket.getMediaServiceUrl();
@@ -169,14 +181,14 @@ messageFileSchema.methods.pushToMediaService = async function(filePath) {
     type: folderType,
     filePath,
     storeUrl: storeServiceUrl,
-    data
+    data,
   });
   return res.files;
-}
+};
 
-messageFileSchema.methods.getRemoteFile = async function(size = 'def') {
+messageFileSchema.methods.getRemoteFile = async function (size = 'def') {
   const FILE = require('../nkcModules/file');
-  const {_id, ext, toc, type, oname, files = {}} = this;
+  const { _id, ext, toc, type, oname, files = {} } = this;
   const MessageFileModel = mongoose.model('messageFiles');
   const folderType = await MessageFileModel.getFolderTypeByType(type);
   return await FILE.getRemoteFile({
@@ -185,59 +197,59 @@ messageFileSchema.methods.getRemoteFile = async function(size = 'def') {
     ext,
     type: folderType,
     name: oname,
-    file: files[size] || files['def']
+    file: files[size] || files['def'],
   });
 };
 
-messageFileSchema.methods.updateFilesInfo = async function() {
+messageFileSchema.methods.updateFilesInfo = async function () {
   const FILE = require('../nkcModules/file');
-  const {toc, type, _id, ext} = this;
+  const { toc, type, _id, ext } = this;
   let filenames;
-  if(type === 'image') {
+  if (type === 'image') {
     filenames = {
       def: `${_id}.${ext}`,
-      sm: `${_id}_sm.${ext}`
+      sm: `${_id}_sm.${ext}`,
     };
-  } else if(type === 'audio') {
+  } else if (type === 'audio') {
     filenames = {
-      def: `${_id}.mp3`
+      def: `${_id}.mp3`,
     };
-  } else if(type === 'voice') {
+  } else if (type === 'voice') {
     filenames = {
-      def: `${_id}.mp3`
+      def: `${_id}.mp3`,
     };
-  } else if(type === 'video') {
+  } else if (type === 'video') {
     filenames = {
       def: `${_id}.mp4`,
-      cover: `${_id}_cover.jpg`
+      cover: `${_id}_cover.jpg`,
     };
   } else {
     filenames = {
-      def: `${_id}.${ext}`
-    }
+      def: `${_id}.${ext}`,
+    };
   }
   const MessageFileModel = mongoose.model('messageFiles');
   const folderType = await MessageFileModel.getFolderTypeByType(type);
   const files = await FILE.getStoreFilesInfoObj(toc, folderType, filenames);
   await this.updateOne({
     $set: {
-      files
-    }
+      files,
+    },
   });
 };
 
-messageFileSchema.methods.extendDefaultFile = function() {
+messageFileSchema.methods.extendDefaultFile = function () {
   const FILE = require('../nkcModules/file');
-  const {duration, ext, size, oname: name, files = {}} = this;
+  const { duration, ext, size, oname: name, files = {} } = this;
   let defaultFile = {
     ext,
     size,
     name,
-    duration
+    duration,
   };
   defaultFile = files.def || defaultFile;
   defaultFile.name = FILE.replaceFileExtension(name, defaultFile.ext);
-  return this.defaultFile = defaultFile;
-}
+  return (this.defaultFile = defaultFile);
+};
 
 module.exports = mongoose.model('messageFiles', messageFileSchema);
