@@ -34,8 +34,9 @@ block content
             //-   span.text-danger 请横向摆放，使用手机拍摄，保留周围背景，不要使用扫描件，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
 
             h5.text-danger(v-if="authenticate.card.status === 'passed' && authenticate.card.isExpired") 已过期
+            h5(v-if="authenticate.card.status === 'passed' && !authenticate.card.isExpired") 认证状态：
+              span.text-success 已通过
             h5(v-if="authenticate.card.status === 'passed' && !authenticate.card.isExpired") 过期时间：{{verify2ExpiryDate}}
-            h5.text-success(v-if="authenticate.card.status === 'passed' && !authenticate.card.isExpired") 已通过审核
             .row(v-if="!(authenticate.card.status === 'passed' && !authenticate.card.isExpired)")
               .col-xs-12.col-md-6.text-center.verify2__img
                 h5 身份证正面
@@ -72,8 +73,9 @@ block content
             //- p 注意：
             //-   span.text-danger 请使用手机拍摄，保留周围背景，且保证身份证上的内容清晰可见，大小不超过300M，并且只有.mp4格式的视频才能预览。
             h5.text-danger(v-if="authenticate.video.status === 'passed' && authenticate.video.isExpired") 已过期
+            h5(v-if="authenticate.video.status === 'passed' && !authenticate.card.isExpired") 认证状态：
+              span.text-success 已通过
             h5(v-if="authenticate.video.status === 'passed' && !authenticate.video.isExpired") 过期时间：{{verify3ExpiryDate}}
-            h5.text-success(v-if="authenticate.video.status === 'passed' && !authenticate.card.isExpired") 已通过审核
             .row(v-if="!(authenticate.video.status === 'passed' && !authenticate.card.isExpired)")
               .col-xs-12.col-md-6.text-center
                 .center-block.idcard-video
