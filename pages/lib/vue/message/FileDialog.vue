@@ -4,7 +4,7 @@
     <div class="dialog-content">
       <div class="dialog-header">
         <span class="dialog-title">{{ title }}</span>
-        <span class="dialog-close" @click="handleCloseClick">×</span>
+        <span class="dialog-close fa fa-remove" @click="handleCloseClick"></span>
       </div>
       <div class="dialog-body">
         <slot></slot>
@@ -67,9 +67,6 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
 }
 
@@ -80,12 +77,19 @@ export default {
   right: 0;
   bottom: 0;
   background-color: rgba(127, 127, 127, 0.5);
+  z-index: 1001;
 }
 
 .dialog-content {
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
   width: 30rem;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 27.6rem;
   max-width: 100%;
   background-color: #fff;
   border-radius: 4px;
@@ -94,43 +98,36 @@ export default {
 }
 
 .dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px;
-  font-size: 12px;
-  font-weight: bold;
+  @headerHeight: 3rem;
+  height: @headerHeight;
+  line-height: @headerHeight;
   border-bottom: 1px solid #e6e6e6;
+  padding-left: 1rem;
+  position: relative;
+  .dialog-close{
+    position: absolute;
+    height: @headerHeight;
+    width: @headerHeight;
+    line-height: @headerHeight;
+    text-align: center;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    &:hover{
+      background-color: #f0f0f0;
+    }
+  }
 }
 
-.dialog-title {
-  flex: 1;
-}
-
-.dialog-close:hover {
-  cursor: pointer;
-}
 
 .dialog-body {
-  flex: 1;
-  padding: 16px;
-  align-items: center;
-  justify-content: center;
-  display: flex;
+  padding: 1rem;
 }
 
 .dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 16px;
+  padding: 1rem;
+  text-align: right;
   border-top: 1px solid #e6e6e6;
-}
-
-.dialog-btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 </style>

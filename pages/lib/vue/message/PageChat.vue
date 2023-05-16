@@ -11,9 +11,9 @@
     ref="chatMessageContainer"
     )
     //展示用户所发文件的dialog
-    FileDialog(:dialogVisible="isShowFileDialog" @updateDialogVisible="updateDialogVisible" :title="dialogTitle" @confirm="confirm" )
-      .image.imgDialog(v-if="previewPath.length !== 0" )
-        img.imgInDialog(:src="src" v-for="src in previewPath" )
+    FileDialog(:dialogVisible="isShowFileDialog" @updateDialogVisible="updateDialogVisible" :title="dialogTitle + fileCountTitle" @confirm="confirm" )
+      .image.img-dialog(v-if="previewPath.length !== 0" )
+        img.img-in-dialog(:src="src" v-for="src in previewPath" )
       .fileDialog(v-if="previewName.length !== 0" )
         i(class="fa fa-file-code-o" aria-hidden="true" )
         p(v-for="fileName in previewName" ) {{fileName}}
@@ -232,6 +232,13 @@ export default {
     this.initChatDialogOffset();
   },
   computed: {
+    fileCountTitle() {
+      let fileCountTitle = '';
+      if(this.previewFile.length > 1) {
+        fileCountTitle = `(共 ${this.previewFile.length} 个文件)`;
+      }
+      return fileCountTitle;
+    },
     chatContainerStyle() {
       if (this.showForm) {
         return `bottom:${this.initialFooterHeight + this.finalBoxHeight}px`;
@@ -1207,7 +1214,7 @@ export default {
   }
 }
 
-.imgDialog {
+.img-dialog {
   height: 18rem;
   overflow-y: auto;
   display: flex;
@@ -1216,9 +1223,10 @@ export default {
   flex-wrap: wrap;
 }
 
-.imgInDialog {
+.img-in-dialog {
   max-width: 100%;
   object-fit: cover;
+  margin-bottom: 0.5rem;
 }
 .warning-info-panel {
   width: 100%;
