@@ -338,46 +338,12 @@ export default {
     //用户粘贴图片行为
     handlePaste(event) {
       const clipboardData = event.clipboardData || window.clipboardData;
-      const items = clipboardData.items;
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
-          this.isShowFileDialog = true;
-          const file = item.getAsFile();
-          this.previewFile.push(file);
-          const imgUrl = URL.createObjectURL(file);
-          this.previewPath.push(imgUrl);
-          this.dialogTitle = '是否发送图片';
-        } else if (item.kind === 'file') {
-          this.isShowFileDialog = true;
-          const file = item.getAsFile();
-          this.previewFile.push(file);
-          this.previewName.push(file.name);
-          this.dialogTitle = '是否发送文件';
-        }
-      }
+      this.fileHandler(clipboardData);
     },
     handleDrop(event) {
       event.preventDefault();
       const clipboardData = event.dataTransfer
-      const items = clipboardData.items;
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
-          this.isShowFileDialog = true;
-          const file = item.getAsFile();
-          this.previewFile.push(file);
-          const imgUrl = URL.createObjectURL(file);
-          this.previewPath.push(imgUrl);
-          this.dialogTitle = '是否发送图片';
-        } else if (item.kind === 'file') {
-          this.isShowFileDialog = true;
-          const file = item.getAsFile();
-          this.previewFile.push(file);
-          this.previewName.push(file.name);
-          this.dialogTitle = '是否发送文件';
-        }
-      }
+      this.fileHandler(clipboardData);
     },
     //关闭dialog
     updateDialogVisible(isShowFileDialog) {
@@ -385,6 +351,27 @@ export default {
       this.previewFile = [];
       this.previewPath = [];
       this.previewName = [];
+    },
+    //对粘贴或上传的文件进行处理
+    fileHandler(clipboardData){
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+          this.isShowFileDialog = true;
+          const file = item.getAsFile();
+          this.previewFile.push(file);
+          const imgUrl = URL.createObjectURL(file);
+          this.previewPath.push(imgUrl);
+          this.dialogTitle = '是否发送图片';
+        } else if (item.kind === 'file') {
+          this.isShowFileDialog = true;
+          const file = item.getAsFile();
+          this.previewFile.push(file);
+          this.previewName.push(file.name);
+          this.dialogTitle = '是否发送文件';
+        }
+      }
     },
     //提交内容
     confirm() {
