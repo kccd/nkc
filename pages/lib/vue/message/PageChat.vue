@@ -1215,7 +1215,7 @@ export default {
 }
 
 .img-dialog {
- text-align: center;
+  text-align: center;
 }
 
 .img-in-dialog {
