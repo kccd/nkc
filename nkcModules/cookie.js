@@ -30,7 +30,7 @@ function getCookieInfo(cookie = '', key) {
   return keyInfo;
 }
 
-function getUserInfo(cookie) {
+function getUserInfo(cookie = '') {
   let userInfo = null;
   try {
     if (isBase64(cookie)) {
