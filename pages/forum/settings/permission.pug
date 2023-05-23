@@ -127,6 +127,27 @@ block content
                 input(type='radio' value='or' v-model='forum.permission.writePost.relation')
                 span 或
         .panel.panel-default
+          .panel-heading 编辑权限（编辑回复位置顺序）
+          .panel-body
+            strong 证书
+            .checkbox
+              label(v-for='r in roles').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.editPostPosition.rolesId')
+                span {{r.displayName}}
+            strong 等级
+            .checkbox
+              label(v-for='r in grades').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.editPostPosition.gradesId')
+                span {{r.displayName}}
+            strong 证书等级关系
+            .radio
+              label.m-r-1
+                input(type='radio' value='and' v-model='forum.permission.editPostPosition.relation')
+                span 与
+              label
+                input(type='radio' value='or' v-model='forum.permission.editPostPosition.relation')
+                span 或
+        .panel.panel-default
           .panel-heading 主管专家
           .panel-body
             .forum-moderators

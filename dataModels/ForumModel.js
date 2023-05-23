@@ -253,6 +253,21 @@ const forumSchema = new Schema(
           default: 'or',
         },
       },
+      // 编辑回复位置
+      editPostPosition: {
+        rolesId: {
+          type: [String],
+          default: ['dev'],
+        },
+        gradesId: {
+          type: [Number],
+          default: [],
+        },
+        relation: {
+          type: String,
+          default: 'or',
+        },
+      },
     },
 
     orderBy: {
