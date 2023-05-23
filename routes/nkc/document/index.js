@@ -1,29 +1,65 @@
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
   const { db, data, query, state, nkcModules } = ctx;
-  let { page = 0, t = '', a = '' } = query;
+  let { page = 0, t = '' } = query;
   const { getUrl } = nkcModules.tools;
   const { stable: stableDocumentType } =
     await db.DocumentModel.getDocumentTypes();
   const documentSourcesObj = await db.DocumentModel.getDocumentSources();
   const articleSourcesObj = await db.ArticleModel.getArticleSources();
   const commentSourcesObj = await db.CommentModel.getCommentSources();
+  const documentStatus = {
+    normal: 'normal',
+    deleted: 'deleted',
+    faulty: 'faulty',
+    disabled: 'disabled',
+  };
   delete documentSourcesObj.draft;
   const documentSources = Object.values(documentSourcesObj);
-  const match = {
-    type: stableDocumentType,
-    source: { $ne: documentSourcesObj.draft },
-  };
-  if (t) {
-    if (documentSources.includes(t)) {
-      match.source = t;
-    } else {
-      ctx.throw(400, `document source error. source=${t}`);
+  //默认初始值
+  let source = [
+    documentSourcesObj.article,
+    documentSourcesObj.comment,
+    documentSourcesObj.moment,
+  ];
+  //默认初始值
+  let status = [
+    documentStatus.normal,
+    documentStatus.deleted,
+    documentStatus.faulty,
+    documentStatus.disabled,
+  ];
+
+  //配置数据库查询状态
+  if (t && Array.isArray(source) && source.length > 0) {
+    const allSourcesExist = source.every((item) =>
+      documentSources.includes(item),
+    );
+
+    if (!allSourcesExist) {
+      ctx.throw(400, `document source error. source=${source}`);
     }
+    const decodedString = atob(t);
+    const jsonString = decodeURIComponent(decodedString);
+    const parsedT = JSON.parse(jsonString);
+    source = parsedT.source;
+    status = parsedT.status;
   }
-  if (a) {
-    const { source, status } = JSON.parse(a);
-  }
+
+  let combinations = source.flatMap((singleSource) =>
+    status.map((singleStatus) => ({
+      source: singleSource,
+      status: singleStatus,
+    })),
+  );
+
+  let match = {
+    $or: combinations.map((combination) => ({
+      source: combination.source,
+      status: combination.status,
+      type: stableDocumentType,
+    })),
+  };
 
   const count = await db.DocumentModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
@@ -197,6 +233,8 @@ router.get('/', async (ctx, next) => {
 
   data.documentsInfo = documentsInfo;
   data.t = t;
+  data.source = source;
+  data.status = status;
   data.paging = paging;
   ctx.template = 'nkc/document/document.pug';
   data.nav = 'document';

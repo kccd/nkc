@@ -5,44 +5,47 @@ block nkcTitle
 block nkcContent
   div
     .m-b-1
-      //ul.nav.nav-tabs
-      //  li(class=!data.t ? 'active' : "")
-      //    a(href='/nkc/document') 全部
-      //  li(class=data.t === 'article' ? 'active' : "")
-      //    a(href='/nkc/document?t=article') 文章
-      //  li(class=data.t === 'comment' ? 'active' : "")
-      //    a(href='/nkc/document?t=comment') 评论
-      //  li(class=data.t === 'moment' ? 'active' : "")
-      //    a(href='/nkc/document?t=moment') 动态
       .m-b-05
-        .form-check.m-r-05
-          input.form-check-input.classification(type="checkbox", value="", id="all" onclick='selectAllContent(this)' checked)
-          label.form-check-label(for="all") 全部
-        .form-check.m-r-05
-          input.form-check-input.classification(type="checkbox", value="article", id="article" checked onclick='uncheck()')
-          label.form-check-label(for="article") 文章
-        .form-check.m-r-05
-          input.form-check-input.classification(type="checkbox", value="comment", id="comment" checked onclick='uncheck()')
-          label.form-check-label(for="comment") 评论
-        .form-check.m-r-05
-          input.form-check-input.classification(type="checkbox", value="moment", id="moment" checked onclick='uncheck()')
-          label.form-check-label(for="moment") 动态
-        .text-right
-          button.btn.btn-primary.btn-sm(type="button" onclick='handleSearch()') 查询
-      .m-b-05
-        .form-check.m-r-05
-          input.form-check-input.status(type="checkbox", value="normal", id="normal"  checked)
-          label.form-check-label(for="normal") 正常
-        .form-check.m-r-05
-          input.form-check-input.status(type="checkbox", value="deleted", id="deleted")
-          label.form-check-label(for="deleted") 删除
-        .form-check.m-r-05
-          input.form-check-input.status(type="checkbox", value="faulty", id="faulty" )
-          label.form-check-label(for="faulty") 退修
-        .form-check.m-r-05
-          input.form-check-input.status(type="checkbox", value="disabled", id="disabled" )
-          label.form-check-label(for="disabled") 屏蔽
+        .checkbox.m-r-05
+          label.form-check-label(for="all")
+            input.form-check-input.classification(type="checkbox", value="", checked= data.source.length === 3 id="all" onclick='selectAllContent(this)')
+            span 全部
+        .checkbox.m-r-05
+          label.form-check-label(for="article")
+            input.form-check-input.classification(type="checkbox", value="article", id="article" checked=data.source.includes('article') onclick='uncheck()')
+            span 文章
+        .checkbox.m-r-05
+          label.form-check-label(for="comment")
+            input.form-check-input.classification(type="checkbox", value="comment", id="comment" checked=data.source.includes('comment') onclick='uncheck()')
+            span 评论
+        .checkbox.m-r-05
+          label.form-check-label(for="moment")
+            input.form-check-input.classification(type="checkbox", value="moment", id="moment" checked=data.source.includes('moment') onclick='uncheck()')
+            span 动态
 
+      .m-b-05
+        .checkbox.m-r-05
+          label.form-check-label(for="normal")
+            input.form-check-input.contentStatus(type="checkbox", value="", id="allStatus" checked=data.status.length === 4 onclick='selectAllStatus(this)')
+            span 全部
+        .checkbox.m-r-05
+          label.form-check-label(for="normal")
+            input.form-check-input.contentStatus(type="checkbox", value="normal", id="normal" checked=data.status.includes('normal') onclick='uncheckStatus()')
+            span 正常
+        .checkbox.m-r-05
+          label.form-check-label(for="deleted")
+            input.form-check-input.contentStatus(type="checkbox", value="deleted", id="deleted" checked=data.status.includes('deleted') onclick='uncheckStatus()')
+            span 删除
+        .checkbox.m-r-05
+          label.form-check-label(for="faulty")
+            input.form-check-input.contentStatus(type="checkbox", value="faulty", id="faulty" checked=data.status.includes('faulty') onclick='uncheckStatus()')
+            span 退修
+        .checkbox.m-r-05
+          label.form-check-label(for="disabled")
+            input.form-check-input.contentStatus(type="checkbox", value="disabled", id="disabled" checked=data.status.includes('disabled') onclick='uncheckStatus()')
+            span 屏蔽
+      .m-b-05
+        button.btn.btn-primary.btn-sm(type="button" onclick='handleSearch()') 查询
     include ../../publicModules/paging/paging_input
     .management-posts
       for document in data.documentsInfo
