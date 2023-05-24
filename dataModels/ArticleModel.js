@@ -293,6 +293,7 @@ schema.statics.getZoneArticle = async (id)=>{
     },
   });
   return {
+    did: `D${document.did}`,
     post: documentContent,
     userAvatar: user.avatar,
     thread: articleInfo,

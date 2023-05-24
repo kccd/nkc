@@ -3,7 +3,7 @@ block baseColumnTitle
   title=`${data.columnPost.post.t}`
   +includeCSS('/columns/article/article.css')
 block baseColumnContent
-  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
+  -var {did, post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
   -var {targetUser, categoryList, categoriesTree} = data
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
@@ -15,7 +15,7 @@ block baseColumnContent
   mixin thread
     .m-b-1
       include ./article/nav
-      +nav({_id, name, hits, count, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
+      +nav({_id, name, hits, count, did, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
       include ./article/setUp
       //- 文章管理员操作
       +setUp()
