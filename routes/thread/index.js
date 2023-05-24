@@ -1407,6 +1407,7 @@ threadRouter
         return post;
       }),
     );
+
     // 获取置顶文章
     if (
       paging.page === 0 &&
@@ -1876,8 +1877,8 @@ threadRouter
   })
   .post('/:tid', async (ctx, next) => {
     // 社区文章发表评论
-
     const { data, nkcModules, params, db, body, state, address: ip } = ctx;
+
     const { user } = data;
 
     try {
@@ -2050,7 +2051,10 @@ threadRouter
       await message.save();
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
-    await thread.updateOne({ $inc: [{ count: 1 }, { hits: 1 }] });
+    await thread.updateOne({
+      $inc: [{ count: 1 }, { hits: 1 }],
+      $push: { posts: _post.pid },
+    });
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
     const newThread = await db.ThreadModel.findOnly({ tid });
