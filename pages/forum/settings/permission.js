@@ -31,6 +31,7 @@ const app = new Vue({
     },
   },
   mounted() {
+    console.log(this.forum, 'forum');
     this.initUserPanel();
   },
   updated() {

@@ -540,6 +540,7 @@ block content
           +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
+          div() test
           if data.thread.type === "fund"
             include ../fund/applicationForm/operationCenter
             -var form = data.applicationForm;

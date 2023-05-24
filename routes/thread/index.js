@@ -803,6 +803,7 @@ threadRouter
     let hasPermissionToHidePost = null;
     let blackListUsersId = [];
     if (data.user) {
+      console.log(data.user, 'data.user');
       if (!data.user.volumeA) {
         // 加载考试设置
         // data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
