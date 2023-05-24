@@ -46,19 +46,10 @@ router.get('/', async (ctx, next) => {
     status = parsedT.status;
   }
 
-  let combinations = source.flatMap((singleSource) =>
-    status.map((singleStatus) => ({
-      source: singleSource,
-      status: singleStatus,
-    })),
-  );
-
-  let match = {
-    $or: combinations.map((combination) => ({
-      source: combination.source,
-      status: combination.status,
-      type: stableDocumentType,
-    })),
+  const match = {
+    source: { $in: source },
+    status: { $in: status },
+    type: stableDocumentType,
   };
 
   const count = await db.DocumentModel.countDocuments(match);
