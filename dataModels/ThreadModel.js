@@ -78,6 +78,11 @@ const threadSchema = new Schema(
       index: 1,
       default: false,
     },
+    posts: {
+      type: [String],
+      default: [],
+      index: 1,
+    },
     //文章内容第一个pid
     oc: {
       type: String,

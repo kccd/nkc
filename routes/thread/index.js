@@ -275,6 +275,7 @@ threadRouter
     };
 
     const { thread } = internalData;
+
     const tid = thread.tid;
     const source = await db.ReviewModel.getDocumentSources();
     // 拓展文章属性
@@ -797,13 +798,18 @@ threadRouter
       thread.firstPost.uidlm = '';
     }
 
+    //判断用户是否具有编辑文章回复顺序的权限
+    const { havePermission } = await db.ForumModel.checkEditPostPosition(
+      data.user.uid,
+      thread.mainForumsId,
+    );
+
     // 发表权限判断
     // const postSettings = await db.SettingModel.getSettings('post');
     let userPostCountToday = 0;
     let hasPermissionToHidePost = null;
     let blackListUsersId = [];
     if (data.user) {
-      console.log(data.user, 'data.user');
       if (!data.user.volumeA) {
         // 加载考试设置
         // data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
@@ -1082,6 +1088,7 @@ threadRouter
     data.authorAvatarUrl = authorAvatarUrl;
     data.authorRegisterInfo = authorRegisterInfo;
     data.userSubscribeUsersId = userSubscribeUsersId;
+    data.editPostPositionPermission = havePermission;
 
     // 商品信息
     if (threadShopInfo) {

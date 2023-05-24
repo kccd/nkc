@@ -3,7 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const client = settings.redisClient;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
-
+const { ThrowCommonError } = require('../nkcModules/error');
 const forumSchema = new Schema(
   {
     abbr: {
@@ -2221,7 +2221,7 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
 
 /*
  * 检查用户在指定专业的权限
- * @param {String} type 执行权限类型 write: 发表, read: 阅读
+ * @param {String} type 执行权限类型 write: 发表, read: 阅读 , editPostPosition:编辑回复位置
  * @param {String} uid 用户ID
  * @param {[String]} fid 专业ID组成的数组
  * */
@@ -2230,8 +2230,8 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const recycleId = await SettingModel.getRecycleId();
   const ForumModel = mongoose.model('forums');
   const { grade: userGrade, roles: userRoles, uid } = user;
-  const userRolesId = userRoles.map((r) => r._id);
-  const userGradeId = userGrade ? userGrade._id : null;
+  const userRolesId = userRoles.map((r) => r._id); //获取证书
+  const userGradeId = userGrade ? userGrade._id : null; //获取等级
   for (const id of fid) {
     if (['write', 'writePost'].includes(type) && id === recycleId) {
       throwErr(400, `不允许发表内容到回收站，请更换专业`);
@@ -2280,12 +2280,16 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
           403,
           `你没有权限在专业「${displayName}」下发表文章，请更换专业。`,
         );
+      } else if (type === 'editPostPosition') {
+        return { havePermission: false, displayName };
       } else {
         throwErr(
           403,
           `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业。`,
         );
       }
+    } else {
+      return { havePermission: true, displayName };
     }
   }
 };
@@ -2310,6 +2314,40 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
  * @param {String} uid 用户ID
  * @author pengxiguaa 2020/8/25
  * */
+forumSchema.statics.checkEditPostPosition = async (uid, fid) => {
+  const ForumModel = mongoose.model('forums');
+  await ForumModel.checkGlobalPostPermission(uid, 'post');
+  const user = await mongoose.model('users').findOnly({ uid });
+  await user.extendRoles();
+  await user.extendGrade();
+  return await ForumModel.checkPermission('editPostPosition', user, fid);
+};
+
+forumSchema.statics.checkEditPostPositionInRoute = async (uid, fid) => {
+  const ForumModel = mongoose.model('forums');
+  await ForumModel.checkGlobalPostPermission(uid, 'post');
+  const user = await mongoose.model('users').findOnly({ uid });
+  await user.extendRoles();
+  await user.extendGrade();
+  const { havePermission, displayName } = await ForumModel.checkPermission(
+    'editPostPosition',
+    user,
+    fid,
+  );
+  if (!havePermission) {
+    ThrowCommonError(
+      403,
+      `你没有权限在专业「${displayName}」下更改文章顺序，请更换专业。`,
+    );
+  }
+};
+
+/*
+ * 验证用户是否能在指定的专业改变文章回复的顺序
+ * @param {[String]} 专业ID组成的数组
+ * @param {String} uid 用户ID
+ * @author by 2023/5/23
+ * */
 forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
   const ForumModel = mongoose.model('forums');
   await ForumModel.checkGlobalPostPermission(uid, 'post');
@@ -2318,7 +2356,6 @@ forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
   await user.extendGrade();
   await ForumModel.checkPermission('writePost', user, fid);
 };
-
 /*
  * 根据后台管理-发表设置验证用户是拥有发表全向
  * @param {String} uid 用户ID
@@ -2471,7 +2508,9 @@ forumSchema.statics.getForumsIdByUidAndType = async (uid, type) => {
     try {
       await ForumModel.checkPermission(type, user, [fid]);
       results.push(fid);
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
   return results;
 };
