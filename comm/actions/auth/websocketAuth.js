@@ -13,7 +13,7 @@ const PostsVoteModel = require('../../../dataModels/PostsVoteModel');
 module.exports = {
   params: {
     cookie: 'string',
-    operationId: 'string',
+    // operationId: 'string',
     os: 'string',
   },
   async handler(ctx) {
@@ -23,10 +23,10 @@ module.exports = {
       ThrowError(HttpErrorCodes.BadRequest, HttpErrorTypes.ERR_INVALID_COOKIE);
     }
     const user = await UserModel.findOnly({ uid: userInfo.uid });
-    const operationsId = await user.getUserOperationsId();
-    if (!operationsId.includes(operationId)) {
-      ThrowError(HttpErrorCodes.Forbidden, HttpErrorTypes.ERR_FORBIDDEN);
-    }
+    // const operationsId = await user.getUserOperationsId();
+    // if (!operationsId.includes(operationId)) {
+    //   ThrowError(HttpErrorCodes.Forbidden, HttpErrorTypes.ERR_FORBIDDEN);
+    // }
     const onlineStatus = await user.setOnlineStatus(os);
     const newMessageCount = await user.getUnreadMessageCount();
     const friendsUid = await MessageModel.getUsersFriendsUid(user.uid);

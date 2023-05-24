@@ -9,13 +9,15 @@ const fs = require('fs');
 const upload = require('../settings/upload');
 
 module.exports = async (url) => {
-  let http;
-  if (url.indexOf('https://') === 0) {
-    http = HTTPS;
-  } else if (url.indexOf('http://') === 0) {
-    http = HTTP;
-  }
   return new Promise((resolve, reject) => {
+    let http;
+    if (url.indexOf('https://') === 0) {
+      http = HTTPS;
+    } else if (url.indexOf('http://') === 0) {
+      http = HTTP;
+    } else {
+      return reject(new Error('未知的请求协议'));
+    }
     http
       .get(
         url,
