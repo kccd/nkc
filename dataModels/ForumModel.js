@@ -2331,8 +2331,10 @@ forumSchema.statics.checkEditPostPosition = async (uid, fid, tid) => {
 
 forumSchema.statics.checkEditPostPositionInRoute = async (uid, fid, tid) => {
   const ForumModel = mongoose.model('forums');
-  const thread = await ThreadModel.find({ tid });
-  if (thread.uid !== uid) {
+  const ThreadModel = mongoose.model('threads');
+  const thread = await ThreadModel.find({ tid }, { uid: 1 });
+  //判断是否为作者本人
+  if (thread[0].uid !== uid) {
     ThrowCommonError(403, `你不是作者本人或管理员,无法使用该功能。`);
   }
   await ForumModel.checkGlobalPostPermission(uid, 'post');
