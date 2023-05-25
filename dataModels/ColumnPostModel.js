@@ -134,7 +134,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
     //获取文章评论数
     thread.count = article.count;
     res = {
-      did: `D${did}`,
+      docNumber: `D${did}`,
       _id: columnPostId,
       type,
       thread,
@@ -166,7 +166,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
     thread.url = url;
     res = {
       _id,
-      did: thread.oc,
+      docNumber: thread.oc,
       type,
       thread,
       article,

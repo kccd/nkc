@@ -263,10 +263,17 @@ router.get('/', async (ctx, next) => {
             highlightObj[_id + '_abstractCN'] =
               '摘要：' + r.highlight.abstractCN;
           }
-          if (r.highlight.pid) {
+          if (
+            (r.docType === 'thread' || r.docType === 'post') &&
+            r.highlight.pid
+          ) {
             highlightObj[_id + '_pid'] = '文号：' + r.highlight.pid;
           }
-          if (r.highlight.tid) {
+          if (
+            (r.docType === 'document_article' ||
+              r.docType === 'document_comment') &&
+            r.highlight.tid
+          ) {
             highlightObj[_id + '_tid'] = '文号：' + r.highlight.tid;
           }
           if (r.highlight.aid) {
@@ -457,6 +464,7 @@ router.get('/', async (ctx, next) => {
           link,
           pid: post.pid,
           oc: thread.oc,
+          docNumber: highlightObj[`${pid}_pid`],
           title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
           threadCategories: tc,
           abstract:
@@ -581,10 +589,11 @@ router.get('/', async (ctx, next) => {
           documentId: document._id,
           articleId: article._id,
           link: article.url,
-          did: highlightObj[`${tid}_tid`],
+          docNumber: highlightObj[`${tid}_tid`],
           title:
             highlightObj[`${tid}_title`] || document.title || article.title,
           abstract:
+            highlightObj[`${tid}_tid`] ||
             highlightObj[`${tid}_pid`] ||
             highlightObj[`${tid}_aid`] ||
             highlightObj[`${tid}_authors`] ||
@@ -622,16 +631,20 @@ router.get('/', async (ctx, next) => {
         if (!comment) {
           continue;
         }
-        const { uid, commentDocument, articleDocument, url } = comment;
+        const { uid, commentDocument, articleDocument, url, commentUrl } =
+          comment;
         const commentUser = userObj[uid];
         r = {
+          docNumber: highlightObj[`${tid}_tid`],
           source: commentDocument.source,
           documentId: commentDocument._id,
           commentId: comment._id,
           docType,
           articleUrl: url,
+          commentUrl: commentUrl,
           articleTitle: articleDocument.title,
           abstract:
+            highlightObj[`${tid}_tid`] ||
             highlightObj[`${tid}_authors`] ||
             highlightObj[`${tid}_content`] ||
             '内容：' +

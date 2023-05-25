@@ -2,7 +2,7 @@ const func = {};
 
 const elasticSearch = require('../settings/elasticSearch');
 const client = elasticSearch();
-
+const { ThrowCommonError } = require('../nkcModules/error');
 const esConfig = require('../config/elasticSearch');
 
 const { analyzer, searchAnalyzer, indexName } = esConfig;
@@ -123,7 +123,7 @@ func.save = async (docType, document) => {
       'document_moment',
     ].includes(docType)
   ) {
-    throwErr(500, 'docType error');
+    ThrowCommonError(500, 'docType error');
   }
 
   let aid = '';
@@ -482,6 +482,18 @@ func.search = async (t, c, options) => {
                     {
                       bool: {
                         should: [
+                          createMatch(
+                            'tid',
+                            (() => {
+                              let targetKeyword = c.toUpperCase();
+                              if (targetKeyword.indexOf('D') === 0) {
+                                targetKeyword = targetKeyword.slice(1);
+                              }
+                              return targetKeyword;
+                            })(),
+                            5,
+                            relation,
+                          ),
                           createMatch('content', c, 2, relation),
                           createMatch('authors', c, 80, relation),
                         ],
@@ -625,9 +637,6 @@ func.search = async (t, c, options) => {
         categoryObj[categoryId].add(nodeId);
       }
       for (let categoryId in categoryObj) {
-        if (!categoryObj.hasOwnProperty(categoryId)) {
-          continue;
-        }
         let nodesId = categoryObj[categoryId];
         categoryId = Number(categoryId);
         const hasDefault = nodesId.has('default');

@@ -8,9 +8,9 @@
   @params {Array} auxiliaryCategory 辅分类
   @params {Number} collectedCount 收藏数
 
-include ../../publicModules/documentNumber
+include ../../publicModules/docNumber
 mixin nav(data)
-  -var {_id, name, hits, count, did, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user} = data
+  -var {_id, name, hits, count, docNumber, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user} = data
   +includeCSS('/columns/article/nav.css')
   header
     -var mainCategoryId = '';
@@ -37,7 +37,7 @@ mixin nav(data)
 
     .info-list
       .info-list-item.m-r-05
-        +documentNumber(did)
+        +docNumber(docNumber)
       .info-list-item(title="浏览数")
         .fa.fa-eye=` ${hits || 0}`
       .info-list-item.pointer(title='回复数' onclick="window.location.href='#container'")

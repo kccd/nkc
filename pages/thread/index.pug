@@ -65,8 +65,8 @@ block content
                       )= name
                   .thread-nav-right
                     .nav-count(style="color: #555;")
-                      include ../publicModules/documentNumber
-                      +documentNumber(data.thread.oc)
+                      include ../publicModules/docNumber
+                      +docNumber(data.thread.oc)
                     .nav-count(title=`浏览数`)
                       .fa.fa-eye
                       span=data.thread.hits

@@ -1,7 +1,7 @@
 //- 字段详情/pages/thread/singlePost/singlePost.pug
 if !isIncluded('singlePostTop')
   mixin singlePostTop(props)
-    -var {pid, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl} = props;
+    -var {pid, docNumber, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
     -var {cancelTopped, url, addr} = props;
     .single-post-top
@@ -37,7 +37,11 @@ if !isIncluded('singlePostTop')
             +fromNow(tlm)
           span=` IP:${addr}`
       .single-post-floor
-        a(href=url)=floor + '楼'
-        .single-post-checkbox
-          label
-            input(type='checkbox' data-pid=pid)
+        .doc-order
+          a(href=url)=floor + '楼'
+          .single-post-checkbox
+            label
+              input(type='checkbox' data-pid=pid)
+        .doc-number
+          include ../../publicModules/docNumber
+          +docNumberCore(docNumber)

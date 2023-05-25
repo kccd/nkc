@@ -8,7 +8,7 @@
   @param {Number}} collectedCount 文章收藏数
 extends ../bootstrap_base
 block title
-  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected, vote, did} = data.columnPost
+  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected, vote, docNumber} = data.columnPost
   -var {_id, name} = column
   -var {targetUser, categoryList, categoriesTree} = data
   -var {hits, comment: count, oc, url} = thread
@@ -24,7 +24,7 @@ block content
   mixin thread
     .m-b-1
       include ../columns/article/nav
-      +nav({_id, name, hits, count, did, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
+      +nav({_id, name, hits, count, docNumber, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
       include ../columns/article/setUp
       if type === 'article'
         //- 文章管理员操作
