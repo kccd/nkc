@@ -2314,10 +2314,19 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
  * @param {String} uid 用户ID
  * @author pengxiguaa 2020/8/25
  * */
-forumSchema.statics.checkEditPostPosition = async (uid, fid, tid) => {
+forumSchema.statics.checkEditPostPosition = async ({
+  uid,
+  fid,
+  tid,
+  isEditArticlePositionOrder,
+}) => {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
   const thread = await ThreadModel.find({ tid }, { uid: 1 });
+  //判断是否有管理员权限可以使用该功能
+  if (isEditArticlePositionOrder) {
+    return { havePermission: true };
+  }
   //判断是否为作者本人
   if (thread[0].uid !== uid) {
     return { havePermission: false };
@@ -2329,10 +2338,18 @@ forumSchema.statics.checkEditPostPosition = async (uid, fid, tid) => {
   return await ForumModel.checkPermission('editPostPosition', user, fid);
 };
 
-forumSchema.statics.checkEditPostPositionInRoute = async (uid, fid, tid) => {
+forumSchema.statics.checkEditPostPositionInRoute = async ({
+  uid,
+  fid,
+  tid,
+  isEditArticlePositionOrder,
+}) => {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
   const thread = await ThreadModel.find({ tid }, { uid: 1 });
+  if(isEditArticlePositionOrder){
+    return true;
+  }
   //判断是否为作者本人
   if (thread[0].uid !== uid) {
     ThrowCommonError(403, `你不是作者本人或管理员,无法使用该功能。`);

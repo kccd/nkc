@@ -799,12 +799,12 @@ threadRouter
     }
 
     //判断用户是否具有编辑文章回复顺序的权限
-    const { havePermission } = await db.ForumModel.checkEditPostPosition(
-      data.user.uid,
-      thread.mainForumsId,
+    const { havePermission } = await db.ForumModel.checkEditPostPosition({
+      uid: data.user.uid,
+      fid: thread.mainForumsId,
       tid,
-    );
-    console.log(havePermission, 'havePermission')
+      isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
+    });
 
     // 发表权限判断
     // const postSettings = await db.SettingModel.getSettings('post');
