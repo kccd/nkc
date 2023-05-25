@@ -802,7 +802,9 @@ threadRouter
     const { havePermission } = await db.ForumModel.checkEditPostPosition(
       data.user.uid,
       thread.mainForumsId,
+      tid,
     );
+    console.log(havePermission, 'havePermission')
 
     // 发表权限判断
     // const postSettings = await db.SettingModel.getSettings('post');
@@ -2053,8 +2055,13 @@ threadRouter
     }
     await thread.updateOne({
       $inc: [{ count: 1 }, { hits: 1 }],
-      $push: { posts: _post.pid },
+      // $push: { posts: _post.pid },
     });
+    if (!_post.parentPostId) {
+      await thread.updateOne({
+        $push: { postIds: _post.pid },
+      });
+    }
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
     const newThread = await db.ThreadModel.findOnly({ tid });

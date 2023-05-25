@@ -78,7 +78,7 @@ const threadSchema = new Schema(
       index: 1,
       default: false,
     },
-    posts: {
+    postIds: {
       type: [String],
       default: [],
       index: 1,
