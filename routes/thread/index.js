@@ -2053,6 +2053,7 @@ threadRouter
       await message.save();
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
+
     await thread.updateOne({
       $inc: [{ count: 1 }, { hits: 1 }],
       // $push: { posts: _post.pid },
@@ -2062,6 +2063,7 @@ threadRouter
         $push: { postIds: _post.pid },
       });
     }
+
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
     const newThread = await db.ThreadModel.findOnly({ tid });
