@@ -469,6 +469,8 @@ threadRouter
       .limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
+    posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
+
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -1031,7 +1033,6 @@ threadRouter
 
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
-
     // 标志
     data.t = t;
     data.creditScore = creditScore;
@@ -1398,6 +1399,7 @@ threadRouter
     // 拓展回复信息
     data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
+
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(
       data.posts.map(async (post) => {
@@ -1409,7 +1411,6 @@ threadRouter
         return post;
       }),
     );
-
     // 获取置顶文章
     if (
       paging.page === 0 &&
@@ -1833,7 +1834,6 @@ threadRouter
       });
       data.notes = await db.NoteModel.getNotesByPosts(notePosts);
     }
-
     // 黑名单判断
     if (data.thread.uid && data.user) {
       data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(

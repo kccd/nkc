@@ -2541,6 +2541,22 @@ postSchema.statics.disableToDraftPosts = async function () {
 };
 
 /*
+ *将posts数组重新排序，根据ThreadModel所存放的pid来排序
+ * @params 对应的tid用于查询到对应的ThreadModel表
+ * @params posts将需要重新排序的的文章下的回复传入进来
+ * */
+postSchema.statics.reorderByThreadModelPostsIds = async (tid, posts) => {
+  const ThreadModel = mongoose.model('threads');
+  const res = await ThreadModel.find({ tid }, { postIds: 1 }).lean();
+  const { postIds } = res[0];
+  return [...posts].sort((a, b) => {
+    const indexA = postIds.indexOf(a.pid);
+    const indexB = postIds.indexOf(b.pid);
+    return indexA - indexB;
+  });
+};
+
+/*
  * post执行科创币加减,加精时根据传入的科创币数量直接加上，取消精选时去查找加精的科创币数量去扣除相应的数量
  * @params {string} type 精选类型 digestPost/unDigestPost
  * @params {object} user 需要加减科创币的用户
