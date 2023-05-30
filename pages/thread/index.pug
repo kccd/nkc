@@ -445,10 +445,10 @@ block content
           //- 回复列表内容
           div.p-a-0.single-posts-container
             include ./singlePost/singlePost
-            for post in data.posts
-              //- post数据格式详见/pages/thread/singlePost/singlePost.pug
-              -post.highlight = data.highlight;
-              +singlePost(post)
+             for post in data.posts
+               //- post数据格式详见/pages/thread/singlePost/singlePost.pug
+               -post.highlight = data.highlight;
+               +singlePost(post)
           //- 回复列表尾部分页、管理按钮
           .p-l-2.p-r-2.m-b--05
             include ../publicModules/paging/paging_input
@@ -540,8 +540,6 @@ block content
           +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
-          if data.editPostPositionPermission
-            div() test
           if data.thread.type === "fund"
             include ../fund/applicationForm/operationCenter
             -var form = data.applicationForm;
@@ -583,6 +581,8 @@ block content
               .form-group(v-if="contract.contractCode")
                 h5 邮政编码：
                 strong {{contract.contractCode}}
+    if data.editPostPositionPermission
+      include ./editOrder/editOrder
 
     include ../debug_output.pug
     include ../publicModules/post_warning

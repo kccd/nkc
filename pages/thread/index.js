@@ -3,12 +3,15 @@ import { RNSetSharePanelStatus } from '../lib/js/reactNative';
 import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
+import Sortable from 'sortablejs';
 
 const socket = getSocket();
 var surveyForms = [],
   draftId = '',
   author = {},
   _id;
+let sortable = null;
+let postIdsOrder = [];
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
@@ -522,6 +525,44 @@ function setSubmitButton(submitting) {
     button.html('回复');
   }
 }
+
+//单次拖拽结束
+function onEndDrop(event) {
+  const items = Array.from(event.from.children);
+  postIdsOrder = items
+    .filter((item) => item.getAttribute('data-pid') !== null)
+    .map((item) => {
+      return item.getAttribute('data-pid');
+    });
+}
+//编辑回复顺序
+function editPostOrder() {
+  const dropPostContainer = document.getElementsByClassName(
+    'single-posts-container',
+  )[0];
+  document.getElementsByClassName('admin-editor')[0].style.display = 'none';
+  document.getElementsByClassName('admin-finished')[0].style.display = 'block';
+  sortable = new Sortable(dropPostContainer, {
+    group: 'post',
+    sort: true,
+    animation: 500,
+    invertSwap: true,
+    onEnd: onEndDrop,
+  });
+}
+//编辑完毕回复顺序
+function finishedEditPostOrder() {
+  if (sortable) {
+    sortable.destroy(); //清除这个sortable
+    document.getElementsByClassName('admin-editor')[0].style.display = 'block';
+    document.getElementsByClassName('admin-finished')[0].style.display = 'none';
+  }
+  if (postIdsOrder.length !== 0) {
+    console.log(data, 'data');
+    console.log(postIdsOrder, 'postIdsOrder');
+  }
+}
+
 // 发表回复
 function submit(tid) {
   Promise.resolve()
@@ -1555,4 +1596,6 @@ Object.assign(window, {
   insertRenderedComment,
   pushBlock,
   pushHomeBlockId,
+  editPostOrder,
+  finishedEditPostOrder,
 });
