@@ -232,7 +232,15 @@ threadRouter
   .get('/:tid', async (ctx, next) => {
     const { data, db, query, nkcModules, state, internalData } = ctx;
     const { token } = query;
-    const { page = 0, pid, last_page, highlight, step, t } = query;
+    const {
+      page = 0,
+      pid,
+      last_page,
+      highlight,
+      step,
+      t,
+      isEnterEditMode = false,
+    } = query;
 
     let mainForum = null;
     let forumsNav = [];
@@ -462,15 +470,20 @@ threadRouter
       pageSettings.threadPostList,
     );
 
+    let posts = [];
     // 获取回复列表
-    let posts = await db.PostModel.find(match)
-      .sort({ toc: 1 })
-      .skip(paging.start)
-      .limit(paging.perpage);
+    //判断是否进入编辑模式
+    if (!isEnterEditMode) {
+      posts = await db.PostModel.find(match)
+        .sort({ toc: 1 })
+        .skip(paging.start)
+        .limit(paging.perpage);
+    } else {
+      posts = await db.PostModel.find(match).sort({ toc: 1 });
+    }
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
-
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -2193,7 +2206,7 @@ threadRouter
         }
         return indexA - indexB;
       });
-      
+
       await db.ThreadModel.findOneAndUpdate(
         {
           tid,
