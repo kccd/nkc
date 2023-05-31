@@ -4,7 +4,7 @@
       <div v-if="!loading">
         <div class="form">
           <div class="form-group">
-            <label>提示信息（在用户名之后显示）</label>
+            <label>提示信息（在用户名后显示）</label>
             <input type="text" class="form-control" v-model="nickname">
           </div>
           <div class="form-group">
@@ -90,7 +90,7 @@ export default {
 </script>
 
 <style lang="less">
-.memo-editor-container{
-  padding: 1rem;
-}
+  .memo-editor-container{
+    padding: 1rem;
+  }
 </style>
