@@ -663,6 +663,8 @@ schema.statics.extendSingleComment = async (comment) => {
     ...m,
     content: await CommentModel.renderComment(document._id),
     docId: document._id,
+    docNumber: `D${document.did}`,
+    addr: document.addr,
     status: document.status,
     type: document.type,
     reason,
