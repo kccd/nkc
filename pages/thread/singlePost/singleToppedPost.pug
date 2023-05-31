@@ -3,7 +3,7 @@
 if !isIncluded('singleToppedPost')
   include ./singlePost
   mixin singleToppedPost(props)
-    +singlePost(Object.assign({}, props, {cancelTopped: true, hidePostBottom: true, disableAutoHideContent: true}))
+    +singlePost(Object.assign({}, props, {cancelTopped: true, hidePostBottom: true, disableAutoHideContent: true ,unEditOrder: true}))
 
 
 

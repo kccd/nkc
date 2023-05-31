@@ -442,6 +442,8 @@ block content
             if disablePost
               //- 回复的批量管理
               +managePosts
+            if data.editPostPositionPermission
+                 include ./editOrder/editOrder
           //- 回复列表内容
           div.p-a-0.single-posts-container
             include ./singlePost/singlePost
@@ -581,8 +583,7 @@ block content
               .form-group(v-if="contract.contractCode")
                 h5 邮政编码：
                 strong {{contract.contractCode}}
-    if data.editPostPositionPermission
-      include ./editOrder/editOrder
+
 
     include ../debug_output.pug
     include ../publicModules/post_warning

@@ -543,12 +543,18 @@ function editPostOrder() {
     'single-posts-container',
   )[0];
   document.getElementsByClassName('admin-editor')[0].style.display = 'none';
-  document.getElementsByClassName('admin-finished')[0].style.display = 'block';
+  document.getElementsByClassName('admin-finished')[0].style.display =
+    'inline-block';
+  document.getElementsByClassName('editOrder').forEach((item) => {
+    item.style.display = 'inline-block';
+  });
+
   sortable = new Sortable(dropPostContainer, {
     group: 'post',
     sort: true,
     animation: 500,
     invertSwap: true,
+    handle: '.editOrder',
     onEnd: onEndDrop,
   });
 }
@@ -556,8 +562,12 @@ function editPostOrder() {
 function finishedEditPostOrder(fid, tid) {
   if (sortable) {
     sortable.destroy(); //清除这个sortable
-    document.getElementsByClassName('admin-editor')[0].style.display = 'block';
+    document.getElementsByClassName('admin-editor')[0].style.display =
+      'inline-block';
     document.getElementsByClassName('admin-finished')[0].style.display = 'none';
+    document.getElementsByClassName('editOrder').forEach((item) => {
+      item.style.display = 'none';
+    });
   }
   if (postIdsOrder.length !== 0) {
     const uid = NKC.configs.uid;
@@ -568,11 +578,16 @@ function finishedEditPostOrder(fid, tid) {
       postIdsOrder,
     })
       .then((res) => {
-        sweetSuccess('文章回复顺序成功');
+        if (res) {
+          postIdsOrder = [];
+          sweetSuccess('文章回复顺序调整成功');
+        }
       })
       .catch((error) => {
         sweetError(error);
       });
+  } else {
+    sweetError('文章回复顺序并未调整');
   }
 }
 

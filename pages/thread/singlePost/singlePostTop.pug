@@ -3,7 +3,7 @@ if !isIncluded('singlePostTop')
   mixin singlePostTop(props)
     -var {pid, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
-    -var {cancelTopped, url, addr} = props;
+    -var {cancelTopped, url, addr, unEditOrder} = props;
     .single-post-top
       .single-post-avatar(
         data-global-mouseover="showUserPanel"
@@ -11,6 +11,8 @@ if !isIncluded('singlePostTop')
         data-global-data=objToStr({uid})
         )
         img(src=avatar class=banned?'user-banned-avatar':'')
+        if !unEditOrder
+          i.fa.fa-bars.editOrder(aria-hidden="true")
       .single-post-user
         .single-post-username
           a(

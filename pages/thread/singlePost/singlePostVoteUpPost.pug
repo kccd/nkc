@@ -5,7 +5,7 @@ if !isIncluded('singlePostVoteUpPost')
   include ./singlePostVote
   mixin singlePostVoteUpPost(props)
     -var {pid, vote, voteUp} = props;
-    +singlePost(Object.assign({}, props, {hideComment: true, disableAutoHideContent: true}))
+    +singlePost(Object.assign({}, props, {hideComment: true, disableAutoHideContent: true, unEditOrder: true }))
 
 
 
