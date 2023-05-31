@@ -4,6 +4,8 @@ import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
+import { ThrowCommonError, ThrowError } from '../../nkcModules/error';
+import { sweetError } from '../lib/js/sweetAlert';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -551,15 +553,26 @@ function editPostOrder() {
   });
 }
 //编辑完毕回复顺序
-function finishedEditPostOrder() {
+function finishedEditPostOrder(fid, tid) {
   if (sortable) {
     sortable.destroy(); //清除这个sortable
     document.getElementsByClassName('admin-editor')[0].style.display = 'block';
     document.getElementsByClassName('admin-finished')[0].style.display = 'none';
   }
   if (postIdsOrder.length !== 0) {
-    console.log(data, 'data');
-    console.log(postIdsOrder, 'postIdsOrder');
+    const uid = NKC.configs.uid;
+    nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
+      uid,
+      fid: [fid],
+      tid,
+      postIdsOrder,
+    })
+      .then((res) => {
+        sweetSuccess('文章回复顺序成功');
+      })
+      .catch((error) => {
+        sweetError(error);
+      });
   }
 }
 

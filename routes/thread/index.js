@@ -803,7 +803,7 @@ threadRouter
     //判断用户是否具有编辑文章回复顺序的权限
     const { havePermission } = await db.ForumModel.checkEditPostPosition({
       uid: data.user.uid,
-      fid: thread.mainForumsId,
+      fid: [thread.mainForumsId],
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
     });
@@ -2168,6 +2168,39 @@ threadRouter
       }).catch((err) => {
         console.error(err);
       });
+    }
+    await next();
+  })
+  .post('/:tid/editPostOrder', async (ctx, next) => {
+    const { db, body } = ctx;
+    const { uid, fid, tid, postIdsOrder } = body;
+    //判断用户是否具有编辑文章回复顺序的权限
+    const havePermission = await db.ForumModel.checkEditPostPositionInRoute({
+      uid,
+      fid,
+      tid,
+      isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
+    });
+    if (havePermission) {
+      const thread = await db.ThreadModel.find({ tid }, { postIds: 1 }).lean();
+      const { postIds } = thread[0];
+      const newPostIds = [...postIds].sort((a, b) => {
+        const indexA = postIdsOrder.indexOf(a);
+        const indexB = postIdsOrder.indexOf(b);
+        // 如果 a 或 b 不在 arr2 中，保持原始顺序
+        if (indexA === -1 || indexB === -1) {
+          return 0;
+        }
+        return indexA - indexB;
+      });
+      
+      await db.ThreadModel.findOneAndUpdate(
+        {
+          tid,
+        },
+        { $set: { postIds: newPostIds } },
+        { new: true },
+      );
     }
     await next();
   })

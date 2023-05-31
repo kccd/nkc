@@ -2338,6 +2338,12 @@ forumSchema.statics.checkEditPostPosition = async ({
   return await ForumModel.checkPermission('editPostPosition', user, fid);
 };
 
+/*
+ * 验证用户是否能在指定的专业发表回复和评论
+ * @param {[String]} 专业ID组成的数组
+ * @param {String} uid 用户ID
+ * @author pengxiguaa 2020/8/25
+ * */
 forumSchema.statics.checkEditPostPositionInRoute = async ({
   uid,
   fid,
@@ -2347,7 +2353,7 @@ forumSchema.statics.checkEditPostPositionInRoute = async ({
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
   const thread = await ThreadModel.find({ tid }, { uid: 1 });
-  if(isEditArticlePositionOrder){
+  if (isEditArticlePositionOrder) {
     return true;
   }
   //判断是否为作者本人
@@ -2368,6 +2374,8 @@ forumSchema.statics.checkEditPostPositionInRoute = async ({
       403,
       `你没有权限在专业「${displayName}」下更改文章顺序，请更换专业。`,
     );
+  } else {
+    return true;
   }
 };
 

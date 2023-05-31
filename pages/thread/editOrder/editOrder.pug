@@ -3,4 +3,4 @@
 
 .admin-operate
   button.admin-editor(onclick='editPostOrder()') 编辑
-  button.admin-finished(onclick='finishedEditPostOrder()') 完成
+  button.admin-finished(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
