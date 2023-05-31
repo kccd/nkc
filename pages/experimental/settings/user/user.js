@@ -1,11 +1,13 @@
-import {objToStr} from "../../../lib/js/tools";
-import {showIpInfo} from "../../../lib/js/ip";
+import { objToStr } from '../../../lib/js/tools';
+import { showIpInfo } from '../../../lib/js/ip';
+import UserMemoEditor from '../../../lib/vue/UserMemoEditor.vue';
+import { getDataById } from '../../../lib/js/dataConversion';
 
-const data = NKC.methods.getDataById('data');
+const data = getDataById('data');
 const usersObj = {};
-data.users.map(u => {
+data.users.map((u) => {
   u.showDetail = false;
-  usersObj[u.uid] = u
+  usersObj[u.uid] = u;
 });
 const app = new Vue({
   el: '#app',
@@ -18,14 +20,17 @@ const app = new Vue({
     roles: data.roles,
     selectedUsersId: [],
   },
+  components: {
+    'user-memo-editor': UserMemoEditor,
+  },
   computed: {
     selectedUsers() {
-      const {usersObj} = this;
-      return this.selectedUsersId.map(uid => usersObj[uid]);
+      const { usersObj } = this;
+      return this.selectedUsersId.map((uid) => usersObj[uid]);
     },
     isChecked() {
       return this.selectedUsersId.length === this.users.length;
-    }
+    },
   },
   methods: {
     objToStr: objToStr,
@@ -34,41 +39,45 @@ const app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     getIpUrl: NKC.methods.tools.getIpUrl,
     search() {
-      const {t, searchType, searchContent} = this;
-      if(!searchContent) sweetError('请输入搜索内容');
+      const { t, searchType, searchContent } = this;
+      if (!searchContent) {
+        sweetError('请输入搜索内容');
+      }
       window.location.href = `/e/settings/user?t=${t}&c=${searchType},${searchContent}`;
     },
     switchDetail(u) {
       u.showDetail = !u.showDetail;
     },
     editUser(u) {
-      if(!window.ModifyAccountInfo) {
+      if (!window.ModifyAccountInfo) {
         window.ModifyAccountInfo = new NKC.modules.ModifyAccountInfo();
       }
       window.ModifyAccountInfo.open({
-        uid: u.uid
+        uid: u.uid,
       });
     },
     toDisableUser(postType, type, disable, user) {
       let usersId;
-      if(type === 'all') {
+      if (type === 'all') {
         usersId = [].concat(this.selectedUsersId);
       } else {
         usersId = [user.uid];
       }
       return Promise.resolve()
         .then(() => {
-          if(!usersId.length) throw '未选择用户';
+          if (!usersId.length) {
+            throw '未选择用户';
+          }
           return nkcAPI(`/e/settings/user`, 'PUT', {
             type: postType,
             usersId,
-            disable: !!disable
+            disable: !!disable,
           });
         })
         .then(() => {
           sweetSuccess('执行成功');
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           sweetError(err);
         });
@@ -80,19 +89,27 @@ const app = new Vue({
       this.toDisableUser('hidden', type, disable, user);
     },
     selectAllUsers() {
-      const {users, isChecked} = this;
-      if(!isChecked) {
-        this.selectedUsersId = users.map(u => u.uid);
+      const { users, isChecked } = this;
+      if (!isChecked) {
+        this.selectedUsersId = users.map((u) => u.uid);
       } else {
         this.selectedUsersId = [];
       }
-    }
+    },
+    editUserMemo(u) {
+      this.$refs.userMemoEditor.open({
+        uid: u.uid,
+        callback: () => {
+          //
+        },
+      });
+    },
   },
   mounted() {
     /*setTimeout(() => {
       floatUserPanel.initPanel();
     }, 500)*/
-  }
+  },
 });
 
 Object.assign(window, {
