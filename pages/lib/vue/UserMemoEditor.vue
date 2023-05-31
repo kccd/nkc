@@ -4,7 +4,7 @@
       <div v-if="!loading">
         <div class="form">
           <div class="form-group">
-            <label>昵称</label>
+            <label>提示信息（在用户名之后显示）</label>
             <input type="text" class="form-control" v-model="nickname">
           </div>
           <div class="form-group">

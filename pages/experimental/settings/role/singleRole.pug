@@ -73,7 +73,7 @@ block eContent
               table.table.table-striped
                 thead
                   tr
-                    th 用户名（昵称）
+                    th 用户名(提示)
                     th 学术分
                     th 文章
                     th 回复
@@ -82,7 +82,7 @@ block eContent
                   tr(v-for='user in users')
                     th
                       a(:href='"/u/" + user.uid' target='_blank') {{user.username || '用户' + user.uid}}
-                        span(v-if="user.nickname") （{{user.nickname}}）
+                        span(v-if="user.nickname") ({{user.nickname}})
                     th {{user.xsf}}
                     th {{user.threadCount}}
                     th {{user.postCount}}

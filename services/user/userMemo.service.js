@@ -3,7 +3,7 @@ const checkData = require('../../nkcModules/checkData');
 class UserMemoService {
   async checkNicknameFormat(nickname) {
     checkData.checkString(nickname, {
-      name: '昵称',
+      name: '提示信息',
       minLength: 0,
       maxLength: 30,
     });

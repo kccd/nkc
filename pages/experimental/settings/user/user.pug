@@ -46,7 +46,7 @@ block eContent
                   input(type='checkbox' :checked='isChecked').m-r-05
                 th 注册时间
                 th UID
-                th 用户名（昵称）
+                th 用户名(提示)
                 th 证书
                 th A卷
                 th B卷
@@ -74,7 +74,7 @@ block eContent
                     data-global-mouseout="hideUserPanel"
                     :data-global-data="objToStr({uid: u.uid})"
                   ) {{u.username}}
-                    span(v-if="u.nickname") （{{u.nickname}}）
+                    span(v-if="u.nickname") ({{u.nickname}})
                 th
                   span(v-for='r in u.roles') {{r.displayName}}&nbsp;
                 th.mwd

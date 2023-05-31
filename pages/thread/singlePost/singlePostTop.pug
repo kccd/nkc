@@ -37,11 +37,11 @@ if !isIncluded('singlePostTop')
             +fromNow(tlm)
           span=` IP:${addr}`
       .single-post-floor
+        .doc-number
+          include ../../publicModules/docNumber
+          +docNumberCore(docNumber)
         .doc-order
           a(href=url)=floor + '楼'
           .single-post-checkbox
             label
               input(type='checkbox' data-pid=pid)
-        .doc-number
-          include ../../publicModules/docNumber
-          +docNumberCore(docNumber)

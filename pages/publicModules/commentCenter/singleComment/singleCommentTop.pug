@@ -32,12 +32,13 @@ if !isIncluded('singleCommentTop')
             +fromNow(tlm)
           span=` IP:${addr}`
       .single-post-floor
+        .doc-number
+          include ../../docNumber
+          +docNumberCore(docNumber)
         .doc-order
           a(href=commentUrl)=order + '楼'
           .single-post-checkbox
             label
               input(type='checkbox' data-docId=docId)
-        .doc-number
-          include ../../docNumber
-          +docNumberCore(docNumber)
+
 
