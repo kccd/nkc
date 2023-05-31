@@ -2,5 +2,9 @@
 +includeCSS('/thread/editOrder/editOrder.css')
 
 
-button.admin-editor(onclick='editPostOrder()') 调整复序
-button.admin-finished(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
+button.admin-editor.editOrderButton(onclick='editPostOrder()') 调整复序
+button.admin-finished.editOrderButton(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
+div(id='admin_operate')
+  button.admin-finished(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
+
+

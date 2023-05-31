@@ -443,7 +443,7 @@ block content
               //- 回复的批量管理
               +managePosts
             if data.editPostPositionPermission
-                 include ./editOrder/editOrder
+              include ./editOrder/editOrder
           //- 回复列表内容
           div.p-a-0.single-posts-container
             include ./singlePost/singlePost
@@ -458,6 +458,8 @@ block content
             if disablePost
               //- 回复的批量管理
               +managePosts
+            if data.editPostPositionPermission
+              include ./editOrder/editOrder
           //- 编辑器相关
           div
             if data.user

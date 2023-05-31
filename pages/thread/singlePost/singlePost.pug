@@ -88,6 +88,7 @@ if !isIncluded('singlePost')
       data-hide=isAuthor || disableAutoHideContent? 'not': hide
       id=highlight === pid? 'highlight': undefined
       )
+
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
 
       +singlePostTop(Object.assign({}, user, {addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped, unEditOrder}))

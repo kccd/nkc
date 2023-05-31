@@ -542,12 +542,19 @@ function editPostOrder() {
   const dropPostContainer = document.getElementsByClassName(
     'single-posts-container',
   )[0];
-  document.getElementsByClassName('admin-editor')[0].style.display = 'none';
-  document.getElementsByClassName('admin-finished')[0].style.display =
-    'inline-block';
+  //显示调整复序按钮
+  document.getElementsByClassName('admin-editor').forEach((item) => {
+    item.style.display = 'none';
+  });
+  //显示完成按钮
+  document.getElementsByClassName('admin-finished').forEach((item) => {
+    item.style.display = 'inline-block';
+  });
+  //头像前面的小图标
   document.getElementsByClassName('editOrder').forEach((item) => {
     item.style.display = 'inline-block';
   });
+  document.getElementById('admin_operate').style.display = 'block';
 
   sortable = new Sortable(dropPostContainer, {
     group: 'post',
@@ -562,12 +569,16 @@ function editPostOrder() {
 function finishedEditPostOrder(fid, tid) {
   if (sortable) {
     sortable.destroy(); //清除这个sortable
-    document.getElementsByClassName('admin-editor')[0].style.display =
-      'inline-block';
-    document.getElementsByClassName('admin-finished')[0].style.display = 'none';
+    document.getElementsByClassName('admin-editor').forEach((item) => {
+      item.style.display = 'inline-block';
+    });
+    document.getElementsByClassName('admin-finished').forEach((item) => {
+      item.style.display = 'none';
+    });
     document.getElementsByClassName('editOrder').forEach((item) => {
       item.style.display = 'none';
     });
+    document.getElementById('admin_operate').style.display = 'none';
   }
   if (postIdsOrder.length !== 0) {
     const uid = NKC.configs.uid;
