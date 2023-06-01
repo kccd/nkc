@@ -574,8 +574,7 @@ function handleMoveUp(event) {
     const ownDataPid = item.getAttribute('data-pid');
     const previousItemId =
       parentBox.children[currentIndex - 1].getAttribute('data-pid');
-    console.log(previousItemId, 'previousItemId');
-    console.log(ownDataPid, 'ownDataPid');
+    const replaceabledPost = { previousItemId, ownDataPid };
     parentBox.insertBefore(item, parentBox.children[currentIndex - 1]);
   } else {
     sweetError('已经是最顶层了');
