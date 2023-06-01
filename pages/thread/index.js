@@ -4,7 +4,6 @@ import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
-import { ThrowCommonError, ThrowError } from '../../nkcModules/error';
 import { sweetError } from '../lib/js/sweetAlert';
 
 const socket = getSocket();
@@ -90,7 +89,7 @@ $(document).ready(function () {
   if ($(window).width() < 433) {
     $('.ThreadTitle1').css('width', '65%');
   }
-  
+
   // var qrcode = geid('qrcode');
   // if(qrcode) {
   // 	var path = window.location.href;
@@ -532,6 +531,7 @@ function setSubmitButton(submitting) {
 //编辑回复顺序
 //判断用户是否进入了编辑模式页面
 let sortable = null;
+
 let postIdsOrder = [];
 const dropPostContainer = document.getElementsByClassName(
   'single-posts-container',
@@ -556,9 +556,47 @@ if (isEditMode) {
     animation: 500,
     invertSwap: true,
     handle: '.editOrder',
+    forceFallback: true,
+    scroll: true,
     onEnd: onEndDrop,
   });
 }
+
+//点击文章回复向上移动一格
+function handleMoveUp(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const parentBox = item.parentNode;
+  const currentIndex = Array.from(parentBox.children).indexOf(item);
+
+  // 如果元素不是第一个，则向上移动一格
+  if (currentIndex > 0) {
+    const ownDataPid = item.getAttribute('data-pid');
+    const previousItemId =
+      parentBox.children[currentIndex - 1].getAttribute('data-pid');
+    console.log(previousItemId, 'previousItemId');
+    console.log(ownDataPid, 'ownDataPid');
+    parentBox.insertBefore(item, parentBox.children[currentIndex - 1]);
+  } else {
+    sweetError('已经是最顶层了');
+  }
+}
+//点击文章回复向下移动一格
+function handleMoveDown(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const parentBox = item.parentNode;
+  const currentIndex = Array.from(parentBox.children).indexOf(item);
+  const nextIndex = currentIndex + 1;
+
+  // 如果元素不是最后一个，则向下移动一格
+  if (nextIndex < parentBox.children.length) {
+    parentBox.insertBefore(parentBox.children[nextIndex], item);
+  } else {
+    sweetError('已经是底层了');
+  }
+}
+
 //编辑完毕回复顺序
 function finishedEditPostOrder(fid, tid) {
   if (postIdsOrder.length !== 0) {
@@ -1620,4 +1658,6 @@ Object.assign(window, {
   pushBlock,
   pushHomeBlockId,
   finishedEditPostOrder,
+  handleMoveUp,
+  handleMoveDown,
 });

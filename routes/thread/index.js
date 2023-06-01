@@ -827,7 +827,7 @@ threadRouter
 
     //判断用户是否具有编辑文章回复顺序的权限
     const { havePermission } = await db.ForumModel.checkEditPostPosition({
-      uid: data.user.uid,
+      uid: state.uid,
       fid: [thread.mainForumsId],
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
@@ -2207,7 +2207,7 @@ threadRouter
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
     });
-    if (havePermission) {
+    if (havePermission && postIdsOrder) {
       const thread = await db.ThreadModel.find({ tid }, { postIds: 1 }).lean();
       const { postIds } = thread[0];
       const newPostIds = [...postIds].sort((a, b) => {

@@ -5,7 +5,7 @@ mixin singlePostEdit(e)
       i.fa.fa-bars.editOrder(aria-hidden="true")
       .operator-button
         button.btn-default.btn.btn-xs.icon-expand() 折叠
-        button.btn-success.btn-save-editor.btn.btn-xs()
+        button.btn-success.btn-save-editor.btn.btn-xs(onclick='handleMoveUp(event)')
           i.fa.fa-chevron-up(aria-hidden="true")
-        button.btn-danger.btn.btn-xs()
+        button.btn-danger.btn.btn-xs(onclick='handleMoveDown(event)')
           i.fa.fa-chevron-down(aria-hidden="true")
