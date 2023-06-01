@@ -232,15 +232,7 @@ threadRouter
   .get('/:tid', async (ctx, next) => {
     const { data, db, query, nkcModules, state, internalData } = ctx;
     const { token } = query;
-    const {
-      page = 0,
-      pid,
-      last_page,
-      highlight,
-      step,
-      t,
-      isEnterEditMode = false,
-    } = query;
+    const { page = 0, pid, last_page, highlight, step, t, e = false } = query;
 
     let mainForum = null;
     let forumsNav = [];
@@ -473,17 +465,37 @@ threadRouter
     let posts = [];
     // 获取回复列表
     //判断是否进入编辑模式
-    if (!isEnterEditMode) {
-      posts = await db.PostModel.find(match)
-        .sort({ toc: 1 })
-        .skip(paging.start)
-        .limit(paging.perpage);
+    if (!e) {
+      //没有进入编辑模式
+      const thread = await db.ThreadModel.find({ tid }).lean();
+      if (thread) {
+        const { postIds } = thread[0];
+        const top50PostsId = postIds.slice(
+          paging.start,
+          paging.start + paging.perpage,
+        );
+        match.pid = { $in: top50PostsId }; // 添加的条件
+        posts = await db.PostModel.find(match);
+      }
+      // posts = await db.PostModel.find(match)
+      //   .sort({ toc: 1 })
+      //   .skip(paging.start)
+      //   .limit(paging.perpage);
     } else {
-      posts = await db.PostModel.find(match).sort({ toc: 1 });
+      //进入了编辑模式
+      //判断是否拥有进入编辑模式的权限
+      await db.ForumModel.checkEditPostPositionInRoute({
+        uid: data.user.uid,
+        fid: [thread.mainForumsId],
+        tid,
+        isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
+      });
+      posts = await db.PostModel.find(match);
     }
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
+
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -1105,6 +1117,7 @@ threadRouter
     data.authorRegisterInfo = authorRegisterInfo;
     data.userSubscribeUsersId = userSubscribeUsersId;
     data.editPostPositionPermission = havePermission;
+    data.e = e;
 
     // 商品信息
     if (threadShopInfo) {

@@ -1,10 +1,14 @@
 
 +includeCSS('/thread/editOrder/editOrder.css')
+a.editOrder(href=`/t/${data.thread.tid}?e=true#post-top`)
+  if(!data.e)
+    div 调整复序
+if data.e
+  button.admin-finished.saveButton(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 保存复序
+  button.saveButton.fixedButton(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 保存复序
 
+//button.admin-finished.editOrderButton(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
+//div(id='admin_operate')
 
-button.admin-editor.editOrderButton(onclick='editPostOrder()') 调整复序
-button.admin-finished.editOrderButton(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
-div(id='admin_operate')
-  button.admin-finished(onclick=`finishedEditPostOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 完成
 
 

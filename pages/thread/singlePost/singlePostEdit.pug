@@ -1,0 +1,11 @@
+
+mixin singlePostEdit(e)
+  if e
+    .single-post-edit.m-b-1
+      i.fa.fa-bars.editOrder(aria-hidden="true")
+      .operator-button
+        button.btn-default.btn.btn-xs.icon-expand() 折叠
+        button.btn-success.btn-save-editor.btn.btn-xs()
+          i.fa.fa-chevron-up(aria-hidden="true")
+        button.btn-danger.btn.btn-xs()
+          i.fa.fa-chevron-down(aria-hidden="true")

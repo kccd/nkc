@@ -72,26 +72,26 @@ if !isIncluded('singlePost')
   include ./singlePostComment
   include ./singlePostWarningInfo
   include ../../publicModules/mixin
+  include ./singlePostEdit
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
-  mixin singlePost(props)
+  mixin singlePost(props, e)
     -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp, disableAutoHideContent} = props;
     -var {digest, type, tid, highlight, hide, addr} = props;
-    -var {cancelTopped, hidePostBottom, cRead, hideComment ,unEditOrder} = props;
+    -var {cancelTopped, hidePostBottom, cRead, hideComment} = props;
     .single-post-container(
+      id=highlight === pid? 'highlight': undefined
       data-un-reviewed=!reviewed
       data-disabled=disabled
       data-return=!!draft
       data-highlight=highlight === pid
       data-pid=pid
       data-hide=isAuthor || disableAutoHideContent? 'not': hide
-      id=highlight === pid? 'highlight': undefined
       )
-
+      +singlePostEdit(e)
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
-
-      +singlePostTop(Object.assign({}, user, {addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped, unEditOrder}))
+      +singlePostTop(Object.assign({}, user, {addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped,}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
         +singlePostBottom({vote, voteUp, pid, count, tid, cRead, hideComment})

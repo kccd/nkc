@@ -12,8 +12,7 @@ var surveyForms = [],
   draftId = '',
   author = {},
   _id;
-let sortable = null;
-let postIdsOrder = [];
+
 const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
@@ -91,6 +90,7 @@ $(document).ready(function () {
   if ($(window).width() < 433) {
     $('.ThreadTitle1').css('width', '65%');
   }
+  
   // var qrcode = geid('qrcode');
   // if(qrcode) {
   // 	var path = window.location.href;
@@ -488,6 +488,7 @@ function autoSaveDraft() {
 }
 // 保存草稿
 function saveDraft(threadId, userId) {
+  Promise.resolve();
   Promise.resolve()
     .then(function () {
       modifyMathJax();
@@ -528,6 +529,16 @@ function setSubmitButton(submitting) {
   }
 }
 
+//编辑回复顺序
+//判断用户是否进入了编辑模式页面
+let sortable = null;
+let postIdsOrder = [];
+const dropPostContainer = document.getElementsByClassName(
+  'single-posts-container',
+)[0];
+const urlParams = new URLSearchParams(window.location.search);
+const isEditMode = urlParams.get('e');
+
 //单次拖拽结束
 function onEndDrop(event) {
   const items = Array.from(event.from.children);
@@ -537,25 +548,8 @@ function onEndDrop(event) {
       return item.getAttribute('data-pid');
     });
 }
-//编辑回复顺序
-function editPostOrder() {
-  const dropPostContainer = document.getElementsByClassName(
-    'single-posts-container',
-  )[0];
-  //显示调整复序按钮
-  document.getElementsByClassName('admin-editor').forEach((item) => {
-    item.style.display = 'none';
-  });
-  //显示完成按钮
-  document.getElementsByClassName('admin-finished').forEach((item) => {
-    item.style.display = 'inline-block';
-  });
-  //头像前面的小图标
-  document.getElementsByClassName('editOrder').forEach((item) => {
-    item.style.display = 'inline-block';
-  });
-  document.getElementById('admin_operate').style.display = 'block';
 
+if (isEditMode) {
   sortable = new Sortable(dropPostContainer, {
     group: 'post',
     sort: true,
@@ -567,19 +561,6 @@ function editPostOrder() {
 }
 //编辑完毕回复顺序
 function finishedEditPostOrder(fid, tid) {
-  if (sortable) {
-    sortable.destroy(); //清除这个sortable
-    document.getElementsByClassName('admin-editor').forEach((item) => {
-      item.style.display = 'inline-block';
-    });
-    document.getElementsByClassName('admin-finished').forEach((item) => {
-      item.style.display = 'none';
-    });
-    document.getElementsByClassName('editOrder').forEach((item) => {
-      item.style.display = 'none';
-    });
-    document.getElementById('admin_operate').style.display = 'none';
-  }
   if (postIdsOrder.length !== 0) {
     const uid = NKC.configs.uid;
     nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
@@ -591,6 +572,9 @@ function finishedEditPostOrder(fid, tid) {
       .then((res) => {
         if (res) {
           postIdsOrder = [];
+          if (sortable) {
+            sortable.destroy(); //清除这个sortable
+          }
           sweetSuccess('文章回复顺序调整成功');
         }
       })
@@ -1635,6 +1619,5 @@ Object.assign(window, {
   insertRenderedComment,
   pushBlock,
   pushHomeBlockId,
-  editPostOrder,
   finishedEditPostOrder,
 });

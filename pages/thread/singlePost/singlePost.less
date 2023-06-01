@@ -52,6 +52,28 @@
     padding: 1rem 1.2rem 1rem 1.2rem;
   }
 }
+.single-post-edit{
+  position: relative;
+  background-color: rgb(155, 174, 200);
+  height: 3rem;
+  padding: 0 1rem;
+  border-radius: 0.3rem;
+  line-height: 3rem;
+  &>.editOrder{
+    color: rgb(255,255,255);
+  }
+  &>.editOrder:hover{
+    cursor: move;
+  }
+  &>.operator-button{
+    margin-left: 1rem;
+    float: right;
+    font-size: 1rem;
+    &>button{
+      height: 2rem;
+    }
+  }
+}
 .single-post-top{
   height: @postTopHeight;
   padding-left: 4rem;
@@ -69,14 +91,7 @@
       width: 100%;
       border-radius: 50%;
     }
-    .editOrder{
-      position: absolute;
-      right: 4rem;
-      display: none;
-    }
-    .editOrder:hover{
-      cursor: move;
-    }
+
   }
   .single-post-user{
     .single-post-username{
