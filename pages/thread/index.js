@@ -610,6 +610,7 @@ function handleMoveUp(event, fid, tid) {
 function handleMoveDown(event, fid, tid) {
   handleMove(event, fid, tid, 'down');
 }
+//添加防抖函数
 const handleMoveDebounce = debounce(handleMoveUp, 100);
 const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 //编辑完毕回复顺序
