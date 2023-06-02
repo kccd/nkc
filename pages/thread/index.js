@@ -5,6 +5,7 @@ import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
 import { sweetError } from '../lib/js/sweetAlert';
+import { debounce } from '../lib/js/execution';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -562,40 +563,55 @@ if (isEditMode) {
   });
 }
 
-//点击文章回复向上移动一格
-function handleMoveUp(event) {
+//handleMoveUp与handleMoveDown的公共部分
+function handleMove(event, fid, tid, direction) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   const parentBox = item.parentNode;
   const currentIndex = Array.from(parentBox.children).indexOf(item);
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
-  // 如果元素不是第一个，则向上移动一格
-  if (currentIndex > 0) {
+  if (targetIndex >= 0 && targetIndex < parentBox.children.length) {
     const ownDataPid = item.getAttribute('data-pid');
     const previousItemId =
-      parentBox.children[currentIndex - 1].getAttribute('data-pid');
-    const replaceabledPost = { previousItemId, ownDataPid };
-    parentBox.insertBefore(item, parentBox.children[currentIndex - 1]);
+      parentBox.children[targetIndex].getAttribute('data-pid');
+    let replaceablePost = { previousItemId, ownDataPid };
+    const uid = NKC.configs.uid;
+    nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
+      uid,
+      fid: [fid],
+      tid,
+      replaceablePost,
+    })
+      .then((res) => {
+        if (res) {
+          replaceablePost = null;
+        }
+      })
+      .catch((error) => {
+        sweetError(error);
+      });
+    parentBox.insertBefore(
+      item,
+      direction === 'up'
+        ? parentBox.children[targetIndex]
+        : parentBox.children[targetIndex + 1],
+    );
   } else {
-    sweetError('已经是最顶层了');
+    sweetError(direction === 'up' ? '已经是最顶层了' : '已经是底层了');
   }
 }
-//点击文章回复向下移动一格
-function handleMoveDown(event) {
-  event.stopPropagation();
-  const item = event.target.closest('.single-post-container');
-  const parentBox = item.parentNode;
-  const currentIndex = Array.from(parentBox.children).indexOf(item);
-  const nextIndex = currentIndex + 1;
 
-  // 如果元素不是最后一个，则向下移动一格
-  if (nextIndex < parentBox.children.length) {
-    parentBox.insertBefore(parentBox.children[nextIndex], item);
-  } else {
-    sweetError('已经是底层了');
-  }
+//点击文章回复向上移动一格
+function handleMoveUp(event, fid, tid) {
+  handleMove(event, fid, tid, 'up');
 }
-
+// 点击文章回复向下移动一格
+function handleMoveDown(event, fid, tid) {
+  handleMove(event, fid, tid, 'down');
+}
+const handleMoveDebounce = debounce(handleMoveUp, 100);
+const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 //编辑完毕回复顺序
 function finishedEditPostOrder(fid, tid) {
   if (postIdsOrder.length !== 0) {
@@ -1657,6 +1673,6 @@ Object.assign(window, {
   pushBlock,
   pushHomeBlockId,
   finishedEditPostOrder,
-  handleMoveUp,
-  handleMoveDown,
+  handleMoveDebounce,
+  handleMoveDownDebounce,
 });

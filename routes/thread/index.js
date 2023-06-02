@@ -2199,7 +2199,7 @@ threadRouter
   })
   .post('/:tid/editPostOrder', async (ctx, next) => {
     const { db, body } = ctx;
-    const { uid, fid, tid, postIdsOrder } = body;
+    const { uid, fid, tid, postIdsOrder = [], replaceablePost = null } = body;
     //判断用户是否具有编辑文章回复顺序的权限
     const havePermission = await db.ForumModel.checkEditPostPositionInRoute({
       uid,
@@ -2207,9 +2207,13 @@ threadRouter
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
     });
-    if (havePermission && postIdsOrder) {
-      const thread = await db.ThreadModel.find({ tid }, { postIds: 1 }).lean();
-      const { postIds } = thread[0];
+    //执行拖拽的时候
+    if (havePermission && postIdsOrder.length !== 0) {
+      const thread = await db.ThreadModel.findOne(
+        { tid },
+        { postIds: 1 },
+      ).lean();
+      const { postIds } = thread;
       const newPostIds = [...postIds].sort((a, b) => {
         const indexA = postIdsOrder.indexOf(a);
         const indexB = postIdsOrder.indexOf(b);
@@ -2227,6 +2231,26 @@ threadRouter
         { $set: { postIds: newPostIds } },
         { new: true },
       );
+    }
+    //执行上下切换的时候
+    if (havePermission && replaceablePost) {
+      const { ownDataPid, previousItemId } = replaceablePost;
+      const thread = await db.ThreadModel.findOne(
+        { tid },
+        { postIds: 1 },
+      ).lean();
+      if (thread && thread.postIds) {
+        const { postIds } = thread;
+        const indexA = postIds.indexOf(ownDataPid);
+        const indexB = postIds.indexOf(previousItemId);
+        if (indexA !== -1 && indexB !== -1) {
+          [postIds[indexA], postIds[indexB]] = [
+            postIds[indexB],
+            postIds[indexA],
+          ];
+          await db.ThreadModel.updateOne({ tid }, { $set: { postIds } });
+        }
+      }
     }
     await next();
   })

@@ -5,7 +5,7 @@ mixin singlePostEdit(e)
       i.fa.fa-bars.editOrder(aria-hidden="true")
       .operator-button
         button.btn-default.btn.btn-xs.icon-expand() 折叠
-        button.btn-success.btn-save-editor.btn.btn-xs(onclick='handleMoveUp(event)')
+        button.btn-success.btn-save-editor.btn.btn-xs(onclick=`handleMoveDebounce(event,'${data.thread.mainForumsId}','${data.thread.tid}')`)
           i.fa.fa-chevron-up(aria-hidden="true")
-        button.btn-danger.btn.btn-xs(onclick='handleMoveDown(event)')
+        button.btn-danger.btn.btn-xs(onclick=`handleMoveDownDebounce(event,'${data.thread.mainForumsId}','${data.thread.tid}')`)
           i.fa.fa-chevron-down(aria-hidden="true")
