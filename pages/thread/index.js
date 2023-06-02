@@ -553,6 +553,7 @@ function onEndDrop(event) {
     .map((item) => {
       return item.getAttribute('data-pid');
     });
+  getPostSort();
 }
 
 if (isEditMode) {
@@ -567,6 +568,7 @@ if (isEditMode) {
     onEnd: onEndDrop,
   });
   handelFoldAll();
+  getPostSort();
 }
 
 //点击折叠全部
@@ -632,11 +634,11 @@ function handleMove(event, fid, tid, direction) {
         ? parentBox.children[targetIndex]
         : parentBox.children[targetIndex + 1],
     );
+    getPostSort();
   } else {
     sweetError(direction === 'up' ? '已经是最顶层了' : '已经是底层了');
   }
 }
-
 //点击文章回复向上移动一格
 function handleMoveUp(event, fid, tid) {
   handleMove(event, fid, tid, 'up');
@@ -725,7 +727,14 @@ function submit(tid) {
       setSubmitButton(false);
     });
 }
-
+function getPostSort() {
+  const parentElement = document.querySelector('.single-posts-container');
+  const childElements = parentElement.children;
+  childElements.forEach((element, index) => {
+    const circleElement = element.querySelector('.real-time-floor');
+    circleElement.textContent = `${index + 1}`;
+  });
+}
 // 点击引用
 function quotePost(pid) {
   if (!window.quotePostApp) {
