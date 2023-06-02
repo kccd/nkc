@@ -686,7 +686,7 @@ function finishedEditPostOrder(fid, tid) {
     window.location.replace(`/t/${tid}`);
   }
 }
-
+const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
 // 发表回复
 function submit(tid) {
   Promise.resolve()
@@ -1720,9 +1720,9 @@ Object.assign(window, {
   insertRenderedComment,
   pushBlock,
   pushHomeBlockId,
-  finishedEditPostOrder,
   handleMoveDebounce,
   handleMoveDownDebounce,
   handelExpand,
   handelFold,
+  finishedEditPostOrderDebounce,
 });
