@@ -432,15 +432,16 @@ block content
               a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
           //- 发表人筛选
           mixin articleNav
-            .paging-button
-              a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
-              a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+            if !data.e
+              .paging-button
+                a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+                a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
           //- 回复列表头部分页、管理按钮
           .p-l-2.p-r-2.m-b--05(id='post-top')
             if !data.e
               include ../publicModules/paging/paging
             +articleNav
-            if disablePost
+            if disablePost && !data.e
               //- 回复的批量管理
               +managePosts
             if data.editPostPositionPermission
@@ -454,10 +455,10 @@ block content
                +singlePost(post, data.e)
           //- 回复列表尾部分页、管理按钮
           .p-l-2.p-r-2.m-b--05
-            if(!data.e)
+            if !data.e
               include ../publicModules/paging/paging_input
             //-+articleNav
-            if disablePost
+            if disablePost && !data.e
               //- 回复的批量管理
               +managePosts
             if data.editPostPositionPermission

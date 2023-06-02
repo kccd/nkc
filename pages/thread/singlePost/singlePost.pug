@@ -89,7 +89,8 @@ if !isIncluded('singlePost')
       data-pid=pid
       data-hide=isAuthor || disableAutoHideContent? 'not': hide
       )
-      +singlePostEdit(e)
+      if e
+        +singlePostEdit(e)
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
       +singlePostTop(Object.assign({}, user, {addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped,}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})

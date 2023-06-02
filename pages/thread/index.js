@@ -534,6 +534,11 @@ function setSubmitButton(submitting) {
 let sortable = null;
 
 let postIdsOrder = [];
+
+let replaceablePost = null;
+
+let isSingleChange = false;
+
 const dropPostContainer = document.getElementsByClassName(
   'single-posts-container',
 )[0];
@@ -561,8 +566,37 @@ if (isEditMode) {
     scroll: true,
     onEnd: onEndDrop,
   });
+  handelFoldAll();
 }
 
+//点击折叠全部
+function handelFoldAll() {
+  const postContainer = document.querySelectorAll('.single-post-container');
+  postContainer.forEach((item) => {
+    //为了区分置顶回复，和高赞回复
+    item.children.forEach((child) => {
+      if (child.classList.contains('single-post-edit')) {
+        item.classList.add('collapsed');
+      }
+    });
+  });
+}
+//点击展开单个
+function handelExpand(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  item.classList.remove('collapsed');
+  event.target.style.display = 'none';
+  event.target.nextElementSibling.style.display = 'inline-block';
+}
+//点击折叠单个
+function handelFold(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  event.target.style.display = 'none';
+  event.target.previousElementSibling.style.display = 'inline-block';
+  item.classList.add('collapsed');
+}
 //handleMoveUp与handleMoveDown的公共部分
 function handleMove(event, fid, tid, direction) {
   event.stopPropagation();
@@ -575,7 +609,7 @@ function handleMove(event, fid, tid, direction) {
     const ownDataPid = item.getAttribute('data-pid');
     const previousItemId =
       parentBox.children[targetIndex].getAttribute('data-pid');
-    let replaceablePost = { previousItemId, ownDataPid };
+    replaceablePost = { previousItemId, ownDataPid };
     const uid = NKC.configs.uid;
     nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
       uid,
@@ -586,6 +620,7 @@ function handleMove(event, fid, tid, direction) {
       .then((res) => {
         if (res) {
           replaceablePost = null;
+          isSingleChange = true;
         }
       })
       .catch((error) => {
@@ -630,13 +665,16 @@ function finishedEditPostOrder(fid, tid) {
             sortable.destroy(); //清除这个sortable
           }
           sweetSuccess('文章回复顺序调整成功');
+          window.location.href = 'https://www.baidu.com';
         }
       })
       .catch((error) => {
         sweetError(error);
       });
-  } else {
+  } else if (!isSingleChange && postIdsOrder.length === 0) {
     sweetError('文章回复顺序并未调整');
+  } else {
+    window.location.href = `/t/${tid}`;
   }
 }
 
@@ -1676,4 +1714,6 @@ Object.assign(window, {
   finishedEditPostOrder,
   handleMoveDebounce,
   handleMoveDownDebounce,
+  handelExpand,
+  handelFold,
 });
