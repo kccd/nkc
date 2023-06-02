@@ -732,7 +732,7 @@ function getPostSort() {
   const childElements = parentElement.children;
   childElements.forEach((element, index) => {
     const circleElement = element.querySelector('.real-time-floor');
-    circleElement.textContent = `${index + 1}`;
+    circleElement.value = `${index + 1}`;
   });
 }
 // 点击引用
