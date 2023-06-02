@@ -664,17 +664,26 @@ function finishedEditPostOrder(fid, tid) {
           if (sortable) {
             sortable.destroy(); //清除这个sortable
           }
-          sweetSuccess('文章回复顺序调整成功');
-          window.location.href = 'https://www.baidu.com';
+          sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
+          setTimeout(() => {
+            window.location.replace(`/t/${tid}`);
+          }, 100);
         }
       })
       .catch((error) => {
         sweetError(error);
       });
   } else if (!isSingleChange && postIdsOrder.length === 0) {
-    sweetError('文章回复顺序并未调整');
+    sweetError('文章回复顺序并未调整，即将离开当前页面');
+    setTimeout(() => {
+      window.location.replace(`/t/${tid}`);
+    }, 100);
   } else {
-    window.location.href = `/t/${tid}`;
+    sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
+    setTimeout(() => {
+      window.location.replace(`/t/${tid}`);
+    }, 100);
+    window.location.replace(`/t/${tid}`);
   }
 }
 
