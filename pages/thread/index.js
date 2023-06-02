@@ -689,6 +689,26 @@ function finishedEditPostOrder(fid, tid) {
   }
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
+function handelInsert(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const parentBox = item.parentNode;
+  const totalLength = parentBox.children.length;
+  const targetIndex = Number(event.target.previousElementSibling.value) - 1;
+  const currentIndex = Array.from(parentBox.children).indexOf(item);
+  if (currentIndex === targetIndex) {
+    sweetError('插入的序号不能与当前序号一致');
+  } else if (targetIndex < 0 || targetIndex > totalLength - 1) {
+    sweetError('不存在当前序号');
+  } else {
+    parentBox.insertBefore(item, parentBox.children[targetIndex]);
+    postIdsOrder = [...parentBox.children].map((item) => {
+      return item.getAttribute('data-pid');
+    });
+    getPostSort();
+  }
+}
+
 // 发表回复
 function submit(tid) {
   Promise.resolve()
@@ -727,6 +747,7 @@ function submit(tid) {
       setSubmitButton(false);
     });
 }
+//获取最新的回复排序号
 function getPostSort() {
   const parentElement = document.querySelector('.single-posts-container');
   const childElements = parentElement.children;
@@ -1734,4 +1755,5 @@ Object.assign(window, {
   handelExpand,
   handelFold,
   finishedEditPostOrderDebounce,
+  handelInsert,
 });
