@@ -3,8 +3,8 @@ module.exports = {
   PARAMETER: {
     GET: 'visitThread',
     POST: 'postToThread',
-    editPostOrder: {
-      POST: 'editPostOrderThread',
+    'post-order': {
+      PUT: 'editThreadPostOrder',
     },
     moveDraft: {
       reason: {

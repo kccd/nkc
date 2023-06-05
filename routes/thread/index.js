@@ -489,7 +489,6 @@ threadRouter
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
-
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -818,15 +817,15 @@ threadRouter
       thread.firstPost.uid = '';
       thread.firstPost.uidlm = '';
     }
-    
+
     const checkEditPostPosition = await db.ForumModel.checkEditPostPosition({
       uid: state.uid,
       fid: [thread.mainForumsId],
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
     });
-    
-    const haveEditPositionOrder = (checkEditPostPosition.status === 200);
+
+    const haveEditPositionOrder = checkEditPostPosition.status === 200;
 
     // 发表权限判断
     // const postSettings = await db.SettingModel.getSettings('post');
@@ -1113,6 +1112,7 @@ threadRouter
     data.userSubscribeUsersId = userSubscribeUsersId;
     data.editPostPositionPermission = haveEditPositionOrder;
     data.isEditMode = isEditMode;
+    data.orderChangeStatus = thread.orderChangeStatus;
 
     // 商品信息
     if (threadShopInfo) {
@@ -2192,7 +2192,7 @@ threadRouter
     }
     await next();
   })
-  .post('/:tid/editPostOrder', async (ctx, next) => {
+  .put('/:tid/post-order', async (ctx, next) => {
     const { db, body } = ctx;
     const { uid, fid, tid, postIdsOrder = [] } = body;
     //判断用户是否具有编辑文章回复顺序的权限
@@ -2204,7 +2204,12 @@ threadRouter
     });
     //执行拖拽的时候
     if (postIdsOrder.length !== 0) {
-      const thread = await db.ThreadModel.findOnly({ tid }, { postIds: 1 });
+      const thread = await db.ThreadModel.findOnly(
+        { tid },
+        { postIds: 1, uid: 1 },
+      );
+      const orderChangeStatus =
+        thread.uid === uid ? 'modifiedByAuthor' : 'modifiedByAdmin';
       const { postIds } = thread;
       const newPostIds = [...postIds].sort((a, b) => {
         const indexA = postIdsOrder.indexOf(a);
@@ -2220,8 +2225,7 @@ threadRouter
         {
           tid,
         },
-        { $set: { postIds: newPostIds } },
-        { new: true },
+        { $set: { postIds: newPostIds, orderChangeStatus } },
       );
     }
     await next();

@@ -9,5 +9,10 @@ if data.isEditMode
     span 保存
     br
     span 复序
-
+if(data.orderChangeStatus !== 'noChangeByAnyone')
+  button.btn.btn-xs.btn-danger(style='float:right')
+    if(data.orderChangeStatus === 'modifiedByAdmin')
+      span 管理员已更改文章回复顺序
+    if(data.orderChangeStatus === 'modifiedByAuthor')
+      span 文章作者已更改文章回复顺序
 

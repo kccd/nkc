@@ -163,6 +163,12 @@ const threadSchema = new Schema(
       default: 0,
       index: 1,
     },
+    //文章回复顺序是否改变，三个字段noChangeByAnyone，modifiedByAdmin，modifiedByAuthor
+    orderChangeStatus: {
+      type: String,
+      default: 'noChangeByAnyone',
+      index: 1,
+    },
 
     // 所有回复的鼓励总数
     encourageTotal: {

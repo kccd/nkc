@@ -890,5 +890,6 @@
   "getLeftDrawData": "小屏时获取左侧抽屉数据",
   "getUserDrawData": "小屏时获取右侧抽屉数据",
   "getUserNavData": "大屏时获取登录用户卡片数据",
-  "modifyAllPostOrder": "调整任意用户的文章回复顺序"
+  "modifyAllPostOrder": "调整任意用户的文章回复顺序",
+  "editThreadPostOrder": "调整文章回复顺序"
 }

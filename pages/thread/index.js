@@ -15,6 +15,13 @@ var surveyForms = [],
   _id;
 
 const commonModel = new NKC.modules.CommonModal();
+
+// const orderChangeStatus = {
+//   noChangeByAnyone: 'noChangeByAnyone',
+//   modifiedByAdmin: 'modifiedByAdmin',
+//   modifiedByAuthor: 'modifiedByAuthor',
+// };
+
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function () {
@@ -637,7 +644,7 @@ const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 function finishedEditPostOrder(fid, tid) {
   if (postIdsOrder.length !== 0) {
     const uid = NKC.configs.uid;
-    nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
+    nkcAPI('/t/' + tid + '/post-order', 'PUT', {
       uid,
       fid: [fid],
       tid,
