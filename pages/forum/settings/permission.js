@@ -1,4 +1,4 @@
-import {objToStr} from "../../lib/js/tools";
+import { objToStr } from '../../lib/js/tools';
 const data = NKC.methods.getDataById('data');
 const selectUser = new NKC.modules.SelectUser();
 const app = new Vue({
@@ -11,26 +11,27 @@ const app = new Vue({
     operations: data.operation,
     libraryClosed: data.libraryClosed,
     saving: false,
-    moderators: data.moderators
+    moderators: data.moderators,
   },
   computed: {
     users() {
-      const {moderators} = this;
+      const { moderators } = this;
       const users = {};
-      for(const u of moderators) {
+      for (const u of moderators) {
         users[u.uid] = u;
       }
       return users;
     },
-    operationsId: function() {
+    operationsId: function () {
       var arr = [];
-      for(var i = 0; i < this.operations.length; i++) {
+      for (var i = 0; i < this.operations.length; i++) {
         arr.push(this.operations[i].name);
       }
       return arr;
-    }
+    },
   },
   mounted() {
+    console.log(this.forum, 'forum');
     this.initUserPanel();
   },
   updated() {
@@ -43,8 +44,8 @@ const app = new Vue({
         window.floatUserPanel.initPanel();
       }, 500)*/
     },
-    selectAll: function(p) {
-      if(p.operationsId.length === this.operationsId.length) {
+    selectAll: function (p) {
+      if (p.operationsId.length === this.operationsId.length) {
         p.operationsId = [];
       } else {
         p.operationsId = this.operationsId;
@@ -55,11 +56,13 @@ const app = new Vue({
     },
     addModerator() {
       const self = this;
-      selectUser.open(data => {
-        const {users, usersId} = data;
+      selectUser.open((data) => {
+        const { users, usersId } = data;
         self.moderators = self.moderators.concat(users);
-        for(const uid of usersId) {
-          if(!self.forum.moderators.includes(uid)) self.forum.moderators.push(uid);
+        for (const uid of usersId) {
+          if (!self.forum.moderators.includes(uid)) {
+            self.forum.moderators.push(uid);
+          }
         }
       });
     },
@@ -68,41 +71,41 @@ const app = new Vue({
       const typeName = {
         create: '开设',
         open: '开启',
-        close: '关闭'
+        close: '关闭',
       }[type];
       sweetQuestion(`确定要${typeName}文库？`)
         .then(() => {
-          return nkcAPI("/f/" + fid + "/library", "POST", {
-            type: type
+          return nkcAPI('/f/' + fid + '/library', 'POST', {
+            type: type,
           });
         })
-        .then(function(data) {
-          const {libraryClosed, library} = data;
+        .then(function (data) {
+          const { libraryClosed, library } = data;
           self.forum.lid = library._id;
           self.libraryClosed = libraryClosed;
-          sweetSuccess("执行成功");
+          sweetSuccess('执行成功');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
+        });
     },
     save() {
-      const {forum} = this;
+      const { forum } = this;
       this.saving = true;
       const self = this;
       return nkcAPI(`/f/${forum.fid}/settings/permission`, 'PUT', {
-        forum
+        forum,
       })
         .then(() => {
           sweetSuccess('保存成功');
           self.saving = false;
         })
-        .catch(err => {
+        .catch((err) => {
           self.saving = false;
           sweetError(err);
         });
-    }
-  }
+    },
+  },
 });
 
 Object.assign(window, {

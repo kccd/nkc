@@ -78,6 +78,11 @@ const threadSchema = new Schema(
       index: 1,
       default: false,
     },
+    postIds: {
+      type: [String],
+      default: [],
+      index: 1,
+    },
     //文章内容第一个pid
     oc: {
       type: String,
@@ -156,6 +161,12 @@ const threadSchema = new Schema(
     voteDown: {
       type: Number,
       default: 0,
+      index: 1,
+    },
+    //文章回复顺序是否改变，三个字段default，admin，author
+    orderStatus: {
+      type: String,
+      default: 'default',
       index: 1,
     },
 
@@ -370,6 +381,7 @@ threadSchema.methods.extendLastPost = async function () {
       .limit(1)
   )[0]);
 };
+
 /*
   拓展文章的专业
   @param types 数组，专业的类型：mainForums, minorForums, customForums(自定义，待定)
@@ -860,6 +872,17 @@ const defaultOptions = {
   removeLink: true,
   threadCategory: true,
 };
+/*
+ * 获取orderStatus的地段状态
+ * */
+threadSchema.statics.getOrderStatus = async function () {
+  return {
+    default: 'default',
+    author: 'author',
+    admin: 'admin',
+  };
+};
+
 threadSchema.statics.extendThreads = async (threads, options) => {
   const nkcRender = require('../nkcModules/nkcRender');
   const o = Object.assign({}, defaultOptions);
@@ -925,7 +948,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       tcId = tcId.concat(thread.tcId || []);
     }
   });
-
   if (o.threadCategory) {
     const ThreadCategoryModel = mongoose.model('threadCategories');
     const threadCategories = await ThreadCategoryModel.getCategoriesById([
@@ -1101,7 +1123,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         thread.lastPost = lastPost.toObject();
       }
     }
-
     if (o.extendColumns) {
       const columns = [];
       for (const cid of thread.columnsId) {
@@ -1361,6 +1382,7 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   } else {
     toppedThreadsId = homeSettings.toppedThreadsId;
   }
+
   const threadsId = [];
   const articlesId = [];
   for (const t of toppedThreadsId) {
@@ -1384,6 +1406,7 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
     status: normal,
   });
   const articlesObj = {};
+
   articles = await ArticleModel.getArticlesInfo(articles);
   articles.map((article) => (articlesObj[article._id] = article));
   threads = await ThreadModel.extendThreads(threads, {

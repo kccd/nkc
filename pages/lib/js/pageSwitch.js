@@ -21,6 +21,9 @@ export function visitUrl(url, blank) {
     }
   }
 }
+export function visitUrlReplace(url) {
+  window.location.replace(url);
+}
 
 export function setPageTitle(title) {
   $('title').text(title);

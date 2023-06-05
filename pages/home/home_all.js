@@ -1,10 +1,10 @@
 window.ForumSelector = undefined;
-window.data = NKC.methods.getDataById("data");
+window.data = NKC.methods.getDataById('data');
 const commonModel = new NKC.modules.CommonModal();
 const fixBlockHeightClass = 'fix-block-height';
-import Sortable from "sortablejs";
+import Sortable from 'sortablejs';
 
-$(function() {
+$(function () {
   // 轮播图
   var swiper = new Swiper('.swiper-container', {
     pagination: {
@@ -21,27 +21,31 @@ $(function() {
       disableOnInteraction: false,
     },
   });
-  swiper.el.onmouseover = function(){
+  swiper.el.onmouseover = function () {
     swiper.autoplay.stop();
   };
-  swiper.el.onmouseleave = function() {
+  swiper.el.onmouseleave = function () {
     swiper.autoplay.start();
   };
   // 监听页面滚动 更改header样式
-  $(window).scroll(function(event){
+  $(window).scroll(function (event) {
     const scrollTop = $(window).scrollTop();
-    const header = $(".navbar-default.nkcshade");
-    if(scrollTop > 10) {
-      header.addClass("home-fixed-header");
+    const header = $('.navbar-default.nkcshade');
+    if (scrollTop > 10) {
+      header.addClass('home-fixed-header');
     } else {
-      header.removeClass("home-fixed-header");
+      header.removeClass('home-fixed-header');
     }
   });
 });
 function initSortable() {
   //在手机端不可拖动元素
-  if(NKC.configs.isApp) return;
-  const masterContainerL = document.getElementsByClassName('home-categories-left')[0];
+  if (NKC.configs.isApp) {
+    return;
+  }
+  const masterContainerL = document.getElementsByClassName(
+    'home-categories-left',
+  )[0];
   new Sortable(masterContainerL, {
     group: 'master',
     invertSwap: true,
@@ -49,9 +53,11 @@ function initSortable() {
     animation: 150,
     fallbackOnBody: true,
     swapThreshold: 0.65,
-    onEnd: changeOrder
+    onEnd: changeOrder,
   });
-  const masterContainerR = document.getElementsByClassName('home-categories-right')[0];
+  const masterContainerR = document.getElementsByClassName(
+    'home-categories-right',
+  )[0];
   new Sortable(masterContainerR, {
     group: 'master',
     invertSwap: true,
@@ -59,33 +65,37 @@ function initSortable() {
     animation: 150,
     fallbackOnBody: true,
     swapThreshold: 0.65,
-    onEnd: changeOrder
+    onEnd: changeOrder,
   });
 }
-function changeOrder(){
+function changeOrder() {
   const leftDom = $('.home-categories-left>.home-forums-list');
   const rightDom = $('.home-categories-right>.home-forums-list');
   const left = [];
   const right = [];
-  for(let i = 0; i < leftDom.length; i++) {
+  for (let i = 0; i < leftDom.length; i++) {
     const m = leftDom.eq(i);
     let cid = m.attr('id');
-    if(cid.indexOf('new_') === 0) continue;
+    if (cid.indexOf('new_') === 0) {
+      continue;
+    }
     cid = cid.split('_').pop();
     left.push(cid);
   }
-  for(let i = 0; i < rightDom.length; i++) {
+  for (let i = 0; i < rightDom.length; i++) {
     const m = rightDom.eq(i);
     let cid = m.attr('id');
-    if(cid.indexOf('new_') === 0) continue;
+    if (cid.indexOf('new_') === 0) {
+      continue;
+    }
     cid = cid.split('_').pop();
     right.push(cid);
   }
   nkcAPI(`/nkc/home/block`, 'PUT', {
     homeBlocksId: {
       left,
-      right
-    }
+      right,
+    },
   })
     .then(() => {
       console.log(`顺序已保存`);
@@ -97,7 +107,7 @@ function create() {
   scrollToTop();
   const vueAppId = getVueAppId('new_blockForm');
   let app = apps[vueAppId];
-  if(!app) {
+  if (!app) {
     app = initVue(`blockForm`, 'new');
     apps[vueAppId] = app;
   }
@@ -108,10 +118,10 @@ const apps = {};
 function getVueAppId(cid) {
   return `vue_app_${cid}`;
 }
-function editorBlock(bid){
+function editorBlock(bid) {
   const vueAppId = getVueAppId(bid);
   let app = apps[vueAppId];
-  if(!app) {
+  if (!app) {
     //创建vue实例
     app = initVue(bid, 'edit');
     apps[vueAppId] = app;
@@ -119,9 +129,9 @@ function editorBlock(bid){
   app.showForm();
 }
 //创建vue实例
-function initVue(bid, type){
+function initVue(bid, type) {
   let cid;
-  if(type === 'new') {
+  if (type === 'new') {
     cid = `new_${bid}`;
   } else {
     cid = `block_${bid}`;
@@ -136,12 +146,12 @@ function initVue(bid, type){
       loading: true,
       //已选择的专业
       forums: [],
-      threads:[],
+      threads: [],
       form: {
-        name:'',
+        name: '',
         forumsId: [],
         tcId: [],
-        digest: false ,
+        digest: false,
         origin: false,
         postCountMin: 0,
         voteUpMin: 0,
@@ -168,8 +178,8 @@ function initVue(bid, type){
         autoThread: [
           {
             sort: 'random',
-            count: 20
-          }
+            count: 20,
+          },
         ],
         autoThreadsId: [],
         fixedThreadsId: [],
@@ -182,79 +192,93 @@ function initVue(bid, type){
       isNewForm() {
         return this.type === 'new';
       },
-      categoriesId(){
-        const {selectedHomeCategoriesId} = this;
-        for(const tc of selectedHomeCategoriesId) {
-          if(tc.nodeId === 'default') continue;
+      categoriesId() {
+        const { selectedHomeCategoriesId } = this;
+        for (const tc of selectedHomeCategoriesId) {
+          if (tc.nodeId === 'default') {
+            continue;
+          }
           this.form.tcId.push(tc.nodeId);
         }
         return arr;
       },
       forumsObj() {
-        const {forums} = this;
+        const { forums } = this;
         const obj = {};
-        for(const forum of forums) {
+        for (const forum of forums) {
           obj[forum.fid] = forum;
         }
         return obj;
       },
       selectedForums() {
-        const {forumsObj, form} = this;
+        const { forumsObj, form } = this;
         const arr = [];
-        for(const fid of form.forumsId) {
+        for (const fid of form.forumsId) {
           const forum = forumsObj[fid];
-          if(!forum) continue;
+          if (!forum) {
+            continue;
+          }
           arr.push(forum);
         }
         return arr;
       },
       threadObj() {
-        const {threads} = this;
+        const { threads } = this;
         const obj = {};
-        for(const thread of threads) {
+        for (const thread of threads) {
           obj[thread.tid] = thread;
         }
         return obj;
       },
       selectedFixThreads() {
-        const {threadObj, form} = this;
+        const { threadObj, form } = this;
         const arr = [];
-        for(const tid of form.fixedThreadsId) {
+        for (const tid of form.fixedThreadsId) {
           const thread = threadObj[tid];
-          if(!thread) continue;
+          if (!thread) {
+            continue;
+          }
           arr.push(thread);
         }
         return arr;
       },
       selectedAutoThreads() {
-        const {threadObj, form} = this;
+        const { threadObj, form } = this;
         const arr = [];
-        for(const tid of form.autoThreadsId) {
+        for (const tid of form.autoThreadsId) {
           const thread = threadObj[tid];
-          if(!thread) continue;
+          if (!thread) {
+            continue;
+          }
           arr.push(thread);
         }
         return arr;
-      }
+      },
     },
     methods: {
-      delThreadId(tid, threadsId){
+      delThreadId(tid, threadsId) {
         const index = threadsId.indexOf(tid);
-        if(index === -1) return;
+        if (index === -1) {
+          return;
+        }
         threadsId.splice(index, 1);
       },
       getUrl: NKC.methods.tools.getUrl,
       showForm() {
-        const {bid} = this;
+        const { bid } = this;
         this.loading = true;
         this.show = true;
-        if(this.isNewForm) {
+        if (this.isNewForm) {
           this.loading = false;
           this.showTid = false;
         } else {
           const oldContainer = $(`#block_${bid}>.home-threads`);
-          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`);
-          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-save-editor`);
+          const editorBlockDom = $(
+            `#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`,
+          );
+          const saveBlockDom = $(
+            `#block_${bid}>.panel-header>.home-forums-list-options>.btn-save-editor`,
+          );
           saveBlockDom.show();
           editorBlockDom.hide();
           oldContainer.hide();
@@ -262,33 +286,37 @@ function initVue(bid, type){
         }
       },
       hideForm() {
-        const {bid} = this;
+        const { bid } = this;
         this.show = false;
-        if(!this.isNewForm) {
+        if (!this.isNewForm) {
           const oldContainer = $(`#block_${bid}>.home-threads`);
-          const editorBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`);
-          const saveBlockDom = $(`#block_${bid}>.panel-header>.home-forums-list-options>.btn-save-editor`);
+          const editorBlockDom = $(
+            `#block_${bid}>.panel-header>.home-forums-list-options>.btn-editor-block`,
+          );
+          const saveBlockDom = $(
+            `#block_${bid}>.panel-header>.home-forums-list-options>.btn-save-editor`,
+          );
           saveBlockDom.hide();
           editorBlockDom.show();
           oldContainer.show();
         }
       },
       saveForm() {
-        const {form, isNewForm, bid} = this;
+        const { form, isNewForm, bid } = this;
         let url = `/nkc/home/block/${bid}`;
         let method = `PUT`;
 
-        if(isNewForm) {
+        if (isNewForm) {
           url = `/nkc/home/block`;
           method = 'POST';
         }
         const _this = this;
 
         nkcAPI(url, method, {
-          block: form
+          block: form,
         })
           .then((data) => {
-            if(isNewForm) {
+            if (isNewForm) {
               screenTopAlert(`保存成功`);
               setTimeout(() => {
                 window.location.reload();
@@ -298,14 +326,14 @@ function initVue(bid, type){
               _this.hideForm();
             }
           })
-          .catch(err => {
-            sweetError(err)
-          })
+          .catch((err) => {
+            sweetError(err);
+          });
       },
-      getData(){
-        const {bid} = this;
+      getData() {
+        const { bid } = this;
         nkcAPI('nkc/home/block/' + bid, 'GET', {})
-          .then(data => {
+          .then((data) => {
             this.form = data.homeBlock;
             this.forums = data.forums;
             this.selectedHomeCategoriesId = data.homeBlock.tcId;
@@ -313,33 +341,37 @@ function initVue(bid, type){
             this.loading = false;
             this.threads = data.threads;
           })
-          .catch(err => {sweetError(err)});
+          .catch((err) => {
+            sweetError(err);
+          });
       },
       //选择文章列表样式
-      selectBlockStyle(){
+      selectBlockStyle() {
         const self = this;
-        commonModel.open(data => {
-          this.form.blockStyle.headerTitleColor = data[0].value;
-          this.form.blockStyle.backgroundColor = data[1].value;
-          /*this.form.blockStyle.forumColor = data[2].value;
+        commonModel.open(
+          (data) => {
+            this.form.blockStyle.headerTitleColor = data[0].value;
+            this.form.blockStyle.backgroundColor = data[1].value;
+            /*this.form.blockStyle.forumColor = data[2].value;
           this.form.blockStyle.titleColor = data[3].value;
           this.form.blockStyle.abstractColor = data[4].value;
           this.form.blockStyle.infoColor = data[5].value;*/
-          commonModel.close();
-        }, {
-          title: '文章列表样式',
-          data: [
-            {
-              dom: 'input',
-              label: '模块名称颜色',
-              value: this.form.blockStyle.headerTitleColor
-            },
-            {
-              dom: 'input',
-              label: '模块背景颜色',
-              value: this.form.blockStyle.backgroundColor
-            },
-            /*{
+            commonModel.close();
+          },
+          {
+            title: '文章列表样式',
+            data: [
+              {
+                dom: 'input',
+                label: '模块名称颜色',
+                value: this.form.blockStyle.headerTitleColor,
+              },
+              {
+                dom: 'input',
+                label: '模块背景颜色',
+                value: this.form.blockStyle.backgroundColor,
+              },
+              /*{
               dom: 'input',
               label: '用户名颜色',
               value: this.form.blockStyle.usernameColor
@@ -364,63 +396,72 @@ function initVue(bid, type){
               label: '时间等其他信息颜色',
               value: this.form.blockStyle.infoColor
             }*/
-          ]
-        })
+            ],
+          },
+        );
       },
       addAutoThreadItem() {
         this.form.autoThread.push({
           sort: 'random',
-          count: 20
+          count: 20,
         });
       },
       removeFromArray(arr, index) {
         arr.splice(index, 1);
       },
       //移除选中的专业
-      removeForum(fid){
+      removeForum(fid) {
         // this.form.forumsId = this.form.forumsId.filter(id => fid !== id);
         const index = this.form.forumsId.indexOf(fid);
-        if(index === -1) return;
+        if (index === -1) {
+          return;
+        }
         this.form.forumsId.splice(index, 1);
       },
       // 获取已选择文章分类ID组成的数组
       selectedCategoriesId() {
         var arr = [];
         var selectedForums = this.selectedForums;
-        for(var i = 0; i < selectedForums.length; i++) {
+        for (var i = 0; i < selectedForums.length; i++) {
           var forum = selectedForums[i];
-          if(forum.fid) arr.push(forum.fid);
+          if (forum.fid) {
+            arr.push(forum.fid);
+          }
         }
         return arr;
       },
       //选择专业
-      selectForums(){
+      selectForums() {
         var self = this;
-        if(!window.MoveThread)
+        if (!window.MoveThread) {
           window.MoveThread = new NKC.modules.MoveThread();
-        window.MoveThread.open(function(res) {
-          const {originForums, forumsId} = res;
-          self.forums.push(...originForums);
-          self.form.forumsId = forumsId;
-          /*for(const fid of forumsId) {
+        }
+        window.MoveThread.open(
+          function (res) {
+            const { originForums, forumsId } = res;
+            self.forums.push(...originForums);
+            self.form.forumsId = forumsId;
+            /*for(const fid of forumsId) {
             if(self.form.forumsId.includes(fid)) continue;
             self.form.forumsId.push(fid);
           }*/
-          window.MoveThread.close();
-        }, {
-          hideMoveType: true,
-          forumCountLimit: 999,
-          mode: 'selector',
-          selectForumCategory: false,
-          selectedForumsId: self.form.forumsId,
-        });
+            window.MoveThread.close();
+          },
+          {
+            hideMoveType: true,
+            forumCountLimit: 999,
+            mode: 'selector',
+            selectForumCategory: false,
+            selectedForumsId: self.form.forumsId,
+          },
+        );
       },
     },
   });
   return app;
 }
 //删除
-function deleteHomeBlock(homeBlockId){
+function deleteHomeBlock(homeBlockId) {
   return sweetQuestion(`确定要删除当前模块吗？`)
     .then(() => {
       return nkcAPI(`/nkc/home/block/${homeBlockId}`, 'DELETE', {});
@@ -431,14 +472,14 @@ function deleteHomeBlock(homeBlockId){
     .catch(sweetError);
 }
 //屏蔽
-function disabledHomeBlock(homeBlockId, disabled){
+function disabledHomeBlock(homeBlockId, disabled) {
   nkcAPI(`/nkc/home/block/${homeBlockId}/disabled`, 'PUT', {
-    disabled
+    disabled,
   })
     .then(() => {
       sweetSuccess(`执行成功`);
     })
-    .catch(sweetError)
+    .catch(sweetError);
 }
 
 const defaultButtonStatus = {
@@ -463,12 +504,12 @@ function renderButtons(status) {
   const create = $('.admin-create');
   const moveHandle = $('.move-handle');
   const saveEditor = $('.btn-saveEditor');
-  status.editor? editor.show(): editor.hide();
-  status.finished? finished.show(): finished.hide();
-  status.create? create.show(): create.hide();
-  status.handle? moveHandle.show(): moveHandle.hide()
+  status.editor ? editor.show() : editor.hide();
+  status.finished ? finished.show() : finished.hide();
+  status.create ? create.show() : create.hide();
+  status.handle ? moveHandle.show() : moveHandle.hide();
 
-  if(status.editor) {
+  if (status.editor) {
     $('.home-forums-list .home-category-master-handle').removeClass('move');
   } else {
     $('.home-forums-list .home-category-master-handle').addClass('move');
@@ -480,7 +521,7 @@ function renderButtons(status) {
 renderButtons(defaultButtonStatus);
 
 //进入编辑模式
-function editor(){
+function editor() {
   renderButtons(editorButtonStatus);
   initSortable();
 }
@@ -492,7 +533,7 @@ function expandList(homeBlockId) {
 
 function fixBlockHeight(blockDom) {
   const fixed = blockDom.hasClass(fixBlockHeightClass);
-  if(!fixed) {
+  if (!fixed) {
     blockDom.addClass(fixBlockHeightClass);
     blockDom.find('.icon-expand').text('展开');
   } else {
@@ -502,19 +543,23 @@ function fixBlockHeight(blockDom) {
 }
 
 function fixAllBlockHeight(fixed) {
-  const blocks = $('.home-categories-left>.home-forums-list, .home-categories-right>.home-forums-list');
-  if(fixed) {
+  const blocks = $(
+    '.home-categories-left>.home-forums-list, .home-categories-right>.home-forums-list',
+  );
+  if (fixed) {
     blocks.addClass(fixBlockHeightClass);
   } else {
     blocks.removeClass(fixBlockHeightClass);
   }
 }
 
-function finished(){
+function finished() {
   renderButtons(defaultButtonStatus);
   fixAllBlockHeight(false);
-  for(const id in apps) {
-    if(!apps.hasOwnProperty(id)) continue;
+  for (const id in apps) {
+    if (!apps.hasOwnProperty(id)) {
+      continue;
+    }
     apps[id].hideForm();
   }
 }
@@ -537,5 +582,5 @@ Object.assign(window, {
   deleteHomeBlock,
   editorBlock,
   disabledHomeBlock,
-  expandList
+  expandList,
 });

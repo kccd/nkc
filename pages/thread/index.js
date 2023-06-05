@@ -3,13 +3,19 @@ import { RNSetSharePanelStatus } from '../lib/js/reactNative';
 import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
+import Sortable from 'sortablejs';
+import { sweetError } from '../lib/js/sweetAlert';
+import { debounce } from '../lib/js/execution';
+import { visitUrlReplace } from '../lib/js/pageSwitch';
 
 const socket = getSocket();
 var surveyForms = [],
   draftId = '',
   author = {},
   _id;
+
 const commonModel = new NKC.modules.CommonModal();
+
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function () {
@@ -86,6 +92,7 @@ $(document).ready(function () {
   if ($(window).width() < 433) {
     $('.ThreadTitle1').css('width', '65%');
   }
+
   // var qrcode = geid('qrcode');
   // if(qrcode) {
   // 	var path = window.location.href;
@@ -522,6 +529,175 @@ function setSubmitButton(submitting) {
     button.html('回复');
   }
 }
+
+//编辑回复顺序
+//判断用户是否进入了编辑模式页面
+let sortable = null;
+
+let postIdsOrder = [];
+
+// let replaceablePost = null;
+
+let isSingleChange = false;
+
+const dropPostContainer = document.getElementsByClassName(
+  'single-posts-container',
+)[0];
+
+const { isEditMode } = NKC.methods.getDataById('isEditMode');
+
+//单次拖拽结束
+function onEndDrop(event) {
+  const items = Array.from(event.from.children);
+  postIdsOrder = items
+    .filter((item) => item.getAttribute('data-pid') !== null)
+    .map((item) => {
+      return item.getAttribute('data-pid');
+    });
+  updatePostSort();
+}
+
+if (isEditMode) {
+  sortable = new Sortable(dropPostContainer, {
+    group: 'post',
+    sort: true,
+    animation: 500,
+    invertSwap: true,
+    handle: '.editOrder',
+    forceFallback: true,
+    scroll: true,
+    onEnd: onEndDrop,
+  });
+  handelFoldAll();
+  updatePostSort();
+}
+
+//点击折叠全部
+function handelFoldAll() {
+  const postContainer = document.querySelectorAll('.single-post-container');
+  postContainer.forEach((item) => {
+    //为了区分置顶回复，和高赞回复
+    item.children.forEach((child) => {
+      if (child.classList.contains('single-post-edit')) {
+        item.classList.add('collapsed');
+      }
+    });
+  });
+}
+//点击展开单个
+function handelExpand(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  item.classList.remove('collapsed');
+  event.target.style.display = 'none';
+  event.target.nextElementSibling.style.display = 'inline-block';
+}
+//点击折叠单个
+function handelFold(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  event.target.style.display = 'none';
+  event.target.previousElementSibling.style.display = 'inline-block';
+  item.classList.add('collapsed');
+}
+//handleMoveUp与handleMoveDown的公共部分
+function handleMove(event, fid, tid, direction) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const parentBox = item.parentNode;
+  const currentIndex = Array.from(parentBox.children).indexOf(item);
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex >= 0 && targetIndex < parentBox.children.length) {
+    parentBox.insertBefore(
+      item,
+      direction === 'up'
+        ? parentBox.children[targetIndex]
+        : parentBox.children[targetIndex + 1],
+    );
+    postIdsOrder = [...parentBox.children].map((child) => {
+      return child.getAttribute('data-pid');
+    });
+    updatePostSort();
+  } else {
+    sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
+  }
+}
+//点击文章回复向上移动一格
+function handleMoveUp(event, fid, tid) {
+  handleMove(event, fid, tid, 'up');
+}
+// 点击文章回复向下移动一格
+function handleMoveDown(event, fid, tid) {
+  handleMove(event, fid, tid, 'down');
+}
+//添加防抖函数
+const handleMoveDebounce = debounce(handleMoveUp, 100);
+const handleMoveDownDebounce = debounce(handleMoveDown, 100);
+//编辑完毕回复顺序
+function finishedEditPostOrder(fid, tid) {
+  if (postIdsOrder.length !== 0) {
+    const uid = NKC.configs.uid;
+    nkcAPI('/t/' + tid + '/post-order', 'PUT', {
+      uid,
+      fid: [fid],
+      tid,
+      postIdsOrder,
+    })
+      .then((res) => {
+        if (res) {
+          postIdsOrder = [];
+          if (sortable) {
+            sortable.destroy(); //清除这个sortable
+          }
+          sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
+          setTimeout(() => {
+            visitUrlReplace(`/t/${tid}`);
+          }, 100);
+        }
+      })
+      .catch((error) => {
+        sweetError(error);
+      });
+  } else {
+    sweetError('文章回复顺序并未调整，即将离开当前页面');
+    setTimeout(() => {
+      visitUrlReplace(`/t/${tid}`);
+    }, 100);
+  }
+}
+const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
+function handelInsert(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const parentBox = item.parentNode;
+  const totalLength = parentBox.children.length;
+  const targetIndex = Number(event.target.previousElementSibling.value) - 1;
+  Promise.resolve()
+    .then(() => {
+      if (isNaN(targetIndex)) {
+        throw new Error('仅支持数字格式');
+      }
+      const currentIndex = Array.from(parentBox.children).indexOf(item);
+      if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
+        updatePostSort();
+        throw new Error('插入的序号不能与当前序号一致');
+      } else if (targetIndex < 0 || targetIndex > totalLength - 1) {
+        updatePostSort();
+        throw new Error('不存在当前序号');
+      } else {
+        parentBox.insertBefore(item, parentBox.children[targetIndex]);
+        postIdsOrder = [...parentBox.children].map((childItem) => {
+          return childItem.getAttribute('data-pid');
+        });
+        updatePostSort();
+      }
+    })
+    .catch((err) => {
+      sweetError(err);
+    });
+}
+
 // 发表回复
 function submit(tid) {
   Promise.resolve()
@@ -560,7 +736,15 @@ function submit(tid) {
       setSubmitButton(false);
     });
 }
-
+//最新的回复排序号
+function updatePostSort() {
+  const parentElement = document.querySelector('.single-posts-container');
+  const childElements = parentElement.children;
+  childElements.forEach((element, index) => {
+    const circleElement = element.querySelector('.real-time-floor');
+    circleElement.value = `${index + 1}`;
+  });
+}
 // 点击引用
 function quotePost(pid) {
   if (!window.quotePostApp) {
@@ -1555,4 +1739,10 @@ Object.assign(window, {
   insertRenderedComment,
   pushBlock,
   pushHomeBlockId,
+  handleMoveDebounce,
+  handleMoveDownDebounce,
+  handelExpand,
+  handelFold,
+  finishedEditPostOrderDebounce,
+  handelInsert,
 });

@@ -1,0 +1,18 @@
+
++includeCSS('/thread/editOrder/editOrder.css')
+if(!data.isEditMode)
+  a.editOrder(href=`/t/${data.thread.tid}?e=true#post-top`)
+    button 调整复序
+if data.isEditMode
+  button.admin-finished.saveButton(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`) 保存复序
+  button.fixedButton(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`)
+    span 保存
+    br
+    span 复序
+if(data.orderStatus !== 'default')
+  div(style='float:right;color:#555')
+    if(data.orderStatus === 'author')
+      span 作者指定排序
+    else
+      span 管理员指定排序
+
