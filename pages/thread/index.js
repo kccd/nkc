@@ -6,7 +6,7 @@ import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
 import { sweetError } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
-import { visitUrlReplace } from "../lib/js/pageSwitch";
+import { visitUrlReplace } from '../lib/js/pageSwitch';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -535,7 +535,7 @@ let sortable = null;
 
 let postIdsOrder = [];
 
-let replaceablePost = null;
+// let replaceablePost = null;
 
 let isSingleChange = false;
 
@@ -608,32 +608,35 @@ function handleMove(event, fid, tid, direction) {
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
   if (targetIndex >= 0 && targetIndex < parentBox.children.length) {
-    const ownDataPid = item.getAttribute('data-pid');
-    const previousItemId =
-      parentBox.children[targetIndex].getAttribute('data-pid');
-    replaceablePost = { previousItemId, ownDataPid };
-    const uid = NKC.configs.uid;
-    nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
-      uid,
-      fid: [fid],
-      tid,
-      replaceablePost,
-    })
-      .then((res) => {
-        if (res) {
-          replaceablePost = null;
-          isSingleChange = true;
-        }
-      })
-      .catch((error) => {
-        sweetError(error);
-      });
+    // const ownDataPid = item.getAttribute('data-pid');
+    // const previousItemId =
+    //   parentBox.children[targetIndex].getAttribute('data-pid');
+    // replaceablePost = { previousItemId, ownDataPid };
+    // const uid = NKC.configs.uid;
+    // nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
+    //   uid,
+    //   fid: [fid],
+    //   tid,
+    //   replaceablePost,
+    // })
+    //   .then((res) => {
+    //     if (res) {
+    //       replaceablePost = null;
+    //       isSingleChange = true;
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     sweetError(error);
+    //   });
     parentBox.insertBefore(
       item,
       direction === 'up'
         ? parentBox.children[targetIndex]
         : parentBox.children[targetIndex + 1],
     );
+    postIdsOrder = [...parentBox.children].map((child) => {
+      return child.getAttribute('data-pid');
+    });
     getPostSort();
   } else {
     sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
@@ -675,17 +678,11 @@ function finishedEditPostOrder(fid, tid) {
       .catch((error) => {
         sweetError(error);
       });
-  } else if (!isSingleChange && postIdsOrder.length === 0) {
+  } else {
     sweetError('文章回复顺序并未调整，即将离开当前页面');
     setTimeout(() => {
       visitUrlReplace(`/t/${tid}`);
     }, 100);
-  } else {
-    sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
-    setTimeout(() => {
-      visitUrlReplace(`/t/${tid}`);
-    }, 100);
-    visitUrlReplace(`/t/${tid}`);
   }
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);

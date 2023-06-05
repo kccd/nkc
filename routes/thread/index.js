@@ -465,11 +465,8 @@ threadRouter
     let posts = [];
     // 获取回复列表
     //判断是否进入编辑模式
-    console.log(thread, 'thread');
     if (!isEditMode) {
       //没有进入编辑模式
-
-      const thread = await db.ThreadModel.findOnly({ tid });
       if (thread) {
         const { postIds } = thread;
         const top50PostsId = postIds.slice(
@@ -482,7 +479,7 @@ threadRouter
       //进入了编辑模式
       //判断是否拥有进入编辑模式的权限
       await db.ForumModel.checkEditPostPositionInRoute({
-        uid: data.user.uid,
+        uid: state.uid,
         fid: [thread.mainForumsId],
         tid,
         isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
@@ -2196,20 +2193,17 @@ threadRouter
   })
   .post('/:tid/editPostOrder', async (ctx, next) => {
     const { db, body } = ctx;
-    const { uid, fid, tid, postIdsOrder = [], replaceablePost = null } = body;
+    const { uid, fid, tid, postIdsOrder = [], } = body;
     //判断用户是否具有编辑文章回复顺序的权限
-    const havePermission = await db.ForumModel.checkEditPostPositionInRoute({
+    await db.ForumModel.checkEditPostPositionInRoute({
       uid,
       fid,
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
     });
     //执行拖拽的时候
-    if (havePermission && postIdsOrder.length !== 0) {
-      const thread = await db.ThreadModel.findOne(
-        { tid },
-        { postIds: 1 },
-      ).lean();
+    if (postIdsOrder.length !== 0) {
+      const thread = await db.ThreadModel.findOnly({ tid }, { postIds: 1 });
       const { postIds } = thread;
       const newPostIds = [...postIds].sort((a, b) => {
         const indexA = postIdsOrder.indexOf(a);
@@ -2230,25 +2224,25 @@ threadRouter
       );
     }
     //执行上下切换的时候
-    if (havePermission && replaceablePost) {
-      const { ownDataPid, previousItemId } = replaceablePost;
-      const thread = await db.ThreadModel.findOne(
-        { tid },
-        { postIds: 1 },
-      ).lean();
-      if (thread && thread.postIds) {
-        const { postIds } = thread;
-        const indexA = postIds.indexOf(ownDataPid);
-        const indexB = postIds.indexOf(previousItemId);
-        if (indexA !== -1 && indexB !== -1) {
-          [postIds[indexA], postIds[indexB]] = [
-            postIds[indexB],
-            postIds[indexA],
-          ];
-          await db.ThreadModel.updateOne({ tid }, { $set: { postIds } });
-        }
-      }
-    }
+    // if (havePermission && replaceablePost) {
+    //   const { ownDataPid, previousItemId } = replaceablePost;
+    //   const thread = await db.ThreadModel.findOne(
+    //     { tid },
+    //     { postIds: 1 },
+    //   ).lean();
+    //   if (thread && thread.postIds) {
+    //     const { postIds } = thread;
+    //     const indexA = postIds.indexOf(ownDataPid);
+    //     const indexB = postIds.indexOf(previousItemId);
+    //     if (indexA !== -1 && indexB !== -1) {
+    //       [postIds[indexA], postIds[indexB]] = [
+    //         postIds[indexB],
+    //         postIds[indexA],
+    //       ];
+    //       await db.ThreadModel.updateOne({ tid }, { $set: { postIds } });
+    //     }
+    //   }
+    // }
     await next();
   })
   //.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
