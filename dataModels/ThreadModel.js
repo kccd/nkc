@@ -163,10 +163,10 @@ const threadSchema = new Schema(
       default: 0,
       index: 1,
     },
-    //文章回复顺序是否改变，三个字段noChangeByAnyone，modifiedByAdmin，modifiedByAuthor
-    orderChangeStatus: {
+    //文章回复顺序是否改变，三个字段default，admin，author
+    orderStatus: {
       type: String,
-      default: 'noChangeByAnyone',
+      default: 'default',
       index: 1,
     },
 
@@ -381,6 +381,7 @@ threadSchema.methods.extendLastPost = async function () {
       .limit(1)
   )[0]);
 };
+
 /*
   拓展文章的专业
   @param types 数组，专业的类型：mainForums, minorForums, customForums(自定义，待定)
@@ -871,6 +872,17 @@ const defaultOptions = {
   removeLink: true,
   threadCategory: true,
 };
+/*
+ * 获取orderStatus的地段状态
+ * */
+threadSchema.statics.getOrderStatus = async function () {
+  return {
+    default: 'default',
+    author: 'author',
+    admin: 'admin',
+  };
+};
+
 threadSchema.statics.extendThreads = async (threads, options) => {
   const nkcRender = require('../nkcModules/nkcRender');
   const o = Object.assign({}, defaultOptions);

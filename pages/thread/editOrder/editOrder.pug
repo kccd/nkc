@@ -9,10 +9,10 @@ if data.isEditMode
     span 保存
     br
     span 复序
-if(data.orderChangeStatus !== 'noChangeByAnyone')
+if(data.orderStatus !== 'default')
   button.btn.btn-xs.btn-danger(style='float:right')
-    if(data.orderChangeStatus === 'modifiedByAdmin')
+    if(data.orderStatus === 'author')
       span 作者指定排序
-    if(data.orderChangeStatus === 'modifiedByAuthor')
+    if(data.orderStatus === 'admin')
       span 管理员指定排序
 

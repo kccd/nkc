@@ -1112,7 +1112,7 @@ threadRouter
     data.userSubscribeUsersId = userSubscribeUsersId;
     data.editPostPositionPermission = haveEditPositionOrder;
     data.isEditMode = isEditMode;
-    data.orderChangeStatus = thread.orderChangeStatus;
+    data.orderStatus = thread.orderStatus;
 
     // 商品信息
     if (threadShopInfo) {
@@ -2208,8 +2208,8 @@ threadRouter
         { tid },
         { postIds: 1, uid: 1 },
       );
-      const orderChangeStatus =
-        thread.uid === uid ? 'modifiedByAuthor' : 'modifiedByAdmin';
+      const { author, admin } = await db.ThreadModel.getOrderStatus();
+      const orderStatus = thread.uid === uid ? author : admin;
       const { postIds } = thread;
       const newPostIds = [...postIds].sort((a, b) => {
         const indexA = postIdsOrder.indexOf(a);
@@ -2225,7 +2225,7 @@ threadRouter
         {
           tid,
         },
-        { $set: { postIds: newPostIds, orderChangeStatus } },
+        { $set: { postIds: newPostIds, orderStatus } },
       );
     }
     await next();
