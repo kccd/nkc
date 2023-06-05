@@ -818,14 +818,15 @@ threadRouter
       thread.firstPost.uid = '';
       thread.firstPost.uidlm = '';
     }
-
-    //判断用户是否具有编辑文章回复顺序的权限
-    const { havePermission } = await db.ForumModel.checkEditPostPosition({
+    
+    const checkEditPostPosition = await db.ForumModel.checkEditPostPosition({
       uid: state.uid,
       fid: [thread.mainForumsId],
       tid,
       isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
     });
+    
+    const haveEditPositionOrder = (checkEditPostPosition.status === 200);
 
     // 发表权限判断
     // const postSettings = await db.SettingModel.getSettings('post');
@@ -1110,8 +1111,8 @@ threadRouter
     data.authorAvatarUrl = authorAvatarUrl;
     data.authorRegisterInfo = authorRegisterInfo;
     data.userSubscribeUsersId = userSubscribeUsersId;
-    data.editPostPositionPermission = havePermission;
-    data.e = e;
+    data.editPostPositionPermission = haveEditPositionOrder;
+    data.isEditMode = isEditMode;
 
     // 商品信息
     if (threadShopInfo) {
@@ -2193,7 +2194,7 @@ threadRouter
   })
   .post('/:tid/editPostOrder', async (ctx, next) => {
     const { db, body } = ctx;
-    const { uid, fid, tid, postIdsOrder = [], } = body;
+    const { uid, fid, tid, postIdsOrder = [] } = body;
     //判断用户是否具有编辑文章回复顺序的权限
     await db.ForumModel.checkEditPostPositionInRoute({
       uid,
@@ -2223,26 +2224,6 @@ threadRouter
         { new: true },
       );
     }
-    //执行上下切换的时候
-    // if (havePermission && replaceablePost) {
-    //   const { ownDataPid, previousItemId } = replaceablePost;
-    //   const thread = await db.ThreadModel.findOne(
-    //     { tid },
-    //     { postIds: 1 },
-    //   ).lean();
-    //   if (thread && thread.postIds) {
-    //     const { postIds } = thread;
-    //     const indexA = postIds.indexOf(ownDataPid);
-    //     const indexB = postIds.indexOf(previousItemId);
-    //     if (indexA !== -1 && indexB !== -1) {
-    //       [postIds[indexA], postIds[indexB]] = [
-    //         postIds[indexB],
-    //         postIds[indexA],
-    //       ];
-    //       await db.ThreadModel.updateOne({ tid }, { $set: { postIds } });
-    //     }
-    //   }
-    // }
     await next();
   })
   //.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())

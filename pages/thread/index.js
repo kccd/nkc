@@ -553,7 +553,7 @@ function onEndDrop(event) {
     .map((item) => {
       return item.getAttribute('data-pid');
     });
-  getPostSort();
+  updatePostSort();
 }
 
 if (isEditMode) {
@@ -568,7 +568,7 @@ if (isEditMode) {
     onEnd: onEndDrop,
   });
   handelFoldAll();
-  getPostSort();
+  updatePostSort();
 }
 
 //点击折叠全部
@@ -608,26 +608,6 @@ function handleMove(event, fid, tid, direction) {
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
   if (targetIndex >= 0 && targetIndex < parentBox.children.length) {
-    // const ownDataPid = item.getAttribute('data-pid');
-    // const previousItemId =
-    //   parentBox.children[targetIndex].getAttribute('data-pid');
-    // replaceablePost = { previousItemId, ownDataPid };
-    // const uid = NKC.configs.uid;
-    // nkcAPI('/t/' + tid + '/editPostOrder', 'POST', {
-    //   uid,
-    //   fid: [fid],
-    //   tid,
-    //   replaceablePost,
-    // })
-    //   .then((res) => {
-    //     if (res) {
-    //       replaceablePost = null;
-    //       isSingleChange = true;
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     sweetError(error);
-    //   });
     parentBox.insertBefore(
       item,
       direction === 'up'
@@ -637,7 +617,7 @@ function handleMove(event, fid, tid, direction) {
     postIdsOrder = [...parentBox.children].map((child) => {
       return child.getAttribute('data-pid');
     });
-    getPostSort();
+    updatePostSort();
   } else {
     sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
   }
@@ -692,17 +672,22 @@ function handelInsert(event) {
   const parentBox = item.parentNode;
   const totalLength = parentBox.children.length;
   const targetIndex = Number(event.target.previousElementSibling.value) - 1;
+  if (isNaN(targetIndex)) {
+    sweetError('仅支持数字格式');
+  }
   const currentIndex = Array.from(parentBox.children).indexOf(item);
-  if (currentIndex === targetIndex) {
+  if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
     sweetError('插入的序号不能与当前序号一致');
+    updatePostSort();
   } else if (targetIndex < 0 || targetIndex > totalLength - 1) {
     sweetError('不存在当前序号');
+    updatePostSort();
   } else {
     parentBox.insertBefore(item, parentBox.children[targetIndex]);
-    postIdsOrder = [...parentBox.children].map((item) => {
-      return item.getAttribute('data-pid');
+    postIdsOrder = [...parentBox.children].map((childItem) => {
+      return childItem.getAttribute('data-pid');
     });
-    getPostSort();
+    updatePostSort();
   }
 }
 
@@ -744,8 +729,8 @@ function submit(tid) {
       setSubmitButton(false);
     });
 }
-//获取最新的回复排序号
-function getPostSort() {
+//最新的回复排序号
+function updatePostSort() {
   const parentElement = document.querySelector('.single-posts-container');
   const childElements = parentElement.children;
   childElements.forEach((element, index) => {

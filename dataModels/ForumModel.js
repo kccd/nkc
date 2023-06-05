@@ -2219,15 +2219,14 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
   return await client.getFromJsonString(key);
 };
 
-forumSchema.statics.checkPermissionCore = async (fid,type,) => {};
 /*
- * 检查用户在指定专业的权限
+ * 检查用户在指定专业的权限的核心内容，负责检测是否符合权限内容
  * @param {String} type 执行权限类型 write: 发表, read: 阅读 , editPostPosition:编辑回复位置
  * @param {String} uid 用户ID
  * @param {[String]} fid 专业ID组成的数组
  * */
 
-forumSchema.statics.checkPermission = async (type, user, fid = []) => {
+forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
   const SettingModel = mongoose.model('settings');
   const recycleId = await SettingModel.getRecycleId();
   const ForumModel = mongoose.model('forums');
@@ -2236,11 +2235,11 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const userGradeId = userGrade ? userGrade._id : null; //获取等级
   for (const id of fid) {
     if (['write', 'writePost'].includes(type) && id === recycleId) {
-      throwErr(400, `不允许发表内容到回收站，请更换专业`);
+      return { status: 400, message: `不允许发表内容到回收站，请更换专业` };
     }
     const forum = await ForumModel.getForumByIdFromRedis(id);
     if (!forum) {
-      throwErr(400, `专业id错误 fid: ${id}`);
+      return { status: 400, message: `专业id错误 fid: ${id}` };
     }
     // 发表文章，只允许发表到最底层专业
     if (type === 'write') {
@@ -2248,7 +2247,10 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
         forum.fid,
       );
       if (childForumsId.length) {
-        throwErr(400, `不允许在父专业发表文章 fid: ${forum.fid}`);
+        return {
+          status: 400,
+          message: `不允许在父专业发表文章 fid: ${forum.fid}`,
+        };
       }
     }
     if (uid && forum.moderators.includes(uid)) {
@@ -2257,7 +2259,10 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     const { accessible, permission, displayName } = forum;
     const { rolesId, gradesId, relation } = permission[type];
     if (!accessible) {
-      throwErr(`专业「${displayName}」暂未开放，请更换专业`);
+      return {
+        status: 400,
+        message: `专业「${displayName}」暂未开放，请更换专业`,
+      };
     }
 
     let hasRole = false,
@@ -2273,26 +2278,47 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
       (relation === 'and' && (!hasRole || !hasGrade))
     ) {
       if (type === 'read') {
-        throwErr(
-          403,
-          `你没有权限阅读专业「${displayName}」下的内容，请更换专业。`,
-        );
+        return {
+          status: 403,
+          message: `你没有权限阅读专业「${displayName}」下的内容，请更换专业。`,
+        };
       } else if (type === 'write') {
-        throwErr(
-          403,
-          `你没有权限在专业「${displayName}」下发表文章，请更换专业。`,
-        );
+        return {
+          status: 403,
+          message: `你没有权限在专业「${displayName}」下发表文章，请更换专业。`,
+        };
       } else if (type === 'editPostPosition') {
-        return { havePermission: false, displayName };
+        return {
+          status: 403,
+          message: `你没有权限在专业「${displayName}」下调整复序，请更换专业。`,
+        };
       } else {
-        throwErr(
-          403,
-          `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业。`,
-        );
+        return {
+          status: 403,
+          message: `你没有权限在专业「${displayName}」下发表发表回复或评论，请更换专业。`,
+        };
       }
     } else {
-      return { havePermission: true, displayName };
+      return { status: 200, message: '该用户用于相关权限' };
     }
+  }
+};
+/*
+ * 检查用户在指定专业的权限
+ * @param {String} type 执行权限类型 write: 发表, read: 阅读 , editPostPosition:编辑回复位置
+ * @param {String} uid 用户ID
+ * @param {[String]} fid 专业ID组成的数组
+ * */
+
+forumSchema.statics.checkPermission = async (type, user, fid = []) => {
+  const ForumModel = mongoose.model('forums');
+  const { status, message } = await ForumModel.checkPermissionCore(
+    type,
+    user,
+    fid,
+  );
+  if (status !== 200) {
+    ThrowCommonError(status, message);
   }
 };
 
@@ -2328,17 +2354,17 @@ forumSchema.statics.checkEditPostPosition = async ({
   const thread = await ThreadModel.find({ tid }, { uid: 1 });
   //判断是否有管理员权限可以使用该功能
   if (isEditArticlePositionOrder) {
-    return { havePermission: true };
+    return { status: 200 };
   }
   //判断是否为作者本人
   if (thread[0].uid !== uid) {
-    return { havePermission: false };
+    return { status: 400 };
   }
   await ForumModel.checkGlobalPostPermission(uid, 'post');
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
-  return await ForumModel.checkPermission('editPostPosition', user, fid);
+  return await ForumModel.checkPermissionCore('editPostPosition', user, fid);
 };
 
 /*
@@ -2367,19 +2393,7 @@ forumSchema.statics.checkEditPostPositionInRoute = async ({
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
-  const { havePermission, displayName } = await ForumModel.checkPermission(
-    'editPostPosition',
-    user,
-    fid,
-  );
-  if (!havePermission) {
-    ThrowCommonError(
-      403,
-      `你没有权限在专业「${displayName}」下更改文章顺序，请更换专业。`,
-    );
-  } else {
-    return true;
-  }
+  await ForumModel.checkPermission('editPostPosition', user, fid);
 };
 
 /*

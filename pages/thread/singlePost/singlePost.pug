@@ -75,7 +75,7 @@ if !isIncluded('singlePost')
   include ./singlePostEdit
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
-  mixin singlePost(props, e)
+  mixin singlePost(props, isEditMode)
     -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp, disableAutoHideContent} = props;
     -var {digest, type, tid, highlight, hide, addr} = props;
@@ -89,8 +89,8 @@ if !isIncluded('singlePost')
       data-pid=pid
       data-hide=isAuthor || disableAutoHideContent? 'not': hide
       )
-      if e
-        +singlePostEdit(e)
+
+      +singlePostEdit(isEditMode)
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
       +singlePostTop(Object.assign({}, user, {addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped,}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
