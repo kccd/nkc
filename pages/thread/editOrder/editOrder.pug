@@ -10,9 +10,9 @@ if data.isEditMode
     br
     span 复序
 if(data.orderStatus !== 'default')
-  button.btn.btn-xs.btn-danger(style='float:right')
+  div(style='float:right;color:#555')
     if(data.orderStatus === 'author')
       span 作者指定排序
-    if(data.orderStatus === 'admin')
+    else
       span 管理员指定排序
 

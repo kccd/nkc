@@ -543,6 +543,7 @@ schema.statics.extendPostComments = async (props) => {
     const commentInfo = await c.getLocationUrl();
     const result = {
       ...m,
+      docNumber: `D${c.did}`,
       content: await CommentModel.renderComment(documentObj[c.did]._id),
       docId: documentObj[c.did]._id,
       status: documentObj[c.did].status,
@@ -1191,7 +1192,7 @@ schema.statics.getCommentsInfo = async function (comments) {
   const { column: columnSource, zone: zoneSource } =
     await ArticlePostModel.getArticlePostSources();
   for (const comment of _comments) {
-    const { sid, _id, source, did } = comment;
+    const { sid, _id, did } = comment;
     const articlePost = articlePostsObj[sid];
     const commentDocument = commentDocumentsObj[did] || null;
     if (!articlePost) {

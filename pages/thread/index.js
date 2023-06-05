@@ -16,12 +16,6 @@ var surveyForms = [],
 
 const commonModel = new NKC.modules.CommonModal();
 
-// const orderChangeStatus = {
-//   noChangeByAnyone: 'noChangeByAnyone',
-//   modifiedByAdmin: 'modifiedByAdmin',
-//   modifiedByAuthor: 'modifiedByAuthor',
-// };
-
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function () {
@@ -679,23 +673,29 @@ function handelInsert(event) {
   const parentBox = item.parentNode;
   const totalLength = parentBox.children.length;
   const targetIndex = Number(event.target.previousElementSibling.value) - 1;
-  if (isNaN(targetIndex)) {
-    sweetError('仅支持数字格式');
-  }
-  const currentIndex = Array.from(parentBox.children).indexOf(item);
-  if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
-    sweetError('插入的序号不能与当前序号一致');
-    updatePostSort();
-  } else if (targetIndex < 0 || targetIndex > totalLength - 1) {
-    sweetError('不存在当前序号');
-    updatePostSort();
-  } else {
-    parentBox.insertBefore(item, parentBox.children[targetIndex]);
-    postIdsOrder = [...parentBox.children].map((childItem) => {
-      return childItem.getAttribute('data-pid');
+  Promise.resolve()
+    .then(() => {
+      if (isNaN(targetIndex)) {
+        throw new Error('仅支持数字格式');
+      }
+      const currentIndex = Array.from(parentBox.children).indexOf(item);
+      if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
+        updatePostSort();
+        throw new Error('插入的序号不能与当前序号一致');
+      } else if (targetIndex < 0 || targetIndex > totalLength - 1) {
+        updatePostSort();
+        throw new Error('不存在当前序号');
+      } else {
+        parentBox.insertBefore(item, parentBox.children[targetIndex]);
+        postIdsOrder = [...parentBox.children].map((childItem) => {
+          return childItem.getAttribute('data-pid');
+        });
+        updatePostSort();
+      }
+    })
+    .catch((err) => {
+      sweetError(err);
     });
-    updatePostSort();
-  }
 }
 
 // 发表回复

@@ -20,8 +20,10 @@ router.get('/', async (ctx, next) => {
     userGrade: data.userGrade,
     limitLevel: false,
   });
+
   for (const category of categoryForums) {
     for (const forum of category.forums) {
+      forum.src = nkcModules.tools.getUrl('forumHome', forum.fid);
       for (const childForum of forum.childrenForums) {
         childForum.src = nkcModules.tools.getUrl('forumHome', childForum.fid);
       }

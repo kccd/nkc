@@ -1,6 +1,6 @@
 if !isIncluded('singleCommentTop')
   mixin singleCommentTop(props)
-    -var {_id: cid, docId, did, username, toc, uid, avatar, userHome, gradeId, gradeName, gradeIconUrl, commentUrl, digest} = props;
+    -var {_id: cid,docNumber, docId, did, username, toc, uid, avatar, userHome, gradeId, gradeName, gradeIconUrl, commentUrl, digest} = props;
     -var {reason, reviewed, isAuthor, order, tlm, addr} = props;
     .single-post-top
       .single-post-avatar(
@@ -32,7 +32,12 @@ if !isIncluded('singleCommentTop')
             +fromNow(tlm)
           span=` IP:${addr}`
       .single-post-floor
-        a(href=commentUrl)=order + '楼'
-        .single-post-checkbox
-          label
-            input(type='checkbox' data-docId=docId)
+        .doc-order
+          a(href=commentUrl)=order + '楼'
+          .single-post-checkbox
+            label
+              input(type='checkbox' data-docId=docId)
+        .doc-number
+          include ../../docNumber
+          +docNumberCore(docNumber)
+

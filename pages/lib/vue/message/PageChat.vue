@@ -14,8 +14,8 @@
     FileDialog(:dialogVisible="isShowFileDialog" @updateDialogVisible="updateDialogVisible" :title="dialogTitle + fileCountTitle" @confirm="confirm" )
       .image.img-dialog(v-if="previewPath.length !== 0" )
         img.img-in-dialog(:src="src" v-for="src in previewPath" )
-      .fileDialog(v-if="previewName.length !== 0" v-for="fileName in previewName")
-        i(class="fa fa-file-code-o" aria-hidden="true" )
+      .file-dialog(v-if="previewName.length !== 0" v-for="fileName in previewName")
+        i(class="fa fa-file-text-o" aria-hidden="true" )
         p {{fileName}}
     //- 通用header组件
     ModuleHeader(
@@ -1193,15 +1193,20 @@ export default {
   }
 }
 
-.fileDialog {
+.file-dialog {
   //display: flex;
   //align-items: center;
-  padding: 10px;
+  @iconWidth: 3rem;
+  padding: 1rem 1rem 1rem @iconWidth;
   border: 1px solid #ccc;
   background-color: #f8f8f8;
   border-radius: 5px;
   margin-bottom: 0.5rem;
+  position: relative;
   i {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
     font-size: 24px;
     margin-right: 10px;
     color: #666;
@@ -1215,7 +1220,7 @@ export default {
 }
 
 .img-dialog {
- text-align: center;
+  text-align: center;
 }
 
 .img-in-dialog {
