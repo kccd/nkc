@@ -52,6 +52,29 @@
     padding: 1rem 1.2rem 1rem 1.2rem;
   }
 }
+.single-post-edit{
+  position: relative;
+  background-color: rgb(155, 174, 200);
+  height: 3rem;
+  padding: 0 1rem;
+  border-radius: 0.3rem;
+  line-height: 3rem;
+  user-select: none;
+  &>.editOrder{
+    color: rgb(255,255,255);
+  }
+  &>.editOrder:hover{
+    cursor: move;
+  }
+  &>.operator-button{
+    margin-left: 1rem;
+    float: right;
+    font-size: 1rem;
+    &>button{
+      height: 2rem;
+    }
+  }
+}
 .single-post-top{
   height: @postTopHeight;
   padding-left: 4rem;
@@ -69,6 +92,7 @@
       width: 100%;
       border-radius: 50%;
     }
+
   }
   .single-post-user{
     .single-post-username{
@@ -334,4 +358,38 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+}
+
+.collapsed {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5rem; /* 调整需要展示的高度 */
+  background-image: linear-gradient(to top, #ffbea1 0%, rgba(255, 255, 255, 0) 50%);
+  pointer-events: none;
+}
+
+.real-time-floor{
+  width: 3rem;
+  height: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: rgb(155, 174, 200);
+  text-align: center;
+}
+.real-time-floor:focus{
+  outline: none;
+  border-color: #5c9eff;
+  box-shadow: 0 2px 4px rgba(92, 158, 255, 0.5);
 }
