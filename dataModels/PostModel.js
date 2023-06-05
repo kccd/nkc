@@ -2547,8 +2547,8 @@ postSchema.statics.disableToDraftPosts = async function () {
  * */
 postSchema.statics.reorderByThreadModelPostsIds = async (tid, posts) => {
   const ThreadModel = mongoose.model('threads');
-  const res = await ThreadModel.find({ tid }, { postIds: 1 }).lean();
-  const { postIds } = res[0];
+  const res = await ThreadModel.findOnly({ tid }, { postIds: 1 });
+  const { postIds } = res;
   return [...posts].sort((a, b) => {
     const indexA = postIds.indexOf(a.pid);
     const indexB = postIds.indexOf(b.pid);

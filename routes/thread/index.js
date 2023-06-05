@@ -233,7 +233,7 @@ threadRouter
     const { data, db, query, nkcModules, state, internalData } = ctx;
     const { token } = query;
     const { page = 0, pid, last_page, highlight, step, t, e = false } = query;
-
+    const isEditMode = e;
     let mainForum = null;
     let forumsNav = [];
     let threadNav = [];
@@ -465,22 +465,19 @@ threadRouter
     let posts = [];
     // 获取回复列表
     //判断是否进入编辑模式
-    if (!e) {
+    console.log(thread, 'thread');
+    if (!isEditMode) {
       //没有进入编辑模式
-      const thread = await db.ThreadModel.find({ tid }).lean();
+
+      const thread = await db.ThreadModel.findOnly({ tid });
       if (thread) {
-        const { postIds } = thread[0];
+        const { postIds } = thread;
         const top50PostsId = postIds.slice(
           paging.start,
           paging.start + paging.perpage,
         );
         match.pid = { $in: top50PostsId }; // 添加的条件
-        posts = await db.PostModel.find(match);
       }
-      // posts = await db.PostModel.find(match)
-      //   .sort({ toc: 1 })
-      //   .skip(paging.start)
-      //   .limit(paging.perpage);
     } else {
       //进入了编辑模式
       //判断是否拥有进入编辑模式的权限
@@ -490,8 +487,8 @@ threadRouter
         tid,
         isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
       });
-      posts = await db.PostModel.find(match);
     }
+    posts = await db.PostModel.find(match);
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
@@ -2086,7 +2083,7 @@ threadRouter
     });
     if (!_post.parentPostId) {
       await thread.updateOne({
-        $push: { postIds: _post.pid },
+        $addToSet: { postIds: _post.pid },
       });
     }
 

@@ -2219,12 +2219,14 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
   return await client.getFromJsonString(key);
 };
 
+forumSchema.statics.checkPermissionCore = async (fid,type,) => {};
 /*
  * 检查用户在指定专业的权限
  * @param {String} type 执行权限类型 write: 发表, read: 阅读 , editPostPosition:编辑回复位置
  * @param {String} uid 用户ID
  * @param {[String]} fid 专业ID组成的数组
  * */
+
 forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const SettingModel = mongoose.model('settings');
   const recycleId = await SettingModel.getRecycleId();
@@ -2293,6 +2295,7 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     }
   }
 };
+
 /*
  * 验证用户是否能在指定专业发表文章
  * @param {[String]} 专业ID组成的数组

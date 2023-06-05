@@ -6,6 +6,7 @@ import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
 import { sweetError } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
+import { visitUrlReplace } from "../lib/js/pageSwitch";
 
 const socket = getSocket();
 var surveyForms = [],
@@ -488,7 +489,6 @@ function autoSaveDraft() {
 }
 // 保存草稿
 function saveDraft(threadId, userId) {
-  Promise.resolve();
   Promise.resolve()
     .then(function () {
       modifyMathJax();
@@ -542,8 +542,8 @@ let isSingleChange = false;
 const dropPostContainer = document.getElementsByClassName(
   'single-posts-container',
 )[0];
-const urlParams = new URLSearchParams(window.location.search);
-const isEditMode = urlParams.get('e');
+
+const { isEditMode } = NKC.methods.getDataById('isEditMode');
 
 //单次拖拽结束
 function onEndDrop(event) {
@@ -636,7 +636,7 @@ function handleMove(event, fid, tid, direction) {
     );
     getPostSort();
   } else {
-    sweetError(direction === 'up' ? '已经是最顶层了' : '已经是底层了');
+    sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
   }
 }
 //点击文章回复向上移动一格
@@ -668,7 +668,7 @@ function finishedEditPostOrder(fid, tid) {
           }
           sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
           setTimeout(() => {
-            window.location.replace(`/t/${tid}`);
+            visitUrlReplace(`/t/${tid}`);
           }, 100);
         }
       })
@@ -678,14 +678,14 @@ function finishedEditPostOrder(fid, tid) {
   } else if (!isSingleChange && postIdsOrder.length === 0) {
     sweetError('文章回复顺序并未调整，即将离开当前页面');
     setTimeout(() => {
-      window.location.replace(`/t/${tid}`);
+      visitUrlReplace(`/t/${tid}`);
     }, 100);
   } else {
     sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
     setTimeout(() => {
-      window.location.replace(`/t/${tid}`);
+      visitUrlReplace(`/t/${tid}`);
     }, 100);
-    window.location.replace(`/t/${tid}`);
+    visitUrlReplace(`/t/${tid}`);
   }
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);

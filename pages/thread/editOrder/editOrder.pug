@@ -1,8 +1,8 @@
 
 +includeCSS('/thread/editOrder/editOrder.css')
-a.editOrder(href=`/t/${data.thread.tid}?e=true#post-top`)
-  if(!data.e)
-    div 调整复序
+if(!data.e)
+  a.editOrder(href=`/t/${data.thread.tid}?e=true#post-top`)
+    button 调整复序
 if data.e
   button.admin-finished.saveButton(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`) 保存复序
   button.fixedButton(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`)
