@@ -2338,29 +2338,29 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
 };
 
 /*
- * 验证用户是否能在指定的专业发表回复和评论
- * @param {[String]} 专业ID组成的数组
- * @param {String} uid 用户ID
- * @author pengxiguaa 2020/8/25
+ * 检测用户是否具有编辑文章回复顺序的权限
+ * @param {{
+ *    @param {String} uid 用户ID
+ *    @param {[string]} fid 专业ID组成的数组
+ * }}
  * */
 forumSchema.statics.checkEditPostPosition = async ({
   uid,
   fid,
   tid,
-  isEditArticlePositionOrder,
+  isAdmin,
 }) => {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
-  const thread = await ThreadModel.find({ tid }, { uid: 1 });
+  const thread = await ThreadModel.findOnly({ tid }, { uid: 1 });
   //判断是否有管理员权限可以使用该功能
-  if (isEditArticlePositionOrder) {
+  if (isAdmin) {
     return { status: 200 };
   }
   //判断是否为作者本人
-  if (thread[0].uid !== uid) {
-    return { status: 400 };
+  if (thread.uid !== uid) {
+    return { status: 403, message: '权限不足' };
   }
-  await ForumModel.checkGlobalPostPermission(uid, 'post');
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
@@ -2377,23 +2377,18 @@ forumSchema.statics.checkEditPostPositionInRoute = async ({
   uid,
   fid,
   tid,
-  isEditArticlePositionOrder,
+  isAdmin,
 }) => {
   const ForumModel = mongoose.model('forums');
-  const ThreadModel = mongoose.model('threads');
-  const thread = await ThreadModel.find({ tid }, { uid: 1 });
-  if (isEditArticlePositionOrder) {
-    return true;
+  const { status, message } = await ForumModel.checkEditPostPosition({
+    uid,
+    fid,
+    tid,
+    isAdmin,
+  });
+  if (status !== 200) {
+    ThrowCommonError(status, message);
   }
-  //判断是否为作者本人
-  if (thread[0].uid !== uid) {
-    ThrowCommonError(403, `你不是作者本人或管理员,无法使用该功能。`);
-  }
-  await ForumModel.checkGlobalPostPermission(uid, 'post');
-  const user = await mongoose.model('users').findOnly({ uid });
-  await user.extendRoles();
-  await user.extendGrade();
-  await ForumModel.checkPermission('editPostPosition', user, fid);
 };
 
 /*
@@ -2411,7 +2406,7 @@ forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
   await ForumModel.checkPermission('writePost', user, fid);
 };
 /*
- * 根据后台管理-发表设置验证用户是拥有发表全向
+ * 根据后台管理-发表设置验证用户是拥有发表权限
  * @param {String} uid 用户ID
  * @param {String} postType 内容类型 post: 回复、评论, thread: 文章
  * */

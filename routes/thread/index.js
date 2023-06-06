@@ -482,7 +482,7 @@ threadRouter
         uid: state.uid,
         fid: [thread.mainForumsId],
         tid,
-        isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
+        isAdmin: ctx.permission('modifyAllPostOrder'),
       });
     }
     posts = await db.PostModel.find(match);
@@ -823,7 +823,7 @@ threadRouter
       uid: state.uid,
       fid: [thread.mainForumsId],
       tid,
-      isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
+      isAdmin: ctx.permission('modifyAllPostOrder'),
     });
 
     const haveEditPositionOrder = checkEditPostPosition.status === 200;
@@ -2201,7 +2201,7 @@ threadRouter
       uid,
       fid,
       tid,
-      isEditArticlePositionOrder: ctx.permission('modifyAllPostOrder'),
+      isAdmin: ctx.permission('modifyAllPostOrder'),
     });
     //执行拖拽的时候
     if (postIdsOrder.length !== 0) {
