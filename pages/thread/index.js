@@ -670,8 +670,8 @@ function handelInsert(event) {
   }
   const parentBox = document.querySelector('.single-posts-container');
   const nodes = parentBox.querySelectorAll('.single-post-container');
-  console.log({ nodes });
   const totalLength = nodes.length;
+  const currentIndex = [...nodes].indexOf(item);
   let targetIndex = Number(inputElement.value) - 1;
 
   Promise.resolve()
@@ -679,27 +679,20 @@ function handelInsert(event) {
       if (isNaN(targetIndex)) {
         throw new Error('序号格式不正确');
       }
-
+      if (currentIndex === targetIndex) {
+        throw new Error('目标序号和当前序号不能相同');
+      }
       if (targetIndex < 0) {
         targetIndex = 0;
       }
-
-      console.log({
-        targetIndex,
-        totalLength: totalLength - 1,
-      });
-
-      // const currentIndex = [...nodes].indexOf(item);
-      /*if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
-        throw new Error('目标序号和当前序号不能相同');
-      }*/
-
-      if (targetIndex > totalLength - 1) {
-        parentBox.insertBefore(item, nodes[targetIndex + 1]);
-      } else {
-        parentBox.insertBefore(item, nodes[targetIndex + 1]);
+      if (targetIndex > totalLength) {
+        targetIndex = totalLength;
       }
-
+      const referenceNode =
+        targetIndex < currentIndex
+          ? nodes[targetIndex]
+          : nodes[targetIndex + 1];
+      parentBox.insertBefore(item, referenceNode);
       postIdsOrder = [...nodes].map((childItem) => {
         return childItem.getAttribute('data-pid');
       });
@@ -709,7 +702,6 @@ function handelInsert(event) {
       sweetError(err);
     });
 }
-
 // 发表回复
 function submit(tid) {
   Promise.resolve()
