@@ -469,11 +469,11 @@ threadRouter
       //没有进入编辑模式
       if (thread) {
         const { postIds } = thread;
-        const top50PostsId = postIds.slice(
+        const topPostsId = postIds.slice(
           paging.start,
           paging.start + paging.perpage,
         );
-        match.pid = { $in: top50PostsId }; // 添加的条件
+        match.pid = { $in: topPostsId }; // 添加的条件
       }
     } else {
       //进入了编辑模式
@@ -489,6 +489,7 @@ threadRouter
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
+
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
