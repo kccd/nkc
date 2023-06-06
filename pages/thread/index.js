@@ -573,14 +573,14 @@ function handelFoldAll() {
   const postContainer = document.querySelector('.single-posts-container');
   const node = postContainer.querySelectorAll('.single-post-container');
   [...node].forEach((child) => {
-    child.classList.add('collapsed');
+    child.classList.add('collapsed-fold');
   });
 }
 //点击展开单个
 function handelExpand(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
-  item.classList.remove('collapsed');
+  item.classList.remove('collapsed-fold');
   item.querySelector('.expansion').style.display = 'none';
   item.querySelector('.fold').style.display = 'inline-block';
 }
@@ -590,7 +590,7 @@ function handelFold(event) {
   const item = event.target.closest('.single-post-container');
   item.querySelector('.fold').style.display = 'none';
   item.querySelector('.expansion').style.display = 'inline-block';
-  item.classList.add('collapsed');
+  item.classList.add('collapsed-fold');
 }
 //handleMoveUp与handleMoveDown的公共部分
 function handleMove(event, fid, tid, direction) {
