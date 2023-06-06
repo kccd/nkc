@@ -636,62 +636,74 @@ const handleMoveDebounce = debounce(handleMoveUp, 100);
 const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 //编辑完毕回复顺序
 function finishedEditPostOrder(fid, tid) {
-  if (postIdsOrder.length !== 0) {
-    const uid = NKC.configs.uid;
-    nkcAPI('/t/' + tid + '/post-order', 'PUT', {
-      uid,
-      fid: [fid],
-      tid,
-      postIdsOrder,
+  return Promise.resolve()
+    .then(() => {
+      if (postIdsOrder.length !== 0) {
+        const uid = NKC.configs.uid;
+        return nkcAPI('/t/' + tid + '/post-order', 'PUT', {
+          uid,
+          fid: [fid],
+          tid,
+          postIdsOrder,
+        });
+      }
     })
-      .then((res) => {
-        if (res) {
-          postIdsOrder = [];
-          if (sortable) {
-            sortable.destroy(); //清除这个sortable
-          }
-          sweetSuccess('文章回复顺序调整成功，即将离开当前页面');
-          setTimeout(() => {
-            visitUrlReplace(`/t/${tid}`);
-          }, 100);
-        }
-      })
-      .catch((error) => {
-        sweetError(error);
-      });
-  } else {
-    sweetError('文章回复顺序并未调整，即将离开当前页面');
-    setTimeout(() => {
-      visitUrlReplace(`/t/${tid}`);
-    }, 100);
-  }
+    .then(() => {
+      postIdsOrder = [];
+      if (sortable) {
+        sortable.destroy(); //清除这个sortable
+      }
+      sweetSuccess('文章回复顺序调整成功，即将前往文章页');
+      setTimeout(() => {
+        visitUrlReplace(`/t/${tid}`);
+      }, 1500);
+    })
+    .catch(sweetError);
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
 function handelInsert(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
-  const parentBox = item.parentNode;
-  const totalLength = parentBox.children.length;
-  const targetIndex = Number(event.target.previousElementSibling.value) - 1;
+  const inputElement = item.querySelector('.single-post-edit .real-time-floor');
+  if (!inputElement) {
+    return;
+  }
+  const parentBox = document.querySelector('.single-posts-container');
+  const nodes = parentBox.querySelectorAll('.single-post-container');
+  console.log({ nodes });
+  const totalLength = nodes.length;
+  let targetIndex = Number(inputElement.value) - 1;
+
   Promise.resolve()
     .then(() => {
       if (isNaN(targetIndex)) {
-        throw new Error('仅支持数字格式');
+        throw new Error('序号格式不正确');
       }
-      const currentIndex = Array.from(parentBox.children).indexOf(item);
-      if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
-        updatePostSort();
-        throw new Error('插入的序号不能与当前序号一致');
-      } else if (targetIndex < 0 || targetIndex > totalLength - 1) {
-        updatePostSort();
-        throw new Error('不存在当前序号');
+
+      if (targetIndex < 0) {
+        targetIndex = 0;
+      }
+
+      console.log({
+        targetIndex,
+        totalLength: totalLength - 1,
+      });
+
+      // const currentIndex = [...nodes].indexOf(item);
+      /*if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
+        throw new Error('目标序号和当前序号不能相同');
+      }*/
+
+      if (targetIndex > totalLength - 1) {
+        parentBox.insertBefore(item, nodes[targetIndex + 1]);
       } else {
-        parentBox.insertBefore(item, parentBox.children[targetIndex]);
-        postIdsOrder = [...parentBox.children].map((childItem) => {
-          return childItem.getAttribute('data-pid');
-        });
-        updatePostSort();
+        parentBox.insertBefore(item, nodes[targetIndex + 1]);
       }
+
+      postIdsOrder = [...nodes].map((childItem) => {
+        return childItem.getAttribute('data-pid');
+      });
+      updatePostSort();
     })
     .catch((err) => {
       sweetError(err);
@@ -739,9 +751,14 @@ function submit(tid) {
 //最新的回复排序号
 function updatePostSort() {
   const parentElement = document.querySelector('.single-posts-container');
-  const childElements = parentElement.children;
+  const childElements = parentElement.querySelectorAll(
+    '.single-post-container',
+  );
   childElements.forEach((element, index) => {
     const circleElement = element.querySelector('.real-time-floor');
+    if (!circleElement) {
+      return;
+    }
     circleElement.value = `${index + 1}`;
   });
 }
