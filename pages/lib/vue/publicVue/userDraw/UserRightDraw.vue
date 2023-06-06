@@ -58,12 +58,15 @@ import userLogin from "./UserLogin";
 import userList from "./UserList";
 import {nkcAPI} from "../../../js/netAPI";
 import { initEventToGetUnreadMessageCount } from "../../../js/socket";
+import {getState} from '../../../js/state'
+const state = getState();
 export default {
   data:() => ({
     user: {},
     show: false,
     loading: true,
     drawState: {},
+    logged: !!state.uid,
     unreadMessageCount: 0,
   }),
   components: {
@@ -73,7 +76,9 @@ export default {
     "user-list": userList,
   },
   mounted() {
-    initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
+    if(this.logged) {
+      initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
+    }
   },
   watch: {
     show(oldValue, newValue) {

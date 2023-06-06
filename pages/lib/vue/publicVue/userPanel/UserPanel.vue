@@ -21,8 +21,11 @@ import userNav from "../../../../publicModules/userNav/userNavBox";
 import {nkcAPI} from "../../../js/netAPI";
 import {throttle} from "../../../js/execution";
 import { initEventToGetUnreadMessageCount } from "../../../js/socket";
+import {getState} from '../../../js/state';
+const state = getState();
 export default {
   data:() => ({
+    logged: !!state.uid,
     show: false,
     loading: true,
     anvState: null,
@@ -33,7 +36,9 @@ export default {
   },
   mounted() {
     //初始化获取未读消息
-    initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
+    if(this.logged) {
+      initEventToGetUnreadMessageCount((unreadMessageCount)=>{ this.getUnreadMessageCount(unreadMessageCount)});
+    }
   },
   methods: {
     stopEvent(e) {
