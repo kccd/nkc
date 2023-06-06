@@ -6,8 +6,8 @@ mixin singlePostEdit(isEditMode)
       input.real-time-floor.m-l-05(type='text')
       button.btn-warning.btn.btn-xs.m-l-05(onclick='handelInsert(event)') 快速移动
       .operator-button
-        button.btn-default.btn.btn-xs.icon-expand.m-r-05(onclick='handelExpand(event)') 展开
-        button.btn-default.btn.btn-xs.icon-expand.m-r-05(onclick='handelFold(event)' style='display:none') 折叠
+        button.btn-default.btn.btn-xs.icon-expand.m-r-05.expansion(onclick='handelExpand(event)') 展开
+        button.btn-default.btn.btn-xs.icon-expand.m-r-05.fold(onclick='handelFold(event)' style='display:none') 折叠
         button.btn-success.btn-save-editor.btn.btn-xs.m-r-05(onclick=`handleMoveDebounce(event,'${data.thread.mainForumsId}','${data.thread.tid}')` title='点击向上移动' )
           i.fa.fa-chevron-up(aria-hidden="true")
         button.btn-danger.btn.btn-xs(onclick=`handleMoveDownDebounce(event,'${data.thread.mainForumsId}','${data.thread.tid}')` title='点击向下移动')

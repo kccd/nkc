@@ -574,14 +574,10 @@ if (isEditMode) {
 
 //点击折叠全部
 function handelFoldAll() {
-  const postContainer = document.querySelectorAll('.single-post-container');
-  postContainer.forEach((item) => {
-    //为了区分置顶回复，和高赞回复
-    item.children.forEach((child) => {
-      if (child.classList.contains('single-post-edit')) {
-        item.classList.add('collapsed');
-      }
-    });
+  const postContainer = document.querySelector('.single-posts-container');
+  const node = postContainer.querySelectorAll('.single-post-container');
+  [...node].forEach((child) => {
+    child.classList.add('collapsed');
   });
 }
 //点击展开单个
@@ -589,15 +585,15 @@ function handelExpand(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   item.classList.remove('collapsed');
-  event.target.style.display = 'none';
-  event.target.nextElementSibling.style.display = 'inline-block';
+  item.querySelector('.expansion').style.display = 'none';
+  item.querySelector('.fold').style.display = 'inline-block';
 }
 //点击折叠单个
 function handelFold(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
-  event.target.style.display = 'none';
-  event.target.previousElementSibling.style.display = 'inline-block';
+  item.querySelector('.fold').style.display = 'none';
+  item.querySelector('.expansion').style.display = 'inline-block';
   item.classList.add('collapsed');
 }
 //handleMoveUp与handleMoveDown的公共部分
@@ -605,22 +601,22 @@ function handleMove(event, fid, tid, direction) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   const parentBox = item.parentNode;
-  const currentIndex = Array.from(parentBox.children).indexOf(item);
+  const node = parentBox.querySelectorAll('.single-post-container');
+  const totalLength = node.length;
+  const currentIndex = Array.from(node).indexOf(item);
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
-  if (targetIndex >= 0 && targetIndex < parentBox.children.length) {
+  if (targetIndex >= 0 && targetIndex < totalLength) {
     parentBox.insertBefore(
       item,
-      direction === 'up'
-        ? parentBox.children[targetIndex]
-        : parentBox.children[targetIndex + 1],
+      direction === 'up' ? node[targetIndex] : node[targetIndex + 1],
     );
-    postIdsOrder = [...parentBox.children].map((child) => {
+    postIdsOrder = [...node].map((child) => {
       return child.getAttribute('data-pid');
     });
     updatePostSort();
   } else {
-    sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
+    return sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
   }
 }
 //点击文章回复向上移动一格

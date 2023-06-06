@@ -92,7 +92,6 @@ if !isIncluded('singlePost')
 
       +singlePostEdit(isEditMode)
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
-
       +singlePostTop(Object.assign({}, user, {docNumber: pid, addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
