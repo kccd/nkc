@@ -10,10 +10,10 @@
         .module-drafts
           .module-draft-warning.bg-warning.text-warning 此处只插入正文，如果要使用草稿中的其余内容，请点击继续创作。
           .paging-button
-            a(:class="{'active': draftType === 'auto'}" @click="selectDraftType('auto')")
+            a.radius-left(:class="{'active': draftType === 'auto'}" @click="selectDraftType('auto')")
               .fa &nbsp;
               | 草稿
-            a(:class="{'active': draftType === 'custom'}" @click="selectDraftType('custom')")
+            a.radius-right(:class="{'active': draftType === 'custom'}" @click="selectDraftType('custom')")
               .fa &nbsp;
               | 图文片段
           auto-drafts-box(ref="autoDraftsBox" v-if="draftType === 'auto'" @callback-data="insert")
@@ -211,7 +211,7 @@
       },
       open(callback) {
         this.callback = callback;
-        this.$refs.autoDraftsBox.open();
+        this.selectDraftType('auto');
         this.draggableElement.show();
       },
       close() {

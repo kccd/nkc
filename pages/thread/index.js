@@ -3,13 +3,19 @@ import { RNSetSharePanelStatus } from '../lib/js/reactNative';
 import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
+import Sortable from 'sortablejs';
+import { sweetError } from '../lib/js/sweetAlert';
+import { debounce } from '../lib/js/execution';
+import { visitUrlReplace } from '../lib/js/pageSwitch';
 
 const socket = getSocket();
 var surveyForms = [],
   draftId = '',
   author = {},
   _id;
+
 const commonModel = new NKC.modules.CommonModal();
+
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function () {
@@ -86,6 +92,7 @@ $(document).ready(function () {
   if ($(window).width() < 433) {
     $('.ThreadTitle1').css('width', '65%');
   }
+
   // var qrcode = geid('qrcode');
   // if(qrcode) {
   // 	var path = window.location.href;
@@ -522,6 +529,176 @@ function setSubmitButton(submitting) {
     button.html('回复');
   }
 }
+
+//编辑回复顺序
+//判断用户是否进入了编辑模式页面
+let sortable = null;
+
+//文章回复顺序pid数组
+let postIdsOrder = [];
+
+const dropPostContainer = document.getElementsByClassName(
+  'single-posts-container',
+)[0];
+
+const { isEditMode } = NKC.methods.getDataById('isEditMode');
+
+//单次拖拽结束
+function onEndDrop(event) {
+  const items = Array.from(event.from.children);
+  postIdsOrder = items
+    .filter((item) => item.getAttribute('data-pid') !== null)
+    .map((item) => {
+      return item.getAttribute('data-pid');
+    });
+  updatePostSort();
+}
+//判断是否进入编辑模式，创建sortable对象
+if (isEditMode) {
+  sortable = new Sortable(dropPostContainer, {
+    group: 'post',
+    sort: true,
+    animation: 500,
+    invertSwap: true,
+    handle: '.editOrder',
+    forceFallback: true,
+    scroll: true,
+    onEnd: onEndDrop,
+  });
+  handelFoldAll();
+  updatePostSort();
+}
+//点击折叠全部
+function handelFoldAll() {
+  const postContainer = document.querySelector('.single-posts-container');
+  const node = postContainer.querySelectorAll('.single-post-container');
+  [...node].forEach((child) => {
+    child.classList.add('collapsed-fold');
+  });
+}
+//点击展开单个
+function handelExpand(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  item.classList.remove('collapsed-fold');
+  item.querySelector('.expansion').style.display = 'none';
+  item.querySelector('.fold').style.display = 'inline-block';
+}
+//点击折叠单个
+function handelFold(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  item.querySelector('.fold').style.display = 'none';
+  item.querySelector('.expansion').style.display = 'inline-block';
+  item.classList.add('collapsed-fold');
+}
+//handleMoveUp与handleMoveDown的公共部分
+function handleMove(event, fid, tid, direction) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const parentBox = item.parentNode;
+  const node = parentBox.querySelectorAll('.single-post-container');
+  const totalLength = node.length;
+  const currentIndex = Array.from(node).indexOf(item);
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex >= 0 && targetIndex < totalLength) {
+    parentBox.insertBefore(
+      item,
+      direction === 'up' ? node[targetIndex] : node[targetIndex + 1],
+    );
+    postIdsOrder = [
+      ...parentBox.querySelectorAll('.single-post-container'),
+    ].map((child) => {
+      return child.getAttribute('data-pid');
+    });
+    updatePostSort();
+  } else {
+    return sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
+  }
+}
+//点击文章回复向上移动一格
+function handleMoveUp(event, fid, tid) {
+  handleMove(event, fid, tid, 'up');
+}
+// 点击文章回复向下移动一格
+function handleMoveDown(event, fid, tid) {
+  handleMove(event, fid, tid, 'down');
+}
+//添加防抖函数
+const handleMoveDebounce = debounce(handleMoveUp, 100);
+const handleMoveDownDebounce = debounce(handleMoveDown, 100);
+//编辑完毕回复顺序
+function finishedEditPostOrder(fid, tid) {
+  return Promise.resolve()
+    .then(() => {
+      if (postIdsOrder.length !== 0) {
+        const uid = NKC.configs.uid;
+        return nkcAPI('/t/' + tid + '/post-order', 'PUT', {
+          uid,
+          fid: [fid],
+          tid,
+          postIdsOrder,
+        });
+      }
+    })
+    .then(() => {
+      postIdsOrder = [];
+      if (sortable) {
+        sortable.destroy(); //清除这个sortable
+      }
+      sweetSuccess('文章回复顺序调整成功，即将前往文章页');
+      setTimeout(() => {
+        visitUrlReplace(`/t/${tid}`);
+      }, 1500);
+    })
+    .catch(sweetError);
+}
+const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
+//插入元素
+function handelInsert(event) {
+  event.stopPropagation();
+  const item = event.target.closest('.single-post-container');
+  const inputElement = item.querySelector('.single-post-edit .real-time-floor');
+  if (!inputElement) {
+    return;
+  }
+  const parentBox = document.querySelector('.single-posts-container');
+  const nodes = parentBox.querySelectorAll('.single-post-container');
+  const totalLength = nodes.length;
+  const currentIndex = [...nodes].indexOf(item);
+  let targetIndex = Number(inputElement.value) - 1;
+
+  Promise.resolve()
+    .then(() => {
+      if (isNaN(targetIndex)) {
+        throw new Error('序号格式不正确');
+      }
+      if (currentIndex === targetIndex) {
+        throw new Error('目标序号和当前序号不能相同');
+      }
+      if (targetIndex < 0) {
+        targetIndex = 0;
+      }
+      if (targetIndex > totalLength) {
+        targetIndex = totalLength;
+      }
+      const referenceNode =
+        targetIndex < currentIndex
+          ? nodes[targetIndex]
+          : nodes[targetIndex + 1];
+      parentBox.insertBefore(item, referenceNode);
+      postIdsOrder = [
+        ...parentBox.querySelectorAll('.single-post-container'),
+      ].map((childItem) => {
+        return childItem.getAttribute('data-pid');
+      });
+      updatePostSort();
+    })
+    .catch((err) => {
+      sweetError(err);
+    });
+}
 // 发表回复
 function submit(tid) {
   Promise.resolve()
@@ -560,7 +737,20 @@ function submit(tid) {
       setSubmitButton(false);
     });
 }
-
+//最新的回复排序号
+function updatePostSort() {
+  const parentElement = document.querySelector('.single-posts-container');
+  const childElements = parentElement.querySelectorAll(
+    '.single-post-container',
+  );
+  childElements.forEach((element, index) => {
+    const circleElement = element.querySelector('.real-time-floor');
+    if (!circleElement) {
+      return;
+    }
+    circleElement.value = `${index + 1}`;
+  });
+}
 // 点击引用
 function quotePost(pid) {
   if (!window.quotePostApp) {
@@ -1555,4 +1745,10 @@ Object.assign(window, {
   insertRenderedComment,
   pushBlock,
   pushHomeBlockId,
+  handleMoveDebounce,
+  handleMoveDownDebounce,
+  handelExpand,
+  handelFold,
+  finishedEditPostOrderDebounce,
+  handelInsert,
 });

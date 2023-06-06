@@ -1385,7 +1385,7 @@ postSchema.statics.newPost = async (options) => {
 
 /*
  * 获取回复或评论的url
- * @param {String} pid 评论、回复的ID或对象
+ * @param {String} pid 评论、回复的ID或post对象
  * @return {String} 不带域名的url
  * @author pengxiguaa 2019-6-11
  * */
@@ -1403,9 +1403,12 @@ postSchema.statics.getUrl = async function (pid, redirect) {
 
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
+  const ThreadModel = mongoose.model('threads');
+
   // const pageSettings = await SettingModel.findOnly({_id: "page"});
   const pageSettings = await SettingModel.getSettings('page');
   let post;
+
   if (typeof pid == 'string') {
     post = await PostModel.findOnly({ pid });
   } else {
@@ -1416,12 +1419,12 @@ postSchema.statics.getUrl = async function (pid, redirect) {
   let posts, perpage;
   if (!isComment) {
     perpage = pageSettings.threadPostList;
-    posts = await PostModel.find(
-      { type: 'post', tid: post.tid, parentPostId: '' },
-      { pid: 1, _id: 0 },
-    ).sort({ toc: 1 });
-    const postsId = posts.map((post) => post.pid);
-    const step = postsId.indexOf(post.pid);
+    const { tid } = post;
+    if (!tid) {
+      return;
+    }
+    const { postIds } = await ThreadModel.findOnly({ tid }, { postIds: 1 });
+    const step = postIds.indexOf(post.pid);
     if (step === -1) {
       return `/t/${post.tid}`;
     }
@@ -2538,6 +2541,22 @@ postSchema.statics.disableToDraftPosts = async function () {
       });
     }
   }
+};
+
+/*
+ *将posts数组重新排序，根据ThreadModel所存放的pid来排序
+ * @params 对应的tid用于查询到对应的ThreadModel表
+ * @params posts将需要重新排序的的文章下的回复传入进来
+ * */
+postSchema.statics.reorderByThreadModelPostsIds = async (tid, posts) => {
+  const ThreadModel = mongoose.model('threads');
+  const res = await ThreadModel.findOnly({ tid }, { postIds: 1 });
+  const { postIds } = res;
+  return [...posts].sort((a, b) => {
+    const indexA = postIds.indexOf(a.pid);
+    const indexB = postIds.indexOf(b.pid);
+    return indexA - indexB;
+  });
 };
 
 /*

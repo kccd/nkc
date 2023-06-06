@@ -41,5 +41,18 @@ module.exports = {
     review: {
       GET: 'api_get_review_data',
     },
+    user: {
+      PARAMETER: {
+        'public-info': {
+          GET: 'api_get_user_public_info',
+        },
+      },
+    },
+    users: {
+      memo: {
+        PUT: 'api_put_user_memo',
+        GET: 'api_get_user_memo',
+      },
+    },
   },
 };

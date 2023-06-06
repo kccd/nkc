@@ -884,6 +884,7 @@ export default {
     height: 100%;
     box-sizing: border-box;
     border: 1px solid #e7e7e7;
+    border-left: none;
     width: 100%;
     position: relative;
   }

@@ -1,5 +1,8 @@
 const Router = require('koa-router');
 const {
+  userMemoService,
+} = require('../../../../services/user/userMemo.service');
+const {
   usernameCheckerService,
 } = require('../../../../services/user/usernameChecker.service');
 const {
@@ -13,7 +16,7 @@ userRouter
     await next();
   })
   .get('/', async (ctx, next) => {
-    const { query, data, db, nkcModules } = ctx;
+    const { query, data, db, nkcModules, state } = ctx;
     const { page = 0, t = 'default', c = '' } = query;
     let users, paging;
     let [searchType = '', searchContent = ''] = c.split(',');
@@ -67,6 +70,11 @@ userRouter
         user.roles.reverse();
       }),
     );
+    const usersId = users.map((item) => item.uid);
+    const userNicknameObject = await userMemoService.getUsersNicknameObject({
+      uid: state.uid,
+      targetUsersId: usersId,
+    });
     users = await db.UserModel.extendUsersSecretInfo(users);
     for (const u of users) {
       if (!ctx.permission('visitUserSensitiveInfo')) {
@@ -83,6 +91,7 @@ userRouter
       u.scores = await db.UserModel.getUserScores(u.uid);
       u.badRecords = await db.UserModel.getUserBadRecords(u.uid);
       u.blacklistCount = await db.BlacklistModel.getBlacklistCount(u.uid);
+      u.nickname = userNicknameObject[u.uid] || '';
     }
     data.roles = await db.RoleModel.find().sort({ toc: 1 });
     data.users = users;

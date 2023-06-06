@@ -27,8 +27,6 @@
       if result.docType === 'thread' && result.threadCategories && result.threadCategories.length > 0
         -var tc = result.threadCategories.map(t => `${t.categoryName}: ${t.nodeName}`);
         span=tc.join(`，`)
-
-
     .search-result-abstract!= result.abstract
   else if result.docType === "user"
     .search-result-user-panel
@@ -179,7 +177,7 @@
     .checkbox.thread-checkbox(style="display: inline;")
       label
         input(type="checkbox" data-comment-id=result.commentId data-document-id=result.documentId)
-    a(href=result.articleUrl target="_blank").clear-a-style.search-result-title!= result.articleTitle
+    a(href=result.commentUrl target="_blank").clear-a-style.search-result-title!= result.articleTitle
     .search-result-info
       if !result.anonymous
         a.clear-a-style.search-result-author(href=`/u/${result.commentUser.uid}`

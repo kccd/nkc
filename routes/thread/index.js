@@ -232,8 +232,8 @@ threadRouter
   .get('/:tid', async (ctx, next) => {
     const { data, db, query, nkcModules, state, internalData } = ctx;
     const { token } = query;
-    const { page = 0, pid, last_page, highlight, step, t } = query;
-
+    const { page = 0, pid, last_page, highlight, step, t, e = false } = query;
+    const isEditMode = e;
     let mainForum = null;
     let forumsNav = [];
     let threadNav = [];
@@ -275,6 +275,7 @@ threadRouter
     };
 
     const { thread } = internalData;
+
     const tid = thread.tid;
     const source = await db.ReviewModel.getDocumentSources();
     // 拓展文章属性
@@ -461,13 +462,34 @@ threadRouter
       pageSettings.threadPostList,
     );
 
+    let posts = [];
     // 获取回复列表
-    let posts = await db.PostModel.find(match)
-      .sort({ toc: 1 })
-      .skip(paging.start)
-      .limit(paging.perpage);
+    //判断是否进入编辑模式
+    if (!isEditMode) {
+      //没有进入编辑模式
+      if (thread) {
+        const { postIds } = thread;
+        const topPostsId = postIds.slice(
+          paging.start,
+          paging.start + paging.perpage,
+        );
+        match.pid = { $in: topPostsId }; // 添加的条件
+      }
+    } else {
+      //进入了编辑模式
+      //判断是否拥有进入编辑模式的权限
+      await db.ForumModel.checkEditPostPositionInRoute({
+        uid: state.uid,
+        fid: [thread.mainForumsId],
+        tid,
+        isAdmin: ctx.permission('modifyAllPostOrder'),
+      });
+    }
+    posts = await db.PostModel.find(match);
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
+    posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
+
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -797,6 +819,15 @@ threadRouter
       thread.firstPost.uidlm = '';
     }
 
+    const checkEditPostPosition = await db.ForumModel.checkEditPostPosition({
+      uid: state.uid,
+      fid: [thread.mainForumsId],
+      tid,
+      isAdmin: ctx.permission('modifyAllPostOrder'),
+    });
+
+    const haveEditPositionOrder = checkEditPostPosition.status === 200;
+
     // 发表权限判断
     // const postSettings = await db.SettingModel.getSettings('post');
     let userPostCountToday = 0;
@@ -1022,7 +1053,6 @@ threadRouter
 
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
-
     // 标志
     data.t = t;
     data.creditScore = creditScore;
@@ -1081,6 +1111,9 @@ threadRouter
     data.authorAvatarUrl = authorAvatarUrl;
     data.authorRegisterInfo = authorRegisterInfo;
     data.userSubscribeUsersId = userSubscribeUsersId;
+    data.editPostPositionPermission = haveEditPositionOrder;
+    data.isEditMode = isEditMode;
+    data.orderStatus = thread.orderStatus;
 
     // 商品信息
     if (threadShopInfo) {
@@ -1388,6 +1421,7 @@ threadRouter
     // 拓展回复信息
     data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
+
     // 回复是否是待审核状态，是的话读取送审原因
     data.posts = await Promise.all(
       data.posts.map(async (post) => {
@@ -1822,7 +1856,6 @@ threadRouter
       });
       data.notes = await db.NoteModel.getNotesByPosts(notePosts);
     }
-
     // 黑名单判断
     if (data.thread.uid && data.user) {
       data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(
@@ -1868,8 +1901,8 @@ threadRouter
   })
   .post('/:tid', async (ctx, next) => {
     // 社区文章发表评论
-
     const { data, nkcModules, params, db, body, state, address: ip } = ctx;
+
     const { user } = data;
 
     try {
@@ -2042,7 +2075,17 @@ threadRouter
       await message.save();
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
-    await thread.updateOne({ $inc: [{ count: 1 }, { hits: 1 }] });
+
+    await thread.updateOne({
+      $inc: [{ count: 1 }, { hits: 1 }],
+      // $push: { posts: _post.pid },
+    });
+    if (!_post.parentPostId) {
+      await thread.updateOne({
+        $addToSet: { postIds: _post.pid },
+      });
+    }
+
     const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
     const newThread = await db.ThreadModel.findOnly({ tid });
@@ -2147,6 +2190,44 @@ threadRouter
       }).catch((err) => {
         console.error(err);
       });
+    }
+    await next();
+  })
+  .put('/:tid/post-order', async (ctx, next) => {
+    const { db, body } = ctx;
+    const { uid, fid, tid, postIdsOrder = [] } = body;
+    //判断用户是否具有编辑文章回复顺序的权限
+    await db.ForumModel.checkEditPostPositionInRoute({
+      uid,
+      fid,
+      tid,
+      isAdmin: ctx.permission('modifyAllPostOrder'),
+    });
+    //执行拖拽的时候
+    if (postIdsOrder.length !== 0) {
+      const thread = await db.ThreadModel.findOnly(
+        { tid },
+        { postIds: 1, uid: 1 },
+      );
+      const { author, admin } = await db.ThreadModel.getOrderStatus();
+      const orderStatus = thread.uid === uid ? author : admin;
+      const { postIds } = thread;
+      const newPostIds = [...postIds].sort((a, b) => {
+        const indexA = postIdsOrder.indexOf(a);
+        const indexB = postIdsOrder.indexOf(b);
+        // 如果 a 或 b 不在 arr2 中，保持原始顺序
+        if (indexA === -1 || indexB === -1) {
+          return 0;
+        }
+        return indexA - indexB;
+      });
+
+      await db.ThreadModel.findOneAndUpdate(
+        {
+          tid,
+        },
+        { $set: { postIds: newPostIds, orderStatus } },
+      );
     }
     await next();
   })

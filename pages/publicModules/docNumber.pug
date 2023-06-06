@@ -1,0 +1,7 @@
+if !isIncluded('/pages/publicModules/docNumber')
+  mixin docNumberCore(text)
+    span(title=`文号：${text}`)=`${text}`
+  mixin docNumber(text)
+    span(style='margin-right: 0.5rem;') 文号
+    span
+      +docNumberCore(text)

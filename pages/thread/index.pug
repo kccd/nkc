@@ -43,6 +43,7 @@ block content
     .container-fluid.max-width
       .hidden#threadId= data.thread.tid
       .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId, tcId: data.thread.tcId})
+      .hidden#isEditMode=objToStr({isEditMode: data.isEditMode})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_digest
@@ -64,8 +65,9 @@ block content
                         data-global-data=objToStr({fid})
                       )= name
                   .thread-nav-right
-                    .nav-count
-                      .nav-post-id=`文号 ${data.thread.oc}`
+                    .nav-count(style="color: #555;")
+                      include ../publicModules/docNumber
+                      +docNumber(data.thread.oc)
                     .nav-count(title=`浏览数`)
                       .fa.fa-eye
                       span=data.thread.hits
@@ -432,30 +434,37 @@ block content
               a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
           //- 发表人筛选
           mixin articleNav
-            .paging-button
-              a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
-              a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+            if !data.isEditMode
+              .paging-button
+                a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+                a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
           //- 回复列表头部分页、管理按钮
-          .p-l-2.p-r-2.m-b--05
-            include ../publicModules/paging/paging
+          .p-l-2.p-r-2.m-b--05(id='post-top')
+            if !data.isEditMode
+              include ../publicModules/paging/paging
             +articleNav
-            if disablePost
+            if disablePost && !data.isEditMode
               //- 回复的批量管理
               +managePosts
+            if data.editPostPositionPermission
+              include ./editOrder/editOrder
           //- 回复列表内容
           div.p-a-0.single-posts-container
             include ./singlePost/singlePost
-            for post in data.posts
-              //- post数据格式详见/pages/thread/singlePost/singlePost.pug
-              -post.highlight = data.highlight;
-              +singlePost(post)
+             for post in data.posts
+               //- post数据格式详见/pages/thread/singlePost/singlePost.pug
+               -post.highlight = data.highlight;
+               +singlePost(post, data.isEditMode)
           //- 回复列表尾部分页、管理按钮
           .p-l-2.p-r-2.m-b--05
-            include ../publicModules/paging/paging_input
+            if !data.isEditMode
+              include ../publicModules/paging/paging_input
             //-+articleNav
-            if disablePost
+            if disablePost && !data.isEditMode
               //- 回复的批量管理
               +managePosts
+            if data.editPostPositionPermission
+              include ./editOrder/editOrder
           //- 编辑器相关
           div
             if data.user
@@ -581,6 +590,7 @@ block content
               .form-group(v-if="contract.contractCode")
                 h5 邮政编码：
                 strong {{contract.contractCode}}
+
 
     include ../debug_output.pug
     include ../publicModules/post_warning

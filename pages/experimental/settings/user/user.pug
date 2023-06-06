@@ -12,6 +12,7 @@ block eContent
       a.button(@click='hiddenUsersHome("all", false)') 显示名片
       a.button.radius-right(@click='hiddenUsersHome("all", true)') 隐藏名片
   .container-fluid.max-width#app(v-cloak)
+    user-memo-editor(ref='userMemoEditor')
     .row
       .col-xs-12.col-md-12.m-b-1
         ul.nav.nav-tabs
@@ -45,7 +46,7 @@ block eContent
                   input(type='checkbox' :checked='isChecked').m-r-05
                 th 注册时间
                 th UID
-                th 用户名
+                th 用户名(提示)
                 th 证书
                 th A卷
                 th B卷
@@ -73,6 +74,7 @@ block eContent
                     data-global-mouseout="hideUserPanel"
                     :data-global-data="objToStr({uid: u.uid})"
                   ) {{u.username}}
+                    span(v-if="u.nickname") ({{u.nickname}})
                 th
                   span(v-for='r in u.roles') {{r.displayName}}&nbsp;
                 th.mwd
@@ -85,12 +87,13 @@ block eContent
                   span(v-else).text-danger 未通过
                 th.nwd
                   .pointer.text-primary(@click="showIpInfo(u.regIP)") {{u.regIP}}:{{u.regPort}}
-                th
+                th(style="min-width: 24rem")
                   button.btn.btn-default.btn-xs(@click='disableUsers("one", false, u)' v-if='u.certs.includes("banned")') 解封
                   button.btn.btn-default.btn-xs(@click='disableUsers("one", true, u)' v-else) 封禁
                   button.btn.btn-default.btn-xs(v-if='u.hidden' @click='hiddenUsersHome("one", false, u)') 显名片
                   button.btn.btn-default.btn-xs(v-else @click='hiddenUsersHome("one", true, u)') 隐名片
                   button.btn.btn-default.btn-xs(@click='editUser(u)') 编辑
+                  button.btn.btn-default.btn-xs(@click='editUserMemo(u)') 备注
                   | &nbsp;
                   a.btn.btn-default.btn-xs(:href='"/u/" + u.uid + "/alt"' target="_blank") 查马甲
                   button.btn.btn-default.btn-xs(@click='switchDetail(u)') 更多
