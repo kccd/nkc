@@ -14,14 +14,13 @@ router.get('/', async (ctx, next) => {
   });
 
   const { nkcRender } = nkcModules;
-  let { page = 0, t, c, d, form = '' } = query;
+  let { page = 0, t = '', c, d, form = '' } = query;
   const { user } = data;
   // 通过mongodb精准搜索用户名
   let targetUser,
     existUser = false,
     searchUserFromMongodb = false,
     uidToUser;
-
   if (c) {
     if (!d) {
       data.c = Buffer.from(encodeURIComponent(c)).toString('base64');
@@ -32,9 +31,12 @@ router.get('/', async (ctx, next) => {
       data.c = c;
       try {
         c = decodeURIComponent(Buffer.from(c, 'base64').toString());
-      } catch (err) {}
+      } catch (err) {
+        //
+      }
     }
   }
+  c = c.trim();
   data.t = t;
   data.d = d;
   data.form = form;
@@ -243,7 +245,10 @@ router.get('/', async (ctx, next) => {
           ) {
             _id = r.tid;
           }
-          highlightObj[_id + '_title'] = r.highlight.title;
+          if (r.highlight.title) {
+            highlightObj[_id + '_title'] = '' + r.highlight.title;
+          }
+
           if (r.highlight.content) {
             highlightObj[_id + '_content'] = '内容：' + r.highlight.content;
           }
@@ -484,6 +489,8 @@ router.get('/', async (ctx, next) => {
           anonymous: post.anonymous,
           forums,
         };
+        r.title = nkcRender.replaceTextLinkToHTML(r.title + '');
+        r.abstract = nkcRender.replaceTextLinkToHTML(r.abstract + '');
         if (!post.anonymous) {
           r.postUser = {
             uid: postUser.uid,
@@ -491,8 +498,6 @@ router.get('/', async (ctx, next) => {
             username: postUser.username,
           };
         }
-        r.title = nkcRender.htmlFilter(r.title);
-        r.abstract = nkcRender.htmlFilter(r.abstract);
       } else if (docType === 'user') {
         if (targetUser && targetUser.uid === uid) {
           if (existUser) {
@@ -516,8 +521,8 @@ router.get('/', async (ctx, next) => {
           user: u,
           uid: highlightObj[`${uid}_uid`] || u.uid,
         };
-        r.username = nkcRender.htmlFilter(r.username);
-        r.description = nkcRender.htmlFilter(r.description);
+        r.username = nkcRender.replaceTextLinkToHTML(r.username + '');
+        r.description = nkcRender.replaceTextLinkToHTML(r.description + '');
       } else if (docType === 'column') {
         const column = columnObj[tid];
         if (!column) {
@@ -534,8 +539,8 @@ router.get('/', async (ctx, next) => {
           abbr: highlightObj[`${tid}_abbr`] || column.abbr,
           column,
         };
-        r.name = nkcRender.htmlFilter(r.name);
-        r.abbr = nkcRender.htmlFilter(r.abbr);
+        r.name = nkcRender.replaceTextLinkToHTML(r.name + '');
+        r.abbr = nkcRender.replaceTextLinkToHTML(r.abbr + '');
       } else if (docType === 'columnPage') {
         const page = columnPageObj[tid];
         if (!page) {
@@ -558,8 +563,8 @@ router.get('/', async (ctx, next) => {
           column,
           page,
         };
-        r.t = nkcRender.htmlFilter(r.t);
-        r.c = nkcRender.htmlFilter(r.c);
+        r.t = nkcRender.replaceTextLinkToHTML(r.t + '');
+        r.c = nkcRender.replaceTextLinkToHTML(r.c + '');
       } else if (docType === 'resource') {
         let resource = resourcesObj[tid];
         if (!resource) {
@@ -573,8 +578,8 @@ router.get('/', async (ctx, next) => {
           c: highlightObj[`${tid}_c`] || resource.description,
           resource,
         };
-        r.t = nkcRender.htmlFilter(r.t);
-        r.c = nkcRender.htmlFilter(r.c);
+        r.t = nkcRender.replaceTextLinkToHTML(r.t + '');
+        r.c = nkcRender.replaceTextLinkToHTML(r.c + '');
       } else if (docType === 'document_article') {
         //article文章搜索
         const article = articlesObj[tid];
@@ -623,8 +628,8 @@ router.get('/', async (ctx, next) => {
         if (column) {
           r.column = column;
         }
-        r.title = nkcRender.htmlFilter(r.title);
-        r.abstract = nkcRender.htmlFilter(r.abstract);
+        r.title = nkcRender.replaceTextLinkToHTML(r.title + '');
+        r.abstract = nkcRender.replaceTextLinkToHTML(r.abstract + '');
       } else if (docType === 'document_comment') {
         //comment搜索
         const comment = commentObj[tid];
@@ -657,6 +662,8 @@ router.get('/', async (ctx, next) => {
           commentTime: commentDocument.toc,
           user: commentUser,
         };
+        r.articleTitle = nkcRender.replaceTextLinkToHTML(r.articleTitle + '');
+        r.abstract = nkcRender.replaceTextLinkToHTML(r.abstract + '');
         if (!commentDocument.anonymous) {
           r.commentUser = {
             uid: commentUser.uid,

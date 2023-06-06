@@ -450,17 +450,13 @@ class NKCRender {
   }
 
   replaceTextLinkToHTML(content = '') {
-    let oldData = content;
     let html = content;
-    const newData = this.replaceLink(content);
-    if (oldData !== newData) {
-      oldData = Buffer.from(encodeURIComponent(oldData)).toString('base64');
-      const $ = cheerio.load(
-        `<span data-type="nkc-url" data-url="${oldData}"></span>`,
-      );
-      $('span[data-type="nkc-url"]').text(newData);
-      html = $('body').html();
-    }
+    const $ = cheerio.load(html);
+
+    const body = $('body');
+    this.replaceLinkInfo($, body[0]);
+
+    html = body.html();
     return htmlFilter(html);
   }
 

@@ -5,6 +5,7 @@ import {
   clearUserAvatar,
   banUser,
 } from '../lib/js/user';
+import { replaceNKCUrl } from '../lib/js/nkcUrl';
 
 window.SubscribeTypes = undefined;
 var initComplexOptions = !!localStorage.getItem('search_complexOptions');
@@ -258,6 +259,8 @@ var app = new Vue({
     if (data.form === 'complex') {
       this.openComplexForm();
     }
+
+    replaceNKCUrl();
   },
 });
 
