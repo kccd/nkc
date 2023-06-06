@@ -76,7 +76,7 @@ if !isIncluded('singlePost')
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
   mixin singlePost(props, isEditMode)
-    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url} = props;
+    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft, url, homeUrl} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp, disableAutoHideContent} = props;
     -var {digest, type, tid, highlight, hide, addr} = props;
     -var {cancelTopped, hidePostBottom, cRead, hideComment} = props;
@@ -92,7 +92,7 @@ if !isIncluded('singlePost')
 
       +singlePostEdit(isEditMode)
       +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
-      +singlePostTop(Object.assign({}, user, {docNumber: pid, addr, pid, url, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
+      +singlePostTop(Object.assign({}, user, {docNumber: pid, addr, pid, url, homeUrl, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
         +singlePostBottom({vote, voteUp, pid, count, tid, cRead, hideComment})

@@ -3,7 +3,7 @@ if !isIncluded('singlePostTop')
   mixin singlePostTop(props)
     -var {pid, docNumber, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
-    -var {cancelTopped, url, addr,} = props;
+    -var {cancelTopped, url, addr, homeUrl} = props;
     .single-post-top
       .single-post-avatar(
         data-global-mouseover="showUserPanel"
@@ -41,7 +41,7 @@ if !isIncluded('singlePostTop')
           include ../../publicModules/docNumber
           +docNumberCore(docNumber)
         .doc-order
-          a(href=url)=floor + '楼'
+          a(href=homeUrl || url)=floor + '楼'
           .single-post-checkbox
             label
               input(type='checkbox' data-pid=pid)
