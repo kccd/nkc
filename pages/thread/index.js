@@ -534,11 +534,8 @@ function setSubmitButton(submitting) {
 //判断用户是否进入了编辑模式页面
 let sortable = null;
 
+//文章回复顺序pid数组
 let postIdsOrder = [];
-
-// let replaceablePost = null;
-
-let isSingleChange = false;
 
 const dropPostContainer = document.getElementsByClassName(
   'single-posts-container',
@@ -556,7 +553,7 @@ function onEndDrop(event) {
     });
   updatePostSort();
 }
-
+//判断是否进入编辑模式，创建sortable对象
 if (isEditMode) {
   sortable = new Sortable(dropPostContainer, {
     group: 'post',
@@ -571,17 +568,12 @@ if (isEditMode) {
   handelFoldAll();
   updatePostSort();
 }
-
 //点击折叠全部
 function handelFoldAll() {
-  const postContainer = document.querySelectorAll('.single-post-container');
-  postContainer.forEach((item) => {
-    //为了区分置顶回复，和高赞回复
-    item.children.forEach((child) => {
-      if (child.classList.contains('single-post-edit')) {
-        item.classList.add('collapsed');
-      }
-    });
+  const postContainer = document.querySelector('.single-posts-container');
+  const node = postContainer.querySelectorAll('.single-post-container');
+  [...node].forEach((child) => {
+    child.classList.add('collapsed');
   });
 }
 //点击展开单个
@@ -589,15 +581,15 @@ function handelExpand(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   item.classList.remove('collapsed');
-  event.target.style.display = 'none';
-  event.target.nextElementSibling.style.display = 'inline-block';
+  item.querySelector('.expansion').style.display = 'none';
+  item.querySelector('.fold').style.display = 'inline-block';
 }
 //点击折叠单个
 function handelFold(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
-  event.target.style.display = 'none';
-  event.target.previousElementSibling.style.display = 'inline-block';
+  item.querySelector('.fold').style.display = 'none';
+  item.querySelector('.expansion').style.display = 'inline-block';
   item.classList.add('collapsed');
 }
 //handleMoveUp与handleMoveDown的公共部分
@@ -605,22 +597,24 @@ function handleMove(event, fid, tid, direction) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   const parentBox = item.parentNode;
-  const currentIndex = Array.from(parentBox.children).indexOf(item);
+  const node = parentBox.querySelectorAll('.single-post-container');
+  const totalLength = node.length;
+  const currentIndex = Array.from(node).indexOf(item);
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
-  if (targetIndex >= 0 && targetIndex < parentBox.children.length) {
+  if (targetIndex >= 0 && targetIndex < totalLength) {
     parentBox.insertBefore(
       item,
-      direction === 'up'
-        ? parentBox.children[targetIndex]
-        : parentBox.children[targetIndex + 1],
+      direction === 'up' ? node[targetIndex] : node[targetIndex + 1],
     );
-    postIdsOrder = [...parentBox.children].map((child) => {
+    postIdsOrder = [
+      ...parentBox.querySelectorAll('.single-post-container'),
+    ].map((child) => {
       return child.getAttribute('data-pid');
     });
     updatePostSort();
   } else {
-    sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
+    return sweetError(direction === 'up' ? '已经是最顶层了' : '已经是最底层了');
   }
 }
 //点击文章回复向上移动一格
@@ -661,6 +655,7 @@ function finishedEditPostOrder(fid, tid) {
     .catch(sweetError);
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
+//插入元素
 function handelInsert(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
@@ -670,8 +665,8 @@ function handelInsert(event) {
   }
   const parentBox = document.querySelector('.single-posts-container');
   const nodes = parentBox.querySelectorAll('.single-post-container');
-  console.log({ nodes });
   const totalLength = nodes.length;
+  const currentIndex = [...nodes].indexOf(item);
   let targetIndex = Number(inputElement.value) - 1;
 
   Promise.resolve()
@@ -679,28 +674,23 @@ function handelInsert(event) {
       if (isNaN(targetIndex)) {
         throw new Error('序号格式不正确');
       }
-
+      if (currentIndex === targetIndex) {
+        throw new Error('目标序号和当前序号不能相同');
+      }
       if (targetIndex < 0) {
         targetIndex = 0;
       }
-
-      console.log({
-        targetIndex,
-        totalLength: totalLength - 1,
-      });
-
-      // const currentIndex = [...nodes].indexOf(item);
-      /*if (currentIndex === targetIndex - 1 || currentIndex === targetIndex) {
-        throw new Error('目标序号和当前序号不能相同');
-      }*/
-
-      if (targetIndex > totalLength - 1) {
-        parentBox.insertBefore(item, nodes[targetIndex + 1]);
-      } else {
-        parentBox.insertBefore(item, nodes[targetIndex + 1]);
+      if (targetIndex > totalLength) {
+        targetIndex = totalLength;
       }
-
-      postIdsOrder = [...nodes].map((childItem) => {
+      const referenceNode =
+        targetIndex < currentIndex
+          ? nodes[targetIndex]
+          : nodes[targetIndex + 1];
+      parentBox.insertBefore(item, referenceNode);
+      postIdsOrder = [
+        ...parentBox.querySelectorAll('.single-post-container'),
+      ].map((childItem) => {
         return childItem.getAttribute('data-pid');
       });
       updatePostSort();
@@ -709,7 +699,6 @@ function handelInsert(event) {
       sweetError(err);
     });
 }
-
 // 发表回复
 function submit(tid) {
   Promise.resolve()
