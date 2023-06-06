@@ -739,7 +739,9 @@ function submit(tid) {
 //最新的回复排序号
 function updatePostSort() {
   const parentElement = document.querySelector('.single-posts-container');
-  const childElements = parentElement.children;
+  const childElements = parentElement.querySelectorAll(
+    '.single-post-container',
+  );
   childElements.forEach((element, index) => {
     const circleElement = element.querySelector('.real-time-floor');
     circleElement.value = `${index + 1}`;
