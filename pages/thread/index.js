@@ -534,11 +534,8 @@ function setSubmitButton(submitting) {
 //判断用户是否进入了编辑模式页面
 let sortable = null;
 
+//文章回复顺序pid数组
 let postIdsOrder = [];
-
-// let replaceablePost = null;
-
-let isSingleChange = false;
 
 const dropPostContainer = document.getElementsByClassName(
   'single-posts-container',
@@ -556,7 +553,7 @@ function onEndDrop(event) {
     });
   updatePostSort();
 }
-
+//判断是否进入编辑模式，创建sortable对象
 if (isEditMode) {
   sortable = new Sortable(dropPostContainer, {
     group: 'post',
@@ -571,7 +568,6 @@ if (isEditMode) {
   handelFoldAll();
   updatePostSort();
 }
-
 //点击折叠全部
 function handelFoldAll() {
   const postContainer = document.querySelector('.single-posts-container');
@@ -611,7 +607,9 @@ function handleMove(event, fid, tid, direction) {
       item,
       direction === 'up' ? node[targetIndex] : node[targetIndex + 1],
     );
-    postIdsOrder = [...node].map((child) => {
+    postIdsOrder = [
+      ...parentBox.querySelectorAll('.single-post-container'),
+    ].map((child) => {
       return child.getAttribute('data-pid');
     });
     updatePostSort();
@@ -657,6 +655,7 @@ function finishedEditPostOrder(fid, tid) {
     .catch(sweetError);
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
+//插入元素
 function handelInsert(event) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
@@ -689,7 +688,9 @@ function handelInsert(event) {
           ? nodes[targetIndex]
           : nodes[targetIndex + 1];
       parentBox.insertBefore(item, referenceNode);
-      postIdsOrder = [...nodes].map((childItem) => {
+      postIdsOrder = [
+        ...parentBox.querySelectorAll('.single-post-container'),
+      ].map((childItem) => {
         return childItem.getAttribute('data-pid');
       });
       updatePostSort();
