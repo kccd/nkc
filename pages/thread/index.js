@@ -4,7 +4,7 @@ import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
-import { sweetError } from '../lib/js/sweetAlert';
+import { sweetConfirm, sweetError, sweetPrompt } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
 import { visitUrlReplace } from '../lib/js/pageSwitch';
 
@@ -629,18 +629,19 @@ function handleMoveDown(event, fid, tid) {
 const handleMoveDebounce = debounce(handleMoveUp, 100);
 const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 //编辑完毕回复顺序
-function finishedEditPostOrder(fid, tid) {
+function finishedEditPostOrder(fid, tid, type) {
   return Promise.resolve()
     .then(() => {
-      if (postIdsOrder.length !== 0) {
-        const uid = NKC.configs.uid;
-        return nkcAPI('/t/' + tid + '/post-order', 'PUT', {
-          uid,
-          fid: [fid],
-          tid,
-          postIdsOrder,
-        });
+      const requestPayload = {
+        uid:NKC.configs.uid,
+        fid: [fid],
+        tid,
+        type,
+      };
+      if (type === 'saveOrder' && postIdsOrder.length !== 0) {
+        requestPayload.postIdsOrder = postIdsOrder;
       }
+      return nkcAPI('/t/' + tid + '/post-order', 'PUT', requestPayload);
     })
     .then(() => {
       postIdsOrder = [];
@@ -698,6 +699,12 @@ function handelInsert(event) {
     .catch((err) => {
       sweetError(err);
     });
+}
+//点击恢复默认排序
+function restoreDefaultOrder(fid, tid, type) {
+  sweetConfirm('是否要恢复默认排序').then(() => {
+    finishedEditPostOrder(fid, tid, type);
+  });
 }
 // 发表回复
 function submit(tid) {
@@ -1751,4 +1758,5 @@ Object.assign(window, {
   handelFold,
   finishedEditPostOrderDebounce,
   handelInsert,
+  restoreDefaultOrder,
 });

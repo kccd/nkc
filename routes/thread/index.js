@@ -9,6 +9,7 @@ const closeRouter = require('./close');
 const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+const db = require('../../dataModels');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -2195,7 +2196,7 @@ threadRouter
   })
   .put('/:tid/post-order', async (ctx, next) => {
     const { db, body } = ctx;
-    const { uid, fid, tid, postIdsOrder = [] } = body;
+    const { uid, fid, tid, postIdsOrder = [], type } = body;
     //判断用户是否具有编辑文章回复顺序的权限
     await db.ForumModel.checkEditPostPositionInRoute({
       uid,
@@ -2203,14 +2204,15 @@ threadRouter
       tid,
       isAdmin: ctx.permission('modifyAllPostOrder'),
     });
+    const thread = await db.ThreadModel.findOnly(
+      { tid },
+      { postIds: 1, uid: 1 },
+    );
+    //回复顺序的操作状态
+    const status = await db.ThreadModel.getOrderStatus();
     //执行拖拽的时候
-    if (postIdsOrder.length !== 0) {
-      const thread = await db.ThreadModel.findOnly(
-        { tid },
-        { postIds: 1, uid: 1 },
-      );
-      const { author, admin } = await db.ThreadModel.getOrderStatus();
-      const orderStatus = thread.uid === uid ? author : admin;
+    if (postIdsOrder.length !== 0 && type === 'saveOrder') {
+      const orderStatus = thread.uid === uid ? status.author : status.admin;
       const { postIds } = thread;
       const newPostIds = [...postIds].sort((a, b) => {
         const indexA = postIdsOrder.indexOf(a);
@@ -2227,6 +2229,22 @@ threadRouter
           tid,
         },
         { $set: { postIds: newPostIds, orderStatus } },
+      );
+    }
+    //恢复默认排序的时候
+    if (type === 'reOrder') {
+      const posts = await db.PostModel.find(
+        { tid, type: 'post', parentPostId: '' },
+        { pid: 1 },
+      ).sort({ toc: 1 });
+      const postIds = posts.map((post) => {
+        return post.pid;
+      });
+      await db.ThreadModel.updateOne(
+        { tid },
+        {
+          $set: { postIds },
+        },
       );
     }
     await next();
