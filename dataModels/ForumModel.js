@@ -2557,9 +2557,7 @@ forumSchema.statics.getForumsIdByUidAndType = async (uid, type) => {
     try {
       await ForumModel.checkPermission(type, user, [fid]);
       results.push(fid);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   }
   return results;
 };
