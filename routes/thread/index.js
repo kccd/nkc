@@ -822,7 +822,6 @@ threadRouter
 
     const checkEditPostPosition = await db.ForumModel.checkEditPostPosition({
       uid: state.uid,
-      fid: [thread.mainForumsId],
       tid,
       isAdmin: ctx.permission('modifyAllPostOrder'),
     });
@@ -2195,12 +2194,13 @@ threadRouter
     await next();
   })
   .put('/:tid/post-order', async (ctx, next) => {
-    const { db, body } = ctx;
-    const { uid, fid, tid, postIdsOrder = [], type } = body;
+    const { db, body, state, params } = ctx;
+    const { postIdsOrder = [], type } = body;
+    const { tid } = params;
+    const { uid } = state;
     //判断用户是否具有编辑文章回复顺序的权限
     await db.ForumModel.checkEditPostPositionInRoute({
       uid,
-      fid,
       tid,
       isAdmin: ctx.permission('modifyAllPostOrder'),
     });

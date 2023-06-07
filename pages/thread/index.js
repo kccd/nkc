@@ -593,7 +593,7 @@ function handelFold(event) {
   item.classList.add('collapsed-fold');
 }
 //handleMoveUp与handleMoveDown的公共部分
-function handleMove(event, fid, tid, direction) {
+function handleMove(event, direction) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   const parentBox = item.parentNode;
@@ -618,23 +618,21 @@ function handleMove(event, fid, tid, direction) {
   }
 }
 //点击文章回复向上移动一格
-function handleMoveUp(event, fid, tid) {
-  handleMove(event, fid, tid, 'up');
+function handleMoveUp(event) {
+  handleMove(event, 'up');
 }
 // 点击文章回复向下移动一格
-function handleMoveDown(event, fid, tid) {
-  handleMove(event, fid, tid, 'down');
+function handleMoveDown(event) {
+  handleMove(event, 'down');
 }
 //添加防抖函数
 const handleMoveDebounce = debounce(handleMoveUp, 100);
 const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 //编辑完毕回复顺序
-function finishedEditPostOrder(fid, tid, type) {
+function finishedEditPostOrder(tid, type) {
   return Promise.resolve()
     .then(() => {
       const requestPayload = {
-        uid: NKC.configs.uid,
-        fid: [fid],
         tid,
         type,
       };
@@ -701,9 +699,9 @@ function handelInsert(event) {
     });
 }
 //点击恢复默认排序
-function restoreDefaultOrder(fid, tid, type) {
+function restoreDefaultOrder(tid, type) {
   sweetConfirm('是否要恢复默认排序').then(() => {
-    finishedEditPostOrder(fid, tid, type);
+    finishedEditPostOrder(tid, type);
   });
 }
 // 发表回复
