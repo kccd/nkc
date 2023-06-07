@@ -1,8 +1,8 @@
 
 +includeCSS('/thread/editOrder/editOrder.css')
 if data.isEditMode
-  button.save-button.general-button.m-r-05(onclick=`finishedEditPostOrderDebounce('${data.thread.tid}','saveOrder')`) 保存复序
-  button.recover-button.general-button(onclick=`restoreDefaultOrder('${data.thread.tid}','reOrder')`) 恢复默认排序
+  button.btn.btn-primary.btn-xs.m-r-05(onclick=`finishedEditPostOrderDebounce('${data.thread.tid}','saveOrder')`) 保存复序
+  button.btn.btn-default.btn-xs(onclick=`restoreDefaultOrder('${data.thread.tid}','reOrder')`) 恢复默认排序
   button.fixed-button(onclick=`finishedEditPostOrderDebounce('${data.thread.tid}','saveOrder')`)
     span 保存
     br
