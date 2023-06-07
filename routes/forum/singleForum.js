@@ -411,7 +411,7 @@ router
   })
 	.get(['/', '/library'], async (ctx, next) => {
 		const {data, db, query, state} = ctx;
-		const {pageSettings} = state;
+		const {pageSettings, uid} = state;
 		const {forum} = data;
 		const recycleId = await db.SettingModel.getRecycleId();
 		let {page = 0, s, cat, d} = query;
@@ -419,8 +419,11 @@ router
 		// 构建查询条件
 		const match = {};
 		// 获取加精文章
-		if(d) {
+		if(d === 'featured') {
 			match.digest = true;
+			data.d = d;
+		}else if (uid && d === 'personal')  {
+			match.uid = uid;
 			data.d = d;
 		}
 		// 加载某个类别的文章
