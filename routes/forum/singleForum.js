@@ -411,8 +411,8 @@ router
   })
 	.get(['/', '/library'], async (ctx, next) => {
 		const {data, db, query, state} = ctx;
-		const {pageSettings} = state;
-		const {forum, user} = data;
+		const {pageSettings, uid} = state;
+		const {forum} = data;
 		const recycleId = await db.SettingModel.getRecycleId();
 		let {page = 0, s, cat, d} = query;
 		page = parseInt(page);
@@ -422,8 +422,8 @@ router
 		if(d === 'featured') {
 			match.digest = true;
 			data.d = d;
-		}else if (d === 'personal')  {
-			match.uid = user.uid;
+		}else if (uid && d === 'personal')  {
+			match.uid = uid;
 			data.d = d;
 		}
 		// 加载某个类别的文章
