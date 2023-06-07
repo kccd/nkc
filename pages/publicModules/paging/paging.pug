@@ -7,8 +7,8 @@ if data.t
   -query = `&t=${data.t}`;
 if data.c
   -query += `&c=${data.c}`;
-if data.d
-  -query += `&d=${data.d}`;
+//if data.d
+//  -query += `&d=${data.d}`;
 if data.cat
   -query += `&cat=${data.cat}`;
 //-if data.s
@@ -16,7 +16,12 @@ if data.cat
 if showPagingDigestButton
   .paging-button
     a.radius-left.button(href=`${remoteState.url}` class=!data.d?"active": "" data-type="reload") 全部
-    a.radius-right.button(href=`${remoteState.url}?d=true${query}` class=data.d?"active": "" data-type="reload") 精选
+    - var klass = data.d === 'featured' ? "active" : ""
+    if !data.user
+      -klass += ' radius-right'
+    a.button(href=`${remoteState.url}?d=featured${query}` class=klass data-type="reload") 精选
+    if data.user
+      a.radius-right.button(href=`${remoteState.url}?d=personal${query}` class=data.d === 'personal' ? "active" : "" data-type="reload") 我的
 if showPagingSortButton
   .paging-button
     a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '' data-type="reload") 复序
