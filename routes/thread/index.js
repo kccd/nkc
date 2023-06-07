@@ -2243,7 +2243,7 @@ threadRouter
       await db.ThreadModel.updateOne(
         { tid },
         {
-          $set: { postIds },
+          $set: { postIds, orderStatus: status.default },
         },
       );
     }
