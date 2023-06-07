@@ -1764,6 +1764,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       hide: post.hidePost || post.hide,
       cRead: ['r', 'rw'].includes(post.comment),
       url: tools.getUrl('post', post.pid),
+      homeUrl: tools.getUrl('postHome', post.pid),
       addr: post.addr,
       user,
       quote,

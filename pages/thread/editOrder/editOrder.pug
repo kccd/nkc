@@ -1,18 +1,17 @@
 
 +includeCSS('/thread/editOrder/editOrder.css')
-if(!data.isEditMode)
-  a.editOrder(href=`/t/${data.thread.tid}?e=true#post-top`)
-    button 调整复序
 if data.isEditMode
-  button.admin-finished.saveButton(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`) 保存复序
-  button.fixedButton(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`)
+  button.save-button.general-button.m-r-05(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`) 保存复序
+  button.recover-button.general-button.btn-warning(onclick=`restoreDefaultOrder('${data.thread.mainForumsId}','${data.thread.tid}')`) 恢复默认排序
+  button.fixed-button(onclick=`finishedEditPostOrderDebounce('${data.thread.mainForumsId}','${data.thread.tid}')`)
     span 保存
     br
     span 复序
-if(data.orderStatus !== 'default')
-  div(style='float:right;color:#555')
-    if(data.orderStatus === 'author')
-      span 作者指定排序
-    else
-      span 管理员指定排序
-
+div(style='float:right;color:#555')
+  if(data.orderStatus === 'author')
+    div.reorder.m-r-1 作者已重新排序
+  if(data.orderStatus === 'admin')
+    div.reorder.m-r-1 管理员已重新排序
+  if(!data.isEditMode)
+    a(href=`/t/${data.thread.tid}?e=true#post-top` title='调整复序')
+      span.glyphicon.glyphicon-sort(aria-hidden="true")

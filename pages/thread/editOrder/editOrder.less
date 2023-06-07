@@ -1,34 +1,18 @@
 @import "../../publicModules/base.less";
 
 
-.editOrder{
-  button{
-    font-size: 1rem;
-    border: none;
-    width: 6rem;
-    padding: 0;
-    background-color: @primary;
-    display: inline-block;
-    border-radius: 2px;
-    height: 2rem;
-    line-height: 2rem;
-    text-align: center;
-    color: #fff;
-  }
-  &:hover{
-    text-decoration: none;
-    opacity: 0.7;
-    cursor: pointer;
-  }
+.save-button{
+  background-color: @primary;
+}
+.recover-button{
+  background-color: rgb(40, 166, 67);
 }
 
-.saveButton{
+.general-button{
   font-size: 1rem;
   border: none;
-  width: 6rem;
+  width: 7rem;
   height: 2rem;
-  padding: 0;
-  background-color: @primary;
   border-radius: 2px;
   color: #fff;
   margin-bottom: 0.5rem;
@@ -36,10 +20,9 @@
   &:hover{
     opacity: 0.7;
   }
-
 }
 
-.fixedButton {
+.fixed-button {
   font-size: 1rem;
   border: none;
   width: 4rem;
@@ -59,12 +42,12 @@
   transition: box-shadow 0.3s ease;
 }
 
-.fixedButton:hover {
+.fixed-button:hover {
   opacity: 1;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.fixedButton::before {
+.fixed-button::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -78,6 +61,19 @@
   transition: opacity 0.3s ease;
 }
 
-.fixedButton:hover::before {
+.fixed-button:hover::before {
   opacity: 1;
 }
+
+.reorder{
+  color: #333;
+  background-color: rgb(253, 236, 240);
+  padding: 0.25rem;
+  border-radius: 3px;
+  display: inline-block;
+  position: relative;
+  bottom: 0.125rem;
+  font-weight: bold;
+}
+
+

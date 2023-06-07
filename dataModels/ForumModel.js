@@ -2299,9 +2299,10 @@ forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
         };
       }
     } else {
-      return { status: 200, message: '该用户用于相关权限' };
+      return { status: 200, message: '' };
     }
   }
+  return { status: 200, message: '' };
 };
 /*
  * 检查用户在指定专业的权限
@@ -2557,7 +2558,9 @@ forumSchema.statics.getForumsIdByUidAndType = async (uid, type) => {
     try {
       await ForumModel.checkPermission(type, user, [fid]);
       results.push(fid);
-    } catch (err) {}
+    } catch (err) {
+      // console.log(err);
+    }
   }
   return results;
 };
