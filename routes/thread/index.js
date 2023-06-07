@@ -2199,7 +2199,6 @@ threadRouter
     //判断用户是否具有编辑文章回复顺序的权限
     await db.ForumModel.checkEditPostPositionInRoute({
       uid,
-      fid,
       tid,
       isAdmin: ctx.permission('modifyAllPostOrder'),
     });
