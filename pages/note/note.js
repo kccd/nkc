@@ -10,7 +10,7 @@ const app = new Vue({
   data: {
     uid: NKC.configs.uid,
     note: data.note,
-    query: Number(data.query.n),
+    query: Number(data.query && data.query.n),
     submitting: false,
     content: "",
     noteStatus:{
@@ -26,7 +26,7 @@ const app = new Vue({
       if(e.target.classList.contains("note-options-icon")) return;
       app.note.notes.map(note => note.options = false);
     });
-    if(data.query.n){
+    if(data.query && data.query.n){
       const element = $(`#${data.query.n}`);
       scrollPageToElement(element); //滚动
     }
