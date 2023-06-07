@@ -2345,15 +2345,11 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
  *    @param {[string]} fid 专业ID组成的数组
  * }}
  * */
-forumSchema.statics.checkEditPostPosition = async ({
-  uid,
-  fid,
-  tid,
-  isAdmin,
-}) => {
+forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
   const thread = await ThreadModel.findOnly({ tid }, { uid: 1 });
+  const fid = thread.mainForumsId;
   //判断是否有管理员权限可以使用该功能
   if (isAdmin) {
     return { status: 200 };
@@ -2376,14 +2372,12 @@ forumSchema.statics.checkEditPostPosition = async ({
  * */
 forumSchema.statics.checkEditPostPositionInRoute = async ({
   uid,
-  fid,
   tid,
   isAdmin,
 }) => {
   const ForumModel = mongoose.model('forums');
   const { status, message } = await ForumModel.checkEditPostPosition({
     uid,
-    fid,
     tid,
     isAdmin,
   });

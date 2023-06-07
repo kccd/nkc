@@ -4,7 +4,7 @@ import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
-import { sweetError } from '../lib/js/sweetAlert';
+import { sweetConfirm, sweetError, sweetPrompt } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
 import { visitUrlReplace } from '../lib/js/pageSwitch';
 
@@ -593,7 +593,7 @@ function handelFold(event) {
   item.classList.add('collapsed-fold');
 }
 //handleMoveUp与handleMoveDown的公共部分
-function handleMove(event, fid, tid, direction) {
+function handleMove(event, direction) {
   event.stopPropagation();
   const item = event.target.closest('.single-post-container');
   const parentBox = item.parentNode;
@@ -618,29 +618,28 @@ function handleMove(event, fid, tid, direction) {
   }
 }
 //点击文章回复向上移动一格
-function handleMoveUp(event, fid, tid) {
-  handleMove(event, fid, tid, 'up');
+function handleMoveUp(event) {
+  handleMove(event, 'up');
 }
 // 点击文章回复向下移动一格
-function handleMoveDown(event, fid, tid) {
-  handleMove(event, fid, tid, 'down');
+function handleMoveDown(event) {
+  handleMove(event, 'down');
 }
 //添加防抖函数
 const handleMoveDebounce = debounce(handleMoveUp, 100);
 const handleMoveDownDebounce = debounce(handleMoveDown, 100);
 //编辑完毕回复顺序
-function finishedEditPostOrder(fid, tid) {
+function finishedEditPostOrder(tid, type) {
   return Promise.resolve()
     .then(() => {
-      if (postIdsOrder.length !== 0) {
-        const uid = NKC.configs.uid;
-        return nkcAPI('/t/' + tid + '/post-order', 'PUT', {
-          uid,
-          fid: [fid],
-          tid,
-          postIdsOrder,
-        });
+      const requestPayload = {
+        tid,
+        type,
+      };
+      if (type === 'saveOrder' && postIdsOrder.length !== 0) {
+        requestPayload.postIdsOrder = postIdsOrder;
       }
+      return nkcAPI('/t/' + tid + '/post-order', 'PUT', requestPayload);
     })
     .then(() => {
       postIdsOrder = [];
@@ -667,7 +666,7 @@ function handelInsert(event) {
   const nodes = parentBox.querySelectorAll('.single-post-container');
   const totalLength = nodes.length;
   const currentIndex = [...nodes].indexOf(item);
-  let targetIndex = Number(inputElement.value) - 1;
+  let targetIndex = Math.ceil(Number(inputElement.value) - 1);
 
   Promise.resolve()
     .then(() => {
@@ -698,6 +697,12 @@ function handelInsert(event) {
     .catch((err) => {
       sweetError(err);
     });
+}
+//点击恢复默认排序
+function restoreDefaultOrder(tid, type) {
+  sweetConfirm('是否要恢复默认排序').then(() => {
+    finishedEditPostOrder(tid, type);
+  });
 }
 // 发表回复
 function submit(tid) {
@@ -1751,4 +1756,5 @@ Object.assign(window, {
   handelFold,
   finishedEditPostOrderDebounce,
   handelInsert,
+  restoreDefaultOrder,
 });
