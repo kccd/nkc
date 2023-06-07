@@ -2345,15 +2345,13 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
  *    @param {[string]} fid 专业ID组成的数组
  * }}
  * */
-forumSchema.statics.checkEditPostPosition = async ({
-  uid,
-  fid,
-  tid,
-  isAdmin,
-}) => {
+forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
-  const thread = await ThreadModel.findOnly({ tid }, { uid: 1 });
+  const thread = await ThreadModel.findOnly(
+    { tid },
+    { uid: 1, mainForumsId: 1 },
+  );
   //判断是否有管理员权限可以使用该功能
   if (isAdmin) {
     return { status: 200 };
@@ -2362,10 +2360,15 @@ forumSchema.statics.checkEditPostPosition = async ({
   if (thread.uid !== uid) {
     return { status: 403, message: '权限不足' };
   }
+  const mainForumsId = thread.mainForumsId;
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
-  return await ForumModel.checkPermissionCore('editPostPosition', user, fid);
+  return await ForumModel.checkPermissionCore(
+    'editPostPosition',
+    user,
+    mainForumsId,
+  );
 };
 
 /*
@@ -2376,14 +2379,12 @@ forumSchema.statics.checkEditPostPosition = async ({
  * */
 forumSchema.statics.checkEditPostPositionInRoute = async ({
   uid,
-  fid,
   tid,
   isAdmin,
 }) => {
   const ForumModel = mongoose.model('forums');
   const { status, message } = await ForumModel.checkEditPostPosition({
     uid,
-    fid,
     tid,
     isAdmin,
   });

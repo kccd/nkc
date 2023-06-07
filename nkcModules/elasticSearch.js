@@ -673,9 +673,12 @@ func.search = async (t, c, options) => {
 
     if (author) {
       let uid = '';
-      const user = await UserModel.findOne({
-        usernameLowerCase: (author || '').toLowerCase(),
-      });
+      const user = await UserModel.findOne(
+        {
+          usernameLowerCase: (author || '').toLowerCase(),
+        },
+        { uid: 1 },
+      );
       if (user) {
         uid = user.uid;
       }
@@ -687,6 +690,9 @@ func.search = async (t, c, options) => {
       //添加只查看该用户的搜索结果
       body.query.bool.must[0].bool.should[0].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[2].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[3].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[4].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[5].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[6].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[7].bool.must.push(authorMatch);
