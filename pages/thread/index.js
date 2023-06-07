@@ -633,7 +633,7 @@ function finishedEditPostOrder(fid, tid, type) {
   return Promise.resolve()
     .then(() => {
       const requestPayload = {
-        uid:NKC.configs.uid,
+        uid: NKC.configs.uid,
         fid: [fid],
         tid,
         type,
@@ -668,7 +668,7 @@ function handelInsert(event) {
   const nodes = parentBox.querySelectorAll('.single-post-container');
   const totalLength = nodes.length;
   const currentIndex = [...nodes].indexOf(item);
-  let targetIndex = Number(inputElement.value) - 1;
+  let targetIndex = Math.ceil(Number(inputElement.value) - 1);
 
   Promise.resolve()
     .then(() => {
