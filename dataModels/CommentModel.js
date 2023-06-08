@@ -351,6 +351,13 @@ schema.methods.modifyComment = async function (props) {
   //   }
   // });
 };
+//在编辑的时候，判断是否有稳定的版本已经存在了
+schema.methods.isExistStableV = async function () {
+  const DocumentModel = mongoose.model('documents');
+  const { did } = this;
+  const res = await DocumentModel.find({ did, type: 'stable' });
+  return res.length !== 0;
+};
 /*
  * 拓展展示的comment评论数据
  * @param {object} props

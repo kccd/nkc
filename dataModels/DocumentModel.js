@@ -707,7 +707,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     content,
     betaDocument._id,
   );
-  await betaDocument.updateOne({
+  const updateObject = {
     $set: {
       title,
       content: html,
@@ -720,9 +720,11 @@ schema.statics.updateDocumentByDid = async (did, props) => {
       tlm,
       origin,
       authorInfos,
-      quoteDid,
+      ...(quoteDid && { quoteDid }), // 使用对象扩展运算符根据条件添加属性
     },
-  });
+  };
+
+  await betaDocument.updateOne(updateObject);
   const _betaDocument = await DocumentModel.findOnly({ _id: betaDocument._id });
   await _betaDocument.updateResourceReferences();
   if (coverFile) {
