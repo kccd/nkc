@@ -8,6 +8,7 @@ const {
   ThrowCommonError,
   ThrowServerInternalError,
 } = require('../nkcModules/error');
+const { json } = require('elasticsearch/src/lib/serializers');
 
 const userSchema = new Schema(
   {
@@ -3007,10 +3008,20 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
         await ForumModel.checkWritePostPermission(uid, fids);
       }
     } catch (err) {
-      result = {
-        permit: false,
-        warning: `<div>${err.message}</div>`,
-      };
+      try {
+        const {
+          args: { message },
+        } = JSON.parse(err.message);
+        result = {
+          permit: false,
+          warning: `<div>${message}</div>`,
+        };
+      } catch (_err) {
+        result = {
+          permit: false,
+          warning: `<div>${err.message}</div>`,
+        };
+      }
     }
   }
   const shouldVerifyPhoneNumber =
