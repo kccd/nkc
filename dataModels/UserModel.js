@@ -8,7 +8,7 @@ const {
   ThrowCommonError,
   ThrowServerInternalError,
 } = require('../nkcModules/error');
-const { json } = require('elasticsearch/src/lib/serializers');
+
 
 const userSchema = new Schema(
   {
