@@ -1,12 +1,12 @@
-import {getDataById} from "../../lib/js/dataConversion";
-import {getSocket} from "../../lib/js/socket";
+import { getDataById } from '../../lib/js/dataConversion';
+import { getSocket } from '../../lib/js/socket';
 const socket = getSocket();
 const data = getDataById('data');
-const {article} = data;
-import CommentEditor from "../../lib/vue/comment/CommentEditor";
-if(data.type === 'article' && $("#commentEditor").length !== 0) {
+const { article } = data;
+import CommentEditor from '../../lib/vue/comment/CommentEditor';
+if (data.type === 'article' && $('#commentEditor').length !== 0) {
   window.commentEditor = new Vue({
-    el: "#commentEditor",
+    el: '#commentEditor',
     data: {
       comment: data.comment || null,
       articleId: data.article._id || '',
@@ -14,57 +14,57 @@ if(data.type === 'article' && $("#commentEditor").length !== 0) {
       addedToColumn: data.addedToColumn,
     },
     components: {
-      "comment-editor": CommentEditor
+      'comment-editor': CommentEditor,
     },
     mounted() {
       this.initId();
     },
     methods: {
-      initId() {
-      },
+      initId() {},
       //引用评论
       quoteComment(docId) {
         this.$refs.commentEditor.changeQuote(docId, 'article');
-      }
-    }
-  })
+      },
+    },
+  });
 }
 
-
-import CommentOptions from "../../comment/CommentOptions";
-import DisabledComment from "../../lib/vue/DisabledComment";
-import Complaint from "../../lib/vue/Complaint";
-import ViolationRecord from "../../lib/vue/ViolationRecord";
-import CommentPostEditor from "../../lib/vue/comment/CommentPostEditor";
-import {nkcAPI} from "../../lib/js/netAPI";
-import {screenTopAlert, screenTopWarning} from "../../lib/js/topAlert";
-import CommentHit from "../../lib/vue/comment/CommentHit";
-import {contentTypes, creditTypes} from "../../lib/vue/Credit";
+import CommentOptions from '../../comment/CommentOptions';
+import DisabledComment from '../../lib/vue/DisabledComment';
+import Complaint from '../../lib/vue/Complaint';
+import ViolationRecord from '../../lib/vue/ViolationRecord';
+import CommentPostEditor from '../../lib/vue/comment/CommentPostEditor';
+import { nkcAPI } from '../../lib/js/netAPI';
+import { screenTopAlert, screenTopWarning } from '../../lib/js/topAlert';
+import CommentHit from '../../lib/vue/comment/CommentHit';
+import { contentTypes, creditTypes } from '../../lib/vue/Credit';
 const singleBottomDom = $('.single-post-bottom');
 const singleCommentBottom = {};
-for(let i = 0;i < singleBottomDom.length;i++) {
+for (let i = 0; i < singleBottomDom.length; i++) {
   const dom = singleBottomDom.eq(i);
-  if(!dom) continue;
+  if (!dom) {
+    continue;
+  }
   const cid = dom.attr('cid');
-  if(!cid) continue;
+  if (!cid) {
+    continue;
+  }
   initSingleCommentBottom(cid);
 }
 
 function initSingleCommentBottom(cid) {
   singleCommentBottom[cid] = new Vue({
     el: `#singleCommentBottom_${cid}`,
-    data: {
-    },
+    data: {},
     components: {
-      "comment-options": CommentOptions,
-      "disabled-comment": DisabledComment,
+      'comment-options': CommentOptions,
+      'disabled-comment': DisabledComment,
       complaint: Complaint,
-      "violation-record": ViolationRecord,
-      "comment-post-editor": CommentPostEditor,
-      "comment-hit": CommentHit
+      'violation-record': ViolationRecord,
+      'comment-post-editor': CommentPostEditor,
+      'comment-hit': CommentHit,
     },
-    mounted() {
-    },
+    mounted() {},
     methods: {
       getDataById: getDataById,
       //其他操作
@@ -74,21 +74,26 @@ function initSingleCommentBottom(cid) {
         const cid = e.getAttribute('data-cid');
         const data = this.getDataById(`comment_${cid}`);
         const init = e.getAttribute('data-init');
-        if(init === 'true') return;
-        this.$refs.commentOptions.open({DOM: target, comment: data.comment, direction});
+        if (init === 'true') {
+          return;
+        }
+        this.$refs.commentOptions.open({
+          DOM: target,
+          comment: data.comment,
+          direction,
+        });
         //阻止事件冒泡到父级
         // event.stopPropagation();
       },
       //查看违规记录
       violationRecord(uid) {
-        this.$refs.violationRecord.open({uid});
+        this.$refs.violationRecord.open({ uid });
       },
       //退修或删除
       disableComment(docId) {
-        this.$refs.disabledComment.open(function (res){
-        }, {
-          docId
-        })
+        this.$refs.disabledComment.open(function (res) {}, {
+          docId,
+        });
       },
       //投诉或举报
       complaint(cid) {
@@ -96,7 +101,9 @@ function initSingleCommentBottom(cid) {
       },
       //编辑评论
       editorComment(cid) {
-        if(!cid) return;
+        if (!cid) {
+          return;
+        }
         this.switchCommentEditor(cid);
       },
       //关闭评论编辑器
@@ -123,19 +130,20 @@ function initSingleCommentBottom(cid) {
       },
       //评论解封
       unblock(docId) {
-        if(!docId) return;
+        if (!docId) {
+          return;
+        }
         nkcAPI(`/comment/${docId}/unblock`, 'POST', {
-          docsId: [docId]
+          docsId: [docId],
         })
           .then(() => {
-            screenTopAlert(docId +' 已解除屏蔽')
+            screenTopAlert(docId + ' 已解除屏蔽');
           })
-          .catch(err => {
+          .catch((err) => {
             sweetError(err);
-          })
-      }
-
-    }
+          });
+      },
+    },
   });
 }
 
@@ -145,17 +153,17 @@ function getPostsDom() {
 
 //重置选中评论
 function resetCheckbox() {
-  getPostsDom().prop("checked", false);
+  getPostsDom().prop('checked', false);
 }
 
 //评论管理开关
 function manageComments() {
   resetCheckbox();
   const comments = getPostsDom();
-  if(comments.eq(0).css("display") === "none") {
-    comments.css("display", "inline-block")
+  if (comments.eq(0).css('display') === 'none') {
+    comments.css('display', 'inline-block');
   } else {
-    comments.css("display", "none");
+    comments.css('display', 'none');
   }
 }
 
@@ -163,10 +171,10 @@ function manageComments() {
 function getMarkedCommentDocId() {
   const commentsDocId = [];
   const comments = getPostsDom();
-  for(var i = 0;i < comments.length;i ++) {
+  for (var i = 0; i < comments.length; i++) {
     const comment = comments.eq(i);
-    if(comment.prop("checked")) {
-      commentsDocId.push(comment.attr("data-docId"));
+    if (comment.prop('checked')) {
+      commentsDocId.push(comment.attr('data-docId'));
     }
   }
   return commentsDocId;
@@ -175,17 +183,21 @@ function getMarkedCommentDocId() {
 //全选
 function markAllComments() {
   const comments = getPostsDom();
-  if(comments.eq(0).css("display") !== "inline-block") return;
+  if (comments.eq(0).css('display') !== 'inline-block') {
+    return;
+  }
   var length = comments.length;
   var count = 0;
-  for(var i = 0; i < length; i++) {
+  for (var i = 0; i < length; i++) {
     var p = comments.eq(i);
-    if(p.prop("checked")) count ++;
+    if (p.prop('checked')) {
+      count++;
+    }
   }
-  if(length === count) {
-    comments.prop("checked", false);
+  if (length === count) {
+    comments.prop('checked', false);
   } else {
-    comments.prop("checked", true);
+    comments.prop('checked', true);
   }
 }
 
@@ -203,27 +215,36 @@ var nkchl = [];
 
 // 回复发表成功后将后台返回的内容动态插入最后一页评论页
 function insertRenderedComment(renderedComment) {
-  if(!renderedComment) return;
+  if (!renderedComment) {
+    return;
+  }
   //排除自己的发表
-  if(renderedComment.comment && NKC.configs.uid !== renderedComment.comment.uid) {
-    const comment={
+  if (
+    renderedComment.comment &&
+    NKC.configs.uid !== renderedComment.comment.uid
+  ) {
+    const comment = {
       content: renderedComment.comment.content,
       contentUrl: renderedComment.comment.commentUrl,
-      avatarUrl: renderedComment.comment.user && renderedComment.comment.user.avatarUrl,
+      avatarUrl:
+        renderedComment.comment.user && renderedComment.comment.user.avatarUrl,
       postId: renderedComment.comment.did,
       uid: renderedComment.comment.uid,
-      username: renderedComment.comment.user && renderedComment.comment.user.username,
-    }
+      username:
+        renderedComment.comment.user && renderedComment.comment.user.username,
+    };
     bulletComments.add(comment);
   }
   //仅在最后一页时才动态插入内容
-  if(!data.isLastPage) return;
+  if (!data.isLastPage) {
+    return;
+  }
   var JQDOM = $(renderedComment.html).find('.single-post-container');
   JQDOM = JQDOM[0];
   // 公式渲染
-  try{
+  try {
     MathJax.typesetPromise([JQDOM]);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
   JQDOM = $(JQDOM);
@@ -250,11 +271,11 @@ function insertRenderedComment(renderedComment) {
 }
 
 $(function () {
-  if(NKC.configs.uid && socket) {
+  if (NKC.configs.uid && socket) {
     window.bulletComments = new NKC.modules.BulletComments({
-      offsetTop: NKC.configs.isApp? 20: 60
+      offsetTop: NKC.configs.isApp ? 20 : 60,
     });
-    if(socket.connected) {
+    if (socket.connected) {
       joinCommentRoom();
     } else {
       socket.on('connect', function () {
@@ -272,39 +293,47 @@ function joinCommentRoom() {
     type: 'article',
     data: {
       articleId: article._id,
-    }
-  })
+    },
+  });
 }
 
 //屏蔽鼓励原因
 function hideCommentKcbRecord(cid, recordId, hide) {
-  nkcAPI("/comment/" + cid + "/credit/kcb/" + recordId, "PUT", {
-    hide: !!hide
+  nkcAPI('/comment/' + cid + '/credit/kcb/' + recordId, 'PUT', {
+    hide: !!hide,
   })
-    .then(function() {
-      if(hide) {
-        screenTopAlert("屏蔽成功");
+    .then(function () {
+      if (hide) {
+        screenTopAlert('屏蔽成功');
       } else {
-        screenTopAlert("已取消屏蔽");
+        screenTopAlert('已取消屏蔽');
       }
     })
-    .catch(function(data) {
+    .catch(function (data) {
       screenTopWarning(data);
-    })
+    });
 }
 
 //撤销学术分
 function cancelCommentXsf(cid, id) {
   var reason = prompt('请输入撤销原因：');
-  if(reason === null) return;
-  if(reason === '') return screenTopWarning('撤销原因不能为空！');
-  nkcAPI('/comment/' + cid + '/credit/xsf/' + id + '?reason=' + reason, 'DELETE', {})
-    .then(function() {
+  if (reason === null) {
+    return;
+  }
+  if (reason === '') {
+    return screenTopWarning('撤销原因不能为空！');
+  }
+  nkcAPI(
+    '/comment/' + cid + '/credit/xsf/' + id + '?reason=' + reason,
+    'DELETE',
+    {},
+  )
+    .then(function () {
       window.location.reload();
     })
-    .catch(function(data) {
+    .catch(function (data) {
       screenTopWarning(data.error || data);
-    })
+    });
 }
 
 //鼓励回复
