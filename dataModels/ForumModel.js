@@ -2348,8 +2348,10 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
 forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
-  const thread = await ThreadModel.findOnly({ tid }, { uid: 1 });
-  const fid = thread.mainForumsId;
+  const thread = await ThreadModel.findOnly(
+    { tid },
+    { uid: 1, mainForumsId: 1 },
+  );
   //判断是否有管理员权限可以使用该功能
   if (isAdmin) {
     return { status: 200 };
@@ -2358,10 +2360,15 @@ forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   if (thread.uid !== uid) {
     return { status: 403, message: '权限不足' };
   }
+  const mainForumsId = thread.mainForumsId;
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
-  return await ForumModel.checkPermissionCore('editPostPosition', user, fid);
+  return await ForumModel.checkPermissionCore(
+    'editPostPosition',
+    user,
+    mainForumsId,
+  );
 };
 
 /*

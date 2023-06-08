@@ -4,7 +4,7 @@ import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
-import { sweetConfirm, sweetError, sweetPrompt } from '../lib/js/sweetAlert';
+import { sweetError, sweetQuestion } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
 import { visitUrlReplace } from '../lib/js/pageSwitch';
 
@@ -700,8 +700,8 @@ function handelInsert(event) {
 }
 //点击恢复默认排序
 function restoreDefaultOrder(tid, type) {
-  sweetConfirm('是否要恢复默认排序').then(() => {
-    finishedEditPostOrder(tid, type);
+  sweetQuestion('当前操作无法撤回，确定要执行吗？').then(() => {
+    finishedEditPostOrder(tid, type).catch(sweetError);
   });
 }
 // 发表回复

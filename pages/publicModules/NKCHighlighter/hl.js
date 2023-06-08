@@ -55,7 +55,7 @@ NKC.modules.NKCHL = class {
           return;
         }
         // if(window.notePanel && window.notePanel.isOpen()) return;
-        let {range} = data;
+        let { range } = data;
         self.sleep(200)
           .then(() => {
             const offset = self.hl.getStartNodeOffset(range);

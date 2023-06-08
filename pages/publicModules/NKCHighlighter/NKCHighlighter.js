@@ -235,6 +235,7 @@ window.NKCHighlighter = class {
 
 
     self.range = {};
+    self.sel = {};
     self.sources = [];
     self.events = {};
     self.disabled = false;
@@ -266,7 +267,7 @@ window.NKCHighlighter = class {
     try{
       // 屏蔽划词事件
       if(this.disabled) return;
-      const range = this.getRange();
+      const { range, sel } = this.getRange();
       if(!range || range.collapsed) return;
       if(
         range.startContainer === this.range.startContainer &&
@@ -277,6 +278,7 @@ window.NKCHighlighter = class {
       // 限制选择文字的区域，只能是root下的选区
       if(!this.contains(range.startContainer) || !this.contains(range.endContainer)) return;
       this.range = range;
+      this.sel = sel;
       this.emit(this.eventNames.select, {
         range
       });
@@ -297,7 +299,8 @@ window.NKCHighlighter = class {
   }
   getRange() {
     try{
-      const range = window.getSelection().getRangeAt(0);
+      const sel = window.getSelection();
+      const range = sel.getRangeAt(0);
       const {startOffset, endOffset, startContainer, endContainer} = range;
       this.getParent(this, startContainer);
       this.getParent(this, endContainer);
@@ -306,7 +309,7 @@ window.NKCHighlighter = class {
         this.getParent(this, node);
       });
       if(startOffset === endOffset && startContainer === endContainer) return;
-      return range;
+      return { sel, range };
     } catch(err) {
       console.log(err.message || err);
     }
@@ -550,15 +553,20 @@ window.NKCHighlighter = class {
     // 在选区起始处插入span
     // 获取span的位置信息
     // 移除span
-    let span = document.createElement("span");
+    // 保存当前选区
+    const selection = this.sel;
+    let span = document.createElement('span');
     // span.style.display = "none";
-    span.style.display = "inline-block";
-    span.style.verticalAlign = "top";
+    span.style.display = 'inline-block';
+    span.style.verticalAlign = 'top';
     range.insertNode(span);
     const parentNode = span.parentNode;
-    span.style.width = "30px";
+    span.style.width = '30px';
     const offset = this.offset(span);
     parentNode.removeChild(span);
+    // 恢复选区
+    // selection.removeAllRanges();
+    selection.addRange(range);
     return offset;
   }
   lock() {

@@ -456,7 +456,7 @@ block content
                -post.highlight = data.highlight;
                +singlePost(post, data.isEditMode)
           //- 回复列表尾部分页、管理按钮
-          .p-l-2.p-r-2.m-b--05
+          .p-l-2.p-r-2.m-b--05(style="min-height: 4.5rem;")
             if !data.isEditMode
               include ../publicModules/paging/paging_input
             //-+articleNav
