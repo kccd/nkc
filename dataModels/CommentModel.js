@@ -355,12 +355,8 @@ schema.methods.modifyComment = async function (props) {
 schema.methods.isExistStableV = async function () {
   const DocumentModel = mongoose.model('documents');
   const { did } = this;
-  const res = await DocumentModel.find({ did }, { type: 1 });
-  if (res) {
-    return res.some((item) => {
-      return item.type === 'stable';
-    });
-  }
+  const res = await DocumentModel.find({ did, type: 'stable' });
+  return res.length !== 0;
 };
 /*
  * 拓展展示的comment评论数据
