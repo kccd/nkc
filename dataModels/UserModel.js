@@ -9,7 +9,6 @@ const {
   ThrowServerInternalError,
 } = require('../nkcModules/error');
 
-
 const userSchema = new Schema(
   {
     // 是否注销

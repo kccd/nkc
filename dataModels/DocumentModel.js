@@ -690,7 +690,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     tlm,
     origin,
     authorInfos,
-    quoteDid = '',
+    quoteDid,
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const DocumentModel = mongoose.model('documents');
@@ -720,9 +720,12 @@ schema.statics.updateDocumentByDid = async (did, props) => {
       tlm,
       origin,
       authorInfos,
-      ...(quoteDid && { quoteDid }), // 使用对象扩展运算符根据条件添加属性
     },
   };
+  //如果上层函数没有传入quoteDid，就代表是编辑模式，不用去更改引用字段
+  if (quoteDid !== undefined) {
+    updateObject.quoteDid = quoteDid;
+  }
 
   await betaDocument.updateOne(updateObject);
   const _betaDocument = await DocumentModel.findOnly({ _id: betaDocument._id });
