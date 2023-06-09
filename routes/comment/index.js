@@ -128,11 +128,13 @@ router
         port: ctx.port,
       });
     } else if (comment) {
+      const isExistStableV = await comment.isExistStableV();
+      //这里是为了区分是否要取消引用
       await comment.modifyComment({
-        quoteDid,
+        quoteDid: isExistStableV ? undefined : quoteDid ? quoteDid : '',
         content,
       });
-      const isExistStableV = await comment.isExistStableV();
+
       if (type === 'publish') {
         nkcModules.checkData.checkString(content, {
           name: '内容',
