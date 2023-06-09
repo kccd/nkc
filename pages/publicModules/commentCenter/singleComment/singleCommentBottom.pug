@@ -2,7 +2,7 @@
 if !isIncluded('singlePostBottom')
   include ./singleCommentVote
   mixin singleCommentBottom(props)
-    -var {cid, docId, props: comment, voteDown, voteUp, vote, articleId, permissions} = props;
+    -var {cid, docId, props: comment, voteDown, voteUp, vote, articleId, permissions ,} = props;
     .single-post-bottom(id=`singleCommentBottom_${cid}` cid=cid)
       violation-record(ref="violationRecord")
       complaint(ref="complaint")
