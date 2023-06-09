@@ -131,7 +131,7 @@ router
       const isExistStableV = await comment.isExistStableV();
       //这里是为了区分是否要取消引用
       await comment.modifyComment({
-        quoteDid: isExistStableV ? undefined : '',
+        quoteDid: isExistStableV ? undefined : quoteDid ? quoteDid : '',
         content,
       });
 
