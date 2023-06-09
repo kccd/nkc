@@ -44,8 +44,9 @@ const usersPersonalSchema = new Schema({
   },
 	// 修改密码后刷新
 	secret: {
-  	type: String,
-		required: true
+  	type: [String],
+		required: true,
+		default: []
 	},
   password: {
     salt: {
