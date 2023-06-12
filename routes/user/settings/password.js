@@ -35,16 +35,26 @@ passwordRouter
 			newHash: newPassword.password.hash,
 			newSalt: newPassword.password.salt
 		};
+		const address = ctx.address;
+		const port = ctx.port;
+		const userAgent = ctx.request.headers['user-agent'];
+		const loginRecordDoc = await db.LoginRecordModel.createLoginRecord({
+			uid: user.uid,
+			ip: address,
+			port,
+			userAgent,
+		});
 		await userPersonal.updateOne({
 			password: newPassword.password,
-			secret: newPassword.secret,
+			secret: [loginRecordDoc._id],
 			hashType: newPassword.hashType
 		});
+
 		await db.SecretBehaviorModel(behavior).save();
 		ctx.setCookie("userInfo", {
 			uid: user.uid,
 			username: user.username,
-			lastLogin: newPassword.secret
+			lastLogin: loginRecordDoc._id
 		});
 		// 兼容app，修改app时去掉
 		data.loginKey = "";

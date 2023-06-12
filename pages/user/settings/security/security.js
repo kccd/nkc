@@ -2,32 +2,30 @@ function submitPassword(uid) {
   var obj = {
     oldPassword: $('#oldPassword').val(),
     password: $('#password').val(),
-    password2: $('#password2').val()
+    password2: $('#password2').val(),
   };
-  if(obj.oldPassword === '') {
+  if (obj.oldPassword === '') {
     return sweetError('请输入旧密码');
   }
-  if(obj.password === '') {
+  if (obj.password === '') {
     return sweetError('请输入新密码');
   }
-  if(obj.password !== obj.password2) {
+  if (obj.password !== obj.password2) {
     return sweetError('两次输入的新密码不一致');
   }
   delete obj.password2;
-  nkcAPI('/u/'+uid+'/settings/password', 'PUT', obj)
-    .then(function() {
+  nkcAPI('/u/' + uid + '/settings/password', 'PUT', obj)
+    .then(function () {
       sweetSuccess('修改成功');
     })
-    .catch(function(data) {
+    .catch(function (data) {
       sweetError(data.error);
-    })
+    });
 }
-
-
 
 var nationCode = '86';
 //选择国际区号
-function chooseCountryNum(num){
+function chooseCountryNum(num) {
   nationCode = parseInt(num);
 }
 
@@ -36,9 +34,7 @@ function changeNumber() {
   $('#inputDiv').show();
 }
 
-
-
-var email={
+var email = {
   'qq.com': 'http://mail.qq.com',
   'gmail.com': 'http://mail.google.com',
   'sina.com': 'http://mail.sina.com.cn',
@@ -59,394 +55,433 @@ var email={
   'eyou.com': 'http://www.eyou.com/',
   '21cn.com': 'http://mail.21cn.com/',
   '188.com': 'http://www.188.com/',
-  'foxmail.com': 'http://www.foxmail.com'
+  'foxmail.com': 'http://www.foxmail.com',
 };
 
 function sendBindEmail(uid) {
   var obj = {
     email: $('#email').val(),
-    operation: 'bindEmail'
+    operation: 'bindEmail',
   };
-  if(obj.email === '') {
+  if (obj.email === '') {
     return sweetError('请输入邮箱地址');
   }
   obj.email = obj.email.trim();
-  nkcAPI('/u/'+uid+'/settings/email', 'POST', obj)
-    .then(function() {
+  nkcAPI('/u/' + uid + '/settings/email', 'POST', obj)
+    .then(function () {
       var url = obj.email.split('@')[1];
       var href = email[url] || '###';
-      var aHTML = $('<a href="'+href+'" target="_blank">'+obj.email+'</a>');
+      var aHTML = $(
+        '<a href="' + href + '" target="_blank">' + obj.email + '</a>',
+      );
       $('#emailInfo').html(aHTML);
       $('#bindEmailDiv').show();
       $('input[name="email"]').val(obj.email);
     })
-    .catch(function(data) {
+    .catch(function (data) {
       sweetError(data.error || data);
-    })
+    });
 }
 
 function verifyOldEmail(uid, oldEmail) {
   var obj = {
-    operation: 'verifyOldEmail'
+    operation: 'verifyOldEmail',
   };
-  nkcAPI('/u/'+uid+'/settings/email', 'POST', obj)
-    .then(function() {
+  nkcAPI('/u/' + uid + '/settings/email', 'POST', obj)
+    .then(function () {
       $('#changeBtn').text('重新发送邮件');
       var url = oldEmail.split('@')[1];
       var href = email[url] || '###';
-      var aHTML = $('<a href="'+href+'" target="_blank">'+oldEmail+'</a>');
+      var aHTML = $(
+        '<a href="' + href + '" target="_blank">' + oldEmail + '</a>',
+      );
       $('#oldEmail').html(aHTML);
       $('#verifyOldEmailDiv').show();
     })
-    .catch(function(data) {
+    .catch(function (data) {
       sweetError(data.error || data);
-    })
+    });
 }
 
 function sendNewEmail(uid) {
   var obj = {
     oldToken: $('#oldToken').val(),
     email: $('#email').val(),
-    operation: 'verifyNewEmail'
+    operation: 'verifyNewEmail',
   };
-  if(obj.email === '') {
+  if (obj.email === '') {
     return sweetError('请输入新邮箱地址');
   }
   obj.email = obj.email.trim();
-  nkcAPI('/u/'+uid+'/settings/email', 'POST', obj)
-    .then(function() {
+  nkcAPI('/u/' + uid + '/settings/email', 'POST', obj)
+    .then(function () {
       var url = obj.email.split('@')[1];
       var href = email[url] || '###';
-      var aHTML = $('<a href="'+href+'" target="_blank">'+obj.email+'</a>');
+      var aHTML = $(
+        '<a href="' + href + '" target="_blank">' + obj.email + '</a>',
+      );
       $('#newEmail').html(aHTML);
       $('input[name="email"]').val(obj.email);
       $('#verifyNewEmailDiv').show();
     })
-    .catch(function(data) {
+    .catch(function (data) {
       sweetError(data.error || data);
-    })
+    });
 }
-
 
 function displayChangeDiv() {
   $('#changeSwitch').hide();
   $('#changeBtnDiv').show();
 }
-var data = NKC.methods.getDataById("data");
+var data = NKC.methods.getDataById('data');
 var app = new Vue({
-  el: "#app",
+  el: '#app',
   data: {
     email: data.email,
-    type: data.email?"showEmail":"bindEmail",
+    type: data.email ? 'showEmail' : 'bindEmail',
 
-    formType: "", // changeEmail, unbindEmail
+    formType: '', // changeEmail, unbindEmail
 
-    oldEmailCode: "",
+    oldEmailCode: '',
     newEmail: data.unverifiedEmail,
     newEmailCode: data.nationCode,
 
     newTime: 0,
-    oldTime: 0
+    oldTime: 0,
   },
   methods: {
-    timeout: function(t) {
+    timeout: function (t) {
       var self = this;
       var time = self[t];
-      if(time <= 0) return;
-      setTimeout(function() {
-        self[t] --;
+      if (time <= 0) {
+        return;
+      }
+      setTimeout(function () {
+        self[t]--;
         self.timeout(t);
       }, 1000);
     },
-    reduceTime: function(t) {
+    reduceTime: function (t) {
       this[t] = 120;
       this.timeout(t);
     },
-    selectBindEmail: function() {
-      this.type = "verifyOldEmail";
+    selectBindEmail: function () {
+      this.type = 'verifyOldEmail';
     },
-    getEmailCode: function(type) {
+    getEmailCode: function (type) {
       var self = this;
-      NKC.methods.sendEmailCode(type)
-        .then(function() {
-          sweetSuccess("发送成功");
-          self.reduceTime("oldTime");
+      NKC.methods
+        .sendEmailCode(type)
+        .then(function () {
+          sweetSuccess('发送成功');
+          self.reduceTime('oldTime');
         })
         .catch(sweetError);
     },
-    getOldEmailCode: function() {
+    getOldEmailCode: function () {
       var self = this;
-      nkcAPI('/u/'+data.user.uid+'/settings/email', 'POST', {
-        operation: 'verifyOldEmail'
+      nkcAPI('/u/' + data.user.uid + '/settings/email', 'POST', {
+        operation: 'verifyOldEmail',
       })
-        .then(function() {
-          sweetSuccess("发送成功");
-          self.reduceTime("oldTime");
+        .then(function () {
+          sweetSuccess('发送成功');
+          self.reduceTime('oldTime');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
+        });
     },
-    getNewEmailCode: function() {
+    getNewEmailCode: function () {
       var self = this;
-      nkcAPI('/u/'+data.user.uid+'/settings/email', 'POST', {
+      nkcAPI('/u/' + data.user.uid + '/settings/email', 'POST', {
         oldToken: this.oldEmailCode,
         email: this.newEmail,
-        operation: 'verifyNewEmail'
+        operation: 'verifyNewEmail',
       })
-        .then(function() {
-          sweetSuccess("发送成功");
-          self.reduceTime("newTime");
+        .then(function () {
+          sweetSuccess('发送成功');
+          self.reduceTime('newTime');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
+        });
     },
-    getBindEmailCode: function() {
+    getBindEmailCode: function () {
       var self = this;
-      nkcAPI('/u/'+data.user.uid+'/settings/email', 'POST', {
+      nkcAPI('/u/' + data.user.uid + '/settings/email', 'POST', {
         email: this.newEmail,
-        operation: 'bindEmail'
+        operation: 'bindEmail',
       })
-        .then(function() {
-          sweetSuccess("发送成功");
-          self.reduceTime("newTime");
+        .then(function () {
+          sweetSuccess('发送成功');
+          self.reduceTime('newTime');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
+        });
     },
-    submitChangeEmail: function() {
-      var query = "?email=" + this.newEmail + "&oldToken=" + this.oldEmailCode + "&token=" + this.newEmailCode;
-      nkcAPI("/u/" + data.user.uid + "/settings/email/verify" + query, "GET")
-        .then(function() {
-          sweetSuccess("绑定成功");
+    submitChangeEmail: function () {
+      var query =
+        '?email=' +
+        this.newEmail +
+        '&oldToken=' +
+        this.oldEmailCode +
+        '&token=' +
+        this.newEmailCode;
+      nkcAPI('/u/' + data.user.uid + '/settings/email/verify' + query, 'GET')
+        .then(function () {
+          sweetSuccess('绑定成功');
           window.location.reload();
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
+        });
     },
-    submitBindEmail: function() {
-      var query = "?email=" + this.newEmail + "&token=" + this.newEmailCode;
-      nkcAPI("/u/" + data.user.uid + "/settings/email/bind" + query, "GET")
-        .then(function() {
-          sweetSuccess("绑定成功");
+    submitBindEmail: function () {
+      var query = '?email=' + this.newEmail + '&token=' + this.newEmailCode;
+      nkcAPI('/u/' + data.user.uid + '/settings/email/bind' + query, 'GET')
+        .then(function () {
+          sweetSuccess('绑定成功');
           window.location.reload();
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
+        });
     },
-    submitUnbindEmail: function() {
-      var query = "?token=" + this.oldEmailCode;
-      nkcAPI("/u/" + data.user.uid + "/settings/email/unbind" + query, "GET")
-        .then(function() {
-          sweetSuccess("解绑成功");
+    submitUnbindEmail: function () {
+      var query = '?token=' + this.oldEmailCode;
+      nkcAPI('/u/' + data.user.uid + '/settings/email/unbind' + query, 'GET')
+        .then(function () {
+          sweetSuccess('解绑成功');
           window.location.reload();
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-        })
-    }
-  }
+        });
+    },
+  },
 });
 
-
 var mobileApp = new Vue({
-  el: "#mobileApp",
+  el: '#mobileApp',
   data: {
     nationCodes: window.nationCodes,
     mobile: data.mobile,
-    formType: !data.mobile? "bind": "",
+    formType: !data.mobile ? 'bind' : '',
     newMobile: data.unverifiedMobile,
     newNationCode: data.nationCode || nationCode,
-    newCode: "",
-    oldCode: "",
+    newCode: '',
+    oldCode: '',
 
     newTime: 0,
     oldTime: 0,
 
     phoneVerify: {
-      status: "wait",
+      status: 'wait',
       time: 0,
-      code: "",
-      complete: false
-    }
+      code: '',
+      complete: false,
+    },
   },
   methods: {
-    timeout: function(t) {
+    timeout: function (t) {
       var self = this;
       var time = self[t];
-      if(time <= 0) return;
-      setTimeout(function() {
-        self[t] --;
+      if (time <= 0) {
+        return;
+      }
+      setTimeout(function () {
+        self[t]--;
         self.timeout(t);
       }, 1000);
     },
-    reduceTime: function(t) {
+    reduceTime: function (t) {
       this[t] = 120;
       this.timeout(t);
     },
-    bindMobileMessage: function() {
+    bindMobileMessage: function () {
       var obj = {
         mobile: this.newMobile,
-        nationCode: this.newNationCode
+        nationCode: this.newNationCode,
       };
-      if(obj.mobile === '') {
+      if (obj.mobile === '') {
         return sweetError('请输入手机号码');
       }
       var self = this;
       nkcAPI('/sendMessage/bindMobile', 'POST', obj)
-        .then(function() {
+        .then(function () {
           sweetSuccess('验证码发送成功');
-          self.reduceTime("newTime");
+          self.reduceTime('newTime');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data.error);
-        })
+        });
     },
-    submitBindMobile: function() {
+    submitBindMobile: function () {
       var obj = {
         code: this.newCode,
         mobile: this.newMobile,
-        nationCode: this.newNationCode
+        nationCode: this.newNationCode,
       };
-      if(obj.code === '') {
+      if (obj.code === '') {
         return sweetError('请输入手机验证码');
       }
-      if(obj.mobile === '') {
+      if (obj.mobile === '') {
         return sweetError('请输入手机号码');
       }
-      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile', 'POST', obj)
-        .then(function() {
+      nkcAPI('/u/' + NKC.configs.uid + '/settings/mobile', 'POST', obj)
+        .then(function () {
           sweetSuccess('绑定成功');
           window.location.reload();
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data.error);
-        })
+        });
     },
-    sendMessage: function(type) {
+    sendMessage: function (type) {
       var self = this;
-      var obj = {operation: 'verifyOldMobile'};
-      if(type) {
+      var obj = { operation: 'verifyOldMobile' };
+      if (type) {
         obj.operation = 'verifyNewMobile';
         obj.nationCode = this.newNationCode;
         obj.mobile = this.newMobile;
-        if(obj.mobile === '') {
+        if (obj.mobile === '') {
           return sweetError('请输入新手机号');
         }
       }
 
       nkcAPI('/sendMessage/changeMobile', 'POST', obj)
-        .then(function() {
+        .then(function () {
           sweetSuccess('验证码发送成功');
-          if(type) {
-            self.reduceTime("newTime");
+          if (type) {
+            self.reduceTime('newTime');
           } else {
-            self.reduceTime("oldTime");
+            self.reduceTime('oldTime');
           }
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data.error);
-        })
+        });
     },
-    submitChangeMobile: function() {
+    submitChangeMobile: function () {
       var obj = {
         oldCode: this.oldCode,
         code: this.newCode,
         mobile: this.newMobile,
-        nationCode: this.newNationCode
+        nationCode: this.newNationCode,
       };
-      if(obj.oldCode === '') {
+      if (obj.oldCode === '') {
         return sweetError('请输入旧手机验证码');
       }
-      if(obj.code === '') {
+      if (obj.code === '') {
         return sweetError('请输入新手机验证码');
       }
-      if(obj.mobile === '') {
+      if (obj.mobile === '') {
         return sweetError('请输入新手机号码');
       }
-      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile', 'PUT', obj)
-        .then(function() {
+      nkcAPI('/u/' + NKC.configs.uid + '/settings/mobile', 'PUT', obj)
+        .then(function () {
           sweetSuccess('更改绑定成功');
           window.location.reload();
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data.error);
-        })
+        });
     },
-    unbindMobileMessage: function() {
+    unbindMobileMessage: function () {
       var self = this;
       nkcAPI('/sendMessage/unbindMobile', 'POST', {})
-        .then(function() {
+        .then(function () {
           sweetSuccess('验证码发送成功');
-          self.reduceTime("oldTime");
+          self.reduceTime('oldTime');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data.error);
-        })
+        });
     },
-    submitUnbindMobile: function() {
+    submitUnbindMobile: function () {
       var obj = {
-        code: this.oldCode
+        code: this.oldCode,
       };
-      if(obj.code === '') {
+      if (obj.code === '') {
         return sweetError('请输入手机验证码');
       }
-      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile' + "?code=" + obj.code, 'DELETE')
-        .then(function() {
+      nkcAPI(
+        '/u/' + NKC.configs.uid + '/settings/mobile' + '?code=' + obj.code,
+        'DELETE',
+      )
+        .then(function () {
           sweetSuccess('解绑成功');
           window.location.reload();
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data.error);
-        })
+        });
     },
 
-    sendPhoneVerifySmsCode: function() {
+    sendPhoneVerifySmsCode: function () {
       var self = this.phoneVerify;
-      self.status = "sending";
-      nkcAPI("/u/"+ NKC.configs.uid +"/phoneVerify/sendSmsCode", "POST")
-        .then(function(data) {
+      self.status = 'sending';
+      nkcAPI('/u/' + NKC.configs.uid + '/phoneVerify/sendSmsCode', 'POST')
+        .then(function (data) {
           var countdownLen = data.countdownLen;
           self.time = countdownLen;
-          self.status = "countdown";
-          var timer = setInterval(function() {
+          self.status = 'countdown';
+          var timer = setInterval(function () {
             self.time -= 1;
-            if(self.time === 0) {
+            if (self.time === 0) {
               clearInterval(timer);
-              self.status = "wait";
+              self.status = 'wait';
               self.time = 0;
             }
           }, 1000);
         })
-        .catch(function(data) {
+        .catch(function (data) {
           sweetError(data);
-          self.status = "wait";
+          self.status = 'wait';
           self.time = 0;
-        })
+        });
     },
-    submitPhoneVerify: function() {
+    submitPhoneVerify: function () {
       var self = this.phoneVerify;
-      nkcAPI("/u/"+ NKC.configs.uid +"/phoneVerify", "POST", { code: self.code })
-        .then(function() {
+      nkcAPI('/u/' + NKC.configs.uid + '/phoneVerify', 'POST', {
+        code: self.code,
+      })
+        .then(function () {
           self.complete = true;
-          return sweetSuccess("验证成功");
+          return sweetSuccess('验证成功');
         })
-        .then(function() {
+        .then(function () {
           location.reload();
         })
-        .catch(sweetError)
+        .catch(sweetError);
     },
-    toPhoneVerify: function() {
-      this.formType = "phoneVerify";
+    toPhoneVerify: function () {
+      this.formType = 'phoneVerify';
       this.sendPhoneVerifySmsCode();
-    }
-  }
+    },
+  },
 });
-
+var loginRecordApp = new Vue({
+  el: '#loginRecordApp',
+  data: {
+    loginRecordList: data.loginRecordList,
+  },
+  methods: {
+    loginRecordOffline(loginRecord) {
+      nkcAPI('/u/' + NKC.configs.uid + '/settings/loginRecord', 'PUT', {
+        loginRecordId: loginRecord._id,
+      })
+        .then(function () {
+          return sweetSuccess('下线成功');
+        })
+        .then(function () {
+          location.reload();
+        })
+        .catch(sweetError);
+    },
+  },
+});
 Object.assign(window, {
   submitPassword,
   nationCode,
@@ -460,4 +495,5 @@ Object.assign(window, {
   data,
   app,
   mobileApp,
+  loginRecordApp,
 });
