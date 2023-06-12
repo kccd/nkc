@@ -3032,7 +3032,9 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
     result.warning += `<div>您的账号可能存在安全风险，请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号，验证前你所发表的内容需通过审核后才能显示。</div>`;
   }
   //过滤result内部是否有其他的脚本标签
-  result.warning = filterResult(result.warning);
+  if (result.warning) {
+    result.warning = filterResult(result.warning);
+  }
   return result;
 };
 
