@@ -1561,10 +1561,17 @@ schema.statics.renderSingleCommentToHtml = async (cid) => {
   const UserModel = mongoose.model('users');
   const PATH = require('path');
   const CommentModel = mongoose.model('comments');
+  const ArticlePostsModel = mongoose.model('articlePosts');
   let comment = await CommentModel.findOnly({ _id: cid });
+  const { sid } = await ArticlePostsModel.findOnly(
+    { _id: comment.sid },
+    { sid: 1 },
+  );
+
   let user = await UserModel.findOnly({ uid: comment.uid });
   user = await UserModel.extendUserInfo(user);
   const commentData = await CommentModel.extendSingleComment(comment);
+  commentData.articleId = sid;
   const html = render(
     PATH.resolve(
       __dirname,

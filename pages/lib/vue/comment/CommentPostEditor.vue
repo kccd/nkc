@@ -135,20 +135,20 @@ export default {
         this.commentContent = data;
         this.modifyPost();
       }
-    }, 1000),
+    }, 200),
     modifyPost() {
       const self = this;
       clearTimeout(self.setTimeout);
       self.setTimeout = setTimeout(function () {
         self.post(self.type);
-      }, 2000);
+      }, 1000);
     },
     //设置编辑器保存状态 succeeded failed saving
     setSavedStatus(type) {
       this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
     },
     //提交内容
-    post(type) {
+    post(type,isTs) {
       if(!this.protocol) sweetWarning('请勾选协议！');
       if(!type) return;
       if(type === 'publish') clearTimeout(this.setTimeout);
@@ -156,37 +156,40 @@ export default {
       this.lockPost = true;
       const self = this;
       self.setSavedStatus('saving');
-      nkcAPI('/comment', 'POST', {
-        content: self.commentContent,
-        type,
-        source: self.comment.source,
-        aid: self.aid,
-        commentId: self.comment._id,
+      return Promise.resolve().then(()=>{
+       return  nkcAPI('/comment', 'POST', {
+          content: self.commentContent,
+          type,
+          source: self.comment.source,
+          aid: self.aid,
+          commentId: self.comment._id,
+        }).then(res => {
+            self.commentId = res.commentId;
+            if(type !== 'publish') {
+              self.lockPost = false;
+              self.type = 'modify';
+              if(type === 'save' && !isTs) sweetSuccess('保存成功');
+            } else {
+              self.contentChangeEventFlag = false;
+              self.lockPost = false;
+              sweetSuccess('提交成功');
+              //提交成功后关闭评论编辑器
+              self.close();
+            }
+            return self.setSavedStatus('succeeded');
+          })
+      }).catch(err => {
+        self.lockPost = false;
+        self.setSavedStatus('failed');
+        sweetError(err);
       })
-        .then(res => {
-          self.commentId = res.commentId;
-          if(type !== 'publish') {
-            self.lockPost = false;
-            self.type = 'modify';
-            if(type === 'save') sweetSuccess('保存成功');
-          } else {
-            self.contentChangeEventFlag = false;
-            self.lockPost = false;
-            sweetSuccess('提交成功');
-            //提交成功后关闭评论编辑器
-            self.close();
-          }
-          return self.setSavedStatus('succeeded');
-        })
-        .catch(err => {
-          self.lockPost = false;
-          self.setSavedStatus('failed');
-          sweetError(err);
-        })
     },
     //提交正式版评论
     publishComment() {
-      this.post('publish');
+      this.post('save',true).then(()=>{
+          this.post('publish').then(()=>{
+        })
+      });
     },
     //暂存评论
     saveComment() {

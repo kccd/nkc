@@ -8,6 +8,7 @@ const {
   ThrowCommonError,
   ThrowServerInternalError,
 } = require('../nkcModules/error');
+const filterResult = require('../nkcModules/xssFilters/filterResult');
 
 const userSchema = new Schema(
   {
@@ -2900,6 +2901,7 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
+  const filterResult = require('../nkcModules/xssFilters/filterResult');
   let result = {
     permit: false,
     warning: null,
@@ -3028,6 +3030,10 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   if (shouldVerifyPhoneNumber) {
     result.warning = result.warning || '';
     result.warning += `<div>您的账号可能存在安全风险，请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号，验证前你所发表的内容需通过审核后才能显示。</div>`;
+  }
+  //过滤result内部是否有其他的脚本标签
+  if (result.warning) {
+    result.warning = filterResult(result.warning);
   }
   return result;
 };
