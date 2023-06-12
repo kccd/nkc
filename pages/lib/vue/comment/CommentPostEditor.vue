@@ -174,7 +174,7 @@ export default {
             self.lockPost = false;
             sweetSuccess('提交成功');
             //提交成功后关闭评论编辑器
-            // self.close();
+            self.close();
           }
           return self.setSavedStatus('succeeded');
         })
