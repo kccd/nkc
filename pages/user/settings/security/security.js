@@ -471,12 +471,12 @@ var loginRecordApp = new Vue({
   },
   methods: {
     loginRecordOffline(loginRecord) {
-      sweetQuestion('确认下线该次登录吗？').then(() => {
+      sweetQuestion('当前操作无法撤销，确定要取消该次登录吗？').then(() => {
         nkcAPI('/u/' + NKC.configs.uid + '/settings/loginRecord', 'PUT', {
           loginRecordId: loginRecord._id,
         })
           .then(function () {
-            return sweetSuccess('下线成功');
+            return sweetSuccess('执行成功');
           })
           .then(function () {
             location.reload();

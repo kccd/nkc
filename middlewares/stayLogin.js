@@ -14,10 +14,12 @@ module.exports = async (ctx, next) => {
   let userGrade = {};
   let user;
   let usersPersonal;
+  let lastLogin = '';
   if (userInfo) {
     try {
       const now = Date.now();
-      const { uid, lastLogin = '' } = userInfo;
+      const { uid } = userInfo;
+      lastLogin = userInfo.lastLogin;
       const _user = await db.UserModel.findOneAndUpdate(
         { uid },
         {
@@ -29,7 +31,7 @@ module.exports = async (ctx, next) => {
       if (_user) {
         _user.tlv = now;
         usersPersonal = await db.UsersPersonalModel.findOne(
-          { uid: _user.uid, secret: { $elemMatch: { $eq: lastLogin } } },
+          { uid: _user.uid, secret: lastLogin },
           {
             secret: 1,
             uid: 1,
@@ -58,7 +60,7 @@ module.exports = async (ctx, next) => {
     ctx.setCookie('userInfo', {
       uid: user.uid,
       username: user.username,
-      lastLogin: usersPersonal.secret[usersPersonal.secret.length - 1],
+      lastLogin,
     });
   }
   // 根据用户语言设置加载语言对象

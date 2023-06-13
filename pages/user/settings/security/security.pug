@@ -195,23 +195,25 @@ block content
             span 最近登录记录
           .panel-body
             #loginRecordApp(v-cloak)
-              table.table.table-striped
-                thead
-                  tr
-                    th 登录时间
-                    th ip
-                    th userAgent
-                    th 状态
-                tbody
-                  tr(v-for="loginRecord in loginRecordList" )
-                    .row
-                      th.col-xs-2.col-md-2 {{loginRecord.toc}}
-                      th.col-xs-2.col-md-2 {{`${loginRecord.ip}:${loginRecord.port}`}}
-                      th.col-xs-4.col-md-4 {{loginRecord.userAgent}}
-                      th.col-xs-3.col-md-3(v-if="loginRecord.status")
-                        span.p-r-1 有效
-                        button.btn.btn-primary(@click=`loginRecordOffline(loginRecord)`) 下线
-                      th(v-else ) 无效
+              .table-responsive
+                table.table
+                  thead
+                    tr
+                      th 时间
+                      th IP
+                      th 设备信息
+                      th 状态
+                  tbody
+                    tr(v-for="loginRecord in loginRecordList" :style="loginRecord.status?'': 'background-color: #ddd;'")
+                      th {{loginRecord.toc}}
+                      th {{loginRecord.address}}
+                      th.col-xs-5.col-md-5 {{loginRecord.userAgent}}
+                      th
+                        div(v-if="loginRecord.status")
+                          span.p-r-1.text-success 有效
+                          button.btn.btn-xs.btn-default(@click=`loginRecordOffline(loginRecord)`) 下线
+                        div(v-else)
+                          span.text-danger 已失效
 
     .text-right
           a.text-danger(href=`/u/${data.user.uid}/destroy`) 账号注销

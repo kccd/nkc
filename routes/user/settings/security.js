@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const moment = require('moment');
 const router = new Router();
 router.get('/', async (ctx, next) => {
-  const { db, data, params } = ctx;
+  const { db, data, params, nkcModules } = ctx;
   data.selected = 'security';
   const { uid } = params;
   const userPersonal = await db.UsersPersonalModel.findOnly({ uid });
@@ -32,16 +32,16 @@ router.get('/', async (ctx, next) => {
   const loginRecordList = await db.LoginRecordModel.find({ uid })
     .sort({ toc: -1 })
     .limit(20);
-  data.loginRecordList = loginRecordList.map((item) => {
-    return {
+  data.loginRecordList = [];
+  for (const item of loginRecordList) {
+    data.loginRecordList.push({
       _id: item._id,
-      ip: item.ip,
-      port: item.port,
+      address: `${item.ip}(${await db.IPModel.getIpCity(item.ip)})`,
       userAgent: item.userAgent,
-      toc: moment(item.toc).format('YYYY-MM-DD HH:MM:SS'),
+      toc: nkcModules.tools.timeFormat(item.toc),
       status: secret.includes(item._id),
-    };
-  });
+    });
+  }
   ctx.template = 'user/settings/security/security.pug';
   await next();
 });

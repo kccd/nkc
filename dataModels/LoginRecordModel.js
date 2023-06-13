@@ -1,5 +1,5 @@
 const mongoose = require('../settings/database');
-const collectionName = 'loginRecord';
+const collectionName = 'loginRecords';
 
 const schema = mongoose.Schema(
   {
