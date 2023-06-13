@@ -37,7 +37,6 @@ router.get('/', async (ctx, next) => {
       _id: item._id,
       ip: item.ip,
       port: item.port,
-      uid: item.uid,
       userAgent: item.userAgent,
       toc: moment(item.toc).format('YYYY-MM-DD HH:MM:SS'),
       status: secret.includes(item._id),
