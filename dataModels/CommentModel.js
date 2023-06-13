@@ -351,6 +351,13 @@ schema.methods.modifyComment = async function (props) {
   //   }
   // });
 };
+//在编辑的时候，判断是否有稳定的版本已经存在了
+schema.methods.isExistStableV = async function () {
+  const DocumentModel = mongoose.model('documents');
+  const { did } = this;
+  const res = await DocumentModel.find({ did, type: 'stable' });
+  return res.length !== 0;
+};
 /*
  * 拓展展示的comment评论数据
  * @param {object} props
@@ -1554,10 +1561,17 @@ schema.statics.renderSingleCommentToHtml = async (cid) => {
   const UserModel = mongoose.model('users');
   const PATH = require('path');
   const CommentModel = mongoose.model('comments');
+  const ArticlePostsModel = mongoose.model('articlePosts');
   let comment = await CommentModel.findOnly({ _id: cid });
+  const { sid } = await ArticlePostsModel.findOnly(
+    { _id: comment.sid },
+    { sid: 1 },
+  );
+
   let user = await UserModel.findOnly({ uid: comment.uid });
   user = await UserModel.extendUserInfo(user);
   const commentData = await CommentModel.extendSingleComment(comment);
+  commentData.articleId = sid;
   const html = render(
     PATH.resolve(
       __dirname,

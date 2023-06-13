@@ -2,7 +2,7 @@ extends ../../../bootstrap_base
 block title
   title 账号安全
 block content
-  #data.hidden=objToStr({user: data.user, email: data.userEmail, mobile: data.mobile, unverifiedEmail: data.unverifiedEmail, unverifiedMobile:data.unverifiedMobile, nationCode: data.nationCode})
+  #data.hidden=objToStr({user: data.user, email: data.userEmail, mobile: data.mobile, unverifiedEmail: data.unverifiedEmail, unverifiedMobile:data.unverifiedMobile, nationCode: data.nationCode, loginRecordList:data.loginRecordList})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -190,7 +190,32 @@ block content
                   //
                     h5.text-info 更换绑定邮箱需要验证旧邮箱，请点击发送按钮发送验证邮件。
                     button.btn.btn-primary(@click="sendVerifyEmail") 发送验证邮件
-        .text-right
+        .panel.panel-default
+          .panel-heading
+            span 最近登录记录
+          .panel-body
+            #loginRecordApp(v-cloak)
+              .table-responsive
+                table.table
+                  thead
+                    tr
+                      th 时间
+                      th IP
+                      th 设备信息
+                      th 状态
+                  tbody
+                    tr(v-for="loginRecord in loginRecordList" :style="loginRecord.status?'': 'background-color: #ddd;'")
+                      th {{loginRecord.toc}}
+                      th {{loginRecord.address}}
+                      th.col-xs-5.col-md-5 {{loginRecord.userAgent}}
+                      th
+                        div(v-if="loginRecord.status")
+                          span.p-r-1.text-success 有效
+                          button.btn.btn-xs.btn-default(@click=`loginRecordOffline(loginRecord)`) 下线
+                        div(v-else)
+                          span.text-danger 已失效
+
+    .text-right
           a.text-danger(href=`/u/${data.user.uid}/destroy`) 账号注销
 
 block scripts

@@ -128,10 +128,13 @@ router
         port: ctx.port,
       });
     } else if (comment) {
+      const isExistStableV = await comment.isExistStableV();
+      //这里是为了区分是否要取消引用
       await comment.modifyComment({
-        quoteDid,
+        quoteDid: isExistStableV ? undefined : quoteDid ? quoteDid : '',
         content,
       });
+
       if (type === 'publish') {
         nkcModules.checkData.checkString(content, {
           name: '内容',
@@ -154,9 +157,12 @@ router
         const lock = await nkcModules.redLock.lock(key, 6000);
         try {
           // 获取最新评论的楼层
-          const order = await db.CommentModel.getCommentOrder(article._id);
-          console.log(order, 'order');
-          await comment.updateOrder(order);
+          let order;
+          if (!isExistStableV) {
+            order = await db.CommentModel.getCommentOrder(article._id);
+            await comment.updateOrder(order);
+          }
+
           //发布评论
           data.renderedComment = await comment.publishComment(
             article,
@@ -166,9 +172,10 @@ router
               port: ctx.port,
             },
           );
-          console.log(data.renderedComment, 'data.renderedComment');
           //更新评论引用的评论数replies
-          await db.ArticlePostModel.updateOrder(order, article._id);
+          if (order) {
+            await db.ArticlePostModel.updateOrder(order, article._id);
+          }
           await lock.unlock();
         } catch (err) {
           await lock.unlock();
