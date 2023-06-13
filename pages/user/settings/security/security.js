@@ -1,3 +1,5 @@
+import { sweetQuestion } from '../../../lib/js/sweetAlert';
+
 function submitPassword(uid) {
   var obj = {
     oldPassword: $('#oldPassword').val(),
@@ -469,16 +471,18 @@ var loginRecordApp = new Vue({
   },
   methods: {
     loginRecordOffline(loginRecord) {
-      nkcAPI('/u/' + NKC.configs.uid + '/settings/loginRecord', 'PUT', {
-        loginRecordId: loginRecord._id,
-      })
-        .then(function () {
-          return sweetSuccess('下线成功');
+      sweetQuestion('确认下线该次登录吗？').then(() => {
+        nkcAPI('/u/' + NKC.configs.uid + '/settings/loginRecord', 'PUT', {
+          loginRecordId: loginRecord._id,
         })
-        .then(function () {
-          location.reload();
-        })
-        .catch(sweetError);
+          .then(function () {
+            return sweetSuccess('下线成功');
+          })
+          .then(function () {
+            location.reload();
+          })
+          .catch(sweetError);
+      });
     },
   },
 });

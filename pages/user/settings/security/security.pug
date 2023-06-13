@@ -192,31 +192,28 @@ block content
                     button.btn.btn-primary(@click="sendVerifyEmail") 发送验证邮件
         .panel.panel-default
           .panel-heading
-            span 登录记录（最近二十次）
+            span 最近登录记录
           .panel-body
             #loginRecordApp(v-cloak)
               table.table.table-striped
                 thead
                   tr
-                    th UID
-                    th ip
-                    th port
-                    th userAgent
                     th 登录时间
-                    th 操作
+                    th ip
+                    th userAgent
+                    th 状态
                 tbody
                   tr(v-for="loginRecord in loginRecordList" )
                     .row
-                      th.col-xs-1.col-md-1 {{loginRecord.uid}}
-                      th.col-xs-2.col-md-2 {{loginRecord.ip}}
-                      th.col-xs-1.col-md-1 {{loginRecord.port}}
-                      th.col-xs-4.col-md-4 {{loginRecord.userAgent}}
                       th.col-xs-2.col-md-2 {{loginRecord.toc}}
+                      th.col-xs-2.col-md-2 {{`${loginRecord.ip}:${loginRecord.port}`}}
+                      th.col-xs-4.col-md-4 {{loginRecord.userAgent}}
                       th.col-xs-3.col-md-3(v-if="loginRecord.status")
-                        a(@click=`loginRecordOffline(loginRecord)`) 下线
-                      th(v-else ) 已失效
+                        span.p-r-1 有效
+                        button.btn.btn-primary(@click=`loginRecordOffline(loginRecord)`) 下线
+                      th(v-else ) 无效
 
-  .text-right
+    .text-right
           a.text-danger(href=`/u/${data.user.uid}/destroy`) 账号注销
 
 block scripts
