@@ -445,11 +445,18 @@ router
     const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
-      await db.NewNoticesModel.extendNoticeContent({
+      const { toc } = await db.NewNoticesModel.extendNoticeContent({
         pid,
         hid,
         noticeContent,
       });
+      if (toc && targetThread) {
+        const { tid } = targetThread;
+        await db.NewNoticesModel.updateThreadStatus(tid, true);
+      }
+    } else {
+      const { tid } = targetThread;
+      await db.NewNoticesModel.updateThreadStatus(tid, false);
     }
     // 判断文本是否有变化，有变化版本号加1
     /*if(c !== targetPost.c) {

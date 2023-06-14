@@ -43,7 +43,19 @@ schema.statics.extendNoticeContent = async ({ pid, hid, noticeContent }) => {
     noticeContent,
   };
   const newNotice = new NewNoticesModel(noticeObj);
-  await newNotice.save();
+  return await newNotice.save();
+};
+
+schema.statics.updateThreadStatus = async (tid, isNewThread = false) => {
+  const ThreadModel = mongoose.model('threads');
+  await ThreadModel.updateOne(
+    { tid },
+    {
+      $set: {
+        isNewThread,
+      },
+    },
+  );
 };
 
 module.exports = mongoose.model('newNotices', schema);

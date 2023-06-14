@@ -19,6 +19,11 @@ const threadSchema = new Schema(
       default: 'article',
       index: 1,
     },
+    //用户是否勾选发表新文章通告
+    isNewThread: {
+      type: Boolean,
+      default: false,
+    },
     //文章的评论数量
     count: {
       type: Number,
@@ -592,11 +597,13 @@ threadSchema.methods.updateThreadEncourage = async function () {
 // 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const ThreadModel = mongoose.model('threads');
+  const NewNoticesModel = mongoose.model('newNotices');
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const thread = await ThreadModel.findOne({ tid: this.tid });
   const PostModel = mongoose.model('posts');
   const updateObj = {};
+  const { isNewThread } = thread;
   const oc = await PostModel.findOneAndUpdate(
     { tid: thread.tid },
     {
@@ -622,7 +629,14 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-  updateObj.tlm = lm ? lm.toc : '';
+  if (isNewThread) {
+    const { toc } = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
+      toc: -1,
+    });
+    updateObj.tlm = toc ? toc : '';
+  } else {
+    updateObj.tlm = lm ? lm.toc : '';
+  }
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;

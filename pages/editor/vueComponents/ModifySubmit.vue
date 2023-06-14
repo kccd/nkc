@@ -169,7 +169,7 @@ export default {
     visitUrl: NKC.methods.visitUrl,
     handleNoticeContentChange:debounce(function(event){
       this.noticeContent = event.target.value
-    },500),
+    },200),
     history() {
       let url;
       if (this.data.type === 'newThread') {
