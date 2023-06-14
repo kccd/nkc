@@ -16,12 +16,12 @@
           | 匿名发表
           span.text-danger(v-if="!allowedAnonymous") (所选专业分类不支持匿名发表)
     .checkbox
-      label(style="margin-bottom: 0.5rem")
+      label(style="margin-bottom: 0.5rem" v-if="type==='modifyThread'" )
         input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
         span
           | 新版本公告。
 
-      div(v-if="checkNewNotice")
+      div(v-if="checkNewNotice&&type==='modifyThread'")
         h5.text-danger 如果勾选新版本公告，文章将被顶至最前
         textarea(placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange")
 
@@ -231,7 +231,9 @@ export default {
             saveData.keyWordsCn.length ||
             saveData.keyWordsEn.length ||
             saveData.authorInfos ||
-            saveData.surveyId
+            saveData.surveyId ||
+            saveData.noticeContent||
+            saveData.checkNewNotice
           )
         )
           return;
@@ -446,6 +448,12 @@ export default {
         if (f.cid === null) throw "请选择完整的专业分类";
       }
     },
+    //检查新通告内容
+    checkNoticeContent(v){
+      if(!v){
+        throw new  Error('请输入本次更新的说明');
+      }
+    },
     checkThreadCategory(v) {
       for (const tc of v) {
         if (tc.selectedNode === null) {
@@ -470,6 +478,9 @@ export default {
       });
     },
     submit(submitData) {
+      if(this.checkNewNotice){
+        submitData.noticeContent = this.noticeContent;
+      }
       let type;
       Promise.resolve()
         .then(() => {
@@ -479,7 +490,6 @@ export default {
         })
         .then(() => {
           if (type === "newThread") {
-
             // 发新帖：从专业点发表、首页点发表、草稿箱
             this.checkTitle(submitData.t);
             this.checkContent(submitData.c);
@@ -532,6 +542,8 @@ export default {
             this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
             this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
             this.checkAuthorInfos(submitData.authorInfos);
+            this.checkNewNotice && this.checkNoticeContent(submitData.noticeContent);
+
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
             if (submitData.coverData) {

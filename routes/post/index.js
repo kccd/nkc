@@ -331,7 +331,6 @@ router
       body = ctx.body;
     }
     const post = body.post;
-
     const {
       columnMainCategoriesId = [],
       columnMinorCategoriesId = [],
@@ -347,6 +346,7 @@ router
       survey,
       did,
       cover = '',
+      noticeContent,
       _id,
     } = post;
     const { pid } = ctx.params;
@@ -442,8 +442,15 @@ router
     }
 
     // 生成历史记录
-    await db.HistoriesModel.createHistory(_targetPost);
-
+    const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
+    // 如果有文章新通告就生成新通告记录表
+    if (noticeContent) {
+      await db.NewNoticesModel.extendNoticeContent({
+        pid,
+        hid,
+        noticeContent,
+      });
+    }
     // 判断文本是否有变化，有变化版本号加1
     /*if(c !== targetPost.c) {
       targetPost.cv ++;
