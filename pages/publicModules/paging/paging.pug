@@ -22,6 +22,9 @@ if showPagingDigestButton
     a.button(href=`${remoteState.url}?d=featured${query}` class=klass data-type="reload") 精选
     if data.user
       a.radius-right.button(href=`${remoteState.url}?d=personal${query}` class=data.d === 'personal' ? "active" : "" data-type="reload") 我的
+else
+  if data.d
+    -query += `&d=${data.d}`;
 if showPagingSortButton
   .paging-button
     a.radius-left.button(href=`?page=${page}${query}&s=tlm` class=data.s!=='toc'? "active": '' data-type="reload") 复序
