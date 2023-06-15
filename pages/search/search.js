@@ -157,7 +157,7 @@ var app = new Vue({
       }
       NKC.methods.visitUrl(
         '/search?c=' +
-          this.strToBase64(this.c || '') +
+          encodeURIComponent(this.c) +
           (this.t ? '&t=' + this.t : '') +
           '&d=' +
           this.options,
