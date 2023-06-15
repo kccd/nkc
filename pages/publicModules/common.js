@@ -885,7 +885,7 @@ NKC.methods.search = function (inputId) {
     return;
   }
   var c = input.val();
-  window.open('/search?c=' + encodeURI(c));
+  window.open('/search?c=' + encodeURIComponent(c));
 };
 
 /**
