@@ -448,6 +448,7 @@ router
       const { toc } = await db.NewNoticesModel.extendNoticeContent({
         pid,
         hid,
+        uid: state.uid,
         noticeContent,
       });
       if (toc && targetThread) {
