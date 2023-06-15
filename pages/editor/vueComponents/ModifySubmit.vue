@@ -23,8 +23,8 @@
 
       div(v-if="checkNewNotice&&type==='modifyThread'")
         h5.text-danger 如果勾选新版本公告，文章将被顶至最前
-        textarea(placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange")
-
+        textarea( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
+        p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 已达到最大限制字数200
       label
         input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
         span
@@ -659,5 +659,21 @@ export default {
   border: 1px solid rgb(43, 144, 217);
   outline: none;
 
+}
+.warning{
+  animation: shake 0.5s ;
+  font-size: 1rem;
+  color: red;
+}
+@keyframes shake {
+  0% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(-2px);
+  }
 }
 </style>
