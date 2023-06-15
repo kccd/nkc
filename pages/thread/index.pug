@@ -555,14 +555,18 @@ block content
             +applicantOperationCenter(form, data.user? data.user.uid:'')
             -var fundBlacklistPostPermission = data.permissions && data.permissions.fundBlacklistPost;
             +managerOperationCenter(form, data.userFundRoles, fundBlacklistPostPermission)
+
           if data.targetUser
             .m-b-1
               //- .panel-header 作者
               -const author = data.targetUser;
               include ./authorInfo
+            include ../publicModules/side_thread_notice
             include ../publicModules/side_thread_list
+            +sideThreadNotice(data.noticeContent)
             +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
             +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
+
           .hidden-sm.hidden-xs
             include ../publicModules/footer/footer_sm
 

@@ -1,0 +1,14 @@
++includeCSS('/publicModules/side_thread_notice.css')
+if !isIncluded('publicModules/side_thread_notice.pug')
+  mixin sideThreadNotice(noticeContent)
+    if noticeContent
+      .thread-notice-head
+        span.notice-span 更新记录
+        for notice in noticeContent
+          .thread-notice-content.m-t-05
+            span 更新说明：
+            span=notice.noticeContent
+            span=notice.renderedTime
+
+
+

@@ -239,6 +239,7 @@ router
       categoriesId: 1,
       disabled: 1,
       recycleMark: 1,
+      isNewThread: 1,
     })
       .skip(paging.start)
       .limit(paging.perpage)

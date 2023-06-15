@@ -267,7 +267,6 @@ threadRouter
     if (data.user) {
       await data.user.extendAuthLevel();
     }
-
     // 拓展POST时的相关配置
     const extendPostOptions = {
       uid: data.user ? data.user.uid : '',
@@ -1050,6 +1049,34 @@ threadRouter
     const subscribeAuthor = !!(
       data.user && userSubscribeUsersId.includes(authorId)
     );
+
+    const notices = await db.NewNoticesModel.find(
+      {
+        pid: thread.oc,
+      },
+      { toc: 1, noticeContent: 1, hid: 1 },
+    ).sort({ toc: -1 });
+    if (notices.length !== 0) {
+      data.noticeContent = notices.map(({ toc, noticeContent, hid }) => {
+        const date = new Date(toc);
+        const currentDate = new Date();
+        const timeDiff = currentDate - date;
+        const minutesAgo = Math.floor(timeDiff / (1000 * 60));
+        const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+        const daysAgo = Math.floor(hoursAgo / 24);
+        const remainingHours = hoursAgo % 24;
+        const remainingMinutes = minutesAgo % 60;
+        let renderedTime;
+        if (minutesAgo < 60) {
+          renderedTime = minutesAgo + '分前';
+        } else if (hoursAgo < 24) {
+          renderedTime = hoursAgo + '时' + remainingMinutes + '分前';
+        } else {
+          renderedTime = daysAgo + '天' + remainingHours + '时前';
+        }
+        return { toc, noticeContent, hid, renderedTime };
+      });
+    }
 
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });

@@ -1648,6 +1648,7 @@ threadSchema.statics.extendArticlesPanelData = async function (threads) {
       oc: thread.oc,
       id: thread.tid,
       pid: thread.oc,
+      isNewThread: thread.isNewThread,
       user,
       pages,
       content,
