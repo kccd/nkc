@@ -135,11 +135,7 @@ var app = new Vue({
       }
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
       NKC.methods.visitUrl(
-        '/search?c=' +
-          this.strToBase64(this.c || '') +
-          t +
-          '&d=' +
-          this.options,
+        '/search?c=' + encodeURIComponent(this.c) + t + '&d=' + this.options,
       );
     },
     // 搜索
@@ -204,13 +200,13 @@ var app = new Vue({
   },
   mounted: function () {
     var data = NKC.methods.getDataById('data');
-    try {
-      this.c = this.base64ToStr(data.c);
-    } catch (err) {
-      console.log(err);
-      this.c = data.c;
-    }
-
+    // try {
+    //   this.c = this.base64ToStr(data.c);
+    // } catch (err) {
+    //   console.log(err);
+    //   this.c = data.c;
+    // }
+    this.c = data.c;
     this.t = data.t || '';
     this.selectedForums = data.selectedForums || [];
     this.excludedForums = data.excludedForums || [];
