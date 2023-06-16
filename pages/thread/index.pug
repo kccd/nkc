@@ -563,7 +563,7 @@ block content
               include ./authorInfo
             include ../publicModules/side_thread_notice
             include ../publicModules/side_thread_list
-            +sideThreadNotice(data.noticeContent)
+            +sideThreadNotice(data.noticeContent,data.threadHistory)
             +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
             +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
 
@@ -573,6 +573,7 @@ block content
           include ../module_scrollTo
 
     //- 作者信息
+
     .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
       .modal-dialog.modal-sm(role="document" v-cloak v-if="contract")#moduleAuthorApp
         .modal-content
@@ -636,8 +637,8 @@ block scripts
   //include ../publicModules/replaceNKCRender
   include ../post/options/options
   include ../publicModules/commonModal/commonModal
-
   //- 违规记录模块 NKC.modules.violationRecord
+
   if data.permissions.violationRecord
     include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug

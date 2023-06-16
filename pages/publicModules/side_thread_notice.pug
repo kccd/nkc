@@ -1,8 +1,8 @@
 +includeCSS('/publicModules/side_thread_notice.css')
 if !isIncluded('publicModules/side_thread_notice.pug')
-  mixin sideThreadNotice(noticeContent)
+  mixin sideThreadNotice(noticeContent,threadHistory)
     if noticeContent
-      .thread-notice-head
+      #thread-notice-head
         .nav.notice-span
           span 更新记录
       .thread-notice-content.m-b-1
@@ -11,10 +11,9 @@ if !isIncluded('publicModules/side_thread_notice.pug')
             div
               img.notice-user-banned.m-r-05(src=notice.user.avatar )
               span.renderedTime=notice.renderedTime
-              a.notice-float 查看详情
+              if threadHistory !== null
+                a.notice-float 查看详情
             div
               span=notice.noticeContent
-
-
 
 

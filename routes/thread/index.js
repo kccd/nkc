@@ -1050,13 +1050,28 @@ threadRouter
       data.user && userSubscribeUsersId.includes(authorId)
     );
 
+    //文章通告内容处理
     const notices = await db.NewNoticesModel.find(
       {
         pid: thread.oc,
       },
       { toc: 1, noticeContent: 1, hid: 1, uid: 1 },
     ).sort({ toc: -1 });
+    let threadHistory = null;
     if (notices.length !== 0) {
+      const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
+      const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
+      if (
+        threadPost.tlm > threadPost.toc &&
+        ctx.permission('visitPostHistory') &&
+        isModerator
+      ) {
+        threadHistory =
+          !threadPost.hideHistories ||
+          ctx.permission('displayPostHideHistories')
+            ? true
+            : null;
+      }
       data.noticeContent = await Promise.all(
         notices.map(async ({ toc, noticeContent, hid, uid }) => {
           const user = await db.UserModel.findOnly(
@@ -1089,6 +1104,7 @@ threadRouter
       ).catch((err) => {
         console.log(err, 'err');
       });
+      
     }
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
@@ -1153,6 +1169,7 @@ threadRouter
     data.editPostPositionPermission = haveEditPositionOrder;
     data.isEditMode = isEditMode;
     data.orderStatus = thread.orderStatus;
+    data.threadHistory = threadHistory;
 
     // 商品信息
     if (threadShopInfo) {
