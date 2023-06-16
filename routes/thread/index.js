@@ -1068,7 +1068,11 @@ threadRouter
         const remainingMinutes = minutesAgo % 60;
         let renderedTime;
         if (minutesAgo < 60) {
-          renderedTime = minutesAgo + '分前';
+          if (minutesAgo <= 0) {
+            renderedTime = '刚刚';
+          } else {
+            renderedTime = minutesAgo + '分前';
+          }
         } else if (hoursAgo < 24) {
           renderedTime = hoursAgo + '时' + remainingMinutes + '分前';
         } else {
