@@ -19,6 +19,9 @@ const commentRouter = require('./comment');
 const router = new Router();
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
+const {
+  sensitiveDetectionService,
+} = require('../../services/sensitive/sensitiveDetection.service');
 
 router
   .use('/', async (ctx, next) => {
@@ -445,6 +448,9 @@ router
     const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
+      //检测文章通告内容是否有敏感词
+      await sensitiveDetectionService.threadNoticeDetection(noticeContent);
+
       const { toc } = await db.NewNoticesModel.extendNoticeContent({
         pid,
         hid,
