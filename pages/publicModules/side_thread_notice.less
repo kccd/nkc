@@ -10,10 +10,20 @@
   font-size: 15px;
 }
 .thread-notice-content{
+  margin-top: 0 !important;
+  margin-bottom: 1rem;
   span{
     font-size: 1rem;
     color: #9baec8;
-    margin-right: 0.5rem;
+    margin: 0 !important;
+  }
+  a{
+    font-size: 1rem;
+    color: #9baec8;
+    text-decoration: none;
+  }
+  a:hover{
+    cursor: pointer;
   }
  .renderedTime{
    white-space: nowrap;
@@ -26,3 +36,14 @@
   max-height: 2rem;
   border-radius: 50%;
 }
+
+.notice-float{
+  float: right;
+}
+
+.notice-clearfix::after{
+  content: "";
+  display: table;
+  clear: both;
+}
+
