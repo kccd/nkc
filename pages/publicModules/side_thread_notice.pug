@@ -12,7 +12,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
               img.notice-user-banned.m-r-05(src=notice.user.avatar )
               span.renderedTime=notice.renderedTime
               if threadHistory !== null
-                a.notice-float 查看详情
+                a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
             div
               span=notice.noticeContent
 

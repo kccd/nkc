@@ -1055,7 +1055,7 @@ threadRouter
       {
         pid: thread.oc,
       },
-      { toc: 1, noticeContent: 1, hid: 1, uid: 1 },
+      { toc: 1, noticeContent: 1, hid: 1, uid: 1, pid: 1 },
     ).sort({ toc: -1 });
     let threadHistory = null;
     if (notices.length !== 0) {
@@ -1073,7 +1073,7 @@ threadRouter
             : null;
       }
       data.noticeContent = await Promise.all(
-        notices.map(async ({ toc, noticeContent, hid, uid }) => {
+        notices.map(async ({ toc, noticeContent, hid, uid ,pid }) => {
           const user = await db.UserModel.findOnly(
             { uid },
             { avatar: 1, uid: 1, username: 1 },
@@ -1099,12 +1099,11 @@ threadRouter
           } else {
             renderedTime = daysAgo + '天' + remainingHours + '时前';
           }
-          return { toc, noticeContent, hid, renderedTime, user };
+          return { toc, noticeContent, hid, renderedTime, user, pid };
         }),
       ).catch((err) => {
         console.log(err, 'err');
       });
-      
     }
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
