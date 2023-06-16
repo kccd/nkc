@@ -10,6 +10,7 @@ const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const db = require('../../dataModels');
+const tools = require('../../nkcModules/tools');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -489,7 +490,6 @@ threadRouter
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
-
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -1054,34 +1054,42 @@ threadRouter
       {
         pid: thread.oc,
       },
-      { toc: 1, noticeContent: 1, hid: 1 },
+      { toc: 1, noticeContent: 1, hid: 1, uid: 1 },
     ).sort({ toc: -1 });
     if (notices.length !== 0) {
-      data.noticeContent = notices.map(({ toc, noticeContent, hid }) => {
-        const date = new Date(toc);
-        const currentDate = new Date();
-        const timeDiff = currentDate - date;
-        const minutesAgo = Math.floor(timeDiff / (1000 * 60));
-        const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
-        const daysAgo = Math.floor(hoursAgo / 24);
-        const remainingHours = hoursAgo % 24;
-        const remainingMinutes = minutesAgo % 60;
-        let renderedTime;
-        if (minutesAgo < 60) {
-          if (minutesAgo <= 0) {
-            renderedTime = '刚刚';
+      data.noticeContent = await Promise.all(
+        notices.map(async ({ toc, noticeContent, hid, uid }) => {
+          const user = await db.UserModel.findOnly(
+            { uid },
+            { avatar: 1, uid: 1, username: 1 },
+          );
+          user.avatar = tools.getUrl('userAvatar', user.avatar);
+          const date = new Date(toc);
+          const currentDate = new Date();
+          const timeDiff = currentDate - date;
+          const minutesAgo = Math.floor(timeDiff / (1000 * 60));
+          const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+          const daysAgo = Math.floor(hoursAgo / 24);
+          const remainingHours = hoursAgo % 24;
+          const remainingMinutes = minutesAgo % 60;
+          let renderedTime;
+          if (minutesAgo < 60) {
+            if (minutesAgo <= 0) {
+              renderedTime = '刚刚';
+            } else {
+              renderedTime = minutesAgo + '分前';
+            }
+          } else if (hoursAgo < 24) {
+            renderedTime = hoursAgo + '时' + remainingMinutes + '分前';
           } else {
-            renderedTime = minutesAgo + '分前';
+            renderedTime = daysAgo + '天' + remainingHours + '时前';
           }
-        } else if (hoursAgo < 24) {
-          renderedTime = hoursAgo + '时' + remainingMinutes + '分前';
-        } else {
-          renderedTime = daysAgo + '天' + remainingHours + '时前';
-        }
-        return { toc, noticeContent, hid, renderedTime };
+          return { toc, noticeContent, hid, renderedTime, user };
+        }),
+      ).catch((err) => {
+        console.log(err, 'err');
       });
     }
-
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
     // 标志

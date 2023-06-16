@@ -7,8 +7,9 @@ if !isIncluded('publicModules/side_thread_notice.pug')
           span 更新记录
       .thread-notice-content.m-b-1
         for notice in noticeContent
+          -console.log(notice, 'notice')
           .thread-notice-content.m-t-05
-            span 更新说明：
+            img.notice-user-banned(src=notice.user.avatar )
             span=notice.noticeContent
             span.renderedTime=notice.renderedTime
 
