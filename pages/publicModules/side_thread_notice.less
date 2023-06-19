@@ -1,15 +1,7 @@
 @import "base";
 
-.thread-notice-head{
-  padding: 1rem !important;
-}
 
-.notice-span{
-  color: rgb(119,119,119);
-  font-weight: 700;
-  font-size: 15px;
-}
-.thread-notice-content{
+.thread-notice{
   margin-top: 0 !important;
   margin-bottom: 1rem;
   span{
@@ -39,6 +31,7 @@
 
 .notice-float{
   float: right;
+  margin-right: 0.5rem;
 }
 
 .notice-clearfix::after{
@@ -46,4 +39,8 @@
   display: table;
   clear: both;
 }
-
+.thread-notice-content{
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 10px;
+}

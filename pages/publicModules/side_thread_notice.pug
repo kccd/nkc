@@ -4,10 +4,10 @@ if !isIncluded('publicModules/side_thread_notice.pug')
     if noticeContent
       div.m-b-1
         .panel-header 更新记录
-        .thread-notice-content
+        div
           for notice in noticeContent
-            .thread-notice-content.m-t-05.notice-clearfix
-              div(
+            .thread-notice.m-t-05.notice-clearfix
+              .thread-notice-head.m-b-05(
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
                 data-global-data=objToStr({uid: notice.user.uid })
@@ -16,7 +16,10 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 span.renderedTime=notice.renderedTime
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
-              div
+                a.notice-float 编辑公告
+              .thread-notice-content
                 span=notice.noticeContent
+
+
 
 

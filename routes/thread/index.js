@@ -1085,9 +1085,14 @@ threadRouter
           const minutesAgo = Math.floor(timeDiff / (1000 * 60));
           const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
           const daysAgo = Math.floor(hoursAgo / 24);
+          const monthAgo = Math.floor(daysAgo / 30);
+          const yearAgo = Math.floor(daysAgo / 365);
           const remainingHours = hoursAgo % 24;
           const remainingMinutes = minutesAgo % 60;
+          const remainingDay = daysAgo % 30;
+          const remainingMonth = monthAgo % 12;
           let renderedTime;
+
           if (minutesAgo < 60) {
             if (minutesAgo <= 0) {
               renderedTime = '刚刚';
@@ -1096,8 +1101,12 @@ threadRouter
             }
           } else if (hoursAgo < 24) {
             renderedTime = hoursAgo + '时' + remainingMinutes + '分前';
-          } else {
+          } else if (daysAgo < 30) {
             renderedTime = daysAgo + '天' + remainingHours + '时前';
+          } else if (monthAgo < 12) {
+            renderedTime = monthAgo + '个月' + remainingDay + '天前';
+          } else {
+            renderedTime = yearAgo + '年' + remainingMonth + '个月前';
           }
           return { toc, noticeContent, hid, renderedTime, user, pid };
         }),
