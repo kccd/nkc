@@ -1,4 +1,5 @@
 +includeCSS('/publicModules/side_thread_notice.css')
++includeJS('/publicModules/side_thread_notice.js')
 if !isIncluded('publicModules/side_thread_notice.pug')
   mixin sideThreadNotice(noticeContent,threadHistory)
     if noticeContent
@@ -16,9 +17,11 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 span.renderedTime=notice.renderedTime
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
-                a.notice-float 编辑公告
+                a.notice-float(onclick=`editNotice('${notice.nid}', '${notice.noticeContent}')`) 编辑公告
               .thread-notice-content
                 span=notice.noticeContent
+
+
 
 
 

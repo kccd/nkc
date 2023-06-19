@@ -1054,8 +1054,7 @@ threadRouter
     const notices = await db.NewNoticesModel.find(
       {
         pid: thread.oc,
-      },
-      { toc: 1, noticeContent: 1, hid: 1, uid: 1, pid: 1 },
+      }
     ).sort({ toc: -1 });
     let threadHistory = null;
     if (notices.length !== 0) {
@@ -1073,7 +1072,7 @@ threadRouter
             : null;
       }
       data.noticeContent = await Promise.all(
-        notices.map(async ({ toc, noticeContent, hid, uid, pid }) => {
+        notices.map(async ({ toc, noticeContent, hid, uid, pid ,nid }) => {
           const user = await db.UserModel.findOnly(
             { uid },
             { avatar: 1, uid: 1, username: 1 },
@@ -1108,7 +1107,7 @@ threadRouter
           } else {
             renderedTime = yearAgo + '年' + remainingMonth + '个月前';
           }
-          return { toc, noticeContent, hid, renderedTime, user, pid };
+          return { toc, noticeContent, hid, renderedTime, user, pid, nid };
         }),
       ).catch((err) => {
         console.log(err, 'err');
