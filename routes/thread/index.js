@@ -1073,7 +1073,7 @@ threadRouter
             : null;
       }
       data.noticeContent = await Promise.all(
-        notices.map(async ({ toc, noticeContent, hid, uid ,pid }) => {
+        notices.map(async ({ toc, noticeContent, hid, uid, pid }) => {
           const user = await db.UserModel.findOnly(
             { uid },
             { avatar: 1, uid: 1, username: 1 },

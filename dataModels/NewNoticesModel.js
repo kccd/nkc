@@ -17,7 +17,7 @@ const schema = new Schema(
     hid: {
       type: String,
       index: 1,
-      required: true,
+      default: '',
     },
     noticeContent: {
       type: String,
@@ -39,9 +39,9 @@ const schema = new Schema(
 
 schema.statics.extendNoticeContent = async ({
   pid,
-  hid,
   noticeContent,
   uid,
+  hid = '',
 }) => {
   const NewNoticesModel = mongoose.model('newNotices');
   const SettingModel = mongoose.model('settings');

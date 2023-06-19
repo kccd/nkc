@@ -2,18 +2,17 @@
 if !isIncluded('publicModules/side_thread_notice.pug')
   mixin sideThreadNotice(noticeContent,threadHistory)
     if noticeContent
-      #thread-notice-head
-        .nav.notice-span
-          span 更新记录
-      .thread-notice-content.m-b-1
-        for notice in noticeContent
-          .thread-notice-content.m-t-05.notice-clearfix
-            div
-              img.notice-user-banned.m-r-05(src=notice.user.avatar )
-              span.renderedTime=notice.renderedTime
-              if threadHistory !== null
-                a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
-            div
-              span=notice.noticeContent
+      div.m-b-1
+        .panel-header 更新记录
+        .thread-notice-content
+          for notice in noticeContent
+            .thread-notice-content.m-t-05.notice-clearfix
+              div
+                img.notice-user-banned.m-r-05(src=notice.user.avatar )
+                span.renderedTime=notice.renderedTime
+                if threadHistory !== null && notice.hid
+                  a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
+              div
+                span=notice.noticeContent
 
 

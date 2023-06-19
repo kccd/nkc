@@ -450,13 +450,24 @@ router
     if (noticeContent) {
       //检测文章通告内容是否有敏感词
       await sensitiveDetectionService.threadNoticeDetection(noticeContent);
-
-      const { toc } = await db.NewNoticesModel.extendNoticeContent({
-        pid,
-        hid,
-        uid: state.uid,
-        noticeContent,
+      //是否已经存在数据
+      const isExist = await db.NewNoticesModel.find({ pid }, { nid: 1 }).sort({
+        toc: -1,
       });
+      if (isExist.length !== 0) {
+        const { nid } = isExist[0];
+        await db.NewNoticesModel.updateOne(
+          { nid },
+          {
+            $set: {
+              hid,
+            },
+          },
+        );
+      }
+      let noticeObj = { pid, uid: state.uid, noticeContent };
+      //存储文章通告数据
+      const { toc } = await db.NewNoticesModel.extendNoticeContent(noticeObj);
       if (toc && targetThread) {
         const { tid } = targetThread;
         await db.NewNoticesModel.updateThreadStatus(tid, true);
