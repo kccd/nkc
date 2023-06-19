@@ -7,7 +7,11 @@ if !isIncluded('publicModules/side_thread_notice.pug')
         .thread-notice-content
           for notice in noticeContent
             .thread-notice-content.m-t-05.notice-clearfix
-              div
+              div(
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: notice.user.uid })
+                )
                 img.notice-user-banned.m-r-05(src=notice.user.avatar )
                 span.renderedTime=notice.renderedTime
                 if threadHistory !== null && notice.hid
