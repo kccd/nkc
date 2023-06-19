@@ -640,6 +640,7 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;
+  updateObj.isNewThread = thread.isNewThread;
   updateObj.count = await PostModel.countDocuments({
     tid: thread.tid,
     type: 'post',

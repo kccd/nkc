@@ -37,19 +37,13 @@ const schema = new Schema(
   { collection: 'newNotices' },
 );
 
-schema.statics.extendNoticeContent = async ({
-  pid,
-  noticeContent,
-  uid,
-  hid = '',
-}) => {
+schema.statics.extendNoticeContent = async ({ pid, uid, noticeContent }) => {
   const NewNoticesModel = mongoose.model('newNotices');
   const SettingModel = mongoose.model('settings');
   const nid = await SettingModel.operateSystemID('newNotices', 1);
   const noticeObj = {
     nid,
     pid,
-    hid,
     uid,
     noticeContent,
   };

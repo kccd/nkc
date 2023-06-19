@@ -349,14 +349,14 @@ router
         });
         type = 'passThread';
       }
-      await db.ThreadModel.updateOne(
-        { tid: post.tid },
-        {
-          $set: {
-            isNewThread: false,
-          },
-        },
-      );
+      // await db.ThreadModel.updateOne(
+      //   { tid: post.tid },
+      //   {
+      //     $set: {
+      //       isNewThread: false,
+      //     },
+      //   },
+      // );
       //更新文章信息
       await thread.updateThreadMessage(false);
       //生成审核记录
