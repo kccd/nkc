@@ -7,7 +7,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
         .panel-header 更新记录
         div
           for notice in noticeContent
-            .thread-notice.m-t-05.notice-clearfix
+            .thread-notice.notice-clearfix
               .thread-notice-head.m-b-05(
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
@@ -18,7 +18,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
                 if threadHistory !== null
-                  a.notice-float(onclick=`editNotice('${notice.nid}', '${notice.noticeContent}')`) 编辑公告
+                  a.notice-float(onclick=`editNotice(this,'${notice.nid}', '${notice.noticeContent}')`) 编辑公告
               .thread-notice-content
                 span=notice.noticeContent
 

@@ -80,13 +80,17 @@ export function sweetEditNotice(title, nid, content = '') {
         return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
           noticeContent: text,
         })
-          .then((res) => {
+          .then(() => {
             resolve(text);
           })
           .catch(({ error }) => {
             Swal.showValidationMessage(error);
           });
       },
+    }).then((result) => {
+      if (result.value) {
+        sweetSuccess('提交成功');
+      }
     });
   });
 }
