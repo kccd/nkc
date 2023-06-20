@@ -1051,11 +1051,9 @@ threadRouter
     );
 
     //文章通告内容处理
-    const notices = await db.NewNoticesModel.find(
-      {
-        pid: thread.oc,
-      }
-    ).sort({ toc: -1 });
+    const notices = await db.NewNoticesModel.find({
+      pid: thread.oc,
+    }).sort({ toc: -1 });
     let threadHistory = null;
     if (notices.length !== 0) {
       const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
@@ -1072,7 +1070,7 @@ threadRouter
             : null;
       }
       data.noticeContent = await Promise.all(
-        notices.map(async ({ toc, noticeContent, hid, uid, pid ,nid }) => {
+        notices.map(async ({ toc, noticeContent, hid, uid, pid, nid }) => {
           const user = await db.UserModel.findOnly(
             { uid },
             { avatar: 1, uid: 1, username: 1 },

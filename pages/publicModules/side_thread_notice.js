@@ -1,8 +1,8 @@
 import { sweetEditNotice } from '../lib/js/sweetAlert';
 
+//编辑公告内容
 async function editNotice(nid, noticeContent) {
-  const newNoticeContent = await sweetEditNotice('编辑公告', noticeContent);
-  console.log(newNoticeContent, 'newNoticeContent');
+  await sweetEditNotice('编辑公告', nid, noticeContent);
 }
 
 export { editNotice };

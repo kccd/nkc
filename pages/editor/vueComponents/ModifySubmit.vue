@@ -19,7 +19,7 @@
       label(style="margin-bottom: 0.5rem" v-if="type==='modifyThread'" )
         input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
         span
-          | 新版本公告。
+          | 新版本公告
 
       div(v-if="checkNewNotice&&type==='modifyThread'")
         h5.text-danger 如果勾选新版本公告，文章将被顶至最前

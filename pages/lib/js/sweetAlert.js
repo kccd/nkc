@@ -6,32 +6,6 @@ export function sweetAlert(text) {
   });
 }
 
-export function sweetEditNotice(title, content = '') {
-  return new Promise((resolve) => {
-    Swal.fire({
-      title,
-      input: 'textarea',
-      inputAttributes: {
-        autocapitalize: 'off',
-        maxlength: 200,
-      },
-      inputValue: content,
-      allowOutsideClick: true,
-      showCancelButton: true,
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      showLoaderOnConfirm: true,
-      preConfirm: (text) => {
-        if (text.length > 199) {
-          Swal.showValidationMessage('文本超过长度限制200');
-          return;
-        } else {
-          resolve(text);
-        }
-      },
-    });
-  });
-}
 export function sweetPrompt(title, content = '') {
   return new Promise((resolve) => {
     Swal.fire({
@@ -86,6 +60,36 @@ export function sweetError(text) {
   });
 }
 
+//为了考虑到文章通告的内容编辑，定制的一个弹窗，不可复用
+export function sweetEditNotice(title, nid, content = '') {
+  return new Promise((resolve) => {
+    Swal.fire({
+      title,
+      input: 'textarea',
+      inputAttributes: {
+        autocapitalize: 'off',
+        maxlength: 200,
+      },
+      inputValue: content,
+      allowOutsideClick: () => !Swal.isLoading(),
+      showCancelButton: true,
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      showLoaderOnConfirm: true,
+      preConfirm: (text) => {
+        return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
+          noticeContent: text,
+        })
+          .then((res) => {
+            resolve(text);
+          })
+          .catch(({ error }) => {
+            Swal.showValidationMessage(error);
+          });
+      },
+    });
+  });
+}
 export function sweetInfo(text) {
   text = text + '';
   Swal({

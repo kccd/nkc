@@ -12,6 +12,7 @@ const deleteRouter = require('./delete');
 const postRouter = require('./post');
 const toppedRouter = require('./topped');
 const authorRouter = require('./author');
+const editNoticeRouter = require('./editNotice');
 const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
@@ -674,5 +675,10 @@ router
     commentsRouter.allowedMethods(),
   )
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
-  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods());
+  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
+  .use(
+    '/:nid/editNotice',
+    editNoticeRouter.routes(),
+    editNoticeRouter.allowedMethods(),
+  );
 module.exports = router;
