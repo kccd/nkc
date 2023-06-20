@@ -36,6 +36,7 @@ router.put('/', async (ctx, next) => {
     {
       $set: {
         noticeContent,
+        uid,
       },
     },
   );
