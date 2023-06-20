@@ -1055,7 +1055,11 @@ threadRouter
       pid: thread.oc,
     }).sort({ toc: -1 });
     let threadHistory = null;
+    let canEditNotice = false;
+
     if (notices.length !== 0) {
+      canEditNotice =
+        thread.uid === state.uid || ctx.permission('editNoticeContent');
       const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
       const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
       if (
@@ -1105,7 +1109,15 @@ threadRouter
           } else {
             renderedTime = yearAgo + '年' + remainingMonth + '个月前';
           }
-          return { toc, noticeContent, hid, renderedTime, user, pid, nid };
+          return {
+            toc,
+            noticeContent,
+            hid,
+            renderedTime,
+            user,
+            pid,
+            nid,
+          };
         }),
       ).catch((err) => {
         console.log(err, 'err');
@@ -1175,6 +1187,7 @@ threadRouter
     data.isEditMode = isEditMode;
     data.orderStatus = thread.orderStatus;
     data.threadHistory = threadHistory;
+    data.canEditNotice = canEditNotice;
 
     // 商品信息
     if (threadShopInfo) {

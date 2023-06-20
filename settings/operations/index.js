@@ -128,6 +128,7 @@ operationObj.defaultOperations = [
   'viewUserCode', // 可查看任意用户的动态码
   'viewUserArticle', //查看任意用户的文章
   'modifyAllPostOrder', //可以调整任意用户的文章回复顺序
+  'editNoticeContent', //可以任意调整用户的文章通告内容
 ];
 
 operationObj.operationTree = {

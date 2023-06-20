@@ -17,8 +17,8 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 span.renderedTime=notice.renderedTime
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
-                if threadHistory !== null
-                  a.notice-float(onclick=`editNotice(this,'${notice.nid}', '${notice.noticeContent}')`) 编辑公告
+                if data.canEditNotice
+                  a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑公告
               .thread-notice-content
                 span=notice.noticeContent
 

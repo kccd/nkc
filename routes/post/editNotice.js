@@ -9,23 +9,10 @@ router.put('/', async (ctx, next) => {
   const { nid } = params;
   const { noticeContent } = body;
   const { uid } = state;
-
   const { pid } = await db.NewNoticesModel.findOnly({ nid }, { pid: 1 });
-  const threadPost = await db.PostModel.findOnly({ pid });
-  const isModerator = await db.PostModel.isModerator(uid, pid);
-  let threadHistory = null;
+  const thread = await db.ThreadModel.findOnly({ oc: pid }, { uid: 1 });
   //判断用户是否有权限修改
-  if (
-    threadPost.tlm > threadPost.toc &&
-    ctx.permission('visitPostHistory') &&
-    isModerator
-  ) {
-    threadHistory =
-      !threadPost.hideHistories || ctx.permission('displayPostHideHistories')
-        ? true
-        : null;
-  }
-  if (threadHistory === null) {
+  if (thread.uid !== uid && !ctx.permission('editNoticeContent')) {
     ThrowCommonError(403, '您没有相应的权限，或等级不足');
   }
   //检测文章通告内容是否有敏感词
