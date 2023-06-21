@@ -1929,55 +1929,44 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
+  const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
+    .limit(100)
+    .sort({ toc: -1 })
+    .lean();
 
-  const time = 10;
-  const finalArr = [];
-  let i = 0;
+  const filterPid = Array.from(new Set(academicPost.map((item) => item.pid)));
 
-  while (finalArr.length < time) {
-    const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
-      .limit(time * 2)
-      .sort({ toc: -1 })
-      .skip(i * time * 2)
-      .lean();
-
-    const filterPid = Array.from(new Set(academicPost.map((item) => item.pid)));
-
-    const postPid = await PostModel.find(
-      {
-        pid: { $in: filterPid },
-        mainForumsId: { $in: fid },
-        disabled: false,
-        reviewed: true,
-        toDraft: { $ne: true },
-        type: 'thread',
-        originState: { $nin: ['0', '', '1', '2'] },
-      },
-      { pid: 1 },
-    ).lean();
-
-    const filteredPid = postPid.map((item) => {
-      return item.pid;
-    });
-
-    const academicThread = await ThreadModel.find({
+  const postPid = await PostModel.find(
+    {
+      pid: { $in: filterPid },
       mainForumsId: { $in: fid },
       disabled: false,
       reviewed: true,
-      recycleMark: { $ne: true },
-      oc: { $in: filteredPid },
-    })
-      .sort({ toc: -1 })
-      .lean();
+      toDraft: { $ne: true },
+      type: 'thread',
+      originState: { $nin: ['0', '', '1', '2'] },
+    },
+    { pid: 1 },
+  ).lean();
+ 
+  const filteredPid = postPid.map((item) => {
+    return item.pid;
+  });
 
-    academicThread.forEach((item) => {
-      if (!finalArr.includes(item) && finalArr.length < time) {
-        finalArr.push(item);
-      }
-    });
-    i++;
-  }
+  const academicThread = await ThreadModel.find({
+    mainForumsId: { $in: fid },
+    disabled: false,
+    reviewed: true,
+    recycleMark: { $ne: true },
+    oc: { $in: filteredPid },
+  })
+    .sort({ toc: -1 })
+    .lean();
 
+  const sortedAcademicThread = filterPid
+    .map((pid) => academicThread.find((thread) => thread.oc === pid))
+    .filter(Boolean);
+  const finalArr = sortedAcademicThread.slice(0, 10);
   return await ThreadModel.extendThreads(finalArr, {
     lastPost: true,
     lastPostUser: true,
