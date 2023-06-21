@@ -11,6 +11,7 @@ const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const db = require('../../dataModels');
 const tools = require('../../nkcModules/tools');
+const { ThrowCommonError } = require('../../nkcModules/error');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -1120,7 +1121,7 @@ threadRouter
           };
         }),
       ).catch((err) => {
-        console.log(err, 'err');
+        ThrowCommonError(404, err);
       });
     }
     // 文章访问次数加一

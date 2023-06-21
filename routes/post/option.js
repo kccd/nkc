@@ -1,6 +1,5 @@
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
-  console.log('走了这里');
   const { state, data, db, params } = ctx;
   const { user } = data;
   const { uid } = state;
