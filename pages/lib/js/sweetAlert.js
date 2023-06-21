@@ -60,40 +60,7 @@ export function sweetError(text) {
   });
 }
 
-//为了考虑到文章通告的内容编辑，定制的一个弹窗，不可复用
-export function sweetEditNotice(title, nid, content = '') {
-  return new Promise((resolve) => {
-    Swal.fire({
-      title,
-      input: 'textarea',
-      inputAttributes: {
-        autocapitalize: 'off',
-        maxlength: 200,
-      },
-      inputValue: content,
-      allowOutsideClick: () => !Swal.isLoading(),
-      showCancelButton: true,
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      showLoaderOnConfirm: true,
-      preConfirm: (text) => {
-        return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
-          noticeContent: text,
-        })
-          .then(() => {
-            resolve(text);
-          })
-          .catch(({ error }) => {
-            Swal.showValidationMessage(error);
-          });
-      },
-    }).then((result) => {
-      if (result.value) {
-        sweetSuccess('提交成功');
-      }
-    });
-  });
-}
+
 export function sweetInfo(text) {
   text = text + '';
   Swal({

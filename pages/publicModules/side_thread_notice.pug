@@ -14,7 +14,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 data-global-data=objToStr({uid: notice.user.uid })
                 )
                 img.notice-user-banned.m-r-05(src=notice.user.avatar )
-                span.renderedTime=notice.renderedTime
+                +fromNow(notice.toc)
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
                 if data.canEditNotice

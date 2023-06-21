@@ -1948,7 +1948,7 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
     },
     { pid: 1 },
   ).lean();
- 
+
   const filteredPid = postPid.map((item) => {
     return item.pid;
   });
