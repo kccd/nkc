@@ -2,9 +2,9 @@
 +includeJS('/publicModules/side_thread_notice.js')
 if !isIncluded('publicModules/side_thread_notice.pug')
   mixin sideThreadNotice(noticeContent,threadHistory)
-    if noticeContent
-      div.m-b-1
-        .panel-header 更新记录
+    div.m-b-1
+      .panel-header 更新记录
+      if noticeContent
         div
           for notice in noticeContent
             .thread-notice.notice-clearfix
@@ -21,6 +21,8 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                   a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑公告
               .thread-notice-content
                 span=notice.noticeContent
+      else
+        div 空空如也~
 
 
 
