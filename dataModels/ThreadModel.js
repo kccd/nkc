@@ -1918,6 +1918,79 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
  * @param {Number} limit 条数，
  * @author pengxiguaa 2019-4-26
  * */
+
+/*
+ *获取最新加学术分的文章
+ *@param {[String]} fid 能够从中读取文章的专业ID
+ *
+ */
+threadSchema.statics.getNewAcademicThread = async (fid) => {
+  //获取最新加学术分文章
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+
+  const time = 10;
+  const finalArr = [];
+  let i = 0;
+
+  while (finalArr.length < time) {
+    const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
+      .limit(time * 2)
+      .sort({ toc: -1 })
+      .skip(i * time * 2)
+      .lean();
+
+    const filterPid = Array.from(new Set(academicPost.map((item) => item.pid)));
+
+    const postPid = await PostModel.find(
+      {
+        pid: { $in: filterPid },
+        mainForumsId: { $in: fid },
+        disabled: false,
+        reviewed: true,
+        toDraft: { $ne: true },
+        type: 'thread',
+        originState: { $nin: ['0', '', '1', '2'] },
+      },
+      { pid: 1 },
+    ).lean();
+
+    const filteredPid = postPid.map((item) => {
+      return item.pid;
+    });
+
+    const academicThread = await ThreadModel.find({
+      mainForumsId: { $in: fid },
+      disabled: false,
+      reviewed: true,
+      recycleMark: { $ne: true },
+      oc: { $in: filteredPid },
+    })
+      .sort({ toc: -1 })
+      .lean();
+
+    academicThread.forEach((item) => {
+      if (!finalArr.includes(item) && finalArr.length < time) {
+        finalArr.push(item);
+      }
+    });
+    i++;
+  }
+
+  return await ThreadModel.extendThreads(finalArr, {
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    firstPostResource: false,
+    htmlToText: true,
+  });
+};
+
 threadSchema.statics.getLatestThreads = async (
   fid,
   sort = 'toc',
