@@ -1076,27 +1076,28 @@ threadRouter
             : null;
       }
       //
-      const uids = Array.from(new Set(notices.map((item) => item.uid)));
+      const userId = Array.from(new Set(notices.map((item) => item.uid)));
       const users = await db.UserModel.find(
-        { uid: { $in: uids } },
+        { uid: { $in: userId } },
         { avatar: 1, uid: 1, username: 1 },
       ).lean();
-      data.noticeContent = await Promise.all(
-        notices.map(async ({ toc, noticeContent, hid, uid, pid, nid }) => {
-          const user = users.filter((item) => item.uid === uid)[0];
-          user.avatar = tools.getUrl('userAvatar', user.avatar);
+      data.noticeContent = notices.map(
+        ({ toc, noticeContent, hid, uid, pid, nid }) => {
+          const user = users.find((item) => item.uid === uid);
+          const updatedUser = {
+            ...user,
+            avatar: tools.getUrl('userAvatar', user.avatar),
+          };
           return {
             toc,
             noticeContent,
             hid,
-            user,
+            user: updatedUser,
             pid,
             nid,
           };
-        }),
-      ).catch((err) => {
-        ThrowCommonError(404, err);
-      });
+        },
+      );
     }
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });

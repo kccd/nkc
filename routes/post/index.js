@@ -23,7 +23,7 @@ const { ObjectId } = require('mongodb');
 const {
   sensitiveDetectionService,
 } = require('../../services/sensitive/sensitiveDetection.service');
-const { getLength } = require('../../nkcModules/checkData');
+const { getLength, checkString } = require('../../nkcModules/checkData');
 const { ThrowCommonError } = require('../../nkcModules/error');
 
 router
@@ -454,9 +454,7 @@ router
       //检测文章通告内容是否有敏感词
       await sensitiveDetectionService.threadNoticeDetection(noticeContent);
       //检测文章通告内容是否超过字数限制
-      if (getLength(noticeContent) > 200) {
-        ThrowCommonError(403, '您的字数已超过限制200');
-      }
+      checkString(noticeContent, { minTextLength: 5, maxTextLength: 200 });
       //是否已经存在数据
       const isExist = await db.NewNoticesModel.find({ pid }, { nid: 1 }).sort({
         toc: -1,
