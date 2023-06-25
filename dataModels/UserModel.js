@@ -3014,8 +3014,7 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
         } = JSON.parse(err.message);
         result = {
           permit: false,
-          // warning: `<div>${message}</div>`,
-          warning: `<a href="https://www.baidu.com/">这里</a>`,
+          warning: `<div>${message}</div>`,
         };
       } catch (_err) {
         result = {
