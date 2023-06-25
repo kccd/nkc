@@ -172,8 +172,6 @@ if !isIncluded('publicModules/articlePanel')
               a(href=c.url target='_blank')=c.name
           .article-panel-time
             +fromNow(content.time)
-          if article.isNewThread
-            .new-article.m-l-1 新版本
           .pull-right
             if content.voteUpCount > 0
               .article-panel-count
@@ -188,6 +186,8 @@ if !isIncluded('publicModules/articlePanel')
                 .fa.fa-comment
                 span=content.replyCount
         .article-panel-title
+          if article.isNewThread
+            .new-article.m-r-05 新版本
           a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0? 'm-r-05':'')
             span(class=content.digest? 'digest': '')=content.title
           for page in pages

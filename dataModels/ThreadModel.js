@@ -1944,7 +1944,6 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
       reviewed: true,
       toDraft: { $ne: true },
       type: 'thread',
-      originState: { $nin: ['0', '', '1', '2'] },
     },
     { pid: 1 },
   ).lean();

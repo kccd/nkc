@@ -24,7 +24,7 @@
       div(v-if="checkNewNotice&&type==='modifyThread'")
         h5.text-danger 如果勾选新版本公告，文章将被顶至最前。
         textarea.form-control( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
-        p.warning(v-if="noticeContent?noticeContent.length>=10:noticeContent" ) 新版本公告内容不能超过 200 个字
+        p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 新版本公告内容不能超过 200 个字
       label
         input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
         span
