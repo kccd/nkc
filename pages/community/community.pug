@@ -74,6 +74,14 @@ block content
         +managementPanel(data.managementData)
         include ../publicModules/apps/apps
         +appsPanel(data.appsData)
+        //最新学术加分文章
+        if data.academicThread && data.academicThread.length>0
+          .home-forums-list.m-b-1
+            .panel-header.m-b-0 最新学术加分文章
+            .home-threads
+              -const defaultThreadListStyle = {type: 'brief'}
+              for thread in data.academicThread
+                include ../publicModules/thread_panel/thread_panel
         //- 最新发表
         if data.originalThreads && data.originalThreads.length > 0
           .home-forums-list.m-b-1

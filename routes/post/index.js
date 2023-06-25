@@ -12,6 +12,7 @@ const deleteRouter = require('./delete');
 const postRouter = require('./post');
 const toppedRouter = require('./topped');
 const authorRouter = require('./author');
+const editNoticeRouter = require('./editNotice');
 const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
@@ -19,6 +20,11 @@ const commentRouter = require('./comment');
 const router = new Router();
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
+const {
+  sensitiveDetectionService,
+} = require('../../services/sensitive/sensitiveDetection.service');
+const { getLength, checkString } = require('../../nkcModules/checkData');
+const { ThrowCommonError } = require('../../nkcModules/error');
 
 router
   .use('/', async (ctx, next) => {
@@ -331,7 +337,6 @@ router
       body = ctx.body;
     }
     const post = body.post;
-
     const {
       columnMainCategoriesId = [],
       columnMinorCategoriesId = [],
@@ -347,6 +352,7 @@ router
       survey,
       did,
       cover = '',
+      noticeContent,
       _id,
     } = post;
     const { pid } = ctx.params;
@@ -442,8 +448,39 @@ router
     }
 
     // 生成历史记录
-    await db.HistoriesModel.createHistory(_targetPost);
-
+    const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
+    // 如果有文章新通告就生成新通告记录表
+    if (noticeContent) {
+      //检测文章通告内容是否有敏感词
+      await sensitiveDetectionService.threadNoticeDetection(noticeContent);
+      //检测文章通告内容是否超过字数限制
+      checkString(noticeContent, { minTextLength: 5, maxTextLength: 200 });
+      //是否已经存在数据
+      const isExist = await db.NewNoticesModel.find({ pid }, { nid: 1 }).sort({
+        toc: -1,
+      });
+      if (isExist.length !== 0) {
+        const { nid } = isExist[0];
+        await db.NewNoticesModel.updateOne(
+          { nid },
+          {
+            $set: {
+              hid,
+            },
+          },
+        );
+      }
+      let noticeObj = { pid, uid: state.uid, noticeContent };
+      //存储文章通告数据
+      const { toc } = await db.NewNoticesModel.extendNoticeContent(noticeObj);
+      if (toc && targetThread) {
+        const { tid } = targetThread;
+        await db.NewNoticesModel.updateThreadStatus(tid, true);
+      }
+    } else {
+      const { tid } = targetThread;
+      await db.NewNoticesModel.updateThreadStatus(tid, false);
+    }
     // 判断文本是否有变化，有变化版本号加1
     /*if(c !== targetPost.c) {
       targetPost.cv ++;
@@ -642,5 +679,10 @@ router
     commentsRouter.allowedMethods(),
   )
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
-  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods());
+  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
+  .use(
+    '/:nid/editNotice',
+    editNoticeRouter.routes(),
+    editNoticeRouter.allowedMethods(),
+  );
 module.exports = router;

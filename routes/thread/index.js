@@ -10,6 +10,8 @@ const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const db = require('../../dataModels');
+const tools = require('../../nkcModules/tools');
+const { ThrowCommonError } = require('../../nkcModules/error');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -267,7 +269,6 @@ threadRouter
     if (data.user) {
       await data.user.extendAuthLevel();
     }
-
     // 拓展POST时的相关配置
     const extendPostOptions = {
       uid: data.user ? data.user.uid : '',
@@ -490,7 +491,6 @@ threadRouter
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
-
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -1051,6 +1051,54 @@ threadRouter
       data.user && userSubscribeUsersId.includes(authorId)
     );
 
+    //文章通告内容处理
+    const notices = await db.NewNoticesModel.find({
+      pid: thread.oc,
+    }).sort({ toc: -1 });
+    let threadHistory = null;
+    let canEditNotice = false;
+
+    if (notices.length !== 0) {
+      canEditNotice =
+        thread.uid === state.uid || ctx.permission('editNoticeContent');
+      const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
+      const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
+      //判断是否有查看历史记录的权限
+      if (
+        threadPost.tlm > threadPost.toc &&
+        ctx.permission('visitPostHistory') &&
+        isModerator
+      ) {
+        threadHistory =
+          !threadPost.hideHistories ||
+          ctx.permission('displayPostHideHistories')
+            ? true
+            : null;
+      }
+      //
+      const userId = Array.from(new Set(notices.map((item) => item.uid)));
+      const users = await db.UserModel.find(
+        { uid: { $in: userId } },
+        { avatar: 1, uid: 1, username: 1 },
+      ).lean();
+      data.noticeContent = notices.map(
+        ({ toc, noticeContent, hid, uid, pid, nid }) => {
+          const user = users.find((item) => item.uid === uid);
+          const updatedUser = {
+            ...user,
+            avatar: tools.getUrl('userAvatar', user.avatar),
+          };
+          return {
+            toc,
+            noticeContent,
+            hid,
+            user: updatedUser,
+            pid,
+            nid,
+          };
+        },
+      );
+    }
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
     // 标志
@@ -1114,6 +1162,8 @@ threadRouter
     data.editPostPositionPermission = haveEditPositionOrder;
     data.isEditMode = isEditMode;
     data.orderStatus = thread.orderStatus;
+    data.threadHistory = threadHistory;
+    data.canEditNotice = canEditNotice;
 
     // 商品信息
     if (threadShopInfo) {

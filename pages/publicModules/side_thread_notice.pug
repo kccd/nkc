@@ -1,0 +1,31 @@
++includeCSS('/publicModules/side_thread_notice.css')
++includeJS('/publicModules/side_thread_notice.js')
+if !isIncluded('publicModules/side_thread_notice.pug')
+  mixin sideThreadNotice(noticeContent,threadHistory)
+    div.m-b-1
+      .panel-header 文章通告
+      if noticeContent
+        div
+          for notice in noticeContent
+            .thread-notice.notice-clearfix
+              .thread-notice-head.m-b-05(
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                data-global-data=objToStr({uid: notice.user.uid })
+                )
+                img.notice-user-banned.m-r-05(src=notice.user.avatar )
+                +fromNow(notice.toc)
+                if threadHistory !== null && notice.hid
+                  a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情
+                if data.canEditNotice
+                  a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑
+              .thread-notice-content
+                span=notice.noticeContent
+      else
+        div 空空如也~
+
+
+
+
+
+

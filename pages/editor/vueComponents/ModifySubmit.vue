@@ -16,6 +16,15 @@
           | 匿名发表
           span.text-danger(v-if="!allowedAnonymous") (所选专业分类不支持匿名发表)
     .checkbox
+      label(style="margin-bottom: 0.5rem" v-if="type==='modifyThread'" )
+        input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
+        span
+          | 新版本公告
+
+      div(v-if="checkNewNotice&&type==='modifyThread'")
+        h5.text-danger 如果勾选新版本公告，文章将被顶至最前
+        textarea( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
+        p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 已达到最大限制字数200
       label
         input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
         span
@@ -37,7 +46,7 @@
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
-// import {debounce} from '../../lib/js/execution';
+import {debounce} from '../../lib/js/execution';
 // import 'url-search-params-polyfill';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
@@ -63,6 +72,7 @@ export default {
     type: "newThread",
     disabledSubmit: false, // 锁定提交按钮
     checkProtocol: true, // 是否勾选协议
+    checkNewNotice: false, // 是否发布新版文章通告
     // 当前用户是否有权限发表匿名内容
     havePermissionToSendAnonymousPost: false,
     // 允许发表匿名内容的专业ID
@@ -80,7 +90,9 @@ export default {
     // 保存草稿后的数据
     draft: '',
     // 判断是否有草稿ID
-    submitStatus: false
+    submitStatus: false,
+    //用户输入的新版本公告
+    noticeContent: "",
   }),
   watch: {
     data : {
@@ -89,7 +101,11 @@ export default {
         this.allowedAnonymousForumsId = n?.allowedAnonymousForumsId || [];
         this.havePermissionToSendAnonymousPost =
           n?.havePermissionToSendAnonymousPost || false;
-        if (n?.post) this.oldContent = n.post.c;
+        if (n?.post) {
+          this.oldContent = n.post.c;
+          this.checkNewNotice = n.post.checkNewNotice;
+          this.noticeContent = n.post.noticeContent
+        }
         if (n?.type) this.type = n.type;
         if (n?.forum) this.forum = n.forum;
         if (n?.thread) this.thread = n.thread;
@@ -109,7 +125,12 @@ export default {
       handler(n) {
           this.allowSave2 = n
       }
-    }
+    },
+    tempData: {
+      handler(newValue,oldValue){
+        this.saveToDraftBase("automatic");
+      }
+    },
   },
 
   computed: {
@@ -122,6 +143,9 @@ export default {
       }
       return arr;
     },
+    tempData(){
+      return this.noticeContent + this.checkNewNotice
+    }
   },
   created() {
     if (this.data.type === 'newThread') {
@@ -143,6 +167,9 @@ export default {
     checkString: NKC.methods.checkData.checkString,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
+    handleNoticeContentChange:debounce(function(event){
+      this.noticeContent = event.target.value
+    },200),
     history() {
       let url;
       if (this.data.type === 'newThread') {
@@ -204,7 +231,9 @@ export default {
             saveData.keyWordsCn.length ||
             saveData.keyWordsEn.length ||
             saveData.authorInfos ||
-            saveData.surveyId
+            saveData.surveyId ||
+            saveData.noticeContent||
+            saveData.checkNewNotice
           )
         )
           return;
@@ -236,7 +265,9 @@ export default {
             saveData.keyWordsCn?.length ||
             saveData.keyWordsEn?.length  ||
             saveData.authorInfos?.length ||
-            saveData.survey
+            saveData.survey||
+            saveData.checkNewNotice||
+            saveData.noticeContent
           )
         ) return
       let type = this.type;
@@ -417,6 +448,12 @@ export default {
         if (f.cid === null) throw "请选择完整的专业分类";
       }
     },
+    //检查新通告内容
+    checkNoticeContent(v){
+      if(!v){
+        throw new  Error('请输入本次更新的说明');
+      }
+    },
     checkThreadCategory(v) {
       for (const tc of v) {
         if (tc.selectedNode === null) {
@@ -436,9 +473,14 @@ export default {
     readyDataForSave() {
       this.$emit("ready-data", (data) => {
         this.saveData = data;
+        this.saveData.checkNewNotice = this.checkNewNotice;
+        this.saveData.noticeContent = this.noticeContent;
       });
     },
     submit(submitData) {
+      if(this.checkNewNotice){
+        submitData.noticeContent = this.noticeContent;
+      }
       let type;
       Promise.resolve()
         .then(() => {
@@ -448,7 +490,6 @@ export default {
         })
         .then(() => {
           if (type === "newThread") {
-
             // 发新帖：从专业点发表、首页点发表、草稿箱
             this.checkTitle(submitData.t);
             this.checkContent(submitData.c);
@@ -501,6 +542,8 @@ export default {
             this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
             this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
             this.checkAuthorInfos(submitData.authorInfos);
+            this.checkNewNotice && this.checkNoticeContent(submitData.noticeContent);
+
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
             if (submitData.coverData) {
@@ -606,6 +649,31 @@ export default {
   @media (min-width: 992px) {
     // max-width: 25rem;
     position: fixed;
+  }
+}
+.check-area{
+  width: 100%;
+  max-width: 100%;
+}
+.check-area:focus{
+  border: 1px solid rgb(43, 144, 217);
+  outline: none;
+
+}
+.warning{
+  animation: shake 0.5s ;
+  font-size: 1rem;
+  color: red;
+}
+@keyframes shake {
+  0% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(-2px);
   }
 }
 </style>

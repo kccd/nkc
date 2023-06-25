@@ -157,6 +157,8 @@ block content
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
                       if thread.type !== "fund"
+                        if thread.type === "article" && thread.isNewThread
+                          div.m-b-1(style='background-color:rgba(251, 199, 170,0.2);padding:0.5rem;')=`新版文章通告：${(data.noticeContent)[0].noticeContent}`
                         .h3.thread-title.text-center= thread.firstPost.t
                       -const post = thread.firstPost;
                       if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
@@ -555,20 +557,25 @@ block content
             +applicantOperationCenter(form, data.user? data.user.uid:'')
             -var fundBlacklistPostPermission = data.permissions && data.permissions.fundBlacklistPost;
             +managerOperationCenter(form, data.userFundRoles, fundBlacklistPostPermission)
+
           if data.targetUser
             .m-b-1
               //- .panel-header 作者
               -const author = data.targetUser;
               include ./authorInfo
+            include ../publicModules/side_thread_notice
             include ../publicModules/side_thread_list
+            +sideThreadNotice(data.noticeContent,data.threadHistory,data.canEditNotice)
             +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
             +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
+
           .hidden-sm.hidden-xs
             include ../publicModules/footer/footer_sm
 
           include ../module_scrollTo
 
     //- 作者信息
+
     .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
       .modal-dialog.modal-sm(role="document" v-cloak v-if="contract")#moduleAuthorApp
         .modal-content
@@ -632,8 +639,8 @@ block scripts
   //include ../publicModules/replaceNKCRender
   include ../post/options/options
   include ../publicModules/commonModal/commonModal
-
   //- 违规记录模块 NKC.modules.violationRecord
+
   if data.permissions.violationRecord
     include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug

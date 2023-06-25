@@ -19,6 +19,11 @@ const threadSchema = new Schema(
       default: 'article',
       index: 1,
     },
+    //用户是否勾选发表新文章通告
+    isNewThread: {
+      type: Boolean,
+      default: false,
+    },
     //文章的评论数量
     count: {
       type: Number,
@@ -592,11 +597,13 @@ threadSchema.methods.updateThreadEncourage = async function () {
 // 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const ThreadModel = mongoose.model('threads');
+  const NewNoticesModel = mongoose.model('newNotices');
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const thread = await ThreadModel.findOne({ tid: this.tid });
   const PostModel = mongoose.model('posts');
   const updateObj = {};
+  const { isNewThread } = thread;
   const oc = await PostModel.findOneAndUpdate(
     { tid: thread.tid },
     {
@@ -622,10 +629,18 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-  updateObj.tlm = lm ? lm.toc : '';
+  if (isNewThread) {
+    const { toc } = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
+      toc: -1,
+    });
+    updateObj.tlm = toc ? toc : '';
+  } else {
+    updateObj.tlm = lm ? lm.toc : '';
+  }
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;
+  updateObj.isNewThread = thread.isNewThread;
   updateObj.count = await PostModel.countDocuments({
     tid: thread.tid,
     type: 'post',
@@ -1634,6 +1649,7 @@ threadSchema.statics.extendArticlesPanelData = async function (threads) {
       oc: thread.oc,
       id: thread.tid,
       pid: thread.oc,
+      isNewThread: thread.isNewThread,
       user,
       pages,
       content,
@@ -1902,6 +1918,68 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
  * @param {Number} limit 条数，
  * @author pengxiguaa 2019-4-26
  * */
+
+/*
+ *获取最新加学术分的文章
+ *@param {[String]} fid 能够从中读取文章的专业ID
+ *
+ */
+threadSchema.statics.getNewAcademicThread = async (fid) => {
+  //获取最新加学术分文章
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
+    .limit(100)
+    .sort({ toc: -1 })
+    .lean();
+
+  const filterPid = Array.from(new Set(academicPost.map((item) => item.pid)));
+
+  const postPid = await PostModel.find(
+    {
+      pid: { $in: filterPid },
+      mainForumsId: { $in: fid },
+      disabled: false,
+      reviewed: true,
+      toDraft: { $ne: true },
+      type: 'thread',
+      originState: { $nin: ['0', '', '1', '2'] },
+    },
+    { pid: 1 },
+  ).lean();
+
+  const filteredPid = postPid.map((item) => {
+    return item.pid;
+  });
+
+  const academicThread = await ThreadModel.find({
+    mainForumsId: { $in: fid },
+    disabled: false,
+    reviewed: true,
+    recycleMark: { $ne: true },
+    oc: { $in: filteredPid },
+  })
+    .sort({ toc: -1 })
+    .lean();
+
+  const sortedAcademicThread = filterPid
+    .map((pid) => academicThread.find((thread) => thread.oc === pid))
+    .filter(Boolean);
+  const finalArr = sortedAcademicThread.slice(0, 10);
+  return await ThreadModel.extendThreads(finalArr, {
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    firstPostResource: false,
+    htmlToText: true,
+  });
+};
+
 threadSchema.statics.getLatestThreads = async (
   fid,
   sort = 'toc',

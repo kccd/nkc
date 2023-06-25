@@ -8,7 +8,6 @@ const {
   ThrowCommonError,
   ThrowServerInternalError,
 } = require('../nkcModules/error');
-const filterResult = require('../nkcModules/xssFilters/filterResult');
 
 const userSchema = new Schema(
   {

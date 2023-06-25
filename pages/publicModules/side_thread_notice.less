@@ -1,0 +1,46 @@
+@import "base";
+
+
+.thread-notice{
+  margin-top: 0 !important;
+  margin-bottom: 2rem;
+  span{
+    font-size: 1rem;
+    color: #9baec8;
+    margin: 0 !important;
+  }
+  a{
+    font-size: 1rem;
+    color: #9baec8;
+    text-decoration: none;
+  }
+  a:hover{
+    cursor: pointer;
+  }
+ .renderedTime{
+   white-space: nowrap;
+   text-overflow: ellipsis;
+ }
+}
+
+.notice-user-banned{
+  max-width: 2rem;
+  max-height: 2rem;
+  border-radius: 50%;
+}
+
+.notice-float{
+  float: right;
+  margin-right: 0.5rem;
+}
+
+.notice-clearfix::after{
+  content: "";
+  display: table;
+  clear: both;
+}
+.thread-notice-content{
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 10px;
+}
