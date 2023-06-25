@@ -16,9 +16,9 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 img.notice-user-banned.m-r-05(src=notice.user.avatar )
                 +fromNow(notice.toc)
                 if threadHistory !== null && notice.hid
-                  a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 查看详情
+                  a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情
                 if data.canEditNotice
-                  a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑公告
+                  a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑
               .thread-notice-content
                 span=notice.noticeContent
       else
