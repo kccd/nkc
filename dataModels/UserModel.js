@@ -8,7 +8,6 @@ const {
   ThrowCommonError,
   ThrowServerInternalError,
 } = require('../nkcModules/error');
-const filterResult = require('../nkcModules/xssFilters/filterResult');
 
 const userSchema = new Schema(
   {
@@ -3015,7 +3014,8 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
         } = JSON.parse(err.message);
         result = {
           permit: false,
-          warning: `<div>${message}</div>`,
+          // warning: `<div>${message}</div>`,
+          warning: `<a href="https://www.baidu.com/">这里</a>`,
         };
       } catch (_err) {
         result = {
