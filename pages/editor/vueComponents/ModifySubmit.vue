@@ -22,9 +22,9 @@
           | 新版本公告
 
       div(v-if="checkNewNotice&&type==='modifyThread'")
-        h5.text-danger 如果勾选新版本公告，文章将被顶至最前
-        textarea( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
-        p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 已达到最大限制字数200
+        h5.text-danger 如果勾选新版本公告，文章将被顶至最前。
+        textarea.form-control( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
+        p.warning(v-if="noticeContent?noticeContent.length>=10:noticeContent" ) 新版本公告内容不能超过 200 个字
       label
         input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
         span
@@ -663,7 +663,7 @@ export default {
 .warning{
   animation: shake 0.5s ;
   font-size: 1rem;
-  color: red;
+  color: rgb(169, 68, 66);
 }
 @keyframes shake {
   0% {

@@ -2,9 +2,9 @@
 +includeJS('/publicModules/side_thread_notice.js')
 if !isIncluded('publicModules/side_thread_notice.pug')
   mixin sideThreadNotice(noticeContent,threadHistory)
-    div.m-b-1
-      .panel-header 文章通告
-      if noticeContent
+    if noticeContent
+      div.m-b-1
+        .panel-header 文章公告
         div
           for notice in noticeContent
             .thread-notice.notice-clearfix
@@ -13,7 +13,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 data-global-mouseout="hideUserPanel"
                 data-global-data=objToStr({uid: notice.user.uid })
                 )
-                img.notice-user-banned.m-r-05(src=notice.user.avatar )
+                img.notice-user-banned.m-r-05(src=notice.user.avatar)
                 +fromNow(notice.toc)
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情
@@ -21,8 +21,6 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                   a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑
               .thread-notice-content
                 span=notice.noticeContent
-      else
-        div 空空如也~
 
 
 

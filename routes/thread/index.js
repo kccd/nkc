@@ -1075,7 +1075,6 @@ threadRouter
             ? true
             : null;
       }
-      //
       const userId = Array.from(new Set(notices.map((item) => item.uid)));
       const users = await db.UserModel.find(
         { uid: { $in: userId } },
