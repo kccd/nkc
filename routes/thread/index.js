@@ -1063,6 +1063,7 @@ threadRouter
         thread.uid === state.uid || ctx.permission('editNoticeContent');
       const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
       const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
+      //判断是否有查看历史记录的权限
       if (
         threadPost.tlm > threadPost.toc &&
         ctx.permission('visitPostHistory') &&
@@ -1074,12 +1075,15 @@ threadRouter
             ? true
             : null;
       }
+      //
+      const uids = Array.from(new Set(notices.map((item) => item.uid)));
+      const users = await db.UserModel.find(
+        { uid: { $in: uids } },
+        { avatar: 1, uid: 1, username: 1 },
+      ).lean();
       data.noticeContent = await Promise.all(
         notices.map(async ({ toc, noticeContent, hid, uid, pid, nid }) => {
-          const user = await db.UserModel.findOnly(
-            { uid },
-            { avatar: 1, uid: 1, username: 1 },
-          );
+          const user = users.filter((item) => item.uid === uid)[0];
           user.avatar = tools.getUrl('userAvatar', user.avatar);
           return {
             toc,

@@ -4,6 +4,7 @@ const { ThrowCommonError } = require('../../nkcModules/error');
 const {
   sensitiveDetectionService,
 } = require('../../services/sensitive/sensitiveDetection.service');
+const { getLength } = require('../../nkcModules/checkData');
 router.put('/', async (ctx, next) => {
   const { db, body, params, state } = ctx;
   const { nid } = params;
@@ -17,6 +18,10 @@ router.put('/', async (ctx, next) => {
   }
   //检测文章通告内容是否有敏感词
   await sensitiveDetectionService.threadNoticeDetection(noticeContent);
+  //检测文章通告内容是否超过字数限制
+  if (getLength(noticeContent) > 200) {
+    ThrowCommonError(403, '您的字数已超过限制200');
+  }
   //更新公告内容
   await db.NewNoticesModel.updateOne(
     { nid },
