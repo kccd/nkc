@@ -4,7 +4,8 @@ module.exports = (html) => {
   html = xss(html, {
     whiteList: {
       div: [],
-      a: [],
+      a: ['href', 'title', 'target'],
+      // a: [],
     },
     // onTag: (tag) => {
     //   if (tag !== 'div' && tag !== 'a') {
