@@ -472,14 +472,7 @@ router
       }
       let noticeObj = { pid, uid: state.uid, noticeContent };
       //存储文章通告数据
-      const { toc } = await db.NewNoticesModel.extendNoticeContent(noticeObj);
-      if (toc && targetThread) {
-        const { tid } = targetThread;
-        await db.NewNoticesModel.updateThreadStatus(tid, true);
-      }
-    } else {
-      const { tid } = targetThread;
-      await db.NewNoticesModel.updateThreadStatus(tid, false);
+      await db.NewNoticesModel.extendNoticeContent(noticeObj);
     }
     // 判断文本是否有变化，有变化版本号加1
     /*if(c !== targetPost.c) {

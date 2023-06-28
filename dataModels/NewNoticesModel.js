@@ -33,6 +33,15 @@ const schema = new Schema(
       required: true,
       index: 1,
     },
+    status: {
+      type: String,
+      default: 'normal',
+    },
+    cv: {
+      type: Number,
+      default: '',
+      index: 1,
+    },
   },
   { collection: 'newNotices' },
 );
@@ -49,18 +58,6 @@ schema.statics.extendNoticeContent = async ({ pid, uid, noticeContent }) => {
   };
   const newNotice = new NewNoticesModel(noticeObj);
   return await newNotice.save();
-};
-
-schema.statics.updateThreadStatus = async (tid, isNewThread = false) => {
-  const ThreadModel = mongoose.model('threads');
-  await ThreadModel.updateOne(
-    { tid },
-    {
-      $set: {
-        isNewThread,
-      },
-    },
-  );
 };
 
 module.exports = mongoose.model('newNotices', schema);

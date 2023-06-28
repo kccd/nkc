@@ -157,8 +157,6 @@ block content
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
                       if thread.type !== "fund"
-                        if thread.type === "article" && thread.isNewThread
-                          div.m-b-2(style='background-color:rgba(251, 199, 170,0.2);padding:0.5rem;')=`新版本公告：${(data.noticeContent)[0].noticeContent}`
                         .h3.thread-title.text-center= thread.firstPost.t
                       -const post = thread.firstPost;
                       if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"

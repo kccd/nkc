@@ -19,11 +19,6 @@ const threadSchema = new Schema(
       default: 'article',
       index: 1,
     },
-    //用户是否勾选发表新文章通告
-    isNewThread: {
-      type: Boolean,
-      default: false,
-    },
     //文章的评论数量
     count: {
       type: Number,
@@ -101,6 +96,10 @@ const threadSchema = new Schema(
     toc: {
       type: Date,
       default: Date.now,
+      index: 1,
+    },
+    ttoc: {
+      type: Date,
       index: 1,
     },
     /*toMid: {
@@ -250,6 +249,9 @@ const threadSchema = new Schema(
 threadSchema.pre('save', function (next) {
   if (!this.tlm) {
     this.tlm = this.toc;
+  }
+  if (!this.ttoc) {
+    this.ttoc = this.toc;
   }
   next();
 });
@@ -603,7 +605,6 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const thread = await ThreadModel.findOne({ tid: this.tid });
   const PostModel = mongoose.model('posts');
   const updateObj = {};
-  const { isNewThread } = thread;
   const oc = await PostModel.findOneAndUpdate(
     { tid: thread.tid },
     {
@@ -629,18 +630,23 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-  if (isNewThread) {
-    const { toc } = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
-      toc: -1,
-    });
-    updateObj.tlm = toc ? toc : '';
+
+  const newNotices = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
+    toc: -1,
+  });
+  if (newNotices) {
+    if (newNotices.toc < lm.toc) {
+      updateObj.tlm = lm ? lm.toc : '';
+    } else {
+      updateObj.tlm = newNotices.toc ? newNotices.toc : '';
+      updateObj.ttoc = newNotices.toc ? newNotices.toc : '';
+    }
   } else {
     updateObj.tlm = lm ? lm.toc : '';
   }
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;
-  updateObj.isNewThread = thread.isNewThread;
   updateObj.count = await PostModel.countDocuments({
     tid: thread.tid,
     type: 'post',
@@ -1649,7 +1655,6 @@ threadSchema.statics.extendArticlesPanelData = async function (threads) {
       oc: thread.oc,
       id: thread.tid,
       pid: thread.oc,
-      isNewThread: thread.isNewThread,
       user,
       pages,
       content,
