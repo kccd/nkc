@@ -14,11 +14,6 @@ const schema = new Schema(
       required: true,
       index: 1,
     },
-    hid: {
-      type: String,
-      index: 1,
-      default: '',
-    },
     noticeContent: {
       type: String,
       required: true,
@@ -39,8 +34,8 @@ const schema = new Schema(
     },
     cv: {
       type: Number,
-      default: '',
       index: 1,
+      default: null,
     },
   },
   { collection: 'newNotices' },

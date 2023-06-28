@@ -449,6 +449,7 @@ router
 
     // 生成历史记录
     const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
+
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
       //检测文章通告内容是否有敏感词
@@ -459,13 +460,14 @@ router
       const isExist = await db.NewNoticesModel.find({ pid }, { nid: 1 }).sort({
         toc: -1,
       });
+      const { cv } = await db.HistoriesModel.findOnly({ _id: hid }, { cv: 1 });
       if (isExist.length !== 0) {
         const { nid } = isExist[0];
         await db.NewNoticesModel.updateOne(
           { nid },
           {
             $set: {
-              hid,
+              cv,
             },
           },
         );
