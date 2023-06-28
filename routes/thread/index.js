@@ -1080,9 +1080,22 @@ threadRouter
         { uid: { $in: userId } },
         { avatar: 1, uid: 1, username: 1 },
       ).lean();
+      const cv = Array.from(
+        new Set(notices.map((item) => item.cv).filter(Boolean)),
+      );
+      const hidArr = await db.HistoriesModel.find(
+        { pid: thread.oc, cv: { $in: cv } },
+        { _id: 1, cv: 1, pid: 1 },
+      ).lean();
+
+      const uniqueArr = hidArr.filter((item, index, self) => {
+        return index === self.findIndex((t) => t.cv === item.cv);
+      });
+
       data.noticeContent = notices.map(
-        ({ toc, noticeContent, hid, uid, pid, nid }) => {
+        ({ toc, noticeContent, cv, uid, pid, nid }) => {
           const user = users.find((item) => item.uid === uid);
+          const hidObj = uniqueArr.find((item) => item.cv === cv);
           const updatedUser = {
             ...user,
             avatar: tools.getUrl('userAvatar', user.avatar),
@@ -1090,7 +1103,7 @@ threadRouter
           return {
             toc,
             noticeContent,
-            hid,
+            hid: hidObj ? hidObj._id : null,
             user: updatedUser,
             pid,
             nid,
