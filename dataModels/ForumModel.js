@@ -2450,7 +2450,7 @@ forumSchema.statics.checkPublishNotice = async ({ uid, id, type }) => {
  */
 forumSchema.statics.checkPublishNoticeInRoute = async ({ uid, id, type }) => {
   const ForumModel = mongoose.model('forums');
-  const { status, isTopPost } = await ForumModel.checkPublishNotice({
+  const { status, message, isTopPost } = await ForumModel.checkPublishNotice({
     uid,
     id,
     type,

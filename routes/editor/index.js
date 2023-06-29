@@ -773,9 +773,11 @@ router
       if (data.type === 'modifyThread') {
         checkObj.type = 'thread';
         const res = await db.ForumModel.checkPublishNotice(checkObj);
+        data.publishNotice = res.status === 200;
       } else {
         checkObj.type === 'post';
         const res = await db.ForumModel.checkPublishNotice(checkObj);
+        data.publishNotice = res.status === 200;
       }
     }
 
