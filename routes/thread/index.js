@@ -1076,18 +1076,22 @@ threadRouter
             : null;
       }
       const userId = Array.from(new Set(notices.map((item) => item.uid)));
+      //获取通告用户信息
       const users = await db.UserModel.find(
         { uid: { $in: userId } },
         { avatar: 1, uid: 1, username: 1 },
       ).lean();
+
+      //获取历史版本
       const cv = Array.from(
         new Set(notices.map((item) => item.cv).filter(Boolean)),
       );
+      //获取hid数组对象
       const hidArr = await db.HistoriesModel.find(
         { pid: thread.oc, cv: { $in: cv } },
         { _id: 1, cv: 1, pid: 1 },
       ).lean();
-
+      //筛选出来的hid对象
       const uniqueArr = hidArr.filter((item, index, self) => {
         return index === self.findIndex((t) => t.cv === item.cv);
       });

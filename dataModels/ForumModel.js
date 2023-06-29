@@ -268,6 +268,44 @@ const forumSchema = new Schema(
           default: 'or',
         },
       },
+      //作者编辑文章是否能发布通告
+      publishNoticeByAuthor: {
+        rolesId: {
+          type: [String],
+          default: ['dev'],
+        },
+        gradesId: {
+          type: [Number],
+          default: [],
+        },
+        relation: {
+          type: String,
+          default: 'or',
+        },
+        isTopPost: {
+          type: Boolean,
+          default: true,
+        }, //是否能顶帖
+      },
+      //其他人编辑文章下的回复是否能发布通告
+      publishNoticeByOther: {
+        rolesId: {
+          type: [String],
+          default: ['dev'],
+        },
+        gradesId: {
+          type: [Number],
+          default: [],
+        },
+        relation: {
+          type: String,
+          default: 'or',
+        },
+        isTopPost: {
+          type: Boolean,
+          default: false,
+        }, //是否能顶帖
+      },
     },
 
     orderBy: {
