@@ -764,6 +764,20 @@ router
       data.originalWordLimit = postSettings.postToForum.originalWordLimit;
       data.minorForumCount = postSettings.postToForum.minorForumCount;
     }
+    //判断用户是否能编辑文章之后发布通告
+    if (['modifyThread', 'modifyPost'].includes(data.type)) {
+      const checkObj = {
+        uid: state.uid,
+        id,
+      };
+      if (data.type === 'modifyThread') {
+        checkObj.type = 'thread';
+        const res = await db.ForumModel.checkPublishNotice(checkObj);
+      } else {
+        checkObj.type === 'post';
+        const res = await db.ForumModel.checkPublishNotice(checkObj);
+      }
+    }
 
     if (data.type === 'newThread') {
       try {
