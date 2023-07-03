@@ -91,6 +91,7 @@
         :notice="pageState.editorSettings && pageState.editorSettings.notes",
         :data="pageData",
         :o="reqUrl.o",
+        :publishNotice="publishNotice",
         @ready-data="readyData",
         @remove-editor="removeEditor",
         @cover-change="coverChange",
@@ -155,6 +156,7 @@ export default {
     infoSubmitDebounce: '',
     allowSave: true,
     initEditorContent: false,
+    publishNotice: false,
   }),
   customOptions: {
     saveDraftIndex: 0,
@@ -167,6 +169,7 @@ export default {
   },
   mounted() {
     this.getData();
+    this.checkPublishPermission();
   },
   computed: {
     getTitle(){
@@ -187,6 +190,16 @@ export default {
     },
     coverChange(v) {
       this.$refs.cover.setCover(v)
+    },
+    //检查用户是否有发布通告的权限
+    checkPublishPermission(){
+      nkcAPI(`/editor/publishNotice?type=${this.reqUrl.type}&id=${this.reqUrl.id}`, 'GET')
+        .then((res)=>{
+          this.publishNotice = res.publishNotice
+        })
+        .catch(err => {
+          sweetError(err);
+        })
     },
     getUserDraft(page=0) {
       if(this.lockRequest) return;

@@ -2410,11 +2410,9 @@ forumSchema.statics.checkPublishNotice = async ({ uid, id, type }) => {
       return { status: 403, message: '权限不足非作者本人' };
     }
     const mainForumsId = thread.mainForumsId;
-    return await ForumModel.checkPermissionCore(
-      'publishNoticeByAuthor',
-      user,
-      mainForumsId,
-    );
+    return await ForumModel.checkPermissionCore('publishNoticeByAuthor', user, [
+      mainForumsId[0],
+    ]);
   }
   //编辑回复
   else {
@@ -2429,13 +2427,13 @@ forumSchema.statics.checkPublishNotice = async ({ uid, id, type }) => {
       return await ForumModel.checkPermissionCore(
         'publishNoticeByAuthor',
         user,
-        mainForumsId,
+        [mainForumsId[0]],
       );
     } else {
       return await ForumModel.checkPermissionCore(
         'publishNoticeByOther',
         user,
-        mainForumsId,
+        [mainForumsId[0]],
       );
     }
   }
@@ -2487,11 +2485,9 @@ forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
-  return await ForumModel.checkPermissionCore(
-    'editPostPosition',
-    user,
-    mainForumsId,
-  );
+  return await ForumModel.checkPermissionCore('editPostPosition', user, [
+    mainForumsId[0],
+  ]);
 };
 
 /*

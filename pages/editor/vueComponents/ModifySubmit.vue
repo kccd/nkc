@@ -16,12 +16,12 @@
           | 匿名发表
           span.text-danger(v-if="!allowedAnonymous") (所选专业分类不支持匿名发表)
     .checkbox
-      label(style="margin-bottom: 0.5rem" v-if="(type==='modifyThread'||type==='modifyPost')&&data.publishNotice" )
+      label(style="margin-bottom: 0.5rem" v-if="(type==='modifyThread'||type==='modifyPost')&&publishNotice" )
         input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
         span
           | 新版本公告
 
-      div(v-if="checkNewNotice&&type==='modifyThread'")
+      div(v-if="checkNewNotice")
         h5.text-danger 如果勾选新版本公告，文章将被顶至最前。
         textarea.form-control( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
         p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 新版本公告内容不能超过 200 个字
@@ -65,6 +65,9 @@ export default {
       type: String,
     },
     allowSave: {
+      type: Boolean
+    },
+    publishNotice: {
       type: Boolean
     }
   },
@@ -330,6 +333,7 @@ export default {
             "POST",
             formData
           );
+
         })
         .then((data) => {
           this.draft = data.draft;
@@ -525,6 +529,7 @@ export default {
               maxLength: 200,
             });
             this.checkContent(submitData.c);
+            this.checkNewNotice && this.checkNoticeContent(submitData.noticeContent);
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
             if (submitData.coverData) {
