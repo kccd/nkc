@@ -458,7 +458,9 @@ router
     } else if (type === 'modifyThread') {
       checkObj.type = 'thread';
     }
-    await db.ForumModel.checkPublishNoticeInRoute(checkObj);
+    const { isTopPost } = await db.ForumModel.checkPublishNoticeInRoute(
+      checkObj,
+    );
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
       //检测文章通告内容是否有敏感词
@@ -630,7 +632,7 @@ router
       }
     }
 
-    await targetThread.updateThreadMessage(false);
+    await targetThread.updateThreadMessage(false, isTopPost);
 
     // 帖子曾经在草稿箱中，发表时，删除草稿
     // if(did) {

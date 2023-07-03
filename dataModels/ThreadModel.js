@@ -597,7 +597,10 @@ threadSchema.methods.updateThreadEncourage = async function () {
 // }
 
 // 更新文章 信息
-threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
+threadSchema.methods.updateThreadMessage = async function (
+  toSearch = true,
+  isTopPost = false,
+) {
   const ThreadModel = mongoose.model('threads');
   const NewNoticesModel = mongoose.model('newNotices');
   const apiFunction = require('../nkcModules/apiFunction');
@@ -630,14 +633,13 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-
   const newNotices = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
     toc: -1,
   });
   if (newNotices) {
     if (newNotices.toc < lm.toc) {
       updateObj.tlm = lm ? lm.toc : '';
-    } else {
+    } else if (isTopPost) {
       updateObj.tlm = newNotices.toc ? newNotices.toc : '';
       updateObj.ttoc = newNotices.toc ? newNotices.toc : '';
     }

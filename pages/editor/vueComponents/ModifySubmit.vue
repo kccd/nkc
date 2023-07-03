@@ -16,7 +16,7 @@
           | 匿名发表
           span.text-danger(v-if="!allowedAnonymous") (所选专业分类不支持匿名发表)
     .checkbox
-      label(style="margin-bottom: 0.5rem" v-if="(type==='modifyThread'||type==='modifyPost')" )
+      label(style="margin-bottom: 0.5rem" v-if="(type==='modifyThread'||type==='modifyPost')&&publishNotice" )
         input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
         span
           | 新版本公告
