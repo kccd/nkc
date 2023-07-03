@@ -13,6 +13,7 @@ const postRouter = require('./post');
 const toppedRouter = require('./topped');
 const authorRouter = require('./author');
 const editNoticeRouter = require('./editNotice');
+const shieldNotice = require('./shieldNotice');
 const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
@@ -679,5 +680,10 @@ router
     '/:nid/editNotice',
     editNoticeRouter.routes(),
     editNoticeRouter.allowedMethods(),
+  )
+  .use(
+    '/:nid/shieldNotice',
+    shieldNotice.routes(),
+    shieldNotice.allowedMethods(),
   );
 module.exports = router;

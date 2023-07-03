@@ -1,7 +1,7 @@
 +includeCSS('/publicModules/side_thread_notice.css')
 +includeJS('/publicModules/side_thread_notice.js')
 if !isIncluded('publicModules/side_thread_notice.pug')
-  mixin sideThreadNotice(noticeContent,threadHistory)
+  mixin sideThreadNotice(noticeContent,threadHistory,canEditNotice,shieldNotice)
     if noticeContent
       div.m-b-1
         .panel-header 文章公告
@@ -17,8 +17,12 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                 +fromNow(notice.toc)
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情
-                if data.canEditNotice
+                if canEditNotice
                   a.notice-float(onclick=`editNotice(this,'${notice.nid}')`) 编辑
+                if shieldNotice && notice.status === 'normal'
+                  a.notice-float(onclick=`shieldNotice(this,'${notice.nid}',true)`) 屏蔽
+                if shieldNotice && notice.status === 'shield'
+                  a.notice-float(onclick=`shieldNotice(this,'${notice.nid}',false)`) 解除屏蔽
               .thread-notice-content
                 span=notice.noticeContent
 

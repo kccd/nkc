@@ -1,6 +1,6 @@
 //编辑文章通告内容
-import { sweetSuccess } from '../lib/js/sweetAlert';
-
+import { sweetConfirm, sweetError, sweetSuccess } from '../lib/js/sweetAlert';
+//编辑通告内容
 async function editNotice(target, nid) {
   const threadNotice = target.closest('.thread-notice');
   const spanElement = threadNotice.querySelector('.thread-notice-content span');
@@ -12,6 +12,19 @@ async function editNotice(target, nid) {
   if (newNoticeContent) {
     spanElement.textContent = newNoticeContent;
   }
+}
+//屏蔽通告内容
+async function shieldNotice(target, nid, isShield) {
+  let text = isShield ? '确定屏蔽？' : '解除屏蔽？';
+  sweetConfirm(text).then(() => {
+    nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield })
+      .then(() => {
+        sweetSuccess('修改成功');
+      })
+      .catch((err) => {
+        sweetError(err);
+      });
+  });
 }
 
 //为了考虑到文章通告的内容编辑，定制的一个弹窗，不可复用
@@ -48,4 +61,4 @@ function sweetEditNotice(title, nid, content = '') {
     });
   });
 }
-export { editNotice };
+export { editNotice, shieldNotice };

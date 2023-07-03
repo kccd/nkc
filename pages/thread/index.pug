@@ -563,7 +563,7 @@ block content
               include ./authorInfo
             include ../publicModules/side_thread_notice
             include ../publicModules/side_thread_list
-            +sideThreadNotice(data.noticeContent,data.threadHistory,data.canEditNotice)
+            +sideThreadNotice(data.noticeContent,data.threadHistory,data.canEditNotice,data.shieldNotice)
             +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
             +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
 

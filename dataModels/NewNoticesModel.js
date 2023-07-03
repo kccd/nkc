@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const { getUrl, fromNow } = require('../nkcModules/tools');
-const videoSize = require('../settings/video');
 const Schema = mongoose.Schema;
 const schema = new Schema(
   {
@@ -37,11 +35,24 @@ const schema = new Schema(
       index: 1,
       default: null,
     },
+    tlm: {
+      type: Date,
+      default: Date.now,
+      index: 1,
+    },
   },
   { collection: 'newNotices' },
 );
-
-schema.statics.extendNoticeContent = async ({ pid, uid, noticeContent }) => {
+schema.statics.noticeStatus = async () => {
+  return { normal: 'normal', shield: 'shield' };
+};
+schema.statics.extendNoticeContent = async ({
+  pid,
+  uid,
+  noticeContent,
+  toc,
+  cv,
+}) => {
   const NewNoticesModel = mongoose.model('newNotices');
   const SettingModel = mongoose.model('settings');
   const nid = await SettingModel.operateSystemID('newNotices', 1);
@@ -51,6 +62,12 @@ schema.statics.extendNoticeContent = async ({ pid, uid, noticeContent }) => {
     uid,
     noticeContent,
   };
+  if (toc) {
+    noticeObj.toc = toc;
+  }
+  if (cv) {
+    noticeObj.cv = cv;
+  }
   const newNotice = new NewNoticesModel(noticeObj);
   return await newNotice.save();
 };

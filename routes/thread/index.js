@@ -1052,15 +1052,17 @@ threadRouter
     );
 
     //文章通告内容处理
-    const notices = await db.NewNoticesModel.find({
-      pid: thread.oc,
-    }).sort({ toc: -1 });
+    let shieldNotice = ctx.permission('editNoticeContent');
+    let canEditNotice =
+      thread.uid === state.uid || ctx.permission('editNoticeContent');
+    const noticeObj = { pid: thread.oc, status: 'normal' };
+    if (shieldNotice) {
+      noticeObj.status = { $in: ['normal', 'shield'] };
+    }
+    const notices = await db.NewNoticesModel.find(noticeObj).sort({ toc: -1 });
     let threadHistory = null;
-    let canEditNotice = false;
 
     if (notices.length !== 0) {
-      canEditNotice =
-        thread.uid === state.uid || ctx.permission('editNoticeContent');
       const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
       const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
       //判断是否有查看历史记录的权限
@@ -1097,7 +1099,7 @@ threadRouter
       });
 
       data.noticeContent = notices.map(
-        ({ toc, noticeContent, cv, uid, pid, nid }) => {
+        ({ toc, noticeContent, cv, uid, pid, nid, status }) => {
           const user = users.find((item) => item.uid === uid);
           const hidObj = uniqueArr.find((item) => item.cv === cv);
           const updatedUser = {
@@ -1111,6 +1113,7 @@ threadRouter
             user: updatedUser,
             pid,
             nid,
+            status,
           };
         },
       );
@@ -1180,6 +1183,7 @@ threadRouter
     data.orderStatus = thread.orderStatus;
     data.threadHistory = threadHistory;
     data.canEditNotice = canEditNotice;
+    data.shieldNotice = shieldNotice;
 
     // 商品信息
     if (threadShopInfo) {

@@ -816,7 +816,6 @@ router
         const res = await db.ForumModel.checkPublishNotice(checkObj);
         data.publishNotice = res.status === 200;
       }
-      console.log(data.publishNotice, 'data.publishNotice');
     }
     await next();
   });
