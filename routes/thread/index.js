@@ -1056,7 +1056,7 @@ threadRouter
     let canEditNotice =
       thread.uid === state.uid || ctx.permission('editNoticeContent');
     const noticeObj = { pid: thread.oc, status: 'normal' };
-    if (shieldNotice) {
+    if (shieldNotice || thread.uid === state.uid) {
       noticeObj.status = { $in: ['normal', 'shield'] };
     }
     const notices = await db.NewNoticesModel.find(noticeObj).sort({ toc: -1 });

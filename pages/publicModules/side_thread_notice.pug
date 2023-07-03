@@ -7,7 +7,9 @@ if !isIncluded('publicModules/side_thread_notice.pug')
         .panel-header 文章公告
         div
           for notice in noticeContent
-            .thread-notice.notice-clearfix
+            .thread-notice.notice-clearfix(class={'shield-box': notice.status === 'shield'})
+              if notice.status === 'shield'
+                .shield-box-span 当前通告已经屏蔽，请作者点击编辑按钮修改
               .thread-notice-head.m-b-05(
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
@@ -23,7 +25,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                   a.notice-float(onclick=`shieldNotice(this,'${notice.nid}',true)`) 屏蔽
                 if shieldNotice && notice.status === 'shield'
                   a.notice-float(onclick=`shieldNotice(this,'${notice.nid}',false)`) 解除屏蔽
-              .thread-notice-content
+              .thread-notice-content(class={'shield-box': notice.status === 'shield'})
                 span=notice.noticeContent
 
 
