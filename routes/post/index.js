@@ -355,6 +355,7 @@ router
       cover = '',
       noticeContent,
       _id,
+      type,
     } = post;
     const { pid } = ctx.params;
     const { state, data, db, nkcModules } = ctx;
@@ -450,7 +451,14 @@ router
 
     // 生成历史记录
     const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
-
+    // 检测是否有发布文章通告的权限
+    const checkObj = { uid: state.uid, id: pid };
+    if (type === 'modifyPost') {
+      checkObj.type = 'post';
+    } else if (type === 'modifyThread') {
+      checkObj.type = 'thread';
+    }
+    await db.ForumModel.checkPublishNoticeInRoute(checkObj);
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
       //检测文章通告内容是否有敏感词
