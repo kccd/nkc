@@ -44,7 +44,7 @@ const schema = new Schema(
   { collection: 'newNotices' },
 );
 schema.statics.noticeStatus = async () => {
-  return { normal: 'normal', shield: 'shield' };
+  return { normal: 'normal', shield: 'shield', history: 'history' };
 };
 schema.statics.extendNoticeContent = async ({
   pid,
