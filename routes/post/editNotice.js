@@ -9,11 +9,12 @@ router.put('/', async (ctx, next) => {
   const { db, body, params, state } = ctx;
   const { nid } = params;
   const newNoticeContent = body.noticeContent;
-  const { pid, uid, toc, cv, noticeContent } =
+  const { pid, uid, toc, cv, noticeContent, status } =
     await db.NewNoticesModel.findOnly(
       { nid },
-      { pid: 1, uid: 1, toc: 1, cv: 1, noticeContent: 1 },
+      { pid: 1, uid: 1, toc: 1, cv: 1, noticeContent: 1, status: 1 },
     );
+  const { history } = await db.NewNoticesModel.noticeStatus();
   const thread = await db.ThreadModel.findOnly({ oc: pid }, { uid: 1 });
   //判断用户是否有权限修改
   if (thread.uid !== state.uid && !ctx.permission('editNoticeContent')) {
@@ -33,10 +34,11 @@ router.put('/', async (ctx, next) => {
     { nid },
     {
       $set: {
-        status: 'history',
+        status: history,
       },
     },
   );
+
   //并创建一个新的通告，toc时间不改变
   await db.NewNoticesModel.extendNoticeContent({
     pid,
