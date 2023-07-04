@@ -5,6 +5,7 @@ module.exports = (html) => {
     whiteList: {
       div: [],
       a: ['href', 'title', 'target'],
+      br: [],
       // a: [],
     },
     // onTag: (tag) => {
