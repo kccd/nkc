@@ -597,12 +597,10 @@ threadSchema.methods.updateThreadEncourage = async function () {
 // }
 
 // 更新文章 信息
-threadSchema.methods.updateThreadMessage = async function (
-  toSearch = true,
-  isTopPost = false,
-) {
+threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const ThreadModel = mongoose.model('threads');
   const NewNoticesModel = mongoose.model('newNotices');
+  const ForumModel = mongoose.model('forums');
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const thread = await ThreadModel.findOne({ tid: this.tid });
@@ -633,19 +631,12 @@ threadSchema.methods.updateThreadMessage = async function (
       },
     ],
   }).sort({ toc: -1 });
+  
+  await ForumModel.isTopPostCore({ tid: this.tid });
   const newNotices = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
     toc: -1,
   });
-  if (newNotices) {
-    if (newNotices.toc < lm.toc) {
-      updateObj.tlm = lm ? lm.toc : '';
-    } else if (isTopPost) {
-      updateObj.tlm = newNotices.toc ? newNotices.toc : '';
-      updateObj.ttoc = newNotices.toc ? newNotices.toc : '';
-    }
-  } else {
-    updateObj.tlm = lm ? lm.toc : '';
-  }
+  updateObj.tlm = lm ? lm.toc : '';
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;

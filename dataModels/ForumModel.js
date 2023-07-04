@@ -2263,7 +2263,6 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
  * @param {String} uid 用户ID
  * @param {[String]} fid 专业ID组成的数组
  * */
-
 forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
   const SettingModel = mongoose.model('settings');
   const recycleId = await SettingModel.getRecycleId();
@@ -2295,7 +2294,7 @@ forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
       continue;
     }
     const { accessible, permission, displayName } = forum;
-    const { rolesId, gradesId, relation, isTopPost } = permission[type];
+    const { rolesId, gradesId, relation } = permission[type];
     if (!accessible) {
       return {
         status: 400,
@@ -2345,7 +2344,7 @@ forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
         };
       }
     } else {
-      return { status: 200, message: '', isTopPost };
+      return { status: 200, message: '' };
     }
   }
   return { status: 200, message: '' };
@@ -2448,17 +2447,66 @@ forumSchema.statics.checkPublishNotice = async ({ uid, id, type }) => {
  */
 forumSchema.statics.checkPublishNoticeInRoute = async ({ uid, id, type }) => {
   const ForumModel = mongoose.model('forums');
-  const { status, message, isTopPost } = await ForumModel.checkPublishNotice({
+  const { status, message } = await ForumModel.checkPublishNotice({
     uid,
     id,
     type,
   });
   if (status !== 200) {
     ThrowCommonError(status, message);
-  } else {
-    return { status, isTopPost };
   }
 };
+
+/*
+ *检测该文章或回复编辑新版本公告发布之后，在该专业下是否能顶帖
+ *@param {String} tid 当前文章或回复所处的文章的tid
+ *@author by 2023/7/4
+ */
+forumSchema.statics.isTopPostCore = async ({ tid }) => {
+  const ThreadModel = mongoose.model('threads');
+  const ForumModel = mongoose.model('forums');
+  const { mainForumsId } = await ThreadModel.findOnly(
+    { tid },
+    { mainForumsId: 1 },
+  );
+  //当前文章所处的主专业id
+  const id = mainForumsId[0];
+  const forum = await ForumModel.getForumByIdFromRedis(id);
+  if (!forum) {
+    ThrowCommonError(400, `专业id错误 fid: ${id}`);
+  }
+  const { accessible, permission, displayName } = forum;
+  if (!accessible) {
+    return {
+      status: 400,
+      message: `专业「${displayName}」暂未开放，请更换专业`,
+    };
+  }
+  //过滤留下拥有isTopPost属性的对象
+  return Object.keys(permission)
+    .filter(
+      (key) =>
+        permission[key].hasOwnProperty('isTopPost') &&
+        Object.keys(permission[key]).length > 0,
+    )
+    .reduce((result, key) => {
+      result[key] = permission[key];
+      return result;
+    }, {});
+};
+
+/*
+ * 检测该文章或回复编辑新版本公告发布之后，在该专业下是否能顶帖
+ * @param {String} tid
+ * @param {String} type 检测的权限类型
+ * @author by 2023/7/4
+ * */
+forumSchema.statics.isTopPost = async ({ tid, type }) => {
+  const ForumModel = mongoose.model('forums');
+  const objectsWithIsTopPost = await ForumModel.isTopPostCore({ tid });
+  return objectsWithIsTopPost[type].isTopPost;
+};
+
 /*
  * 检测用户是否具有编辑文章回复顺序的权限
  * @param {String} uid 用户ID

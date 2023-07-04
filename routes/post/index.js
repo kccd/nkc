@@ -451,18 +451,17 @@ router
 
     // 生成历史记录
     const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
-    // 检测是否有发布文章通告的权限
-    const checkObj = { uid: state.uid, id: pid };
-    if (type === 'modifyPost') {
-      checkObj.type = 'post';
-    } else if (type === 'modifyThread') {
-      checkObj.type = 'thread';
-    }
-    const { isTopPost } = await db.ForumModel.checkPublishNoticeInRoute(
-      checkObj,
-    );
+
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
+      // 检测是否有发布文章通告的权限
+      const checkObj = { uid: state.uid, id: pid };
+      if (type === 'modifyPost') {
+        checkObj.type = 'post';
+      } else if (type === 'modifyThread') {
+        checkObj.type = 'thread';
+      }
+      await db.ForumModel.checkPublishNoticeInRoute(checkObj);
       //检测文章通告内容是否有敏感词
       await sensitiveDetectionService.threadNoticeDetection(noticeContent);
       //检测文章通告内容是否超过字数限制
@@ -632,7 +631,7 @@ router
       }
     }
 
-    await targetThread.updateThreadMessage(false, isTopPost);
+    await targetThread.updateThreadMessage(false);
 
     // 帖子曾经在草稿箱中，发表时，删除草稿
     // if(did) {
