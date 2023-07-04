@@ -2460,11 +2460,11 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
       // 关闭了未考试的发表权限
       if (volumeA) {
         if (!user.volumeA) {
-          throwErr(403, `你暂未通过A卷考试，不能发表${settingsType.name}。`);
+          throwErr(403, `由于近期发布骚扰性提问的新账号较多，为了改善原创用户体验，现要求所有用户必须通过A卷考试以后才能发表，请在https://www.kechuang.org/exam 参加A卷或B卷考试，通过任何一门考试即可获得发表权限。`);
         }
       } else if (volumeB) {
         if (!user.volumeB) {
-          throwErr(403, `你暂未通过B卷考试，不能发表${settingsType.name}。`);
+          throwErr(403, `由于近期发布骚扰性提问的新账号较多，为了改善原创用户体验，现要求用户必须通过B卷考试以后才能发表，请在https://www.kechuang.org/exam 参加B卷考试，通过任何一门考试即可获得发表权限。`);
         }
       } else {
         throwErr(403, '发表功能已关闭');
