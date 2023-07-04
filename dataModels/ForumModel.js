@@ -2457,7 +2457,18 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
   if ((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) {
     // a, b考试未开启或用户未通过
     if (!status) {
-      throwErr(403, '权限不足，请提升账号等级');
+      // 关闭了未考试的发表权限
+      if (volumeA) {
+        if (!user.volumeA) {
+          throwErr(403, `你暂未通过A卷考试，不能发表${settingsType.name}。`);
+        }
+      } else if (volumeB) {
+        if (!user.volumeB) {
+          throwErr(403, `你暂未通过B卷考试，不能发表${settingsType.name}。`);
+        }
+      } else {
+        throwErr(403, '发表功能已关闭');
+      }
     }
     if (!unlimited && countLimit <= todayCount) {
       throwErr(403, `今日发表${settingsType.name}次数已用完，请明天再试。`);
