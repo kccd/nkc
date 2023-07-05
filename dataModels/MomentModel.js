@@ -151,14 +151,26 @@ const schema = new mongoose.Schema({
  * 获取动态的状态列表
  * */
 schema.statics.getMomentStatus = async () => {
-  return momentStatus;
+  return { ...momentStatus };
+};
+
+/*
+ * 获取作者可看的动态的状态列表
+ * */
+schema.statics.getAuthorMomentStatus = async () => {
+  return [
+    momentStatus.disabled,
+    momentStatus.normal,
+    momentStatus.faulty,
+    momentStatus.unknown,
+  ];
 };
 
 /*
  * 获取动态的引用类型
  * */
 schema.statics.getMomentQuoteTypes = async () => {
-  return momentQuoteTypes;
+  return { ...momentQuoteTypes };
 };
 
 /*
@@ -170,7 +182,7 @@ schema.statics.getMomentCommentPerPage = async (mode = 'simple') => {
 };
 
 schema.statics.getMomentCommentModes = async () => {
-  return momentCommentModes;
+  return { ...momentCommentModes };
 };
 
 /*
