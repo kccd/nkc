@@ -4,7 +4,7 @@ const { ThrowCommonError } = require('../../nkcModules/error');
 router.put('/', async (ctx, next) => {
   const { db, params, body } = ctx;
   const { nid } = params;
-  const { isShield } = body;
+  const { isShield, reason } = body;
   const { status } = await db.NewNoticesModel.findOnly({ nid }, { status: 1 });
   const { normal, shield, history } = await db.NewNoticesModel.noticeStatus();
 
@@ -22,7 +22,10 @@ router.put('/', async (ctx, next) => {
   } else if (status === history) {
     ThrowCommonError(403, '该通告已经成为历史版本，请刷新');
   } else {
-    await db.NewNoticesModel.updateOne({ nid }, { status: shield });
+    await db.NewNoticesModel.updateOne(
+      { nid },
+      { status: shield, reason: reason ? reason : '' },
+    );
   }
   await next();
 });

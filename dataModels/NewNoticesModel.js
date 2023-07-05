@@ -40,6 +40,10 @@ const schema = new Schema(
       default: Date.now,
       index: 1,
     },
+    reason: {
+      type: String,
+      default: '',
+    },
   },
   { collection: 'newNotices' },
 );

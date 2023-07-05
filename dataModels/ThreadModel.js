@@ -634,11 +634,9 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   }).sort({ toc: -1 });
 
   //检测该专业下发表文章或回复的通告是否需要顶贴
-
   const permission = await ForumModel.isTopPostCore({
     fid: thread.mainForumsId[0],
   });
-  console.log(permission, 'permission');
   let authorTlm = 0;
   let otherTlm = 0;
   let postType = 'post';
