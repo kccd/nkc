@@ -9,7 +9,10 @@ if !isIncluded('publicModules/side_thread_notice.pug')
           for notice in noticeContent
             .thread-notice.notice-clearfix(class={'shield-box': notice.status === 'shield'})
               if notice.status === 'shield'
-                .shield-box-span 当前通告已经屏蔽
+                if notice.reason
+                  .shield-box-span=`当前通告已经屏蔽 原因：${notice.reason}`
+                else
+                  .shield-box-span=`当前通告已经屏蔽`
               .thread-notice-head.m-b-05(
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"

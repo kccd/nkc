@@ -1059,7 +1059,7 @@ threadRouter
     if (shieldNotice || thread.uid === state.uid) {
       noticeObj.status = { $in: ['normal', 'shield'] };
     }
-    const notices = await db.NewNoticesModel.find(noticeObj).sort({ toc: -1 });
+    const notices = await db.NewNoticesModel.find(noticeObj).sort({ toc: -1 }).lean();
     let threadHistory = null;
 
     if (notices.length !== 0) {
@@ -1099,7 +1099,7 @@ threadRouter
       });
 
       data.noticeContent = notices.map(
-        ({ toc, noticeContent, cv, uid, pid, nid, status }) => {
+        ({ toc, noticeContent, cv, uid, pid, nid, status, reason }) => {
           const user = users.find((item) => item.uid === uid);
           const hidObj = uniqueArr.find((item) => item.cv === cv);
           const updatedUser = {
@@ -1114,6 +1114,7 @@ threadRouter
             pid,
             nid,
             status,
+            reason,
           };
         },
       );
