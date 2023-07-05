@@ -604,6 +604,7 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const thread = await ThreadModel.findOne({ tid: this.tid });
+  const { postIds } = thread;
   const PostModel = mongoose.model('posts');
   const updateObj = {};
   const oc = await PostModel.findOneAndUpdate(
@@ -631,12 +632,65 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-  
-  await ForumModel.isTopPostCore({ tid: this.tid });
-  const newNotices = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
-    toc: -1,
+
+  //检测该专业下发表文章或回复的通告是否需要顶贴
+
+  const permission = await ForumModel.isTopPostCore({
+    fid: thread.mainForumsId[0],
   });
-  updateObj.tlm = lm ? lm.toc : '';
+  console.log(permission, 'permission');
+  let authorTlm = 0;
+  let otherTlm = 0;
+  let postType = 'post';
+  //文章作者
+  if (!permission.publishNoticeByAuthor) {
+    authorTlm = Math.max(thread.tlm, lm.toc);
+  } else {
+    const latestNotice = await NewNoticesModel.findOne(
+      {
+        uid: thread.uid,
+        pid: { $in: [...postIds, thread.oc] },
+      },
+      { toc: 1, pid: 1 },
+    )
+      .sort({ toc: -1 })
+      .lean();
+    if (latestNotice && latestNotice.toc > lm.toc) {
+      //判断是文章还是回复
+      authorTlm = latestNotice.toc;
+      postType = thread.oc === latestNotice.pid ? 'thread' : 'post';
+    } else {
+      authorTlm = Math.max(thread.tlm, lm.toc);
+    }
+  }
+  //其他人
+  if (!permission.publishNoticeByOther) {
+    otherTlm = Math.max(thread.tlm, lm.toc);
+  } else {
+    const latestNotice = await NewNoticesModel.findOne({
+      uid: { $ne: thread.uid },
+      pid: { $in: postIds },
+    })
+      .sort({ toc: -1 })
+      .lean();
+    if (latestNotice && latestNotice.toc > lm.toc) {
+      otherTlm = latestNotice.toc;
+    } else {
+      otherTlm = Math.max(thread.tlm, lm.toc);
+    }
+  }
+
+  if (authorTlm === otherTlm) {
+    updateObj.tlm = authorTlm ? authorTlm : '';
+  } else if (authorTlm > otherTlm && postType === 'thread') {
+    updateObj.tlm = authorTlm;
+    updateObj.ttoc = authorTlm;
+  } else if (authorTlm > otherTlm && postType === 'post') {
+    updateObj.tlm = authorTlm;
+  } else {
+    updateObj.tlm = otherTlm;
+  }
+
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;

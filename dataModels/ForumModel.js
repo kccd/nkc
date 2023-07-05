@@ -2462,26 +2462,15 @@ forumSchema.statics.checkPublishNoticeInRoute = async ({ uid, id, type }) => {
  *@param {String} tid 当前文章或回复所处的文章的tid
  *@author by 2023/7/4
  */
-forumSchema.statics.isTopPostCore = async ({ tid }) => {
-  const ThreadModel = mongoose.model('threads');
+forumSchema.statics.isTopPostCore = async ({ fid }) => {
   const ForumModel = mongoose.model('forums');
-  const { mainForumsId } = await ThreadModel.findOnly(
-    { tid },
-    { mainForumsId: 1 },
-  );
   //当前文章所处的主专业id
-  const id = mainForumsId[0];
-  const forum = await ForumModel.getForumByIdFromRedis(id);
+  const forum = await ForumModel.getForumByIdFromRedis(fid);
   if (!forum) {
-    ThrowCommonError(400, `专业id错误 fid: ${id}`);
+    ThrowCommonError(400, `专业id错误 fid: ${fid}`);
   }
-  const { accessible, permission, displayName } = forum;
-  if (!accessible) {
-    return {
-      status: 400,
-      message: `专业「${displayName}」暂未开放，请更换专业`,
-    };
-  }
+  const { permission } = forum;
+
   //过滤留下拥有isTopPost属性的对象
   return Object.keys(permission)
     .filter(
@@ -2490,7 +2479,7 @@ forumSchema.statics.isTopPostCore = async ({ tid }) => {
         Object.keys(permission[key]).length > 0,
     )
     .reduce((result, key) => {
-      result[key] = permission[key];
+      result[key] = permission[key].isTopPost;
       return result;
     }, {});
 };
