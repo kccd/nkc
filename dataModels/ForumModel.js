@@ -2445,6 +2445,7 @@ forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
  * 根据后台管理-发表设置验证用户是拥有发表权限
  * @param {String} uid 用户ID
  * @param {String} postType 内容类型 post: 回复、评论, thread: 文章
+ * 2023/07/06 此方法已废弃，被 UserModel.statics.getUserGlobalPostPermissionStatus 替代
  * */
 forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
   const UserModel = mongoose.model('users');
