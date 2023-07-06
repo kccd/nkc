@@ -2904,12 +2904,11 @@ userSchema.statics.getUserGlobalPostPermissionStatus = async (uid, type) => {
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const PostModel = mongoose.model('posts');
   const filterResult = require('../nkcModules/xssFilters/filterResult');
-  let result = {
-    permit: false,
-    warning: '',
-  };
   if (!uid) {
-    return result;
+    return {
+      permit: false,
+      warning: [],
+    };
   }
   const user = await UserModel.findOnly({ uid });
   const postSettings = await SettingModel.getSettings('post');
