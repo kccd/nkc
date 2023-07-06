@@ -1943,7 +1943,7 @@ threadRouter
     data.forum = thread.forum;
     // 权限判断
     // await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-    await db.ForumModel.checkWritePostPermission(
+    await db.ForumModel.checkGlobalPostAndForumWritePostPermission(
       data.user.uid,
       thread.mainForumsId,
     );

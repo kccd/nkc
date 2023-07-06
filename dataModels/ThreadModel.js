@@ -1332,7 +1332,7 @@ threadSchema.statics.publishArticle = async (options) => {
   }
   const user = await UserModel.findById(uid);
   // await ThreadModel.ensurePublishPermission(options);
-  await ForumModel.checkWritePermission(options.uid, options.fids);
+  await ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
   const tid = await SettingModel.operateSystemID('threads', 1);
   const thread = ThreadModel({
     tid,
@@ -2204,7 +2204,7 @@ threadSchema.statics.postNewThread = async (options) => {
   await ForumModel.checkForumCategoryBeforePost(options.fids);
   // 1.检测发表权限
   // await ThreadModel.ensurePublishPermission(options);
-  await ForumModel.checkWritePermission(options.uid, options.fids);
+  await ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
   // 2.生成一条新的thread，并返回post
   const _post = await ForumModel.createNewThread(options);
   // 获取当前的thread

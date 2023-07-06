@@ -521,17 +521,14 @@ router
       },
       user: data.user,
     });
-    try {
-      await db.ForumModel.checkWritePermission(state.uid, [fid]);
-    } catch (err) {
-      try {
-        const {
-          args: { message },
-        } = JSON.parse(err.message);
-        data.noPermissionReason = message;
-      } catch (_err) {
-        data.noPermissionReason = err.message;
-      }
+    const { permit, warning } = await db.UserModel.getPostPermission(
+      state.uid,
+      'thread',
+      [fid],
+    );
+    data.noPermissionReason = '';
+    if (!permit) {
+      data.noPermissionReason = warning.join('<br/>');
     }
     ctx.template = 'forum/forum.pug';
     await next();
