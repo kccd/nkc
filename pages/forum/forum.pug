@@ -115,7 +115,7 @@ block content
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else if data.noPermissionReason
-                    button.forum-post-button.btn.btn-default.btn-xs(title=data.noPermissionReason onclick=`sweetInfo('${data.noPermissionReason}')`)
+                    button.forum-post-button.btn.btn-default.btn-xs(title=data.noPermissionReason onclick=`noPermissionToPostAlert('${data.noPermissionReason}')`)
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else if state.isApp

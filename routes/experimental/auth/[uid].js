@@ -27,6 +27,7 @@ authRouter
 		data.videoErrorInfo = verifiedUploadVideo?verifiedUploadCardB.errorInfo:'';
 		data.cardAErrorInfo = verifiedUploadCardA?verifiedUploadCardA.errorInfo:'';
 		data.cardBErrorInfo = verifiedUploadCardB?verifiedUploadCardB.errorInfo:'';
+		data.auth3Codes = await db.UsersPersonalModel.adminGetUserAuth3Codes(uid);
     data.auth3Content = auth3Content;
 		ctx.template = 'experimental/auth/[uid]/index.pug';
 		await next();

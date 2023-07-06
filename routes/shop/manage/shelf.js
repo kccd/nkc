@@ -276,7 +276,7 @@ shelfRouter
 
       // await db.ThreadModel.ensurePublishPermission(options);
       // 检查发表权限
-      await db.ForumModel.checkWritePermission(options.uid, options.fids);
+      await db.ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
       // 检测专业分类互斥
       await db.ForumModel.checkForumCategoryBeforePost(options.fids);
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
