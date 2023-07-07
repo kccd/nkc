@@ -9,15 +9,24 @@ router.put('/', async (ctx, next) => {
   const { db, body, params, state } = ctx;
   const { nid } = params;
   const newNoticeContent = body.noticeContent;
+  const { type } = body;
   const { pid, toc, cv, noticeContent, status } =
     await db.NewNoticesModel.findOnly(
       { nid },
       { pid: 1, toc: 1, cv: 1, noticeContent: 1, status: 1 },
     );
   const { history, shield } = await db.NewNoticesModel.noticeStatus();
-  const thread = await db.ThreadModel.findOnly({ oc: pid }, { uid: 1 });
+  let author = '';
+  if (type === 'thread') {
+    const thread = await db.ThreadModel.findOnly({ oc: pid }, { uid: 1 });
+    author = thread.uid;
+  } else if (type === 'post') {
+    const post = await db.PostModel.findOnly({ pid }, { uid: 1 });
+    author = post.uid;
+  }
+
   //判断用户是否有权限修改
-  if (thread.uid !== state.uid && !ctx.permission('editNoticeContent')) {
+  if (author !== state.uid && !ctx.permission('editNoticeContent')) {
     ThrowCommonError(403, '您没有相应的权限，或等级不足');
   } else if (status === shield) {
     ThrowCommonError(403, '该通告已经被屏蔽请刷新');

@@ -60,6 +60,9 @@ module.exports = {
     shieldNotice: {
       PUT: 'editNoticePut',
     },
+    checkNotice: {
+      GET: 'checkNoticeGet',
+    },
     topped: {
       POST: 'topPost',
     },

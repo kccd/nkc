@@ -62,6 +62,7 @@ function sweetEditNotice(title, nid, content = '') {
       preConfirm: (text) => {
         return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
           noticeContent: text,
+          type: 'thread',
         })
           .then(() => {
             resolve(text);

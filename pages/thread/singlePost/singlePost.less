@@ -396,3 +396,60 @@
   border-color: #5c9eff;
   box-shadow: 0 2px 4px rgba(92, 158, 255, 0.5);
 }
+.new-post-notice{
+  color: rgb(166, 168, 170) ;
+}
+.new-post-notice:hover{
+  cursor: pointer;
+  color: #0e0e0e;
+}
+#notice-content{
+  height: 30rem;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.post-notice {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #e4e7ed;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+
+  a {
+    text-decoration: none;
+    color: rgb(155, 174, 200); /* Element UI中的主题色 */
+    transition: color 0.3s ease;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+
+  .post-notice-head {
+    margin-bottom: 5px;
+    color: rgb(155, 174, 200);
+
+    img.notice-user-banned {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  }
+
+  .post-notice-content {
+    margin-top: 5px;
+    font-size: 14px;
+    color: rgb(155, 174, 200);
+    background-color: #d3dce6; /* 加深的背景色 */
+    padding: 8px;
+    border-radius: 4px;
+  }
+}
+
+.shield-box {
+  background-color: rgb(255, 219, 213);
+}

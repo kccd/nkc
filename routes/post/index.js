@@ -14,6 +14,7 @@ const toppedRouter = require('./topped');
 const authorRouter = require('./author');
 const editNoticeRouter = require('./editNotice');
 const shieldNotice = require('./shieldNotice');
+const checkNotice = require('./checkNotice');
 const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
@@ -694,5 +695,7 @@ router
     '/:nid/shieldNotice',
     shieldNotice.routes(),
     shieldNotice.allowedMethods(),
-  );
+  )
+  .use('/:pid/checkNotice', checkNotice.routes(), checkNotice.allowedMethods());
+
 module.exports = router;

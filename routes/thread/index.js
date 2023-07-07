@@ -1052,16 +1052,20 @@ threadRouter
     );
 
     //文章通告内容处理
+    //屏蔽通告权限
     let shieldNotice = ctx.permission('editNoticeContent');
+    //编辑通告权限
     let canEditNotice =
       thread.uid === state.uid || ctx.permission('editNoticeContent');
     const noticeObj = { pid: thread.oc, status: 'normal' };
     if (shieldNotice || thread.uid === state.uid) {
       noticeObj.status = { $in: ['normal', 'shield'] };
     }
-    const notices = await db.NewNoticesModel.find(noticeObj).sort({ toc: -1 }).lean();
+    const notices = await db.NewNoticesModel.find(noticeObj)
+      .sort({ toc: -1 })
+      .lean();
+    //查看回复历史权限
     let threadHistory = null;
-
     if (notices.length !== 0) {
       const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
       const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
@@ -1119,6 +1123,14 @@ threadRouter
         },
       );
     }
+
+    //赛选出文章下的回复，哪些是有发过通告的pid
+    const postNotice = await db.NewNoticesModel.aggregate([
+      { $match: { pid: { $in: thread.postIds } } },
+      { $group: { _id: '$pid' } },
+    ]).exec();
+    const repliesWithNotice = postNotice.map((item) => item._id);
+
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
     // 标志
@@ -1185,6 +1197,7 @@ threadRouter
     data.threadHistory = threadHistory;
     data.canEditNotice = canEditNotice;
     data.shieldNotice = shieldNotice;
+    data.repliesWithNotice = repliesWithNotice;
 
     // 商品信息
     if (threadShopInfo) {

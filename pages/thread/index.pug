@@ -454,7 +454,7 @@ block content
              for post in data.posts
                //- post数据格式详见/pages/thread/singlePost/singlePost.pug
                -post.highlight = data.highlight;
-               +singlePost(post, data.isEditMode)
+               +singlePost(Object.assign({},post,{isEditMode:data.isEditMode},{repliesWithNotice:data.repliesWithNotice}))
           //- 回复列表尾部分页、管理按钮
           .p-l-2.p-r-2.m-b--05(style="min-height: 4.5rem;")
             if !data.isEditMode
