@@ -21,8 +21,7 @@
         span
           | 新版本公告
 
-      div(v-if="checkNewNotice")
-        h5.text-danger 如果勾选新版本公告，文章将被顶至最前。
+      div(v-if="checkNewNotice").m-b-1
         textarea.form-control( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
         p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 新版本公告内容不能超过 200 个字
       label
