@@ -357,15 +357,16 @@ router
     data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
     // data.type 用于请求草稿提示，用于获取draft表中指定类型的数据
     // 直接进编辑器
+
     if (!type) {
       data.type = 'newThread';
     } else if (type === draftDesType.newThread) {
       // 在专业进编辑器，需要预制当前专业
       const { id } = query;
       data.type = 'newThread';
-      // 判断用户是否用有制定专业的发表权限
+      // 判断用户是否用有指定专业的发表权限
       try {
-        await db.ForumModel.checkWritePermission(state.uid, [id]);
+        await db.ForumModel.checkGlobalPostAndForumWritePermission(state.uid, [id]);
         selectedForumsId = [id];
       } catch (err) {
         data.permissionInfo = err.message;

@@ -3,6 +3,7 @@ block eTitle
   title 用户身份审核
   +includeCSS("/experimental/auth/[uid]/index.css")
 block eContent
+  #auth3Codes.hidden=objToStr({codes: data.auth3Codes})
   #data.hidden= JSON.stringify(data)
   #app.container-fluid.max-width(v-cloak)
     .row
@@ -127,7 +128,9 @@ block eContent
             .row
               .col-xs-12.text-center
                 //-h5 手持身份证视频
-                p(v-if="authenticate.video.status !== 'unsubmit'") 提示语：{{verifyDescription}}
+                div.m-b-1(v-if="authenticate.video.status !== 'unsubmit'")
+                  p 提示语：{{verifyDescription}}
+                  p 最近刷新的动态码：{{auth3Codes.join(', ')}}
                 .idcard-video
                   if(data.verifiedVideoState === 'usable')
                     video(:src="video" controls v-if="authenticate.video.status !== 'unsubmit'")

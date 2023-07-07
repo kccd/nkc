@@ -1,39 +1,41 @@
-import {getState} from '../lib/js/state';
-import {RNOpenEditorPage, RNSetSharePanelStatus} from "../lib/js/reactNative";
-import {getSocket} from '../lib/js/socket';
-import {shareTypes} from "../lib/js/shareTypes";
+import { getState } from '../lib/js/state';
+import { RNOpenEditorPage, RNSetSharePanelStatus } from '../lib/js/reactNative';
+import { getSocket } from '../lib/js/socket';
+import { shareTypes } from '../lib/js/shareTypes';
 const socket = getSocket();
-const {isApp} = getState();
+const { isApp } = getState();
 const forumInfo = NKC.methods.getDataById('forumInfo');
-const {fid, page, digest, sort} = forumInfo;
+const { fid, page, digest, sort } = forumInfo;
 
-$(function() {
+$(function () {
   RNSetSharePanelStatus(true, shareTypes.forum, fid);
 });
 
-$(function() {
-  const dom = $("#navbar_custom_dom");
-  const leftDom = $("#leftDom");
+$(function () {
+  const dom = $('#navbar_custom_dom');
+  const leftDom = $('#leftDom');
   dom.html(leftDom.html());
-  if(NKC.configs.lid) {
+  if (NKC.configs.lid) {
     window.Library = new NKC.modules.Library({
       lid: NKC.configs.lid,
       folderId: NKC.configs.folderId,
       tLid: NKC.configs.tLid,
       closed: NKC.configs.closed,
-      uploadResourcesId: NKC.configs.uploadResourcesId?NKC.configs.uploadResourcesId.split("-"):[]
+      uploadResourcesId: NKC.configs.uploadResourcesId
+        ? NKC.configs.uploadResourcesId.split('-')
+        : [],
     });
   }
   const threadUrlSwitch = $('#threadUrlSwitch');
-  if(threadUrlSwitch.length) {
+  if (threadUrlSwitch.length) {
     const threadUrlSwitchStatus = getThreadUrlSwitchStatus();
     modifyThreadUrl(threadUrlSwitchStatus);
-    threadUrlSwitch.on("click", function() {
+    threadUrlSwitch.on('click', function () {
       const s = $(this).prop('checked');
       modifyThreadUrl(s);
     });
   }
-  if(NKC.configs.uid) {
+  if (NKC.configs.uid) {
     connectForumRoom();
   }
 });
@@ -41,14 +43,14 @@ $(function() {
 const threadUrlSwitchKey = 'forum_thread_a_target';
 
 function modifyThreadUrl(status) {
-  var target = status? '_blank': '_self';
+  var target = status ? '_blank' : '_self';
   $('.thread-panel-url').attr('target', target);
   $('#threadUrlSwitch').prop('checked', !!status);
   setThreadUrlSwitchStatus(status);
 }
 /*
-* @return {Boolean}
-* */
+ * @return {Boolean}
+ * */
 function getThreadUrlSwitchStatus() {
   return localStorage.getItem(threadUrlSwitchKey) === 'true';
 }
@@ -57,46 +59,46 @@ function setThreadUrlSwitchStatus(status) {
   localStorage.setItem(threadUrlSwitchKey, status);
 }
 
-window.openEditSite = function() {
-  const url = window.location.origin + "/editor?type=forum&id=" + fid;
-  if(isApp) {
-    RNOpenEditorPage("openEditorPage", url);
+window.openEditSite = function () {
+  const url = window.location.origin + '/editor?type=forum&id=' + fid;
+  if (isApp) {
+    RNOpenEditorPage('openEditorPage', url);
   } else {
     NKC.methods.visitUrl(url, true);
   }
-}
+};
 
 /*
-* 连入房间
-* */
+ * 连入房间
+ * */
 function joinRoom() {
   socket.emit('joinRoom', {
     type: 'forum',
     data: {
-      forumId: fid
-    }
+      forumId: fid,
+    },
   });
 }
 
 /*
-* 连接上专业房间
-* */
+ * 连接上专业房间
+ * */
 function connectForumRoom() {
-  socket.on('connect', function() {
+  socket.on('connect', function () {
     joinRoom();
   });
-  socket.on('forumMessage', function(data) {
-    const {html, tid, contentType} = data;
+  socket.on('forumMessage', function (data) {
+    const { html, tid, contentType } = data;
     const threadList = $('div.normal-thread-list');
-    let targetThread = threadList.find('div[data-tid="'+tid+'"]');
-    if(
+    let targetThread = threadList.find('div[data-tid="' + tid + '"]');
+    if (
       page === 0 && // 处于专业首页
-      (!digest || digest && data.digest) &&
+      (!digest || (digest && data.digest)) &&
       (contentType === 'thread' || sort === 'tlm') // 发表文章或发表回复且按回复排序
     ) {
       // 如果文章存在则先移除再在列表头部创建
       // 如果文章不存在则移除列表最后一项再在列表头部创建
-      if(targetThread.length) {
+      if (targetThread.length) {
         targetThread.remove();
       } else {
         removeLastThreadPanel();
@@ -104,21 +106,22 @@ function connectForumRoom() {
       targetThread = $(html);
       threadList.prepend(targetThread);
     } else {
-      if(!targetThread) return;
+      if (!targetThread) {
+        return;
+      }
     }
 
     let count = NKC.methods.getThreadListNewPostCount(tid);
 
-    count ++;
+    count++;
 
     NKC.methods.setThreadListNewPostCount(tid, count);
 
     setThreadListNewCount(tid, count);
 
     createMouseEvents();
-
   });
-  if(socket.connected) {
+  if (socket.connected) {
     joinRoom();
   }
 
@@ -128,9 +131,9 @@ function connectForumRoom() {
 }
 
 /*
-* 设置一个10秒的定时器 定时从本地获取条数更新dom
-* @author pengxiguaa 2020-12-11
-* */
+ * 设置一个10秒的定时器 定时从本地获取条数更新dom
+ * @author pengxiguaa 2020-12-11
+ * */
 function createTimeoutToUpdateThreadListCount() {
   setTimeout(() => {
     updateThreadListCount();
@@ -138,26 +141,30 @@ function createTimeoutToUpdateThreadListCount() {
   }, 10 * 1000);
 }
 function createClickEventToUpdateThreadListCount() {
-  document.body.addEventListener('click', function(e) {
+  document.body.addEventListener('click', function (e) {
     let target = e.target;
-    if(target.tagName.toLowerCase() !== 'a') return;
+    if (target.tagName.toLowerCase() !== 'a') {
+      return;
+    }
     target = $(target);
     const href = target.attr('href');
-    const reg = /^\/t\/([0-9]+)\??/ig;
-    if(!reg.test(href)) return;
+    const reg = /^\/t\/([0-9]+)\??/gi;
+    if (!reg.test(href)) {
+      return;
+    }
     const tid = RegExp.$1;
     NKC.methods.setThreadListNewPostCount(tid, 0);
     setThreadListNewCount(tid, 0);
   });
 }
 /*
-* 从本地获取数据更新dom
-* @author pengxiguaa 2020-12-11
-* */
+ * 从本地获取数据更新dom
+ * @author pengxiguaa 2020-12-11
+ * */
 function updateThreadListCount() {
   const threadList = $('div.normal-thread-list');
   const threads = threadList.find('.thread-panel');
-  for(let i = 0; i < threads.length; i++) {
+  for (let i = 0; i < threads.length; i++) {
     const thread = threads.eq(i);
     const tid = thread.attr('data-tid');
     const count = NKC.methods.getThreadListNewPostCount(tid);
@@ -166,27 +173,35 @@ function updateThreadListCount() {
 }
 
 /*
-* 添加鼠标事件
-* @author pengxiguaa 2020-12-11
-* */
+ * 添加鼠标事件
+ * @author pengxiguaa 2020-12-11
+ * */
 function createMouseEvents() {
   // floatUserPanel.initPanel();
   // floatForumPanel.initPanel();
 }
 
 /*
-* 设置文章的未读数
-* @param {String} tid 文章ID
-* @param {Number} count 未读数
-* @author pengxiguaa 2020-12-11
-* */
+ * 设置文章的未读数
+ * @param {String} tid 文章ID
+ * @param {Number} count 未读数
+ * @author pengxiguaa 2020-12-11
+ * */
 function setThreadListNewCount(tid, count) {
   const threadList = $('div.normal-thread-list');
-  const targetThreadInfo = threadList.find('div[data-tid="'+tid+'"] .thread-panel-author-info');
-  if(!targetThreadInfo.length) return;
-  const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-point');
+  const targetThreadInfo = threadList.find(
+    'div[data-tid="' + tid + '"] .thread-panel-author-info',
+  );
+  if (!targetThreadInfo.length) {
+    return;
+  }
+  const targetThreadCounter = threadList.find(
+    'div[data-tid="' + tid + '"] span.thread-panel-point',
+  );
   targetThreadCounter.remove();
-  if(count === 0) return;
+  if (count === 0) {
+    return;
+  }
 
   // 暂时评论红点提示 当前仅仅指定文章而不显示红点
   // 显示条数
@@ -198,18 +213,20 @@ function setThreadListNewCount(tid, count) {
 }
 
 /*
-* 移除文章列表中的最后一条
-* @author pengxiguaa 2020-12-14
-* */
+ * 移除文章列表中的最后一条
+ * @author pengxiguaa 2020-12-14
+ * */
 function removeLastThreadPanel() {
   const threadPanel = $('div.normal-thread-list>.thread-panel');
   const length = threadPanel.length;
-  if(length === 0) return;
+  if (length === 0) {
+    return;
+  }
   threadPanel.eq(length - 1).remove();
 }
 
 const formSearchApp = new Vue({
-  el: "#forumSearch",
+  el: '#forumSearch',
   data: {
     content: '',
     show: false,
@@ -219,25 +236,36 @@ const formSearchApp = new Vue({
       this.show = !this.show;
     },
     search() {
-      const {content} = this;
+      const { content } = this;
       return Promise.resolve()
         .then(() => {
-          if(content.length === 0) throw new Error("搜索内容不能为空");
-          return nkcAPI(`/f/${fid}/child?type=all`, 'GET')
+          if (content.length === 0) {
+            throw new Error('搜索内容不能为空');
+          }
+          return nkcAPI(`/f/${fid}/child?type=all`, 'GET');
         })
         .then((res) => {
           const fid = res.forumsId;
           const c = window.btoa(encodeURIComponent(content));
-          const d = window.btoa(encodeURIComponent(JSON.stringify({fid})));
+          const d = window.btoa(encodeURIComponent(JSON.stringify({ fid })));
           const form = 'complex';
           NKC.methods.visitUrl(`/search?c=${c}&d=${d}&form=${form}`, true);
         })
-        .catch(err => {
-          screenTopWarning(err.message || err.error || err)
-        })
-    }
-  }
+        .catch((err) => {
+          screenTopWarning(err.message || err.error || err);
+        });
+    },
+  },
 });
+
+function noPermissionToPostAlert(htmlContent = '') {
+  return Swal({
+    title: '权限不足',
+    type: 'error',
+    confirmButtonText: '关闭',
+    html: htmlContent,
+  });
+}
 
 Object.assign(window, {
   threadUrlSwitchKey,
@@ -253,4 +281,5 @@ Object.assign(window, {
   setThreadListNewCount,
   removeLastThreadPanel,
   formSearchApp,
+  noPermissionToPostAlert,
 });

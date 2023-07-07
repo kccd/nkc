@@ -444,7 +444,12 @@
       },
       editorDropImageEventHandle(event) {
         const items = event.dataTransfer.items;
-        this.insertImageAndUploadResourceByDataTransferItemList(items);
+        const files = event.dataTransfer.files;
+        if(files.length > 0) {
+          this.insertImageAndUploadResourceByDataTransferFileList(files);
+        } else if(items.length > 0) {
+          this.insertImageAndUploadResourceByDataTransferItemList(items);
+        }
         event.preventDefault();
       },
       insertImageAndUploadResourceByDataTransferItemList(dataTransferItemList) {
@@ -461,6 +466,18 @@
           }
         }
 
+        this.uploadImageFiles(files);
+      },
+
+      insertImageAndUploadResourceByDataTransferFileList(dataTransferFileList) {
+        const files = [];
+        for(const file of dataTransferFileList) {
+          files.push(file);
+        }
+        this.uploadImageFiles(files);
+      },
+
+      uploadImageFiles(files = []) {
         for(let i = 0; i < files.length; i ++) {
           const file = files[i];
           const url = URL.createObjectURL(file);
@@ -488,6 +505,7 @@
             })
         }
       },
+
       initEditorPasteImageEvent() {
         this.editor.document.addEventListener('paste', this.editorPasteImageEventHandle);
       },

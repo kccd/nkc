@@ -210,7 +210,7 @@ function viewPostComments(tid, pid, page, callback) {
         editorNotice.hide();
       }
       singlePostComment.show();
-      postCommentWarning.html(postPermission.warning);
+      postCommentWarning.html(postPermission.warning.join('<br/>'));
       var buttonValue = data.paging.buttonValue;
       comments[pid] = html?html:" ";
       commentsDiv.html(html);

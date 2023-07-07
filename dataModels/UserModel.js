@@ -2884,29 +2884,30 @@ userSchema.statics.getModifyPostTimeLimitMS = async (uid) => {
 };
 
 /*
- * 根据用户的等级以及身份认证信息
- * 判断用户是否有权加载编辑器以及发表相关说明
- * @param {String} uid 用户ID
- * @param {String} type 发表类型 thread文章，post回复
- * @param {String} fids 内容所在的专业
- * @return {Object}
- *   @param {Boolean} permit 是否有权发表
- *   @param {HTML String} warning 提示信息
- * @author pengxiguaa 20200-12-18
+ * 根据后台管理的发表设置，判断用户是否有权限发表
+ * 并且会返回有关发表相关的提示
+ *
+ * @param {String} uid 用户uid
+ * @param {String} type 内容类型，post或thread
+ * @return {
+ *   {
+ *     @param {Boolean} permit 是否有权发表
+ *     @param {[String]} warning 有发表权限有关的提示，数组的元素是富文本
+ *   }
+ * }
  * */
-userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
+userSchema.statics.getUserGlobalPostPermissionStatus = async (uid, type) => {
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  const apiFunction = require('../nkcModules/apiFunction');
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   const filterResult = require('../nkcModules/xssFilters/filterResult');
-  let result = {
-    permit: false,
-    warning: null,
-  };
   if (!uid) {
-    return result;
+    return {
+      permit: false,
+      warning: [],
+    };
   }
   const user = await UserModel.findOnly({ uid });
   const postSettings = await SettingModel.getSettings('post');
@@ -2924,82 +2925,163 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const { status, unlimited, countLimit } = notPass;
   const authLevel = await user.extendAuthLevel();
 
+  // 默认是可以发的，但是下面会有很多条条款款限制发表
+  let permit = true;
+  // 有关能够发表的一些提示，仅用于显示在给中输入框前提示用户
+  const warning = [];
+
+  const today = apiFunction.today();
+  const todayCount = await PostModel.countDocuments({
+    type,
+    uid,
+    toc: { $gte: today },
+  });
+  const contentName = `${type === 'post' ? '条' : '篇'}${postType}`;
+
   if (authLevel < authLevelMin) {
-    result = {
-      permit: false,
-      warning: `<div>你还未完成身份认证${authLevelMin}，点击<a href="/u/${uid}/settings/verify">这里</a>去完成。</div>`,
-    };
+    // 身份认证不符合要求，无需再判断是否通过考试
+    permit = false;
+    warning.push(
+      `你还未完成身份认证${authLevelMin}，请在 <a href="/u/${uid}/settings/verify" target="_blank">资料设置-身份认证</a> 页面完善身份信息。`,
+    );
   } else {
-    if (user.volumeB) {
-      if (!volumeB) {
-        result = {
-          permit: false,
-          warning: `<div>发表${postType}功能已关闭</div>`,
-        };
-      } else {
-        result = {
-          permit: true,
-          warning: null,
-        };
-      }
-    } else if (user.volumeA) {
-      if (!volumeA) {
-        if (!volumeB) {
-          result = {
-            permit: false,
-            warning: `<div>发表${postType}功能已关闭</div>`,
-          };
-        } else {
-          result = {
-            permit: false,
-            warning: `<div>你暂未通过B卷考试，不能发表${postType}。</div>`,
-          };
-        }
-      } else {
-        result = {
-          permit: true,
-          warning: null,
-        };
-      }
-    } else {
+    // 满足身份认证要求
+    // 判断AB考试是满足要求
+    if ((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) {
+      // 没有开启B卷考试或开启了B卷考试用户没有通过，并且没有开启A卷考试或开启了A卷考试用户没有通过
+      // 最后的效果就是用户是否有权发表内容全靠未考试的发表设置
       if (!status) {
+        // 到此，未考试的也不能发
+        // 最终用户肯定是没有发表权限的，下面主要是用于拓展不能发的原因
         if (volumeA) {
-          result = {
-            permit: false,
-            warning: `<div>你暂未通过A卷考试，不能发表${postType}。</div>`,
-          };
+          if (!user.volumeA) {
+            // 如果通过A卷考试就能发但用户没通过A卷考试（肯定没过B卷考试，因为过了B卷默认会过A卷）
+            // 那么就得提示用户是因为没有通过A卷考试导致没有发表权限
+            permit = false;
+            warning.push(
+              `由于近期发布骚扰性提问的新账号较多，为了改善原创用户体验，现要求所有用户必须通过A卷考试以后才能发表，请在 <a href="/exam" target="_blank">考试系统</a> 参加A卷或B卷考试，通过任何一门考试即可获得发表权限。`,
+            );
+          }
         } else if (volumeB) {
-          result = {
-            permit: false,
-            warning: `<div>你暂未通过B卷考试，不能发表${postType}。</div>`,
-          };
+          if (!user.volumeB) {
+            // 同上，如果通过B卷考试就能发但用户没通过B卷考试
+            // 那么就得提示用户是因为没有通过B卷考试导致没有发表权限
+            permit = false;
+            warning.push(
+              `由于近期发布骚扰性提问的新账号较多，为了改善原创用户体验，现要求用户必须通过B卷考试以后才能发表，请在 <a href="/exam" target="_blank">考试系统</a> 参加B卷考试，通过任何一门考试即可获得发表权限。`,
+            );
+          }
         } else {
-          result = {
-            permit: false,
-            warning: `<div>发表${postType}功能已关闭</div>`,
-          };
+          // 到此，通过A卷或B卷均不能发表，所以直接提示发表功能已关闭
+          permit = false;
+          warning.push('发表功能已关闭');
         }
-      } else if (unlimited) {
-        result = {
-          permit: true,
-          warning: null,
-        };
       } else {
-        const today = require('../nkcModules/apiFunction').today();
-        const count = await PostModel.countDocuments({
-          type,
-          uid,
-          toc: { $gte: today },
-        });
-        const contentName = `${type === 'post' ? '条' : '篇'}${postType}`;
-        result = {
-          permit: count < countLimit,
-          warning: `<div>你还未参加考试，每天仅能发表${countLimit}${contentName}。今日已发表${count}${contentName}。
-<br>点击<a href="/exam" target="_blank">这里</a>参加考试，通过后将获得更多发言权限。</div>`,
-        };
+        // 虽然用户靠通过考试的方式获得发表权限已经GG了
+        // 但是在这里可以允许未通过考试的用户发表内容，但是一般会受限制，例如每天只能发10条，这要看具体的设置。
+        if (!unlimited) {
+          // 到此，没有开启无限制
+          // 未通过考试的用户每天发表的内容条数会受到一定的限制
+          // 需要提示用户未通过考试的话，权限有点不太够，无论结果如何还是应该去考一下
+          // 而是否还能够发表，则需要看今日的发表条数是否已达到最大值
+          if (todayCount >= countLimit) {
+            permit = false;
+          }
+          warning.push(
+            `你还未参加考试，每天仅能发表${countLimit}${contentName}。今日已发表${todayCount}${contentName}。\n<br>请在 <a href="/exam" target="_blank">考试系统</a> 参加A卷或B卷考试，通过后将获得更多发言权限。`,
+          );
+        }
       }
     }
   }
+
+  // 下面开始校验发表频次和单位时间内发表的数量
+  let postCountLimit = 0,
+    postTimeLimit = 0;
+  const {
+    postToForumCountLimit,
+    postToForumTimeLimit,
+    postToThreadCountLimit,
+    postToThreadTimeLimit,
+  } = await user.getPostLimit();
+  if (type === 'post') {
+    postCountLimit = postToThreadCountLimit;
+    postTimeLimit = postToThreadTimeLimit;
+  } else {
+    postCountLimit = postToForumCountLimit;
+    postTimeLimit = postToForumTimeLimit;
+  }
+  if (todayCount >= postCountLimit) {
+    // 单位时间内的发表条数超过限制
+    permit = false;
+    warning.push(
+      `你当前的账号等级每天最多只能发表${postCountLimit}${contentName}，请明天再试。`,
+    );
+  }
+  const latestPost = await PostModel.findOne(
+    {
+      type,
+      uid: user.uid,
+      toc: { $gte: Date.now() - postTimeLimit * 60 * 1000 },
+    },
+    { pid: 1 },
+  );
+  if (latestPost) {
+    // 两次发表的间隔时间太短
+    permit = false;
+    warning.push(
+      `你当前的账号等级限定发表${postType}间隔时间不能小于${postTimeLimit}分钟，请稍后再试。`,
+    );
+  }
+
+  // 下面开始校验手机号
+  // 检测用户是否需要验证手机号
+  // 如果用户需要验证手机号而没有验证，则需要提示用户
+  // 这里仅仅提示用户，不会影响发表权限
+  const shouldVerifyPhoneNumber =
+    await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
+  // 下面这一行内容是旧的、写死的提示，提供参考
+  // 你的账号可能存在安全风险，请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号，验证前你所发表的内容需通过审核后才能显示。
+  if (shouldVerifyPhoneNumber) {
+    const authSettings = await SettingModel.getSettings('auth');
+    if (authSettings.verifyPhoneNumber.type === 'disablePublish') {
+      permit = false;
+      warning.push(authSettings.verifyPhoneNumber.disablePublishContent);
+    } else {
+      warning.push(authSettings.verifyPhoneNumber.reviewPostContent);
+    }
+    warning.push(
+      `请在 <a href="/u/${uid}/settings/security" target="_blank">资料设置-账号安全</a> 页面验证手机号。`,
+    );
+  }
+
+  return {
+    permit,
+    warning: warning.map((html) => {
+      return filterResult(html);
+    }),
+  };
+};
+
+/*
+ * 根据用户的等级以及身份认证信息
+ * 判断用户是否有权加载编辑器以及发表相关说明
+ * @param {String} uid 用户ID
+ * @param {String} type 发表类型 thread文章，post回复
+ * @param {String} fids 内容所在的专业
+ * @return {Object}
+ *   @param {Boolean} permit 是否有权发表
+ *   @param {HTML String} warning 提示信息
+ * @author pengxiguaa 20200-12-18
+ * */
+userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
+  const UserModel = mongoose.model('users');
+  const ForumModel = mongoose.model('forums');
+  let { permit, warning } = await UserModel.getUserGlobalPostPermissionStatus(
+    uid,
+    type,
+  );
+
   if (fids.length > 0) {
     try {
       if (type === 'thread') {
@@ -3008,33 +3090,28 @@ userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
         await ForumModel.checkWritePostPermission(uid, fids);
       }
     } catch (err) {
+      permit = false;
+      let errorMessage = '';
       try {
+        // 为了兼容自定义的错误信息，所以需要尝试解析
+        // 如果解析出错，则认为是一个血统纯正的error，进而可以从error.message上获错误信息
         const {
           args: { message },
         } = JSON.parse(err.message);
-        result = {
-          permit: false,
-          warning: `<div>${message}</div>`,
-        };
+        errorMessage = message;
       } catch (_err) {
-        result = {
-          permit: false,
-          warning: `<div>${err.message}</div>`,
-        };
+        errorMessage = err.message;
       }
+      warning.push(errorMessage);
     }
   }
-  const shouldVerifyPhoneNumber =
-    await UsersPersonalModel.shouldVerifyPhoneNumber(uid);
-  if (shouldVerifyPhoneNumber) {
-    result.warning = result.warning || '';
-    result.warning += `<div>您的账号可能存在安全风险，请点击 <a href="/u/${uid}/settings/security" target="_blank">这里</a> 去验证手机号，验证前你所发表的内容需通过审核后才能显示。</div>`;
-  }
-  //过滤result内部是否有其他的脚本标签
-  if (result.warning) {
-    result.warning = filterResult(result.warning);
-  }
-  return result;
+
+  return {
+    permit,
+    warning: warning.map((html) => {
+      return filterResult(html);
+    }),
+  };
 };
 
 /*

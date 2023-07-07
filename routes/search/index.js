@@ -22,18 +22,11 @@ router.get('/', async (ctx, next) => {
     searchUserFromMongodb = false,
     uidToUser;
   if (c) {
+    data.c = c;
     if (!d) {
-      data.c = Buffer.from(encodeURIComponent(c)).toString('base64');
       d = Buffer.from(encodeURIComponent(JSON.stringify({ a: 1 }))).toString(
         'base64',
       );
-    } else {
-      data.c = c;
-      try {
-        c = decodeURIComponent(Buffer.from(c, 'base64').toString());
-      } catch (err) {
-        //
-      }
     }
   }
   c = c.trim();

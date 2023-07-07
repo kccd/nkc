@@ -4,8 +4,21 @@ block title
   +includeCSS("/user/settings/verify/verify.css")
   -let defaultImg = '/default/photo_setting.jpg'
 block content
-  //- #data.hidden= objToStr({data})
-  #data.hidden=objToStr({data:{auth1Content: data.auth1Content, auth2Content: data.auth2Content, auth3Content: data.auth3Content, level: data.level, boundMobile: data.boundMobile, user: data.user, authenticate: data.authenticate, loading: data.loading, VerifiedVideoState: data.VerifiedVideoState, videoInputFile: data.videoInputFile}})
+  -
+    var dataString = objToStr({
+      auth3Code: data.auth3Code,
+      auth1Content: data.auth1Content,
+      auth2Content: data.auth2Content,
+      auth3Content: data.auth3Content,
+      level: data.level,
+      boundMobile: data.boundMobile,
+      user: data.user,
+      authenticate: data.authenticate,
+      loading: data.loading,
+      VerifiedVideoState: data.VerifiedVideoState,
+      videoInputFile: data.videoInputFile
+    });
+  #data.hidden=dataString
   #app.container-fluid.max-width(v-cloak)
     .row
       .col-xs-12.col-md-2
@@ -43,13 +56,13 @@ block content
                 img(:src="IDCardA")
                 br
                 input.hidden(type='file' accept="image/jpeg,image/png" @change="IDCardAInputFile = $event.target.files[0]" ref="idCardAInput")
-                button.btn.btn-primary(v-if="['unsubmit', 'fail'].indexOf(authenticate.card.status) >= 0" @click="$refs.idCardAInput.click()") 选择图片
+                button.btn.btn-primary(v-if="['unsubmit', 'fail', 'useless'].indexOf(authenticate.card.status) >= 0" @click="$refs.idCardAInput.click()") 选择图片
               .col-xs-12.col-md-6.text-center.verify2__img
                 h5 身份证背面
                 img(:src="IDCardB")
                 br
                 input.hidden(type='file' accept="image/jpeg,image/png" @change="IDCardBInputFile = $event.target.files[0]" ref="idCardBInput")
-                button.btn.btn-primary(v-if="['unsubmit', 'fail'].indexOf(authenticate.card.status) >= 0" @click="$refs.idCardBInput.click()") 选择图片
+                button.btn.btn-primary(v-if="['unsubmit', 'fail', 'useless'].indexOf(authenticate.card.status) >= 0" @click="$refs.idCardBInput.click()") 选择图片
               .col-xs-12.col-md-12.text-center
                 br
                 br
@@ -61,7 +74,7 @@ block content
                   p
                     span 原因：
                     span.text-danger(v-if="authenticate.card.status === 'fail'") {{authenticate.card.message}}
-                    span.text-danger(v-if="authenticate.card.status === 'useless'") 图片处理失败,请重新上传视频！
+                    span.text-danger(v-if="authenticate.card.status === 'useless'") 图片处理失败，请重新上传！
                   button.btn.btn-primary(@click="submitVerify2()") 提交审核
         .panel.panel-default
           .panel-heading
@@ -93,7 +106,7 @@ block content
                   p
                     span 原因：
                     span.text-danger(v-if="authenticate.video.status === 'fail'") {{authenticate.video.message}}
-                    span.text-danger(v-if="authenticate.video.status === 'useless'") 视频处理失败,请重新上传视频！
+                    span.text-danger(v-if="authenticate.video.status === 'useless'") 视频处理失败，请重新上传！
                   button.btn.btn-primary#pickVerify3Video(@click="$refs.videoInput.click()" :disabled="loading") 选择视频
                   button.btn.btn-primary#submiteAuth(v-if="loading" :disabled="loading") 上传进度: {{uploadProgress}}%
                   button.btn.btn-primary#submiteAuth(@click="submiteVerify3()" v-else :disabled="loading") 提交审核
