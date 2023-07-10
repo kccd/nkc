@@ -1,7 +1,31 @@
 //- 字段详情/pages/thread/singlePost/singlePost.pug
 if !isIncluded('singlePostTop')
+  div(id='notice-dialog')
+    Draggable(title='回复公告' ref="noticeDialog" max-Width="40rem" )
+      div(slot="content" id='notice-content')
+        div(v-for="notice in postNotices" v-if="postNotices.length !==0")
+          .post-notice(:class="notice.status === 'shield' ? 'shield-box': ''")
+            .shield-box-span(v-if="notice.status === 'shield'" )
+              span(v-if="notice.reason" ) 当前通告已经屏蔽 原因：{{ notice.reason }}
+              span(v-else) 当前通告已经屏蔽
+            .post-notice-head.m-b-05(
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              :data-global-data="getObjToStr({uid:notice.user.uid})"
+              )
+              img.notice-user-banned.m-r-05(:src="notice.user.avatar")
+              From-Now(:time="notice.toc")
+              a.notice-float(v-if="postHistory !==null && notice.hid " :href="`/p/${notice.pid}/history?t=detail&c=${notice.hid}`") 详情
+              a.notice-float(v-if="canEditNotice && notice.status === 'normal'" @click='editNotice(notice.nid,notice.noticeContent)') 编辑
+              a.notice-float(v-if="shieldNotice && notice.status === 'normal'" @click='disabledNotice(notice.nid,true)') 屏蔽
+              a.notice-float(v-if="shieldNotice && notice.status === 'shield'" @click="disabledNotice(notice.nid,false)") 解除屏蔽
+            .post-notice-content
+              span {{notice.noticeContent}}
+        .empty(v-if="postNotices.length ===0") ~~空空如也
+  include ../../publicModules/mixin.pug
+    +includeJS('/thread/singlePost/singlePostNotice.js')
   mixin singlePostTop(props)
-    -var {pid, docNumber, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl} = props;
+    -var {pid, docNumber, username, toc, uid, avatar, home, gradeId, gradeName, banned, userHome, gradeIconUrl ,repliesWithNotice} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
     -var {cancelTopped, url, addr, homeUrl} = props;
     .single-post-top
@@ -30,6 +54,8 @@ if !isIncluded('singlePostTop')
             span 作者
           if cancelTopped
             span.single-post-cancel-topped(onclick=`topPost('${pid}', false)`) 取消置顶
+          if repliesWithNotice && repliesWithNotice.includes(pid)
+            i.fa.fa-info-circle.new-post-notice( aria-hidden="true" title="点击可查看该回复的公告")
         .single-post-toc
           +fromNow(toc)
           if tlm

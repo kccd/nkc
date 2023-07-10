@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const { getUrl, fromNow } = require('../nkcModules/tools');
-const videoSize = require('../settings/video');
 const Schema = mongoose.Schema;
 const schema = new Schema(
   {
@@ -13,11 +11,6 @@ const schema = new Schema(
       type: String,
       required: true,
       index: 1,
-    },
-    hid: {
-      type: String,
-      index: 1,
-      default: '',
     },
     noticeContent: {
       type: String,
@@ -33,11 +26,37 @@ const schema = new Schema(
       required: true,
       index: 1,
     },
+    status: {
+      type: String,
+      default: 'normal',
+    },
+    cv: {
+      type: Number,
+      index: 1,
+      default: null,
+    },
+    tlm: {
+      type: Date,
+      default: Date.now,
+      index: 1,
+    },
+    reason: {
+      type: String,
+      default: '',
+    },
   },
   { collection: 'newNotices' },
 );
-
-schema.statics.extendNoticeContent = async ({ pid, uid, noticeContent }) => {
+schema.statics.noticeStatus = async () => {
+  return { normal: 'normal', shield: 'shield', history: 'history' };
+};
+schema.statics.extendNoticeContent = async ({
+  pid,
+  uid,
+  noticeContent,
+  toc,
+  cv,
+}) => {
   const NewNoticesModel = mongoose.model('newNotices');
   const SettingModel = mongoose.model('settings');
   const nid = await SettingModel.operateSystemID('newNotices', 1);
@@ -47,20 +66,14 @@ schema.statics.extendNoticeContent = async ({ pid, uid, noticeContent }) => {
     uid,
     noticeContent,
   };
+  if (toc) {
+    noticeObj.toc = toc;
+  }
+  if (cv) {
+    noticeObj.cv = cv;
+  }
   const newNotice = new NewNoticesModel(noticeObj);
   return await newNotice.save();
-};
-
-schema.statics.updateThreadStatus = async (tid, isNewThread = false) => {
-  const ThreadModel = mongoose.model('threads');
-  await ThreadModel.updateOne(
-    { tid },
-    {
-      $set: {
-        isNewThread,
-      },
-    },
-  );
 };
 
 module.exports = mongoose.model('newNotices', schema);

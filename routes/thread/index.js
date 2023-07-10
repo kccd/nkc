@@ -1052,15 +1052,21 @@ threadRouter
     );
 
     //文章通告内容处理
-    const notices = await db.NewNoticesModel.find({
-      pid: thread.oc,
-    }).sort({ toc: -1 });
+    //屏蔽通告权限
+    let shieldNotice = ctx.permission('editNoticeContent');
+    //编辑通告权限
+    let canEditNotice =
+      thread.uid === state.uid || ctx.permission('editNoticeContent');
+    const noticeObj = { pid: thread.oc, status: 'normal' };
+    if (shieldNotice || thread.uid === state.uid) {
+      noticeObj.status = { $in: ['normal', 'shield'] };
+    }
+    const notices = await db.NewNoticesModel.find(noticeObj)
+      .sort({ toc: -1 })
+      .lean();
+    //查看回复历史权限
     let threadHistory = null;
-    let canEditNotice = false;
-
     if (notices.length !== 0) {
-      canEditNotice =
-        thread.uid === state.uid || ctx.permission('editNoticeContent');
       const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
       const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
       //判断是否有查看历史记录的权限
@@ -1076,13 +1082,30 @@ threadRouter
             : null;
       }
       const userId = Array.from(new Set(notices.map((item) => item.uid)));
+      //获取通告用户信息
       const users = await db.UserModel.find(
         { uid: { $in: userId } },
         { avatar: 1, uid: 1, username: 1 },
       ).lean();
+
+      //获取历史版本
+      const cv = Array.from(
+        new Set(notices.map((item) => item.cv).filter(Boolean)),
+      );
+      //获取hid数组对象
+      const hidArr = await db.HistoriesModel.find(
+        { pid: thread.oc, cv: { $in: cv } },
+        { _id: 1, cv: 1, pid: 1 },
+      ).lean();
+      //筛选出来的hid对象
+      const uniqueArr = hidArr.filter((item, index, self) => {
+        return index === self.findIndex((t) => t.cv === item.cv);
+      });
+
       data.noticeContent = notices.map(
-        ({ toc, noticeContent, hid, uid, pid, nid }) => {
+        ({ toc, noticeContent, cv, uid, pid, nid, status, reason }) => {
           const user = users.find((item) => item.uid === uid);
+          const hidObj = uniqueArr.find((item) => item.cv === cv);
           const updatedUser = {
             ...user,
             avatar: tools.getUrl('userAvatar', user.avatar),
@@ -1090,14 +1113,24 @@ threadRouter
           return {
             toc,
             noticeContent,
-            hid,
+            hid: hidObj ? hidObj._id : null,
             user: updatedUser,
             pid,
             nid,
+            status,
+            reason,
           };
         },
       );
     }
+
+    //赛选出文章下的回复，哪些是有发过通告的pid
+    const postNotice = await db.NewNoticesModel.aggregate([
+      { $match: { pid: { $in: thread.postIds } } },
+      { $group: { _id: '$pid' } },
+    ]).exec();
+    const repliesWithNotice = postNotice.map((item) => item._id);
+
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
     // 标志
@@ -1163,6 +1196,8 @@ threadRouter
     data.orderStatus = thread.orderStatus;
     data.threadHistory = threadHistory;
     data.canEditNotice = canEditNotice;
+    data.shieldNotice = shieldNotice;
+    data.repliesWithNotice = repliesWithNotice;
 
     // 商品信息
     if (threadShopInfo) {

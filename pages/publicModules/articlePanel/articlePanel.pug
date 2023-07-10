@@ -172,8 +172,6 @@ if !isIncluded('publicModules/articlePanel')
               a(href=c.url target='_blank')=c.name
           .article-panel-time
             +fromNow(content.time)
-          if article.isNewThread
-            .new-article.m-l-1 新版本
           .pull-right
             if content.voteUpCount > 0
               .article-panel-count

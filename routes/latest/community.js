@@ -214,7 +214,7 @@ router
     const count = await db.ThreadModel.countDocuments(q);
     let sort = { tlm: -1 };
     if (s === 'toc') {
-      sort = { toc: -1 };
+      sort = { ttoc: -1 };
     }
     const paging = nkcModules.apiFunction.paging(
       page,
@@ -239,7 +239,7 @@ router
       categoriesId: 1,
       disabled: 1,
       recycleMark: 1,
-      isNewThread: 1,
+      ttoc: 1,
     })
       .skip(paging.start)
       .limit(paging.perpage)

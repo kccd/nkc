@@ -19,11 +19,6 @@ const threadSchema = new Schema(
       default: 'article',
       index: 1,
     },
-    //用户是否勾选发表新文章通告
-    isNewThread: {
-      type: Boolean,
-      default: false,
-    },
     //文章的评论数量
     count: {
       type: Number,
@@ -101,6 +96,10 @@ const threadSchema = new Schema(
     toc: {
       type: Date,
       default: Date.now,
+      index: 1,
+    },
+    ttoc: {
+      type: Date,
       index: 1,
     },
     /*toMid: {
@@ -250,6 +249,9 @@ const threadSchema = new Schema(
 threadSchema.pre('save', function (next) {
   if (!this.tlm) {
     this.tlm = this.toc;
+  }
+  if (!this.ttoc) {
+    this.ttoc = this.toc;
   }
   next();
 });
@@ -598,12 +600,13 @@ threadSchema.methods.updateThreadEncourage = async function () {
 threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const ThreadModel = mongoose.model('threads');
   const NewNoticesModel = mongoose.model('newNotices');
+  const ForumModel = mongoose.model('forums');
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const thread = await ThreadModel.findOne({ tid: this.tid });
+  const { postIds } = thread;
   const PostModel = mongoose.model('posts');
   const updateObj = {};
-  const { isNewThread } = thread;
   const oc = await PostModel.findOneAndUpdate(
     { tid: thread.tid },
     {
@@ -629,18 +632,66 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-  if (isNewThread) {
-    const { toc } = await NewNoticesModel.findOne({ pid: oc.pid }).sort({
-      toc: -1,
-    });
-    updateObj.tlm = toc ? toc : '';
+
+  //检测该专业下发表文章或回复的通告是否需要顶贴
+  const permission = await ForumModel.isTopPostCore({
+    fid: thread.mainForumsId[0],
+  });
+  let authorTlm = 0;
+  let otherTlm = 0;
+  let postType = 'post';
+  //文章作者
+  if (!permission.publishNoticeByAuthor) {
+    authorTlm = Math.max(thread.tlm, lm.toc);
   } else {
-    updateObj.tlm = lm ? lm.toc : '';
+    const latestNotice = await NewNoticesModel.findOne(
+      {
+        uid: thread.uid,
+        pid: { $in: [...postIds, thread.oc] },
+      },
+      { toc: 1, pid: 1 },
+    )
+      .sort({ toc: -1 })
+      .lean();
+    if (latestNotice && latestNotice.toc > lm.toc) {
+      //判断是文章还是回复
+      authorTlm = latestNotice.toc;
+      postType = thread.oc === latestNotice.pid ? 'thread' : 'post';
+    } else {
+      authorTlm = Math.max(thread.tlm, lm.toc);
+    }
   }
+  //其他人
+  if (!permission.publishNoticeByOther) {
+    otherTlm = Math.max(thread.tlm, lm.toc);
+  } else {
+    const latestNotice = await NewNoticesModel.findOne({
+      uid: { $ne: thread.uid },
+      pid: { $in: postIds },
+    })
+      .sort({ toc: -1 })
+      .lean();
+    if (latestNotice && latestNotice.toc > lm.toc) {
+      otherTlm = latestNotice.toc;
+    } else {
+      otherTlm = Math.max(thread.tlm, lm.toc);
+    }
+  }
+
+  if (authorTlm === otherTlm) {
+    updateObj.tlm = authorTlm ? authorTlm : '';
+  } else if (authorTlm > otherTlm && postType === 'thread') {
+    updateObj.tlm = authorTlm;
+    updateObj.ttoc = authorTlm;
+  } else if (authorTlm > otherTlm && postType === 'post') {
+    updateObj.tlm = authorTlm;
+  } else {
+    updateObj.tlm = otherTlm;
+  }
+
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;
-  updateObj.isNewThread = thread.isNewThread;
   updateObj.count = await PostModel.countDocuments({
     tid: thread.tid,
     type: 'post',
@@ -1649,7 +1700,6 @@ threadSchema.statics.extendArticlesPanelData = async function (threads) {
       oc: thread.oc,
       id: thread.tid,
       pid: thread.oc,
-      isNewThread: thread.isNewThread,
       user,
       pages,
       content,
@@ -1944,7 +1994,6 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
       reviewed: true,
       toDraft: { $ne: true },
       type: 'thread',
-      originState: { $nin: ['0', '', '1', '2'] },
     },
     { pid: 1 },
   ).lean();

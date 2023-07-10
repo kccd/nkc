@@ -13,6 +13,8 @@ const postRouter = require('./post');
 const toppedRouter = require('./topped');
 const authorRouter = require('./author');
 const editNoticeRouter = require('./editNotice');
+const shieldNotice = require('./shieldNotice');
+const checkNotice = require('./checkNotice');
 const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
@@ -354,6 +356,7 @@ router
       cover = '',
       noticeContent,
       _id,
+      type,
     } = post;
     const { pid } = ctx.params;
     const { state, data, db, nkcModules } = ctx;
@@ -449,8 +452,17 @@ router
 
     // 生成历史记录
     const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
+
     // 如果有文章新通告就生成新通告记录表
     if (noticeContent) {
+      // 检测是否有发布文章通告的权限
+      const checkObj = { uid: state.uid, id: pid };
+      if (type === 'modifyPost') {
+        checkObj.type = 'post';
+      } else if (type === 'modifyThread') {
+        checkObj.type = 'thread';
+      }
+      await db.ForumModel.checkPublishNoticeInRoute(checkObj);
       //检测文章通告内容是否有敏感词
       await sensitiveDetectionService.threadNoticeDetection(noticeContent);
       //检测文章通告内容是否超过字数限制
@@ -459,27 +471,21 @@ router
       const isExist = await db.NewNoticesModel.find({ pid }, { nid: 1 }).sort({
         toc: -1,
       });
+      const { cv } = await db.HistoriesModel.findOnly({ _id: hid }, { cv: 1 });
       if (isExist.length !== 0) {
         const { nid } = isExist[0];
         await db.NewNoticesModel.updateOne(
           { nid },
           {
             $set: {
-              hid,
+              cv,
             },
           },
         );
       }
       let noticeObj = { pid, uid: state.uid, noticeContent };
       //存储文章通告数据
-      const { toc } = await db.NewNoticesModel.extendNoticeContent(noticeObj);
-      if (toc && targetThread) {
-        const { tid } = targetThread;
-        await db.NewNoticesModel.updateThreadStatus(tid, true);
-      }
-    } else {
-      const { tid } = targetThread;
-      await db.NewNoticesModel.updateThreadStatus(tid, false);
+      await db.NewNoticesModel.extendNoticeContent(noticeObj);
     }
     // 判断文本是否有变化，有变化版本号加1
     /*if(c !== targetPost.c) {
@@ -684,5 +690,12 @@ router
     '/:nid/editNotice',
     editNoticeRouter.routes(),
     editNoticeRouter.allowedMethods(),
-  );
+  )
+  .use(
+    '/:nid/shieldNotice',
+    shieldNotice.routes(),
+    shieldNotice.allowedMethods(),
+  )
+  .use('/:pid/checkNotice', checkNotice.routes(), checkNotice.allowedMethods());
+
 module.exports = router;

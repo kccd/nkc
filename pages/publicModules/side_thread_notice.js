@@ -1,6 +1,11 @@
 //编辑文章通告内容
-import { sweetSuccess } from '../lib/js/sweetAlert';
-
+import {
+  sweetConfirm,
+  sweetError,
+  sweetPrompt,
+  sweetSuccess,
+} from '../lib/js/sweetAlert';
+//编辑通告内容
 async function editNotice(target, nid) {
   const threadNotice = target.closest('.thread-notice');
   const spanElement = threadNotice.querySelector('.thread-notice-content span');
@@ -11,6 +16,30 @@ async function editNotice(target, nid) {
   );
   if (newNoticeContent) {
     spanElement.textContent = newNoticeContent;
+  }
+}
+//屏蔽通告内容
+async function shieldNotice(target, nid, isShield) {
+  if (isShield) {
+    sweetPrompt('屏蔽原因').then((reason) => {
+      nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield, reason })
+        .then(() => {
+          sweetSuccess('屏蔽成功');
+        })
+        .catch((err) => {
+          sweetError(err);
+        });
+    });
+  } else {
+    sweetConfirm('是否解除屏蔽').then(() => {
+      nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield })
+        .then(() => {
+          sweetSuccess('解除屏蔽成功');
+        })
+        .catch((err) => {
+          sweetError(err);
+        });
+    });
   }
 }
 
@@ -33,6 +62,7 @@ function sweetEditNotice(title, nid, content = '') {
       preConfirm: (text) => {
         return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
           noticeContent: text,
+          type: 'thread',
         })
           .then(() => {
             resolve(text);
@@ -48,4 +78,4 @@ function sweetEditNotice(title, nid, content = '') {
     });
   });
 }
-export { editNotice };
+export { editNotice, shieldNotice };

@@ -57,6 +57,12 @@ module.exports = {
     editNotice: {
       PUT: 'editNoticePut',
     },
+    shieldNotice: {
+      PUT: 'editNoticePut',
+    },
+    checkNotice: {
+      GET: 'checkNoticeGet',
+    },
     topped: {
       POST: 'topPost',
     },

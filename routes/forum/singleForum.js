@@ -94,7 +94,6 @@ router
       options.surveyId = surveyDB._id;
     }
     const _post = await db.ThreadModel.postNewThread(options);
-
     if (surveyDB) {
       await surveyDB.updateOne({ pid: _post.pid });
     }
