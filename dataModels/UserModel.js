@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
 const redisClient = require('../settings/redisClient');
 const { defaultCerts } = require('../settings/userCerts');
+const filterResult = require('../nkcModules/xssFilters/filterResult');
 const {
   ThrowCommonError,
   ThrowServerInternalError,
