@@ -14969,11 +14969,9 @@
     me.addshortcutkey({
       "Undo": "ctrl+90", //undo
       "Redo": "ctrl+89" //redo
-
     });
     var isCollapsed = true;
     me.addListener('keydown', function (type, evt) {
-
       var me = this;
       var keyCode = evt.keyCode || evt.which;
       if (!keys[keyCode] && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && !evt.altKey) {

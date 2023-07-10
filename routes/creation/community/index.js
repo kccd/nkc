@@ -14,5 +14,5 @@ router
   })
   .get('/note', async (ctx, next) => {
     await next();
-  })
+  });
 module.exports = router;
