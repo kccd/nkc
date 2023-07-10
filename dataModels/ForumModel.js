@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const client = settings.redisClient;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
 const { ThrowCommonError } = require('../nkcModules/error');
+const { getHTMLText } = require('../nkcModules/html');
 const forumSchema = new Schema(
   {
     abbr: {
@@ -2323,15 +2324,33 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   }
 };
 
+forumSchema.statics.checkGlobalPostAndForumWritePermission = async (
+  uid,
+  fid,
+) => {
+  const UserModel = mongoose.model('users');
+  const ForumModel = mongoose.model('forums');
+  const { getHTMLText } = require('../nkcModules/html');
+  const type = 'thread';
+  const { permit, warning } = await UserModel.getUserGlobalPostPermissionStatus(
+    uid,
+    type,
+  );
+  if (!permit) {
+    ThrowCommonError(403, getHTMLText(warning.join('\n')));
+  }
+  await ForumModel.checkWritePermission(uid, fid);
+};
+
 /*
- * 验证用户是否能在指定专业发表文章
+ * 验证用户是否能在指定专业发表文章，不包含全局的发表判断
+ * 包含全局的发表判断请使用 checkGlobalPostAndForumWritePermission
  * @param {[String]} 专业ID组成的数组
  * @param {String} uid 用户ID
  * @author pengxiguaa 2020/8/25
  * */
 forumSchema.statics.checkWritePermission = async (uid, fid) => {
   const ForumModel = mongoose.model('forums');
-  await ForumModel.checkGlobalPostPermission(uid, 'thread');
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
@@ -2393,6 +2412,22 @@ forumSchema.statics.checkEditPostPositionInRoute = async ({
   }
 };
 
+forumSchema.statics.checkGlobalPostAndForumWritePostPermission = async (
+  uid,
+  fid,
+) => {
+  const ForumModel = mongoose.model('forums');
+  const UserModel = mongoose.model('users');
+  const { warning, permit } = await UserModel.getUserGlobalPostPermissionStatus(
+    uid,
+    'post',
+  );
+  if (!permit) {
+    ThrowCommonError(403, getHTMLText(warning.join('\n')));
+  }
+  await ForumModel.checkWritePostPermission(uid, fid);
+};
+
 /*
  * 验证用户是否能在指定的专业改变文章回复的顺序
  * @param {[String]} 专业ID组成的数组
@@ -2401,7 +2436,6 @@ forumSchema.statics.checkEditPostPositionInRoute = async ({
  * */
 forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
   const ForumModel = mongoose.model('forums');
-  await ForumModel.checkGlobalPostPermission(uid, 'post');
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
@@ -2411,6 +2445,7 @@ forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
  * 根据后台管理-发表设置验证用户是拥有发表权限
  * @param {String} uid 用户ID
  * @param {String} postType 内容类型 post: 回复、评论, thread: 文章
+ * 2023/07/06 此方法已废弃，被 UserModel.statics.getUserGlobalPostPermissionStatus 替代
  * */
 forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
   const UserModel = mongoose.model('users');
@@ -2429,11 +2464,11 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
     },
   }[type];
   if (!settingsType) {
-    throwErr(500, `发表类型错误 type: ${type}`);
+    ThrowCommonError(500, `发表类型错误 type: ${type}`);
   }
   const user = await UserModel.findOne({ uid });
   if (!user) {
-    throwErr(500, `未找到用户 uid: ${uid}`);
+    ThrowCommonError(500, `未找到用户 uid: ${uid}`);
   }
   await user.ensureUserInfo();
   const postSettings = await SettingModel.getSettings('post');
@@ -2443,7 +2478,7 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
   const userLevel = await user.extendAuthLevel();
   authLevelMin = Number(authLevelMin);
   if (userLevel < authLevelMin) {
-    throwErr(
+    ThrowCommonError(
       403,
       `身份认证等级未达要求，发表${settingsType.name}至少需要完成身份认证 ${authLevelMin}`,
     );
@@ -2457,10 +2492,30 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
   if ((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) {
     // a, b考试未开启或用户未通过
     if (!status) {
-      throwErr(403, '权限不足，请提升账号等级');
+      // 关闭了未考试的发表权限
+      if (volumeA) {
+        if (!user.volumeA) {
+          ThrowCommonError(
+            403,
+            `由于近期发布骚扰性提问的新账号较多，为了改善原创用户体验，现要求所有用户必须通过A卷考试以后才能发表，请在 <a href="https://www.kechuang.org/exam" target="_blank">考试系统</a> 参加A卷或B卷考试，通过任何一门考试即可获得发表权限。`,
+          );
+        }
+      } else if (volumeB) {
+        if (!user.volumeB) {
+          ThrowCommonError(
+            403,
+            `由于近期发布骚扰性提问的新账号较多，为了改善原创用户体验，现要求用户必须通过B卷考试以后才能发表，请在 <a href="https://www.kechuang.org/exam" target="_blank">考试系统</a> 参加B卷考试，通过任何一门考试即可获得发表权限。`,
+          );
+        }
+      } else {
+        ThrowCommonError(403, '发表功能已关闭');
+      }
     }
     if (!unlimited && countLimit <= todayCount) {
-      throwErr(403, `今日发表${settingsType.name}次数已用完，请明天再试。`);
+      ThrowCommonError(
+        403,
+        `今日发表${settingsType.name}次数已用完，请明天再试。`,
+      );
     }
   }
   // 发表回复时间、条数限制
@@ -2479,7 +2534,7 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
     postTimeLimit = postToForumTimeLimit;
   }
   if (todayCount >= postCountLimit) {
-    throwErr(
+    ThrowCommonError(
       400,
       `你当前的账号等级每天最多只能发表${postCountLimit}篇${settingsType.name}，请明天再试。`,
     );
@@ -2493,7 +2548,7 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
     { pid: 1 },
   );
   if (latestPost) {
-    throwErr(
+    ThrowCommonError(
       400,
       `你当前的账号等级限定发表${settingsType.name}间隔时间不能小于${postTimeLimit}分钟，请稍后再试。`,
     );
@@ -2501,7 +2556,10 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
   if (await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
     const authSettings = await SettingModel.getSettings('auth');
     if (authSettings.verifyPhoneNumber.type === 'disablePublish') {
-      throwErr(403, authSettings.verifyPhoneNumber.disablePublishContent);
+      ThrowCommonError(
+        403,
+        authSettings.verifyPhoneNumber.disablePublishContent,
+      );
     }
   }
 };

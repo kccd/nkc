@@ -523,8 +523,8 @@ block content
               else
                 //- 发表权限判断
                 //- warning中的内容为html，由服务器根据发表设置动态渲染
-                if data.postPermission.warning
-                  .m-b-1.text-danger!=data.postPermission.warning
+                if data.postPermission.warning && data.postPermission.warning.length > 0
+                  .m-b-1.text-danger!=data.postPermission.warning.join('<br/>')
                 //- 是否显示编辑器
                 if data.postPermission.permit
                   -const blacklistInfo = data.blacklistInfo;
