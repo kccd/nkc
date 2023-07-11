@@ -13,12 +13,12 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                   .shield-box-span=`当前通告已经屏蔽 原因：${notice.reason}`
                 else
                   .shield-box-span=`当前通告已经屏蔽`
-              .thread-notice-head.m-b-05(
-                data-global-mouseover="showUserPanel"
-                data-global-mouseout="hideUserPanel"
-                data-global-data=objToStr({uid: notice.user.uid })
-                )
-                img.notice-user-banned.m-r-05(src=notice.user.avatar)
+              .thread-notice-head.m-b-05
+                img.notice-user-banned.m-r-05(
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  data-global-data=objToStr({ uid: notice.user.uid })
+                  src=notice.user.avatar)
                 +fromNow(notice.toc)
                 if threadHistory !== null && notice.hid
                   a.notice-float(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情

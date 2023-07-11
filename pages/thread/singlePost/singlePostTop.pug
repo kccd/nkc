@@ -8,12 +8,12 @@ if !isIncluded('singlePostTop')
             .shield-box-span(v-if="notice.status === 'shield'" )
               span(v-if="notice.reason" ) 当前通告已经屏蔽 原因：{{ notice.reason }}
               span(v-else) 当前通告已经屏蔽
-            .post-notice-head.m-b-05(
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
-              :data-global-data="getObjToStr({uid:notice.user.uid})"
-              )
-              img.notice-user-banned.m-r-05(:src="notice.user.avatar")
+            .post-notice-head.m-b-05
+              img.notice-user-banned.m-r-05(
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="getObjToStr({uid:notice.user.uid})"
+                :src="notice.user.avatar")
               From-Now(:time="notice.toc")
               a.notice-float(v-if="postHistory !==null && notice.hid " :href="`/p/${notice.pid}/history?t=detail&c=${notice.hid}`") 详情
               a.notice-float(v-if="canEditNotice && notice.status === 'normal'" @click='editNotice(notice.nid,notice.noticeContent)') 编辑
