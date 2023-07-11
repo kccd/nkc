@@ -70,8 +70,8 @@ vueInstance = new Vue({
               noticeContent: text,
               type: 'post',
             })
-              .then(() => {
-                resolve(text);
+              .then((res) => {
+                resolve(res.newNotice);
               })
               .catch(({ error }) => {
                 Swal.showValidationMessage(error);
@@ -93,45 +93,69 @@ vueInstance = new Vue({
       if (newNoticeContent) {
         this.postNotices.forEach((notice) => {
           if (notice.nid === nid) {
-            notice.noticeContent = newNoticeContent;
+            notice.noticeContent = newNoticeContent.noticeContent;
+            notice.nid = newNoticeContent.nid;
           }
         });
       }
     },
     async disabledNotice(nid, isShield) {
-      if (isShield) {
-        sweetPrompt('屏蔽原因').then((reason) => {
-          nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield, reason })
-            .then(() => {
+      return new Promise((resolve) => {
+        if (isShield) {
+          Swal.fire({
+            title: '屏蔽公告',
+            input: 'textarea',
+            inputAttributes: {
+              autocapitalize: 'off',
+              maxlength: 200,
+            },
+            inputValue: '',
+            allowOutsideClick: () => !Swal.isLoading(),
+            showCancelButton: true,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            showLoaderOnConfirm: true,
+            preConfirm: (reason) => {
+              return nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', {
+                isShield,
+                reason,
+              })
+                .then(() => {
+                  resolve(reason);
+                })
+                .catch(({ error }) => {
+                  Swal.showValidationMessage(error);
+                });
+            },
+          }).then((result) => {
+            if (result.value) {
               this.postNotices.forEach((item) => {
                 if (item.nid === nid) {
                   item.status = 'shield';
-                  item.reason = reason;
+                  item.reason = result.value;
                 }
               });
               sweetSuccess('屏蔽成功');
-            })
-            .catch((err) => {
-              sweetError(err);
-            });
-        });
-      } else {
-        sweetConfirm('是否解除屏蔽').then(() => {
-          nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield })
-            .then(() => {
-              this.postNotices.forEach((item) => {
-                if (item.nid === nid) {
-                  item.status = 'normal';
-                  item.reason = '';
-                }
+            }
+          });
+        } else {
+          sweetConfirm('是否解除屏蔽').then(() => {
+            nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield })
+              .then(() => {
+                this.postNotices.forEach((item) => {
+                  if (item.nid === nid) {
+                    item.status = 'normal';
+                    item.reason = '';
+                  }
+                });
+                sweetSuccess('解除屏蔽成功');
+              })
+              .catch((err) => {
+                sweetError(err);
               });
-              sweetSuccess('解除屏蔽成功');
-            })
-            .catch((err) => {
-              sweetError(err);
-            });
-        });
-      }
+          });
+        }
+      });
     },
   },
 });

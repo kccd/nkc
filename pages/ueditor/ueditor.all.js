@@ -14919,7 +14919,8 @@
 
     me.undoManger = new UndoManager();
     me.undoManger.editor = me;
-
+    
+    
     function saveScene() {
       this.undoManger.save();
     }
@@ -29672,7 +29673,6 @@
           }
           if (editor.options.scaleEnabled) {
             me[(editor.queryCommandState('scale') == -1 ? 'dis' : 'en') + 'ableScale']();
-
           }
         });
         var popup = new baidu.editor.ui.Popup({

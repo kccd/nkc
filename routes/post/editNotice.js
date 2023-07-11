@@ -6,7 +6,7 @@ const {
 } = require('../../services/sensitive/sensitiveDetection.service');
 const { checkString } = require('../../nkcModules/checkData');
 router.put('/', async (ctx, next) => {
-  const { db, body, params, state } = ctx;
+  const { db, body, params, state, data } = ctx;
   const { nid } = params;
   const newNoticeContent = body.noticeContent;
   const { type } = body;
@@ -53,7 +53,7 @@ router.put('/', async (ctx, next) => {
   );
 
   //并创建一个新的通告，toc时间不改变
-  await db.NewNoticesModel.extendNoticeContent({
+  data.newNotice = await db.NewNoticesModel.extendNoticeContent({
     pid,
     uid: state.uid,
     noticeContent: newNoticeContent,

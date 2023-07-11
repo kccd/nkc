@@ -20,10 +20,13 @@
         input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
         span
           | 新版本公告
+      h5.text-danger(v-if="checkNewNotice&&noticesExplain") 温馨提示：
+      .pre-wrap(v-if="checkNewNotice&&noticesExplain") {{ noticesExplain }}
 
       div(v-if="checkNewNotice").m-b-1
         textarea.form-control( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
-        p.warning(v-if="noticeContent?noticeContent.length>=200:noticeContent" ) 新版本公告内容不能超过 200 个字
+        p.text-right {{noticeContent?noticeContent.length:0}}/200
+        p.warning(v-if="noticeContent?noticeContent.length>=200:''" ) 新版本公告内容不能超过 200 个字
       label
         input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
         span
@@ -68,6 +71,9 @@ export default {
     },
     publishNotice: {
       type: Boolean
+    },
+    noticesExplain:{
+      type: String
     }
   },
   data: () => ({
