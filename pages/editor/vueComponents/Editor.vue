@@ -96,6 +96,7 @@
         @remove-editor="removeEditor",
         @cover-change="coverChange",
         :allow-save="allowSave"
+        :noticesExplain="pageState.editorSettings && pageState.editorSettings.notices"
       )
         //- @save-draft-success="saveDraftSuccess"
 
@@ -157,6 +158,7 @@ export default {
     allowSave: true,
     initEditorContent: false,
     publishNotice: false,
+    noticesExplain: ''
   }),
   customOptions: {
     saveDraftIndex: 0,

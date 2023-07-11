@@ -19,6 +19,11 @@ block eContent
             vue-markdown(:source="editorSettings.onEditNotes")
 
           .form-group
+            label 发布新版本公告提示
+            textarea.form-control(rows=5 v-model="editorSettings.notices")
+            vue-markdown(:source="editorSettings.notices")
+
+          .form-group
             button.btn.btn-primary.btn-sm(@click="submit") 保存
 block scripts
-  +includeJS("/experimental/settings/editor/editor.js")            
+  +includeJS("/experimental/settings/editor/editor.js")
