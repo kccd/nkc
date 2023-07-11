@@ -36,15 +36,16 @@ module.exports = async (ctx, next) => {
   const lock = await nkcModules.redLock.lock(`page:cache:lock:${url}`, 30000);
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
+  const cachedHTML = await redisClient.getAsync(dataKey);
   if (
     !toc ||
+    !cachedHTML ||
     ctx.reqTime.getTime() - Number(toc) >
       cacheSettings.visitorPageCacheTime * 1000
   ) {
     state.cachePage = true;
   } else {
     await lock.unlock();
-    const html = await redisClient.getAsync(dataKey);
     // 记录并在控制台打印日志
     ctx.set('Content-Type', 'text/html');
     ctx.logIt = true;
@@ -54,7 +55,7 @@ module.exports = async (ctx, next) => {
     if (tid !== url_) {
       await db.ThreadModel.updateOne({ tid }, { $inc: { hits: 1 } });
     }
-    return (ctx.body = html);
+    return (ctx.body = cachedHTML);
   }
   try {
     await next();
@@ -68,8 +69,17 @@ module.exports = async (ctx, next) => {
     return;
   }
   const html = ctx.body.toString();
-  await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
-  await redisClient.setAsync(dataKey, html);
+  // html页面内容存入redis，并且设置一个过期时间，减少redis的内存占用
+  await redisClient.setWithTimeoutAsync(
+    tocKey,
+    ctx.reqTime.getTime(),
+    cacheSettings.visitorPageCacheTime,
+  );
+  await redisClient.setWithTimeoutAsync(
+    dataKey,
+    html,
+    cacheSettings.visitorPageCacheTime,
+  );
   await lock.unlock();
   setImmediate(async () => {
     // 生成缓存记录
