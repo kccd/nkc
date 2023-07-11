@@ -104,6 +104,7 @@
           order: Number, // 上传的临时ID，非必要
         }*/
       ],
+      dragEventInnerContentMark: 'nkc:editor:inner:content',
       socketHandleTimer: null,
       logged: !!state.uid,
       socket: null,
@@ -175,6 +176,7 @@
         this.removeEditorAfterPasteEvent();
         this.removeEditorBeforePasteEvent();
         this.removeEditorDropImageEvent();
+        this.removeEditorDragStartEvent();
         this.editor.destroy();
       }
       this.removeNoticeEvent();
@@ -265,6 +267,7 @@
               self.initEditorBeforePasteEvent();
               self.initEditorAfterPasteEvent();
               self.initEditorPasteImageEvent();
+              self.initEditorDragStartEvent();
               self.initEditorDropImageEvent();
             }, 500)
           });
@@ -429,6 +432,7 @@
           });
       },
       editorPasteImageEventHandle(event) {
+        // 在这里处理粘贴事件
         if(IsFirefox()) {
           setTimeout(() => {
             try{
@@ -440,42 +444,65 @@
           return;
         }
         const items = event.clipboardData.items;
-        this.insertImageAndUploadResourceByDataTransferItemList(items);
-      },
-      editorDropImageEventHandle(event) {
-        const items = event.dataTransfer.items;
-        const files = event.dataTransfer.files;
-        if(files.length > 0) {
-          this.insertImageAndUploadResourceByDataTransferFileList(files);
-        } else if(items.length > 0) {
-          this.insertImageAndUploadResourceByDataTransferItemList(items);
-        }
-        event.preventDefault();
-      },
-      insertImageAndUploadResourceByDataTransferItemList(dataTransferItemList) {
+
         const files = [];
 
-        for(const item of dataTransferItemList) {
+        for(const item of items) {
           if(item.kind === 'file') {
             if(item.type.indexOf('image/') === 0) {
               files.push(item.getAsFile())
             }
           } else if(item.kind === 'string') {
             // 粘贴的符文本，本函数不做任何处理，交由ueditor自行处理
+            // 到此，由于浏览器默认会放一张图片到编辑器，所以如果不reture则会塞入重复的图片
             return;
           }
         }
-
         this.uploadImageFiles(files);
-      },
 
-      insertImageAndUploadResourceByDataTransferFileList(dataTransferFileList) {
-        const files = [];
-        for(const file of dataTransferFileList) {
-          files.push(file);
+      },
+      editorDropImageEventHandle(event) {
+        // 拖拽事件有一个缺陷，就是拖动富文本内容到编辑器时，无法识别富文本中的图片
+        // 导致图片会以默认的方式插入到编辑器，无法触发外链图片的自动上传
+        // 所以如果检测到拖动了不含图片的内容到编辑器，则延迟启动一次外链图片检测
+        if(event.dataTransfer.getData('text/plain') === this.dragEventInnerContentMark) {
+          // 拖动的是内部内容，不需要做任何处理
+          // 不然拖动编辑器内的图片时会重复上传
+          return;
         }
-        this.uploadImageFiles(files);
+        const files = [];
+
+        let disableEvent = false;
+
+        for(const item of event.dataTransfer.items) {
+          if(item.kind === 'file') {
+            if (!disableEvent) {
+              disableEvent = true;
+              // 如果想要实现拖拽图片到编辑器功能，下面这一句少不了
+              // 否则拖动图片到浏览器时，浏览器仅会在新标签页打开图片
+              event.preventDefault();
+            }
+
+            if(item.type.indexOf('image/') === 0) {
+              files.push(item.getAsFile())
+            }
+          }
+        }
+        if (files.length > 0) {
+          this.uploadImageFiles(files);
+        } else {
+          // 没有检测到图片内容，可能拖动的是富文本
+          // 延迟启动外链图片检测
+          setTimeout(() => {
+            try{
+              this.catchRemoteImage();
+            } catch(err) {
+              console.log(err);
+            }
+          }, 1000);
+        }
       },
+
 
       uploadImageFiles(files = []) {
         for(let i = 0; i < files.length; i ++) {
@@ -511,6 +538,15 @@
       },
       removeEditorPasteImageEvent(){
         this.editor.document.removeEventListener('paste', this.editorPasteImageEventHandle);
+      },
+      initEditorDragStartEvent() {
+        this.editor.document.addEventListener('dragstart', this.editorDragStartEvent);
+      },
+      removeEditorDragStartEvent() {
+        this.editor.document.removeEventListener('dragstart', this.editorDragStartEvent);
+      },
+      editorDragStartEvent(event) {
+        event.dataTransfer.setData('text/plain', this.dragEventInnerContentMark)
       },
       initEditorDropImageEvent() {
         this.editor.document.addEventListener('drop', this.editorDropImageEventHandle);
