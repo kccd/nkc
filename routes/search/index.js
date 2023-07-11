@@ -14,7 +14,7 @@ router.get('/', async (ctx, next) => {
   });
 
   const { nkcRender } = nkcModules;
-  let { page = 0, t = '', c, d, form = '' } = query;
+  let { page = 0, t = '', c = '', d = '', form = '' } = query;
   const { user } = data;
   // 通过mongodb精准搜索用户名
   let targetUser,

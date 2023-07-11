@@ -16,17 +16,18 @@
           | 匿名发表
           span.text-danger(v-if="!allowedAnonymous") (所选专业分类不支持匿名发表)
     .checkbox
-      label(style="margin-bottom: 0.5rem" v-if="(type==='modifyThread'||type==='modifyPost')&&publishNotice" )
+      label.m-b-05(v-if="(type==='modifyThread'||type==='modifyPost')&&publishNotice" )
         input.agreement(type="checkbox", v-model="checkNewNotice", :value="false")
         span
           | 新版本公告
-      h5.text-danger(v-if="checkNewNotice&&noticesExplain") 温馨提示：
-      .pre-wrap(v-if="checkNewNotice&&noticesExplain") {{ noticesExplain }}
+        span(v-if="checkNewNotice") （{{noticeContent?noticeContent.length:0}}/200）
+      //- h5.text-danger(v-if="checkNewNotice&&noticesExplain") 温馨提示：
+      .notice-explain.pre-wrap.m-b-05(v-if="checkNewNotice&&noticesExplain") {{ noticesExplain }}
 
       div(v-if="checkNewNotice").m-b-1
-        textarea.form-control( placeholder='请输入新版本公告' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
-        p.text-right {{noticeContent?noticeContent.length:0}}/200
-        p.warning(v-if="noticeContent?noticeContent.length>=200:''" ) 新版本公告内容不能超过 200 个字
+        textarea.form-control( rows=4 placeholder='请输入公告内容' class='check-area' :value="noticeContent"  @input="handleNoticeContentChange" maxlength="200")
+        //- div 字数限制 {{noticeContent?noticeContent.length:0}}/200
+        //- p.warning(v-if="noticeContent?noticeContent.length>=200:''" ) 新版本公告内容不能超过 200 个字
       label
         input.agreement(type="checkbox", v-model="checkProtocol", :value="true")
         span
@@ -686,5 +687,9 @@ export default {
   100% {
     transform: translateX(-2px);
   }
+}
+.notice-explain{
+  border-radius: 3px;
+  color: #a94442;
 }
 </style>
