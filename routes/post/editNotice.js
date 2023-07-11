@@ -35,7 +35,7 @@ router.put('/', async (ctx, next) => {
   }
   //检测文章通告内容是否有更改
   else if (newNoticeContent === noticeContent) {
-    ThrowCommonError(403, '您的通告内容没有任何更改');
+    return;
   }
   //检测文章通告内容是否有敏感词
   await sensitiveDetectionService.threadNoticeDetection(newNoticeContent);
