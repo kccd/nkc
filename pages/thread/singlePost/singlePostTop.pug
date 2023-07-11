@@ -9,16 +9,18 @@ if !isIncluded('singlePostTop')
               span(v-if="notice.reason" ) 当前通告已经屏蔽 原因：{{ notice.reason }}
               span(v-else) 当前通告已经屏蔽
             .post-notice-head.m-b-05
-              img.notice-user-banned.m-r-05(
-                data-global-mouseover="showUserPanel"
-                data-global-mouseout="hideUserPanel"
-                :data-global-data="getObjToStr({uid:notice.user.uid})"
-                :src="notice.user.avatar")
+              a(:href="`/u/${notice.user.uid}/profile/moment`")
+                img.notice-user-banned.m-r-05(
+                  data-global-mouseover="showUserPanel"
+                  data-global-mouseout="hideUserPanel"
+                  :data-global-data="getObjToStr({uid:notice.user.uid})"
+                  :src="notice.user.avatar")
               From-Now(:time="notice.toc")
-              a.notice-float(v-if="postHistory !==null && notice.hid " :href="`/p/${notice.pid}/history?t=detail&c=${notice.hid}`") 详情
-              a.notice-float(v-if="canEditNotice && notice.status === 'normal'" @click='editNotice(notice.nid,notice.noticeContent)') 编辑
-              a.notice-float(v-if="shieldNotice && notice.status === 'normal'" @click='disabledNotice(notice.nid,true)') 屏蔽
-              a.notice-float(v-if="shieldNotice && notice.status === 'shield'" @click="disabledNotice(notice.nid,false)") 解除屏蔽
+              .notice-float
+                a.m-r-05(v-if="shieldNotice && notice.status === 'normal'" @click='disabledNotice(notice.nid,true)') 屏蔽
+                a.m-r-05(v-if="shieldNotice && notice.status === 'shield'" @click="disabledNotice(notice.nid,false)") 解除屏蔽
+                a.m-r-05(v-if="canEditNotice && notice.status === 'normal'" @click='editNotice(notice.nid,notice.noticeContent)') 编辑
+                a.m-r-05(v-if="postHistory !==null && notice.hid " :href="`/p/${notice.pid}/history?t=detail&c=${notice.hid}`") 详情
             .post-notice-content
               span {{notice.noticeContent}}
         .empty(v-if="postNotices.length ===0") ~~空空如也
