@@ -1,13 +1,13 @@
 //- 字段详情/pages/thread/singlePost/singlePost.pug
 if !isIncluded('singlePostTop')
   div(id='notice-dialog')
-    Draggable(title='回复公告' ref="noticeDialog" max-Width="40rem" )
+    Draggable(title='回复新版本公告' ref="noticeDialog" max-Width="40rem" )
       div(slot="content" id='notice-content')
         div(v-for="notice in postNotices" v-if="postNotices.length !==0")
           .post-notice(:class="notice.status === 'shield' ? 'shield-box': ''")
             .shield-box-span(v-if="notice.status === 'shield'" )
-              span(v-if="notice.reason" ) 当前通告已经屏蔽 原因：{{ notice.reason }}
-              span(v-else) 当前通告已经屏蔽
+              span(v-if="notice.reason" ) 已屏蔽 原因：{{ notice.reason }}
+              span(v-else) 已屏蔽
             .post-notice-head.m-b-05
               a(:href="`/u/${notice.user.uid}/profile/moment`")
                 img.notice-user-banned.m-r-05(
@@ -17,9 +17,9 @@ if !isIncluded('singlePostTop')
                   :src="notice.user.avatar")
               From-Now(:time="notice.toc")
               .notice-float
-                a.m-r-05(v-if="shieldNotice && notice.status === 'normal'" @click='disabledNotice(notice.nid,true)') 屏蔽
-                a.m-r-05(v-if="shieldNotice && notice.status === 'shield'" @click="disabledNotice(notice.nid,false)") 解除屏蔽
-                a.m-r-05(v-if="canEditNotice && notice.status === 'normal'" @click='editNotice(notice.nid,notice.noticeContent)') 编辑
+                a.m-r-05(v-if="shieldNotice && notice.status === 'normal'" @click='disabledNotice(notice.pid, notice.nid,true)') 屏蔽
+                a.m-r-05(v-if="shieldNotice && notice.status === 'shield'" @click="disabledNotice(notice.pid, notice.nid,false)") 解除屏蔽
+                a.m-r-05(v-if="canEditNotice && notice.status === 'normal'" @click='editNotice(notice.pid, notice.nid,notice.noticeContent)') 编辑
                 a.m-r-05(v-if="postHistory !==null && notice.hid " :href="`/p/${notice.pid}/history?t=detail&c=${notice.hid}`") 详情
             .post-notice-content
               span {{notice.noticeContent}}
@@ -57,7 +57,7 @@ if !isIncluded('singlePostTop')
           if cancelTopped
             span.single-post-cancel-topped(onclick=`topPost('${pid}', false)`) 取消置顶
           if repliesWithNotice && repliesWithNotice.includes(pid)
-            i.fa.fa-info-circle.new-post-notice( aria-hidden="true" title="点击查看公告")
+            i.fa.fa-bookmark-o.new-post-notice( aria-hidden="true" title="点击查看新版本公告")
         .single-post-toc
           +fromNow(toc)
           if tlm

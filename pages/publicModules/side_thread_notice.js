@@ -1,24 +1,31 @@
 //编辑文章通告内容
 import { sweetConfirm, sweetError, sweetSuccess } from '../lib/js/sweetAlert';
+import { nkcAPI } from '../lib/js/netAPI';
+
 //编辑通告内容
 async function editNotice(target) {
   const threadNotice = target.closest('.thread-notice');
   const oldNid = threadNotice.getAttribute('data-nid');
-  const spanElement = threadNotice.querySelector('.thread-notice-content span');
-  const { noticeContent, nid } = await sweetEditNotice(
-    '编辑公告',
-    oldNid,
-    spanElement.textContent,
-  );
+  const pid = threadNotice.getAttribute('data-pid');
+  const spanElement = threadNotice.querySelector('.thread-notice-content');
+  const { noticeContent, nid } = await sweetEditNotice({
+    title: '编辑公告',
+    content: spanElement.innerText,
+    nid: oldNid,
+    pid,
+  });
   if (noticeContent) {
     threadNotice.dataset.nid = nid;
-    spanElement.textContent = noticeContent;
+    spanElement.innerText = noticeContent;
   }
 }
 //屏蔽通告内容
 async function shieldNotice(target, isShield) {
   const threadNotice = target.closest('.thread-notice');
   const nid = threadNotice.getAttribute('data-nid');
+  const pid = threadNotice.getAttribute('data-pid');
+  const url = `/p/${pid}/notice/${nid}/disabled`;
+  const method = 'PUT';
   return new Promise((resolve) => {
     if (isShield) {
       Swal.fire({
@@ -35,7 +42,7 @@ async function shieldNotice(target, isShield) {
         cancelButtonText: '取消',
         showLoaderOnConfirm: true,
         preConfirm: (reason) => {
-          return nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', {
+          return nkcAPI(url, method, {
             isShield,
             reason,
           })
@@ -53,7 +60,7 @@ async function shieldNotice(target, isShield) {
       });
     } else {
       sweetConfirm('是否解除屏蔽').then(() => {
-        nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield })
+        nkcAPI(url, method, { isShield })
           .then(() => {
             sweetSuccess('解除屏蔽成功');
           })
@@ -66,7 +73,8 @@ async function shieldNotice(target, isShield) {
 }
 
 //为了考虑到文章通告的内容编辑，定制的一个弹窗，不可复用
-function sweetEditNotice(title, nid, content = '') {
+function sweetEditNotice(props) {
+  const { title, content = '', nid, pid } = props;
   return new Promise((resolve) => {
     Swal.fire({
       title,
@@ -82,7 +90,7 @@ function sweetEditNotice(title, nid, content = '') {
       cancelButtonText: '取消',
       showLoaderOnConfirm: true,
       preConfirm: (text) => {
-        return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
+        return nkcAPI(`/p/${pid}/notice/${nid}/content`, 'PUT', {
           noticeContent: text,
           type: 'thread',
         })

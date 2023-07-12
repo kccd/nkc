@@ -1053,10 +1053,10 @@ threadRouter
 
     //文章通告内容处理
     //屏蔽通告权限
-    let shieldNotice = ctx.permission('editNoticeContent');
+    let shieldNotice = ctx.permission('disablePostNotice');
     //编辑通告权限
     let canEditNotice =
-      thread.uid === state.uid || ctx.permission('editNoticeContent');
+      thread.uid === state.uid || ctx.permission('disablePostNotice');
     const noticeObj = { pid: thread.oc, status: 'normal' };
     if (shieldNotice || thread.uid === state.uid) {
       noticeObj.status = { $in: ['normal', 'shield'] };

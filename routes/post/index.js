@@ -12,9 +12,6 @@ const deleteRouter = require('./delete');
 const postRouter = require('./post');
 const toppedRouter = require('./topped');
 const authorRouter = require('./author');
-const editNoticeRouter = require('./editNotice');
-const shieldNotice = require('./shieldNotice');
-const checkNotice = require('./checkNotice');
 const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
@@ -25,8 +22,9 @@ const { ObjectId } = require('mongodb');
 const {
   sensitiveDetectionService,
 } = require('../../services/sensitive/sensitiveDetection.service');
-const { getLength, checkString } = require('../../nkcModules/checkData');
-const { ThrowCommonError } = require('../../nkcModules/error');
+const noticeRouter = require('./notice');
+const noticesRouter = require('./notices');
+const { checkString } = require('../../nkcModules/checkData');
 
 router
   .use('/', async (ctx, next) => {
@@ -672,16 +670,7 @@ router
   )
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
   .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
-  .use(
-    '/:nid/editNotice',
-    editNoticeRouter.routes(),
-    editNoticeRouter.allowedMethods(),
-  )
-  .use(
-    '/:nid/shieldNotice',
-    shieldNotice.routes(),
-    shieldNotice.allowedMethods(),
-  )
-  .use('/:pid/checkNotice', checkNotice.routes(), checkNotice.allowedMethods());
+  .use('/:pid/notice', noticeRouter.routes(), noticeRouter.allowedMethods())
+  .use('/:pid/notices', noticesRouter.routes(), noticesRouter.allowedMethods());
 
 module.exports = router;

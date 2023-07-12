@@ -1,6 +1,6 @@
-const Router = require('koa-router');
 const tools = require('../../nkcModules/tools');
-const router = new Router();
+const router = require('koa-router')();
+
 router.get('/', async (ctx, next) => {
   const { db, params, data, state } = ctx;
   const { pid } = params;
@@ -8,9 +8,9 @@ router.get('/', async (ctx, next) => {
   const { normal, shield } = await db.NewNoticesModel.noticeStatus();
   const post = await db.PostModel.findOnly({ pid });
   //屏蔽通告权限
-  let shieldNotice = ctx.permission('editNoticeContent');
+  let shieldNotice = ctx.permission('disablePostNotice');
   //编辑通告权限
-  let canEditNotice = post.uid === uid || ctx.permission('editNoticeContent');
+  let canEditNotice = post.uid === uid || ctx.permission('disablePostNotice');
   const noticeObj = { pid, status: normal };
   if (shieldNotice || post.uid === uid) {
     noticeObj.status = { $in: [normal, shield] };

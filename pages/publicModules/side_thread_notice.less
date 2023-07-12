@@ -3,12 +3,7 @@
 
 .thread-notice{
   margin-top: 0 !important;
-  margin-bottom: 2rem;
-  span{
-    font-size: 1rem;
-    color: #9baec8;
-    margin: 0 !important;
-  }
+  margin-bottom: 1rem;
   a{
     font-size: 1rem;
     color: #9baec8;
@@ -17,10 +12,18 @@
   a:hover{
     cursor: pointer;
   }
- .renderedTime{
-   white-space: nowrap;
-   text-overflow: ellipsis;
- }
+  .renderedTime{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .notice-time{
+    display: inline;
+    font-size: 1rem;
+    color: #555;
+  }
+  &:last-child{
+    margin-bottom: 0;
+  }
 }
 
 .notice-user-banned{
@@ -39,9 +42,7 @@
   clear: both;
 }
 .thread-notice-content{
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  padding: 10px;
+  color: #333;
 }
 .shield-box{
   background-color: rgb(255, 219, 213);

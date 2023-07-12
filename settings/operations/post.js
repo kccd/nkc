@@ -1,4 +1,3 @@
-const editNoticeRouter = require('../../routes/post/editNotice');
 module.exports = {
   PARAMETER: {
     GET: 'visitPost',
@@ -54,14 +53,18 @@ module.exports = {
     anonymous: {
       POST: 'anonymousPost',
     },
-    editNotice: {
-      PUT: 'editNoticePut',
+    notice: {
+      PARAMETER: {
+        content: {
+          PUT: 'modifyPostNoticeContent',
+        },
+        disabled: {
+          PUT: 'disablePostNotice',
+        },
+      },
     },
-    shieldNotice: {
-      PUT: 'editNoticePut',
-    },
-    checkNotice: {
-      GET: 'checkNoticeGet',
+    notices: {
+      GET: 'getPostNotices',
     },
     topped: {
       POST: 'topPost',

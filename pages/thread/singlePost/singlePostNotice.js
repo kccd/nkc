@@ -1,6 +1,7 @@
 // 引入 Vue.js 库
 import Vue from 'vue';
 import Draggable from '../../lib/vue/publicVue/draggable.vue';
+import { nkcAPI } from '../../lib/js/netAPI';
 import FromNow from '../../lib/vue/FromNow.vue';
 import {
   sweetConfirm,
@@ -30,7 +31,7 @@ vueInstance = new Vue({
     checkNotice(pid) {
       return Promise.resolve()
         .then(() => {
-          return nkcAPI('/p/' + pid + '/checkNotice', 'GET').then((res) => {
+          return nkcAPI(`/p/${pid}/notices`, 'GET').then((res) => {
             if (res) {
               const { canEditNotice, shieldNotice, postHistory } =
                 res.permission;
@@ -49,7 +50,8 @@ vueInstance = new Vue({
     getObjToStr({ uid }) {
       return objToStr({ uid });
     },
-    sweetEditNotice(title, nid, content = '') {
+    sweetEditNotice(props) {
+      const { title, content = '', nid, pid } = props;
       return new Promise((resolve) => {
         Swal.fire({
           title,
@@ -65,7 +67,7 @@ vueInstance = new Vue({
           cancelButtonText: '取消',
           showLoaderOnConfirm: true,
           preConfirm: (text) => {
-            return nkcAPI('/p/' + nid + '/editNotice', 'PUT', {
+            return nkcAPI(`/p/${pid}/notice/${nid}/content`, 'PUT', {
               noticeContent: text,
               type: 'post',
             })
@@ -83,12 +85,13 @@ vueInstance = new Vue({
         });
       });
     },
-    async editNotice(nid, noticeContent) {
-      const newNoticeContent = await this.sweetEditNotice(
-        '编辑公告',
+    async editNotice(pid, nid, noticeContent) {
+      const newNoticeContent = await this.sweetEditNotice({
+        title: '编辑公告',
+        content: noticeContent,
         nid,
-        noticeContent,
-      );
+        pid,
+      });
       if (newNoticeContent) {
         this.postNotices.forEach((notice) => {
           if (notice.nid === nid) {
@@ -98,7 +101,9 @@ vueInstance = new Vue({
         });
       }
     },
-    async disabledNotice(nid, isShield) {
+    async disabledNotice(pid, nid, isShield) {
+      const url = `/p/${pid}/notice/${nid}/disabled`;
+      const method = 'PUT';
       return new Promise((resolve) => {
         if (isShield) {
           Swal.fire({
@@ -115,7 +120,7 @@ vueInstance = new Vue({
             cancelButtonText: '取消',
             showLoaderOnConfirm: true,
             preConfirm: (reason) => {
-              return nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', {
+              return nkcAPI(url, method, {
                 isShield,
                 reason,
               })
@@ -139,7 +144,7 @@ vueInstance = new Vue({
           });
         } else {
           sweetConfirm('是否解除屏蔽').then(() => {
-            nkcAPI('/p/' + nid + '/shieldNotice', 'PUT', { isShield })
+            nkcAPI(url, method, { isShield })
               .then(() => {
                 this.postNotices.forEach((item) => {
                   if (item.nid === nid) {

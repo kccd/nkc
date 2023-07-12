@@ -4,15 +4,15 @@ if !isIncluded('publicModules/side_thread_notice.pug')
   mixin sideThreadNotice(noticeContent,threadHistory,canEditNotice,shieldNotice)
     if noticeContent
       div.m-b-1
-        .panel-header 文章公告
+        .panel-header 新版本公告
         div
           for notice in noticeContent
-            .thread-notice.notice-clearfix(class={'shield-box': notice.status === 'shield'} data-nid=notice.nid)
+            .thread-notice.notice-clearfix(class={'shield-box': notice.status === 'shield'} data-nid=notice.nid data-pid=notice.pid)
               if notice.status === 'shield'
                 if notice.reason
-                  .shield-box-span=`当前通告已经屏蔽 原因：${notice.reason}`
+                  .shield-box-span=`已屏蔽 原因：${notice.reason}`
                 else
-                  .shield-box-span=`当前通告已经屏蔽`
+                  .shield-box-span=`已屏蔽`
               .thread-notice-head.m-b-05
                 a(href=`/u/${notice.user.uid}/profile/moment`)
                   img.notice-user-banned.m-r-05(
@@ -20,7 +20,8 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                     data-global-mouseout="hideUserPanel"
                     data-global-data=objToStr({ uid: notice.user.uid })
                     src=notice.user.avatar)
-                +fromNow(notice.toc)
+                .notice-time
+                  +fromNow(notice.toc)
                 .notice-float
                   if shieldNotice && notice.status === 'normal'
                     a.m-r-05(onclick=`shieldNotice(this,true)`) 屏蔽
@@ -31,7 +32,7 @@ if !isIncluded('publicModules/side_thread_notice.pug')
                   if threadHistory !== null && notice.hid
                     a.m-r-05(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情
               .thread-notice-content(class={'shield-box': notice.status === 'shield'})
-                span=notice.noticeContent
+                =notice.noticeContent
 
 
 
