@@ -1,7 +1,7 @@
 //- 字段详情/pages/thread/singlePost/singlePost.pug
 if !isIncluded('singlePostTop')
   div(id='notice-dialog')
-    Draggable(title='回复新版本公告' ref="noticeDialog" max-Width="40rem" )
+    Draggable(title='新版本公告' ref="noticeDialog" max-Width="40rem" )
       div(slot="content" id='notice-content')
         div(v-for="notice in postNotices" v-if="postNotices.length !==0")
           .post-notice(:class="notice.status === 'shield' ? 'shield-box': ''")
