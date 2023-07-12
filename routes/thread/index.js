@@ -10,6 +10,8 @@ const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const db = require('../../dataModels');
+const tools = require('../../nkcModules/tools');
+const { ThrowCommonError } = require('../../nkcModules/error');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -267,7 +269,6 @@ threadRouter
     if (data.user) {
       await data.user.extendAuthLevel();
     }
-
     // 拓展POST时的相关配置
     const extendPostOptions = {
       uid: data.user ? data.user.uid : '',
@@ -490,7 +491,6 @@ threadRouter
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
     posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
-
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
@@ -1051,6 +1051,86 @@ threadRouter
       data.user && userSubscribeUsersId.includes(authorId)
     );
 
+    //文章通告内容处理
+    //屏蔽通告权限
+    let shieldNotice = ctx.permission('disablePostNotice');
+    //编辑通告权限
+    let canEditNotice =
+      thread.uid === state.uid || ctx.permission('disablePostNotice');
+    const noticeObj = { pid: thread.oc, status: 'normal' };
+    if (shieldNotice || thread.uid === state.uid) {
+      noticeObj.status = { $in: ['normal', 'shield'] };
+    }
+    const notices = await db.NewNoticesModel.find(noticeObj)
+      .sort({ toc: -1 })
+      .lean();
+    //查看回复历史权限
+    let threadHistory = null;
+    if (notices.length !== 0) {
+      const threadPost = await db.PostModel.findOnly({ pid: thread.oc });
+      const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
+      //判断是否有查看历史记录的权限
+      if (
+        threadPost.tlm > threadPost.toc &&
+        ctx.permission('visitPostHistory') &&
+        isModerator
+      ) {
+        threadHistory =
+          !threadPost.hideHistories ||
+          ctx.permission('displayPostHideHistories')
+            ? true
+            : null;
+      }
+      const userId = Array.from(new Set(notices.map((item) => item.uid)));
+      //获取通告用户信息
+      const users = await db.UserModel.find(
+        { uid: { $in: userId } },
+        { avatar: 1, uid: 1, username: 1 },
+      ).lean();
+
+      //获取历史版本
+      const cv = Array.from(
+        new Set(notices.map((item) => item.cv).filter(Boolean)),
+      );
+      //获取hid数组对象
+      const hidArr = await db.HistoriesModel.find(
+        { pid: thread.oc, cv: { $in: cv } },
+        { _id: 1, cv: 1, pid: 1 },
+      ).lean();
+      //筛选出来的hid对象
+      const uniqueArr = hidArr.filter((item, index, self) => {
+        return index === self.findIndex((t) => t.cv === item.cv);
+      });
+
+      data.noticeContent = notices.map(
+        ({ toc, noticeContent, cv, uid, pid, nid, status, reason }) => {
+          const user = users.find((item) => item.uid === uid);
+          const hidObj = uniqueArr.find((item) => item.cv === cv);
+          const updatedUser = {
+            ...user,
+            avatar: tools.getUrl('userAvatar', user.avatar),
+          };
+          return {
+            toc,
+            noticeContent,
+            hid: hidObj ? hidObj._id : null,
+            user: updatedUser,
+            pid,
+            nid,
+            status,
+            reason,
+          };
+        },
+      );
+    }
+
+    //赛选出文章下的回复，哪些是有发过通告的pid
+    const postNotice = await db.NewNoticesModel.aggregate([
+      { $match: { pid: { $in: thread.postIds } } },
+      { $group: { _id: '$pid' } },
+    ]).exec();
+    const repliesWithNotice = postNotice.map((item) => item._id);
+
     // 文章访问次数加一
     await thread.updateOne({ $inc: { hits: 1 } });
     // 标志
@@ -1114,6 +1194,10 @@ threadRouter
     data.editPostPositionPermission = haveEditPositionOrder;
     data.isEditMode = isEditMode;
     data.orderStatus = thread.orderStatus;
+    data.threadHistory = threadHistory;
+    data.canEditNotice = canEditNotice;
+    data.shieldNotice = shieldNotice;
+    data.repliesWithNotice = repliesWithNotice;
 
     // 商品信息
     if (threadShopInfo) {

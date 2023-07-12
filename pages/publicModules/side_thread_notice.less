@@ -1,0 +1,54 @@
+@import "base";
+
+
+.thread-notice{
+  margin-top: 0 !important;
+  margin-bottom: 1rem;
+  a{
+    font-size: 1rem;
+    color: #9baec8;
+    text-decoration: none;
+  }
+  a:hover{
+    cursor: pointer;
+  }
+  .renderedTime{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .notice-time{
+    display: inline;
+    font-size: 1rem;
+    color: #555;
+  }
+  &:last-child{
+    margin-bottom: 0;
+  }
+}
+
+.notice-user-banned{
+  max-width: 2rem;
+  max-height: 2rem;
+  border-radius: 50%;
+}
+
+.notice-float{
+  float: right;
+}
+
+.notice-clearfix::after{
+  content: "";
+  display: table;
+  clear: both;
+}
+.thread-notice-content{
+  color: #333;
+}
+.shield-box{
+  background-color: rgb(255, 219, 213);
+}
+.shield-box-span{
+  font-size: 1rem;
+  text-align: center;
+  padding: 1rem 0;
+}

@@ -269,6 +269,44 @@ const forumSchema = new Schema(
           default: 'or',
         },
       },
+      //作者编辑文章是否能发布通告
+      publishNoticeByAuthor: {
+        rolesId: {
+          type: [String],
+          default: ['dev'],
+        },
+        gradesId: {
+          type: [Number],
+          default: [],
+        },
+        relation: {
+          type: String,
+          default: 'or',
+        },
+        isTopPost: {
+          type: Boolean,
+          default: true,
+        }, //是否能顶帖
+      },
+      //其他人编辑文章下的回复是否能发布通告
+      publishNoticeByOther: {
+        rolesId: {
+          type: [String],
+          default: ['dev'],
+        },
+        gradesId: {
+          type: [Number],
+          default: [],
+        },
+        relation: {
+          type: String,
+          default: 'or',
+        },
+        isTopPost: {
+          type: Boolean,
+          default: false,
+        }, //是否能顶帖
+      },
     },
 
     orderBy: {
@@ -2226,7 +2264,6 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
  * @param {String} uid 用户ID
  * @param {[String]} fid 专业ID组成的数组
  * */
-
 forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
   const SettingModel = mongoose.model('settings');
   const recycleId = await SettingModel.getRecycleId();
@@ -2293,6 +2330,14 @@ forumSchema.statics.checkPermissionCore = async (type, user, fid = []) => {
           status: 403,
           message: `你没有权限在专业「${displayName}」下调整复序，请更换专业。`,
         };
+      } else if (
+        type === 'publishNoticeByAuthor' ||
+        type === 'publishNoticeByOther'
+      ) {
+        return {
+          status: 403,
+          message: `你没有权限在专业「${displayName}」下发布文章通告。`,
+        };
       } else {
         return {
           status: 403,
@@ -2358,11 +2403,124 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
 };
 
 /*
+ *检测用户是否具有编辑文章回复后可以发表文章通告的权限
+ * @param {String} uid 用户ID
+ * @param {[string]} id 文章tid或者是回复的pid
+ * @param {string} isAdmin是否有管理员权限
+ * @param {type} thread 还是 post
+ * @author by 2023/6/29
+ */
+forumSchema.statics.checkPublishNotice = async ({ uid, id, type }) => {
+  const ForumModel = mongoose.model('forums');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const user = await mongoose.model('users').findOnly({ uid });
+  await user.extendRoles();
+  await user.extendGrade();
+  //编辑文章
+  if (type === 'thread') {
+    const thread = await ThreadModel.findOnly(
+      { oc: id },
+      { uid: 1, mainForumsId: 1 },
+    );
+    //判断是否为作者本人
+    if (thread.uid !== uid) {
+      return { status: 403, message: '权限不足非作者本人' };
+    }
+    const mainForumsId = thread.mainForumsId;
+    return await ForumModel.checkPermissionCore('publishNoticeByAuthor', user, [
+      mainForumsId[0],
+    ]);
+  }
+  //编辑回复
+  else {
+    const post = await PostModel.findOnly(
+      { pid: id },
+      { mainForumsId: 1, tid: 1 },
+    );
+    const thread = await ThreadModel.findOnly({ tid: post.tid }, { uid: 1 });
+    const mainForumsId = post.mainForumsId;
+    //判断是否为作者本人
+    if (thread.uid === uid) {
+      return await ForumModel.checkPermissionCore(
+        'publishNoticeByAuthor',
+        user,
+        [mainForumsId[0]],
+      );
+    } else {
+      return await ForumModel.checkPermissionCore(
+        'publishNoticeByOther',
+        user,
+        [mainForumsId[0]],
+      );
+    }
+  }
+};
+/*
+ *检测用户是否具有编辑文章回复后可以发表文章通告的权限路由端检测
+ * @param {String} uid 用户ID
+ * @param {[string]} id 文章tid或者是回复的pid
+ * @param {string} isAdmin是否有管理员权限
+ * @param {type} thread 还是 post
+ * @author by 2023/6/29
+ */
+forumSchema.statics.checkPublishNoticeInRoute = async ({ uid, id, type }) => {
+  const ForumModel = mongoose.model('forums');
+  const { status, message } = await ForumModel.checkPublishNotice({
+    uid,
+    id,
+    type,
+  });
+  if (status !== 200) {
+    ThrowCommonError(status, message);
+  }
+};
+
+/*
+ *检测该文章或回复编辑新版本公告发布之后，在该专业下是否能顶帖
+ *@param {String} tid 当前文章或回复所处的文章的tid
+ *@author by 2023/7/4
+ */
+forumSchema.statics.isTopPostCore = async ({ fid }) => {
+  const ForumModel = mongoose.model('forums');
+  //当前文章所处的主专业id
+  const forum = await ForumModel.getForumByIdFromRedis(fid);
+  if (!forum) {
+    ThrowCommonError(400, `专业id错误 fid: ${fid}`);
+  }
+  const { permission } = forum;
+
+  //过滤留下拥有isTopPost属性的对象
+  return Object.keys(permission)
+    .filter(
+      (key) =>
+        permission[key].hasOwnProperty('isTopPost') &&
+        Object.keys(permission[key]).length > 0,
+    )
+    .reduce((result, key) => {
+      result[key] = permission[key].isTopPost;
+      return result;
+    }, {});
+};
+
+/*
+ * 检测该文章或回复编辑新版本公告发布之后，在该专业下是否能顶帖
+ * @param {String} tid
+ * @param {String} type 检测的权限类型
+ * @author by 2023/7/4
+ * */
+forumSchema.statics.isTopPost = async ({ tid, type }) => {
+  const ForumModel = mongoose.model('forums');
+  const objectsWithIsTopPost = await ForumModel.isTopPostCore({ tid });
+  return objectsWithIsTopPost[type].isTopPost;
+};
+
+/*
  * 检测用户是否具有编辑文章回复顺序的权限
- * @param {{
- *    @param {String} uid 用户ID
- *    @param {[string]} fid 专业ID组成的数组
- * }}
+ * @param {String} uid 用户ID
+ * @param {[string]} tid 文章tid
+ * @param {string} isAdmin是否有管理员权限
+ * @author by 2023/5/23
  * */
 forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   const ForumModel = mongoose.model('forums');
@@ -2383,18 +2541,17 @@ forumSchema.statics.checkEditPostPosition = async ({ uid, tid, isAdmin }) => {
   const user = await mongoose.model('users').findOnly({ uid });
   await user.extendRoles();
   await user.extendGrade();
-  return await ForumModel.checkPermissionCore(
-    'editPostPosition',
-    user,
-    mainForumsId,
-  );
+  return await ForumModel.checkPermissionCore('editPostPosition', user, [
+    mainForumsId[0],
+  ]);
 };
 
 /*
- * 验证用户是否能在指定的专业发表回复和评论
- * @param {[String]} 专业ID组成的数组
+ * 验证用户是否能在指定的专业改变文章回复的顺序
+ * @param {[String]} tid 文章的tid
  * @param {String} uid 用户ID
- * @author pengxiguaa 2020/8/25
+ * @param {String}  isAdmin 是否拥有管理员权限
+ * @author by 2023/5/23
  * */
 forumSchema.statics.checkEditPostPositionInRoute = async ({
   uid,
@@ -2429,10 +2586,10 @@ forumSchema.statics.checkGlobalPostAndForumWritePostPermission = async (
 };
 
 /*
- * 验证用户是否能在指定的专业改变文章回复的顺序
+ * 验证用户是否能在指定的专业发表回复和评论
  * @param {[String]} 专业ID组成的数组
  * @param {String} uid 用户ID
- * @author by 2023/5/23
+ * @author pengxiguaa 2020/8/25
  * */
 forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
   const ForumModel = mongoose.model('forums');

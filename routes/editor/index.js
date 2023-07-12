@@ -798,6 +798,27 @@ router
       source: 'thread',
     });
     await next();
+  })
+  .get('/publishNotice', async (ctx, next) => {
+    const { db, data, query, state } = ctx;
+    const { type, id } = query;
+    //判断用户是否能编辑文章之后发布通告
+    if (['modifyThread', 'modifyPost'].includes(type)) {
+      const checkObj = {
+        uid: state.uid,
+        id,
+      };
+      if (type === 'modifyThread') {
+        checkObj.type = 'thread';
+        const res = await db.ForumModel.checkPublishNotice(checkObj);
+        data.publishNotice = res.status === 200;
+      } else {
+        checkObj.type === 'post';
+        const res = await db.ForumModel.checkPublishNotice(checkObj);
+        data.publishNotice = res.status === 200;
+      }
+    }
+    await next();
   });
 
 module.exports = router;

@@ -44,7 +44,7 @@
   top: 0;
   left: 0;
   position: absolute;
-  z-index: 1000;
+  z-index: 9999;
   .float-user{
     border: 1px solid #ccc;
     min-height: 7.5rem;

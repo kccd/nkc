@@ -14919,7 +14919,8 @@
 
     me.undoManger = new UndoManager();
     me.undoManger.editor = me;
-
+    
+    
     function saveScene() {
       this.undoManger.save();
     }
@@ -14969,11 +14970,9 @@
     me.addshortcutkey({
       "Undo": "ctrl+90", //undo
       "Redo": "ctrl+89" //redo
-
     });
     var isCollapsed = true;
     me.addListener('keydown', function (type, evt) {
-
       var me = this;
       var keyCode = evt.keyCode || evt.which;
       if (!keys[keyCode] && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && !evt.altKey) {
@@ -29674,7 +29673,6 @@
           }
           if (editor.options.scaleEnabled) {
             me[(editor.queryCommandState('scale') == -1 ? 'dis' : 'en') + 'ableScale']();
-
           }
         });
         var popup = new baidu.editor.ui.Popup({

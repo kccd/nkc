@@ -32,8 +32,8 @@ new Vue({
         ios: {
           disabled: true,
           url: ``,
-          version: '暂未开发',
-          title: '暂未开发',
+          version: '暂未开放',
+          title: '暂未开放',
           desc: '',
         },
       };

@@ -142,6 +142,10 @@ class SensitiveDetectionService {
   async columnAbbrDetection(content) {
     await this.#contentDetection(sensitiveTypes.columnAbbr, content);
   }
+
+  async threadNoticeDetection(content) {
+    await this.#contentDetection(sensitiveTypes.threadNotice, content);
+  }
 }
 
 module.exports = {

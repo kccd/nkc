@@ -4,7 +4,7 @@ import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
 import { getDataById } from '../lib/js/dataConversion';
 import Sortable from 'sortablejs';
-import { sweetError, sweetQuestion } from '../lib/js/sweetAlert';
+import { sweetError, sweetQuestion, sweetSuccess } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
 import { visitUrlReplace } from '../lib/js/pageSwitch';
 
@@ -529,6 +529,7 @@ function setSubmitButton(submitting) {
     button.html('回复');
   }
 }
+//查看回复的通告
 
 //编辑回复顺序
 //判断用户是否进入了编辑模式页面
@@ -651,7 +652,9 @@ function finishedEditPostOrder(tid, type) {
         visitUrlReplace(`/t/${tid}`);
       }, 1500);
     })
-    .catch(sweetError);
+    .catch((err) => {
+      sweetError(err);
+    });
 }
 const finishedEditPostOrderDebounce = debounce(finishedEditPostOrder, 100);
 //插入元素
