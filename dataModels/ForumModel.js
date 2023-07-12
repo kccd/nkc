@@ -2396,7 +2396,14 @@ forumSchema.statics.checkGlobalPostAndForumWritePermission = async (
  * */
 forumSchema.statics.checkWritePermission = async (uid, fid) => {
   const ForumModel = mongoose.model('forums');
-  const user = await mongoose.model('users').findOnly({ uid });
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({ uid });
+  if (!user) {
+    ThrowCommonError(
+      403,
+      '游客没有发表内容的权限。想参与大家的讨论？现在就 <a href="/login" target="_blank">登录</a> 或 <a href="/register" target="_blank">注册</a>。',
+    );
+  }
   await user.extendRoles();
   await user.extendGrade();
   await ForumModel.checkPermission('write', user, fid);
@@ -2593,7 +2600,14 @@ forumSchema.statics.checkGlobalPostAndForumWritePostPermission = async (
  * */
 forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
   const ForumModel = mongoose.model('forums');
-  const user = await mongoose.model('users').findOnly({ uid });
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({ uid });
+  if (!user) {
+    ThrowCommonError(
+      403,
+      '游客没有发表内容的权限。想参与大家的讨论？现在就 <a href="/login" target="_blank">登录</a> 或 <a href="/register" target="_blank">注册</a>。',
+    );
+  }
   await user.extendRoles();
   await user.extendGrade();
   await ForumModel.checkPermission('writePost', user, fid);
