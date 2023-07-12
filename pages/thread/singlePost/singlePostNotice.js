@@ -5,7 +5,6 @@ import FromNow from '../../lib/vue/FromNow.vue';
 import {
   sweetConfirm,
   sweetError,
-  sweetPrompt,
   sweetSuccess,
 } from '../../lib/js/sweetAlert';
 import { objToStr } from '../../lib/js/dataConversion';

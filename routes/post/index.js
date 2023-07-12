@@ -451,42 +451,8 @@ router
     }
 
     // 生成历史记录
-    const hid = (await db.HistoriesModel.createHistory(_targetPost))._id;
+    await db.HistoriesModel.createHistory(_targetPost);
 
-    // 如果有文章新通告就生成新通告记录表
-    if (noticeContent) {
-      // 检测是否有发布文章通告的权限
-      const checkObj = { uid: state.uid, id: pid };
-      if (type === 'modifyPost') {
-        checkObj.type = 'post';
-      } else if (type === 'modifyThread') {
-        checkObj.type = 'thread';
-      }
-      await db.ForumModel.checkPublishNoticeInRoute(checkObj);
-      //检测文章通告内容是否有敏感词
-      await sensitiveDetectionService.threadNoticeDetection(noticeContent);
-      //检测文章通告内容是否超过字数限制
-      checkString(noticeContent, { minTextLength: 5, maxTextLength: 200 });
-      //是否已经存在数据
-      const isExist = await db.NewNoticesModel.find({ pid }, { nid: 1 }).sort({
-        toc: -1,
-      });
-      const { cv } = await db.HistoriesModel.findOnly({ _id: hid }, { cv: 1 });
-      if (isExist.length !== 0) {
-        const { nid } = isExist[0];
-        await db.NewNoticesModel.updateOne(
-          { nid },
-          {
-            $set: {
-              cv,
-            },
-          },
-        );
-      }
-      let noticeObj = { pid, uid: state.uid, noticeContent };
-      //存储文章通告数据
-      await db.NewNoticesModel.extendNoticeContent(noticeObj);
-    }
     // 判断文本是否有变化，有变化版本号加1
     /*if(c !== targetPost.c) {
       targetPost.cv ++;
@@ -630,6 +596,26 @@ router
           },
         );
       }
+    }
+    // 如果有文章新通告就生成新通告记录表
+    if (noticeContent) {
+      // 检测是否有发布回复公告或回复公告的权限
+      const checkObj = { uid: state.uid, id: pid };
+      if (type === 'modifyPost') {
+        checkObj.type = 'post';
+      } else if (type === 'modifyThread') {
+        checkObj.type = 'thread';
+      }
+      await db.ForumModel.checkPublishNoticeInRoute(checkObj);
+      //检测文章通告内容是否有敏感词
+      await sensitiveDetectionService.threadNoticeDetection(noticeContent);
+      //检测文章通告内容是否超过字数限制
+      checkString(noticeContent, { minTextLength: 5, maxTextLength: 200 });
+      const { cv } = await db.PostModel.findOnly({ pid }, { cv: 1 });
+
+      let noticeObj = { pid, uid: state.uid, noticeContent, cv };
+      //存储文章通告数据
+      await db.NewNoticesModel.extendNoticeContent(noticeObj);
     }
 
     await targetThread.updateThreadMessage(false);
