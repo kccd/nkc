@@ -766,6 +766,7 @@ threadSchema.methods.newPost = async function (post, user, ip) {
     originState,
     parentPostId,
   } = post;
+  const isComment = parentPostId !== '';
   let { quote = '' } = post;
   // 如果存在引用，则先判断引用的post是否存在
   let quotePost;
@@ -837,10 +838,13 @@ threadSchema.methods.newPost = async function (post, user, ip) {
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
   _post = _post.toObject();
-  await this.updateOne({
-    lm: pid,
-    tlm: nowTime,
-  });
+  if (!isComment) {
+    // 只有发表回复时才更新文章上的最后回复和时间
+    await this.updateOne({
+      lm: pid,
+      tlm: nowTime,
+    });
+  }
   // 如果存在引用并且不需要审核，则给被引用者发送引用通知
   if (quotePost) {
     // 如果引用的不是自己的回复
@@ -1398,7 +1402,10 @@ threadSchema.statics.publishArticle = async (options) => {
   }
   const user = await UserModel.findById(uid);
   // await ThreadModel.ensurePublishPermission(options);
-  await ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
+  await ForumModel.checkGlobalPostAndForumWritePermission(
+    options.uid,
+    options.fids,
+  );
   const tid = await SettingModel.operateSystemID('threads', 1);
   const thread = ThreadModel({
     tid,
@@ -2331,7 +2338,10 @@ threadSchema.statics.postNewThread = async (options) => {
   await ForumModel.checkForumCategoryBeforePost(options.fids);
   // 1.检测发表权限
   // await ThreadModel.ensurePublishPermission(options);
-  await ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
+  await ForumModel.checkGlobalPostAndForumWritePermission(
+    options.uid,
+    options.fids,
+  );
   // 2.生成一条新的thread，并返回post
   const _post = await ForumModel.createNewThread(options);
   // 获取当前的thread
