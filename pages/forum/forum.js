@@ -235,6 +235,9 @@ const formSearchApp = new Vue({
     switchForumSearch() {
       this.show = !this.show;
     },
+    strToBase64: function (str) {
+      return window.btoa(encodeURIComponent(str));
+    },
     search() {
       const { content } = this;
       return Promise.resolve()
@@ -246,8 +249,8 @@ const formSearchApp = new Vue({
         })
         .then((res) => {
           const fid = res.forumsId;
-          const c = window.btoa(encodeURIComponent(content));
-          const d = window.btoa(encodeURIComponent(JSON.stringify({ fid })));
+          const c = encodeURIComponent(content);
+          const d = this.strToBase64(JSON.stringify({ fid }));
           const form = 'complex';
           NKC.methods.visitUrl(`/search?c=${c}&d=${d}&form=${form}`, true);
         })
