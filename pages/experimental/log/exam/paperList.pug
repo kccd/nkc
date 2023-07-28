@@ -1,0 +1,58 @@
+extends ../../experimental
+block eTitle
+  title 考试记录
+block eContent
+  #data.hidden=objToStr({t: data.t, content: data.content})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4.m-b-1 按条件查询记录
+        .form-inline(style='margin-bottom: 1rem;' v-cloak)#app
+          .form-group
+            select.form-control(v-model='t')
+              option(value='username') 用户名
+              option(value='uid') UID
+              option(value='ip') IP
+          .form-group
+            input.form-control(placeholder='请输入内容' v-model='content' @keyup.enter='search')
+          .form-group
+            button.btn.btn-primary(type='submit' @click='search') 搜索
+            span &nbsp;
+            a.btn.btn-default(type='submit' href='/e/log/exam') 全部
+          h5.text-danger= data.info
+      .col-xs-12.col-md-12
+        include ../../../publicModules/paging/paging
+        table.table
+          thead
+            tr
+              th 时间
+              th 用户
+              th 科目
+              th 题目类型
+              th 状态
+              th 及格分数
+              th 得分
+              th IP
+              th 答题卡
+          tbody
+            for paper in data.papers
+              tr
+                th=paper.toc.toLocaleString()
+                th
+                  a(href=`/u/${paper.uid}` target="_blank")=paper.user.username || paper.user.uid
+                th=paper.category.name
+                th=paper.category.volume
+                th
+                  if paper.passed
+                    .text-success 通过
+                  else
+                    .text-danger 未通过
+                th=paper.passScore
+                th=paper.score
+                th
+                  .pointer.text-primary(onclick=`showIpInfo("${paper.ip}")`)=paper.ip
+                th
+                  a(href=`/e/log/exam/paper/${paper._id}` target="_blank") 查看
+        include ../../../publicModules/paging/paging_input
+block scripts
+  +includeJS("/experimental/log/exam/paperList.js")
