@@ -479,9 +479,16 @@
         }
       },
       open: function(type) {
-        $(this.$el).modal("show");
-        this.type = type || LoginType.SignIn;
-        // this.getSvgData();
+        nkcAPI("/exam/public/register","GET").then((res)=>{
+          if (res && res.registerExamination) {
+            window.location.href = "/exam/public"
+          } else {
+            $(this.$el).modal("show");
+            this.type = type || LoginType.SignIn;
+          }
+        }).catch((err)=>{
+          sweetError(err)
+        })
       }
     }
   };

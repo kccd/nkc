@@ -15,5 +15,5 @@ router
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/threads', threadsRouter.routes(), threadsRouter.allowedMethods())
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
-  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods());
+  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
 module.exports = router;

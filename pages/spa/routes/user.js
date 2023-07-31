@@ -1,19 +1,19 @@
 import User from '../views/user/User';
-import UserFollowerAndFans from "../../lib/vue/publicVue/userFollowAndFans/UserFollowerAndFans";
-import UserMoment from "../views/user/propfile/profile/UserMoment";
-import UserPostList from "../views/user/propfile/profile/UserPostList";
-import Subscribe from "../views/user/subscribe/Subscribe";
-import ProfileView from "../views/user/propfile/ProfileView";
-import Profile from "../views/user/propfile/profile/Profile";
-import SubscribeColumns from "../views/user/subscribe/SubscribeColumns";
-import SubscribeBlacklist from "../views/user/subscribe/SubscribeBlacklist";
-import SubscribeUsers from "../views/user/subscribe/SubscribeUsers";
-import SubscribeForums from "../views/user/subscribe/SubscribeForums";
-import SubscribeCollection from "../views/user/subscribe/SubscribeCollection";
-import SubscribeThreads from "../views/user/subscribe/SubscribeThreads";
-import Finance from "../views/user/propfile/profile/Finance";
-import UserColumnThread from "../views/user/propfile/profile/UserColumnThread";
-import AppProfileView from "../views/app/profile/AppProfileView";
+import UserFollowerAndFans from '../../lib/vue/publicVue/userFollowAndFans/UserFollowerAndFans';
+import UserMoment from '../views/user/propfile/profile/UserMoment';
+import UserPostList from '../views/user/propfile/profile/UserPostList';
+import Subscribe from '../views/user/subscribe/Subscribe';
+import ProfileView from '../views/user/propfile/ProfileView';
+import Profile from '../views/user/propfile/profile/Profile';
+import SubscribeColumns from '../views/user/subscribe/SubscribeColumns';
+import SubscribeBlacklist from '../views/user/subscribe/SubscribeBlacklist';
+import SubscribeUsers from '../views/user/subscribe/SubscribeUsers';
+import SubscribeForums from '../views/user/subscribe/SubscribeForums';
+import SubscribeCollection from '../views/user/subscribe/SubscribeCollection';
+import SubscribeThreads from '../views/user/subscribe/SubscribeThreads';
+import Finance from '../views/user/propfile/profile/Finance';
+import UserColumnThread from '../views/user/propfile/profile/UserColumnThread';
+import AppProfileView from '../views/app/profile/AppProfileView';
 import UserTimeline from '../views/user/propfile/profile/UserTimeline';
 export const routerName = {
   user: 'userHome',
@@ -43,8 +43,8 @@ export const routerName = {
   appFollower: 'follower',
   appScore: 'appScore',
   appBlacklist: 'appBlacklist',
-  timeline: 'timeline'
-}
+  timeline: 'timeline',
+};
 
 export default [
   {
@@ -68,7 +68,7 @@ export default [
               {
                 name: routerName.timeline,
                 path: '/u/:uid/profile/timeline',
-                component: UserTimeline
+                component: UserTimeline,
               },
               {
                 name: routerName.moment,
@@ -89,20 +89,20 @@ export default [
                 name: routerName.follower,
                 path: '/u/:uid/profile/follower',
                 component: UserFollowerAndFans,
-                props: { pageType: "follower" }
+                props: { pageType: 'follower' },
               },
               {
                 name: routerName.fan,
                 path: '/u/:uid/profile/fan',
                 component: UserFollowerAndFans,
-                props: { pageType: "fan" }
+                props: { pageType: 'fan' },
               },
               {
                 name: routerName.column,
                 path: '/u/:uid/profile/column',
                 component: UserColumnThread,
-              }
-            ]
+              },
+            ],
           },
           {
             name: routerName.subscribe,
@@ -138,10 +138,10 @@ export default [
                 name: routerName.subThreads,
                 path: '/u/:uid/profile/subscribe/thread',
                 component: SubscribeThreads,
-              }
-            ]
-          }
-        ]
+              },
+            ],
+          },
+        ],
       },
       {
         name: routerName.finance,
@@ -149,7 +149,6 @@ export default [
         component: Finance,
       },
     ],
-
   },
   {
     name: routerName.appSubUser,
@@ -159,49 +158,48 @@ export default [
       {
         name: routerName.appSubUser,
         path: '/app/profile/sub/user',
-        component: SubscribeUsers
+        component: SubscribeUsers,
       },
       {
         name: routerName.appSubForum,
         path: '/app/profile/sub/forum',
-        component: SubscribeForums
+        component: SubscribeForums,
       },
       {
         name: routerName.appSubColumn,
         path: '/app/profile/sub/column',
-        component: SubscribeColumns
+        component: SubscribeColumns,
       },
       {
         name: routerName.appCollection,
         path: '/app/profile/sub/collection',
-        component: SubscribeCollection
+        component: SubscribeCollection,
       },
       {
         name: routerName.appSubThread,
         path: '/app/profile/sub/thread',
-        component: SubscribeThreads
+        component: SubscribeThreads,
       },
       {
         name: routerName.appFollower,
         path: '/app/profile/sub/follower',
-        component: UserFollowerAndFans
+        component: UserFollowerAndFans,
       },
       {
         name: routerName.appFan,
         path: '/app/profile/sub/fan',
-        component: UserFollowerAndFans
+        component: UserFollowerAndFans,
       },
       {
         name: routerName.appScore,
         path: '/app/profile/finance',
-        component: Finance
+        component: Finance,
       },
       {
         name: routerName.appBlacklist,
         path: '/app/profile/blacklist',
         component: SubscribeBlacklist,
-      }
-    ]
-  }
-]
-
+      },
+    ],
+  },
+];

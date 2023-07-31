@@ -57,7 +57,7 @@ if !isIncluded('singlePostTop')
           if cancelTopped
             span.single-post-cancel-topped(onclick=`topPost('${pid}', false)`) 取消置顶
           if repliesWithNotice && repliesWithNotice.includes(pid)
-            i.fa.fa-bookmark-o.new-post-notice( aria-hidden="true" title="点击查看新版本公告")
+            i.fa.fa-bookmark-o.new-post-notice(aria-hidden="true" title="点击查看新版本公告")
         .single-post-toc
           +fromNow(toc)
           if tlm

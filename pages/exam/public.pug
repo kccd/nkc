@@ -1,0 +1,12 @@
+extends ../bootstrap_base
+block title
+  title=`开卷考试说明`
+  +includeCSS('/exam/public.css')
+block content
+  .container-fluid.max-width(id="exam-public")
+    .examNotes
+      h2.m-b-1 考试须知
+      .pre-content.m-b-1  {{publicExamNotes}}
+      button.btn.btn-default.fund-terms-button(@click='takeExam') 参加考试
+block scripts
+  +includeJS('/exam/public.js')
