@@ -85,8 +85,7 @@ async function saveLogToDB(ctx) {
 
   const referer = ctx.get('referer');
   const userAgent = ctx.get('User-Agent');
-  const { operation, logSettings } = state;
-  const operationId = operation._id;
+  const { operationId, logSettings } = state;
   const { operationsId } = logSettings;
   const log = {
     error,
