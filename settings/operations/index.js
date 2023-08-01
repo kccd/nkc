@@ -95,42 +95,8 @@ const settings = require('./settings');
 const latest = require('./latest');
 const oauth = require('./oauth');
 const tc = require('./tc');
-const operationObj = {};
 
-// 默认操作类型，没有路由与之对应的操作权限
-operationObj.defaultOperations = [
-  'modifyOtherPosts',
-  'modifyOtherArticles',
-  'displayRecycleMarkThreads',
-  'displayDisabledPosts',
-  'displayPostHideHistories',
-  'displayFundNoVerifyBills',
-  'displayFundBillsSecretInfo',
-  'displayFundApplicationFormSecretInfo',
-  'getAnyBodyPhoto', // 忽略相册、证书照片的权限
-  'removeAnyBodyPhoto', // 忽略相册、证书照片的权限
-  'canSendToEveryOne', // 跳过`仅接收好友信息`限制
-  'creditXsf',
-  'modifyAllQuestions', // 可修改审核过的试题
-  'viewAllPaperRecords', // 可查看所有的考试记录
-  'removeAllQuestion', // 可删除别人出的试题
-  'superModerator', // 超级专家，所有专业的专家权限
-  'getAnyBodyShopCert', // 可查看任何人的商城凭证
-  'viewUserAllFansAndFollowers', // 可查看用户的所有关注的人和粉丝
-  'showSecretSurvey', // 查看隐藏的调查结果
-  'showSurveyCertLimit', // 发起调查时可更具证书限制参与的用户
-  'getAllMessagesResources', // 查看所有的短消息资源
-  'topAllPost', // 置顶任何人的回复
-  'modifyAllResource', // 可修改任何人的附件
-  'visitAllUserProfile', // 可查看任何人的个人中心
-  'managementNote', // 可屏蔽编辑任何人的笔记
-  'viewUserScores', // 可在用户名片页查看用户的积分
-  'viewUserCode', // 可查看任意用户的动态码
-  'viewUserArticle', //查看任意用户的文章
-  'modifyAllPostOrder', //可以调整任意用户的文章回复顺序
-];
-
-operationObj.operationTree = {
+const operationTree = {
   home: {
     GET: 'visitHome', // 首页
 
@@ -304,4 +270,6 @@ operationObj.operationTree = {
     tc, // 多维分类
   },
 };
-module.exports = operationObj;
+module.exports = {
+  operationTree,
+};

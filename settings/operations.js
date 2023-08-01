@@ -7,27 +7,27 @@ const Operations = {
   displayFundNoVerifyBills: 'displayFundNoVerifyBills',
   displayFundBillsSecretInfo: 'displayFundBillsSecretInfo',
   displayFundApplicationFormSecretInfo: 'displayFundApplicationFormSecretInfo',
-  getAnyBodyPhoto: 'getAnyBodyPhoto',
-  removeAnyBodyPhoto: 'removeAnyBodyPhoto',
-  canSendToEveryOne: 'canSendToEveryOne',
+  getAnyBodyPhoto: 'getAnyBodyPhoto', // 忽略相册、证书照片的权限
+  removeAnyBodyPhoto: 'removeAnyBodyPhoto', // 忽略相册、证书照片的权限
+  canSendToEveryOne: 'canSendToEveryOne', // 跳过`仅接收好友信息`限制
   creditXsf: 'creditXsf',
-  modifyAllQuestions: 'modifyAllQuestions',
-  viewAllPaperRecords: 'viewAllPaperRecords',
-  removeAllQuestion: 'removeAllQuestion',
-  superModerator: 'superModerator',
-  getAnyBodyShopCert: 'getAnyBodyShopCert',
-  viewUserAllFansAndFollowers: 'viewUserAllFansAndFollowers',
-  showSecretSurvey: 'showSecretSurvey',
-  showSurveyCertLimit: 'showSurveyCertLimit',
-  getAllMessagesResources: 'getAllMessagesResources',
-  topAllPost: 'topAllPost',
-  modifyAllResource: 'modifyAllResource',
-  visitAllUserProfile: 'visitAllUserProfile',
-  managementNote: 'managementNote',
-  viewUserScores: 'viewUserScores',
-  viewUserCode: 'viewUserCode',
-  viewUserArticle: 'viewUserArticle',
-  modifyAllPostOrder: 'modifyAllPostOrder',
+  modifyAllQuestions: 'modifyAllQuestions', // 可修改审核过的试题
+  viewAllPaperRecords: 'viewAllPaperRecords', // 可查看所有的考试记录
+  removeAllQuestion: 'removeAllQuestion', // 可删除别人出的试题
+  superModerator: 'superModerator', // 超级专家，所有专业的专家权限
+  getAnyBodyShopCert: 'getAnyBodyShopCert', // 可查看任何人的商城凭证
+  viewUserAllFansAndFollowers: 'viewUserAllFansAndFollowers', // 可查看用户的所有关注的人和粉丝
+  showSecretSurvey: 'showSecretSurvey', // 查看隐藏的调查结果
+  showSurveyCertLimit: 'showSurveyCertLimit', // 发起调查时可更具证书限制参与的用户
+  getAllMessagesResources: 'getAllMessagesResources', // 查看所有的短消息资源
+  topAllPost: 'topAllPost', // 置顶任何人的回复
+  modifyAllResource: 'modifyAllResource', // 可修改任何人的附件
+  visitAllUserProfile: 'visitAllUserProfile', // 可查看任何人的个人中心
+  managementNote: 'managementNote', // 可屏蔽编辑任何人的笔记
+  viewUserScores: 'viewUserScores', // 可在用户名片页查看用户的积分
+  viewUserCode: 'viewUserCode', // 可查看任意用户的动态码
+  viewUserArticle: 'viewUserArticle', //查看任意用户的文章
+  modifyAllPostOrder: 'modifyAllPostOrder', //可以调整任意用户的文章回复顺序
   visitHome: 'visitHome',
   discuz: 'discuz',
   previewDocument: 'previewDocument',

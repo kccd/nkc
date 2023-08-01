@@ -1,1 +1,16 @@
-module.exports = require('../requireFolder')(__dirname);
+module.exports = {
+  rateLimit: require('./rateLimit'),
+  stayLogin: require('./stayLogin'),
+  init: require('./init'),
+  initState: require('./initState'),
+  initAddress: require('./initAddress'),
+  initCtxMethods: require('./initCtxMethods'),
+  body: require('./body'),
+  urlRewrite: require('./urlRewrite'),
+  permission: require('./permission'),
+  logger: require('./logger'),
+  IPLimit: require('./IPLimit'),
+  filterDomain: require('./filterDomain'),
+  apiData: require('./apiData'),
+  cache: require('./cache'),
+};

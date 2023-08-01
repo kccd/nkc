@@ -1,31 +1,13 @@
-const permission = {};
-const operationObj = require('../settings/operations/index.js');
-const operationsJS = require('../settings/operations.js');
-const methods = ['GET', 'POST', 'PUT', 'DELETE'];
+const { operationTree } = require('../settings/operations/index.js');
+const { Operations } = require('../settings/operations.js');
 
-permission.getOperationsId = () => {
-  const fn = (obj, arr) => {
-    for (let key in obj) {
-      if (!obj.hasOwnProperty(key)) {
-        continue;
-      }
-      if (methods.includes(key)) {
-        arr.push(obj[key]);
-      } else {
-        if (typeof obj[key] === 'object') {
-          fn(obj[key], arr);
-        }
-      }
-    }
-  };
-  const operations = operationObj.defaultOperations.concat([]);
-  fn(operationObj.operationTree, operations);
-  return [
-    ...new Set(operations.concat(Object.values(operationsJS.Operations))),
-  ];
-};
+// 获取所有的操作权限
+function getOperationsId() {
+  return [...Object.values(Operations)];
+}
 
-permission.getOperationId = (url, method) => {
+// 根据 request 中的 url 和 method 获取操作权限
+function getOperationId(url, method) {
   let urlArr = [];
   url = url.replace(/\?.*/, '');
   if (url === '/') {
@@ -36,7 +18,7 @@ permission.getOperationId = (url, method) => {
   }
   const fn = (obj, dKey) => {
     for (let key in obj) {
-      if (!obj.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) {
         continue;
       }
       if (key === 'PARAMETER') {
@@ -46,7 +28,7 @@ permission.getOperationId = (url, method) => {
       }
     }
   };
-  let obj = Object.assign({}, operationObj.operationTree);
+  let obj = Object.assign({}, operationTree);
   for (let i = 0; i < urlArr.length; i++) {
     const key = urlArr[i];
     obj = fn(obj, key);
@@ -58,6 +40,9 @@ permission.getOperationId = (url, method) => {
     error.status = 404;
     throw error;
   }
-};
+}
 
-module.exports = permission;
+module.exports = {
+  getOperationId,
+  getOperationsId,
+};
