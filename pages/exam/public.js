@@ -12,10 +12,10 @@ new Vue({
   },
   methods: {
     getExamNotes() {
-      nkcAPI('/exam/public', 'GET')
+      nkcAPI('/api/v1/exam/public', 'GET')
         .then((res) => {
-          if (res.publicExamNotes) {
-            this.publicExamNotes = res.publicExamNotes;
+          if (res.data.publicExamNotes) {
+            this.publicExamNotes = res.data.publicExamNotes;
           }
         })
         .catch((err) => {

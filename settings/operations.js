@@ -766,7 +766,7 @@ const DynamicOperations = {
   columnManage: 'columnManage',
   getThreadCategories: 'getThreadCategories',
   manageQuestionTags: 'manageQuestionTags',
-  VISIT_PUBLIC_EXAM: 'VISIT_PUBLIC_EXAM',
+  visitPublicExam: 'visitPublicExam',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };
