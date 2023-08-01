@@ -6,8 +6,15 @@ block eContent
     .row
       .col-xs-12.col-md-12
         include ./roleNav
-      .col-xs-12.col-md-12.m-t-1
-      .hidden#data=JSON.stringify({roles: data.roles,defaultOperationsId: data.defaultOperationsId, role: data.role, operationTypes: data.operationTypes, operations: data.operations, users: data.users})
+    -
+      var objectData = {
+        roles: data.roles,
+        defaultOperationsId: data.defaultOperationsId,
+        role: data.role,
+        operations: data.operations,
+        users: data.users
+      };
+    .hidden#data=objToStr(objectData)
     .row#app(v-cloak)
       button.btn.btn-primary.btn-fab(@click='save') 保存
       .col-xs-12.col-md-7.col-md-offset-2
@@ -81,61 +88,57 @@ block eContent
                 tbody
                   tr(v-for='user in users')
                     th
-                      a(:href='"/u/" + user.uid' target='_blank') {{user.username || '用户' + user.uid}}
+                      a(
+                        :href='"/u/" + user.uid'
+                        target='_blank'
+                        data-global-mouseover="showUserPanel"
+                        data-global-mouseout="hideUserPanel"
+                        :data-global-data="objToStr({uid: user.uid})"
+                        ) {{user.username || '用户' + user.uid}}
                         span(v-if="user.nickname") ({{user.nickname}})
                     th {{user.xsf}}
                     th {{user.threadCount}}
                     th {{user.postCount}}
-                    th {{format('YYYY/MM/DD HH:mm:ss', user.toc)}}
+                    th {{detailedTime(user.toc)}}
             .text-right.p-b-3
               a(href=`/e/settings/user?t=${data.role._id}`) 查看更多
 
         h3.p-t-6#permission 权限设置
         hr
         .row
-          .rol-xs-12.col-md-3
-            .list-group
-              a.pointer.list-group-item(v-for='t in types' :class='{"active": t._id === type._id}' @click='selectType(t)')
-                span {{t.displayName}}
-                span.badge {{t.operations.length}}
-          .rol-xs-12.col-md-9
+          .rol-xs-12.col-md-12
             div(v-if="role.defaultRole && role._id !== 'dev'")
               .form-inline.m-b-1
                 .form-group
                   select.form-control(v-model="cloneRoleId")
                     option(v-for="r in roles" :value="r._id" v-if="r.defaultRole && r._id !== role._id") {{r.displayName}}
                 .form-group
-                  button.btn.btn-default(@click="cloneOperations") 一键复制
+                  button.btn.btn-default(@click="cloneOperations" :disabled="cloneRoleId === ''") 一键复制
               h5.text-danger 此操作将会覆盖原设置。
             .panel.panel-default
-              .panel-heading {{type.displayName}}
               table.table.table-hover
                 thead
                   tr
                     th 权限名
                     th 选择
                 tbody
-                  tr(v-for='o in type.operations')
-                    th(v-if='o.name') {{o.name}}({{o._id}})
-                    th(v-else) {{o._id}}
+                  tr(v-for='o in operations')
+                    th(v-if='o.operationName') {{o.operationName}}({{o.operationId}})
+                    th(v-else) {{o.operationId}}
                     th
                       div(v-if="!role.defaultRole")
-                        <label v-if="isDefault(o._id)">
+                        <label v-if="isDefault(o.operationId)">
                           <input type="checkbox" checked disabled>
                         </label>
                         <label v-else>
-                          <input type="checkbox" :value='o._id' v-model='role.operationsId'>
+                          <input type="checkbox" :value='o.operationId' v-model='role.operationsId'>
                         </label>
                       div(v-else)
                         <label>
-                          <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>
+                          <input v-if='role._id !== "dev"' type="checkbox" :value='o.operationId' v-model='role.operationsId'>
                           span(v-else) 默认
                         </label>
-                      //-
-                        <label>
-                          <input v-if='role._id !== "dev"' type="checkbox" :value='o._id' v-model='role.operationsId'>
-                          span(v-else) 默认
-                        </label>
+
 
 block scripts
   include ../../../publicModules/selectColor

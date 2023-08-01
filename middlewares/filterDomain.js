@@ -1,5 +1,5 @@
 const { domain, reserveDomain = [] } = require('../config/server');
-const { fileDownload } = require('../settings/operationsType');
+const { fileDownload } = require('../settings/operationGroups');
 const { isProduction } = require('../settings/env');
 const domainHost = new URL(domain).host;
 const reserveDomainHost = reserveDomain.map((d) => new URL(d).host);

@@ -101,11 +101,11 @@ router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
   const { operationId, user } = data;
   const isWhitelistOperation =
-    settings.operationsType.whitelistOfGlobalAccessControl.includes(
+    settings.operationGroups.whitelistOfGlobalAccessControl.includes(
       operationId,
     );
   const isResourceOperation =
-    settings.operationsType.fileDownload.includes(operationId);
+    settings.operationGroups.fileDownload.includes(operationId);
   if (
     !isWhitelistOperation &&
     (!user || !user.certs || !user.certs.includes('dev'))

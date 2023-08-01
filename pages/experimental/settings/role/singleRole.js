@@ -1,122 +1,120 @@
+import { getDataById } from '../../../lib/js/dataConversion';
+import {
+  sweetQuestion,
+  sweetError,
+  sweetSuccess,
+} from '../../../lib/js/sweetAlert';
+import { nkcAPI, nkcUploadFile } from '../../../lib/js/netAPI';
+import { visitUrl } from '../../../lib/js/pageSwitch';
+import { objToStr } from '../../../lib/js/dataConversion';
+import { detailedTime } from '../../../lib/js/time';
+import Vue from 'vue';
+
+const data = getDataById('data');
+
 var app = new Vue({
   el: '#app',
   data: {
-    role: '',
-    roles: [],
-    cloneRoleId: "",
-    operations: [],
-    defaultOperationsId: [],
-    type: '',
-    types: [],
-    users: []
+    role: data.role,
+    roles: data.roles,
+    cloneRoleId: '',
+    operations: data.operations,
+    defaultOperationsId: data.defaultOperationsId,
+    users: data.users,
   },
-  mounted: function() {
-    var data = document.getElementById('data');
-    data = JSON.parse(data.innerHTML);
-    this.role = data.role;
-    this.roles = data.roles;
-    this.users = data.users;
-    this.operations = data.operations;
-    this.defaultOperationsId = data.defaultOperationsId;
-    this.types = this.extendCount(data.operationTypes);
-    this.types.unshift({
-      _id: 'all',
-      displayName: '全部权限',
-      operations: this.operations
-    });
-    this.selectType(this.types[0]);
-    
+  computed: {
+    rolesObj() {
+      const obj = {};
+      for (const role of this.roles) {
+        obj[role._id] = role;
+      }
+      return obj;
+    },
   },
-  updated: function() {
+  mounted() {
+    NKC.methods.initSelectColor(this.changeColor);
+  },
+  updated: function () {
     NKC.methods.initSelectColor(this.changeColor);
   },
   methods: {
-    format: NKC.methods.format,
-    cloneOperations: function() {
-      var roles = this.roles;
-      var cloneRoleId = this.cloneRoleId;
-      if(!cloneRoleId) return;
-      var role;
-      for(var i = 0; i < roles.length; i++) {
-        var _role = roles[i];
-        if(cloneRoleId === _role._id) role = _role;
-      }
-      if(!role) return;
-      sweetQuestion("确定要复制“"+role.displayName+"”的权限设置？")
-        .then(function() {
-          app.role.operationsId = [].concat(role.operationsId);
+    detailedTime,
+    objToStr,
+    cloneOperations: function () {
+      const targetRole = this.rolesObj[this.cloneRoleId];
+      sweetQuestion('确定要复制“' + targetRole.displayName + '”的权限设置？')
+        .then(function () {
+          app.role.operationsId = [...targetRole.operationsId];
+          sweetSuccess('复制成功');
         })
-        .catch(sweetError)
+        .catch(sweetError);
     },
-    isDefault: function(operationId) {
+    isDefault: function (operationId) {
       return this.defaultOperationsId.indexOf(operationId) !== -1;
     },
-    removeRole: function() {
-      if(confirm('确认要删除“' + this.role.displayName + '”证书？') === false) return;
-      nkcAPI('/e/settings/role/' + app.role._id, 'DELETE', {})
-        .then(function() {
-          // window.location.href = '/e/settings/role';
-          openToNewLocation('/e/settings/role');
+    removeRole: function () {
+      sweetQuestion(
+        `当前操作不可撤销，确定要删除“${this.role.displayName}”证书？`,
+      )
+        .then(() => {
+          return nkcAPI('/e/settings/role/' + app.role._id, 'DELETE', {});
         })
-        .catch(function(err) {
-          screenTopWarning(err);
+        .then(function () {
+          visitUrl('/e/settings/role');
         })
+        .catch(sweetError);
     },
-    extendCount: function(types) {
-      for(var j = 0; j < types.length; j++) {
+    extendCount: function (types) {
+      for (var j = 0; j < types.length; j++) {
         var type = types[j];
         var operations = [];
-        for(var i = 0; i < this.operations.length; i++) {
+        for (var i = 0; i < this.operations.length; i++) {
           var operation = this.operations[i];
-          if(operation.typeId.indexOf(type._id) !== -1) {
+          if (operation.typeId.indexOf(type._id) !== -1) {
             operations.push(operation);
-          };
+          }
         }
         type.operations = operations;
       }
       return types;
     },
-    selectType: function(type) {
-      this.type = type;
-    },
-    changeColor: function(value) {
+    changeColor: function (value) {
       this.role.color = value;
     },
-    uploadIcon: function(e) {
+    uploadIcon: function (e) {
       var input = e.target;
       var role = app.role;
       var file = input.files[0];
       var formData = new FormData();
       formData.append('file', file);
       input.value = '';
-      uploadFilePromise('/e/settings/role/' + role._id + '/icon', formData)
-        .then(function() {
+      nkcUploadFile('/e/settings/role/' + role._id + '/icon', formData)
+        .then(function () {
           role.hasIcon = true;
           var img = app.$refs.img;
-          if(img) {
-            img.setAttribute('src', '/statics/role_icon/' + role._id + '.png?t=' + Date.now());
+          if (img) {
+            img.setAttribute(
+              'src',
+              '/statics/role_icon/' + role._id + '.png?t=' + Date.now(),
+            );
           }
         })
-        .catch(function(err) {
-          screenTopWarning(err);
-        });
+        .catch(sweetError);
     },
-    deleteIcon: function() {
+    deleteIcon: function () {
       this.role.hasIcon = false;
     },
-    clickIconButton: function() {
+    clickIconButton: function () {
       var input = this.$refs.input;
       input.click();
     },
-    save: function() {
+    save: function () {
       var role = this.role;
-      nkcAPI('/e/settings/role/' + role._id, 'PUT', {role: role})
-        .then(function() {
-          screenTopAlert('保存成功');
+      nkcAPI('/e/settings/role/' + role._id, 'PUT', { role: role })
+        .then(function () {
+          sweetSuccess('保存成功');
         })
-        .catch(function(err) {
-          screenTopWarning(err);
-        })
-    }
-  }
-})
+        .catch(sweetError);
+    },
+  },
+});

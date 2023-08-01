@@ -260,7 +260,6 @@ module.exports = {
     },
     log: {
       GET: Operations.logParamsSetting,
-      POST: Operations.logParamsSettingModify,
     },
     page: {
       GET: Operations.visitPageSettings,

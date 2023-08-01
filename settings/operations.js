@@ -199,7 +199,6 @@ const DynamicOperations = {
   visitXsfSettings: 'visitXsfSettings',
   modifyXsfSettings: 'modifyXsfSettings',
   logParamsSetting: 'logParamsSetting',
-  logParamsSettingModify: 'logParamsSettingModify',
   visitPageSettings: 'visitPageSettings',
   modifyPageSettings: 'modifyPageSettings',
   visitExamSettings: 'visitExamSettings',

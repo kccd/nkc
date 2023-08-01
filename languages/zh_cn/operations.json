@@ -339,16 +339,12 @@
   "visitAppDownload": "访问app下载页面",
   "sendAnApplicationToAddAFriend": "发送添加好友的申请",
   "getFriendsApplication": "获取好友申请信息",
-  "agreeApplicationToAddAFriend": "同意好友的添加申请",
-  "disagreeApplicationToAddAFriend": "拒绝好友的添加申请",
   "getFriendNotePicture": "获取关于好友的备注图片",
   "modifyFriendNotePicture": "修改关于好友的备注图片",
   "modifyMessageSettingsForUser": "修改好友备注信息及权限设置",
   "removeMessageChat": "从消息中移除已创建的聊天",
-  "deleteFriend": "删除用户",
   "modifyFriendCategory" : "修改好友分组信息",
   "removeFriendCategory": "删除好友分组",
-  "addFriendsCategory": "添加好友分组",
   "messageSearchUser": "消息中的搜索用户",
   "visitHomeSubscription": "首页我的关注",
 
@@ -895,5 +891,6 @@
   "modifyPostNoticeContent": "修改新版公告内容",
   "disablePostNotice": "屏蔽新版公告",
   "getPostNotices": "获取新版通告列表",
-  "visitPublicExam": "访问开卷考试"
+  "visitPublicExam": "访问开卷考试",
+  "manageQuestionTags": "管理考试系统试题标签"
 }

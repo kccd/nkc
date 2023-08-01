@@ -1,9 +1,32 @@
 const { operationTree } = require('../settings/operations/index.js');
 const { Operations } = require('../settings/operations.js');
+const { files: fileOperationsId } = require('../settings/operationGroups');
+const methods = ['POST', 'GET', 'PUT', 'DELETE'];
 
-// 获取所有的操作权限
+// 获取所有的操作
 function getOperationsId() {
   return [...Object.values(Operations)];
+}
+
+// 获取路由操作
+function getRouterOperationsId() {
+  const fn = (obj, arr) => {
+    for (let key in obj) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+        continue;
+      }
+      if (methods.includes(key)) {
+        arr.push(obj[key]);
+      } else {
+        if (typeof obj[key] === 'object') {
+          fn(obj[key], arr);
+        }
+      }
+    }
+  };
+  const operations = [];
+  fn(operationTree, operations);
+  return [...new Set(operations)];
 }
 
 // 根据 request 中的 url 和 method 获取操作权限
@@ -42,7 +65,15 @@ function getOperationId(url, method) {
   }
 }
 
+function getLoggerOperationsId() {
+  return getRouterOperationsId().filter(
+    (operationId) => !fileOperationsId.includes(operationId),
+  );
+}
+
 module.exports = {
   getOperationId,
   getOperationsId,
+  getRouterOperationsId,
+  getLoggerOperationsId,
 };

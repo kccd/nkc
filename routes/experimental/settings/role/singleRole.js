@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const {
   userMemoService,
 } = require('../../../../services/user/userMemo.service');
+const { DynamicOperations } = require('../../../../settings/operations.js');
 const router = new Router();
 router
   .use('/', async (ctx, next) => {
@@ -15,15 +16,12 @@ router
     ctx.template = 'experimental/settings/role/singleRole.pug';
     const defaultRole = await db.RoleModel.findOnly({ _id: 'default' });
     data.defaultOperationsId = defaultRole.operationsId;
-    data.operationTypes = await db.OperationTypeModel.find().sort({ toc: 1 });
-    const operations = await db.OperationModel.find();
-    data.operations = await Promise.all(
-      operations.map(async (o) => {
-        const operation = o.toObject();
-        operation.name = ctx.state.lang('operations', operation._id);
-        return operation;
-      }),
-    );
+    data.operations = Object.values(DynamicOperations).map((operationId) => {
+      return {
+        operationId: operationId,
+        operationName: ctx.state.lang('operations', operationId),
+      };
+    });
     const { role } = data;
     let q = {};
     if (role._id === 'default') {
@@ -37,6 +35,7 @@ router
       uid: 1,
       username: 1,
       kcb: 1,
+      xsf: 1,
       threadCount: 1,
       postCount: 1,
       toc: 1,
@@ -49,11 +48,12 @@ router
       targetUsersId: usersId,
     });
     data.users = users.map((u) => {
-      const { uid, username, kcb, threadCount, postCount, toc } = u;
+      const { uid, username, kcb, threadCount, postCount, toc, xsf } = u;
       return {
         uid,
         username,
         kcb,
+        xsf,
         threadCount,
         postCount,
         toc,
@@ -114,10 +114,10 @@ router
       hidden: !!hidden,
     };
     if (role._id !== 'dev') {
-      const operations = await db.OperationModel.find({
-        _id: { $in: operationsId },
-      });
-      updateObj.operationsId = operations.map((o) => o._id);
+      const allOperationsId = Object.values(DynamicOperations);
+      updateObj.operationsId = operationsId.filter((operationId) =>
+        allOperationsId.includes(operationId),
+      );
     }
     await roleDB.updateOne(updateObj);
     await db.RoleModel.saveRolesToRedis();

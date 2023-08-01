@@ -22,7 +22,6 @@ module.exports = async (ctx, next) => {
     postSettings: await db.SettingModel.getSettings('post'),
     serverSettings: await db.SettingModel.getSettings('server'),
     stickerSettings: await db.SettingModel.getSettings('sticker'),
-    logSettings: await db.SettingModel.getSettings('log'),
     threadSettings: await db.SettingModel.getSettings('thread'),
     // 缓存相关
     cachePage: false,
