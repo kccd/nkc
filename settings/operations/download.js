@@ -1,3 +1,3 @@
 module.exports = {
-  POST: 'editorAutoUploadImage'
+  POST: 'editorAutoUploadImage',
 };

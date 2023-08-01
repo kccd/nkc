@@ -3,5 +3,5 @@ module.exports = {
     GET: 'OAuthAuthentication',
     POST: 'OAuthAuthentication',
     PUT: 'OAuthAuthentication',
-  }
-}
+  },
+};

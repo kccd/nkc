@@ -1,12 +1,12 @@
 module.exports = {
-  GET: "nkcManagement",
-  POST: "nkcManagement",
+  GET: 'nkcManagement',
+  POST: 'nkcManagement',
   home: {
-    GET: "nkcManagementHome",
-    POST: "nkcManagementHome",
-    PUT: "nkcManagementHome",
+    GET: 'nkcManagementHome',
+    POST: 'nkcManagementHome',
+    PUT: 'nkcManagementHome',
     showActivityEnter: {
-      PUT: "showActivityEnter"
+      PUT: 'showActivityEnter',
     },
     block: {
       POST: 'nkcManagementHome',
@@ -19,44 +19,44 @@ module.exports = {
           PUT: 'nkcManagementHome',
         },
         refresh: {
-          POST: 'nkcManagementHome'
-        }
-      }
-    }
+          POST: 'nkcManagementHome',
+        },
+      },
+    },
   },
   sticker: {
-    GET: "nkcManagementSticker",
-    POST: "nkcManagementSticker"
+    GET: 'nkcManagementSticker',
+    POST: 'nkcManagementSticker',
   },
   note: {
-    GET: "nkcManagementNote",
-    POST: "nkcManagementNote"
+    GET: 'nkcManagementNote',
+    POST: 'nkcManagementNote',
   },
   post: {
-    GET: "nkcManagementPost",
-    POST: "nkcManagementPost"
+    GET: 'nkcManagementPost',
+    POST: 'nkcManagementPost',
   },
   document: {
-    GET: "nkcManagementDocument",
-    POST: "nkcManagementDocument"
+    GET: 'nkcManagementDocument',
+    POST: 'nkcManagementDocument',
   },
   column: {
-    GET: "nkcManagementColumn",
+    GET: 'nkcManagementColumn',
     POST: 'nkcManagementColumn',
   },
   section: {
-    GET: "nkcManagementSection",
-    POST: "nkcManagementSection"
+    GET: 'nkcManagementSection',
+    POST: 'nkcManagementSection',
   },
   applyForum: {
     GET: 'nkcManagementApplyForum',
-    POST: "nkcManagementApplyForum"
+    POST: 'nkcManagementApplyForum',
   },
   securityApplication: {
     GET: 'nkcManagementSecurityApplication',
-    POST: 'nkcManagementSecurityApplication'
+    POST: 'nkcManagementSecurityApplication',
   },
   os: {
-    GET: 'nkcManagementOS'
-  }
+    GET: 'nkcManagementOS',
+  },
 };

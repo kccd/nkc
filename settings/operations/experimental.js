@@ -462,6 +462,11 @@ module.exports = {
     },
     exam: {
       GET: 'visitExperimentalExam',
+      paper: {
+        PARAMETER: {
+          GET: 'visitExperimentalExam',
+        },
+      },
     },
     warning: {
       GET: 'experimentalWarningLog',

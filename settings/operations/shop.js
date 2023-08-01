@@ -4,32 +4,32 @@ module.exports = {
     PARAMETER: {
       GET: 'visitProductSingle',
       top: {
-        POST: "pushGoodsToHome",
-        DELETE: "pushGoodsToHome"
+        POST: 'pushGoodsToHome',
+        DELETE: 'pushGoodsToHome',
       },
       changePara: {
-        PUT: 'changeProductParams'
+        PUT: 'changeProductParams',
       },
       banSale: {
-        PUT: 'banSaleProductParams'
-      }
-    }
+        PUT: 'banSaleProductParams',
+      },
+    },
   },
   manage: {
-    GET: "visitManageRouter",
+    GET: 'visitManageRouter',
     // 订单管理
     order: {
-      GET: "visitShopOrderIndex"
+      GET: 'visitShopOrderIndex',
     },
     // 作为卖家编辑交易设置，包含全局公告、运费模板
     settings: {
-      GET: "modifyStoreInfo",
-      PUT: "modifyStoreInfo"
+      GET: 'modifyStoreInfo',
+      PUT: 'modifyStoreInfo',
     },
     // 上架相关
     shelf: {
       GET: 'visitShelfIndex',
-      POST: 'productToShelf'
+      POST: 'productToShelf',
     },
     home: {
       GET: 'visitManageHome',
@@ -37,15 +37,15 @@ module.exports = {
     PARAMETER: {
       GET: 'visitManageIndex',
       home: {
-        GET:'visitManageHome',
+        GET: 'visitManageHome',
       },
       info: {
         GET: 'visitStoreInfoIndex',
-        POST: 'modifyStoreInfo'
+        POST: 'modifyStoreInfo',
       },
       template: {
         GET: 'visitFreightTemplate',
-        PUT: 'saveFreightTemplate'
+        PUT: 'saveFreightTemplate',
       },
       /* // 上架相关
       shelf: {
@@ -54,124 +54,124 @@ module.exports = {
       }, */
       decoration: {
         sign: {
-          POST: 'modifyStoreDecorationSign'
+          POST: 'modifyStoreDecorationSign',
         },
         service: {
-          POST: 'modifyStoreDecorationService'
+          POST: 'modifyStoreDecorationService',
         },
         search: {
-          POST: 'modifyStoreDecorationSearch'
+          POST: 'modifyStoreDecorationSearch',
         },
         featured: {
-          GET: "visitFeaturedProductList",
-          POST: "modifyStoreDecorationFeatured"
+          GET: 'visitFeaturedProductList',
+          POST: 'modifyStoreDecorationFeatured',
         },
         addClass: {
-          PUT: 'addStoreClassFeatured'
+          PUT: 'addStoreClassFeatured',
         },
         delClass: {
-          PUT: 'delStoreClassFeatured'
+          PUT: 'delStoreClassFeatured',
         },
         singleClass: {
-          GET: 'getStoreSingleClassify'
+          GET: 'getStoreSingleClassify',
         },
         addSingleClass: {
-          PUT: 'addStoreSingleClassify'
+          PUT: 'addStoreSingleClassify',
         },
         GET: 'visitStoreDecorationIndex',
-        POST: 'modifyStoreDecoration'
+        POST: 'modifyStoreDecoration',
       },
       classify: {
         GET: 'visitShopClassifyIndex',
         add: {
-          POST: 'addStoreClassify'
+          POST: 'addStoreClassify',
         },
         del: {
-          POST: 'delStoreClassify'
-        }
+          POST: 'delStoreClassify',
+        },
       },
       order: {
         GET: 'visitShopOrderIndex',
         sendGoods: {
-          PUT: 'sendGoods'
+          PUT: 'sendGoods',
         },
         editGoods: {
-          PUT: 'editGoodsLogositics'
+          PUT: 'editGoodsLogositics',
         },
-        sendGoodsNoLog:{
-          PUT: "sendGoodsNoLog"
+        sendGoodsNoLog: {
+          PUT: 'sendGoodsNoLog',
         },
         editOrder: {
-          PUT: 'editOrder'
+          PUT: 'editOrder',
         },
         editOrderTrackNumber: {
-          PUT: 'editOrderTrackNumber'
+          PUT: 'editOrderTrackNumber',
         },
         detail: {
-          GET: "visitStoreOrderDetail"
+          GET: 'visitStoreOrderDetail',
         },
         refund: {
           GET: 'visitStoreOrderRefund',
-          POST: 'submitStoreOrderRefund'
+          POST: 'submitStoreOrderRefund',
         },
         logositics: {
-          GET: 'visitStoreOrderLogositics'
+          GET: 'visitStoreOrderLogositics',
         },
         cancel: {
-          GET: "storeCancelOrder",
-          POST: "storeCancelOrder"
+          GET: 'storeCancelOrder',
+          POST: 'storeCancelOrder',
         },
         editSellMessage: {
-          PUT: "editSellMessage",
+          PUT: 'editSellMessage',
         },
         editCostRecord: {
-          PUT: "editCostRecord",
+          PUT: 'editCostRecord',
         },
         editOrderPrice: {
-          PUT: "editOrderPrice"
+          PUT: 'editOrderPrice',
         },
         orderListToExcel: {
-          GET: "orderListToExcel"
-        }
+          GET: 'orderListToExcel',
+        },
       },
       goodslist: {
-        GET: "visitStoreGoodsList",
+        GET: 'visitStoreGoodsList',
         editParam: {
-          GET: "visitStoreGoodsParamEdit",
-          PUT: "submitEditToParam"
+          GET: 'visitStoreGoodsParamEdit',
+          PUT: 'submitEditToParam',
         },
         editProduct: {
-          GET: "visitStoreGoodsProductEdit",
-          PUT: "submitEditToProduct",
+          GET: 'visitStoreGoodsProductEdit',
+          PUT: 'submitEditToProduct',
         },
         shelfRightNow: {
-          PUT: "productShelfRightNow"
+          PUT: 'productShelfRightNow',
         },
         productStopSale: {
-          PUT: "productStopSale"
+          PUT: 'productStopSale',
         },
         productGoonSale: {
-          PUT: "productGoonSale"
-        }
-      }
+          PUT: 'productGoonSale',
+        },
+      },
     },
   },
   openStore: {
     GET: 'visitOpenStoreIndex',
-    POST: 'openStoreApply'
+    POST: 'openStoreApply',
   },
   store: {
-    PARAMETER:{
+    PARAMETER: {
       GET: 'visitStoreIndex',
-    }
+    },
   },
   cart: {
     POST: 'addProductToCart',
     GET: 'visitShopCart',
     PARAMETER: {
       PUT: 'modifyCartData',
-      DELETE: 'modifyCartData'
-    }
+      DELETE: 'modifyCartData',
+    },
   },
   bill: {
     GET: 'visitShopBill',
@@ -181,48 +181,48 @@ module.exports = {
     },
     plus: {
       PUT: 'billParamPlusOne',
-    }
+    },
   },
   order: {
     GET: 'visitUserOrder',
     POST: 'submitToPay',
     PARAMETER: {
       refund: {
-        GET: 'visitUserOrderRefund'
+        GET: 'visitUserOrderRefund',
       },
       logistics: {
-        GET: "visitOrderLogistics"
+        GET: 'visitOrderLogistics',
       },
       receipt: {
-        PUT: 'confirmOrderReceipt'
+        PUT: 'confirmOrderReceipt',
       },
       detail: {
-        GET: 'visitSingleOrderDetail'
+        GET: 'visitSingleOrderDetail',
       },
       delivery: {
-        PUT: 'modifyShopOrderDeliveryInfo'
-      }
-    }
+        PUT: 'modifyShopOrderDeliveryInfo',
+      },
+    },
   },
   pay: {
     GET: 'visitShopPay',
     POST: 'kcbPay',
     alipay: {
-      POST: 'getAlipayUrl'
-    }
+      POST: 'getAlipayUrl',
+    },
   },
   refund: {
     POST: 'userApplyRefund',
     PARAMETER: {
-      POST: "userApplyRefund"
-    }
+      POST: 'userApplyRefund',
+    },
   },
   cert: {
     POST: 'shopUploadCert',
     PUT: 'saveShopCerts',
     PARAMETER: {
       GET: 'shopGetCert',
-      DELETE: 'shopDeleteCert'
-    }
-  }
+      DELETE: 'shopDeleteCert',
+    },
+  },
 };

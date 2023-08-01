@@ -1,4 +1,3 @@
-const { Operations } = require('../operations');
 module.exports = {
   GET: 'visitExamPaperList',
   record: {
@@ -55,12 +54,12 @@ module.exports = {
     GET: 'visitEditQuestion',
   },
   public: {
-    GET: Operations.Visit_Public_Exam,
+    GET: 'Visit_Public_Exam',
     register: {
-      GET: Operations.Visit_Public_Exam,
+      GET: 'Visit_Public_Exam',
     },
     takeExam: {
-      GET: Operations.Visit_Public_Exam,
+      GET: 'Visit_Public_Exam',
     },
   },
 };

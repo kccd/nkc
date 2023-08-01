@@ -11,6 +11,7 @@ block content
     include ../publicModules/selectForum/selectForum.pug
     .hidden#data=JSON.stringify({question: data.question || ''})
     .row#app(v-cloak)
+      question-tag-selector(ref='questionTagSelector')
       .col-xs-12.col-md-12.text-center(v-if='submitted')
         include ../publicModules/icon-success
         h4 非常感谢您的提交！

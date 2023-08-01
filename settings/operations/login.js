@@ -1,4 +1,4 @@
 module.exports = {
-	GET: 'visitLogin',
-	POST: 'submitLogin'
+  GET: 'visitLogin',
+  POST: 'submitLogin',
 };

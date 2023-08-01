@@ -1,8 +1,8 @@
 module.exports = {
-  GET: "test",
+  GET: 'test',
   POST: 'test',
   PUT: 'test',
   PARAMETER: {
-    GET: "test",
-  }
+    GET: 'test',
+  },
 };

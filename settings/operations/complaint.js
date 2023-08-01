@@ -2,9 +2,9 @@ module.exports = {
   GET: 'complaintGet',
   POST: 'complaintPost',
   resolve: {
-    POST: "complaintResolvePost"
+    POST: 'complaintResolvePost',
   },
   type: {
-    GET: 'complaintPost'
-  }
+    GET: 'complaintPost',
+  },
 };

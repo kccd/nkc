@@ -1,13 +1,13 @@
 module.exports = {
-  GET: "getLibraryInfo",
+  GET: 'getLibraryInfo',
   PARAMETER: {
-    PUT: "modifyLibraryFolder",
-    POST: "libraryUpload",
-    GET: "getLibraryInfo",
+    PUT: 'modifyLibraryFolder',
+    POST: 'libraryUpload',
+    GET: 'getLibraryInfo',
     list: {
-      POST: "createLibraryFolder",
-      PUT: "moveLibraryFolder",
-      DELETE: "deleteLibraryFolder"
+      POST: 'createLibraryFolder',
+      PUT: 'moveLibraryFolder',
+      DELETE: 'deleteLibraryFolder',
     },
-  }
+  },
 };

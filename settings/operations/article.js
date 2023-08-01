@@ -1,14 +1,14 @@
 module.exports = {
   PARAMETER: {
-    DELETE: "deleteArticle",
+    DELETE: 'deleteArticle',
     options: {
-      GET: "getArticleOptions",
+      GET: 'getArticleOptions',
     },
     unblock: {
-      POST: "unblockArticle",
+      POST: 'unblockArticle',
     },
     draft: {
-      DELETE: "deleteArticleDraft",
+      DELETE: 'deleteArticleDraft',
     },
     collection: {
       POST: 'collectionArticle',
@@ -25,23 +25,23 @@ module.exports = {
       xsf: {
         POST: 'creditXsf',
         PARAMETER: {
-          DELETE: 'cancelXsf'
-        }
+          DELETE: 'cancelXsf',
+        },
       },
       kcb: {
         POST: 'creditKcb',
         PARAMETER: {
-          PUT: "modifyKcbRecordReason"
-        }
-      }
+          PUT: 'modifyKcbRecordReason',
+        },
+      },
     },
     vote: {
       up: {
-        POST: 'post-vote-up'
+        POST: 'post-vote-up',
       },
       down: {
-        POST: 'post-vote-down'
-      }
+        POST: 'post-vote-down',
+      },
     },
-  }
+  },
 };

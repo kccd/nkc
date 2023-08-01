@@ -1,3 +1,4 @@
+import QuestionTagSelector from '../lib/vue/QuestionTagSelector.vue';
 var defaultQuestion = {
   type: 'ch4',
   public: false,
@@ -32,6 +33,9 @@ var app = new Vue({
     submitting: '',
     question: JSON.parse(JSON.stringify(defaultQuestion)),
   },
+  components: {
+    'question-tag-selector': QuestionTagSelector,
+  },
   mounted: function () {
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
@@ -50,6 +54,7 @@ var app = new Vue({
     vueSelectForum.init({
       func: this.selectedForum,
     });
+    // this.$refs.questionTagSelector.open();
   },
   methods: {
     showSelectForumPanel: function () {

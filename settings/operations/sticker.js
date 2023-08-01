@@ -1,7 +1,7 @@
 module.exports = {
-  GET: "stickerCenter",
-  POST: "modifySticker",
+  GET: 'stickerCenter',
+  POST: 'modifySticker',
   PARAMETER: {
-    GET: "getSticker"
-  }
+    GET: 'getSticker',
+  },
 };

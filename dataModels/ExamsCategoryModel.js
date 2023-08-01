@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const typeObj = { secret: 'secret', public: 'public' };
 const schema = new Schema(
   {
     _id: Number,
@@ -56,14 +57,32 @@ const schema = new Schema(
       default: [],
     },
     from: {
-      // 考卷试题来源
-      type: Schema.Types.Mixed,
-      default: [],
+      type: [
+        {
+          // 试题来源的标签，tag=null意味着不区分标签而全部选择
+          tag: {
+            type: Number,
+            index: 1,
+            require: true,
+          },
+          // 抽取试题的道数
+          count: {
+            type: Number,
+            default: 1,
+          },
+        },
+      ],
     },
     type: {
       type: String,
-      default: 'secret',
+      default: typeObj.secret,
+      required: true,
     },
+    /*from: {
+      // 考卷试题来源
+      type: Schema.Types.Mixed,
+      default: [],
+    },*/
     /* from: [
     {
       type: { // pub: public, pro: professional
@@ -86,6 +105,6 @@ const schema = new Schema(
   },
 );
 schema.statics.getExamCategoryType = async () => {
-  return { secret: 'secret', public: 'public' };
+  return typeObj;
 };
 module.exports = mongoose.model('examsCategories', schema);

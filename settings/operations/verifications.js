@@ -1,4 +1,4 @@
 module.exports = {
   GET: 'getVerifications',
-  POST: 'getVerifications'
-}
+  POST: 'getVerifications',
+};

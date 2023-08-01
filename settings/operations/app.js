@@ -1,72 +1,72 @@
 module.exports = {
-	GET: 'visitAppDownload',
+  GET: 'visitAppDownload',
   upgrade: {
     GET: 'APPUpgrade',
   },
-	location: {
-		GET: "selectLocation",
-	},
-	check: {
-		GET: 'APPcheckout',
-	},
-	nav: {
-		GET: "APPGetNav"
-	},
-	my: {
-		GET: "APPGetMy"
-	},
-  account: {
-    GET: 'APPGetAccountInfo'
+  location: {
+    GET: 'selectLocation',
   },
-	download: {
-		GET: "appGetDownload"
-	},
-	profile: {
-		GET: "appVisitProfile",
+  check: {
+    GET: 'APPcheckout',
+  },
+  nav: {
+    GET: 'APPGetNav',
+  },
+  my: {
+    GET: 'APPGetMy',
+  },
+  account: {
+    GET: 'APPGetAccountInfo',
+  },
+  download: {
+    GET: 'appGetDownload',
+  },
+  profile: {
+    GET: 'appVisitProfile',
     blacklist: {
-      GET: 'appVisitProfile'
+      GET: 'appVisitProfile',
     },
     finance: {
-      GET: 'appVisitProfile'
+      GET: 'appVisitProfile',
     },
-		sub: {
-			GET: "appVisitProfile",
-			user: {
-				GET: "appVisitProfile",
-			},
-			forum: {
-				GET: "appVisitProfile",
-			},
-			column: {
-				GET: "appVisitProfile",
-			},
-			thread: {
-				GET: "appVisitProfile",
-			},
-			fan: {
-				GET: "appVisitProfile",
-			},
-			follower: {
-				GET: "appVisitProfile",
-			},
-			collection: {
-				GET: "appVisitProfile",
-			},
-		},
-	},
-	scoreChange: {
-		PARAMETER: {
-			GET: 'APPgetScoreChange'
-		}
-	},
-	android: {
-		PARAMETER: {
-			GET: 'downloadApp'
-		}
-	},
-	ios: {
-		PARAMETER: {
-			GET: 'downloadApp'
-		}
-	}
+    sub: {
+      GET: 'appVisitProfile',
+      user: {
+        GET: 'appVisitProfile',
+      },
+      forum: {
+        GET: 'appVisitProfile',
+      },
+      column: {
+        GET: 'appVisitProfile',
+      },
+      thread: {
+        GET: 'appVisitProfile',
+      },
+      fan: {
+        GET: 'appVisitProfile',
+      },
+      follower: {
+        GET: 'appVisitProfile',
+      },
+      collection: {
+        GET: 'appVisitProfile',
+      },
+    },
+  },
+  scoreChange: {
+    PARAMETER: {
+      GET: 'APPgetScoreChange',
+    },
+  },
+  android: {
+    PARAMETER: {
+      GET: 'downloadApp',
+    },
+  },
+  ios: {
+    PARAMETER: {
+      GET: 'downloadApp',
+    },
+  },
 };

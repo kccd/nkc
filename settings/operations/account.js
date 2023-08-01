@@ -4,34 +4,34 @@ module.exports = {
       GET: 'accountRecharge',
       POST: 'rechargePost',
       payment: {
-        POST: 'accountRecharge'
-      }
+        POST: 'accountRecharge',
+      },
     },
     withdraw: {
       GET: 'accountWithdraw',
-      POST: "accountWithdraw"
+      POST: 'accountWithdraw',
     },
     exchange: {
       GET: 'accountExchange',
-      POST: 'accountExchange'
-    }
+      POST: 'accountExchange',
+    },
   },
   contribute: {
-    GET: "visitUserContribute"
+    GET: 'visitUserContribute',
   },
   subscribes: {
-    GET: "account_subscribe",
-    PUT: "account_subscribe",
+    GET: 'account_subscribe',
+    PUT: 'account_subscribe',
   },
   subscribe_settings: {
     GET: 'account_subscribe',
   },
   subscribe_types: {
-    GET: "account_subscribe",
-    POST: "account_subscribe",
+    GET: 'account_subscribe',
+    POST: 'account_subscribe',
     PARAMETER: {
-      DELETE: "account_subscribe",
-      PUT: "account_subscribe"
-    }
-  }
-}
+      DELETE: 'account_subscribe',
+      PUT: 'account_subscribe',
+    },
+  },
+};

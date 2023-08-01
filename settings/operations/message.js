@@ -1,19 +1,19 @@
 module.exports = {
   GET: 'visitMessagePage',
   list: {
-    GET: 'messageGetData'
+    GET: 'messageGetData',
   },
   systemInfo: {
     //GET: 'getSystemInfo'
   },
   blackList: {
-    POST: "messageBlackList"
+    POST: 'messageBlackList',
   },
   remind: {
     //GET: 'getRemind'
   },
   friendsApplication: {
-    GET: 'getFriendsApplication'
+    GET: 'getFriendsApplication',
   },
   friend: {
     GET: 'messageGetData',
@@ -21,42 +21,42 @@ module.exports = {
     DELETE: 'messagePostData',
     PUT: 'messagePostData',
     apply: {
-      POST: 'messagePostData'
-    }
+      POST: 'messagePostData',
+    },
   },
   user: {
     GET: 'messageGetData',
     PARAMETER: {
       //GET: 'getUserMessage',
-      POST: 'sendMessageToUser'
-    }
+      POST: 'sendMessageToUser',
+    },
   },
   resource: {
     PARAMETER: {
-      GET: 'getMessageFile'
-    }
+      GET: 'getMessageFile',
+    },
   },
   settings: {
     GET: 'messageGetData',
     PUT: 'modifyMessageSettings',
   },
   mark: {
-    PUT: 'modifyMessageStatus'
+    PUT: 'modifyMessageStatus',
   },
   withdrawn: {
-    PUT: 'userWithdrawnMessage'
+    PUT: 'userWithdrawnMessage',
   },
   chat: {
-    DELETE: 'messagePostData'
+    DELETE: 'messagePostData',
   },
   search: {
-    GET: 'messageSearchUser'
+    GET: 'messageSearchUser',
   },
   data: {
-    GET: "messageDataGet"
+    GET: 'messageDataGet',
   },
   addFriend: {
-    GET: 'sendAnApplicationToAddAFriend'
+    GET: 'sendAnApplicationToAddAFriend',
   },
   category: {
     GET: 'messageCategory',

@@ -1,3 +1,3 @@
 module.exports = {
-	GET: 'logout'
+  GET: 'logout',
 };

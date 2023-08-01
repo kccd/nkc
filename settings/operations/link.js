@@ -1,6 +1,6 @@
 module.exports = {
-  GET: "linkToTarget",
+  GET: 'linkToTarget',
   report: {
-    POST: "reportLinkToTarget"
-  }
+    POST: 'reportLinkToTarget',
+  },
 };

@@ -1,5 +1,5 @@
 module.exports = {
-	faq: {
-		GET: 'faq'
-	}
+  faq: {
+    GET: 'faq',
+  },
 };

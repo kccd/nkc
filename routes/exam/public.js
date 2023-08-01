@@ -37,7 +37,6 @@ publicRouter
     ).lean();
     categorise.reduce((acc, cur) => {
       const { from, ...resParma } = cur;
-      console.log(from, 'from');
     }, []);
     // data.examSource = examSource;
     await next();

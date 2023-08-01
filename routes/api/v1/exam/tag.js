@@ -1,0 +1,31 @@
+const router = require('koa-router')();
+const { Operations } = require('../../../../settings/operations.js');
+const { OnlyPermission } = require('../../../../middlewares/permission');
+const {
+  questionTagService,
+} = require('../../../../services/exam/questionTag.service');
+router
+  .put(
+    '/',
+    OnlyPermission(Operations.MANAGE_QUESTION_TAGS),
+    async (ctx, next) => {
+      const { name, desc } = ctx.body;
+      const { tagId } = ctx.params;
+      await questionTagService.checkNameDescFormat(name, desc);
+      await questionTagService.modifyQuestionTag({
+        _id: tagId,
+        name,
+        desc,
+      });
+      await next();
+    },
+  )
+  .del(
+    '/',
+    OnlyPermission(Operations.MANAGE_QUESTION_TAGS),
+    async (ctx, next) => {
+      await next();
+    },
+  );
+
+module.exports = router;

@@ -1,0 +1,84 @@
+extends ../../experimental
+block eTitle
+  title 试卷详情
+  +includeCSS('/experimental/log/exam/paper.css')
+block eContent
+  #data.hidden=objToStr({paper: data.paper, category: data.category, paperUser: data.paperUser})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-5
+        .form-horizontal
+          .form-group
+            label.col-sm-5.control-label 考卷ID：
+            h5.col-sm-7
+              strong {{paper._id}}
+          .form-group
+            label.col-sm-5.control-label 发卷时间：
+            h5.col-sm-7
+              strong {{detailedTime(paper.toc)}}
+          .form-group
+            label.col-sm-5.control-label 交卷时间：
+            h5.col-sm-7
+              strong {{detailedTime(paper.tlm)}}
+          .form-group
+            label.col-sm-5.control-label 用户：
+            h5.col-sm-7
+              a(
+                :href="getUrl('userHome', paper.uid)"
+                target="_blank"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({ uid: paper.uid })"
+                )
+                strong {{paperUser.username}}
+          .form-group
+            label.col-sm-5.control-label 考试科目
+            h5.col-sm-7
+              a(:href="`/exam/categories/editor?cid=${category._id}`" target="_blank")
+                strong {{category.name}}
+              span ({{category.volume}})
+          .form-group
+            label.col-sm-5.control-label 及格分数：
+            h5.col-sm-7
+              strong {{paper.passScore}}
+          .form-group
+            label.col-sm-5.control-label 试卷得分：
+            h5.col-sm-7
+              strong {{paper.score}}
+          .form-group
+            label.col-sm-5.control-label 状态：
+            h5.col-sm-7
+                strong.text-success(v-if="paper.passed") 通过
+                strong.text-danger(v-else) 未通过
+          .form-group
+            label.col-sm-5.control-label IP：
+            h5.col-sm-7
+              strong
+                .pointer.text-primary(@click=`showIpInfo(paper.ip)`) {{paper.ip}}
+      .col-xs-12.col-md-7
+        h3.m-b-2
+          strong 答题卡
+          small &nbsp;绿色为正确答案
+        hr
+
+        div
+          div.m-b-2(v-for='(record, index) in paper.record')
+            div.question-content.m-b-05(v-html="markdownToHTML(`${index + 1}、${record.content || '太久远，未导入'}`)")
+            div.font-size-1rem.text-info.m-b-05(v-if='record.contentDesc.length > 0') 题干说明：{{record.contentDesc}}
+            div.question-answers.m-b-1
+              div.question.m-b-05(v-for="(answer, index) in record.answer" v-if='record.type === "ch4"')
+                //- 选择题
+                div.question-answer-text.m-b-05(
+                  v-html="markdownToHTML(`${optionIndex[index]}、${answer.text}${answer.selected? '【已选】': ''}`)"
+                  :class="{'text-danger': !answer.correct, 'text-success': answer.correct}"
+                  )
+                div.font-size-1rem.text-info(v-if='answer.desc.length > 0') 选项说明：{{answer.desc}}
+              div.question-result.m-b-05(v-else)
+                //- 填空题
+                div.text-success 标准答案：{{record.answer[0].text}}
+                div 用户作答：{{record.answer[0].fill}}
+            div.question-result #&nbsp;
+              span.text-success(v-if='record.correct') 回答正确
+              span.text-danger(v-else) 回答错误
+block scripts
+  +includeJS("/experimental/log/exam/paper.js")
