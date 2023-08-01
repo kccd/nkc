@@ -1,15 +1,16 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   mobile: {
-    GET: 'visitFindPasswordByMobile',
-    POST: 'findPasswordVerifyMobile',
-    PUT: 'modifyPasswordByMobile',
+    GET: Operations.visitFindPasswordByMobile,
+    POST: Operations.findPasswordVerifyMobile,
+    PUT: Operations.modifyPasswordByMobile,
   },
   email: {
-    GET: 'visitFindPasswordByEmail',
-    POST: 'findPasswordSendVerifyEmail',
-    PUT: 'modifyPasswordByEmail',
+    GET: Operations.visitFindPasswordByEmail,
+    POST: Operations.findPasswordSendVerifyEmail,
+    PUT: Operations.modifyPasswordByEmail,
     verify: {
-      GET: 'findPasswordVerifyEmail',
+      GET: Operations.findPasswordVerifyEmail,
     },
   },
 };

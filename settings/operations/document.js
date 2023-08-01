@@ -1,13 +1,14 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   preview: {
-    GET: 'previewDocument',
+    GET: Operations.previewDocument,
   },
   history: {
-    GET: 'viewHistoryDocument',
+    GET: Operations.viewHistoryDocument,
     PARAMETER: {
-      GET: 'viewHistoryDocument',
+      GET: Operations.viewHistoryDocument,
       edit: {
-        POST: 'historyEditDocument',
+        POST: Operations.historyEditDocument,
       },
     },
   },

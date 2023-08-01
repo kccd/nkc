@@ -1,4 +1,5 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitLogin',
-  POST: 'submitLogin',
+  GET: Operations.visitLogin,
+  POST: Operations.submitLogin,
 };

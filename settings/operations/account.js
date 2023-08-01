@@ -1,37 +1,38 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   finance: {
     recharge: {
-      GET: 'accountRecharge',
-      POST: 'rechargePost',
+      GET: Operations.accountRecharge,
+      POST: Operations.rechargePost,
       payment: {
-        POST: 'accountRecharge',
+        POST: Operations.accountRecharge,
       },
     },
     withdraw: {
-      GET: 'accountWithdraw',
-      POST: 'accountWithdraw',
+      GET: Operations.accountWithdraw,
+      POST: Operations.accountWithdraw,
     },
     exchange: {
-      GET: 'accountExchange',
-      POST: 'accountExchange',
+      GET: Operations.accountExchange,
+      POST: Operations.accountExchange,
     },
   },
   contribute: {
-    GET: 'visitUserContribute',
+    GET: Operations.visitUserContribute,
   },
   subscribes: {
-    GET: 'account_subscribe',
-    PUT: 'account_subscribe',
+    GET: Operations.account_subscribe,
+    PUT: Operations.account_subscribe,
   },
   subscribe_settings: {
-    GET: 'account_subscribe',
+    GET: Operations.account_subscribe,
   },
   subscribe_types: {
-    GET: 'account_subscribe',
-    POST: 'account_subscribe',
+    GET: Operations.account_subscribe,
+    POST: Operations.account_subscribe,
     PARAMETER: {
-      DELETE: 'account_subscribe',
-      PUT: 'account_subscribe',
+      DELETE: Operations.account_subscribe,
+      PUT: Operations.account_subscribe,
     },
   },
 };

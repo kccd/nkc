@@ -1,66 +1,67 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitMessagePage',
+  GET: Operations.visitMessagePage,
   list: {
-    GET: 'messageGetData',
+    GET: Operations.messageGetData,
   },
   systemInfo: {
-    //GET: 'getSystemInfo'
+    //GET: Operations.getSystemInfo
   },
   blackList: {
-    POST: 'messageBlackList',
+    POST: Operations.messageBlackList,
   },
   remind: {
-    //GET: 'getRemind'
+    //GET: Operations.getRemind
   },
   friendsApplication: {
-    GET: 'getFriendsApplication',
+    GET: Operations.getFriendsApplication,
   },
   friend: {
-    GET: 'messageGetData',
-    POST: 'messagePostData',
-    DELETE: 'messagePostData',
-    PUT: 'messagePostData',
+    GET: Operations.messageGetData,
+    POST: Operations.messagePostData,
+    DELETE: Operations.messagePostData,
+    PUT: Operations.messagePostData,
     apply: {
-      POST: 'messagePostData',
+      POST: Operations.messagePostData,
     },
   },
   user: {
-    GET: 'messageGetData',
+    GET: Operations.messageGetData,
     PARAMETER: {
-      //GET: 'getUserMessage',
-      POST: 'sendMessageToUser',
+      //GET: Operations.getUserMessage,
+      POST: Operations.sendMessageToUser,
     },
   },
   resource: {
     PARAMETER: {
-      GET: 'getMessageFile',
+      GET: Operations.getMessageFile,
     },
   },
   settings: {
-    GET: 'messageGetData',
-    PUT: 'modifyMessageSettings',
+    GET: Operations.messageGetData,
+    PUT: Operations.modifyMessageSettings,
   },
   mark: {
-    PUT: 'modifyMessageStatus',
+    PUT: Operations.modifyMessageStatus,
   },
   withdrawn: {
-    PUT: 'userWithdrawnMessage',
+    PUT: Operations.userWithdrawnMessage,
   },
   chat: {
-    DELETE: 'messagePostData',
+    DELETE: Operations.messagePostData,
   },
   search: {
-    GET: 'messageSearchUser',
+    GET: Operations.messageSearchUser,
   },
   data: {
-    GET: 'messageDataGet',
+    GET: Operations.messageDataGet,
   },
   addFriend: {
-    GET: 'sendAnApplicationToAddAFriend',
+    GET: Operations.sendAnApplicationToAddAFriend,
   },
   category: {
-    GET: 'messageCategory',
-    POST: 'messagePostData',
-    DELETE: 'messagePostData',
+    GET: Operations.messageCategory,
+    POST: Operations.messagePostData,
+    DELETE: Operations.messagePostData,
   },
 };

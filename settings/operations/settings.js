@@ -1,8 +1,9 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   credit: {
-    GET: 'getCreditSettings',
+    GET: Operations.getCreditSettings,
   },
   digest: {
-    GET: 'getDigestSettings',
+    GET: Operations.getDigestSettings,
   },
 };

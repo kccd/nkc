@@ -1,21 +1,22 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitMobileRegister',
-  POST: 'submitRegister',
+  GET: Operations.visitMobileRegister,
+  POST: Operations.submitRegister,
   /*information: {
-		POST: 'submitInformation'
+		POST: Operations.submitInformation
 	},*/
   mobile: {
-    GET: 'visitMobileRegister',
-    POST: 'submitRegister',
+    GET: Operations.visitMobileRegister,
+    POST: Operations.submitRegister,
   },
   code: {
-    GET: 'getRegisterCode',
+    GET: Operations.getRegisterCode,
   },
   subscribe: {
-    GET: 'registerSubscribe',
-    POST: 'registerSubscribe',
+    GET: Operations.registerSubscribe,
+    POST: Operations.registerSubscribe,
   },
   check: {
-    POST: 'submitRegister',
+    POST: Operations.submitRegister,
   },
 };

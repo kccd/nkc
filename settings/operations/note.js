@@ -1,12 +1,13 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'viewNote',
-  POST: 'addNote',
+  GET: Operations.viewNote,
+  POST: Operations.addNote,
   PARAMETER: {
-    GET: 'viewNote',
+    GET: Operations.viewNote,
     c: {
       PARAMETER: {
-        DELETE: 'deleteNote',
-        PUT: 'modifyNote',
+        DELETE: Operations.deleteNote,
+        PUT: Operations.modifyNote,
       },
     },
   },

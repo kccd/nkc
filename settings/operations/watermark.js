@@ -1,6 +1,7 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'getWatermark',
+  GET: Operations.getWatermark,
   PARAMETER: {
-    GET: 'getAppsWatermark',
+    GET: Operations.getAppsWatermark,
   },
 };

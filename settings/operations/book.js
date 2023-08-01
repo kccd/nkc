@@ -1,14 +1,15 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   PARAMETER: {
-    GET: 'getBook',
+    GET: Operations.getBook,
     member: {
       invitation: {
-        GET: 'bookInvitation',
-        POST: 'bookInvitation',
+        GET: Operations.bookInvitation,
+        POST: Operations.bookInvitation,
       },
     },
     options: {
-      GET: 'getBook',
+      GET: Operations.getBook,
     },
   },
 };

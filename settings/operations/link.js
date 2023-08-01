@@ -1,6 +1,7 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'linkToTarget',
+  GET: Operations.linkToTarget,
   report: {
-    POST: 'reportLinkToTarget',
+    POST: Operations.reportLinkToTarget,
   },
 };

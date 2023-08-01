@@ -1,14 +1,15 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   move: {
-    POST: 'moveThreads',
+    POST: Operations.moveThreads,
   },
   draft: {
-    POST: 'movePostsToDraft',
+    POST: Operations.movePostsToDraft,
   },
   recycle: {
-    POST: 'movePostsToRecycle',
+    POST: Operations.movePostsToRecycle,
   },
   unblock: {
-    POST: 'unblockPosts',
+    POST: Operations.unblockPosts,
   },
 };

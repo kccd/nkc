@@ -1,56 +1,57 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitExamPaperList',
+  GET: Operations.visitExamPaperList,
   record: {
     question: {
-      GET: 'viewQuestionRecord',
+      GET: Operations.viewQuestionRecord,
     },
     paper: {
-      GET: 'viewPaperRecord',
+      GET: Operations.viewPaperRecord,
     },
   },
   categories: {
-    POST: 'addExamsCategory',
+    POST: Operations.addExamsCategory,
     editor: {
-      GET: 'visitEditCategory',
+      GET: Operations.visitEditCategory,
     },
   },
   category: {
     PARAMETER: {
-      PUT: 'modifyExamsCategory',
+      PUT: Operations.modifyExamsCategory,
     },
   },
   auth: {
-    GET: 'visitExamsQuestionAuth',
-    POST: 'submitExamsQuestionAuth',
+    GET: Operations.visitExamsQuestionAuth,
+    POST: Operations.submitExamsQuestionAuth,
   },
   paper: {
-    GET: 'getExamsPaper',
+    GET: Operations.getExamsPaper,
     PARAMETER: {
-      GET: 'getExamsPaper',
-      POST: 'postExamsPaper',
+      GET: Operations.getExamsPaper,
+      POST: Operations.postExamsPaper,
     },
   },
   question: {
-    POST: 'postQuestion',
+    POST: Operations.postQuestion,
     PARAMETER: {
-      PUT: 'modifyQuestion',
-      DELETE: 'removeQuestion',
+      PUT: Operations.modifyQuestion,
+      DELETE: Operations.removeQuestion,
       disabled: {
-        DELETE: 'enabledQuestion',
-        POST: 'disabledQuestion',
+        DELETE: Operations.enabledQuestion,
+        POST: Operations.disabledQuestion,
       },
       image: {
-        GET: 'getQuestionImage',
+        GET: Operations.getQuestionImage,
       },
       auth: {
-        PUT: 'modifyQuestionAuthStatus',
+        PUT: Operations.modifyQuestionAuthStatus,
       },
     },
   },
   questions: {
-    GET: 'visitExamQuestionManagement',
+    GET: Operations.visitExamQuestionManagement,
   },
   editor: {
-    GET: 'visitEditQuestion',
+    GET: Operations.visitEditQuestion,
   },
 };

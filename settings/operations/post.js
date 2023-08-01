@@ -1,39 +1,40 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   PARAMETER: {
-    GET: 'visitPost',
-    PUT: 'modifyPost',
+    GET: Operations.visitPost,
+    PUT: Operations.modifyPost,
     option: {
-      GET: 'getPostOption',
+      GET: Operations.getPostOption,
     },
     quote: {
-      GET: 'quotePost',
+      GET: Operations.quotePost,
     },
     credit: {
       xsf: {
-        POST: 'creditXsf',
+        POST: Operations.creditXsf,
         PARAMETER: {
-          DELETE: 'cancelXsf',
+          DELETE: Operations.cancelXsf,
         },
       },
       kcb: {
-        POST: 'creditKcb',
+        POST: Operations.creditKcb,
         PARAMETER: {
-          PUT: 'modifyKcbRecordReason',
+          PUT: Operations.modifyKcbRecordReason,
         },
       },
     },
     history: {
-      GET: 'visitPostHistory',
-      PUT: 'disableHistories',
+      GET: Operations.visitPostHistory,
+      PUT: Operations.disableHistories,
       PARAMETER: {
         rollback: {
-          POST: 'rollbackPost',
+          POST: Operations.rollbackPost,
         },
       },
     },
     digest: {
-      POST: 'digestPost',
-      DELETE: 'unDigestPost',
+      POST: Operations.digestPost,
+      DELETE: Operations.unDigestPost,
     },
     vote: {
       up: {
@@ -44,43 +45,43 @@ module.exports = {
       },
     },
     warning: {
-      POST: 'postWarningPost',
-      PUT: 'postWarningPatch',
+      POST: Operations.postWarningPost,
+      PUT: Operations.postWarningPatch,
     },
     author: {
-      GET: 'getPostAuthor',
+      GET: Operations.getPostAuthor,
     },
     anonymous: {
-      POST: 'anonymousPost',
+      POST: Operations.anonymousPost,
     },
     notice: {
       PARAMETER: {
         content: {
-          PUT: 'modifyPostNoticeContent',
+          PUT: Operations.modifyPostNoticeContent,
         },
         disabled: {
-          PUT: 'disablePostNotice',
+          PUT: Operations.disablePostNotice,
         },
       },
     },
     notices: {
-      GET: 'getPostNotices',
+      GET: Operations.getPostNotices,
     },
     topped: {
-      POST: 'topPost',
+      POST: Operations.topPost,
     },
     resources: {
-      GET: 'getPostResources',
+      GET: Operations.getPostResources,
     },
     hide: {
-      PUT: 'hidePost',
+      PUT: Operations.hidePost,
     },
     comments: {
-      GET: 'getPostComments',
+      GET: Operations.getPostComments,
     },
     comment: {
-      GET: 'postCommentControl',
-      POST: 'postCommentControl',
+      GET: Operations.postCommentControl,
+      POST: Operations.postCommentControl,
     },
     /*delete: {
 			GET: "deletePost"

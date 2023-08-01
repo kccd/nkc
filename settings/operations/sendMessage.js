@@ -1,29 +1,30 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   changeMobile: {
-    POST: 'sendChangeMobileMessage',
+    POST: Operations.sendChangeMobileMessage,
   },
   bindMobile: {
-    POST: 'sendBindMobileMessage',
+    POST: Operations.sendBindMobileMessage,
   },
   register: {
-    POST: 'sendRegisterMessage',
+    POST: Operations.sendRegisterMessage,
   },
   getback: {
-    POST: 'sendGetBackPasswordMessage',
+    POST: Operations.sendGetBackPasswordMessage,
   },
   login: {
-    POST: 'sendLoginMessage',
+    POST: Operations.sendLoginMessage,
   },
   withdraw: {
-    POST: 'sendWithdrawMessage',
+    POST: Operations.sendWithdrawMessage,
   },
   destroy: {
-    POST: 'sendDestroyMessage',
+    POST: Operations.sendDestroyMessage,
   },
   unbindMobile: {
-    POST: 'sendUnbindMobileMessage',
+    POST: Operations.sendUnbindMobileMessage,
   },
   common: {
-    POST: 'sendPhoneMessage',
+    POST: Operations.sendPhoneMessage,
   },
 };

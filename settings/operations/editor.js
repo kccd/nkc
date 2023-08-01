@@ -1,12 +1,13 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitEditor',
+  GET: Operations.visitEditor,
   // copy:{
-  // 	GET: 'visitEditor'
+  // 	GET: Operations.visitEditor
   // },
   data: {
-    GET: 'visitEditor',
+    GET: Operations.visitEditor,
   },
   publishNotice: {
-    GET: 'visitEditor',
+    GET: Operations.visitEditor,
   },
 };

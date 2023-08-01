@@ -1,118 +1,119 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   avatar: {
     // 用户头像
     PARAMETER: {
-      GET: 'getUserAvatar',
-      POST: 'uploadUserAvatar',
+      GET: Operations.getUserAvatar,
+      POST: Operations.uploadUserAvatar,
     },
   },
   banner: {
     PARAMETER: {
-      POST: 'modifyUserBanner',
+      POST: Operations.modifyUserBanner,
       homeBanner: {
-        POST: 'modifyUserBanner',
+        POST: Operations.modifyUserBanner,
       },
     },
   },
   shopLogo: {
     PARAMETER: {
-      GET: 'getShopLogo',
-      POST: 'uploadShopLogo',
+      GET: Operations.getShopLogo,
+      POST: Operations.uploadShopLogo,
     },
   },
   poster: {
     // 活动海报
     PARAMETER: {
-      GET: 'getActivityPoster',
+      GET: Operations.getActivityPoster,
     },
-    POST: 'uploadActivityPoster',
+    POST: Operations.uploadActivityPoster,
   },
   /*avatar_small: {// 用户头像
 		PARAMETER: {
-			GET: 'getUserAvatar',
+			GET: Operations.getUserAvatar,
 		}
 	},*/
   r: {
     // 资源
-    POST: 'uploadResources',
+    POST: Operations.uploadResources,
     PARAMETER: {
-      GET: 'getResources',
-      PUT: 'modifyResources',
+      GET: Operations.getResources,
+      PUT: Operations.modifyResources,
       info: {
-        GET: 'getResourceInfo',
+        GET: Operations.getResourceInfo,
       },
       del: {
-        POST: 'modifyResources',
+        POST: Operations.modifyResources,
       },
       pay: {
-        POST: 'buyResource',
+        POST: Operations.buyResource,
       },
       detail: {
-        GET: 'resourceDetail',
+        GET: Operations.resourceDetail,
       },
       cover: {
-        GET: 'getResourceCover',
+        GET: Operations.getResourceCover,
       },
     },
   },
   rm: {
     PARAMETER: {
-      GET: 'getMediums',
+      GET: Operations.getMediums,
     },
   },
   ro: {
     PARAMETER: {
-      GET: 'getOrigins',
+      GET: Operations.getOrigins,
     },
   },
   appDownload: {
     // 安装包下载
     android: {
       PARAMETER: {
-        GET: 'getAndroidPackage',
+        GET: Operations.getAndroidPackage,
       },
     },
     ios: {
       PARAMETER: {
-        GET: 'getIosPackage',
+        GET: Operations.getIosPackage,
       },
     },
   },
   default: {
     // 默认图片
     PARAMETER: {
-      GET: 'getDefaultImage',
+      GET: Operations.getDefaultImage,
     },
   },
   attachIcon: {
     // 默认附件图标
     PARAMETER: {
-      GET: 'getAttachmentIcon',
+      GET: Operations.getAttachmentIcon,
     },
   },
   pfa: {
     // 专栏logo
     PARAMETER: {
-      GET: 'getPersonalForumAvatar',
+      GET: Operations.getPersonalForumAvatar,
     },
   },
   pfb: {
     // 专栏banner
     PARAMETER: {
-      GET: 'getPersonalForumBanner',
+      GET: Operations.getPersonalForumBanner,
     },
   },
   photo: {
     // 照片
-    POST: 'uploadPhoto',
+    POST: Operations.uploadPhoto,
     PARAMETER: {
-      GET: 'getPhoto',
-      DELETE: 'deletePhoto',
+      GET: Operations.getPhoto,
+      DELETE: Operations.deletePhoto,
     },
   },
   photo_small: {
     PARAMETER: {
-      GET: 'getSmallPhoto',
+      GET: Operations.getSmallPhoto,
     },
   },
 };

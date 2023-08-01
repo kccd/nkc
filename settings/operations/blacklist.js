@@ -1,5 +1,6 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'checkBlacklist',
-  POST: 'addUserToBlacklist',
-  DELETE: 'removeUserFromBlacklist',
+  GET: Operations.checkBlacklist,
+  POST: Operations.addUserToBlacklist,
+  DELETE: Operations.removeUserFromBlacklist,
 };

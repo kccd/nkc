@@ -1,5 +1,6 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   logs: {
-    GET: 'getLibraryLogs',
+    GET: Operations.getLibraryLogs,
   },
 };

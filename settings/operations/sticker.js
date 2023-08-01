@@ -1,7 +1,8 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'stickerCenter',
-  POST: 'modifySticker',
+  GET: Operations.stickerCenter,
+  POST: Operations.modifySticker,
   PARAMETER: {
-    GET: 'getSticker',
+    GET: Operations.getSticker,
   },
 };

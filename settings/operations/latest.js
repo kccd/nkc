@@ -1,12 +1,13 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitHome',
+  GET: Operations.visitHome,
   community: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
   column: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
   zone: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
 };

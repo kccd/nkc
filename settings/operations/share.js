@@ -1,7 +1,8 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  POST: 'getShareToken',
-  GET: 'getShareToken',
+  POST: Operations.getShareToken,
+  GET: Operations.getShareToken,
   PARAMETER: {
-    GET: 'visitShareLink',
+    GET: Operations.visitShareLink,
   },
 };

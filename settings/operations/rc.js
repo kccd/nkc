@@ -1,10 +1,11 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'resourceCategory',
-  POST: 'resourceCategory',
+  GET: Operations.resourceCategory,
+  POST: Operations.resourceCategory,
   move: {
-    POST: 'resourceCategory',
+    POST: Operations.resourceCategory,
   },
   order: {
-    POST: 'resourceCategory',
+    POST: Operations.resourceCategory,
   },
 };

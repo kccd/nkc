@@ -1,43 +1,44 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitActivityIndex',
+  GET: Operations.visitActivityIndex,
   block: {
-    POST: 'blockCurrentActivity',
+    POST: Operations.blockCurrentActivity,
   },
   unblock: {
-    POST: 'unBlockCurrentActivity',
+    POST: Operations.unBlockCurrentActivity,
   },
   release: {
-    GET: 'activityReleaseIndex',
-    POST: 'activityReleasePost',
+    GET: Operations.activityReleaseIndex,
+    POST: Operations.activityReleasePost,
   },
   list: {
-    GET: 'activityListIndex',
+    GET: Operations.activityListIndex,
   },
   single: {
     PARAMETER: {
-      GET: 'visitActivitySingle',
-      POST: 'activityApplyPost',
-      DELETE: 'cancelActivityApply',
-      PUT: 'activityEditPost',
+      GET: Operations.visitActivitySingle,
+      POST: Operations.activityApplyPost,
+      DELETE: Operations.cancelActivityApply,
+      PUT: Operations.activityEditPost,
     },
   },
   myApply: {
-    GET: 'myActivityApplyIndex',
+    GET: Operations.myActivityApplyIndex,
   },
   myRelease: {
-    GET: 'myActivityReleaseIndex',
+    GET: Operations.myActivityReleaseIndex,
   },
   post: {
     PARAMETER: {
-      POST: 'postToActivity',
+      POST: Operations.postToActivity,
     },
   },
   modify: {
     PARAMETER: {
-      GET: 'getActivityModify',
-      POST: 'postActivityModify',
-      DELETE: 'delActivityModify',
-      PUT: 'sendActivityMessage',
+      GET: Operations.getActivityModify,
+      POST: Operations.postActivityModify,
+      DELETE: Operations.delActivityModify,
+      PUT: Operations.sendActivityMessage,
     },
   },
 };

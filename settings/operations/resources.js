@@ -1,6 +1,7 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'getResources',
+  GET: Operations.getResources,
   md5: {
-    POST: 'uploadResources',
+    POST: Operations.uploadResources,
   },
 };

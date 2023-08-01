@@ -1,186 +1,187 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitFundHome',
+  GET: Operations.visitFundHome,
   add: {
-    GET: 'visitAddFund',
+    GET: Operations.visitAddFund,
   },
   info: {
-    GET: 'visitFundInfo',
+    GET: Operations.visitFundInfo,
   },
   bills: {
-    GET: 'visitFundBills',
-    POST: 'addFundBill',
+    GET: Operations.visitFundBills,
+    POST: Operations.addFundBill,
     PARAMETER: {
-      GET: 'visitFundBill',
-      PUT: 'modifyFundBill',
-      DELETE: 'deleteFundBill',
+      GET: Operations.visitFundBill,
+      PUT: Operations.modifyFundBill,
+      DELETE: Operations.deleteFundBill,
     },
   },
   bill: {
-    GET: 'visitAddFundBill',
+    GET: Operations.visitAddFundBill,
   },
   me: {
-    GET: 'visitMyFund',
+    GET: Operations.visitMyFund,
   },
   blacklist: {
-    GET: 'visitFundBlacklist',
-    POST: 'fundBlacklistPost',
-    DELETE: 'fundBlacklistPost',
+    GET: Operations.visitFundBlacklist,
+    POST: Operations.fundBlacklistPost,
+    DELETE: Operations.fundBlacklistPost,
   },
   list: {
-    GET: 'visitFundObjectList',
-    POST: 'addFund',
+    GET: Operations.visitFundObjectList,
+    POST: Operations.addFund,
     PARAMETER: {
-      DELETE: 'deleteFundObject',
-      GET: 'visitFundObjectHome',
+      DELETE: Operations.deleteFundObject,
+      GET: Operations.visitFundObjectHome,
       settings: {
-        GET: 'singleFundSettings',
-        PUT: 'singleFundSettings',
+        GET: Operations.singleFundSettings,
+        PUT: Operations.singleFundSettings,
       },
       add: {
-        GET: 'agreeFundTerms',
-        POST: 'submitFundApplicationForm',
+        GET: Operations.agreeFundTerms,
+        POST: Operations.submitFundApplicationForm,
       },
       bills: {
-        GET: 'visitFundObjectBills',
+        GET: Operations.visitFundObjectBills,
       },
     },
   },
   donation: {
-    GET: 'fundDonation',
-    POST: 'fundDonation',
+    GET: Operations.fundDonation,
+    POST: Operations.fundDonation,
     return: {
-      GET: 'fundDonation',
+      GET: Operations.fundDonation,
     },
     verify: {
-      POST: 'fundDonation',
+      POST: Operations.fundDonation,
     },
   },
   history: {
-    GET: 'visitHistoryFundList',
+    GET: Operations.visitHistoryFundList,
     PARAMETER: {
-      GET: 'visitHistoryFund',
+      GET: Operations.visitHistoryFund,
     },
   },
   disabled: {
-    GET: 'visitDisabledFundList',
+    GET: Operations.visitDisabledFundList,
   },
   unsubmit: {
-    GET: 'visitUnSubmitFundApplicationList',
+    GET: Operations.visitUnSubmitFundApplicationList,
   },
   giveup: {
-    GET: 'visitGiveUpFundApplicationList',
+    GET: Operations.visitGiveUpFundApplicationList,
   },
   a: {
     PARAMETER: {
-      GET: 'visitFundApplicationForm',
-      POST: 'restoreFundApplicationForm',
-      PUT: 'modifyApplicationForm',
-      DELETE: 'deleteApplicationForm',
+      GET: Operations.visitFundApplicationForm,
+      POST: Operations.restoreFundApplicationForm,
+      PUT: Operations.modifyApplicationForm,
+      DELETE: Operations.deleteApplicationForm,
       report: {
-        GET: 'visitFundApplicationReport',
-        POST: 'addFundApplicationReport',
+        GET: Operations.visitFundApplicationReport,
+        POST: Operations.addFundApplicationReport,
         audit: {
-          GET: 'visitFundApplicationReportAudit',
-          POST: 'submitFundApplicationReportAudit',
+          GET: Operations.visitFundApplicationReportAudit,
+          POST: Operations.submitFundApplicationReportAudit,
         },
         PARAMETER: {
-          PUT: 'deleteFundApplicationReport',
+          PUT: Operations.deleteFundApplicationReport,
         },
       },
       settings: {
-        GET: 'visitFundApplicationFormSettings',
-        POST: 'visitFundApplicationFormSettings',
+        GET: Operations.visitFundApplicationFormSettings,
+        POST: Operations.visitFundApplicationFormSettings,
         member: {
-          POST: 'visitFundApplicationFormSettings',
-          DELETE: 'visitFundApplicationFormSettings',
+          POST: Operations.visitFundApplicationFormSettings,
+          DELETE: Operations.visitFundApplicationFormSettings,
         },
         post: {
-          GET: 'visitFundApplicationFormSettings',
+          GET: Operations.visitFundApplicationFormSettings,
         },
         delete: {
-          POST: 'visitFundApplicationFormSettings',
+          POST: Operations.visitFundApplicationFormSettings,
         },
         giveup: {
-          POST: 'visitFundApplicationFormSettings',
+          POST: Operations.visitFundApplicationFormSettings,
         },
         withdraw: {
-          POST: 'visitFundApplicationFormSettings',
+          POST: Operations.visitFundApplicationFormSettings,
         },
       },
       manage: {
         audit: {
           project: {
-            GET: 'visitFundApplicationAudit',
-            POST: 'submitFundApplicationAudit',
+            GET: Operations.visitFundApplicationAudit,
+            POST: Operations.submitFundApplicationAudit,
           },
           info: {
-            GET: 'visitFundApplicationAudit',
-            POST: 'submitFundApplicationAudit',
+            GET: Operations.visitFundApplicationAudit,
+            POST: Operations.submitFundApplicationAudit,
           },
         },
         refuse: {
-          POST: 'submitFundApplicationAudit',
+          POST: Operations.submitFundApplicationAudit,
         },
         restore: {
-          POST: 'restoreFundApplicationForm',
+          POST: Operations.restoreFundApplicationForm,
         },
         stop: {
-          POST: 'stopFundApplicationForm',
+          POST: Operations.stopFundApplicationForm,
         },
         timeout: {
-          POST: 'timeoutFundApplicationForm',
+          POST: Operations.timeoutFundApplicationForm,
         },
         withdraw: {
-          POST: 'withdrawFundApplicationForm',
+          POST: Operations.withdrawFundApplicationForm,
         },
         refund: {
-          POST: 'refundFundApplicationForm',
+          POST: Operations.refundFundApplicationForm,
         },
       },
       /*comment: {
-				POST: 'addFundApplicationComment',
+				POST: Operations.addFundApplicationComment,
 				PARAMETER: {
-					DELETE: 'deleteFundApplicationComment'
+					DELETE: Operations.deleteFundApplicationComment
 				}
 			},*/
       member: {
-        PUT: 'modifyFundApplicationMember',
+        PUT: Operations.modifyFundApplicationMember,
       },
       vote: {
-        POST: 'submitFundApplicationVote',
+        POST: Operations.submitFundApplicationVote,
       },
       audit: {
-        GET: 'visitFundApplicationAudit',
-        POST: 'submitFundApplicationAudit',
+        GET: Operations.visitFundApplicationAudit,
+        POST: Operations.submitFundApplicationAudit,
       },
       complete: {
-        GET: 'visitFundApplicationComplete',
-        POST: 'submitFundApplicationComplete',
+        GET: Operations.visitFundApplicationComplete,
+        POST: Operations.submitFundApplicationComplete,
         audit: {
-          GET: 'visitFundApplicationCompleteAudit',
-          POST: 'submitFundApplicationCompleteAudit',
+          GET: Operations.visitFundApplicationCompleteAudit,
+          POST: Operations.submitFundApplicationCompleteAudit,
         },
       },
       remittance: {
-        GET: 'visitFundApplicationRemittance',
-        POST: 'submitFundApplicationRemittance',
+        GET: Operations.visitFundApplicationRemittance,
+        POST: Operations.submitFundApplicationRemittance,
         apply: {
-          GET: 'visitFundApplyRemittance',
-          POST: 'submitFundApplyRemittance',
+          GET: Operations.visitFundApplyRemittance,
+          POST: Operations.submitFundApplyRemittance,
         },
         verify: {
-          PUT: 'confirmationFundRemittance',
+          PUT: Operations.confirmationFundRemittance,
         },
       },
       excellent: {
-        PUT: 'fundApplicationFormExcellent',
+        PUT: Operations.fundApplicationFormExcellent,
       },
       disabled: {
-        PUT: 'modifyFundApplicationFormStatus',
+        PUT: Operations.modifyFundApplicationFormStatus,
       },
       refund: {
-        GET: 'fundApplicationFormRefund',
-        POST: 'fundApplicationFormRefund',
+        GET: Operations.fundApplicationFormRefund,
+        POST: Operations.fundApplicationFormRefund,
       },
     },
   },

@@ -1,13 +1,14 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'column_apply',
-  POST: 'column_apply',
+  GET: Operations.column_apply,
+  POST: Operations.column_apply,
   apply: {
-    GET: 'column_apply',
+    GET: Operations.column_apply,
   },
   getColumn: {
-    GET: 'getColumnInfo',
+    GET: Operations.getColumnInfo,
   },
   editor: {
-    GET: 'columnEditor',
+    GET: Operations.columnEditor,
   },
 };

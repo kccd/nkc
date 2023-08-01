@@ -1,7 +1,8 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   PARAMETER: {
     image: {
-      GET: 'getFriendNotePicture',
+      GET: Operations.getFriendNotePicture,
     },
   },
 };

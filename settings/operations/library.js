@@ -1,13 +1,14 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'getLibraryInfo',
+  GET: Operations.getLibraryInfo,
   PARAMETER: {
-    PUT: 'modifyLibraryFolder',
-    POST: 'libraryUpload',
-    GET: 'getLibraryInfo',
+    PUT: Operations.modifyLibraryFolder,
+    POST: Operations.libraryUpload,
+    GET: Operations.getLibraryInfo,
     list: {
-      POST: 'createLibraryFolder',
-      PUT: 'moveLibraryFolder',
-      DELETE: 'deleteLibraryFolder',
+      POST: Operations.createLibraryFolder,
+      PUT: Operations.moveLibraryFolder,
+      DELETE: Operations.deleteLibraryFolder,
     },
   },
 };

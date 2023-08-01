@@ -1,6 +1,7 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  POST: 'saveNewEditPicture',
+  POST: Operations.saveNewEditPicture,
   getOriginId: {
-    PUT: 'getOriginId',
+    PUT: Operations.getOriginId,
   },
 };

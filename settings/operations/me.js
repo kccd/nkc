@@ -1,11 +1,12 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   resource: {
-    GET: 'getPersonalResources',
+    GET: Operations.getPersonalResources,
   },
   media: {
-    GET: 'getPersonalMedia',
+    GET: Operations.getPersonalMedia,
   },
   life_photos: {
-    GET: 'getPersonalLifePhotos',
+    GET: Operations.getPersonalLifePhotos,
   },
 };

@@ -1,23 +1,24 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitToolsList',
+  GET: Operations.visitToolsList,
   open: {
     PARAMETER: {
-      GET: 'visitTool',
+      GET: Operations.visitTool,
     },
   },
   upload: {
-    POST: 'uploadTool',
+    POST: Operations.uploadTool,
   },
   update: {
-    POST: 'updateTool',
+    POST: Operations.updateTool,
   },
   delete: {
-    DELETE: 'deleteTool',
+    DELETE: Operations.deleteTool,
   },
   hide: {
-    DELETE: 'hideTool',
+    DELETE: Operations.hideTool,
   },
   enableSiteTools: {
-    POST: 'enableSiteTools',
+    POST: Operations.enableSiteTools,
   },
 };

@@ -1,277 +1,278 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'searchUser',
+  GET: Operations.searchUser,
   PARAMETER: {
     profile: {
-      GET: 'visitUserCard',
+      GET: Operations.visitUserCard,
       manage: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       manageData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       column: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       columnData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       timeline: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       timelineData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       moment: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       momentData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       post: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       postData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       thread: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       threadData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       note: {
-        GET: 'userProfile',
+        GET: Operations.userProfile,
       },
       noteData: {
-        GET: 'userProfile',
+        GET: Operations.userProfile,
       },
       draft: {
-        GET: 'userProfile',
+        GET: Operations.userProfile,
       },
       draftData: {
-        GET: 'userProfile',
+        GET: Operations.userProfile,
       },
       follower: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       followerData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       fan: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       fanData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       finance: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       financeData: {
-        GET: 'getUserHomeCard',
+        GET: Operations.getUserHomeCard,
       },
       subscribe: {
-        GET: 'visitUserCard',
+        GET: Operations.visitUserCard,
         collection: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         collectionData: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         column: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         columnData: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         user: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         userData: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         forum: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         forumData: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         blacklist: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         blacklistData: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         thread: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
         threadData: {
-          GET: 'getUserHomeCard',
+          GET: Operations.getUserHomeCard,
         },
       },
     },
     userPanel: {
-      GET: 'visitUserCard',
+      GET: Operations.visitUserCard,
     },
-    GET: 'visitUserCard',
+    GET: Operations.visitUserCard,
     userHome: {
-      GET: 'getUserHomeInfo',
+      GET: Operations.getUserHomeInfo,
     },
     navLinks: {
-      GET: 'getUserHomeInfo',
+      GET: Operations.getUserHomeInfo,
     },
     userHomeCard: {
-      GET: 'getUserHomeCard',
+      GET: Operations.getUserHomeCard,
     },
 
     verifiedAssets: {
       PARAMETER: {
-        GET: 'visitVerifiedUpload',
+        GET: Operations.visitVerifiedUpload,
       },
     },
     myProblems: {
-      GET: 'visitSelfProblems',
+      GET: Operations.visitSelfProblems,
       PARAMETER: {
-        GET: 'visitSelfProblemDetails',
+        GET: Operations.visitSelfProblemDetails,
       },
     },
     clear: {
-      POST: 'clearUserInfo',
+      POST: Operations.clearUserInfo,
     },
     hide: {
-      POST: 'hideUserHome', // 隐藏用户的主页
+      POST: Operations.hideUserHome, // 隐藏用户的主页
     },
     banned: {
-      PUT: 'unBannedUser',
-      DELETE: 'bannedUser',
+      PUT: Operations.unBannedUser,
+      DELETE: Operations.bannedUser,
     },
     transaction: {
-      GET: 'visitUserTransaction',
+      GET: Operations.visitUserTransaction,
     },
     // 用户关注的 专业、用户、文章
     sub: {
       t: {
-        GET: 'visitUserSubThreads',
+        GET: Operations.visitUserSubThreads,
       },
     },
     settings: {
-      GET: 'visitUserInfoSettings',
+      GET: Operations.visitUserInfoSettings,
       username: {
-        PUT: 'modifyUsername',
+        PUT: Operations.modifyUsername,
       },
       info: {
-        GET: 'visitUserInfoSettings',
-        PUT: 'modifyUserInfo',
+        GET: Operations.visitUserInfoSettings,
+        PUT: Operations.modifyUserInfo,
       },
       security: {
-        GET: 'visitUserInfoSettings',
-        PUT: 'modifyUserInfo',
+        GET: Operations.visitUserInfoSettings,
+        PUT: Operations.modifyUserInfo,
       },
       loginRecord: {
-        GET: 'visitUserInfoSettings',
-        PUT: 'modifyUserInfo',
+        GET: Operations.visitUserInfoSettings,
+        PUT: Operations.modifyUserInfo,
       },
       apps: {
-        GET: 'visitUserInfoSettings',
-        PUT: 'modifyUserInfo',
+        GET: Operations.visitUserInfoSettings,
+        PUT: Operations.modifyUserInfo,
       },
       resume: {
-        GET: 'visitUserResumeSettings',
-        PUT: 'modifyUserResume',
+        GET: Operations.visitUserResumeSettings,
+        PUT: Operations.modifyUserResume,
       },
       transaction: {
-        GET: 'visitUserTransactionSettings',
-        PUT: 'modifyUserTransaction',
+        GET: Operations.visitUserTransactionSettings,
+        PUT: Operations.modifyUserTransaction,
       },
       social: {
-        GET: 'visitUserSocialSettings',
-        PUT: 'modifyUserSocial',
+        GET: Operations.visitUserSocialSettings,
+        PUT: Operations.modifyUserSocial,
       },
       photo: {
-        GET: 'visitUserPhotoSettings',
-        PUT: 'modifyUserPhotoSettings',
+        GET: Operations.visitUserPhotoSettings,
+        PUT: Operations.modifyUserPhotoSettings,
       },
       water: {
-        GET: 'visitUserWaterSettings',
-        PUT: 'modifyUserWaterSettings',
+        GET: Operations.visitUserWaterSettings,
+        PUT: Operations.modifyUserWaterSettings,
       },
       cert: {
-        GET: 'visitUserCertPhotoSettings',
-        PUT: 'modifyUserCertPhotoSettings',
+        GET: Operations.visitUserCertPhotoSettings,
+        PUT: Operations.modifyUserCertPhotoSettings,
       },
       password: {
-        GET: 'visitPasswordSettings',
-        PUT: 'modifyPassword',
+        GET: Operations.visitPasswordSettings,
+        PUT: Operations.modifyPassword,
       },
       mobile: {
-        GET: 'visitMobileSettings',
-        PUT: 'modifyMobile',
-        DELETE: 'unbindMobile',
-        POST: 'bindMobile',
+        GET: Operations.visitMobileSettings,
+        PUT: Operations.modifyMobile,
+        DELETE: Operations.unbindMobile,
+        POST: Operations.bindMobile,
         apply: {
-          GET: 'applyToChangeUnusedPhoneNumber',
-          POST: 'applyToChangeUnusedPhoneNumber',
+          GET: Operations.applyToChangeUnusedPhoneNumber,
+          POST: Operations.applyToChangeUnusedPhoneNumber,
         },
         verify: {
-          POST: 'applyToChangeUnusedPhoneNumber',
+          POST: Operations.applyToChangeUnusedPhoneNumber,
         },
       },
       email: {
-        GET: 'visitEmailSettings',
-        POST: 'sendEmail',
+        GET: Operations.visitEmailSettings,
+        POST: Operations.sendEmail,
         bind: {
-          GET: 'bindEmail',
+          GET: Operations.bindEmail,
         },
         verify: {
-          GET: 'changeEmail',
+          GET: Operations.changeEmail,
         },
         unbind: {
-          GET: 'unbindEmail',
+          GET: Operations.unbindEmail,
         },
       },
       verify: {
-        GET: 'visitVerifySettings',
+        GET: Operations.visitVerifySettings,
         verify3_form: {
-          POST: 'verify3VideoUpload',
+          POST: Operations.verify3VideoUpload,
         },
         verify2_form: {
-          POST: 'verify2ImageUpload',
+          POST: Operations.verify2ImageUpload,
         },
       },
       red_envelope: {
-        GET: 'visitUserRedEnvelopeSettings',
-        PUT: 'modifyUserRedEnvelopeSettings',
+        GET: Operations.visitUserRedEnvelopeSettings,
+        PUT: Operations.modifyUserRedEnvelopeSettings,
       },
       display: {
-        GET: 'userDisplaySettings',
-        PUT: 'userDisplaySettings',
+        GET: Operations.userDisplaySettings,
+        PUT: Operations.userDisplaySettings,
       },
       alipay: {
-        POST: 'userBindAlipayAccounts',
+        POST: Operations.userBindAlipayAccounts,
       },
       bank: {
-        POST: 'userBindBankAccounts',
+        POST: Operations.userBindBankAccounts,
       },
     },
     drafts: {
-      GET: 'visitDraftList',
-      POST: 'addDraft',
+      GET: Operations.visitDraftList,
+      POST: Operations.addDraft,
       PARAMETER: {
-        DELETE: 'deleteDraft',
+        DELETE: Operations.deleteDraft,
       },
     },
     subscribe: {
-      POST: 'subscribeUser',
-      DELETE: 'unSubscribeUser',
+      POST: Operations.subscribeUser,
+      DELETE: Operations.unSubscribeUser,
     },
     bills: {
-      GET: 'visitUserBills',
+      GET: Operations.visitUserBills,
     },
     transfer: {
-      GET: 'transferKcbToUser',
-      POST: 'transferKcbToUser',
+      GET: Operations.transferKcbToUser,
+      POST: Operations.transferKcbToUser,
     },
     // profile: {
-    // 	GET: 'userProfile',
+    // 	GET: Operations.userProfile,
     // 	summary: {
     // 		pie: {
     // 			GET: "userProfile"
@@ -303,7 +304,7 @@ module.exports = {
     // 			GET: "userProfile"
     // 		},
     // 		forum: {
-    // 			GET: 'userProfile',
+    // 			GET: Operations.userProfile,
     // 		},
     // 		discipline: {
     // 			GET: "userProfile"
@@ -322,38 +323,38 @@ module.exports = {
     // 		GET: "userProfile"
     // 	},
     // 	blacklist: {
-    // 		GET: 'userProfile'
+    // 		GET: Operations.userProfile
     // 	}
     // },
     destroy: {
-      GET: 'destroyAccount',
-      POST: 'destroyAccount',
+      GET: Operations.destroyAccount,
+      POST: Operations.destroyAccount,
     },
     violationRecord: {
-      GET: 'violationRecord',
+      GET: Operations.violationRecord,
     },
     forum: {
       apply: {
-        GET: 'applyForum',
-        POST: 'applyForum',
+        GET: Operations.applyForum,
+        POST: Operations.applyForum,
       },
       invitation: {
-        GET: 'applyForumInvitation',
-        POST: 'applyForumInvitation',
+        GET: Operations.applyForumInvitation,
+        POST: Operations.applyForumInvitation,
       },
     },
     phoneVerify: {
       // GET: "phoneVerifyPage",
-      POST: 'phoneVerify',
+      POST: Operations.phoneVerify,
       sendSmsCode: {
-        POST: 'sendPhoneVerifyCode',
+        POST: Operations.sendPhoneVerifyCode,
       },
     },
     alt: {
-      GET: 'getUserOtherAccount',
+      GET: Operations.getUserOtherAccount,
     },
     code: {
-      POST: 'viewUserCode',
+      POST: Operations.viewUserCode,
     },
   },
 };

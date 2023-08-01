@@ -1,37 +1,38 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   PARAMETER: {
-    DELETE: 'deleteArticle',
+    DELETE: Operations.deleteArticle,
     options: {
-      GET: 'getArticleOptions',
+      GET: Operations.getArticleOptions,
     },
     unblock: {
-      POST: 'unblockArticle',
+      POST: Operations.unblockArticle,
     },
     draft: {
-      DELETE: 'deleteArticleDraft',
+      DELETE: Operations.deleteArticleDraft,
     },
     collection: {
-      POST: 'collectionArticle',
+      POST: Operations.collectionArticle,
     },
     digest: {
-      POST: 'digestArticle',
-      DELETE: 'unDigestArticle',
+      POST: Operations.digestArticle,
+      DELETE: Operations.unDigestArticle,
     },
     homeTop: {
-      POST: 'homeTop',
-      DELETE: 'homeTop',
+      POST: Operations.homeTop,
+      DELETE: Operations.homeTop,
     },
     credit: {
       xsf: {
-        POST: 'creditXsf',
+        POST: Operations.creditXsf,
         PARAMETER: {
-          DELETE: 'cancelXsf',
+          DELETE: Operations.cancelXsf,
         },
       },
       kcb: {
-        POST: 'creditKcb',
+        POST: Operations.creditKcb,
         PARAMETER: {
-          PUT: 'modifyKcbRecordReason',
+          PUT: Operations.modifyKcbRecordReason,
         },
       },
     },

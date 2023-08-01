@@ -1,10 +1,11 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'complaintGet',
-  POST: 'complaintPost',
+  GET: Operations.complaintGet,
+  POST: Operations.complaintPost,
   resolve: {
-    POST: 'complaintResolvePost',
+    POST: Operations.complaintResolvePost,
   },
   type: {
-    GET: 'complaintPost',
+    GET: Operations.complaintPost,
   },
 };

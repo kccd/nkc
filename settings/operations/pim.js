@@ -1,12 +1,13 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'PIMPublic',
+  GET: Operations.PIMPublic,
   teams: {
-    GET: 'PIMPublic',
-    POST: 'PIMPublic',
+    GET: Operations.PIMPublic,
+    POST: Operations.PIMPublic,
   },
   team: {
     PARAMETER: {
-      GET: 'PIMPublic',
+      GET: Operations.PIMPublic,
     },
   },
 };

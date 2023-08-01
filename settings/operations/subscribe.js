@@ -1,17 +1,18 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   moment: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
   user: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
   forum: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
   column: {
-    GET: 'visitHome',
+    GET: Operations.visitHome,
   },
   thread: {
-    GET: 'visitThread',
+    GET: Operations.visitThread,
   },
 };

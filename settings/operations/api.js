@@ -1,69 +1,70 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   v1: {
     server: {
       info: {
-        GET: 'api_get_server_info',
+        GET: Operations.api_get_server_info,
       },
     },
     account: {
       info: {
-        GET: 'api_get_account_info',
+        GET: Operations.api_get_account_info,
       },
       card: {
-        GET: 'api_get_account_card',
+        GET: Operations.api_get_account_card,
       },
       drawer: {
-        GET: 'api_get_account_drawer',
+        GET: Operations.api_get_account_drawer,
       },
     },
     threads: {
       selector: {
-        GET: 'getUserArticles',
+        GET: Operations.getUserArticles,
       },
     },
     articles: {
       selector: {
-        GET: 'getUserArticles',
+        GET: Operations.getUserArticles,
       },
     },
     column: {
       PARAMETER: {
         articles: {
-          POST: 'columnManage',
+          POST: Operations.columnManage,
         },
       },
     },
     recycle: {
       'recycle-bin': {
-        GET: 'api_get_recycle_recycleBin',
+        GET: Operations.api_get_recycle_recycleBin,
       },
     },
     review: {
-      GET: 'api_get_review_data',
+      GET: Operations.api_get_review_data,
     },
     user: {
       PARAMETER: {
         'public-info': {
-          GET: 'api_get_user_public_info',
+          GET: Operations.api_get_user_public_info,
         },
       },
     },
     users: {
       memo: {
-        PUT: 'api_put_user_memo',
-        GET: 'api_get_user_memo',
+        PUT: Operations.api_put_user_memo,
+        GET: Operations.api_get_user_memo,
       },
     },
     exam: {
       tags: {
-        GET: 'api_get_question_tags',
-        POST: 'api_post_question_tags',
+        GET: Operations.api_get_question_tags,
+        POST: Operations.api_post_question_tags,
       },
       tag: {
         PARAMETER: {
-          GET: 'api_get_question_tag',
-          PUT: 'api_put_question_tag',
-          DELETE: 'api_delete_question_tag',
+          GET: Operations.api_get_question_tag,
+          PUT: Operations.api_put_question_tag,
+          DELETE: Operations.api_delete_question_tag,
         },
       },
     },

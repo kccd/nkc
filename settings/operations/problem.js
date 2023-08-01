@@ -1,21 +1,22 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   add: {
-    GET: 'visitAddProblem',
-    POST: 'submitProblem',
+    GET: Operations.visitAddProblem,
+    POST: Operations.submitProblem,
   },
   list: {
-    GET: 'visitProblemList',
+    GET: Operations.visitProblemList,
     PARAMETER: {
-      GET: 'visitProblem',
-      PUT: 'modifyProblem',
-      DELETE: 'deleteProblem',
+      GET: Operations.visitProblem,
+      PUT: Operations.modifyProblem,
+      DELETE: Operations.deleteProblem,
     },
   },
   type: {
-    POST: 'addProblemsType',
+    POST: Operations.addProblemsType,
     PARAMETER: {
-      PUT: 'modifyProblemsType',
-      DELETE: 'deleteProblemsType',
+      PUT: Operations.modifyProblemsType,
+      DELETE: Operations.deleteProblemsType,
     },
   },
 };

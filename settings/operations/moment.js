@@ -1,18 +1,19 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitZoneSingleMoment',
+  GET: Operations.visitZoneSingleMoment,
   PARAMETER: {
-    DELETE: 'deleteMoment',
+    DELETE: Operations.deleteMoment,
     recovery: {
-      POST: 'managementMoment',
+      POST: Operations.managementMoment,
     },
     disable: {
-      POST: 'managementMoment',
+      POST: Operations.managementMoment,
     },
     options: {
-      GET: 'getMomentOption',
+      GET: Operations.getMomentOption,
     },
     ipInfo: {
-      GET: 'getMomentIpInfo',
+      GET: Operations.getMomentIpInfo,
     },
   },
 };

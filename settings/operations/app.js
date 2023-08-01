@@ -1,72 +1,73 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitAppDownload',
+  GET: Operations.visitAppDownload,
   upgrade: {
-    GET: 'APPUpgrade',
+    GET: Operations.APPUpgrade,
   },
   location: {
-    GET: 'selectLocation',
+    GET: Operations.selectLocation,
   },
   check: {
-    GET: 'APPcheckout',
+    GET: Operations.APPcheckout,
   },
   nav: {
-    GET: 'APPGetNav',
+    GET: Operations.APPGetNav,
   },
   my: {
-    GET: 'APPGetMy',
+    GET: Operations.APPGetMy,
   },
   account: {
-    GET: 'APPGetAccountInfo',
+    GET: Operations.APPGetAccountInfo,
   },
   download: {
-    GET: 'appGetDownload',
+    GET: Operations.appGetDownload,
   },
   profile: {
-    GET: 'appVisitProfile',
+    GET: Operations.appVisitProfile,
     blacklist: {
-      GET: 'appVisitProfile',
+      GET: Operations.appVisitProfile,
     },
     finance: {
-      GET: 'appVisitProfile',
+      GET: Operations.appVisitProfile,
     },
     sub: {
-      GET: 'appVisitProfile',
+      GET: Operations.appVisitProfile,
       user: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
       forum: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
       column: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
       thread: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
       fan: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
       follower: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
       collection: {
-        GET: 'appVisitProfile',
+        GET: Operations.appVisitProfile,
       },
     },
   },
   scoreChange: {
     PARAMETER: {
-      GET: 'APPgetScoreChange',
+      GET: Operations.APPgetScoreChange,
     },
   },
   android: {
     PARAMETER: {
-      GET: 'downloadApp',
+      GET: Operations.downloadApp,
     },
   },
   ios: {
     PARAMETER: {
-      GET: 'downloadApp',
+      GET: Operations.downloadApp,
     },
   },
 };

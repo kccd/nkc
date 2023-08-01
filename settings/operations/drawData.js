@@ -1,11 +1,12 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   leftDraw: {
-    GET: 'getLeftDrawData',
+    GET: Operations.getLeftDrawData,
   },
   userDraw: {
-    GET: 'getUserDrawData',
+    GET: Operations.getUserDrawData,
   },
   userNav: {
-    GET: 'getUserNavData',
+    GET: Operations.getUserNavData,
   },
 };

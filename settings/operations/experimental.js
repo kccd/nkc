@@ -1,517 +1,518 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'visitExperimentalStatus',
+  GET: Operations.visitExperimentalStatus,
   login: {
-    GET: 'experimentalLogin',
-    POST: 'experimentalLogin',
+    GET: Operations.experimentalLogin,
+    POST: Operations.experimentalLogin,
   },
   settings: {
     note: {
-      GET: 'experimentalNoteSettings',
-      PUT: 'experimentalNoteSettings',
+      GET: Operations.experimentalNoteSettings,
+      PUT: Operations.experimentalNoteSettings,
     },
     threadCategory: {
-      GET: 'experimentalThreadCategorySettings',
-      POST: 'experimentalThreadCategorySettings',
-      PUT: 'experimentalThreadCategorySettings',
+      GET: Operations.experimentalThreadCategorySettings,
+      POST: Operations.experimentalThreadCategorySettings,
+      PUT: Operations.experimentalThreadCategorySettings,
       PARAMETER: {
-        PUT: 'experimentalThreadCategorySettings',
-        DELETE: 'experimentalThreadCategorySettings',
+        PUT: Operations.experimentalThreadCategorySettings,
+        DELETE: Operations.experimentalThreadCategorySettings,
         default: {
-          PUT: 'experimentalThreadCategorySettings',
+          PUT: Operations.experimentalThreadCategorySettings,
         },
       },
     },
     tools: {
-      GET: 'visitToolsManager',
+      GET: Operations.visitToolsManager,
     },
     complaint: {
-      GET: 'experimentalComplaintSettings',
-      PUT: 'experimentalComplaintSettings',
+      GET: Operations.experimentalComplaintSettings,
+      PUT: Operations.experimentalComplaintSettings,
       type: {
-        POST: 'experimentalComplaintSettings',
-        PUT: 'experimentalComplaintSettings',
+        POST: Operations.experimentalComplaintSettings,
+        PUT: Operations.experimentalComplaintSettings,
       },
     },
     ip: {
-      GET: 'experimentalIPSettings',
-      POST: 'experimentalIPSettings',
-      DELETE: 'experimentalIPSettings',
+      GET: Operations.experimentalIPSettings,
+      POST: Operations.experimentalIPSettings,
+      DELETE: Operations.experimentalIPSettings,
     },
     visit: {
-      GET: 'experimentalVisitSettings',
-      PUT: 'experimentalVisitSettings',
+      GET: Operations.experimentalVisitSettings,
+      PUT: Operations.experimentalVisitSettings,
     },
     verification: {
-      GET: 'experimentalVerificationSettings',
-      PUT: 'experimentalVerificationSettings',
+      GET: Operations.experimentalVerificationSettings,
+      PUT: Operations.experimentalVerificationSettings,
     },
     editor: {
-      GET: 'experimentalEditorSettings',
-      PUT: 'experimentalEditorSettings',
+      GET: Operations.experimentalEditorSettings,
+      PUT: Operations.experimentalEditorSettings,
     },
     sticker: {
-      GET: 'experimentalStickerSettings',
-      PUT: 'experimentalStickerSettings',
+      GET: Operations.experimentalStickerSettings,
+      PUT: Operations.experimentalStickerSettings,
     },
     thread: {
-      GET: 'experimentalThreadSettings',
-      PUT: 'experimentalThreadSettings',
+      GET: Operations.experimentalThreadSettings,
+      PUT: Operations.experimentalThreadSettings,
     },
     transfer: {
-      GET: 'experimentalTransferKCB',
-      POST: 'experimentalTransferKCB',
-      PUT: 'experimentalTransferKCB',
+      GET: Operations.experimentalTransferKCB,
+      POST: Operations.experimentalTransferKCB,
+      PUT: Operations.experimentalTransferKCB,
     },
     hidePost: {
-      GET: 'experimentalHidePostSettings',
-      POST: 'experimentalHidePostSettings',
+      GET: Operations.experimentalHidePostSettings,
+      POST: Operations.experimentalHidePostSettings,
     },
     topping: {
-      GET: 'experimentalToppingSettings',
-      PUT: 'experimentalToppingSettings',
+      GET: Operations.experimentalToppingSettings,
+      PUT: Operations.experimentalToppingSettings,
     },
     username: {
-      GET: 'experimentalUsernameSettings',
-      PUT: 'experimentalUsernameSettings',
+      GET: Operations.experimentalUsernameSettings,
+      PUT: Operations.experimentalUsernameSettings,
     },
     login: {
-      GET: 'experimentalLoginSettings',
-      PUT: 'experimentalLoginSettings',
+      GET: Operations.experimentalLoginSettings,
+      PUT: Operations.experimentalLoginSettings,
     },
     cache: {
-      GET: 'experimentalCacheSettings',
-      PUT: 'experimentalCacheSettings',
+      GET: Operations.experimentalCacheSettings,
+      PUT: Operations.experimentalCacheSettings,
     },
     shop: {
-      GET: 'visitShopSettings',
-      PUT: 'visitShopSettings',
+      GET: Operations.visitShopSettings,
+      PUT: Operations.visitShopSettings,
       refunds: {
-        GET: 'visitShopRefundList',
+        GET: Operations.visitShopRefundList,
         refundDetail: {
-          GET: 'visitShopRefundDetail',
+          GET: Operations.visitShopRefundDetail,
         },
         agree: {
-          POST: 'shopAgreeRefundApply',
+          POST: Operations.shopAgreeRefundApply,
         },
         disagree: {
-          POST: 'shopDisagreeRefundApply',
+          POST: Operations.shopDisagreeRefundApply,
         },
         settings: {
-          GET: 'visitShopRefundSettings',
-          PUT: 'modifyShopRefundSettings',
+          GET: Operations.visitShopRefundSettings,
+          PUT: Operations.modifyShopRefundSettings,
         },
       },
       products: {
-        GET: 'visitiShopProducts',
+        GET: Operations.visitiShopProducts,
         bansale: {
-          PUT: 'shopAdminBanProductSale',
+          PUT: Operations.shopAdminBanProductSale,
         },
         clearban: {
-          PUT: 'shopAdminClearBanSale',
+          PUT: Operations.shopAdminClearBanSale,
         },
       },
       auth: {
-        GET: 'visitShopAuth',
-        POST: 'setShopAuth',
+        GET: Operations.visitShopAuth,
+        POST: Operations.setShopAuth,
         delban: {
-          PUT: 'delShelfAuth',
+          PUT: Operations.delShelfAuth,
         },
       },
       applys: {
-        GET: 'visitShopOpenStoreApplys',
+        GET: Operations.visitShopOpenStoreApplys,
         approve: {
-          POST: 'approveApplyStore',
+          POST: Operations.approveApplyStore,
         },
         reject: {
-          POST: 'rejectApplyStore',
+          POST: Operations.rejectApplyStore,
         },
       },
       homeSetting: {
         carousel: {
-          GET: 'visitHomeSettingCarousel',
-          POST: 'changeHomeSettingCarousel',
-          PUT: 'deleteHomeSettingCarousel',
+          GET: Operations.visitHomeSettingCarousel,
+          POST: Operations.changeHomeSettingCarousel,
+          PUT: Operations.deleteHomeSettingCarousel,
         },
         featured: {
-          GET: 'visitHomeSettingFeatured',
-          POST: 'changeHomeSettingFeatured',
+          GET: Operations.visitHomeSettingFeatured,
+          POST: Operations.changeHomeSettingFeatured,
         },
         recommendation: {
-          GET: 'visitHomeSettingRecommendation',
-          POST: 'changeHomeSettingRecommendation',
+          GET: Operations.visitHomeSettingRecommendation,
+          POST: Operations.changeHomeSettingRecommendation,
         },
         popular: {
-          GET: 'visitHomeSettingPopular',
-          POST: 'changeHomeSettingPopular',
+          GET: Operations.visitHomeSettingPopular,
+          POST: Operations.changeHomeSettingPopular,
         },
       },
     },
     protocol: {
-      GET: 'visitProtocolSetting',
-      POST: 'postNewProtocol',
+      GET: Operations.visitProtocolSetting,
+      POST: Operations.postNewProtocol,
       PARAMETER: {
-        GET: 'visitProtocolType',
-        PUT: 'updateProtocolType',
-        POST: 'deleteProtocolType',
+        GET: Operations.visitProtocolType,
+        PUT: Operations.updateProtocolType,
+        POST: Operations.deleteProtocolType,
       },
     },
     sms: {
-      GET: 'visitSmsSettings',
-      PUT: 'modifySmsSettings',
+      GET: Operations.visitSmsSettings,
+      PUT: Operations.modifySmsSettings,
       test: {
-        POST: 'testSendMessage',
+        POST: Operations.testSendMessage,
       },
     },
     email: {
-      GET: 'visitExperimentalEmailSettings',
-      PUT: 'modifyEmailSettings',
+      GET: Operations.visitExperimentalEmailSettings,
+      PUT: Operations.modifyEmailSettings,
       test: {
-        POST: 'testSendEmail',
+        POST: Operations.testSendEmail,
       },
     },
     base: {
-      GET: 'visitWebBaseSettings',
-      PUT: 'modifyWebBase',
+      GET: Operations.visitWebBaseSettings,
+      PUT: Operations.modifyWebBase,
     },
     home: {
       top: {
-        GET: 'visitHomeTopSettings',
-        PUT: 'modifyHomeTopSettings',
+        GET: Operations.visitHomeTopSettings,
+        PUT: Operations.modifyHomeTopSettings,
       },
       notice: {
-        GET: 'visitHomeNoticeSettings',
-        PUT: 'modifyHomeNoticeSettings',
-        DELETE: 'deleteHomeNotice',
+        GET: Operations.visitHomeNoticeSettings,
+        PUT: Operations.modifyHomeNoticeSettings,
+        DELETE: Operations.deleteHomeNotice,
       },
       list: {
-        GET: 'visitHomeListSettings',
-        PUT: 'modifyHomeListSettings',
+        GET: Operations.visitHomeListSettings,
+        PUT: Operations.modifyHomeListSettings,
         biglogo: {
-          POST: 'uploadHomeBigLogo',
+          POST: Operations.uploadHomeBigLogo,
         },
       },
     },
     app: {
-      GET: 'experimentalAppSettings',
-      POST: 'experimentalAppSettings',
-      PUT: 'experimentalAppSettings',
+      GET: Operations.experimentalAppSettings,
+      POST: Operations.experimentalAppSettings,
+      PUT: Operations.experimentalAppSettings,
     },
     role: {
-      GET: 'visitRoleSettings',
-      POST: 'addRole',
+      GET: Operations.visitRoleSettings,
+      POST: Operations.addRole,
       PARAMETER: {
-        GET: 'visitRoleUsers',
-        DELETE: 'deleteRole',
-        PUT: 'modifyRole',
+        GET: Operations.visitRoleUsers,
+        DELETE: Operations.deleteRole,
+        PUT: Operations.modifyRole,
         icon: {
-          POST: 'uploadRoleIcon',
+          POST: Operations.uploadRoleIcon,
         },
       },
     },
     operation: {
-      GET: 'visitOperationSetting',
-      POST: 'addOperationType',
-      PUT: 'modifyOperation',
+      GET: Operations.visitOperationSetting,
+      POST: Operations.addOperationType,
+      PUT: Operations.modifyOperation,
       PARAMETER: {
-        GET: 'visitOperationType',
-        PUT: 'modifyOperationType',
-        DELETE: 'deleteOperationType',
+        GET: Operations.visitOperationType,
+        PUT: Operations.modifyOperationType,
+        DELETE: Operations.deleteOperationType,
       },
     },
     user: {
-      GET: 'visitEUserSettings',
-      PUT: 'modifyEUserInfo',
+      GET: Operations.visitEUserSettings,
+      PUT: Operations.modifyEUserInfo,
       PARAMETER: {
-        GET: 'visitEUserInfo',
-        PUT: 'modifyEUserInfo',
+        GET: Operations.visitEUserInfo,
+        PUT: Operations.modifyEUserInfo,
       },
     },
     userScores: {
-      GET: 'getUserAllScores',
+      GET: Operations.getUserAllScores,
     },
     sensitive: {
-      GET: 'visitUserSensitiveInfo',
-      PUT: 'modifyUserSensitiveInfo',
+      GET: Operations.visitUserSensitiveInfo,
+      PUT: Operations.modifyUserSensitiveInfo,
     },
     forum: {
-      GET: 'experimentalForumsSettings',
-      POST: 'experimentalForumsSettings',
-      PUT: 'experimentalForumsSettings',
+      GET: Operations.experimentalForumsSettings,
+      POST: Operations.experimentalForumsSettings,
+      PUT: Operations.experimentalForumsSettings,
     },
     grade: {
-      GET: 'visitUsersGradeSettings',
-      PUT: 'modifyUsersGradeSettings',
+      GET: Operations.visitUsersGradeSettings,
+      PUT: Operations.modifyUsersGradeSettings,
     },
     score: {
-      GET: 'experimentalScoreSettings',
-      PUT: 'experimentalScoreSettings',
+      GET: Operations.experimentalScoreSettings,
+      PUT: Operations.experimentalScoreSettings,
     },
     kcb: {
-      GET: 'visitKcbSettings',
-      PUT: 'modifyKcbSettings',
+      GET: Operations.visitKcbSettings,
+      PUT: Operations.modifyKcbSettings,
       record: {
-        PUT: 'modifyWithdrawRecord',
+        PUT: Operations.modifyWithdrawRecord,
       },
     },
     xsf: {
-      GET: 'visitXsfSettings',
-      PUT: 'modifyXsfSettings',
+      GET: Operations.visitXsfSettings,
+      PUT: Operations.modifyXsfSettings,
     },
     log: {
-      GET: 'logParamsSetting',
-      POST: 'logParamsSettingModify',
+      GET: Operations.logParamsSetting,
+      POST: Operations.logParamsSettingModify,
     },
     page: {
-      GET: 'visitPageSettings',
-      PUT: 'modifyPageSettings',
+      GET: Operations.visitPageSettings,
+      PUT: Operations.modifyPageSettings,
     },
     exam: {
-      GET: 'visitExamSettings',
-      PUT: 'modifyExamSettings',
+      GET: Operations.visitExamSettings,
+      PUT: Operations.modifyExamSettings,
     },
     message: {
-      GET: 'visitEMessageSettings',
-      PUT: 'modifyEMessageSettings',
+      GET: Operations.visitEMessageSettings,
+      PUT: Operations.modifyEMessageSettings,
     },
     share: {
-      GET: 'experimentalShareSettings',
-      PUT: 'experimentalShareSettings',
+      GET: Operations.experimentalShareSettings,
+      PUT: Operations.experimentalShareSettings,
     },
     post: {
-      GET: 'visitEPostSettings',
-      PUT: 'modifyEPostSettings',
+      GET: Operations.visitEPostSettings,
+      PUT: Operations.modifyEPostSettings,
     },
     documentPost: {
-      GET: 'experimentalDocumentPostSettings',
-      PUT: 'experimentalDocumentPostSettings',
+      GET: Operations.experimentalDocumentPostSettings,
+      PUT: Operations.experimentalDocumentPostSettings,
     },
     sub: {
-      GET: 'experimentalSubSettings',
-      PUT: 'experimentalSubSettings',
+      GET: Operations.experimentalSubSettings,
+      PUT: Operations.experimentalSubSettings,
     },
     register: {
-      GET: 'experimentalRegisterSettings',
-      PUT: 'experimentalRegisterSettings',
+      GET: Operations.experimentalRegisterSettings,
+      PUT: Operations.experimentalRegisterSettings,
     },
     safe: {
-      GET: 'experimentalSafeSettings',
-      PUT: 'experimentalSafeSettings',
+      GET: Operations.experimentalSafeSettings,
+      PUT: Operations.experimentalSafeSettings,
       unverifiedPhone: {
-        GET: 'unverifiedPhonePage',
+        GET: Operations.unverifiedPhonePage,
       },
       modifyPassword: {
-        POST: 'modifyBackendPassword',
+        POST: Operations.modifyBackendPassword,
       },
       weakPasswordCheck: {
-        GET: 'weakPasswordCheck',
+        GET: Operations.weakPasswordCheck,
         result: {
-          GET: 'weakPasswordCheckResult',
-          POST: 'weakPasswordCheckResult',
+          GET: Operations.weakPasswordCheckResult,
+          POST: Operations.weakPasswordCheckResult,
         },
       },
     },
     auth: {
-      GET: 'experimentalUserAuth',
-      PUT: 'experimentalUserAuth',
+      GET: Operations.experimentalUserAuth,
+      PUT: Operations.experimentalUserAuth,
     },
     review: {
-      GET: 'experimentalReviewSettings',
-      PUT: 'experimentalReviewSettings',
+      GET: Operations.experimentalReviewSettings,
+      PUT: Operations.experimentalReviewSettings,
       keyword: {
-        PUT: 'experimentalKeywordSettings',
+        PUT: Operations.experimentalKeywordSettings,
       },
     },
     column: {
-      GET: 'experimentalColumnSettings',
-      PUT: 'experimentalColumnSettings',
+      GET: Operations.experimentalColumnSettings,
+      PUT: Operations.experimentalColumnSettings,
     },
     library: {
-      GET: 'experimentalLibrarySettings',
-      PUT: 'experimentalLibrarySettings',
+      GET: Operations.experimentalLibrarySettings,
+      PUT: Operations.experimentalLibrarySettings,
     },
     download: {
-      GET: 'experimentalDownloadSettings',
-      PUT: 'experimentalDownloadSettings',
+      GET: Operations.experimentalDownloadSettings,
+      PUT: Operations.experimentalDownloadSettings,
     },
     upload: {
-      GET: 'experimentalUploadSettings',
-      PUT: 'experimentalUploadSettings',
+      GET: Operations.experimentalUploadSettings,
+      PUT: Operations.experimentalUploadSettings,
     },
     'red-envelope': {
-      GET: 'visitERedEnvelope',
-      PUT: 'modifyEPostSettings',
+      GET: Operations.visitERedEnvelope,
+      PUT: Operations.modifyEPostSettings,
     },
     recharge: {
-      GET: 'experimentalRechargeSettings',
-      PUT: 'experimentalRechargeSettings',
+      GET: Operations.experimentalRechargeSettings,
+      PUT: Operations.experimentalRechargeSettings,
     },
     sensitiveWords: {
-      GET: 'sensitiveWords',
-      PUT: 'sensitiveWords',
+      GET: Operations.sensitiveWords,
+      PUT: Operations.sensitiveWords,
       checker: {
-        POST: 'sensitiveWords',
+        POST: Operations.sensitiveWords,
       },
     },
     fund: {
-      GET: 'experimentalFundSettings',
-      PUT: 'experimentalFundSettings',
+      GET: Operations.experimentalFundSettings,
+      PUT: Operations.experimentalFundSettings,
     },
     oauth: {
       creation: {
-        GET: 'manageOauthApp',
-        POST: 'manageOauthApp',
+        GET: Operations.manageOauthApp,
+        POST: Operations.manageOauthApp,
       },
       manage: {
-        GET: 'manageOauthApp',
+        GET: Operations.manageOauthApp,
         PARAMETER: {
-          DELETE: 'manageOauthApp',
+          DELETE: Operations.manageOauthApp,
           settings: {
-            GET: 'manageOauthApp',
-            PUT: 'manageOauthApp',
+            GET: Operations.manageOauthApp,
+            PUT: Operations.manageOauthApp,
           },
           secret: {
-            POST: 'manageOauthApp',
+            POST: Operations.manageOauthApp,
           },
           ban: {
-            PUT: 'manageOauthApp',
+            PUT: Operations.manageOauthApp,
           },
         },
       },
     },
   },
   systemInfo: {
-    GET: 'visitSystemInfo',
-    POST: 'sendSystemInfo',
-    PUT: 'modifySystemInfo',
-    DELETE: 'deleteSystemInfo',
+    GET: Operations.visitSystemInfo,
+    POST: Operations.sendSystemInfo,
+    PUT: Operations.modifySystemInfo,
+    DELETE: Operations.deleteSystemInfo,
     fuzzy_search_user: {
-      GET: 'fuzzySearchUser',
+      GET: Operations.fuzzySearchUser,
     },
   },
   log: {
-    GET: 'visitPublicLogs',
+    GET: Operations.visitPublicLogs,
     filter: {
-      GET: 'experimentalFilterLogs',
-      POST: 'experimentalFilterLogs',
+      GET: Operations.experimentalFilterLogs,
+      POST: Operations.experimentalFilterLogs,
     },
     sensitive: {
-      GET: 'experimentalFilterLogs',
-      POST: 'experimentalFilterLogs',
+      GET: Operations.experimentalFilterLogs,
+      POST: Operations.experimentalFilterLogs,
       PARAMETER: {
-        GET: 'experimentalFilterLogs',
-        POST: 'experimentalFilterLogs',
+        GET: Operations.experimentalFilterLogs,
+        POST: Operations.experimentalFilterLogs,
       },
     },
     resource: {
-      GET: 'experimentalResourceLogs',
-      PUT: 'updateResourceInfo',
+      GET: Operations.experimentalResourceLogs,
+      PUT: Operations.updateResourceInfo,
       updateInfo: {
-        PUT: 'updateResourceInfo',
+        PUT: Operations.updateResourceInfo,
       },
     },
     blacklist: {
-      GET: 'visitExperimentalBlacklist',
+      GET: Operations.visitExperimentalBlacklist,
     },
     shop: {
-      GET: 'visitExperimentalShop',
+      GET: Operations.visitExperimentalShop,
     },
     recycle: {
-      GET: 'visitRecycleMarkThreads',
+      GET: Operations.visitRecycleMarkThreads,
     },
     public: {
-      GET: 'visitPublicLogs',
-      DELETE: 'deletePublicLogs',
+      GET: Operations.visitPublicLogs,
+      DELETE: Operations.deletePublicLogs,
     },
     secret: {
-      GET: 'visitSecretLogs',
-      POST: 'visitSecretLogs',
+      GET: Operations.visitSecretLogs,
+      POST: Operations.visitSecretLogs,
     },
     message: {
-      GET: 'visitMessageLogs',
+      GET: Operations.visitMessageLogs,
     },
     share: {
-      GET: 'visitShareLogs',
+      GET: Operations.visitShareLogs,
     } /*
 		info: {
-			GET: 'visitInfoLogs'
+			GET: Operations.visitInfoLogs
 		},*/,
     experimental: {
-      GET: 'visitExperimentalLogs',
+      GET: Operations.visitExperimentalLogs,
     },
     behavior: {
-      GET: 'visitBehaviorLogs',
+      GET: Operations.visitBehaviorLogs,
     },
     score: {
-      GET: 'visitScoreLogs',
+      GET: Operations.visitScoreLogs,
     },
     kcb: {
-      GET: 'visitExperimentalKcb',
+      GET: Operations.visitExperimentalKcb,
       diff: {
-        GET: 'visitExperimentalDiffKcb',
-        POST: 'resetExperimentalDiffKcb',
+        GET: Operations.visitExperimentalDiffKcb,
+        POST: Operations.resetExperimentalDiffKcb,
       },
     },
     xsf: {
-      GET: 'visitExperimentalXsf',
+      GET: Operations.visitExperimentalXsf,
     },
     recharge: {
-      GET: 'visitExperimentalRecharge',
+      GET: Operations.visitExperimentalRecharge,
     },
     withdraw: {
-      GET: 'visitExperimentalWithdraw',
+      GET: Operations.visitExperimentalWithdraw,
     },
     exam: {
-      GET: 'visitExperimentalExam',
+      GET: Operations.visitExperimentalExam,
       paper: {
         PARAMETER: {
-          GET: 'visitExperimentalExam',
+          GET: Operations.visitExperimentalExam,
         },
       },
     },
     warning: {
-      GET: 'experimentalWarningLog',
+      GET: Operations.experimentalWarningLog,
     },
     review: {
-      GET: 'experimentalReviewLog',
+      GET: Operations.experimentalReviewLog,
     },
     smscode: {
-      GET: 'viewSmscodeRecord',
+      GET: Operations.viewSmscodeRecord,
     },
     emailcode: {
-      GET: 'viewEmailcodeRecord',
+      GET: Operations.viewEmailcodeRecord,
     },
     userCode: {
-      GET: 'experimentalUserCodeLog',
+      GET: Operations.experimentalUserCodeLog,
     },
     payment: {
-      GET: 'experimentalPayment',
+      GET: Operations.experimentalPayment,
     },
   },
   console: {
-    GET: 'visitExperimentalConsole',
+    GET: Operations.visitExperimentalConsole,
   },
   auth: {
-    GET: 'visitAuthList',
+    GET: Operations.visitAuthList,
     PARAMETER: {
-      GET: 'visitUserAuth',
-      DELETE: 'cancelSubmitVerify',
+      GET: Operations.visitUserAuth,
+      DELETE: Operations.cancelSubmitVerify,
       verify2: {
-        POST: 'modifyUserVerifyStatus',
+        POST: Operations.modifyUserVerifyStatus,
       },
       verify3: {
-        POST: 'modifyUserVerifyStatus',
+        POST: Operations.modifyUserVerifyStatus,
       },
       a: {
         PARAMETER: {
-          GET: 'auditorVisitVerifiedUpload',
+          GET: Operations.auditorVisitVerifiedUpload,
         },
       },
     },
   },
   tools: {
     filter: {
-      GET: 'experimentalToolsFilter',
-      POST: 'experimentalToolsFilter',
+      GET: Operations.experimentalToolsFilter,
+      POST: Operations.experimentalToolsFilter,
     },
   },
 };

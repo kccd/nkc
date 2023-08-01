@@ -1,3 +1,4 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'mathJax',
+  GET: Operations.mathJax,
 };

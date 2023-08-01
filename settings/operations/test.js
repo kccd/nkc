@@ -1,8 +1,9 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'test',
-  POST: 'test',
-  PUT: 'test',
+  GET: Operations.test,
+  POST: Operations.test,
+  PUT: Operations.test,
   PARAMETER: {
-    GET: 'test',
+    GET: Operations.test,
   },
 };

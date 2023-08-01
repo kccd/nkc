@@ -1,38 +1,39 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   a: {
     PARAMETER: {
-      GET: 'visitZoneArticle',
+      GET: Operations.visitZoneArticle,
       category: {
-        PUT: 'manageZoneArticleCategory',
+        PUT: Operations.manageZoneArticleCategory,
       },
     },
   },
   m: {
     PARAMETER: {
-      GET: 'visitZoneSingleMoment',
+      GET: Operations.visitZoneSingleMoment,
       vote: {
-        POST: 'zoneMomentVote',
+        POST: Operations.zoneMomentVote,
       },
       options: {
-        GET: 'getZoneMomentOption',
+        GET: Operations.getZoneMomentOption,
       },
       comments: {
-        GET: 'getZoneMomentComments',
+        GET: Operations.getZoneMomentComments,
         child: {
-          GET: 'getZoneMomentComments',
+          GET: Operations.getZoneMomentComments,
         },
       },
       repost: {
-        GET: 'getZoneMomentComments',
+        GET: Operations.getZoneMomentComments,
       },
       comment: {
         PARAMETER: {
-          DELETE: 'deleteZoneMomentComment',
+          DELETE: Operations.deleteZoneMomentComment,
           vote: {
-            POST: 'zoneMomentCommentVote',
+            POST: Operations.zoneMomentCommentVote,
           },
           options: {
-            GET: 'getZoneMomentCommentOptions',
+            GET: Operations.getZoneMomentCommentOptions,
           },
         },
       },

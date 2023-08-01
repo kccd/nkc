@@ -1,62 +1,63 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'nkcManagement',
-  POST: 'nkcManagement',
+  GET: Operations.nkcManagement,
+  POST: Operations.nkcManagement,
   home: {
-    GET: 'nkcManagementHome',
-    POST: 'nkcManagementHome',
-    PUT: 'nkcManagementHome',
+    GET: Operations.nkcManagementHome,
+    POST: Operations.nkcManagementHome,
+    PUT: Operations.nkcManagementHome,
     showActivityEnter: {
-      PUT: 'showActivityEnter',
+      PUT: Operations.showActivityEnter,
     },
     block: {
-      POST: 'nkcManagementHome',
-      PUT: 'nkcManagementHome',
+      POST: Operations.nkcManagementHome,
+      PUT: Operations.nkcManagementHome,
       PARAMETER: {
-        GET: 'nkcManagementHome',
-        PUT: 'nkcManagementHome',
-        DELETE: 'nkcManagementHome',
+        GET: Operations.nkcManagementHome,
+        PUT: Operations.nkcManagementHome,
+        DELETE: Operations.nkcManagementHome,
         disabled: {
-          PUT: 'nkcManagementHome',
+          PUT: Operations.nkcManagementHome,
         },
         refresh: {
-          POST: 'nkcManagementHome',
+          POST: Operations.nkcManagementHome,
         },
       },
     },
   },
   sticker: {
-    GET: 'nkcManagementSticker',
-    POST: 'nkcManagementSticker',
+    GET: Operations.nkcManagementSticker,
+    POST: Operations.nkcManagementSticker,
   },
   note: {
-    GET: 'nkcManagementNote',
-    POST: 'nkcManagementNote',
+    GET: Operations.nkcManagementNote,
+    POST: Operations.nkcManagementNote,
   },
   post: {
-    GET: 'nkcManagementPost',
-    POST: 'nkcManagementPost',
+    GET: Operations.nkcManagementPost,
+    POST: Operations.nkcManagementPost,
   },
   document: {
-    GET: 'nkcManagementDocument',
-    POST: 'nkcManagementDocument',
+    GET: Operations.nkcManagementDocument,
+    POST: Operations.nkcManagementDocument,
   },
   column: {
-    GET: 'nkcManagementColumn',
-    POST: 'nkcManagementColumn',
+    GET: Operations.nkcManagementColumn,
+    POST: Operations.nkcManagementColumn,
   },
   section: {
-    GET: 'nkcManagementSection',
-    POST: 'nkcManagementSection',
+    GET: Operations.nkcManagementSection,
+    POST: Operations.nkcManagementSection,
   },
   applyForum: {
-    GET: 'nkcManagementApplyForum',
-    POST: 'nkcManagementApplyForum',
+    GET: Operations.nkcManagementApplyForum,
+    POST: Operations.nkcManagementApplyForum,
   },
   securityApplication: {
-    GET: 'nkcManagementSecurityApplication',
-    POST: 'nkcManagementSecurityApplication',
+    GET: Operations.nkcManagementSecurityApplication,
+    POST: Operations.nkcManagementSecurityApplication,
   },
   os: {
-    GET: 'nkcManagementOS',
+    GET: Operations.nkcManagementOS,
   },
 };

@@ -1,51 +1,52 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  GET: 'getThreadByQuery',
+  GET: Operations.getThreadByQuery,
   PARAMETER: {
-    GET: 'visitThread',
-    POST: 'postToThread',
+    GET: Operations.visitThread,
+    POST: Operations.postToThread,
     'post-order': {
-      PUT: 'editThreadPostOrder',
+      PUT: Operations.editThreadPostOrder,
     },
     moveDraft: {
       reason: {
-        PUT: 'modifyReasonThreadReturn',
+        PUT: Operations.modifyReasonThreadReturn,
       },
     },
     collection: {
-      POST: 'collectThread',
+      POST: Operations.collectThread,
     },
     /* digest: {
-			POST: 'digestThread',
-			DELETE: 'unDigestThread'
+			POST: Operations.digestThread,
+			DELETE: Operations.unDigestThread
 		}, */
     topped: {
-      POST: 'toppedThread',
-      DELETE: 'unToppedThread',
+      POST: Operations.toppedThread,
+      DELETE: Operations.unToppedThread,
     },
     block: {
-      POST: 'pushThread',
-      GET: 'pushThread',
+      POST: Operations.pushThread,
+      GET: Operations.pushThread,
     },
     hometop: {
-      GET: 'homeTop',
-      POST: 'homeTop',
-      DELETE: 'homeTop',
+      GET: Operations.homeTop,
+      POST: Operations.homeTop,
+      DELETE: Operations.homeTop,
     },
     ad: {
-      GET: 'homeAd',
-      POST: 'homeAd',
-      DELETE: 'homeAd',
+      GET: Operations.homeAd,
+      POST: Operations.homeAd,
+      DELETE: Operations.homeAd,
     },
     /*switchInPersonalForum: {
-			PUT: 'switchInPersonalForum'
+			PUT: Operations.switchInPersonalForum
 		},*/
     close: {
-      POST: 'closeThread',
-      DELETE: 'openThread',
+      POST: Operations.closeThread,
+      DELETE: Operations.openThread,
     },
     subscribe: {
-      POST: 'subThread',
-      DELETE: 'unSubThread',
+      POST: Operations.subThread,
+      DELETE: Operations.unSubThread,
     },
   },
 };

@@ -1,14 +1,15 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   wechat: {
-    POST: 'receiveWeChatPaymentInfo',
+    POST: Operations.receiveWeChatPaymentInfo,
     PARAMETER: {
-      GET: 'postWeChatPayInfo',
+      GET: Operations.postWeChatPayInfo,
     },
   },
   alipay: {
-    POST: 'receiveAliPayPaymentInfo',
+    POST: Operations.receiveAliPayPaymentInfo,
     PARAMETER: {
-      GET: 'postAliPayInfo',
+      GET: Operations.postAliPayInfo,
     },
   },
 };

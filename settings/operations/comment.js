@@ -1,43 +1,44 @@
+const { Operations } = require('../operations.js');
 module.exports = {
-  POST: 'publishComment',
-  GET: 'getComments',
+  POST: Operations.publishComment,
+  GET: Operations.getComments,
   PARAMETER: {
-    PUT: 'modifyComment',
-    DELETE: 'deleteComment',
-    GET: 'getComments',
+    PUT: Operations.modifyComment,
+    DELETE: Operations.deleteComment,
+    GET: Operations.getComments,
     quote: {
-      GET: 'getComments',
+      GET: Operations.getComments,
     },
     commentEditor: {
-      GET: 'getComments',
+      GET: Operations.getComments,
     },
     disabled: {
-      POST: 'disabledComment',
+      POST: Operations.disabledComment,
     },
     unblock: {
-      POST: 'disabledComment',
+      POST: Operations.disabledComment,
     },
     options: {
-      GET: 'getCommentPermission',
+      GET: Operations.getCommentPermission,
     },
     ipInfo: {
-      GET: 'getCommentIpInfo',
+      GET: Operations.getCommentIpInfo,
     },
     digest: {
-      POST: 'digestComment',
-      DELETE: 'unDigestComment',
+      POST: Operations.digestComment,
+      DELETE: Operations.unDigestComment,
     },
     credit: {
       xsf: {
-        POST: 'creditXsf',
+        POST: Operations.creditXsf,
         PARAMETER: {
-          DELETE: 'cancelXsf',
+          DELETE: Operations.cancelXsf,
         },
       },
       kcb: {
-        POST: 'creditKcb',
+        POST: Operations.creditKcb,
         PARAMETER: {
-          PUT: 'modifyKcbRecordReason',
+          PUT: Operations.modifyKcbRecordReason,
         },
       },
     },

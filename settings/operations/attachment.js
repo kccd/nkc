@@ -1,5 +1,6 @@
+const { Operations } = require('../operations.js');
 module.exports = {
   PARAMETER: {
-    GET: 'getAttachment',
+    GET: Operations.getAttachment,
   },
 };
