@@ -1,6 +1,7 @@
 const log4js = require('log4js');
 const { isDevelopment } = require('../settings/env');
 const { processId } = require('../settings/env');
+const { files: fileOperationsId } = require('../settings/operationGroups');
 
 const logger = {
   error,
@@ -85,8 +86,7 @@ async function saveLogToDB(ctx) {
 
   const referer = ctx.get('referer');
   const userAgent = ctx.get('User-Agent');
-  const { operationId, logSettings } = state;
-  const { operationsId } = logSettings;
+  const { operationId } = state;
   const log = {
     error,
     method,
@@ -102,8 +102,8 @@ async function saveLogToDB(ctx) {
     userAgent,
     uid: data.user ? data.user.uid : '',
   };
-  // 存入日志
-  if (operationsId.includes(operationId)) {
+  // 非文件相关路由需记录日志
+  if (!fileOperationsId.includes(operationId)) {
     setImmediate(async () => {
       if (data.user) {
         await db.LogModel(log).save();

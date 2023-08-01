@@ -19,5 +19,6 @@
   "SENSITIVE_TYPE_ERROR": "敏感词类型错误(type={v1})",
   "USED_QUESTION_TAG_NAME": "试题标签名已被使用，请更换",
   "INVALID_QUESTION_TAG_ID": "无效的试题标签ID(id={v1})",
-  "TAG_HAS_QUESTIONS_ERROR": "标签下存在试题，无法删除"
+  "TAG_HAS_QUESTIONS_ERROR": "标签下存在试题，无法删除",
+  "TAG_HAS_CATEGORY_ERROR": "标签存在于试卷下，无法删除"
 }

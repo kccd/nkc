@@ -4,7 +4,7 @@ const {
   usersBehavior,
   experimental,
   timeLine,
-} = require('../settings/operationsType');
+} = require('../settings/operationGroups');
 module.exports = async (ctx, next) => {
   const { db, state, data } = ctx;
   const operationId = state.operationId;

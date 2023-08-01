@@ -104,7 +104,7 @@ const schema = new Schema(
       index: 1,
     },
     fid: {
-      // 专业领域
+      // 专业领域，已被废弃
       type: String,
       default: '',
       index: 1,
