@@ -3,39 +3,39 @@ module.exports = {
     PARAMETER: {
       GET: 'visitZoneArticle',
       category: {
-        PUT: 'manageZoneArticleCategory'
-      }
-    }
+        PUT: 'manageZoneArticleCategory',
+      },
+    },
   },
   m: {
     PARAMETER: {
       GET: 'visitZoneSingleMoment',
       vote: {
-        POST: 'zoneMomentVote'
+        POST: 'zoneMomentVote',
       },
       options: {
-        GET: 'getZoneMomentOption'
+        GET: 'getZoneMomentOption',
       },
       comments: {
         GET: 'getZoneMomentComments',
         child: {
           GET: 'getZoneMomentComments',
-        }
+        },
       },
       repost: {
-        GET: 'getZoneMomentComments'
+        GET: 'getZoneMomentComments',
       },
       comment: {
         PARAMETER: {
           DELETE: 'deleteZoneMomentComment',
           vote: {
-            POST: 'zoneMomentCommentVote'
+            POST: 'zoneMomentCommentVote',
           },
           options: {
-            GET: 'getZoneMomentCommentOptions'
-          }
-        }
-      }
-    }
-  }
-}
+            GET: 'getZoneMomentCommentOptions',
+          },
+        },
+      },
+    },
+  },
+};

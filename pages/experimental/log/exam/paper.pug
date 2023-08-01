@@ -63,7 +63,7 @@ block eContent
 
         div
           div.m-b-2(v-for='(record, index) in paper.record')
-            div.question-content.m-b-05(v-html="markdownToHTML(`${index + 1}、${record.content}`)")
+            div.question-content.m-b-05(v-html="markdownToHTML(`${index + 1}、${record.content || '太久远，未导入'}`)")
             div.font-size-1rem.text-info.m-b-05(v-if='record.contentDesc.length > 0') 题干说明：{{record.contentDesc}}
             div.question-answers.m-b-1
               div.question.m-b-05(v-for="(answer, index) in record.answer" v-if='record.type === "ch4"')
@@ -77,7 +77,7 @@ block eContent
                 //- 填空题
                 div.text-success 标准答案：{{record.answer[0].text}}
                 div 用户作答：{{record.answer[0].fill}}
-            div.question-result
+            div.question-result #&nbsp;
               span.text-success(v-if='record.correct') 回答正确
               span.text-danger(v-else) 回答错误
 block scripts

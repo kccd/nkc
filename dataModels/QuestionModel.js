@@ -109,6 +109,12 @@ const schema = new Schema(
       default: '',
       index: 1,
     },
+    // 试题标签
+    tags: {
+      type: [Number],
+      default: [],
+      index: 1,
+    },
     viewed: {
       type: Boolean,
       default: false,

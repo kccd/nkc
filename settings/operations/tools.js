@@ -2,22 +2,22 @@ module.exports = {
   GET: 'visitToolsList',
   open: {
     PARAMETER: {
-      GET: 'visitTool'
-    }
+      GET: 'visitTool',
+    },
   },
   upload: {
-    POST: 'uploadTool'
+    POST: 'uploadTool',
   },
   update: {
-    POST: 'updateTool'
+    POST: 'updateTool',
   },
   delete: {
-    DELETE: 'deleteTool'
+    DELETE: 'deleteTool',
   },
   hide: {
-    DELETE: 'hideTool'
+    DELETE: 'hideTool',
   },
   enableSiteTools: {
-    POST: 'enableSiteTools'
-  }
-}
+    POST: 'enableSiteTools',
+  },
+};

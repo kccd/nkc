@@ -2,8 +2,8 @@ module.exports = {
   pdf: {
     web: {
       viewer: {
-        GET: "pdfReader"
-      }
-    }
-  }
+        GET: 'pdfReader',
+      },
+    },
+  },
 };

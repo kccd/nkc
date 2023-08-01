@@ -1,5 +1,5 @@
 module.exports = {
   PARAMETER: {
-    GET: 'getSiteSpecific'
-  }
-}
+    GET: 'getSiteSpecific',
+  },
+};

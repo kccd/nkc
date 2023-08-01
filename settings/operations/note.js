@@ -1,13 +1,13 @@
 module.exports = {
-  GET: "viewNote",
-  POST: "addNote",
+  GET: 'viewNote',
+  POST: 'addNote',
   PARAMETER: {
-    GET: "viewNote",
+    GET: 'viewNote',
     c: {
       PARAMETER: {
-        DELETE: "deleteNote",
-        PUT: "modifyNote"
-      }
-    }
-  }
+        DELETE: 'deleteNote',
+        PUT: 'modifyNote',
+      },
+    },
+  },
 };

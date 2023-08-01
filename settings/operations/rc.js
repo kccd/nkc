@@ -2,9 +2,9 @@ module.exports = {
   GET: 'resourceCategory',
   POST: 'resourceCategory',
   move: {
-    POST: "resourceCategory"
+    POST: 'resourceCategory',
   },
   order: {
-    POST: "resourceCategory"
-  }
+    POST: 'resourceCategory',
+  },
 };

@@ -54,5 +54,18 @@ module.exports = {
         GET: 'api_get_user_memo',
       },
     },
+    exam: {
+      tags: {
+        GET: 'api_get_question_tags',
+        POST: 'api_post_question_tags',
+      },
+      tag: {
+        PARAMETER: {
+          GET: 'api_get_question_tag',
+          PUT: 'api_put_question_tag',
+          DELETE: 'api_delete_question_tag',
+        },
+      },
+    },
   },
 };

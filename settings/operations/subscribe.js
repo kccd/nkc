@@ -1,17 +1,17 @@
 module.exports = {
   moment: {
-    GET: 'visitHome'
+    GET: 'visitHome',
   },
-  user:{
-    GET: 'visitHome'
+  user: {
+    GET: 'visitHome',
   },
   forum: {
-    GET: 'visitHome'
+    GET: 'visitHome',
   },
   column: {
-    GET: 'visitHome'
+    GET: 'visitHome',
   },
   thread: {
-    GET: 'visitThread'
-  }
-}
+    GET: 'visitThread',
+  },
+};

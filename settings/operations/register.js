@@ -1,21 +1,21 @@
 module.exports = {
-	GET: 'visitMobileRegister',
-	POST: 'submitRegister',
-	/*information: {
+  GET: 'visitMobileRegister',
+  POST: 'submitRegister',
+  /*information: {
 		POST: 'submitInformation'
 	},*/
-	mobile: {
-		GET: 'visitMobileRegister',
-		POST: 'submitRegister'
-	},
-	code: {
-		GET: 'getRegisterCode'
-	},
-  subscribe: {
-	  GET: "registerSubscribe",
-    POST: "registerSubscribe"
+  mobile: {
+    GET: 'visitMobileRegister',
+    POST: 'submitRegister',
   },
-	check: {
-		POST: 'submitRegister'
-	}
+  code: {
+    GET: 'getRegisterCode',
+  },
+  subscribe: {
+    GET: 'registerSubscribe',
+    POST: 'registerSubscribe',
+  },
+  check: {
+    POST: 'submitRegister',
+  },
 };

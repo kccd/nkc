@@ -1,43 +1,43 @@
 module.exports = {
   GET: 'visitActivityIndex',
   block: {
-    POST: "blockCurrentActivity"
+    POST: 'blockCurrentActivity',
   },
   unblock: {
-    POST: "unBlockCurrentActivity"
+    POST: 'unBlockCurrentActivity',
   },
   release: {
     GET: 'activityReleaseIndex',
-    POST: 'activityReleasePost'
+    POST: 'activityReleasePost',
   },
   list: {
-    GET: 'activityListIndex'
+    GET: 'activityListIndex',
   },
   single: {
     PARAMETER: {
-      GET: "visitActivitySingle",
-      POST: "activityApplyPost",
-      DELETE: "cancelActivityApply",
-      PUT: "activityEditPost"
-    }
+      GET: 'visitActivitySingle',
+      POST: 'activityApplyPost',
+      DELETE: 'cancelActivityApply',
+      PUT: 'activityEditPost',
+    },
   },
   myApply: {
-    GET: 'myActivityApplyIndex'
+    GET: 'myActivityApplyIndex',
   },
   myRelease: {
-    GET: 'myActivityReleaseIndex'
+    GET: 'myActivityReleaseIndex',
   },
   post: {
     PARAMETER: {
-      POST: 'postToActivity'
-    }
+      POST: 'postToActivity',
+    },
   },
   modify: {
     PARAMETER: {
       GET: 'getActivityModify',
       POST: 'postActivityModify',
       DELETE: 'delActivityModify',
-      PUT: 'sendActivityMessage'
-    }
-  }
+      PUT: 'sendActivityMessage',
+    },
+  },
 };

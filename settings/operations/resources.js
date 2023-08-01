@@ -1,6 +1,6 @@
 module.exports = {
-  GET: "getResources",
+  GET: 'getResources',
   md5: {
-    POST: 'uploadResources'
-  }
+    POST: 'uploadResources',
+  },
 };

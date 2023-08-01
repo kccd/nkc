@@ -1,27 +1,27 @@
 module.exports = {
-  POST: "publishComment",
-  GET: "getComments",
+  POST: 'publishComment',
+  GET: 'getComments',
   PARAMETER: {
-    PUT: "modifyComment",
-    DELETE: "deleteComment",
-    GET: "getComments",
+    PUT: 'modifyComment',
+    DELETE: 'deleteComment',
+    GET: 'getComments',
     quote: {
-      GET: "getComments",
+      GET: 'getComments',
     },
     commentEditor: {
-      GET: "getComments",
+      GET: 'getComments',
     },
     disabled: {
-      POST: "disabledComment",
+      POST: 'disabledComment',
     },
     unblock: {
-      POST: "disabledComment",
+      POST: 'disabledComment',
     },
     options: {
-      GET: "getCommentPermission",
+      GET: 'getCommentPermission',
     },
     ipInfo: {
-      GET: "getCommentIpInfo",
+      GET: 'getCommentIpInfo',
     },
     digest: {
       POST: 'digestComment',
@@ -31,23 +31,23 @@ module.exports = {
       xsf: {
         POST: 'creditXsf',
         PARAMETER: {
-          DELETE: 'cancelXsf'
-        }
+          DELETE: 'cancelXsf',
+        },
       },
       kcb: {
         POST: 'creditKcb',
         PARAMETER: {
-          PUT: "modifyKcbRecordReason"
-        }
-      }
+          PUT: 'modifyKcbRecordReason',
+        },
+      },
     },
     vote: {
       up: {
-        POST: 'post-vote-up'
+        POST: 'post-vote-up',
       },
       down: {
-        POST: 'post-vote-down'
-      }
+        POST: 'post-vote-down',
+      },
     },
-  }
-}
+  },
+};

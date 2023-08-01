@@ -2,55 +2,55 @@ module.exports = {
   GET: 'visitExamPaperList',
   record: {
     question: {
-      GET: 'viewQuestionRecord'
+      GET: 'viewQuestionRecord',
     },
     paper: {
-      GET: 'viewPaperRecord'
-    }
+      GET: 'viewPaperRecord',
+    },
   },
   categories: {
     POST: 'addExamsCategory',
     editor: {
-      GET: 'visitEditCategory'
-    }
+      GET: 'visitEditCategory',
+    },
   },
   category: {
     PARAMETER: {
-	    PUT: 'modifyExamsCategory',
-    }
+      PUT: 'modifyExamsCategory',
+    },
   },
   auth: {
     GET: 'visitExamsQuestionAuth',
-    POST: 'submitExamsQuestionAuth'
+    POST: 'submitExamsQuestionAuth',
   },
   paper: {
-	  GET: 'getExamsPaper',
-	  PARAMETER: {
-	    GET: 'getExamsPaper',
-      POST: 'postExamsPaper'
-    }
+    GET: 'getExamsPaper',
+    PARAMETER: {
+      GET: 'getExamsPaper',
+      POST: 'postExamsPaper',
+    },
   },
   question: {
     POST: 'postQuestion',
-	  PARAMETER: {
+    PARAMETER: {
       PUT: 'modifyQuestion',
       DELETE: 'removeQuestion',
       disabled: {
-	      DELETE: 'enabledQuestion',
-        POST: 'disabledQuestion'
+        DELETE: 'enabledQuestion',
+        POST: 'disabledQuestion',
       },
-	    image: {
-	      GET: 'getQuestionImage'
+      image: {
+        GET: 'getQuestionImage',
       },
       auth: {
-        PUT: 'modifyQuestionAuthStatus'
-      }
-    }
+        PUT: 'modifyQuestionAuthStatus',
+      },
+    },
   },
   questions: {
-    GET: 'visitExamQuestionManagement'
+    GET: 'visitExamQuestionManagement',
   },
   editor: {
-	  GET: 'visitEditQuestion'
-  }
+    GET: 'visitEditQuestion',
+  },
 };

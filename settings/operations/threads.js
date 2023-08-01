@@ -1,14 +1,14 @@
 module.exports = {
   move: {
-    POST: "moveThreads"
+    POST: 'moveThreads',
   },
   draft: {
-    POST: "movePostsToDraft"
+    POST: 'movePostsToDraft',
   },
   recycle: {
-    POST: "movePostsToRecycle"
+    POST: 'movePostsToRecycle',
   },
   unblock: {
-    POST: "unblockPosts"
-  }
+    POST: 'unblockPosts',
+  },
 };

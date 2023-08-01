@@ -1,18 +1,18 @@
 module.exports = {
-  GET: "visitZoneSingleMoment",
+  GET: 'visitZoneSingleMoment',
   PARAMETER: {
-    DELETE: "deleteMoment",
+    DELETE: 'deleteMoment',
     recovery: {
-     POST: 'managementMoment'
+      POST: 'managementMoment',
     },
     disable: {
-      POST: 'managementMoment'
+      POST: 'managementMoment',
     },
     options: {
-      GET: "getMomentOption"
+      GET: 'getMomentOption',
     },
     ipInfo: {
-      GET: "getMomentIpInfo"
-    }
-  }
+      GET: 'getMomentIpInfo',
+    },
+  },
 };

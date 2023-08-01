@@ -1,8 +1,8 @@
 module.exports = {
   credit: {
-    GET: 'getCreditSettings'
+    GET: 'getCreditSettings',
   },
   digest: {
-    GET: "getDigestSettings",
-  }
+    GET: 'getDigestSettings',
+  },
 };

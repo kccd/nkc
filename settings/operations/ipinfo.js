@@ -1,3 +1,3 @@
 module.exports = {
-  GET: "ipinfo"
-}
+  GET: 'ipinfo',
+};

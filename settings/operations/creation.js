@@ -1,18 +1,18 @@
 module.exports = {
   GET: 'creationCenter',
-  home:{
-    calendar:{
+  home: {
+    calendar: {
       GET: 'creationCenter',
     },
-    active:{
+    active: {
       GET: 'creationCenter',
     },
-    visit:{
+    visit: {
       GET: 'creationCenter',
     },
-    data:{
+    data: {
       GET: 'creationCenter',
-    }
+    },
   },
   drafts: {
     GET: 'creationCenter',
@@ -20,13 +20,13 @@ module.exports = {
     editor: {
       GET: 'creationCenter',
       POST: 'creationCenter',
-    }
+    },
   },
   draft: {
     PARAMETER: {
-      DELETE:'creationCenter',
-      GET: 'creationCenter'
-    }
+      DELETE: 'creationCenter',
+      GET: 'creationCenter',
+    },
   },
   category: {
     GET: 'creationCenter',
@@ -40,9 +40,9 @@ module.exports = {
       PUT: 'creationCenter',
       DELETE: 'creationCenter',
       editor: {
-        POST: 'creationCenter'
-      }
-    }
+        POST: 'creationCenter',
+      },
+    },
   },
   materials: {
     GET: 'creationCenter',
@@ -60,71 +60,71 @@ module.exports = {
       POST: 'creationCenter',
     },
     del: {
-      POST: 'creationCenter'
+      POST: 'creationCenter',
     },
     drag: {
-      POST: 'creationCenter'
-    }
+      POST: 'creationCenter',
+    },
   },
   books: {
     GET: 'creationCenter',
     editor: {
       GET: 'creationCenter',
-      POST: 'creationCenter'
-    }
+      POST: 'creationCenter',
+    },
   },
   book: {
     PARAMETER: {
       GET: 'creationCenter',
-      list:{
-        delete:{
-          POST:'creationCenterDeleteList'
+      list: {
+        delete: {
+          POST: 'creationCenterDeleteList',
         },
-        move:{
-          POST:'creationCenterMoveList'
+        move: {
+          POST: 'creationCenterMoveList',
         },
-        add:{
-          POST:'creationCenterAddList'
-        }
+        add: {
+          POST: 'creationCenterAddList',
+        },
       },
       member: {
         POST: 'creationCenter',
-        DELETE: 'creationCenter'
+        DELETE: 'creationCenter',
       },
-    }
+    },
   },
   articles: {
     GET: 'creationCenter',
     editor: {
       GET: 'creationCenter',
-      POST: 'publishArticle'
+      POST: 'publishArticle',
     },
     column: {
       GET: 'creationCenter',
       POST: 'creationCenter',
-    }
+    },
   },
   article: {
     PARAMETER: {
       DELETE: 'creationCenter',
       draft: {
-        DELETE: 'creationCenter'
+        DELETE: 'creationCenter',
       },
       options: {
-        GET: "creationCenter"
+        GET: 'creationCenter',
       },
       unblock: {
-        POST: 'creationCenter'
-      }
-    }
+        POST: 'creationCenter',
+      },
+    },
   },
   column: {
     GET: 'creationCenter',
     article: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     draft: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
   },
   zone: {
@@ -133,10 +133,10 @@ module.exports = {
       GET: 'creationCenter',
       editor: {
         GET: 'creationCenter',
-      }
+      },
     },
     draft: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     moment: {
       GET: 'creationCenter',
@@ -144,56 +144,56 @@ module.exports = {
       PARAMETER: {
         POST: 'publishMomentComment',
         comment: {
-          POST: 'publishMomentComment'
-        }
-      }
-    }
+          POST: 'publishMomentComment',
+        },
+      },
+    },
   },
   community: {
     GET: 'creationCenter',
     thread: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     post: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     draft: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     note: {
-      GET: 'creationCenter'
-    }
+      GET: 'creationCenter',
+    },
   },
   editor: {
     column: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     community: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     zone: {
       GET: 'creationCenter',
       moment: {
-        GET: 'creationCenter'
+        GET: 'creationCenter',
       },
       article: {
-        GET: 'creationCenter'
-      }
+        GET: 'creationCenter',
+      },
     },
     book: {
-      GET: 'creationCenter'
+      GET: 'creationCenter',
     },
     draft: {
-      GET: 'creationCenter'
-    }
+      GET: 'creationCenter',
+    },
   },
   collections: {
     GET: 'creationCenter',
     data: {
-      GET: 'creationCenter'
-    }
+      GET: 'creationCenter',
+    },
   },
   blackLists: {
     GET: 'creationCenter',
-  }
-}
+  },
+};

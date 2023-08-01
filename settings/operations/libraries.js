@@ -1,5 +1,5 @@
 module.exports = {
   logs: {
-    GET: "getLibraryLogs"
-  }
+    GET: 'getLibraryLogs',
+  },
 };
