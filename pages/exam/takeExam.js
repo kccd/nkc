@@ -13,7 +13,7 @@ new Vue({
   },
   methods: {
     getTakeExam() {
-      nkcAPI('/exam/public/takeExam', 'GET')
+      nkcAPI('/api/v1/exam/public/takeExam', 'GET')
         .then((res) => {
           console.log(res, 'res');
         })

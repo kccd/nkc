@@ -67,6 +67,15 @@ module.exports = {
           DELETE: Operations.api_delete_question_tag,
         },
       },
+      public: {
+        GET: Operations.visitPublicExam,
+        register: {
+          GET: Operations.visitPublicExam,
+        },
+        takeExam: {
+          GET: Operations.visitPublicExam,
+        },
+      },
     },
   },
 };

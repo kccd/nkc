@@ -479,8 +479,8 @@
         }
       },
       open: function(type) {
-        nkcAPI("/exam/public/register","GET").then((res)=>{
-          if (res && res.registerExamination) {
+        nkcAPI("/api/v1/exam/public/register","GET").then((res)=>{
+          if (res && res.data.registerExamination) {
             window.location.href = "/exam/public"
           } else {
             $(this.$el).modal("show");
