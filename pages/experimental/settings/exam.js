@@ -3,7 +3,7 @@ var app = new Vue({
   data: {
     examSettings: {},
   },
-  mounted: function() {
+  mounted: function () {
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
     var settings = data.examSettings;
@@ -11,20 +11,21 @@ var app = new Vue({
     examSettings.count = settings.count || 0;
     examSettings.countOneDay = settings.countOneDay || 0;
     examSettings.waitingTime = settings.waitingTime || 0;
-    examSettings.examNotes = settings.examNotes || "";
+    examSettings.examNotes = settings.examNotes || '';
+    examSettings.publicExamNotes = settings.publicExamNotes || '';
     this.examSettings = examSettings;
   },
   methods: {
-    save: function() {
-      nkcAPI('/e/settings/exam', 'PUT', {examSettings: app.examSettings})
-        .then(function() {
+    save: function () {
+      nkcAPI('/e/settings/exam', 'PUT', { examSettings: app.examSettings })
+        .then(function () {
           screenTopAlert('保存成功');
         })
-        .catch(function(data) {
+        .catch(function (data) {
           screenTopWarning(data);
         });
-    }
-  }
+    },
+  },
 });
 
 window.app = app;

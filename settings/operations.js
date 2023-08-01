@@ -754,6 +754,7 @@ const Operations = {
   api_delete_question_tag: 'api_delete_question_tag',
   getThreadCategories: 'getThreadCategories',
   MANAGE_QUESTION_TAGS: 'MANAGE_QUESTION_TAGS',
+  VISIT_PUBLIC_EXAM: 'VISIT_PUBLIC_EXAM',
 };
 module.exports = {
   Operations,

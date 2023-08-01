@@ -54,4 +54,13 @@ module.exports = {
   editor: {
     GET: Operations.visitEditQuestion,
   },
+  public: {
+    GET: 'Visit_Public_Exam',
+    register: {
+      GET: 'Visit_Public_Exam',
+    },
+    takeExam: {
+      GET: 'Visit_Public_Exam',
+    },
+  },
 };

@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const typeObj = { secret: 'secret', public: 'public' };
 const schema = new Schema(
   {
     _id: Number,
@@ -72,6 +73,11 @@ const schema = new Schema(
         },
       ],
     },
+    type: {
+      type: String,
+      default: typeObj.secret,
+      required: true,
+    },
     /*from: {
       // 考卷试题来源
       type: Schema.Types.Mixed,
@@ -98,4 +104,7 @@ const schema = new Schema(
     collection: 'examsCategories',
   },
 );
+schema.statics.getExamCategoryType = async () => {
+  return typeObj;
+};
 module.exports = mongoose.model('examsCategories', schema);
