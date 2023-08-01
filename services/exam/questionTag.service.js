@@ -47,7 +47,7 @@ class QuestionTagService {
 
   async createQuestionTag(props) {
     const { name, desc } = props;
-    const _id = await SettingModel.operateSystemID('questionTags');
+    const _id = await SettingModel.operateSystemID('questionTags', 1);
     const tag = new QuestionTagModel({
       _id,
       name,
@@ -73,11 +73,21 @@ class QuestionTagService {
 
   async deleteQuestionTag(_id) {
     const tag = await this.getTagById(_id);
-    const questionCount = await QuestionModel.countDocuments({ tags: _id });
+    const questionCount = await QuestionModel.countDocuments({ tags: tag._id });
     if (questionCount > 0) {
       ThrowBadRequestResponseTypeError(ResponseTypes.TAG_HAS_QUESTIONS_ERROR);
     }
-    // 试卷from字段
+    const examsCategoriesCount = await ExamsCategoryModel.countDocuments({
+      from: {
+        $elemMatch: {
+          tag: tag._id,
+        },
+      },
+    });
+    if (examsCategoriesCount > 0) {
+      ThrowBadRequestResponseTypeError(ResponseTypes.TAG_HAS_QUESTIONS_ERROR);
+    }
+    await tag.remove();
   }
 
   async getAllTag() {

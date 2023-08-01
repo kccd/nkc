@@ -1,7 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const typeObj = { secret: 'secret', public: 'public' };
+const examCategoryTypes = { secret: 'secret', public: 'public' };
 const schema = new Schema(
   {
     _id: Number,
@@ -59,7 +59,7 @@ const schema = new Schema(
     from: {
       type: [
         {
-          // 试题来源的标签，tag=null意味着不区分标签而全部选择
+          // 试题来源的标签ID
           tag: {
             type: Number,
             index: 1,
@@ -75,7 +75,7 @@ const schema = new Schema(
     },
     type: {
       type: String,
-      default: typeObj.secret,
+      default: examCategoryTypes.secret,
       required: true,
     },
     /*from: {
@@ -105,6 +105,6 @@ const schema = new Schema(
   },
 );
 schema.statics.getExamCategoryType = async () => {
-  return typeObj;
+  return { ...examCategoryTypes };
 };
 module.exports = mongoose.model('examsCategories', schema);
