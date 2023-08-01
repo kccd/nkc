@@ -3,12 +3,17 @@ block title
   title=`开卷考试`
   +includeCSS('/exam/takeExam.css')
 block content
-  div(id='take-exam')
-    .exam-content.clearfix
-      .exam-content-left.p-r-1
-        img.img-fluid(src=tools.getUrl('siteFile', 'holy_exam.gif'))
+  .container-fluid.max-width(id='take-exam')
+    .row
+      .col-xs-12.col-md-3.exam-content-left
+        img(src=tools.getUrl('siteFile', 'holy_exam.gif'))
         h3 科创会员开卷考试
-      .exam-content-right
+      .col-xs-12.col-md-9.exam-content-right
         h3 这是demo
+        h5 已完成{{currentQuestion}}/{{msg.length-1}}
+        h4 {{msg[currentQuestion]}}
+        footer
+          button.btn.btn-default(@click='pre') 上一步
+          button.btn.btn-default(@click='prv') 下一步
 block scripts
   +includeJS('/exam/takeExam.js')

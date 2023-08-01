@@ -68,12 +68,12 @@ module.exports = {
         },
       },
       public: {
-        GET: Operations.visitPublicExam,
+        GET: Operations.getPublicExam,
         register: {
-          GET: Operations.visitPublicExam,
+          GET: Operations.openPublicExam,
         },
         takeExam: {
-          GET: Operations.visitPublicExam,
+          GET: Operations.takePublicExam,
         },
       },
     },
