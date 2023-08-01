@@ -20,7 +20,9 @@ permission.getOperationsId = () => {
   };
   const operations = operationObj.defaultOperations.concat([]);
   fn(operationObj.operationTree, operations);
-  return [...new Set(operations.concat(Object.values(operationsJS)))];
+  return [
+    ...new Set(operations.concat(Object.values(operationsJS.Operations))),
+  ];
 };
 
 permission.getOperationId = (url, method) => {
