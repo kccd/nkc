@@ -119,7 +119,7 @@ async function initUsersGrades() {
   }
 }
 
-async function initOperations() {
+/*async function initOperations() {
   const permission = require('../nkcModules/permission');
   const db = require('../dataModels');
   const operationsId = permission.getOperationsId();
@@ -141,7 +141,7 @@ async function initOperations() {
       console.log(`removing operation '${operation._id}' from database`);
     }
   }
-}
+}*/
 
 async function initThreads() {
   const db = require('../dataModels');
@@ -403,7 +403,7 @@ async function init() {
   await initScoreOperations();
   await initUsersGrades();
   await initMessages();
-  await initOperations();
+  // await initOperations();
   await initForum();
   await initThreads();
   await initComplaintType();
@@ -425,7 +425,7 @@ module.exports = {
   initScoreOperations,
   initUsersGrades,
   initMessages,
-  initOperations,
+  // initOperations,
   initAccount,
   initThreads,
   initComplaintType,
