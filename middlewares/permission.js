@@ -1,13 +1,15 @@
 const { defaultCerts } = require('../settings/userCerts');
 const { ThrowForbiddenResponseTypeError } = require('../nkcModules/error');
 const { ResponseTypes } = require('../settings/response');
+const { FixedOperations } = require('../settings/operations.js');
 
 async function permission(ctx, next) {
-  const { data, isAPIRoute } = ctx;
-  // 这里判断了请求的是否为API路由
-  // 如果是API路由则绕过全局的权限判断
-  // API路由需要在路由中间件中进行权限判断
-  if (!isAPIRoute && !data.userOperationsId.includes(data.operationId)) {
+  const { data } = ctx;
+  const isFixedOperation = Object.values(FixedOperations).includes(
+    data.operationId,
+  );
+  // 这里首先判断了当前操作是否为固定操作，固定操作无需进行权限判断
+  if (!isFixedOperation && !data.userOperationsId.includes(data.operationId)) {
     ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
   }
   await next();
@@ -53,7 +55,7 @@ function OnlyBannedUser() {
   };
 }
 
-function OnlyCurrentPermission() {
+/*function OnlyCurrentPermission() {
   return async (ctx, next) => {
     const operationId = ctx.data.operationId;
     if (!ctx.data.userOperationsId.includes(operationId)) {
@@ -61,7 +63,7 @@ function OnlyCurrentPermission() {
     }
     await next();
   };
-}
+}*/
 
 function OnlyPermission(operation) {
   return OnlyPermissionsAnd([operation]);

@@ -1,4 +1,30 @@
-const Operations = {
+/*
+ * 目前，访问任何一个路由都对应一个操作
+ * 一个路由对应一个操作，一个操作可对应多个路由
+ * 除了路由操作以外，还存在非路由操作
+ * 后台证书设置页可配置动态操作给证书，起到控制权限的作用
+ * */
+
+// 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
+const FixedOperations = {
+  api_get_server_info: 'api_get_server_info',
+  api_get_account_info: 'api_get_account_info',
+  api_get_account_card: 'api_get_account_card',
+  api_get_account_drawer: 'api_get_account_drawer',
+  api_get_recycle_recycleBin: 'api_get_recycle_recycleBin',
+  api_get_review_data: 'api_get_review_data',
+  api_get_user_public_info: 'api_get_user_public_info',
+  api_put_user_memo: 'api_put_user_memo',
+  api_get_user_memo: 'api_get_user_memo',
+  getQuestionTag: 'getQuestionTag',
+  putQuestionTag: 'putQuestionTag',
+  deleteQuestionTag: 'deleteQuestionTag',
+  getQuestionTags: 'getQuestionTags',
+  createQuestionTag: 'createQuestionTag',
+};
+
+// 需要在后台配置给相应证书的操作，会经过全局的权限判断
+const DynamicOperations = {
   modifyOtherPosts: 'modifyOtherPosts',
   modifyOtherArticles: 'modifyOtherArticles',
   displayRecycleMarkThreads: 'displayRecycleMarkThreads',
@@ -736,26 +762,17 @@ const Operations = {
   getCreditSettings: 'getCreditSettings',
   getDigestSettings: 'getDigestSettings',
   OAuthAuthentication: 'OAuthAuthentication',
-  api_get_server_info: 'api_get_server_info',
-  api_get_account_info: 'api_get_account_info',
-  api_get_account_card: 'api_get_account_card',
-  api_get_account_drawer: 'api_get_account_drawer',
   getUserArticles: 'getUserArticles',
   columnManage: 'columnManage',
-  api_get_recycle_recycleBin: 'api_get_recycle_recycleBin',
-  api_get_review_data: 'api_get_review_data',
-  api_get_user_public_info: 'api_get_user_public_info',
-  api_put_user_memo: 'api_put_user_memo',
-  api_get_user_memo: 'api_get_user_memo',
-  api_get_question_tags: 'api_get_question_tags',
-  api_post_question_tags: 'api_post_question_tags',
-  api_get_question_tag: 'api_get_question_tag',
-  api_put_question_tag: 'api_put_question_tag',
-  api_delete_question_tag: 'api_delete_question_tag',
   getThreadCategories: 'getThreadCategories',
-  MANAGE_QUESTION_TAGS: 'MANAGE_QUESTION_TAGS',
+  manageQuestionTags: 'manageQuestionTags',
   VISIT_PUBLIC_EXAM: 'VISIT_PUBLIC_EXAM',
 };
+
+const Operations = { ...DynamicOperations, ...FixedOperations };
+
 module.exports = {
   Operations,
+  DynamicOperations,
+  FixedOperations,
 };
