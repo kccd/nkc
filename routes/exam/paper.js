@@ -20,7 +20,6 @@ paperRouter
       submitted: false,
       timeOut: false,
     });
-    console.log(paper, 'paper');
     if (paper) {
       return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
     }

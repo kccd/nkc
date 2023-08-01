@@ -1,4 +1,5 @@
 import { nkcAPI } from '../lib/js/netAPI';
+import Vue from 'vue';
 new Vue({
   el: '#exam-public',
   data() {
