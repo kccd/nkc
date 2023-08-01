@@ -7,7 +7,7 @@ const {
 router
   .put(
     '/',
-    OnlyPermission(Operations.MANAGE_QUESTION_TAGS),
+    OnlyPermission(Operations.manageQuestionTags),
     async (ctx, next) => {
       const { name, desc } = ctx.body;
       const { tagId } = ctx.params;
@@ -22,7 +22,7 @@ router
   )
   .del(
     '/',
-    OnlyPermission(Operations.MANAGE_QUESTION_TAGS),
+    OnlyPermission(Operations.manageQuestionTags),
     async (ctx, next) => {
       await next();
     },

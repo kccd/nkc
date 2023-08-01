@@ -14,7 +14,7 @@ router
   })
   .post(
     '/',
-    OnlyPermission(Operations.MANAGE_QUESTION_TAGS),
+    OnlyPermission(Operations.manageQuestionTags),
     async (ctx, next) => {
       const { body } = ctx;
       const { name, desc } = body;

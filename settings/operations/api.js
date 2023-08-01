@@ -57,14 +57,14 @@ module.exports = {
     },
     exam: {
       tags: {
-        GET: Operations.api_get_question_tags,
-        POST: Operations.api_post_question_tags,
+        GET: Operations.getQuestionTags,
+        POST: Operations.createQuestionTag,
       },
       tag: {
         PARAMETER: {
-          GET: Operations.api_get_question_tag,
-          PUT: Operations.api_put_question_tag,
-          DELETE: Operations.api_delete_question_tag,
+          GET: Operations.getQuestionTag,
+          PUT: Operations.putQuestionTag,
+          DELETE: Operations.deleteQuestionTag,
         },
       },
       public: {

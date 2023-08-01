@@ -1,4 +1,30 @@
-const Operations = {
+/*
+ * 目前，访问任何一个路由都对应一个操作
+ * 一个路由对应一个操作，一个操作可对应多个路由
+ * 除了路由操作以外，还存在非路由操作
+ * 后台证书设置页可配置动态操作给证书，起到控制权限的作用
+ * */
+
+// 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
+const FixedOperations = {
+  api_get_server_info: 'api_get_server_info',
+  api_get_account_info: 'api_get_account_info',
+  api_get_account_card: 'api_get_account_card',
+  api_get_account_drawer: 'api_get_account_drawer',
+  api_get_recycle_recycleBin: 'api_get_recycle_recycleBin',
+  api_get_review_data: 'api_get_review_data',
+  api_get_user_public_info: 'api_get_user_public_info',
+  api_put_user_memo: 'api_put_user_memo',
+  api_get_user_memo: 'api_get_user_memo',
+  getQuestionTag: 'getQuestionTag',
+  putQuestionTag: 'putQuestionTag',
+  deleteQuestionTag: 'deleteQuestionTag',
+  getQuestionTags: 'getQuestionTags',
+  createQuestionTag: 'createQuestionTag',
+};
+
+// 需要在后台配置给相应证书的操作，会经过全局的权限判断
+const DynamicOperations = {
   modifyOtherPosts: 'modifyOtherPosts',
   modifyOtherArticles: 'modifyOtherArticles',
   displayRecycleMarkThreads: 'displayRecycleMarkThreads',
@@ -7,27 +33,27 @@ const Operations = {
   displayFundNoVerifyBills: 'displayFundNoVerifyBills',
   displayFundBillsSecretInfo: 'displayFundBillsSecretInfo',
   displayFundApplicationFormSecretInfo: 'displayFundApplicationFormSecretInfo',
-  getAnyBodyPhoto: 'getAnyBodyPhoto',
-  removeAnyBodyPhoto: 'removeAnyBodyPhoto',
-  canSendToEveryOne: 'canSendToEveryOne',
+  getAnyBodyPhoto: 'getAnyBodyPhoto', // 忽略相册、证书照片的权限
+  removeAnyBodyPhoto: 'removeAnyBodyPhoto', // 忽略相册、证书照片的权限
+  canSendToEveryOne: 'canSendToEveryOne', // 跳过`仅接收好友信息`限制
   creditXsf: 'creditXsf',
-  modifyAllQuestions: 'modifyAllQuestions',
-  viewAllPaperRecords: 'viewAllPaperRecords',
-  removeAllQuestion: 'removeAllQuestion',
-  superModerator: 'superModerator',
-  getAnyBodyShopCert: 'getAnyBodyShopCert',
-  viewUserAllFansAndFollowers: 'viewUserAllFansAndFollowers',
-  showSecretSurvey: 'showSecretSurvey',
-  showSurveyCertLimit: 'showSurveyCertLimit',
-  getAllMessagesResources: 'getAllMessagesResources',
-  topAllPost: 'topAllPost',
-  modifyAllResource: 'modifyAllResource',
-  visitAllUserProfile: 'visitAllUserProfile',
-  managementNote: 'managementNote',
-  viewUserScores: 'viewUserScores',
-  viewUserCode: 'viewUserCode',
-  viewUserArticle: 'viewUserArticle',
-  modifyAllPostOrder: 'modifyAllPostOrder',
+  modifyAllQuestions: 'modifyAllQuestions', // 可修改审核过的试题
+  viewAllPaperRecords: 'viewAllPaperRecords', // 可查看所有的考试记录
+  removeAllQuestion: 'removeAllQuestion', // 可删除别人出的试题
+  superModerator: 'superModerator', // 超级专家，所有专业的专家权限
+  getAnyBodyShopCert: 'getAnyBodyShopCert', // 可查看任何人的商城凭证
+  viewUserAllFansAndFollowers: 'viewUserAllFansAndFollowers', // 可查看用户的所有关注的人和粉丝
+  showSecretSurvey: 'showSecretSurvey', // 查看隐藏的调查结果
+  showSurveyCertLimit: 'showSurveyCertLimit', // 发起调查时可更具证书限制参与的用户
+  getAllMessagesResources: 'getAllMessagesResources', // 查看所有的短消息资源
+  topAllPost: 'topAllPost', // 置顶任何人的回复
+  modifyAllResource: 'modifyAllResource', // 可修改任何人的附件
+  visitAllUserProfile: 'visitAllUserProfile', // 可查看任何人的个人中心
+  managementNote: 'managementNote', // 可屏蔽编辑任何人的笔记
+  viewUserScores: 'viewUserScores', // 可在用户名片页查看用户的积分
+  viewUserCode: 'viewUserCode', // 可查看任意用户的动态码
+  viewUserArticle: 'viewUserArticle', //查看任意用户的文章
+  modifyAllPostOrder: 'modifyAllPostOrder', //可以调整任意用户的文章回复顺序
   visitHome: 'visitHome',
   discuz: 'discuz',
   previewDocument: 'previewDocument',
@@ -736,26 +762,17 @@ const Operations = {
   getCreditSettings: 'getCreditSettings',
   getDigestSettings: 'getDigestSettings',
   OAuthAuthentication: 'OAuthAuthentication',
-  api_get_server_info: 'api_get_server_info',
-  api_get_account_info: 'api_get_account_info',
-  api_get_account_card: 'api_get_account_card',
-  api_get_account_drawer: 'api_get_account_drawer',
   getUserArticles: 'getUserArticles',
   columnManage: 'columnManage',
-  api_get_recycle_recycleBin: 'api_get_recycle_recycleBin',
-  api_get_review_data: 'api_get_review_data',
-  api_get_user_public_info: 'api_get_user_public_info',
-  api_put_user_memo: 'api_put_user_memo',
-  api_get_user_memo: 'api_get_user_memo',
-  api_get_question_tags: 'api_get_question_tags',
-  api_post_question_tags: 'api_post_question_tags',
-  api_get_question_tag: 'api_get_question_tag',
-  api_put_question_tag: 'api_put_question_tag',
-  api_delete_question_tag: 'api_delete_question_tag',
   getThreadCategories: 'getThreadCategories',
-  MANAGE_QUESTION_TAGS: 'MANAGE_QUESTION_TAGS',
+  manageQuestionTags: 'manageQuestionTags',
   visitPublicExam: 'visitPublicExam',
 };
+
+const Operations = { ...DynamicOperations, ...FixedOperations };
+
 module.exports = {
   Operations,
+  DynamicOperations,
+  FixedOperations,
 };
