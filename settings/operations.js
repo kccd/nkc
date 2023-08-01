@@ -7,15 +7,15 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
-  api_get_server_info: 'api_get_server_info',
-  api_get_account_info: 'api_get_account_info',
-  api_get_account_card: 'api_get_account_card',
-  api_get_account_drawer: 'api_get_account_drawer',
+  getServerInfo: 'getServerInfo',
+  getAccountInfo: 'getAccountInfo',
+  getAccountCard: 'getAccountCard',
+  getAccountDrawer: 'getAccountDrawer',
   api_get_recycle_recycleBin: 'api_get_recycle_recycleBin',
-  api_get_review_data: 'api_get_review_data',
-  api_get_user_public_info: 'api_get_user_public_info',
-  api_put_user_memo: 'api_put_user_memo',
-  api_get_user_memo: 'api_get_user_memo',
+  getReviewData: 'getReviewData',
+  getUserPublicInfo: 'getUserPublicInfo',
+  modifyUserMemo: 'modifyUserMemo',
+  getUserMemo: 'getUserMemo',
   getQuestionTag: 'getQuestionTag',
   putQuestionTag: 'putQuestionTag',
   deleteQuestionTag: 'deleteQuestionTag',

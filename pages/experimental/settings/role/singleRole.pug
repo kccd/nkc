@@ -119,10 +119,12 @@ block eContent
               table.table.table-hover
                 thead
                   tr
+                    th 序号
                     th 权限名
                     th 选择
                 tbody
-                  tr(v-for='o in operations')
+                  tr(v-for='(o, index) in operations')
+                    th {{index + 1}}
                     th(v-if='o.operationName') {{o.operationName}}({{o.operationId}})
                     th(v-else) {{o.operationId}}
                     th
