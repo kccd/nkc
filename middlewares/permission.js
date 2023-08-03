@@ -35,6 +35,26 @@ function OnlyUser() {
   };
 }
 
+function OnlyCert(roleId) {
+  return async (ctx, next) => {
+    const userRoles = ctx.data.userRoles;
+    let exists = false;
+    for (const role of userRoles) {
+      if (role._id === roleId) {
+        exists = true;
+        break;
+      }
+    }
+    if (!exists) {
+      const role = await ctx.db.RoleModel.extendRole(roleId);
+      ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_NO_CERT, [
+        role.displayName,
+      ]);
+    }
+    await next();
+  };
+}
+
 function OnlyUnbannedUser() {
   return async (ctx, next) => {
     if (ctx.data.user.certs.includes(defaultCerts.banned)) {
@@ -96,6 +116,7 @@ module.exports = {
   OnlyVisitor,
   OnlyUser,
   OnlyBannedUser,
+  OnlyCert,
   OnlyUnbannedUser,
   OnlyPermission,
   OnlyPermissionsAnd,

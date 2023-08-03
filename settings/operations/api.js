@@ -76,6 +76,14 @@ module.exports = {
           GET: Operations.takePublicExam,
         },
       },
+      questions: {
+        POST: Operations.createExamQuestion,
+      },
+      question: {
+        PARAMETER: {
+          PUT: Operations.modifyExamQuestion,
+        },
+      },
     },
   },
 };

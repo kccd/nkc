@@ -17,6 +17,7 @@
   top: 100px;
   right: 0;
   z-index: 1050;
+  border-radius: 3px;
   background-color: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   border: 1px solid #ddd;

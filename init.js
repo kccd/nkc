@@ -8,9 +8,9 @@ async function InitDefaultData() {
 
 async function InitOperations() {
   logger.info('初始化管理员权限...');
-  const permission = require('./nkcModules/permission');
+  const { DynamicOperations } = require('./settings/operations.js');
   // 运维包含所有的操作权限
-  const operationsId = permission.getOperationsId();
+  const operationsId = Object.values(DynamicOperations);
   const { RoleModel, ForumModel } = require('./dataModels');
   await RoleModel.updateOne(
     { _id: 'dev' },

@@ -1,12 +1,12 @@
 import SparkMD5 from '../../../public/external_pkgs/spark-md5/spark-md5.min';
 /*
-* 返回文件在本地的URL
-* @param {File} file 文件对象
-* @param {String} URL
-* @author pengxiguaa 2019-7-26
-* */
+ * 返回文件在本地的URL
+ * @param {File} file 文件对象
+ * @param {String} URL
+ * @author pengxiguaa 2019-7-26
+ * */
 export function fileToBase64(file) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     var reads = new FileReader();
     reads.onerror = reject;
     reads.onload = function (e) {
@@ -17,16 +17,19 @@ export function fileToBase64(file) {
 }
 
 export function getFileMD5(file) {
-  return new Promise(function(resolve, reject) {
-    var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
-      chunkSize = 2097152,                             // Read in chunks of 2MB
+  return new Promise(function (resolve, reject) {
+    var blobSlice =
+        File.prototype.slice ||
+        File.prototype.mozSlice ||
+        File.prototype.webkitSlice,
+      chunkSize = 2097152, // Read in chunks of 2MB
       chunks = Math.ceil(file.size / chunkSize),
       currentChunk = 0,
       spark = new SparkMD5.ArrayBuffer(),
       fileReader = new FileReader();
     fileReader.onload = function (e) {
       console.log('read chunk nr', currentChunk + 1, 'of', chunks);
-      spark.append(e.target.result);                   // Append array buffer
+      spark.append(e.target.result); // Append array buffer
       currentChunk++;
 
       if (currentChunk < chunks) {
@@ -45,7 +48,7 @@ export function getFileMD5(file) {
 
     function loadNext() {
       var start = currentChunk * chunkSize,
-        end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+        end = start + chunkSize >= file.size ? file.size : start + chunkSize;
 
       fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
     }
@@ -54,12 +57,12 @@ export function getFileMD5(file) {
 }
 
 /*
-* 文件数据转文件
-* @param {Blob} blob 文件数据
-* @param {String} fileName 文件名
-* @return {File} 文件
-* @author pengxiguaa 2019-7-29
-* */
+ * 文件数据转文件
+ * @param {Blob} blob 文件数据
+ * @param {String} fileName 文件名
+ * @return {File} 文件
+ * @author pengxiguaa 2019-7-29
+ * */
 export function blobToFile(blob, fileName) {
   blob.lastModifiedDate = new Date();
   blob.name = fileName || Date.now() + '.png';
@@ -67,10 +70,10 @@ export function blobToFile(blob, fileName) {
 }
 
 /*
-* base64数据转文件
-* @param {base64} base64 文件数据
-* @return {File} 文件
-* */
+ * base64数据转文件
+ * @param {base64} base64 文件数据
+ * @return {File} 文件
+ * */
 export function base64ToFile(base64) {
   const arr = base64.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -79,9 +82,13 @@ export function base64ToFile(base64) {
   const u8arr = new Uint8Array(n);
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
-  };
+  }
   const blob = new Blob([u8arr], { type: mime });
   blob.lastModifiedDate = new Date();
   blob.name = 'base64ToFile.jpg';
   return blob;
+}
+
+export function getFileObjectUrl(file) {
+  return URL.createObjectURL(file);
 }

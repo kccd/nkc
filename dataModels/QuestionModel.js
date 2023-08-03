@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+
 const schema = new Schema(
   {
     _id: Number,
@@ -98,7 +99,7 @@ const schema = new Schema(
       index: 1,
     },
     public: {
-      // 是否为公共题，与之对应的还有专业题，专业题需要选择专业分类。
+      // 是否为公共题，与之对应的还有专业题，专业题需要选择专业分类。已废弃
       type: Boolean,
       default: false,
       index: 1,

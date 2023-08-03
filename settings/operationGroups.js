@@ -35,7 +35,6 @@ module.exports = {
     Operations.addFund,
     Operations.deleteFundObject,
     Operations.disableHistories,
-    Operations.modifyQuestion,
     Operations.toppedThread,
     Operations.deleteRole,
     Operations.addOperationType,
