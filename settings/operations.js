@@ -28,6 +28,7 @@ const FixedOperations = {
   createExamQuestion: 'createExamQuestion',
   modifyExamQuestion: 'modifyExamQuestion',
   visitExamQuestionEditor: 'visitExamQuestionEditor',
+  visitPublicExam: 'visitPublicExam',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -769,7 +770,6 @@ const DynamicOperations = {
   columnManage: 'columnManage',
   getThreadCategories: 'getThreadCategories',
   manageQuestionTags: 'manageQuestionTags',
-  visitPublicExam: 'visitPublicExam',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

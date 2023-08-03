@@ -1,33 +1,30 @@
-const { OnlyPermission } = require('../../../../middlewares/permission');
-const { Operations } = require('../../../../settings/operations');
+const {
+  OnlyPermission,
+  OnlyVisitor,
+} = require('../../../../middlewares/permission');
+const { FixedOperations } = require('../../../../settings/operations');
 const randomize = require('randomatic');
 const router = require('koa-router')();
 router
-  .get('/', OnlyPermission(Operations.visitPublicExam), async (ctx, next) => {
+  .get('/', async (ctx, next) => {
     const { db } = ctx;
-    const {
-      c: { publicExamNotes },
-    } = await db.SettingModel.findOnly({ _id: 'exam' }, { c: 1 });
+    const { publicExamNotes } = await db.SettingModel.getSettings('exam');
     ctx.apiData = { publicExamNotes };
     await next();
   })
+  .get('/register', OnlyVisitor(), async (ctx, next) => {
+    const { db } = ctx;
+    const {
+      c: { registerExamination },
+    } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
+    ctx.apiData = {
+      registerExamination,
+    };
+    await next();
+  })
   .get(
-    '/register',
-    OnlyPermission(Operations.visitPublicExam),
-    async (ctx, next) => {
-      const { db } = ctx;
-      const {
-        c: { registerExamination },
-      } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
-      ctx.apiData = {
-        registerExamination,
-      };
-      await next();
-    },
-  )
-  .get(
-    '/takeExam',
-    OnlyPermission(Operations.visitPublicExam),
+    '/paper',
+    OnlyPermission(FixedOperations.visitPublicExam),
     async (ctx, next) => {
       const { db } = ctx;
       const {
@@ -40,8 +37,8 @@ router
     },
   )
   .post(
-    '/submitExam',
-    OnlyPermission(Operations.visitPublicExam),
+    '/result',
+    OnlyPermission(FixedOperations.visitPublicExam),
     async (ctx, next) => {
       const randomize1 = randomize('A0', 64);
       ctx.apiData = {

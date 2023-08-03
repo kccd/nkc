@@ -72,10 +72,10 @@ module.exports = {
         register: {
           GET: Operations.openPublicExam,
         },
-        takeExam: {
+        paper: {
           GET: Operations.takePublicExam,
         },
-        submitExam: {
+        result: {
           POST: Operations.submitPublicExam,
         },
       },

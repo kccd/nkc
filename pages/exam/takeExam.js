@@ -15,7 +15,7 @@ new Vue({
   },
   methods: {
     getTakeExam() {
-      nkcAPI('/api/v1/exam/public/takeExam', 'GET')
+      nkcAPI('/api/v1/exam/public/paper', 'GET')
         .then((res) => {
           console.log(res, 'res');
         })
@@ -34,7 +34,7 @@ new Vue({
       if (Number(this.answer) !== this.msg[this.currentQuestion].id) {
         sweetError('答案选错了请重新勾选');
       } else if (this.currentQuestion === this.msg.length - 1) {
-        nkcAPI('/api/v1/exam/public/submitExam', 'POST').then((res) => {
+        nkcAPI('/api/v1/exam/public/result', 'POST').then((res) => {
           console.log(res, 'res');
         });
         sweetSuccess('通过了');
