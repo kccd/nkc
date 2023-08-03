@@ -44,7 +44,6 @@ router
     OnlyPermission(Operations.visitPublicExam),
     async (ctx, next) => {
       const randomize1 = randomize('A0', 64);
-
       ctx.apiData = {
         success: '成功了',
       };
