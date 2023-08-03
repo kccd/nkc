@@ -32,9 +32,7 @@ module.exports = {
     },
   },
   question: {
-    POST: Operations.postQuestion,
     PARAMETER: {
-      PUT: Operations.modifyQuestion,
       DELETE: Operations.removeQuestion,
       disabled: {
         DELETE: Operations.enabledQuestion,
@@ -52,7 +50,7 @@ module.exports = {
     GET: Operations.visitExamQuestionManagement,
   },
   editor: {
-    GET: Operations.visitEditQuestion,
+    GET: Operations.visitExamQuestionEditor,
   },
   public: {
     GET: Operations.visitPublicExam,

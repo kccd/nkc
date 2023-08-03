@@ -71,7 +71,7 @@ block content
                 span= question.reason
             div.question-content!=`${markdown_safe('问：' + question.content)}`
             if question.contentDesc
-              div.text-info.font-size-1rem=`题干说明：${question.contentDesc || '无'}`
+              div.text-info.font-size-1rem.m-b-05=`题干说明：${question.contentDesc || '无'}`
             if question.hasImage
               img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
             -var optionIndex = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

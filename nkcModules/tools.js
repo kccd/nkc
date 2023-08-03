@@ -284,6 +284,9 @@ var Tools = function () {
       case 'noteContent': {
         return '/note/' + id + '?n=' + size;
       }
+      case 'questionImage': {
+        return '/exam/question/' + id + '/image';
+      }
     }
   };
   self.getAnonymousInfo = function () {

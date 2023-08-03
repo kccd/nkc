@@ -17,7 +17,7 @@ router
     OnlyPermission(Operations.manageQuestionTags),
     async (ctx, next) => {
       const { body } = ctx;
-      const { name, desc } = body;
+      const { name, desc } = body.tag;
       await questionTagService.checkNameDescFormat(name, desc);
       await questionTagService.checkTagName(name);
       const tag = await questionTagService.createQuestionTag({

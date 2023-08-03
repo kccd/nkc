@@ -3,18 +3,18 @@ module.exports = {
   v1: {
     server: {
       info: {
-        GET: Operations.api_get_server_info,
+        GET: Operations.getServerInfo,
       },
     },
     account: {
       info: {
-        GET: Operations.api_get_account_info,
+        GET: Operations.getAccountInfo,
       },
       card: {
-        GET: Operations.api_get_account_card,
+        GET: Operations.getAccountCard,
       },
       drawer: {
-        GET: Operations.api_get_account_drawer,
+        GET: Operations.getAccountDrawer,
       },
     },
     threads: {
@@ -40,19 +40,19 @@ module.exports = {
       },
     },
     review: {
-      GET: Operations.api_get_review_data,
+      GET: Operations.getReviewData,
     },
     user: {
       PARAMETER: {
         'public-info': {
-          GET: Operations.api_get_user_public_info,
+          GET: Operations.getUserPublicInfo,
         },
       },
     },
     users: {
       memo: {
-        PUT: Operations.api_put_user_memo,
-        GET: Operations.api_get_user_memo,
+        PUT: Operations.modifyUserMemo,
+        GET: Operations.getUserMemo,
       },
     },
     exam: {
@@ -77,6 +77,14 @@ module.exports = {
         },
         submitExam: {
           POST: Operations.submitPublicExam,
+        },
+      },
+      questions: {
+        POST: Operations.createExamQuestion,
+      },
+      question: {
+        PARAMETER: {
+          PUT: Operations.modifyExamQuestion,
         },
       },
     },

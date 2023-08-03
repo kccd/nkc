@@ -101,6 +101,33 @@ class QuestionTagService {
       },
     ).sort({ toc: 1 });
   }
+
+  async getTagsById(tagsId) {
+    const tags = await QuestionTagModel.find(
+      { _id: { $in: tagsId } },
+      {
+        _id: 1,
+        name: 1,
+        desc: 1,
+        toc: 1,
+      },
+    );
+    const tagsObj = {};
+    for (const tag of tags) {
+      tagsObj[tag._id] = {
+        _id: tag._id,
+        name: tag.name,
+        desc: tag.desc,
+        toc: tag.toc,
+      };
+    }
+    const targetTags = [];
+    for (const tagId of tagsId) {
+      const tag = tagsObj[tagId];
+      targetTags.push(tag);
+    }
+    return targetTags;
+  }
 }
 
 module.exports = {

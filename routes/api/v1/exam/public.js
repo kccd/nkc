@@ -43,9 +43,7 @@ router
     '/submitExam',
     OnlyPermission(Operations.visitPublicExam),
     async (ctx, next) => {
-      //设置密钥
       const randomize1 = randomize('A0', 64);
-      // 设置token有效期
 
       ctx.apiData = {
         success: '成功了',

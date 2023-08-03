@@ -2,18 +2,41 @@
   <draggable :title="title" ref="draggableInstance" max-width="40rem">
     <div slot="content" class="p-a-1">
       <div v-if="name === names.list">
+        <div class="m-b-1">
+          已选标签：
+          <span v-if="selectedTags.length === 0">无</span>
+          <span
+            v-else
+            v-for="(tag, index) in selectedTags"
+            class="question-tag selected-tag"
+            @click="cancelSelectedTag(index)"
+          >
+            {{tag.name}}
+            <span class="fa fa-remove remove-tag-icon" />
+          </span>
+        </div>
+        <div class="p-t-2 p-b-2 text-center" v-if="loading">加载中...</div>
+        <div class="m-b-1" v-else>
+          <span
+            class="question-tag"
+            v-for="tag in tags"
+            :title="tag.desc"
+            @click="selectTag(tag)"
+          >{{tag.name}}</span>
+        </div>
         <div class="text-right">
           <button
             class="btn btn-default btn-sm pull-left"
             @click="setName(names.editor)"
-          >新建</button>
+          >创建新标签</button>
           <button
             class="btn btn-default btn-sm"
             @click="close"
           >取消</button>
           <button
-            class="btn btn-default btn-sm"
-            @click="submit"
+            class="btn btn-primary btn-sm"
+            @click="submitSelectedTags"
+            :disabled="selectedTags.length === 0"
           >确定</button>
         </div>
 
@@ -30,8 +53,12 @@
           </div>
         </div>
         <div class="text-right">
-          <button class="btn btn-default btn-sm" @click="setName(names.list)">取消</button>
-          <button class="btn btn-primary btn-sm" @click="submit">提交</button>
+          <button class="btn btn-default btn-sm" @click="editorCancel">取消</button>
+          <button
+            class="btn btn-primary btn-sm"
+            @click="submitTagInfo"
+            :disabled="!tag.name"
+          >提交</button>
         </div>
       </div>
     </div>
@@ -44,35 +71,53 @@ import Draggable from './publicVue/draggable.vue'
 import { HttpMethods, nkcAPI } from "../js/netAPI";
 import {sweetError} from "../js/sweetAlert";
 import {checkString} from "../js/checkData";
+import {Close} from "@icon-park/vue";
 
 const names = {
   list: 'list',
   editor: 'editor'
 };
+const defaultTag = {
+  _id: null,
+  name: '',
+  desc: ''
+};
 export default {
   components: {
     draggable: Draggable,
+    'close-icon': Close,
   },
   data: () => ({
     names: names,
     name: names.list, // list, editor,
+    defaultName: names.list,
     tags: [],
-    tag: {
-      _id: null,
-      name: '',
-      desc: ''
-    }
+    tag: {...defaultTag},
+    selectedTagsId: [],
+    callback: null,
+    loading: true,
   }),
-  mounted() {
-    this.getAllTags();
-  },
   computed: {
+    selectedTags() {
+      const tags = [];
+      for(const tagId of this.selectedTagsId) {
+        tags.push(this.tagsObj[tagId]);
+      }
+      return tags;
+    },
+    tagsObj() {
+      const obj = {};
+      for(const tag of this.tags) {
+        obj[tag._id] = tag;
+      }
+      return obj;
+    },
     draggableInstance() {
       return this.$refs.draggableInstance;
     },
     title() {
       if(this.name === this.names.list) {
-        return '试题标签';
+        return '创建新标签';
       } else if(this.tag._id === null) {
         return '新建标签';
       } else {
@@ -81,8 +126,19 @@ export default {
     }
   },
   methods: {
-    open() {
+    open(props) {
+      const {
+        name = this.names.list,
+        tag = {...defaultTag},
+        callback = null,
+      } = props;
+      this.defaultName = name;
+      this.name = name;
+      this.tag = tag;
+      this.callback = callback;
       this.draggableInstance.open();
+      this.selectedTagsId = [];
+      this.getAllTags();
     },
     close() {
       this.draggableInstance.close();
@@ -90,11 +146,27 @@ export default {
     setName(name) {
       this.name = name;
     },
-    submit() {
+    submitTagInfo() {
       if(this.tag._id) {
         this.modifyTag();
       } else {
         this.createTag();
+      }
+    },
+    submitSelectedTags() {
+      const {selectedTagsId, selectedTags} = this;
+      if(this.callback) {
+        this.callback({
+          tagsId: [...selectedTagsId],
+          tags: selectedTags.map(tag => {
+            return {
+              _id: tag._id,
+              toc: tag.toc,
+              name: tag.name,
+              desc: tag.desc,
+            }
+          }),
+        });
       }
     },
     checkTagInfo() {
@@ -118,11 +190,13 @@ export default {
           desc
         }
       })
-        .then(() => {
-          this.getAllTags()
-          this.setName(this.names.list);
+        .then((res) => {
+          this.editorCallback(res.data.tag);
         })
         .catch(sweetError)
+    },
+    initTag() {
+      this.tag = {...defaultTag};
     },
     modifyTag() {
       this.checkTagInfo();
@@ -131,23 +205,69 @@ export default {
         name,
         desc,
       })
-        .then(() => {
-          this.getAllTags();
-          this.setName(this.names.list);
+        .then((res) => {
+          this.editorCallback(res.data.tag);
         })
         .catch(sweetError);
+    },
+    editorCallback(newTag) {
+      this.initTag();
+      if(this.defaultName === this.names.list) {
+        this.tags.push(newTag);
+        this.setName(this.names.list);
+      } else if(this.callback) {
+        this.callback(newTag);
+      }
     },
     getAllTags() {
       return nkcAPI(`/api/v1/exam/tags`, HttpMethods.GET)
         .then(res => {
           this.tags = [...res.data.tags];
+          this.loading = false;
         })
         .catch(sweetError)
+    },
+    cancelSelectedTag(index) {
+      this.selectedTagsId.splice(index, 1);
+    },
+    selectTag(tag) {
+      if(!this.selectedTagsId.includes(tag._id)) {
+        this.selectedTagsId.push(tag._id);
+      }
+    },
+    editorCancel() {
+      if(this.defaultName === this.names.list) {
+        this.setName(this.names.list)
+      } else {
+        this.close();
+      }
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-
+  @import "../../publicModules/base";
+  .question-tag{
+    display: inline-block;
+    height: 2rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    background-color: @gray;
+    color: #333;
+    margin: 0 0.5rem 0.5rem 0;
+    border-radius: 3px;
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    &:hover{
+      background-color: @primary;
+      color: #fff;
+    }
+  }
+  .selected-tag{
+    background-color: @primary;
+    color: #fff;
+  }
 </style>
