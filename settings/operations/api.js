@@ -75,6 +75,9 @@ module.exports = {
         takeExam: {
           GET: Operations.takePublicExam,
         },
+        submitExam: {
+          POST: Operations.submitPublicExam,
+        },
       },
     },
   },

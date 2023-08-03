@@ -1,5 +1,6 @@
 const { OnlyPermission } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations');
+const randomize = require('randomatic');
 const router = require('koa-router')();
 router
   .get('/', OnlyPermission(Operations.visitPublicExam), async (ctx, next) => {
@@ -32,26 +33,25 @@ router
       const {
         c: { examSource },
       } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
-      const categoriseId = examSource.map((item) => {
-        return item._id;
-      });
-      const examCategoryType =
-        await db.ExamsCategoryModel.getExamCategoryType();
-      const categorise = await db.ExamsCategoryModel.find(
-        {
-          _id: { $in: categoriseId },
-          type: examCategoryType.public,
-          disabled: false,
-        },
-        { volume: 1, from: 1 },
-      ).lean();
-      categorise.reduce((acc, cur) => {
-        const { from, ...resParma } = cur;
-      }, []);
       ctx.apiData = {
         examSource,
       };
       await next();
     },
+  )
+  .post(
+    '/submitExam',
+    OnlyPermission(Operations.visitPublicExam),
+    async (ctx, next) => {
+      //设置密钥
+      const randomize1 = randomize('A0', 64);
+      // 设置token有效期
+
+      ctx.apiData = {
+        success: '成功了',
+      };
+      await next();
+    },
   );
+
 module.exports = router;

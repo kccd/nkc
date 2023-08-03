@@ -1,19 +1,13 @@
 import { nkcAPI } from '../lib/js/netAPI';
 import Vue from 'vue';
-import { sweetError } from '../lib/js/sweetAlert';
+import { sweetError, sweetSuccess } from '../lib/js/sweetAlert';
 new Vue({
   el: '#take-exam',
   data() {
     return {
-      msg: [
-        { name: '测试1', id: 1 },
-        { name: '测试2', id: 2 },
-        { name: '测试3', id: 3 },
-        { name: '测试4', id: 4 },
-        { name: '测试5', id: 5 },
-        { name: '测试6', id: 6 },
-      ],
+      msg: [{ name: '测试1', id: 1 }],
       currentQuestion: 0,
+      answer: 1,
     };
   },
   mounted() {
@@ -37,8 +31,13 @@ new Vue({
       }
     },
     prv() {
-      if (this.currentQuestion === this.msg.length-1) {
-        sweetError('没有下一题了');
+      if (Number(this.answer) !== this.msg[this.currentQuestion].id) {
+        sweetError('答案选错了请重新勾选');
+      } else if (this.currentQuestion === this.msg.length - 1) {
+        nkcAPI('/api/v1/exam/public/submitExam', 'POST').then((res) => {
+          console.log(res, 'res');
+        });
+        sweetSuccess('通过了');
       } else {
         this.currentQuestion += 1;
       }

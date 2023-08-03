@@ -24,6 +24,7 @@ const FixedOperations = {
   getPublicExam: 'getPublicExam',
   openPublicExam: 'openPublicExam',
   takePublicExam: 'takePublicExam',
+  submitPublicExam: 'submitPublicExam',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

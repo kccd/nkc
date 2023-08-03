@@ -479,12 +479,12 @@
         }
       },
       open: function(type) {
+        this.type = type || LoginType.SignIn;
         nkcAPI("/api/v1/exam/public/register","GET").then((res)=>{
-          if (res && res.data.registerExamination) {
+          if (res && res.data.registerExamination && this.type === 'register') {
             window.location.href = "/exam/public"
           } else {
             $(this.$el).modal("show");
-            this.type = type || LoginType.SignIn;
           }
         }).catch((err)=>{
           sweetError(err)

@@ -10,8 +10,10 @@ block content
         h3 科创会员开卷考试
       .col-xs-12.col-md-9.exam-content-right
         h3 这是demo
-        h5 已完成{{currentQuestion}}/{{msg.length-1}}
+        h5 已完成{{currentQuestion}}/{{msg.length}}
         h4 {{msg[currentQuestion]}}
+        input(type='radio' value=1 v-model="answer" )
+        | 1
         footer
           button.btn.btn-default(@click='pre') 上一步
           button.btn.btn-default(@click='prv') 下一步
