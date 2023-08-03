@@ -1,4 +1,4 @@
-const { operationTree } = require('../settings/operations/index.js');
+const { operationTree } = require('../settings/operationsTree/index.js');
 const { Operations } = require('../settings/operations.js');
 const { files: fileOperationsId } = require('../settings/operationGroups');
 const methods = ['POST', 'GET', 'PUT', 'DELETE'];
