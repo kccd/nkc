@@ -14,38 +14,43 @@ block content
             if !question.viewed
               span(style='color: red') *&nbsp;
             span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
-            if question.forum
-              a(href=`/f/${question.forum.fid}` target='_blank').m-r-1=question.forum.displayName
+            for tag in question.tags
+              span.m-r-1=`#${tag.name}`
             if question.volume === 'A'
               span.m-r-1 基础级(A)
-            else 
-              span.m-r-1 专业级(B)  
+            else
+              span.m-r-1 专业级(B)
             if question.disabled
               span.m-r-1.text-danger 已被屏蔽
-            else  
+            else
               if question.auth === null
                 span.m-r-1 等待审核
                 a(href=`/exam/editor?qid=${question._id}`) 编辑
               else if question.auth === true
                 span.text-success 审核已通过
-              else 
+              else
                 span.text-danger.m-r-1 审核未通过
                 a.m-r-1(href=`/exam/editor?qid=${question._id}`) 修改完善
                 a(onclick=`deleteQuestion('${question._id}')`) 删除
             if question.auth === false || question.disabled
               h5.text-danger 原因：
-                span= question.reason  
+                span= question.reason
             div!=`${markdown('问：' + question.content)}`
+            if question.contentDesc
+              div.text-info.font-size-1rem.m-b-05=`题干说明：${question.contentDesc}`
             if question.hasImage
               img(src=`/exam/question/${question._id}/image` style='max-width: 100%;')
             for a, index in question.answer
-              -let c=[], i = ['A：', 'B：', 'C：', 'D：'];
-              if index === 0
+              -var optionIndex = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+              -var c = [];
+              if a.correct
                 -c.push('text-success');
-              else   
+              else
                 -c.push('text-danger');
-              h5(class=c)!= markdown(i[index] + a)    
-        include ../../interface_navigation_paging      
+              h5(class=c)!= markdown(optionIndex[index] + '、' + a.text)
+              if a.desc
+                div.text-info.font-size-1rem=`选项${optionIndex[index]}说明：${a.desc || '无'}`
+        include ../../interface_navigation_paging
 block scripts
   +includeJS('/exam/questions.js')
-  include ../../MathJax            
+  include ../../MathJax

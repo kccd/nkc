@@ -213,6 +213,21 @@ class QuestionService {
     }
     return targetQuestions;
   }
+  async markQuestionsAsViewed(questionsId) {
+    await QuestionModel.updateMany(
+      {
+        _id: {
+          $in: questionsId,
+        },
+        viewed: false,
+      },
+      {
+        $set: {
+          viewed: true,
+        },
+      },
+    );
+  }
 }
 
 module.exports = {
