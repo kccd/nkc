@@ -26,6 +26,7 @@
         </div>
         <div class="text-right">
           <button
+            v-if="manageQuestionTagsPermission"
             class="btn btn-default btn-sm pull-left"
             @click="setName(names.editor)"
           >创建新标签</button>
@@ -96,6 +97,7 @@ export default {
     selectedTagsId: [],
     callback: null,
     loading: true,
+    manageQuestionTagsPermission: false,
   }),
   computed: {
     selectedTags() {
@@ -201,7 +203,7 @@ export default {
     modifyTag() {
       this.checkTagInfo();
       const {name, desc, _id} = this.tag;
-      nkcAPI(`/api/v1/exam/tag/${_id}`, HttpMethods.POST, {
+      nkcAPI(`/api/v1/exam/tag/${_id}`, HttpMethods.PUT, {
         name,
         desc,
       })
@@ -223,6 +225,7 @@ export default {
       return nkcAPI(`/api/v1/exam/tags`, HttpMethods.GET)
         .then(res => {
           this.tags = [...res.data.tags];
+          this.manageQuestionTagsPermission = res.data.manageQuestionTagsPermission;
           this.loading = false;
         })
         .catch(sweetError)

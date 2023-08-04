@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 export function sweetAlert(text) {
   text = (text.error || text) + '';
   return Swal({
@@ -14,14 +15,22 @@ export function sweetPrompt(title, content = '') {
       inputAttributes: {
         autocapitalize: 'off',
       },
+      inputValidator: (value) => {
+        if (!value) {
+          return '请输入内容';
+        }
+      },
       inputValue: content,
-      allowOutsideClick: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: false,
       showCancelButton: true,
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       showLoaderOnConfirm: true,
       preConfirm: (text) => {
         resolve(text);
+        return false;
       },
     });
   });
@@ -59,7 +68,6 @@ export function sweetError(text) {
     text: text.error || text,
   });
 }
-
 
 export function sweetInfo(text) {
   text = text + '';
@@ -198,4 +206,8 @@ export function asyncSweetSelf(text, html) {
       resolve();
     });
   });
+}
+
+export function sweetClose() {
+  Swal.close();
 }

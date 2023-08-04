@@ -3,6 +3,8 @@ const { ResponseTypes } = require('../../settings/response');
 const { checkString } = require('../../nkcModules/checkData');
 const QuestionModel = require('../../dataModels/QuestionModel');
 const SettingModel = require('../../dataModels/SettingModel');
+const { userInfoService } = require('../user/userInfo.service');
+const { questionTagService } = require('./questionTag.service');
 
 class QuestionService {
   questionTypes = {
@@ -184,6 +186,47 @@ class QuestionService {
       ]);
     }
     return question;
+  }
+  async extendQuestions(questions) {
+    const usersId = [];
+    const tagsId = [];
+    for (const question of questions) {
+      usersId.push(question.uid);
+      tagsId.push(...question.tags);
+    }
+    const usersObject = await userInfoService.getUsersBaseInfoObjectByUserIds(
+      usersId,
+    );
+    const tagsObject = await questionTagService.getTagsObjectById(tagsId);
+    const targetQuestions = [];
+    for (const question of questions) {
+      const targetQuestion = question.toObject();
+      const user = usersObject[targetQuestion.uid];
+      const tags = [];
+      for (const tagId of targetQuestion.tags) {
+        const tag = tagsObject[tagId];
+        tags.push(tag);
+      }
+      targetQuestion.tags = tags;
+      targetQuestion.user = user;
+      targetQuestions.push(targetQuestion);
+    }
+    return targetQuestions;
+  }
+  async markQuestionsAsViewed(questionsId) {
+    await QuestionModel.updateMany(
+      {
+        _id: {
+          $in: questionsId,
+        },
+        viewed: false,
+      },
+      {
+        $set: {
+          viewed: true,
+        },
+      },
+    );
   }
 }
 
