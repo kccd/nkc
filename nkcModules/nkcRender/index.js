@@ -449,14 +449,13 @@ class NKCRender {
     }
   }
 
+  // 替换文本中的链接为span标签，标签内容为xxx，前端再根据span属性中的链接信息恢复链接
   replaceTextLinkToHTML(content = '') {
-    let html = content;
-    const $ = cheerio.load(html);
-
+    const $ = cheerio.load('');
     const body = $('body');
+    body.text(content);
     this.replaceLinkInfo($, body[0]);
-
-    html = body.html();
+    const html = body.html();
     return htmlFilter(html);
   }
 
