@@ -4,6 +4,8 @@ const elasticSearch = require('../settings/elasticSearch');
 const client = elasticSearch();
 const { ThrowCommonError } = require('../nkcModules/error');
 const esConfig = require('../config/elasticSearch');
+const cheerio = require('cheerio');
+const filterSearchContent = require('./xssFilters/filterSearchContent');
 
 const { analyzer, searchAnalyzer, indexName } = esConfig;
 
@@ -792,6 +794,16 @@ func.updateThreadForums = async (thread) => {
       },
     },
   });
+};
+
+func.replaceSearchResultHTMLLink = (content = '') => {
+  const nkcRender = require('./nkcRender');
+  let html = content;
+  const $ = cheerio.load(html);
+  const body = $('body');
+  nkcRender.replaceLinkInfo($, body[0]);
+  html = body.html();
+  return filterSearchContent(html);
 };
 
 module.exports = func;
