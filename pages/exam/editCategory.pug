@@ -5,7 +5,7 @@ block title
 block content
   .container-fluid.max-width
     include ./nav
-    .hidden#data=JSON.stringify({roles: data.roles, category: data.category, from: data.from})
+    .hidden#data=JSON.stringify({roles: data.roles, category: data.category,tag:data.tag})
     .row#app(v-cloak)
       .col-xs-12.col-md-6
         .form-horizontal
@@ -68,24 +68,23 @@ block content
                       th
                         button(@click='removeForum(from)') 移除
               button.btn.btn-default.btn-sm(@click='showForums = !showForums') 全部专业领域
-              //- select.form-control(style='max-width: 10rem;')
-              //-   option(v-for='from of f') {{from.forum?from.forum.displayName: '公共题'}}
-              //- button.btn.btn-default 添加
               div(v-if='showForums').m-t-1
                 table.table.table-bordered
                   thead
                     tr
                       th 专业名称
-                      th 基础题数
-                      th 专业题数
-                      th
+                      th {{category.volume === 'A'?'基础题数':'专业题数'}}
                   tbody
-                    tr(v-for='from in f')
-                      th {{from.forum?from.forum.displayName: '公共题库'}}
-                      th {{from.countA}}
-                      th {{from.countB}}
+                    tr(v-for='A in tag.tagA' v-if="category.volume === 'A'" )
+                      th {{A.name}}
+                      th {{A.count}}
                       th
-                        button(@click='addForum(from)') 添加
+                        button(@click='addTag(A)') 添加
+                    tr(v-for="B in tag.tagB" v-if="category.volume === 'B'" )
+                      th {{B.name}}
+                      th {{B.count}}
+                      th
+                        button(@click='addTag(B)') 添加
           .form-group
             label(class="col-sm-2 control-label") 及格分数
             .col-sm-10

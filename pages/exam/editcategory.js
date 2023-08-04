@@ -10,6 +10,7 @@ let app = new Vue({
       from: [],
       disabled: false,
       type: 'secret',
+      tag: {},
     },
     roles: [],
     from: [],
@@ -41,25 +42,15 @@ let app = new Vue({
     data = JSON.parse(data);
     this.roles = data.roles;
     this.from = data.from;
+    this.tag = data.tag;
     if (data.category) {
       this.category = data.category;
     }
   },
   methods: {
-    addForum: function (from) {
-      let have = false;
-      for (let i = 0; i < this.category.from.length; i++) {
-        let f = this.category.from[i];
-        if (
-          from.type === f.type &&
-          (from.type === 'pub' || from.fid === f.fid)
-        ) {
-          have = true;
-        }
-      }
-      if (!have) {
-        this.category.from.push(from);
-      }
+    addTag: function (tag) {
+      console.log(tag);
+      console.log(this.category, 'this.category');
     },
     removeForum: function (forum) {
       console.log(this.category, 'this.category');

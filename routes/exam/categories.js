@@ -11,62 +11,103 @@ router
       });
       const { from } = category;
       for (const f of from) {
-        const { type, fid } = f;
-        if (type === 'pub') {
-          continue;
-        }
-        f.forum = await db.ForumModel.findOnly({ fid });
+        // const { type, fid } = f;
+        // if (type === 'pub') {
+        //   continue;
+        // }
+        // f.forum = await db.ForumModel.findOnly({ fid });
+        const { count, tag } = f;
+        const { name } = await db.QuestionTagModel.findOnly(
+          { _id: tag },
+          { name: 1 },
+        );
+        f.name = name;
       }
       data.category = category;
     }
     data.roles = await db.RoleModel.find({ type: 'common' });
-    const from = [];
-    const pubQ = {
-      disabled: false,
-      auth: true,
-      public: true,
+    const allTag = await db.QuestionTagModel.find({}, { name: 1 }).lean();
+    const tagQ = {
       volume: 'A',
+      auth: true,
+      disabled: false,
     };
-    const pubCountA = await db.QuestionModel.countDocuments(pubQ);
-    pubQ.volume = 'B';
-    const pubCountB = await db.QuestionModel.countDocuments(pubQ);
-    const obj = {
-      type: 'pub',
+    const processTagData = async (tagQ) => {
+      const tagPipelines = [
+        {
+          $match: tagQ,
+        },
+        {
+          $unwind: '$tags',
+        },
+        {
+          $group: {
+            _id: '$tags',
+            count: { $sum: 1 },
+          },
+        },
+      ];
+      const tagData = await db.QuestionModel.aggregate(tagPipelines);
+      tagData.forEach((item) => {
+        const matchedTag = allTag.find((tag) => tag._id === item._id);
+        if (matchedTag) {
+          item.name = matchedTag.name;
+        }
+      });
+      return tagData;
     };
-    obj.countA = pubCountA;
-    obj.countB = pubCountB;
-    if (pubCountA !== 0 || pubCountB !== 0) {
-      from.push(obj);
-    }
-    const fids = await db.QuestionModel.distinct('fid');
-    for (const fid of fids) {
-      if ([null, ''].includes(fid)) {
-        continue;
-      }
-      const forum = await db.ForumModel.findOnly({ fid });
-      const obj = {
-        type: 'pro',
-        forum,
-        fid,
-      };
-      const q = {
-        disabled: false,
-        auth: true,
-        public: false,
-        volume: 'A',
-        fid,
-      };
-      const countA = await db.QuestionModel.countDocuments(q);
-      obj.countA = countA;
-      q.volume = 'B';
-      const countB = await db.QuestionModel.countDocuments(q);
-      obj.countB = countB;
-      if (countA === 0 && countB === 0) {
-        continue;
-      }
-      from.push(obj);
-    }
-    data.from = from;
+    const tagA = await processTagData(tagQ);
+    tagQ.volume = 'B';
+    const tagB = await processTagData(tagQ);
+    data.tag = { tagA, tagB };
+
+    // const from = [];
+    // const pubQ = {
+    //   disabled: false,
+    //   auth: true,
+    //   public: true,
+    //   volume: 'A',
+    // };
+    // const pubCountA = await db.QuestionModel.countDocuments(pubQ);
+    // pubQ.volume = 'B';
+    // const pubCountB = await db.QuestionModel.countDocuments(pubQ);
+    // const obj = {
+    //   type: 'pub',
+    // };
+    // obj.countA = pubCountA;
+    // obj.countB = pubCountB;
+    // if (pubCountA !== 0 || pubCountB !== 0) {
+    //   from.push(obj);
+    // }
+    // const fids = await db.QuestionModel.distinct('fid');
+    // for (const fid of fids) {
+    //   if ([null, ''].includes(fid)) {
+    //     continue;
+    //   }
+    //   const forum = await db.ForumModel.findOnly({ fid });
+    //   const obj = {
+    //     type: 'pro',
+    //     forum,
+    //     fid,
+    //   };
+    //   const q = {
+    //     disabled: false,
+    //     auth: true,
+    //     public: false,
+    //     volume: 'A',
+    //     fid,
+    //   };
+    //   const countA = await db.QuestionModel.countDocuments(q);
+    //   obj.countA = countA;
+    //   q.volume = 'B';
+    //   const countB = await db.QuestionModel.countDocuments(q);
+    //   obj.countB = countB;
+    //   if (countA === 0 && countB === 0) {
+    //     continue;
+    //   }
+    //   from.push(obj);
+    // }
+    // data.from = from;
     data.categories = await db.ExamsCategoryModel.find();
     await next();
   })
