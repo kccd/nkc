@@ -1,14 +1,17 @@
-extends ../bootstrap_base
+extends ../../bootstrap_base
 block title
   title 试题管理
   +includeCSS('/exam/exam.css')
+  +includeCSS('/exam/question/questions.css')
 block content
+  #data.hidden=objToStr({tags: data.tags, tagId: data.fid})
   .container-fluid.max-width
-    include ./nav
+    include ../nav
     .row
       .col-xs-12.col-md-12
         h5.text-danger 提示：为了不影响已创建的考卷和考试，请谨慎修改。
-      .col-xs-12.col-md-3
+      .cox-xs-12.col-md-3#app(v-cloak)
+        question-tag-selector(ref='questionTagSelector')
         .list-group
           a.btn.list-group-item(href=`/exam/questions` class=!data.t?'active': '')
             .text-left 全部
@@ -20,14 +23,16 @@ block content
             .text-left 审核未通过
               .pull-right=`总共：${data.unCount}`
         .list-group
-          a.btn.list-group-item(href='/exam/questions?t=pub' class=data.t==='pub'?'active': '')
-            .text-left 公共题库
-              .pull-right=`总共：${data.allPubCount}, 可用：${data.pubCount}`
-          for forum in data.forums
-            a.btn.list-group-item(href=`/exam/questions?t=pro&fid=${forum.fid}` class=data.fid===forum.fid?'active': '')
-              .text-left=forum.displayName
-                .pull-right=`总共：${forum.allCount}, 可用：${forum.count}`
-
+          .list-group-item(
+            v-for="tag in tags"
+            :class="{'active': tagId === tag.tagId}"
+            )
+            .tag-header.m-b-05
+              a.tag-name(:href="`/exam/questions?t=pro&fid=${tag.tagId}`") {{tag.tagName}}
+              .tag-buttons
+                button.btn.btn-xs.btn-default(@click=`editQuestionTag(tag)`) 编辑
+                button.btn.btn-xs.btn-danger(@click=`deleteQuestionTag(tag)`) 删除
+            .tag-count {{`总共/可用：${tag.allCount}/${tag.count}`}}
       .col-xs-12.col-md-9
         ul.nav.nav-pills.m-b-1
           li(class=!data.v?'active': '')
@@ -36,17 +41,25 @@ block content
             a(href=`/exam/questions?v=A${data.fid?'&fid=' + data.fid:''}${data.t?'&t='+data.t: ''}`) A(基础级)
           li(class=data.v==='B'?'active': '')
             a(href=`/exam/questions?v=B${data.fid?'&fid=' + data.fid:''}${data.t?'&t='+data.t: ''}`) B(专业级)
-        include ../interface_navigation_paging
+        include ../../interface_navigation_paging
         for question in data.questions
           div.m-b-2(style='padding: 1rem;background-color: #efefef;')
             span.m-r-1=format('YYYY/MM/DD HH:mm:ss', question.toc)
-            a.m-r-1(href=`/u/${question.uid}` target='_blank')= question.user.username
-            if question.forum
-              a(href=`/f/${question.forum.fid}` target='_blank').m-r-1=question.forum.displayName
+            a.m-r-1(
+              href=`/u/${question.uid}`
+              target='_blank'
+              data-global-mouseover="showUserPanel"
+              data-global-mouseout="hideUserPanel"
+              data-global-data=objToStr({uid: question.uid})
+              )= question.user.username
             if question.volume === 'A'
               span.m-r-1 基础级(A)
             else
               span.m-r-1 专业级(B)
+            for tag in question.tags
+              a(
+                href=`/exam/questions?t=pro&fid=${tag._id}`
+                ).m-r-1=`${tag.name}`
             if question.disabled
               span.m-r-1.text-danger 已被屏蔽
             else
@@ -83,14 +96,14 @@ block content
                 - c.push('text-danger');
               h5(class=c)!=markdown(optionIndex[index] + '、' + a.text)
               if a.desc
-                div.text-info.font-size-1rem=`选项说明：${a.desc || '无'}`
+                div.text-info.font-size-1rem=`选项${optionIndex[index]}说明：${a.desc || '无'}`
             if question.auth === null
               span 快速审核：
               button.btn.btn-sm.btn-default(onclick=`auth("${question._id}", true)`)
                 span.text-success 通过
               button.btn.btn-sm.btn-default(onclick=`auth("${question._id}", false)`)
                 span.text-danger 不通过
-        include ../interface_navigation_paging
+        include ../../interface_navigation_paging
 block scripts
-  +includeJS('/exam/questions.js')
-  include ../MathJax
+  +includeJS('/exam/question/questions.js')
+  include ../../MathJax

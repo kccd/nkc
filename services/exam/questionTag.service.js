@@ -61,7 +61,7 @@ class QuestionTagService {
     const { _id, name, desc } = props;
     const tag = await this.getTagById(_id);
     tag.name = name;
-    tag.desc = name;
+    tag.desc = desc;
     await tag.updateOne({
       $set: {
         name,
@@ -127,6 +127,14 @@ class QuestionTagService {
       targetTags.push(tag);
     }
     return targetTags;
+  }
+  async getTagsObjectById(tagsId) {
+    const tags = await this.getTagsById(tagsId);
+    const obj = {};
+    for (const tag of tags) {
+      obj[tag._id] = tag;
+    }
+    return obj;
   }
 }
 

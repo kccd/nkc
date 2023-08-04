@@ -4,11 +4,15 @@ const {
 } = require('../../../../services/exam/questionTag.service');
 const { OnlyPermission } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations.js');
+const { DynamicOperations } = require('../../../../settings/operations');
 router
   .get('/', async (ctx, next) => {
     const tags = await questionTagService.getAllTag();
     ctx.apiData = {
       tags,
+      manageQuestionTagsPermission: ctx.permission(
+        DynamicOperations.manageQuestionTags,
+      ),
     };
     await next();
   })
