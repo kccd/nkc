@@ -33,7 +33,7 @@ block content
                     a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
                   //-p=category.description
       .col-xs-12.col-md-3.col-md-offset-1.bg-color-ffffff
-        if permission('visitEditQuestion')
+        if data.hasPermissionToCreateQuestions
           a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题
           a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
             if data.unViewedCount > 0

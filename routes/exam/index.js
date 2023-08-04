@@ -9,6 +9,7 @@ const authRouter = require('./auth');
 const recordRouter = require('./record');
 const questionsRouter = require('./questions');
 const publicRouter = require('./public');
+const { questionService } = require('../../services/exam/question.service');
 examRouter
   .use(async (ctx, next) => {
     const { db, data } = ctx;
@@ -41,7 +42,7 @@ examRouter
     await next();
   })
   .get('/', async (ctx, next) => {
-    const { data, db } = ctx;
+    const { data, db, state } = ctx;
     ctx.template = 'exam/home.pug';
     data.examsCategories = await db.ExamsCategoryModel.find({
       disabled: false,
@@ -91,7 +92,9 @@ examRouter
     }
     await db.UserModel.extendUsersInfo(users);
     data.usersList = usersList;
-    data.examSettings = (await db.SettingModel.findOnly({ _id: 'exam' })).c;
+    data.examSettings = await db.SettingModel.getSettings('exam');
+    data.hasPermissionToCreateQuestions =
+      await questionService.hasPermissionToCreateQuestions(state.uid);
     await next();
   })
   .use('/record', recordRouter.routes(), recordRouter.allowedMethods())

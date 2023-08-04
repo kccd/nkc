@@ -1,10 +1,15 @@
-const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
+const {
+  ThrowBadRequestResponseTypeError,
+  ThrowForbiddenResponseTypeError,
+} = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
 const { checkString } = require('../../nkcModules/checkData');
 const QuestionModel = require('../../dataModels/QuestionModel');
 const SettingModel = require('../../dataModels/SettingModel');
 const { userInfoService } = require('../user/userInfo.service');
 const { questionTagService } = require('./questionTag.service');
+const { defaultCerts } = require('../../settings/userCerts');
+const { DynamicOperations } = require('../../settings/operations');
 
 class QuestionService {
   questionTypes = {
@@ -227,6 +232,25 @@ class QuestionService {
         },
       },
     );
+  }
+  async hasPermissionToCreateQuestions(uid) {
+    const { userPermissionService } = require('../user/userPermission.service');
+    return !!(
+      (await userPermissionService.isUserOwnsCert(uid, defaultCerts.scholar)) ||
+      (await userPermissionService.isUserOwnsOperation(
+        uid,
+        DynamicOperations.modifyAllQuestions,
+      ))
+    );
+  }
+  async checkPermissionToCreateQuestions(uid) {
+    const hasPermissionToCrateQuestions =
+      await this.hasPermissionToCreateQuestions(uid);
+    if (!hasPermissionToCrateQuestions) {
+      ThrowForbiddenResponseTypeError(
+        ResponseTypes.FORBIDDEN_TO_CREATE_QUESTION,
+      );
+    }
   }
 }
 
