@@ -167,6 +167,8 @@ draftsRouter
       survey,
       parentPostId = '',
       tcId = [],
+      noticeContent,
+      checkNewNotice,
     } = post;
     let draft;
     let contentLength;
@@ -200,6 +202,8 @@ draftsRouter
       originState,
       anonymous,
       parentPostId,
+      noticeContent,
+      checkNewNotice,
       tlm: Date.now(),
     };
     if (draft) {

@@ -19,6 +19,12 @@ const commentRouter = require('./comment');
 const router = new Router();
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
+const {
+  sensitiveDetectionService,
+} = require('../../services/sensitive/sensitiveDetection.service');
+const noticeRouter = require('./notice');
+const noticesRouter = require('./notices');
+const { checkString } = require('../../nkcModules/checkData');
 
 router
   .use('/', async (ctx, next) => {
@@ -331,7 +337,6 @@ router
       body = ctx.body;
     }
     const post = body.post;
-
     const {
       columnMainCategoriesId = [],
       columnMinorCategoriesId = [],
@@ -347,7 +352,9 @@ router
       survey,
       did,
       cover = '',
+      noticeContent,
       _id,
+      type,
     } = post;
     const { pid } = ctx.params;
     const { state, data, db, nkcModules } = ctx;
@@ -588,6 +595,26 @@ router
         );
       }
     }
+    // 如果有文章新通告就生成新通告记录表
+    if (noticeContent) {
+      // 检测是否有发布回复公告或回复公告的权限
+      const checkObj = { uid: state.uid, id: pid };
+      if (type === 'modifyPost') {
+        checkObj.type = 'post';
+      } else if (type === 'modifyThread') {
+        checkObj.type = 'thread';
+      }
+      await db.ForumModel.checkPublishNoticeInRoute(checkObj);
+      //检测文章通告内容是否有敏感词
+      await sensitiveDetectionService.threadNoticeDetection(noticeContent);
+      //检测文章通告内容是否超过字数限制
+      checkString(noticeContent, { minTextLength: 5, maxTextLength: 200 });
+      const { cv } = await db.PostModel.findOnly({ pid }, { cv: 1 });
+
+      let noticeObj = { pid, uid: state.uid, noticeContent, cv };
+      //存储文章通告数据
+      await db.NewNoticesModel.extendNoticeContent(noticeObj);
+    }
 
     await targetThread.updateThreadMessage(false);
 
@@ -642,5 +669,8 @@ router
     commentsRouter.allowedMethods(),
   )
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
-  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods());
+  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
+  .use('/:pid/notice', noticeRouter.routes(), noticeRouter.allowedMethods())
+  .use('/:pid/notices', noticesRouter.routes(), noticesRouter.allowedMethods());
+
 module.exports = router;

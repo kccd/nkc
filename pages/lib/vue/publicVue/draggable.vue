@@ -6,7 +6,6 @@
         .fa.fa-remove
     .module-dialog-content
       slot(name="content")
-
 </template>
 <style lang="less" scoped>
 @import "../../../publicModules/base";

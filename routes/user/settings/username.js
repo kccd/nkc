@@ -37,7 +37,6 @@ router.put('/', async (ctx, next) => {
       })
       .save();
   }
-
   user.username = newUsername;
   user.usernameLowerCase = newUsername.toLowerCase();
   behavior.newUsername = user.username;
@@ -54,7 +53,6 @@ router.put('/', async (ctx, next) => {
   );
   // 同步到elasticSearch搜索数据库
   await nkcModules.elasticSearch.save('user', user);
-
   const _usersPersonal = await db.UsersPersonalModel.findOnly({
     uid: user.uid,
   });

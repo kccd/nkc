@@ -1,0 +1,41 @@
++includeCSS('/publicModules/side_thread_notice.css')
++includeJS('/publicModules/side_thread_notice.js')
+if !isIncluded('publicModules/side_thread_notice.pug')
+  mixin sideThreadNotice(noticeContent,threadHistory,canEditNotice,shieldNotice)
+    if noticeContent
+      div.m-b-1
+        .panel-header 新版本公告
+        div
+          for notice in noticeContent
+            .thread-notice.notice-clearfix(class={'shield-box': notice.status === 'shield'} data-nid=notice.nid data-pid=notice.pid)
+              if notice.status === 'shield'
+                if notice.reason
+                  .shield-box-span=`已屏蔽 原因：${notice.reason}`
+                else
+                  .shield-box-span=`已屏蔽`
+              .thread-notice-head.m-b-05
+                a(href=`/u/${notice.user.uid}/profile/moment`)
+                  img.notice-user-banned.m-r-05(
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({ uid: notice.user.uid })
+                    src=notice.user.avatar)
+                .notice-time
+                  +fromNow(notice.toc)
+                .notice-float
+                  if shieldNotice && notice.status === 'normal'
+                    a.m-r-05(onclick=`shieldNotice(this,true)`) 屏蔽
+                  if shieldNotice && notice.status === 'shield'
+                    a.m-r-05(onclick=`shieldNotice(this,false)`) 解除屏蔽
+                  if canEditNotice && notice.status === 'normal'
+                    a.m-r-05(onclick=`editNotice(this)`) 编辑
+                  if threadHistory !== null && notice.hid
+                    a.m-r-05(href=`/p/${notice.pid}/history?t=detail&c=${notice.hid}`) 详情
+              .thread-notice-content(class={'shield-box': notice.status === 'shield'})
+                =notice.noticeContent
+
+
+
+
+
+

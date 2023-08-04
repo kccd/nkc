@@ -98,6 +98,10 @@ const threadSchema = new Schema(
       default: Date.now,
       index: 1,
     },
+    ttoc: {
+      type: Date,
+      index: 1,
+    },
     /*toMid: {
     type: String,
     default: ''
@@ -245,6 +249,9 @@ const threadSchema = new Schema(
 threadSchema.pre('save', function (next) {
   if (!this.tlm) {
     this.tlm = this.toc;
+  }
+  if (!this.ttoc) {
+    this.ttoc = this.toc;
   }
   next();
 });
@@ -592,9 +599,12 @@ threadSchema.methods.updateThreadEncourage = async function () {
 // 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const ThreadModel = mongoose.model('threads');
+  const NewNoticesModel = mongoose.model('newNotices');
+  const ForumModel = mongoose.model('forums');
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
   const thread = await ThreadModel.findOne({ tid: this.tid });
+  const { postIds } = thread;
   const PostModel = mongoose.model('posts');
   const updateObj = {};
   const oc = await PostModel.findOneAndUpdate(
@@ -622,7 +632,63 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
       },
     ],
   }).sort({ toc: -1 });
-  updateObj.tlm = lm ? lm.toc : '';
+
+  //检测该专业下发表文章或回复的通告是否需要顶贴
+  const permission = await ForumModel.isTopPostCore({
+    fid: thread.mainForumsId[0],
+  });
+  let authorTlm = 0;
+  let otherTlm = 0;
+  let postType = 'post';
+  //文章作者
+  if (!permission.publishNoticeByAuthor) {
+    authorTlm = Math.max(thread.tlm, lm.toc);
+  } else {
+    const latestNotice = await NewNoticesModel.findOne(
+      {
+        uid: thread.uid,
+        pid: { $in: [...postIds, thread.oc] },
+      },
+      { toc: 1, pid: 1 },
+    )
+      .sort({ toc: -1 })
+      .lean();
+    if (latestNotice && latestNotice.toc > lm.toc) {
+      //判断是文章还是回复
+      authorTlm = latestNotice.toc;
+      postType = thread.oc === latestNotice.pid ? 'thread' : 'post';
+    } else {
+      authorTlm = Math.max(thread.tlm, lm.toc);
+    }
+  }
+  //其他人
+  if (!permission.publishNoticeByOther) {
+    otherTlm = Math.max(thread.tlm, lm.toc);
+  } else {
+    const latestNotice = await NewNoticesModel.findOne({
+      uid: { $ne: thread.uid },
+      pid: { $in: postIds },
+    })
+      .sort({ toc: -1 })
+      .lean();
+    if (latestNotice && latestNotice.toc > lm.toc) {
+      otherTlm = latestNotice.toc;
+    } else {
+      otherTlm = Math.max(thread.tlm, lm.toc);
+    }
+  }
+
+  if (authorTlm === otherTlm) {
+    updateObj.tlm = authorTlm ? authorTlm : '';
+  } else if (authorTlm > otherTlm && postType === 'thread') {
+    updateObj.tlm = authorTlm;
+    updateObj.ttoc = authorTlm;
+  } else if (authorTlm > otherTlm && postType === 'post') {
+    updateObj.tlm = authorTlm;
+  } else {
+    updateObj.tlm = otherTlm;
+  }
+
   updateObj.toc = oc.toc;
   updateObj.lm = lm ? lm.pid : '';
   updateObj.oc = oc.pid;
@@ -700,6 +766,7 @@ threadSchema.methods.newPost = async function (post, user, ip) {
     originState,
     parentPostId,
   } = post;
+  const isComment = parentPostId !== '';
   let { quote = '' } = post;
   // 如果存在引用，则先判断引用的post是否存在
   let quotePost;
@@ -771,10 +838,13 @@ threadSchema.methods.newPost = async function (post, user, ip) {
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
   _post = _post.toObject();
-  await this.updateOne({
-    lm: pid,
-    tlm: nowTime,
-  });
+  if (!isComment) {
+    // 只有发表回复时才更新文章上的最后回复和时间
+    await this.updateOne({
+      lm: pid,
+      tlm: nowTime,
+    });
+  }
   // 如果存在引用并且不需要审核，则给被引用者发送引用通知
   if (quotePost) {
     // 如果引用的不是自己的回复
@@ -1332,7 +1402,10 @@ threadSchema.statics.publishArticle = async (options) => {
   }
   const user = await UserModel.findById(uid);
   // await ThreadModel.ensurePublishPermission(options);
-  await ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
+  await ForumModel.checkGlobalPostAndForumWritePermission(
+    options.uid,
+    options.fids,
+  );
   const tid = await SettingModel.operateSystemID('threads', 1);
   const thread = ThreadModel({
     tid,
@@ -1902,6 +1975,67 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
  * @param {Number} limit 条数，
  * @author pengxiguaa 2019-4-26
  * */
+
+/*
+ *获取最新加学术分的文章
+ *@param {[String]} fid 能够从中读取文章的专业ID
+ *
+ */
+threadSchema.statics.getNewAcademicThread = async (fid) => {
+  //获取最新加学术分文章
+  const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
+    .limit(100)
+    .sort({ toc: -1 })
+    .lean();
+
+  const filterPid = Array.from(new Set(academicPost.map((item) => item.pid)));
+
+  const postPid = await PostModel.find(
+    {
+      pid: { $in: filterPid },
+      mainForumsId: { $in: fid },
+      disabled: false,
+      reviewed: true,
+      toDraft: { $ne: true },
+      type: 'thread',
+    },
+    { pid: 1 },
+  ).lean();
+
+  const filteredPid = postPid.map((item) => {
+    return item.pid;
+  });
+
+  const academicThread = await ThreadModel.find({
+    mainForumsId: { $in: fid },
+    disabled: false,
+    reviewed: true,
+    recycleMark: { $ne: true },
+    oc: { $in: filteredPid },
+  })
+    .sort({ toc: -1 })
+    .lean();
+
+  const sortedAcademicThread = filterPid
+    .map((pid) => academicThread.find((thread) => thread.oc === pid))
+    .filter(Boolean);
+  const finalArr = sortedAcademicThread.slice(0, 10);
+  return await ThreadModel.extendThreads(finalArr, {
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    firstPostResource: false,
+    htmlToText: true,
+  });
+};
+
 threadSchema.statics.getLatestThreads = async (
   fid,
   sort = 'toc',
@@ -2204,7 +2338,10 @@ threadSchema.statics.postNewThread = async (options) => {
   await ForumModel.checkForumCategoryBeforePost(options.fids);
   // 1.检测发表权限
   // await ThreadModel.ensurePublishPermission(options);
-  await ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
+  await ForumModel.checkGlobalPostAndForumWritePermission(
+    options.uid,
+    options.fids,
+  );
   // 2.生成一条新的thread，并返回post
   const _post = await ForumModel.createNewThread(options);
   // 获取当前的thread
