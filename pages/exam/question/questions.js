@@ -15,6 +15,7 @@ new Vue({
   data: {
     tags: data.tags,
     tagId: data.tagId,
+    manageQuestionTagsPermission: data.manageQuestionTagsPermission,
   },
   components: {
     'question-tag-selector': QuestionTagSelector,

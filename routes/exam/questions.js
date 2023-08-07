@@ -4,6 +4,7 @@ const {
   questionTagService,
 } = require('../../services/exam/questionTag.service');
 const { questionService } = require('../../services/exam/question.service');
+const { DynamicOperations } = require('../../settings/operations');
 router.get('/', async (ctx, next) => {
   const { nkcModules, query, db, data } = ctx;
   let { t, fid, page = 0, v } = query;
@@ -58,6 +59,9 @@ router.get('/', async (ctx, next) => {
   });
   data.unCount = await db.QuestionModel.countDocuments({ auth: false });
   data.waitingCount = await db.QuestionModel.countDocuments({ auth: null });
+  data.manageQuestionTagsPermission = ctx.permission(
+    DynamicOperations.manageQuestionTags,
+  );
   ctx.template = 'exam/question/questions.pug';
   await next();
 });

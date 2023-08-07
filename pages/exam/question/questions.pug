@@ -4,7 +4,13 @@ block title
   +includeCSS('/exam/exam.css')
   +includeCSS('/exam/question/questions.css')
 block content
-  #data.hidden=objToStr({tags: data.tags, tagId: data.fid})
+  -
+    var objectData = {
+      tags: data.tags,
+      tagId: data.fid,
+      manageQuestionTagsPermission: data.manageQuestionTagsPermission,
+    };
+  #data.hidden=objToStr(objectData)
   .container-fluid.max-width
     include ../nav
     .row
@@ -29,7 +35,7 @@ block content
             )
             .tag-header.m-b-05
               a.tag-name(:href="`/exam/questions?t=pro&fid=${tag.tagId}`") {{tag.tagName}}
-              .tag-buttons
+              .tag-buttons(v-if="manageQuestionTagsPermission")
                 button.btn.btn-xs.btn-default(@click=`editQuestionTag(tag)`) 编辑
                 button.btn.btn-xs.btn-danger(@click=`deleteQuestionTag(tag)`) 删除
             .tag-count {{`总共/可用：${tag.allCount}/${tag.count}`}}
