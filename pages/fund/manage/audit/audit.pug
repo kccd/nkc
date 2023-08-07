@@ -34,6 +34,8 @@ block fundContent
       if oldCommentDesc[type]
         h5 上一次未通过审核的原因：
         p.text-danger.pre-wrap= oldCommentDesc[type]
+      .m-b-05
+        button.btn.btn-xs.btn-default(onclick=`window.app.openReasonInput("${type}")`) 打开浮窗模式
       textarea.form-control(rows='12' placeholder='审核评语')
       .radio
         label.m-r-1
@@ -146,6 +148,7 @@ block fundContent
       h3 资金预算
       hr
       #app(v-cloak)
+        common-modal(ref='commonModal')
         if applicationForm.fixedMoney
           span=`固定金额：${applicationForm.money} 元`
         else
