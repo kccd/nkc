@@ -58,7 +58,7 @@ categoryRouter.put('/:_id', async (ctx, next) => {
   if (time <= 0) {
     ctx.throw(400, '答题时间必须大于0分钟');
   }
-  // category.disabled = !!category.disabled;
+  category.disabled = !!category.disabled;
   const q = {
     from,
     uid: user.uid,

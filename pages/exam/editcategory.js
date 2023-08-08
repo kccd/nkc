@@ -86,11 +86,11 @@ let app = new Vue({
       if (category.from.length === 0) {
         return screenTopWarning('请选择试题来源');
       }
-      // if (category.volume === 'A') {
-      //   this.checkTagCount(category, tagA);
-      // } else if (category.volume === 'B') {
-      //   this.checkTagCount(category, tagB);
-      // }
+      if (category.volume === 'A') {
+        this.checkTagCount(category, tagA);
+      } else if (category.volume === 'B') {
+        this.checkTagCount(category, tagB);
+      }
       if (category.passScore < 1 || category.passScore > this.questionsCount) {
         return screenTopWarning('及格分数不能大于试题总数且不能小于1');
       }
@@ -110,7 +110,7 @@ let app = new Vue({
       }
       nkcAPI(url, method, { category: category })
         .then(function () {
-          // window.location.href='/exam';
+          window.location.href = '/exam';
           screenTopAlert('保存成功');
         })
         .catch(function (data) {
