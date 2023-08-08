@@ -5,28 +5,25 @@ router
     ctx.template = 'exam/editCategory.pug';
     const { data, db, query } = ctx;
     const { cid } = query;
+    const allTag = await db.QuestionTagModel.find({}, { name: 1 }).lean();
     if (cid) {
-      const category = await db.ExamsCategoryModel.findOnly({
+      const { from, volume, ...rest } = await db.ExamsCategoryModel.findOne({
         _id: Number(cid),
+      }).lean();
+      const newFrom = from.map((item) => {
+        const tag = allTag.find((t) => t._id === item.tag);
+        if (tag) {
+          return {
+            count: item.count,
+            _id: item.tag,
+            name: tag.name,
+            volume,
+          };
+        }
       });
-      const { from } = category;
-      for (const f of from) {
-        // const { type, fid } = f;
-        // if (type === 'pub') {
-        //   continue;
-        // }
-        // f.forum = await db.ForumModel.findOnly({ fid });
-        const { count, tag } = f;
-        const { name } = await db.QuestionTagModel.findOnly(
-          { _id: tag },
-          { name: 1 },
-        );
-        f.name = name;
-      }
-      data.category = category;
+      data.category = { ...rest, from: newFrom, volume };
     }
     data.roles = await db.RoleModel.find({ type: 'common' });
-    const allTag = await db.QuestionTagModel.find({}, { name: 1 }).lean();
     const tagQ = {
       volume: 'A',
       auth: true,
@@ -44,6 +41,7 @@ router
           $group: {
             _id: '$tags',
             count: { $sum: 1 },
+            volume: { $first: '$volume' }, // 通过 $first 操作获取 volume 字段的值
           },
         },
       ];
@@ -116,7 +114,6 @@ router
     const { user } = data;
     const { contentLength } = tools.checkString;
     const { category } = body;
-    console.log(category, 'category');
     let {
       name,
       description,

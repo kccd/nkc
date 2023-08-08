@@ -51,36 +51,36 @@ block content
             label(class="col-sm-2 control-label") 试题来源
             .col-sm-10
               div(v-if='category.from.length === 0')
-                h5.text-danger 暂未选择任何专业领域
+                h5.text-danger 暂未选择任何领域标签
               div(v-else)
                 h5 已选择的专业领域 试题总数：{{questionsCount}}
                 table.table.table-bordered
                   thead
                     tr
-                      th 专业名称
+                      th 标签名
                       th 抽取数目
                       th
                   tbody
-                    tr(v-for='from in category.from')
-                      th {{from.forum?from.forum.displayName: '公共题库'}}
+                    tr(v-for='tag in category.from')
+                      th {{tag.name}}
                       th
-                        input(type='number' v-model.number='from.count')
+                        input(type='number' style="width:80%"  v-model.number='tag.count' min="1")
                       th
-                        button(@click='removeForum(from)') 移除
-              button.btn.btn-default.btn-sm(@click='showForums = !showForums') 全部专业领域
+                        button(@click='removeTag(tag)') 移除
+              button.btn.btn-default.btn-sm(@click='showForums = !showForums') 全部领域标签
               div(v-if='showForums').m-t-1
                 table.table.table-bordered
                   thead
                     tr
-                      th 专业名称
+                      th 标签名
                       th {{category.volume === 'A'?'基础题数':'专业题数'}}
                   tbody
-                    tr(v-for='A in tag.tagA' v-if="category.volume === 'A'" )
+                    tr(v-for='A in allTag.tagA' v-if="category.volume === 'A'" )
                       th {{A.name}}
                       th {{A.count}}
                       th
                         button(@click='addTag(A)') 添加
-                    tr(v-for="B in tag.tagB" v-if="category.volume === 'B'" )
+                    tr(v-for="B in allTag.tagB" v-if="category.volume === 'B'" )
                       th {{B.name}}
                       th {{B.count}}
                       th

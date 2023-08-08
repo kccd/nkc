@@ -1,8 +1,12 @@
-const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
+const {
+  ThrowBadRequestResponseTypeError,
+  ThrowError,
+} = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
 const { checkString } = require('../../nkcModules/checkData');
 const QuestionModel = require('../../dataModels/QuestionModel');
 const SettingModel = require('../../dataModels/SettingModel');
+const QuestionTagModel = require('../../dataModels/QuestionTagModel');
 const { userInfoService } = require('../user/userInfo.service');
 const { questionTagService } = require('./questionTag.service');
 
@@ -227,6 +231,76 @@ class QuestionService {
         },
       },
     );
+  }
+
+  /*
+   *@Parma
+   *from --- 标签id和取的数量
+   *condition 查询条件
+   */
+  async canTakeQuestionNumbers(from, condition) {
+    const allTag = await QuestionTagModel.find({}, { name: 1 }).lean();
+    const questionId = [];
+    for (const f of from) {
+      const { tag } = f;
+      condition.tags = { $in: [tag] };
+      const question = await QuestionModel.find(condition, { _id: 1 }).lean();
+      question.forEach((item) => {
+        questionId.push(item._id);
+      });
+    }
+    //重复的问题id
+    const repetitionId = questionId.filter(
+      (item, index) => questionId.indexOf(item) !== index,
+    );
+    //深拷贝这个数组用于递减
+    let newRepetitionId = repetitionId.map((item) => item);
+    for (const f of from) {
+      const { tag, count } = f;
+      condition.tags = { $in: [tag] };
+      const question = await QuestionModel.find(condition, { _id: 1 }).lean();
+      const qId = question.map((item) => item._id);
+      //当前标签存在重复问题的id
+      const hasRepetition = qId.filter((item) => repetitionId.includes(item));
+      const { name } = allTag.find((item) => item._id === tag);
+      //问题数量少于用户指定数量
+      if (question.length < count) {
+        ThrowError(400, `${name}题库试题总数目不满足用户指定数量`);
+      }
+      //存在重复问题
+      else if (hasRepetition.length > 0) {
+        //还剩下哪些可以选择的重复问题id
+        const resHasRepetition = hasRepetition.filter((item) =>
+          newRepetitionId.includes(item),
+        );
+        //找出过滤掉重复问题之后还剩下的题数
+        const number = qId.filter((item) => !hasRepetition.includes(item));
+        //如果重复但已经没有可以选的重复问题
+        if (resHasRepetition.length === 0 && number.length < count) {
+          ThrowError(
+            400,
+            `${name}当前题库与其他所选题库存在重复，导致题库数量不足`,
+          );
+        } else if (
+          resHasRepetition.length > 0 &&
+          resHasRepetition.length + number.length < count
+        ) {
+          ThrowError(400, `${name}题库试题数目不足`);
+        } else {
+          let num = resHasRepetition.length - count;
+          if (num <= 0) {
+            newRepetitionId = newRepetitionId.filter(
+              (item) => !hasRepetition.includes(item),
+            );
+          } else {
+            const selectedElements = hasRepetition.slice(0, num);
+            newRepetitionId = newRepetitionId.filter(
+              (item) => !selectedElements.includes(item),
+            );
+          }
+        }
+      }
+    }
   }
 }
 
