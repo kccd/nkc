@@ -75,26 +75,22 @@ let app = new Vue({
       const { tagA, tagB } = this.allTag;
       if (category.name === '') {
         return screenTopWarning('请输入考卷名称');
-      }
-      if (category.description === '') {
+      } else if (category.description === '') {
         return screenTopWarning('请输入考卷介绍');
-      }
-      if (['A', 'B'].indexOf(category.volume) === -1) {
+      } else if (['A', 'B'].indexOf(category.volume) === -1) {
         return screenTopWarning('请选择考卷难度');
-      }
-
-      if (category.from.length === 0) {
+      } else if (category.from.length === 0) {
         return screenTopWarning('请选择试题来源');
-      }
-      if (category.volume === 'A') {
+      } else if (category.volume === 'A') {
         this.checkTagCount(category, tagA);
       } else if (category.volume === 'B') {
         this.checkTagCount(category, tagB);
-      }
-      if (category.passScore < 1 || category.passScore > this.questionsCount) {
+      } else if (
+        category.passScore < 1 ||
+        category.passScore > this.questionsCount
+      ) {
         return screenTopWarning('及格分数不能大于试题总数且不能小于1');
-      }
-      if (category.time <= 0) {
+      } else if (category.time <= 0) {
         return screenTopWarning('答题时间必须大于0分钟');
       }
       category.disabled = ['true', true].indexOf(category.disabled) !== -1;

@@ -265,7 +265,10 @@ class QuestionService {
       const { name } = allTag.find((item) => item._id === tag);
       //问题数量少于用户指定数量
       if (question.length < count) {
-        ThrowError(400, `${name}题库试题总数目不满足用户指定数量`);
+        ThrowBadRequestResponseTypeError(
+          ResponseTypes.INSUFFICIENT_QUESTION_COUNT,
+          [name],
+        );
       }
       //存在重复问题
       else if (hasRepetition.length > 0) {
@@ -277,16 +280,20 @@ class QuestionService {
         const number = qId.filter((item) => !hasRepetition.includes(item));
         //如果重复但已经没有可以选的重复问题
         if (resHasRepetition.length === 0 && number.length < count) {
-          ThrowError(
-            400,
-            `${name}当前题库与其他所选题库存在重复，导致题库数量不足`,
+          ThrowBadRequestResponseTypeError(
+            ResponseTypes.DUPLICATE_QUESTIONS_IN_SELECTED_BANKS,
+            [name],
           );
         } else if (
           resHasRepetition.length > 0 &&
           resHasRepetition.length + number.length < count
         ) {
-          ThrowError(400, `${name}题库试题数目不足`);
+          ThrowBadRequestResponseTypeError(
+            ResponseTypes.DUPLICATE_QUESTIONS_IN_SELECTED_BANKS,
+            [name],
+          );
         } else {
+          //剩余重复的问题是否满足用户指定的数量
           let num = resHasRepetition.length - count;
           if (num <= 0) {
             newRepetitionId = newRepetitionId.filter(
