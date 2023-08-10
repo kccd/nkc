@@ -1,3 +1,5 @@
+import { sweetConfirm } from '../lib/js/sweetAlert';
+
 var app = new Vue({
   el: '#app',
   data: {
@@ -33,25 +35,24 @@ var app = new Vue({
       this.countdown = minutes + ' 分钟 ' + seconds + ' 秒 ';
     },
     submit: function () {
-      for (var i = 0; i < this.questions.length; i++) {
-        var answer = this.questions[i].answer;
-        if (typeof answer === 'undefined') {
-          if (confirm('您还有未作答的题目，确认要提交试卷吗？') === false) {
-            return;
+      Promise.resolve()
+        .then(() => {
+          if (this.unfinished) {
+            return sweetConfirm('您还有未做完的题目，是否要提交');
           }
-          break;
-        }
-      }
-      this.submitted = true;
-      nkcAPI('/exam/paper/' + app.paper._id, 'post', {
-        questions: this.questions,
-      })
-        .then(function (data) {
-          app.passed = data.passed;
         })
-        .catch(function (data) {
-          screenTopWarning(data);
-          app.submitted = false;
+        .then(() => {
+          this.submitted = true;
+          nkcAPI('/exam/paper/' + app.paper._id, 'post', {
+            questions: this.questions,
+          })
+            .then(function (data) {
+              app.passed = data.passed;
+            })
+            .catch(function (data) {
+              screenTopWarning(data);
+              app.submitted = false;
+            });
         });
     },
   },
@@ -70,7 +71,6 @@ var app = new Vue({
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
         const questions = data.questions;
-        console.log(questions, 'questions');
         const newQuestions = questions.map((item, index) => {
           const obj = {
             type: item.type,
@@ -88,6 +88,7 @@ var app = new Vue({
             //判断是否为多选题
             obj.isMultiple = multiple.length > 1;
             obj.selected = [];
+
             for (let j = 0; j < item.answer.length; j++) {
               obj.ans_[j] = NKC.methods.custom_xss_process(
                 NKC.methods.mdToHtml(
@@ -111,5 +112,22 @@ var app = new Vue({
       .catch(function (err) {
         screenTopWarning(err);
       });
+  },
+  computed: {
+    //未做完的题
+    unfinished() {
+      let str = '';
+      this.questions.forEach((question, index) => {
+        const { type, selected, fill } = question;
+        //选择题
+        if (type === 'ch4' && selected.length === 0) {
+          str += `${index + 1}题未完成 `;
+          //填空题
+        } else if (type === 'ans' && !fill) {
+          str += `${index + 1}题未完成 `;
+        }
+      });
+      return str;
+    },
   },
 });
