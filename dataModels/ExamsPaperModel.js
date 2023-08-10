@@ -132,7 +132,8 @@ const schema = new Schema(
                 // 针对选择题，是否选择了当前选项
                 selected: {
                   type: Boolean,
-                  required: false,
+                  default: false,
+                  // required: false,
                 },
                 // 正对填空题，考试者填写的内容
                 fill: {

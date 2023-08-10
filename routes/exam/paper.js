@@ -1,33 +1,34 @@
 const Router = require('koa-router');
+const { questionService } = require('../../services/exam/question.service');
 const paperRouter = new Router();
 paperRouter
   .get('/', async (ctx, next) => {
-    const { db, data, query, nkcModules } = ctx;
+    const { db, query, nkcModules, state } = ctx;
     let { cid } = query;
     cid = Number(cid);
     const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');
     }
-    const { user } = data;
+    const { uid } = state;
+
     const timeLimit = 45 * 60 * 1000;
-    let qidArr = [];
     let questionCount = 0;
     // 该考卷下有未完成的考试
-    let paper = await db.ExamsPaperModel.findOne({
-      uid: user.uid,
-      cid,
-      submitted: false,
-      timeOut: false,
-    });
-    if (paper) {
-      return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
-    }
+    // let paper = await db.ExamsPaperModel.findOne({
+    //   uid: uid,
+    //   cid,
+    //   submitted: false,
+    //   timeOut: false,
+    // });
+    // if (paper) {
+    //   return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
+    // }
     // 限制条件
     const examSettings = await db.SettingModel.findOnly({ _id: 'exam' });
     const { count, countOneDay, waitingTime } = examSettings.c;
     const paperCount = await db.ExamsPaperModel.countDocuments({
-      uid: user.uid,
+      uid,
       toc: { $gte: nkcModules.apiFunction.today() },
     });
     if (paperCount >= countOneDay) {
@@ -38,12 +39,12 @@ paperRouter
     }
     const now = Date.now();
     const generalSettings = await db.UsersGeneralModel.findOne({
-      uid: user.uid,
+      uid,
     });
     let { stageTime } = generalSettings.examSettings;
-    // const allPaperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
+    // const allPaperCount = await db.ExamsPaperModel.countDocuments({uid: uid, toc: {$gte: waitingTime*24*60*60*1000}});
     const allPaperCount = await db.ExamsPaperModel.countDocuments({
-      uid: user.uid,
+      uid,
       toc: { $gte: stageTime },
     });
     stageTime = new Date(stageTime).getTime();
@@ -62,135 +63,70 @@ paperRouter
     // 45分钟之内进入相同的考卷
     const { passScore, time } = category;
     paper = await db.ExamsPaperModel.findOne({
-      uid: user.uid,
+      uid,
       cid,
       toc: { $gte: Date.now() - timeLimit },
     }).sort({ toc: -1 });
-    if (paper) {
-      const record = paper.record.map((r) => {
-        return {
-          qid: r.qid,
-        };
+    // if (paper) {
+    //   const record = paper.record.map((r) => {
+    //     return {
+    //       qid: r.qid,
+    //     };
+    //   });
+    //   // 随机交换数组元素位置
+    //   nkcModules.apiFunction.shuffle(record);
+    //   qidArr = record.map((r) => r.qid);
+    // } else {
+    // 加载不同考卷的题目
+    const { from, volume } = category;
+    const condition = {
+      volume,
+      auth: true,
+      disabled: false,
+    };
+    //检测试题是否满足数量
+    await questionService.canTakeQuestionNumbers(from, condition);
+    const questions = [];
+    const questionsId = [];
+    for (const f of from) {
+      const { count, tag } = f;
+      const conditionQ = {
+        ...condition,
+        tags: { $in: [tag] },
+        _id: { $ne: questionsId },
+      };
+      const selectedQuestions = await db.QuestionModel.aggregate([
+        {
+          $match: conditionQ,
+        },
+        {
+          $sample: { size: count }, // 选择指定数量的随机题目
+        },
+        {
+          $project: { _id: 1, type: 1, content: 1, answer: 1 },
+        },
+      ]);
+      selectedQuestions.forEach((item) => {
+        const { _id, type, content, answer } = item;
+        questions.push({ qid: _id, type, content, answer });
+        questionsId.push(item._id);
       });
-      // 随机交换数组元素位置
-      nkcModules.apiFunction.shuffle(record);
-      qidArr = record.map((r) => r.qid);
-    } else {
-      // 加载不同考卷的题目
-      const { from, volume } = category;
-      for (const f of from) {
-        const { count, type, fid } = f;
-        questionCount += count;
-        if (type === 'pub') {
-          // 需要从公共题库抽取题目，先从45分钟以内出现过的公共题中抽取
-          // 获取用户45分钟以内的考卷
-          const latestPapers = await db.ExamsPaperModel.find({
-            uid: user.uid,
-            toc: { $gte: Date.now() - timeLimit },
-          }).sort({ toc: -1 });
-          // 获取该用户45分钟以内的所有公共题ID
-          const oldQidArr = new Set();
-          latestPapers.map((p) => {
-            p.record.map((r) => {
-              oldQidArr.add(r.qid);
-            });
-          });
-          const oldPubQuestions = await db.QuestionModel.find({
-            _id: { $in: [...oldQidArr] },
-            public: true,
-            volume,
-          });
-          const oldPubId = oldPubQuestions.map((q) => q._id);
-          if (count <= oldPubId.length) {
-            // 45分钟之内出现的公共题数量足够
-            qidArr = qidArr.concat(oldPubId.slice(0, count));
-          } else {
-            // 45分钟之内出现的公共题数量不足，超出的部分去题库里面抽取
-            qidArr = qidArr.concat(oldPubId);
-            const questions = await db.QuestionModel.aggregate([
-              {
-                $match: {
-                  _id: { $nin: oldPubId },
-                  volume,
-                  public: true,
-                  auth: true,
-                  disabled: false,
-                },
-              },
-              {
-                $sample: {
-                  size: count - oldPubId.length,
-                },
-              },
-            ]);
-            if (questions.length < count - oldPubId.length) {
-              ctx.throw(400, '公共题库试题数量不足');
-            }
-            questions.map((q) => {
-              qidArr.push(q._id);
-            });
-          }
-        } else {
-          const questions = await db.QuestionModel.aggregate([
-            {
-              $match: {
-                fid,
-                volume,
-                public: false,
-                auth: true,
-                disabled: false,
-              },
-            },
-            {
-              $sample: {
-                size: count,
-              },
-            },
-          ]);
-          if (questions.length < count) {
-            const forum = await db.ForumModel.findOnly({ fid });
-            ctx.throw(400, `${forum.displayName} 题库试题数量不足`);
-          }
-          questions.map((q) => {
-            qidArr.push(q._id);
-          });
-        }
-      }
+      questionCount += count;
     }
-    const questions = await db.QuestionModel.find({ _id: { $in: qidArr } });
     if (questions.length < questionCount) {
       ctx.throw(400, '当前科目的题库试题不足，请选择其他科目参加考试。');
     }
+    //保证题目的随机性
     nkcModules.apiFunction.shuffle(questions);
-
-    const papersQuestions = [];
-    await Promise.all(
-      questions.map(async (q) => {
-        if (q.type === 'ch4') {
-          const results = [];
-          while (results.length < 4) {
-            const num = Math.round(Math.random() * 3);
-            if (!results.includes(num)) {
-              results.push(num);
-            }
-          }
-          papersQuestions.push({
-            qid: q._id,
-            answerIndex: results,
-          });
-        } else {
-          papersQuestions.push({
-            qid: q._id,
-          });
-        }
-      }),
-    );
+    questions.forEach((item) => {
+      nkcModules.apiFunction.shuffle(item.answer);
+    });
     paper = db.ExamsPaperModel({
       _id: await db.SettingModel.operateSystemID('examsPapers', 1),
-      uid: user.uid,
+      uid,
       cid,
       ip: ctx.address,
-      record: papersQuestions,
+      record: questions,
       passScore,
       time,
     });
@@ -199,14 +135,14 @@ paperRouter
     return ctx.redirect(`/exam/paper/${paper._id}`);
   })
   .get('/:_id', async (ctx, next) => {
-    const { db, data, params, query, nkcModules } = ctx;
+    const { db, data, params, query, nkcModules, state } = ctx;
     const { created } = query;
     if (created === 'true') {
       data.created = true;
     }
-    const { user } = data;
+    const { uid } = state;
     const { _id } = params;
-    const paper = await db.ExamsPaperModel.findOnly({ _id, uid: user.uid });
+    const paper = await db.ExamsPaperModel.findOnly({ _id, uid });
     if (paper.timeOut) {
       ctx.throw(403, '考试已结束');
     }
@@ -220,19 +156,14 @@ paperRouter
     const questions = [];
     const { record } = paper;
     for (const r of record) {
-      const question = await db.QuestionModel.findOnly({ _id: r.qid });
-      const ans = [];
-      if (question.type === 'ch4') {
-        for (const n of r.answerIndex) {
-          ans.push(question.answer[n]);
-        }
-      }
+      const { hasImage } = await db.QuestionModel.findOnly({ _id: r.qid });
+      const { qid, type, content, answer } = r;
       questions.push({
-        _id: question._id,
-        type: question.type,
-        content: question.content,
-        ans,
-        hasImage: question.hasImage,
+        qid,
+        type,
+        content,
+        answer,
+        hasImage,
       });
     }
     data.questions = questions;
@@ -244,19 +175,19 @@ paperRouter
     data.category = category;
     data.examSettings = (await db.SettingModel.findOnly({ _id: 'exam' })).c;
     data.countToday = await db.ExamsPaperModel.countDocuments({
-      uid: user.uid,
+      uid: uid,
       toc: { $gte: nkcModules.apiFunction.today() },
     });
     ctx.template = 'exam/paper.pug';
     await next();
   })
   .post('/:_id', async (ctx, next) => {
-    const { params, db, data, body } = ctx;
-    const { user } = data;
+    const { params, db, data, body, state } = ctx;
+    const { uid } = state;
     const { _id } = params;
     const paper = await db.ExamsPaperModel.findOnly({
       _id: Number(_id),
-      uid: user.uid,
+      uid,
     });
     if (paper.timeOut) {
       ctx.throw(403, '考试已结束');

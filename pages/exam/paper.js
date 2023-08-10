@@ -69,20 +69,38 @@ var app = new Vue({
         app.category = data.category;
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
-        var questions = data.questions;
-        for (var i = 0; i < questions.length; i++) {
-          var a = questions[i];
-          a.content_ = NKC.methods.custom_xss_process(
-            NKC.methods.mdToHtml(i + 1 + '、' + a.content),
-          );
-          a.ans_ = [];
-          for (var j = 0; j < a.ans.length; j++) {
-            a.ans_[j] = NKC.methods.custom_xss_process(
-              NKC.methods.mdToHtml(['A', 'B', 'C', 'D'][j] + '. ' + a.ans[j]),
-            );
+        const questions = data.questions;
+        console.log(questions, 'questions');
+        const newQuestions = questions.map((item, index) => {
+          const obj = {
+            type: item.type,
+            content_: NKC.methods.custom_xss_process(
+              NKC.methods.mdToHtml(index + 1 + '、' + item.content),
+            ),
+            _id: item.qid,
+          };
+          //填空题值唯一
+          if (item.type === 'ans') {
+            obj.fill = '';
+          } else if (item.type === 'ch4') {
+            obj.ans_ = [];
+            const multiple = item.answer.filter((item) => item.correct);
+            //判断是否为多选题
+            obj.isMultiple = multiple.length > 1;
+            obj.selected = [];
+            for (let j = 0; j < item.answer.length; j++) {
+              obj.ans_[j] = NKC.methods.custom_xss_process(
+                NKC.methods.mdToHtml(
+                  ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'][j] +
+                    '. ' +
+                    item.answer[j].text,
+                ),
+              );
+            }
           }
-        }
-        app.questions = questions;
+          return obj;
+        });
+        app.questions = newQuestions;
         setInterval(function () {
           app.compute();
         }, 500);
