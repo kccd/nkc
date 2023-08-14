@@ -228,7 +228,7 @@ paperRouter
           const picked = r.answer.filter(
             (item, index) => selected.includes(index) && item.correct,
           );
-          //选对了的答案数量要完全一直
+          //选对了的答案数量要完全一致
           if (picked.length === correctQ.length) {
             r.correct = true;
             score++;
@@ -255,10 +255,10 @@ paperRouter
       if (category.volume === 'B') {
         userObj.volumeA = true;
       }
-      await user.updateOne(userObj);
+      await db.UserModel.updateOne({ uid }, userObj);
       for (const id of category.rolesId) {
         if (id) {
-          await user.updateOne({ $addToSet: { certs: id } });
+          await db.UserModel.updateOne({ uid }, { $addToSet: { certs: id } });
         }
       }
     }

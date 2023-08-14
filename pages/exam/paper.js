@@ -52,7 +52,7 @@ var app = new Vue({
                 : [item.selected],
             fill: item.type !== 'ans' ? null : item.fill,
           }));
-          // this.submitted = true;
+          this.submitted = true;
           nkcAPI('/exam/paper/' + app.paper._id, 'post', {
             questions,
           })
