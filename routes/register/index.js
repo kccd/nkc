@@ -22,7 +22,6 @@ registerRouter
   .post('/', async (ctx, next) => {
     // 手机注册
     const { db, body } = ctx;
-    let user;
     const { mobile, nationCode, code, username, password } = body;
     delete body.password;
     await usernameCheckerService.checkNewUsername(username);
@@ -59,7 +58,7 @@ registerRouter
     delete option.type;
     option.username = username;
     option.password = password;
-    user = await db.UserModel.createUser(option);
+    const user = await db.UserModel.createUser(option);
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,
