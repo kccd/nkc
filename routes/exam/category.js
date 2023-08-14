@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const { questionService } = require('../../services/exam/question.service');
 const categoryRouter = new Router();
 categoryRouter.put('/:_id', async (ctx, next) => {
   const { data, db, body, tools, params } = ctx;
@@ -20,62 +21,41 @@ categoryRouter.put('/:_id', async (ctx, next) => {
   } = category;
   if (!name) {
     ctx.throw(400, '考卷名不能为空');
-  }
-  if (contentLength(name) > 50) {
+  } else if (contentLength(name) > 50) {
     ctx.throw(400, '考卷名称字数不能大于50');
-  }
-  if (!description) {
+  } else if (!description) {
     ctx.throw(400, '考卷介绍不能为空');
-  }
-  if (contentLength(description) > 500) {
+  } else if (contentLength(description) > 500) {
     ctx.throw(400, '考卷介绍字数不能大于500');
-  }
-  if (!rolesId) {
+  } else if (!rolesId) {
     rolesId = [];
-  }
-  if (rolesId.length !== 0) {
+  } else if (rolesId.length !== 0) {
     const roles = await db.RoleModel.find({
       _id: { $in: rolesId },
       defaultRole: false,
     });
     rolesId = roles.map((r) => r._id);
   }
+
+  const condition = {
+    volume,
+    auth: true,
+    disabled: false,
+  };
   let questionsCount = 0;
   if (from.length !== 0) {
+    //检测题库题数是否满足
+    await questionService.canTakeQuestionNumbers(from, condition);
     for (const f of from) {
-      const { fid, count, type } = f;
-      delete f.countA;
-      delete f.countB;
+      const { count } = f;
       questionsCount += count;
-      if (type === 'pub') {
-        const pubCount = await db.QuestionModel.countDocuments({
-          disabled: false,
-          auth: true,
-          public: true,
-          volume,
-        });
-        if (count > pubCount) {
-          ctx.throw(400, '公共题库试题数目不足，请刷新');
-        }
-      } else {
-        const questionCount = await db.QuestionModel.countDocuments({
-          disabled: false,
-          auth: true,
-          volume,
-          public: false,
-          fid,
-        });
-        if (count > questionCount) {
-          const forum = await db.ForumModel.findOnly({ fid });
-          ctx.throw(400, `${forum.displayName}题库数量不足，请刷新`);
-        }
-      }
     }
   }
-  if (category.passScore < 1 || category.passScore > questionsCount) {
+
+  if (passScore < 1 || passScore > questionsCount) {
     ctx.throw('及格分数不能大于试题总数且不能小于1');
   }
-  if (category.time <= 0) {
+  if (time <= 0) {
     ctx.throw(400, '答题时间必须大于0分钟');
   }
   category.disabled = !!category.disabled;

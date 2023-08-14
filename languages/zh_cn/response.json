@@ -29,6 +29,8 @@
   "INVALID_ANS_QUESTION_ANSWER_COUNT": "填空题答案个数错误",
   "INVALID_QUESTION_TAG_COUNT": "试题至少应该包含一个标签",
   "INVALID_QUESTION_ID": "无效的试题ID(id={v1})",
+  "FORBIDDEN_TO_CREATE_QUESTION": "您没有出题的权限",
   "FORBIDDEN_BECAUSE_QUESTION_DISABLED": "试题已被屏蔽",
-  "FORBIDDEN_TO_CREATE_QUESTION": "您没有出题的权限"
+  "INSUFFICIENT_QUESTION_COUNT": "(题库{v1})试题总数目不满足用户指定数量",
+  "DUPLICATE_QUESTIONS_IN_SELECTED_BANKS": "(题库{v1})与其他所选题库存在重复，导致题库数量不足"
 }
