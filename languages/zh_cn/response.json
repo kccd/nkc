@@ -32,5 +32,7 @@
   "FORBIDDEN_TO_CREATE_QUESTION": "您没有出题的权限",
   "FORBIDDEN_BECAUSE_QUESTION_DISABLED": "试题已被屏蔽",
   "INSUFFICIENT_QUESTION_COUNT": "(题库{v1})试题总数目不满足用户指定数量",
-  "DUPLICATE_QUESTIONS_IN_SELECTED_BANKS": "(题库{v1})与其他所选题库存在重复，导致题库数量不足"
+  "DUPLICATE_QUESTIONS_IN_SELECTED_BANKS": "(题库{v1})与其他所选题库存在重复，导致题库数量不足",
+  "INVALID_EXAM_PAPER_ID": "无效的PaperID(id={v1})",
+  "INVALID_EXAM_PAPER_TOKEN": "无效的注册码(token={v1})"
 }

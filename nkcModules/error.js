@@ -93,6 +93,14 @@ function ThrowBadRequestResponseTypeError(responseType, args = []) {
   ThrowResponseTypeError(HttpErrorCodes.BadRequest, responseType, args);
 }
 
+function ThrowServerInternalResponseTypeError(responseType, args = []) {
+  ThrowResponseTypeError(
+    HttpErrorCodes.InternalServerError,
+    responseType,
+    args,
+  );
+}
+
 function ThrowForbiddenErrorPageError(errorPage, errorData) {
   ThrowErrorPageError(HttpErrorCodes.Forbidden, errorPage, errorData);
 }
@@ -144,6 +152,7 @@ module.exports = {
   ThrowErrorToRenderFullErrorPage,
   ThrowErrorToRenderStaticErrorPage,
   ThrowForbiddenResponseTypeError,
+  ThrowServerInternalResponseTypeError,
   ThrowBadRequestResponseTypeError,
   ThrowServerInternalError,
   ThrowForbiddenErrorPageError,

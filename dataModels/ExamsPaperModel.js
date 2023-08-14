@@ -151,6 +151,13 @@ const schema = new Schema(
         },
       ],
     },
+    // 考试通过后设置的token
+    // 目前用于注册时校验考试是否通过
+    token: {
+      type: String,
+      default: '',
+      index: 1,
+    },
   },
   {
     collection: 'examsPapers',
