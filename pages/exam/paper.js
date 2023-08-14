@@ -42,9 +42,19 @@ var app = new Vue({
           }
         })
         .then(() => {
-          this.submitted = true;
+          const questions = this.questions.map((item) => ({
+            _id: item._id,
+            selected:
+              item.type !== 'ch4'
+                ? null
+                : Array.isArray(item.selected)
+                ? item.selected
+                : [item.selected],
+            fill: item.type !== 'ans' ? null : item.fill,
+          }));
+          // this.submitted = true;
           nkcAPI('/exam/paper/' + app.paper._id, 'post', {
-            questions: this.questions,
+            questions,
           })
             .then(function (data) {
               app.passed = data.passed;
@@ -71,7 +81,7 @@ var app = new Vue({
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
         const questions = data.questions;
-        const newQuestions = questions.map((item, index) => {
+        app.questions = questions.map((item, index) => {
           const obj = {
             type: item.type,
             content_: NKC.methods.custom_xss_process(
@@ -101,7 +111,6 @@ var app = new Vue({
           }
           return obj;
         });
-        app.questions = newQuestions;
         setInterval(function () {
           app.compute();
         }, 500);

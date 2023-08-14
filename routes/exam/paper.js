@@ -12,18 +12,18 @@ paperRouter
     }
     const { uid } = state;
 
-    const timeLimit = 45 * 60 * 1000;
+    // const timeLimit = 45 * 60 * 1000;
     let questionCount = 0;
     // 该考卷下有未完成的考试
-    // let paper = await db.ExamsPaperModel.findOne({
-    //   uid: uid,
-    //   cid,
-    //   submitted: false,
-    //   timeOut: false,
-    // });
-    // if (paper) {
-    //   return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
-    // }
+    let paper = await db.ExamsPaperModel.findOne({
+      uid: uid,
+      cid,
+      submitted: false,
+      timeOut: false,
+    });
+    if (paper) {
+      return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
+    }
     // 限制条件
     const examSettings = await db.SettingModel.findOnly({ _id: 'exam' });
     const { count, countOneDay, waitingTime } = examSettings.c;
@@ -60,25 +60,24 @@ paperRouter
         );
       }
     }
-    // 45分钟之内进入相同的考卷
-    const { passScore, time } = category;
-    paper = await db.ExamsPaperModel.findOne({
-      uid,
-      cid,
-      toc: { $gte: Date.now() - timeLimit },
-    }).sort({ toc: -1 });
-    // if (paper) {
-    //   const record = paper.record.map((r) => {
-    //     return {
-    //       qid: r.qid,
-    //     };
-    //   });
-    //   // 随机交换数组元素位置
-    //   nkcModules.apiFunction.shuffle(record);
-    //   qidArr = record.map((r) => r.qid);
-    // } else {
+    const { passScore, time, from, volume } = category;
+    // // 45分钟之内进入相同的考卷
+    // paper = await db.ExamsPaperModel.findOne({
+    //   uid,
+    //   cid,
+    //   toc: { $gte: Date.now() - timeLimit },
+    // }).sort({ toc: -1 });
+    // // if (paper) {
+    // //   const record = paper.record.map((r) => {
+    // //     return {
+    // //       qid: r.qid,
+    // //     };
+    // //   });
+    // //   // 随机交换数组元素位置
+    // //   nkcModules.apiFunction.shuffle(record);
+    // //   qidArr = record.map((r) => r.qid);
+    // // } else {
     // 加载不同考卷的题目
-    const { from, volume } = category;
     const condition = {
       volume,
       auth: true,
@@ -183,6 +182,7 @@ paperRouter
   })
   .post('/:_id', async (ctx, next) => {
     const { params, db, data, body, state } = ctx;
+    const { user } = data;
     const { uid } = state;
     const { _id } = params;
     const paper = await db.ExamsPaperModel.findOnly({
@@ -200,47 +200,55 @@ paperRouter
     if (category.disabled) {
       ctx.throw(403, `该科目下的考试已被屏蔽`);
     }
-    const qid = paper.record.map((r) => r.qid);
-    const questionsDB = await db.QuestionModel.find({ _id: { $in: qid } });
-    const questionObj = {};
-    for (const q of questionsDB) {
-      questionObj[q._id] = q;
-    }
+    //用户填写的问题
     const { questions } = body;
+    //考卷的问题
     const { record } = paper;
+    //用户总分
     let score = 0;
-    const q = {};
+    let q = {};
     for (let i = 0; i < record.length; i++) {
       const r = record[i];
-      if (r.qid !== questions[i]._id) {
+      const { selected, _id, fill } = questions[i];
+      //判断试卷问题的顺序是否一致
+      if (r.qid !== _id) {
         ctx.throw(400, '试卷题目顺序有误，本次考试无效，请重新考试。');
       }
-      const question = questionObj[r.qid];
-      r.correct = false;
-      if (question.type === 'ch4') {
-        for (let j = 0; j < r.answerIndex.length; j++) {
-          const index = r.answerIndex[j];
-          if (question.answer[index] !== questions[i].ans[j]) {
-            ctx.throw(400, '试卷题目答案顺序有误，本次考试无效，请重新考试。');
-          }
-          if (index === 0 && questions[i].answer === j) {
+      //选择题
+      if (r.type === 'ch4') {
+        const correctQ = r.answer.filter((item) => item.correct);
+        //判断用户的选项数量是否满足
+        if (correctQ.length === selected.length) {
+          //筛选出选对了哪些答案
+          r.answer.forEach((item, index) => {
+            if (selected.includes(index)) {
+              item.selected = true;
+            }
+          });
+          const picked = r.answer.filter(
+            (item, index) => selected.includes(index) && item.correct,
+          );
+          //选对了的答案数量要完全一直
+          if (picked.length === correctQ.length) {
             r.correct = true;
             score++;
           }
         }
-      } else {
-        if (question.answer[0] === questions[i].answer) {
+      } else if (r.type === 'ans') {
+        //填空题
+        r.answer[0].fill = fill;
+        if (r.answer[0].text === fill) {
           r.correct = true;
           score++;
         }
       }
-      record[i].answer = questions[i].answer;
     }
     q.record = record;
     q.score = score;
     q.passed = paper.passScore <= q.score;
     q.submitted = true;
     q.tlm = time;
+
     if (q.passed) {
       const userObj = {};
       userObj[`volume${category.volume}`] = true;
@@ -254,7 +262,7 @@ paperRouter
         }
       }
     }
-    await paper.updateOne(q);
+    await db.ExamsPaperModel.updateOne({ _id: Number(_id), uid }, q);
     data.passed = q.passed;
     await next();
   });
