@@ -6,7 +6,7 @@ const {
 const ExamsPaperModel = require('../../dataModels/ExamsPaperModel');
 const { ResponseTypes } = require('../../settings/response');
 const { paperTokenValidityPeriod } = require('../../settings/exam');
-const redLock = require('../../nkcModules/redLock');
+const { redLock } = require('../../nkcModules/redLock');
 
 class PaperService {
   async getPaperById(paperId) {

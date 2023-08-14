@@ -374,7 +374,7 @@ schema.statics.changeKey = async (content) => {
  * */
 schema.statics.getNewId = async () => {
   const ArticleModel = mongoose.model('articles');
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const getRedisKeys = require('../nkcModules/getRedisKeys');
   const { getRandomString } = require('../nkcModules/apiFunction');
   const key = getRedisKeys('newArticleId');

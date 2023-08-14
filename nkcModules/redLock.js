@@ -12,4 +12,9 @@ redLock.on('clientError', (err) => {
     console.log(err);
   }
 });
-module.exports = redLock;
+
+async function createLock(name, ttl) {
+  return await redLock.lock(name, ttl);
+}
+
+module.exports = { createLock, redLock };

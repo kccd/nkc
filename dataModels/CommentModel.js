@@ -1507,7 +1507,7 @@ schema.methods.updateCommentsVote = async function () {
  * */
 schema.statics.getNewId = async () => {
   const CommentModel = mongoose.model('comments');
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const getRedisKeys = require('../nkcModules/getRedisKeys');
   const { getRandomString } = require('../nkcModules/apiFunction');
   const key = getRedisKeys('newArticleId');

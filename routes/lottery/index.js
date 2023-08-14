@@ -17,7 +17,7 @@ luckRouter
   })
   .post('/', async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
-    const lock = await nkcModules.redLock.lock(`postReward`, 6000);
+    const lock = await nkcModules.redLock.redLock.lock(`postReward`, 6000);
     try {
       const { user } = data;
       const redEnvelopeSettings = await db.SettingModel.getSettings(

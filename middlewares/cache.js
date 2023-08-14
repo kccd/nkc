@@ -33,7 +33,7 @@ module.exports = async (ctx, next) => {
 
   const cacheSettings = await db.SettingModel.getSettings('cache');
   // 防止因缓存过期同一时间大量请求数据库
-  const lock = await nkcModules.redLock.lock(`page:cache:lock:${url}`, 30000);
+  const lock = await nkcModules.redLock.redLock.lock(`page:cache:lock:${url}`, 30000);
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
   const cachedHTML = await redisClient.getAsync(dataKey);

@@ -9,7 +9,7 @@ router
     const {data, state, nkcModules, db} = ctx;
     const {user} = data;
     if(state.uid) {
-      const lock = await nkcModules.redLock.lock(`dailyLogin:${state.uid}`, 5000);
+      const lock = await nkcModules.redLock.redLock.lock(`dailyLogin:${state.uid}`, 5000);
       try{
         await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', user, ctx);
         const {today} = nkcModules.apiFunction;
