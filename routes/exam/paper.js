@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { questionService } = require('../../services/exam/question.service');
+const { paperService } = require('../../services/exam/paper.service');
 const paperRouter = new Router();
 paperRouter
   .get('/', async (ctx, next) => {
@@ -12,7 +12,7 @@ paperRouter
     }
     const { uid } = state;
 
-    // const timeLimit = 45 * 60 * 1000;
+    const timeLimit = 45 * 60 * 1000;
     let questionCount = 0;
     // 该考卷下有未完成的考试
     let paper = await db.ExamsPaperModel.findOne({
@@ -62,76 +62,92 @@ paperRouter
     }
     const { passScore, time, from, volume } = category;
     // // 45分钟之内进入相同的考卷
-    // paper = await db.ExamsPaperModel.findOne({
-    //   uid,
-    //   cid,
-    //   toc: { $gte: Date.now() - timeLimit },
-    // }).sort({ toc: -1 });
-    // // if (paper) {
-    // //   const record = paper.record.map((r) => {
-    // //     return {
-    // //       qid: r.qid,
-    // //     };
-    // //   });
-    // //   // 随机交换数组元素位置
-    // //   nkcModules.apiFunction.shuffle(record);
-    // //   qidArr = record.map((r) => r.qid);
-    // // } else {
-    // 加载不同考卷的题目
-    const condition = {
-      volume,
-      auth: true,
-      disabled: false,
-    };
-    //检测试题是否满足数量
-    await questionService.canTakeQuestionNumbers(from, condition);
-    const questions = [];
-    const questionsId = [];
-    for (const f of from) {
-      const { count, tag } = f;
-      const conditionQ = {
-        ...condition,
-        tags: { $in: [tag] },
-        _id: { $ne: questionsId },
-      };
-      const selectedQuestions = await db.QuestionModel.aggregate([
-        {
-          $match: conditionQ,
-        },
-        {
-          $sample: { size: count }, // 选择指定数量的随机题目
-        },
-        {
-          $project: { _id: 1, type: 1, content: 1, answer: 1 },
-        },
-      ]);
-      selectedQuestions.forEach((item) => {
-        const { _id, type, content, answer } = item;
-        questions.push({ qid: _id, type, content, answer });
-        questionsId.push(item._id);
-      });
-      questionCount += count;
-    }
-    if (questions.length < questionCount) {
-      ctx.throw(400, '当前科目的题库试题不足，请选择其他科目参加考试。');
-    }
-    //保证题目的随机性
-    nkcModules.apiFunction.shuffle(questions);
-    questions.forEach((item) => {
-      nkcModules.apiFunction.shuffle(item.answer);
-    });
-    paper = db.ExamsPaperModel({
-      _id: await db.SettingModel.operateSystemID('examsPapers', 1),
+    paper = await db.ExamsPaperModel.findOne({
       uid,
       cid,
-      ip: ctx.address,
-      record: questions,
-      passScore,
-      time,
-    });
-    await paper.save();
-    // 跳转到考试页面
-    return ctx.redirect(`/exam/paper/${paper._id}`);
+      toc: { $gte: Date.now() - timeLimit },
+    }).sort({ toc: -1 });
+    if (paper) {
+      const { record } = paper;
+      nkcModules.apiFunction.shuffle(record);
+      const newRecord = record.map((r) => {
+        const { answer, qid, type, content } = r;
+        answer.forEach((a) => {
+          a.fill = '';
+          a.selected = false;
+        });
+        nkcModules.apiFunction.shuffle(answer);
+        return { answer, qid, type, content };
+      });
+      paper = db.ExamsPaperModel({
+        _id: await db.SettingModel.operateSystemID('examsPapers', 1),
+        uid,
+        cid,
+        ip: ctx.address,
+        record: newRecord,
+        passScore,
+        time,
+      });
+      await paper.save();
+      // 跳转到考试页面
+      return ctx.redirect(`/exam/paper/${paper._id}`);
+    } else {
+      // 加载不同考卷的题目
+      const condition = {
+        volume,
+        auth: true,
+        disabled: false,
+      };
+      //检测试题是否满足数量
+      await paperService.canTakeQuestionNumbers(from, condition);
+      const questions = [];
+      const questionsId = [];
+      for (const f of from) {
+        const { count, tag } = f;
+        const conditionQ = {
+          ...condition,
+          tags: { $in: [tag] },
+          _id: { $ne: questionsId },
+        };
+        const selectedQuestions = await db.QuestionModel.aggregate([
+          {
+            $match: conditionQ,
+          },
+          {
+            $sample: { size: count }, // 选择指定数量的随机题目
+          },
+          {
+            $project: { _id: 1, type: 1, content: 1, answer: 1 },
+          },
+        ]);
+        selectedQuestions.forEach((item) => {
+          const { _id, type, content, answer } = item;
+          questions.push({ qid: _id, type, content, answer });
+          questionsId.push(item._id);
+        });
+        questionCount += count;
+      }
+      if (questions.length < questionCount) {
+        ctx.throw(400, '当前科目的题库试题不足，请选择其他科目参加考试。');
+      }
+      //保证题目的随机性
+      nkcModules.apiFunction.shuffle(questions);
+      questions.forEach((item) => {
+        nkcModules.apiFunction.shuffle(item.answer);
+      });
+      paper = db.ExamsPaperModel({
+        _id: await db.SettingModel.operateSystemID('examsPapers', 1),
+        uid,
+        cid,
+        ip: ctx.address,
+        record: questions,
+        passScore,
+        time,
+      });
+      await paper.save();
+      // 跳转到考试页面
+      return ctx.redirect(`/exam/paper/${paper._id}`);
+    }
   })
   .get('/:_id', async (ctx, next) => {
     const { db, data, params, query, nkcModules, state } = ctx;
@@ -182,7 +198,6 @@ paperRouter
   })
   .post('/:_id', async (ctx, next) => {
     const { params, db, data, body, state } = ctx;
-    const { user } = data;
     const { uid } = state;
     const { _id } = params;
     const paper = await db.ExamsPaperModel.findOnly({

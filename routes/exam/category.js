@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { questionService } = require('../../services/exam/question.service');
+const { paperService } = require('../../services/exam/paper.service');
 const categoryRouter = new Router();
 categoryRouter.put('/:_id', async (ctx, next) => {
   const { data, db, body, tools, params } = ctx;
@@ -45,7 +45,7 @@ categoryRouter.put('/:_id', async (ctx, next) => {
   let questionsCount = 0;
   if (from.length !== 0) {
     //检测题库题数是否满足
-    await questionService.canTakeQuestionNumbers(from, condition);
+    await paperService.canTakeQuestionNumbers(from, condition);
     for (const f of from) {
       const { count } = f;
       questionsCount += count;
