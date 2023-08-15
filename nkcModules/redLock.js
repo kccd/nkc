@@ -17,4 +17,8 @@ async function createLock(name, ttl) {
   return await redLock.lock(name, ttl);
 }
 
-module.exports = { createLock, redLock };
+async function getActivationCodeLock() {
+  return await createLock('getNewActivationCode', 6000);
+}
+
+module.exports = { createLock, redLock, getActivationCodeLock };

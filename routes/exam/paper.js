@@ -1,6 +1,8 @@
 const Router = require('koa-router');
 const { questionService } = require('../../services/exam/question.service');
 const paperRouter = new Router();
+const { paperService } = require('../../services/exam/paper.service');
+
 paperRouter
   .get('/', async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
@@ -263,6 +265,10 @@ paperRouter
       }
     }
     await db.ExamsPaperModel.updateOne({ _id: Number(_id), uid }, q);
+    if (q.passed) {
+      // 生成注册码
+      data.token = await paperService.createActivationCodeByPaperId(_id);
+    }
     data.passed = q.passed;
     await next();
   });
