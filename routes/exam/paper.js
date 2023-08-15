@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
 const paperRouter = new Router();
-const { paperService } = require('../../services/exam/paper.service');
 
 paperRouter
   .get('/', async (ctx, next) => {
