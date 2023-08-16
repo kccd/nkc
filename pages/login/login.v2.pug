@@ -1,0 +1,15 @@
+extends ../bootstrap_base
+block title
+  title Login v2
+  +includeCSS('/login/login.v2.css')
+block navbar
+
+block content
+  .hidden#data=objToStr({referer: data.referer, type: data.type})
+  .container-fluid.max-width#app(v-cloak)
+    .login-container
+      login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
+
+block footer
+block scripts
+  +includeJS("/login/login.v2.js")

@@ -1,18 +1,11 @@
 const Router = require('koa-router');
-const loginBehaviorMap = require('../../tools/loginBehaviorMap');
 const loginRouter = new Router();
 loginRouter
-  .use('/', async (ctx, next) => {
-    const { user } = ctx.data;
-    if (user) {
-      return ctx.redirect('/');
-    }
-    await next();
-  })
   .get('/', async (ctx, next) => {
-    const { t: type } = ctx.query;
-    ctx.data.type = type || 'login';
-    ctx.template = 'login/login.pug';
+    const { query, data } = ctx;
+    const { t: type } = query;
+    data.type = type || 'login';
+    ctx.template = 'login/login.v2.pug';
     await next();
   })
   .post('/', async (ctx, next) => {
