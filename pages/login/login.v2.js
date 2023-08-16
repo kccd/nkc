@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import LoginCore from '../lib/vue/LoginCore.vue';
 import { getState } from '../lib/js/state';
-import { RNLogin } from '../lib/js/reactNative';
+import { RNCloseWebview, RNLogin } from '../lib/js/reactNative';
 import { getDataById } from '../lib/js/dataConversion';
 import { nkcAPI } from '../lib/js/netAPI';
 const { referer, type } = getDataById('data');
@@ -46,6 +46,11 @@ new Vue({
           });
       } else {
         window.location.href = '/';
+      }
+    },
+    close() {
+      if (isApp) {
+        RNCloseWebview();
       }
     },
   },

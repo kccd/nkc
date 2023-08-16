@@ -8,6 +8,8 @@ block content
   .hidden#data=objToStr({referer: data.referer, type: data.type})
   .container-fluid.max-width#app(v-cloak)
     .login-container
+      .login-form-header(v-if="isApp")
+        .login-form-header-close(@click="close") 关闭
       login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
 
 block footer
