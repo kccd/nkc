@@ -68,12 +68,13 @@ module.exports = {
         },
       },
       public: {
-        GET: Operations.getPublicExam,
         register: {
           GET: Operations.openPublicExam,
         },
         paper: {
-          GET: Operations.takePublicExam,
+          PARAMETER: {
+            GET: Operations.takePublicExam,
+          },
         },
         result: {
           POST: Operations.submitPublicExam,

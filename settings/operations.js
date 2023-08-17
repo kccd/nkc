@@ -21,7 +21,6 @@ const FixedOperations = {
   deleteQuestionTag: 'deleteQuestionTag',
   getQuestionTags: 'getQuestionTags',
   createQuestionTag: 'createQuestionTag',
-  getPublicExam: 'getPublicExam',
   openPublicExam: 'openPublicExam',
   takePublicExam: 'takePublicExam',
   submitPublicExam: 'submitPublicExam',
@@ -29,6 +28,8 @@ const FixedOperations = {
   modifyExamQuestion: 'modifyExamQuestion',
   visitExamQuestionEditor: 'visitExamQuestionEditor',
   visitPublicExam: 'visitPublicExam',
+  getExamsPaper: 'getExamsPaper',
+  postExamsPaper: 'postExamsPaper',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -103,8 +104,6 @@ const DynamicOperations = {
   modifyExamsCategory: 'modifyExamsCategory',
   visitExamsQuestionAuth: 'visitExamsQuestionAuth',
   submitExamsQuestionAuth: 'submitExamsQuestionAuth',
-  getExamsPaper: 'getExamsPaper',
-  postExamsPaper: 'postExamsPaper',
   removeQuestion: 'removeQuestion',
   enabledQuestion: 'enabledQuestion',
   disabledQuestion: 'disabledQuestion',

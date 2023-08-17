@@ -7,12 +7,12 @@ const schema = new Schema(
     _id: Number,
     uid: {
       type: String,
-      required: true,
       index: 1,
     },
     ip: {
       type: String,
       default: '',
+      index: 1,
     },
     // 试卷创建的时间
     toc: {

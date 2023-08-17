@@ -1,12 +1,5 @@
-const randomize = require('randomatic');
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
-    const { db } = ctx;
-    const { publicExamNotes } = await db.SettingModel.getSettings('exam');
-    ctx.apiData = { publicExamNotes };
-    await next();
-  })
   .get('/register', async (ctx, next) => {
     const { db } = ctx;
     const {
@@ -17,18 +10,12 @@ router
     };
     await next();
   })
-  .get('/paper', async (ctx, next) => {
-    const { db } = ctx;
+  .get('/paper/:pid', async (ctx, next) => {
     const {
-      c: { examSource },
-    } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
-    ctx.apiData = {
-      examSource,
-    };
-    await next();
+      params: { pid },
+    } = ctx;
   })
   .post('/result', async (ctx, next) => {
-    const randomize1 = randomize('A0', 64);
     ctx.apiData = {
       success: '成功了',
     };

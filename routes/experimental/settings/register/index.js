@@ -49,24 +49,20 @@ router
     recommendUsers.lastVisitTime = parseInt(recommendUsers.lastVisitTime);
     if (recommendUsers.usersCount <= 0) {
       ctx.throw(400, '推荐用户数量不能小于1');
-    }
-    if (recommendUsers.digestThreadsCount < 0) {
+    } else if (recommendUsers.digestThreadsCount < 0) {
       ctx.throw(400, '加精文章数量不能小于0');
-    }
-    if (recommendUsers.threadCount < 0) {
+    } else if (recommendUsers.threadCount < 0) {
       ctx.throw(400, '文章总数不能小于0');
-    }
-    if (recommendUsers.postCount < 0) {
+    } else if (recommendUsers.postCount < 0) {
       ctx.throw(400, '回复总数不能小于0');
-    }
-    if (recommendUsers.xsf < 0) {
+    } else if (recommendUsers.xsf < 0) {
       ctx.throw(400, '学术分不能小于0');
-    }
-    if (recommendUsers.lastVisitTime <= 0) {
+    } else if (recommendUsers.lastVisitTime <= 0) {
       ctx.throw(400, '最后活动时间不能小于1天');
-    }
-    if (registerExamination && examSource.length === 0) {
-      ctx.throw(400, '若选择开启考试，题库不能为空');
+    } else if (registerExamination && examSource.length === 0) {
+      ctx.throw(400, '若选择开启考试，试卷不能为空');
+    } else if (registerExamination && examSource.length > 1) {
+      ctx.throw(400, '若选择开启考试，只能选择一份试卷');
     }
 
     await Promise.all(

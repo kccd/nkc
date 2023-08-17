@@ -16,6 +16,7 @@ const schema = new Schema(
       type: String,
       default: 'A',
     },
+    //闭卷考试是必带uid，但是开卷考试用户并没有uid
     uid: {
       type: String,
       required: true,

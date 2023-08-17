@@ -21,13 +21,15 @@ block content
           .form-group
             label(class="col-sm-2 control-label") 考卷类型
             .col-sm-10
-              div
+              div(v-if='!category._id')
                 label.radio-inline
                   input(type="radio" value="secret" v-model='category.type')
                   |闭卷
                 label.radio-inline
                   input(type="radio" value="public" v-model='category.type')
                   |开卷
+              h5(v-else) {{{'public':'开卷','secret':'闭卷'}[category.type]}}
+
 
           .form-group
             label(class="col-sm-2 control-label") 考卷难度

@@ -46,19 +46,20 @@ var app = new Vue({
         _id: event.target.id,
         name: event.target.name,
       };
-      const isDuplicate = this.regSettings.examSource.some(
-        (examSource) => examSource._id === newData._id,
-      );
-      if (!isDuplicate) {
+      if (this.regSettings.examSource.length === 0) {
         this.regSettings.examSource.push(newData);
       } else {
-        sweetError('请别重复添加相同试卷');
+        sweetError('注册考试只能选择一份试卷');
       }
     },
     deleteExam(event) {
-      this.regSettings.examSource = this.regSettings.examSource.filter(
-        (exam) => exam._id !== event.target.id,
+      const idToRemove = event.target.id;
+      const examIndex = this.regSettings.examSource.findIndex(
+        (exam) => exam._id === idToRemove,
       );
+      if (examIndex !== -1) {
+        this.regSettings.examSource.splice(examIndex, 1);
+      }
     },
     save: function () {
       var selectedForums = app.selectedForums;

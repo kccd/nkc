@@ -1,30 +1,22 @@
-import { nkcAPI } from '../lib/js/netAPI';
 import Vue from 'vue';
 new Vue({
   el: '#exam-public',
   data() {
     return {
       publicExamNotes: '',
+      cid: '',
     };
   },
   mounted() {
-    this.getExamNotes();
+    this.getInit();
   },
   methods: {
-    getExamNotes() {
-      nkcAPI('/api/v1/exam/public', 'GET')
-        .then((res) => {
-          if (res.data.publicExamNotes) {
-            this.publicExamNotes = res.data.publicExamNotes;
-          }
-        })
-        .catch((err) => {
-          console.log(err, '失败');
-        });
-    },
-    takeExam(event) {
-      event.preventDefault(); // 阻止默认行为（页面跳转）
-      window.location.href = '/exam/public/takeExam';
+    //初始化
+    getInit() {
+      const data = NKC.methods.getDataById('data');
+      this.publicExamNotes = data.publicExamNotes;
+      this.cid = data.examSource[0]._id;
+      console.log(this.cid, 'cid');
     },
   },
 });

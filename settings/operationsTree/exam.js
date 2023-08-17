@@ -55,7 +55,9 @@ module.exports = {
   public: {
     GET: Operations.visitPublicExam,
     takeExam: {
-      GET: Operations.visitPublicExam,
+      PARAMETER: {
+        GET: Operations.visitPublicExam,
+      },
     },
   },
 };

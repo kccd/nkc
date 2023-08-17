@@ -11,17 +11,25 @@ new Vue({
     };
   },
   mounted() {
-    this.getTakeExam();
+    // this.getTakeExam();
   },
   methods: {
     getTakeExam() {
-      nkcAPI('/api/v1/exam/public/paper', 'GET')
-        .then((res) => {
-          console.log(res, 'res');
-        })
-        .catch((err) => {
-          sweetError(err);
-        });
+      // nkcAPI('/api/v1/exam/public/paper', 'GET')
+      //   .then((res) => {
+      //     if (res) {
+      //       const {
+      //         data: { examSource },
+      //       } = res;
+      //       const cid = examSource[0]._id;
+      //       if (cid) {
+      //         nkcAPI(`/exam/paper?cid=${cid}`, 'GET').then((res) => {});
+      //       }
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     sweetError(err);
+      //   });
     },
     pre() {
       if (this.currentQuestion === 0) {
