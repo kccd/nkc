@@ -252,12 +252,14 @@ export default {
         if(!mobile) return throwError("请输入手机号");
         if(!code) return throwError("请输入短信验证码");
         this.submitting = true;
+        const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
         nkcAPI("/register", "POST", {
           nationCode: nationCode,
           mobile: mobile,
           code: code,
           username: username,
           password: password,
+          activationCode: registerActivationCode,
         })
           .then(function() {
             this_.succeed = true;

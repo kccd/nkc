@@ -6,6 +6,7 @@ const {
 } = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
 const ActivationCodeModel = require('../../dataModels/ActivationCodeModel');
+const { activationCodeSources } = require('../../settings/activationCode');
 
 class ActivationCodeService {
   async getNewActivationCodeId() {
@@ -93,6 +94,10 @@ class ActivationCodeService {
         },
       },
     );
+    if (activationCode.source === activationCodeSources.examPaper) {
+      const { paperService } = require('../exam/paper.service');
+      await paperService.setPaperUserId(activationCode.sid, uid);
+    }
   }
 }
 

@@ -29,6 +29,18 @@ class PaperService {
       expiration: Date.now() + activationCodeValidityPeriod.examPaper,
     });
   }
+  async setPaperUserId(paperId, uid) {
+    await this.ExamsPaperModel.updateOne(
+      {
+        _id: paperId,
+      },
+      {
+        $set: {
+          uid,
+        },
+      },
+    );
+  }
   async canTakeQuestionNumbers(from, condition) {
     const allTag = await QuestionTagModel.find({}, { name: 1 }).lean();
     const questionId = [];
