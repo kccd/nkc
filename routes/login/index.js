@@ -4,6 +4,7 @@ loginRouter
   .get('/', async (ctx, next) => {
     const { query, data } = ctx;
     const { t: type } = query;
+    data.referer = ctx.get('referer');
     data.type = type || 'login';
     ctx.template = 'login/login.v2.pug';
     await next();
