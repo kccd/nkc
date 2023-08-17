@@ -20,8 +20,15 @@ async function createLock(name, ttl) {
 async function getActivationCodeLock() {
   return await createLock('getNewActivationCode', 6000);
 }
-async function getRegisterExamCheckLock() {
-  return await createLock('registerExamCheck', 6000);
+async function getRegisterExamCheckLock(ip) {
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const key = getRedisKeys('registerExamLimitLock', ip);
+  return await createLock(key, 6000);
 }
 
-module.exports = { createLock, redLock, getActivationCodeLock };
+module.exports = {
+  createLock,
+  redLock,
+  getActivationCodeLock,
+  getRegisterExamCheckLock,
+};
