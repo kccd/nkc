@@ -85,24 +85,16 @@
           backdrop: "static"
         });
       },
-      close: function() {
+      close() {
         if(isApp) {
           RNCloseWebview();
         } else {
           $(this.$el).modal("hide");
         }
       },
-      open: function(type = LoginType.SignIn) {
+      open(type = LoginType.SignIn) {
         this.$refs.loginCore.selectType(type);
-        nkcAPI("/api/v1/exam/public/register","GET").then((res)=>{
-          if (res && res.data.registerExamination && type === 'register') {
-            window.location.href = "/exam/public"
-          } else {
-            $(this.$el).modal("show");
-          }
-        }).catch((err)=>{
-          sweetError(err)
-        })
+        $(this.$el).modal("show");
       },
       onLogged() {
         if(this.isApp) {

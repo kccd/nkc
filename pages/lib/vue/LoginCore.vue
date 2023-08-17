@@ -110,6 +110,8 @@ import Verifications from './Verifications';
 import {getState} from '../js/state';
 import {nkcAPI} from "../js/netAPI";
 import {getNationCodes} from "../js/nationCodes";
+import { visitUrl } from "../js/pageSwitch";
+import { getRegisterActivationCodeFromLocalstorage } from "../js/activationCode";
 const {
   isApp,
   websiteBrief,
@@ -177,6 +179,16 @@ export default {
     },
     selectType(type = LoginType.SignIn) {
       this.type = type;
+      if(type === LoginType.SignUp) {
+        const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
+        nkcAPI(`/api/v1/register/exam?code=${registerActivationCode}`, 'GET')
+          .then(res => {
+            if(res.data.isExamRequired) {
+              visitUrl(`/exam/public`);
+            }
+          })
+          .catch(sweetError);
+      }
     },
     throwError(error) {
       this.error = error.error || error.message || error;

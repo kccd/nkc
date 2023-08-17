@@ -29,6 +29,7 @@ const FixedOperations = {
   modifyExamQuestion: 'modifyExamQuestion',
   visitExamQuestionEditor: 'visitExamQuestionEditor',
   visitPublicExam: 'visitPublicExam',
+  registerExamCheck: 'registerExamCheck',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

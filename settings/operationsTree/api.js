@@ -88,5 +88,10 @@ module.exports = {
         },
       },
     },
+    register: {
+      exam: {
+        GET: Operations.registerExamCheck,
+      },
+    },
   },
 };

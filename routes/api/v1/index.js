@@ -1,4 +1,5 @@
-const router = require('koa-router')();
+const Router = require('koa-router');
+const router = new Router();
 const userRouter = require('./user');
 const serverRouter = require('./server');
 const accountRouter = require('./account');
@@ -8,6 +9,7 @@ const columnRouter = require('./column');
 const recycleRouter = require('./recycle');
 const usersRouter = require('./users');
 const examRouter = require('./exam');
+const registerRouter = require('./register');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
@@ -17,5 +19,6 @@ router
   .use('/threads', threadsRouter.routes(), threadsRouter.allowedMethods())
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/exam', examRouter.routes(), examRouter.allowedMethods())
+  .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods());
 module.exports = router;
