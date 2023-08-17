@@ -44,5 +44,7 @@ module.exports = (type, v1, v2) => {
       return `grades`;
     case 'sensitiveSettings':
       return `sensitiveSettings`;
+    case 'registerExamLimit':
+      return `register:exam:limit:${v1}`;
   }
 };

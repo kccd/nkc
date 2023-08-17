@@ -1,0 +1,17 @@
+extends ../bootstrap_base
+block title
+  title=`${remoteState.serverSettings.websiteName}账号登录`
+  +includeCSS('/login/login.v2.css')
+block navbar
+
+block content
+  .hidden#data=objToStr({referer: data.referer, type: data.type})
+  .container-fluid.max-width#app(v-cloak)
+    .login-container
+      .login-form-header(v-if="isApp")
+        .login-form-header-close(@click="close") 关闭
+      login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
+
+block footer
+block scripts
+  +includeJS("/login/login.v2.js")

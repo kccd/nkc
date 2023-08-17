@@ -36,31 +36,26 @@ class ActivationCodeService {
     return activationCode;
   }
 
-  async checkActivationCodeId(codeId) {
+  async isActivationCodeValid(codeId) {
     const now = Date.now();
     if (!codeId) {
-      ThrowBadRequestResponseTypeError(
-        ResponseTypes.INVALID_ACTIVATION_CODE_ID,
-        codeId,
-      );
+      return false;
     }
     const activationCode = await ActivationCodeModel.findOne({ _id: codeId });
     if (!activationCode) {
       // code不存在
-      ThrowBadRequestResponseTypeError(
-        ResponseTypes.INVALID_ACTIVATION_CODE_ID,
-        codeId,
-      );
+      return false;
     }
     if (activationCode.used) {
       // code已被使用
-      ThrowBadRequestResponseTypeError(
-        ResponseTypes.INVALID_ACTIVATION_CODE_ID,
-        codeId,
-      );
+      return false;
     }
-    if (now > activationCode.expiration) {
-      // code已过期
+    return now <= activationCode.expiration;
+  }
+
+  async checkActivationCodeId(codeId) {
+    const valid = await this.isActivationCodeValid(codeId);
+    if (!valid) {
       ThrowBadRequestResponseTypeError(
         ResponseTypes.INVALID_ACTIVATION_CODE_ID,
         codeId,

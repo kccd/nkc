@@ -756,5 +756,6 @@
   "zoneMomentVote": "点赞/点踩空间电文",
   "createExamQuestion": "创建考试系统试题",
   "modifyExamQuestion": "修改考试系统试题",
-  "visitExamQuestionEditor": "访问考试系统试题编辑器"
+  "visitExamQuestionEditor": "访问考试系统试题编辑器",
+  "registerExamCheck": "注册前检测是否需要考试"
 }
