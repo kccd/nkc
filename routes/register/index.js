@@ -4,6 +4,9 @@ const captcha = require('../../nkcModules/captcha');
 const {
   usernameCheckerService,
 } = require('../../services/user/usernameChecker.service');
+const {
+  activationCodeService,
+} = require('../../services/activationCode/activationCode.service');
 registerRouter
   .get(['/', '/mobile'], async (ctx, next) => {
     const { data, query } = ctx;
@@ -22,8 +25,18 @@ registerRouter
   .post('/', async (ctx, next) => {
     // 手机注册
     const { db, body } = ctx;
-    const { mobile, nationCode, code, username, password } = body;
+    const { mobile, nationCode, code, username, password, activationCode } =
+      body;
     delete body.password;
+
+    const { registerExamination } = await db.SettingModel.getSettings(
+      'register',
+    );
+
+    if (registerExamination) {
+      await activationCodeService.checkActivationCodeId(activationCode);
+    }
+
     await usernameCheckerService.checkNewUsername(username);
     await db.UserModel.checkNewPassword(password);
     if (!nationCode) {
@@ -59,6 +72,7 @@ registerRouter
     option.username = username;
     option.password = password;
     const user = await db.UserModel.createUser(option);
+    await activationCodeService.useActivationCode(activationCode, user.uid);
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,

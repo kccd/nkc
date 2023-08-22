@@ -300,10 +300,6 @@ paperRouter
       }
     }
     await db.ExamsPaperModel.updateOne({ _id: Number(_id), uid }, q);
-    if (q.passed) {
-      // 生成注册码
-      data.token = await paperService.createActivationCodeByPaperId(_id);
-    }
     data.passed = q.passed;
     await next();
   });

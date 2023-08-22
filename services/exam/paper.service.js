@@ -30,6 +30,18 @@ class PaperService {
       expiration: Date.now() + activationCodeValidityPeriod.examPaper,
     });
   }
+  async setPaperUserId(paperId, uid) {
+    await this.ExamsPaperModel.updateOne(
+      {
+        _id: paperId,
+      },
+      {
+        $set: {
+          uid,
+        },
+      },
+    );
+  }
   //检测生成考卷的题库数量是否足够
   async canTakeQuestionNumbers(from, condition) {
     const allTag = await QuestionTagModel.find({}, { name: 1 }).lean();
