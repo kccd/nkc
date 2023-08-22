@@ -1,5 +1,6 @@
 const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
 const ExamsPaperModel = require('../../dataModels/ExamsPaperModel');
+const ExamsCategoryModel = require('../../dataModels/ExamsCategoryModel');
 const { ResponseTypes } = require('../../settings/response');
 const {
   activationCodeSources,
@@ -29,6 +30,7 @@ class PaperService {
       expiration: Date.now() + activationCodeValidityPeriod.examPaper,
     });
   }
+  //检测生成考卷的题库数量是否足够
   async canTakeQuestionNumbers(from, condition) {
     const allTag = await QuestionTagModel.find({}, { name: 1 }).lean();
     const questionId = [];
@@ -99,6 +101,56 @@ class PaperService {
         }
       }
     }
+  }
+  //检测开卷的题是否满足需求
+  async checkPaperLegal(pid, ip) {
+    const paper = await ExamsPaperModel.findOnly({ _id: pid });
+    if (ip !== paper.ip) {
+      ThrowBadRequestResponseTypeError(ResponseTypes.QUESTION_DOES_NOT_EXIST);
+    } else if (paper.submitted) {
+      ThrowBadRequestResponseTypeError(ResponseTypes.EXAM_HAS_ENDED);
+    }
+    const category = await ExamsCategoryModel.findOnly({ _id: paper.cid });
+    if (category.disabled) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_QUESTION_DISABLED,
+      );
+    }
+  }
+  //更新开卷考试用户的选择题填写状态
+  //params: pid 试卷id index用户所做题目下标 selected 用户所选答案 bel 为题目是否正确
+  async updatePaperCh4(pid, index, selected, bel = true) {
+    await ExamsPaperModel.updateOne(
+      { _id: pid },
+      {
+        $set: {
+          [`record.${index}.correct`]: bel,
+          ...selected.reduce((acc, selectedIndex) => {
+            acc[`record.${index}.answer.${selectedIndex}.selected`] = true;
+            return acc;
+          }, {}),
+        },
+      },
+    );
+  }
+  //更新开卷考试用户的填空题填写状态
+  async updatePaperAns(pid, index, fill, bel = true) {
+    await ExamsPaperModel.updateOne(
+      { _id: pid },
+      {
+        $set: {
+          [`record.${index}.correct`]: bel,
+          [`record.${index}.answer.0.fill`]: fill,
+        },
+      },
+    );
+  }
+
+  //检测用户是否已经做了试卷的哪些题目了
+  async checkIsFinishPaper(pid) {
+    const paper = await ExamsPaperModel.findOnly({ _id: pid });
+    const { record } = paper;
+    return record.findIndex((item) => !item.correct);
   }
 }
 

@@ -4,18 +4,29 @@ block title
   +includeCSS('/exam/takeExam.css')
 block content
   .container-fluid.max-width(id='take-exam')
+    .hidden#data= objToStr({pid:data.pid})
     .row
       .col-xs-12.col-md-3.exam-content-left
         img(src=tools.getUrl('siteFile', 'holy_exam.gif'))
         h3 科创会员开卷考试
       .col-xs-12.col-md-9.exam-content-right
-        h3 这是demo
-        h5 已完成{{currentQuestion}}/{{msg.length}}
-        h4 {{msg[currentQuestion]}}
-        input(type='radio' value=1 v-model="answer" )
-        | 1
+        h3 开卷考试
+        h5 待做题数：{{questionTotal}}
+        h5 当前题数: {{index+1}}
+        div.paper-panel
+          .question-content(v-html='question.content')
+          img.paper-img(v-if='question.hasImage' :src='"/exam/question/" + question._id + "/image"')
+          form(v-if='question.type === "ans"')
+            span 答案：
+            input(v-model='this.fill')
+          form(v-else)
+            .radio.checkbox
+              label.radio.paper-radio(v-for='(q, index) in question.answer')
+                input(v-if="!isMultiple" type="radio" :name="'question' + index" :value='index' v-model='selected')
+                input(v-else type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
+                span {{q.serialIndex}}.
+                span {{q.text}}
         footer
-          button.btn.btn-default(@click='pre') 上一步
-          button.btn.btn-default(@click='prv') 下一步
+          button.btn.btn-default(@click='submit') 提交
 block scripts
   +includeJS('/exam/takeExam.js')

@@ -2,6 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const { ThrowCommonError } = require('../nkcModules/error');
+const fromType = { register: 'register', exam: 'exam' };
 const schema = new Schema(
   {
     _id: Number,
@@ -13,6 +14,11 @@ const schema = new Schema(
       type: String,
       default: '',
       index: 1,
+    },
+    //试题来源
+    from: {
+      type: String,
+      default: fromType.exam,
     },
     // 试卷创建的时间
     toc: {
@@ -157,6 +163,9 @@ const schema = new Schema(
   },
 );
 
+schema.statics.getFromType = async () => {
+  return { ...fromType };
+};
 /*
   拓展试卷的用户和分类
   @param papers: 试卷对象数组

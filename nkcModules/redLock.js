@@ -24,4 +24,9 @@ async function getRegisterExamCheckLock() {
   return await createLock('registerExamCheck', 6000);
 }
 
-module.exports = { createLock, redLock, getActivationCodeLock };
+module.exports = {
+  createLock,
+  redLock,
+  getActivationCodeLock,
+  getRegisterExamCheckLock,
+};

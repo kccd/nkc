@@ -16,7 +16,6 @@ new Vue({
       const data = NKC.methods.getDataById('data');
       this.publicExamNotes = data.publicExamNotes;
       this.cid = data.examSource[0]._id;
-      console.log(this.cid, 'cid');
     },
   },
 });

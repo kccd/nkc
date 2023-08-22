@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const { paperService } = require('../../services/exam/paper.service');
 const publicRouter = new Router();
 publicRouter
   .get('/', async (ctx, next) => {
@@ -14,6 +15,13 @@ publicRouter
     await next();
   })
   .get('/takeExam/:pid', async (ctx, next) => {
+    const {
+      params: { pid },
+      data,
+    } = ctx;
+    const ip = ctx.address;
+    await paperService.checkPaperLegal(pid, ip);
+    data.pid = pid;
     ctx.template = 'exam/takeExam.pug';
     await next();
   });
