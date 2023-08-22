@@ -44,7 +44,6 @@ new Vue({
             } else {
               this.question = question;
             }
-            console.log(this.question, 'this.question');
             this.questionTotal = questionTotal;
             this.isMultiple = isMultiple;
             this.paper = paper;
@@ -71,11 +70,11 @@ new Vue({
       })
         .then((res) => {
           if (res.data) {
-            const { message, status, newQuestion } = res.data;
+            const { message, status, newQuestion, index } = res.data;
             if (status === 403) {
               sweetError(message);
             } else if (status === 200) {
-              const { index } = res.data;
+              this.selected = [];
               if (index <= this.questionTotal - 1) {
                 this.index = index;
                 this.getInit();

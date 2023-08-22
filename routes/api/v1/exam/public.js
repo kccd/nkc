@@ -82,7 +82,9 @@ router
         (item, indexQ) => selected.includes(indexQ) && item.correct,
       );
       // 判断是否答案有误
-      const isAnswerIncorrect = correctQ.length !== picked.length;
+      const isAnswerIncorrect =
+        selected.length !== correctQ.length ||
+        correctQ.length !== picked.length;
       // 更新试卷数据
       await paperService.updatePaperCh4(
         pid,

@@ -21,9 +21,9 @@ block content
             input(v-model='fill')
           form(v-else)
             .radio.checkbox
-              label.radio.paper-radio(v-for='(q, index) in question.answer')
-                input(v-if="!isMultiple" type="radio" :name="'question' + index" :value='index' v-model='selected')
-                input(v-else type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
+              label.radio.paper-radio(v-for='(q, indexQ) in question.answer')
+                input(v-if="!isMultiple" type="radio" :name="'question' + index" :value='indexQ' v-model='selected')
+                input(v-else type="checkbox" :name="'question' + index" :value='indexQ' v-model='selected' )
                 span {{q.serialIndex}}.
                 span {{q.text}}
         footer
