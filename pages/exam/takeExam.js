@@ -18,6 +18,7 @@ new Vue({
       selected: [],
       fill: '',
       pid: '',
+      questionDesc: {},
     };
   },
   mounted() {
@@ -73,13 +74,13 @@ new Vue({
       })
         .then((res) => {
           if (res.data) {
-            const { message, status, newQuestion, index } = res.data;
-            console.log(res.data, 'res.data');
+            const { message, status, questionDesc, index } = res.data;
             if (status === 403) {
-              console.log(newQuestion, 'newQuestion');
+              this.questionDesc = questionDesc;
               sweetError(message);
             } else if (status === 200) {
               this.selected = [];
+              this.questionDesc = {};
               if (index <= this.questionTotal - 1) {
                 this.index = index;
                 this.getInit();

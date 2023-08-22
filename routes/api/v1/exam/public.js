@@ -75,7 +75,13 @@ router
         ctx.throw(403, '当前选项不能为空');
       }
       // 生成一份答案描述数组
-      const answerDesc = question.answer.map((item) => item.desc);
+      const answerDesc = question.answer.map((item, index) => {
+        if (selected.includes(index)) {
+          return item.desc;
+        } else {
+          return '';
+        }
+      });
       // 判断用户的选项数量是否满足
       const correctQ = question.answer.filter((item) => item.correct);
       const picked = question.answer.filter(
@@ -94,11 +100,10 @@ router
       );
       // 根据是否答案有误，设置返回数据
       if (isAnswerIncorrect) {
-        console.log(question, 'question');
         ctx.apiData = {
           status: 403,
           message: '答案有误',
-          newQuestion: { contentDesc: question.contentDesc, answerDesc },
+          questionDesc: { contentDesc: question.contentDesc, answerDesc },
         };
       } else {
         ctx.apiData = {
@@ -119,7 +124,7 @@ router
         ctx.apiData = {
           status: 403,
           message: '答案有误',
-          newQuestion: { contentDesc: question.contentDesc, answerDesc },
+          questionDesc: { contentDesc: question.contentDesc, answerDesc },
         };
       } else {
         ctx.apiData = {
@@ -153,7 +158,9 @@ router
           score,
         },
       );
-      const activationCode = await paperService.createActivationCodeByPaperId(pid);
+      const activationCode = await paperService.createActivationCodeByPaperId(
+        pid,
+      );
       ctx.apiData = {
         redirectUrl: `/login?t=register`,
         activationCode: activationCode._id,

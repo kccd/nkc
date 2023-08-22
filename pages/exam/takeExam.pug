@@ -13,6 +13,7 @@ block content
         h3 开卷考试
         h5 待做题数：{{questionTotal}}
         h5 当前题数: {{index+1}}
+        h5(v-if="questionDesc.contentDesc" ) 题目简介: {{questionDesc.contentDesc}}
         div.paper-panel
           .question-content(v-html='question.content')
           img.paper-img(v-if='question.hasImage' :src='"/exam/question/" + question._id + "/image"')
@@ -21,11 +22,13 @@ block content
             input(v-model='fill')
           form(v-else)
             .radio.checkbox
-              label.radio.paper-radio(v-for='(q, indexQ) in question.answer')
-                input(v-if="!isMultiple" type="radio" :name="'question' + index" :value='indexQ' v-model='selected')
-                input(v-else type="checkbox" :name="'question' + index" :value='indexQ' v-model='selected' )
+              label.radio.paper-radio(v-for='(q, index) in question.answer')
+                input(v-if="!isMultiple" type="radio" :name="'question' + index" :value='index' v-model='selected')
+                input(v-else type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
                 span {{q.serialIndex}}.
-                span {{q.text}}
+                span.m-r-2 {{q.text}}
+                span(v-if="questionDesc.answerDesc && selected.includes(index)") {{questionDesc.answerDesc[index]}}
+
         footer
           button.btn.btn-default(@click='submit') 提交
 block scripts
