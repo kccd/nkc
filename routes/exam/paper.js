@@ -6,7 +6,7 @@ paperRouter
   .get('/', async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
-    let { cid } = query;
+    let { cid, userFrom } = query;
     //问题总数
     let questionCount = 0;
     const timeLimit = 45 * 60 * 1000;
@@ -148,6 +148,7 @@ paperRouter
       record: questions,
       passScore,
       time,
+      from: userFrom,
     });
     await newPaper.save();
     // 跳转到考试页面
@@ -158,6 +159,7 @@ paperRouter
     }
   })
   .get('/:_id', async (ctx, next) => {
+    //获取闭卷考试的题目数据
     const { db, data, params, query, nkcModules, state } = ctx;
     const { created } = query;
     if (created === 'true') {
@@ -181,11 +183,23 @@ paperRouter
     for (const r of record) {
       const { hasImage } = await db.QuestionModel.findOnly({ _id: r.qid });
       const { qid, type, content, answer } = r;
+      let isMultiple = [];
+      //判断该题是否为多选
+      if (type === 'ch4') {
+        isMultiple = answer.filter((a) => a.correct);
+      }
+      const newAnswer = answer.map((item) => {
+        return {
+          des: item.desc,
+          text: item.text,
+        };
+      });
       questions.push({
         qid,
         type,
         content,
-        answer,
+        answer: newAnswer,
+        isMultiple: isMultiple.length > 1,
         hasImage,
       });
     }

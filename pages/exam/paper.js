@@ -81,7 +81,7 @@ var app = new Vue({
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
         const questions = data.questions;
-        app.questions = questions.map((item, index) => {
+        app.questions = questions.map((item, index) => {;
           const obj = {
             type: item.type,
             content_: NKC.methods.custom_xss_process(
@@ -94,11 +94,9 @@ var app = new Vue({
             obj.fill = '';
           } else if (item.type === 'ch4') {
             obj.ans_ = [];
-            const multiple = item.answer.filter((item) => item.correct);
             //判断是否为多选题
-            obj.isMultiple = multiple.length > 1;
+            obj.isMultiple = item.isMultiple;
             obj.selected = [];
-
             for (let j = 0; j < item.answer.length; j++) {
               obj.ans_[j] = NKC.methods.custom_xss_process(
                 NKC.methods.mdToHtml(

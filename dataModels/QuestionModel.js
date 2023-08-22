@@ -1,7 +1,8 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-
+//选择题：ch4 填空题：ans
+const questionType = { ch4: 'ch4', ans: 'ans' };
 const schema = new Schema(
   {
     _id: Number,
@@ -156,6 +157,9 @@ schema.statics.extendQuestions = async (questions) => {
   );
 };
 
+schema.statics.getQuestionType = async () => {
+  return { ...questionType };
+};
 /*
  * 保存试题的图片
  * @param {File} file 图片对象

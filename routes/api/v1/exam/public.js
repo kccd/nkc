@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const { paperService } = require('../../../../services/exam/paper.service');
 router
   .get('/register', async (ctx, next) => {
     const { db } = ctx;
@@ -11,14 +12,139 @@ router
     await next();
   })
   .get('/paper/:pid', async (ctx, next) => {
+    //获取开卷考试的题目数据
+    const {
+      params: { pid },
+      db,
+      query,
+    } = ctx;
+    const ip = ctx.address;
+    await paperService.checkPaperLegal(pid, ip);
+    const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
+    const category = await db.ExamsCategoryModel.findOnly({ _id: paper.cid });
+    const hasFinish = await paperService.checkIsFinishPaper(pid);
+    let index = hasFinish === -1 ? 0 : hasFinish;
+    index += Number(query.index);
+    const { record } = paper;
+    const question = JSON.parse(JSON.stringify(record[index]));
+    let isMultiple = [];
+    if (question.type === 'ch4') {
+      isMultiple = question.answer.filter((q) => q.correct);
+      question.answer = question.answer.map((item) => {
+        const { text, _id } = item;
+        return { text, _id };
+      });
+    } else {
+      question.answer = [];
+    }
+    const { answer, content, qid, type } = question;
+    ctx.apiData = {
+      question: { answer, content, qid, type },
+      questionTotal: record.length,
+      paper: {
+        toc: paper.toc,
+        category: category,
+        _id: paper._id,
+      },
+      isMultiple: isMultiple.length > 1,
+      index,
+    };
+    await next();
+  })
+  .post('/result/:pid', async (ctx, next) => {
+    const {
+      body,
+      params: { pid },
+      db,
+    } = ctx;
+
+    const { index, qid, selected, fill } = body;
+    const ip = ctx.address;
+    await paperService.checkPaperLegal(pid, ip);
+    const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
+    const { ch4, ans } = await db.QuestionModel.getQuestionType();
+    const { record } = paper;
+    if (Number(index) > record.length - 1) {
+      ctx.throw(404, '所做题目与实际不符，请刷新');
+    }
+    const question = record[index];
+    if (qid !== question.qid) {
+      ctx.throw(404, '所做题目与实际不符，请刷新');
+    }
+    const { type } = question;
+    //选择题
+    if (type === ch4) {
+      if (selected.length === 0) {
+        ctx.throw(403, '当前选项不能为空');
+      }
+      // 生成一份答案描述数组
+      const answerDesc = question.answer.map((item) => item.desc);
+      // 判断用户的选项数量是否满足
+      const correctQ = question.answer.filter((item) => item.correct);
+      const picked = question.answer.filter(
+        (item, index) => selected.includes(index) && item.correct,
+      );
+      // 判断是否答案有误
+      const isAnswerIncorrect = correctQ.length !== picked.length;
+      // 更新试卷数据
+      await paperService.updatePaperCh4(
+        pid,
+        index,
+        selected,
+        !isAnswerIncorrect,
+      );
+      // 根据是否答案有误，设置返回数据
+      if (isAnswerIncorrect) {
+        ctx.apiData = {
+          status: 403,
+          message: '答案有误',
+          newQuestion: { contentDesc: question.contentDesc, answerDesc },
+        };
+      } else {
+        ctx.apiData = {
+          status: 200,
+          message: '答案正确',
+          pid,
+          index: Number(index) + 1,
+        };
+      }
+    } else if (type === ans) {
+      if (fill === '') {
+        ctx.throw(403, '当前问题答案不能为空');
+      }
+      const isAnswerIncorrect = question.answer[0].text !== fill;
+      await paperService.updatePaperAns(pid, index, fill, !isAnswerIncorrect);
+      const answerDesc = question.answer[0].desc;
+      if (isAnswerIncorrect) {
+        ctx.apiData = {
+          status: 403,
+          message: '答案有误',
+          newQuestion: { contentDesc: question.contentDesc, answerDesc },
+        };
+      } else {
+        ctx.apiData = {
+          status: 200,
+          message: '答案正确',
+          index: Number(index) + 1,
+        };
+      }
+    }
+    await next();
+  })
+  .post('/final-result/:pid', async (ctx, next) => {
     const {
       params: { pid },
     } = ctx;
-  })
-  .post('/result', async (ctx, next) => {
-    ctx.apiData = {
-      success: '成功了',
-    };
+    const hasFinish = await paperService.checkIsFinishPaper(pid);
+    if (hasFinish !== -1) {
+      ctx.throw('该用户还未完成试卷');
+    } else {
+      const { _id } = await paperService.createActivationCodeByPaperId(pid);
+      ctx.apiData = {
+        _id,
+        src: `/login?t=register`,
+      };
+    }
     await next();
   });
 

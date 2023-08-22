@@ -77,7 +77,14 @@ module.exports = {
           },
         },
         result: {
-          POST: Operations.submitPublicExam,
+          PARAMETER: {
+            POST: Operations.submitPublicExam,
+          },
+        },
+        'final-result': {
+          PARAMETER: {
+            POST: Operations.submitPublicExam,
+          },
         },
       },
       questions: {
