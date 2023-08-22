@@ -94,6 +94,7 @@ router
       );
       // 根据是否答案有误，设置返回数据
       if (isAnswerIncorrect) {
+        console.log(question, 'question');
         ctx.apiData = {
           status: 403,
           message: '答案有误',

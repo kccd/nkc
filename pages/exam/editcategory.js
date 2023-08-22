@@ -1,4 +1,5 @@
 import { sweetError } from '../lib/js/sweetAlert';
+import { visitUrl } from '../lib/js/pageSwitch';
 
 let app = new Vue({
   el: '#app',
@@ -104,10 +105,10 @@ let app = new Vue({
         method = 'PUT';
         url = '/exam/category/' + category._id;
       }
-      nkcAPI(url, method, { category: category })
+      nkcAPI(url, method, { category })
         .then(function () {
-          window.location.href = '/exam';
           screenTopAlert('保存成功');
+          visitUrl('/exam');
         })
         .catch(function (data) {
           screenTopWarning(data);

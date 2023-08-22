@@ -74,7 +74,9 @@ new Vue({
         .then((res) => {
           if (res.data) {
             const { message, status, newQuestion, index } = res.data;
+            console.log(res.data, 'res.data');
             if (status === 403) {
+              console.log(newQuestion, 'newQuestion');
               sweetError(message);
             } else if (status === 200) {
               this.selected = [];

@@ -76,6 +76,7 @@ router
       passScore,
       time,
       disabled,
+      type,
     } = category;
     if (!name) {
       ctx.throw(400, '考卷名不能为空');
@@ -131,6 +132,7 @@ router
       passScore,
       time,
       disabled,
+      type,
     });
     await c.save();
     await next();

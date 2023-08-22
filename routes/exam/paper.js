@@ -122,12 +122,12 @@ paperRouter
           $sample: { size: count }, // 选择指定数量的随机题目
         },
         {
-          $project: { _id: 1, type: 1, content: 1, answer: 1 },
+          $project: { _id: 1, type: 1, content: 1, answer: 1, contentDesc: 1 },
         },
       ]);
       selectedQuestions.forEach((item) => {
-        const { _id, type, content, answer } = item;
-        questions.push({ qid: _id, type, content, answer });
+        const { _id, type, content, answer, contentDesc } = item;
+        questions.push({ qid: _id, type, content, answer, contentDesc });
         questionsId.push(item._id);
       });
       questionCount += count;
