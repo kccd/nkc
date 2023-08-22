@@ -3,7 +3,7 @@ block title
   title=`开卷考试`
   +includeCSS('/exam/takeExam.css')
 block content
-  .container-fluid.max-width(id='take-exam')
+  .container-fluid.max-width(id='take-exam' v-cloak)
     .hidden#data= objToStr({pid:data.pid})
     .row
       .col-xs-12.col-md-3.exam-content-left
@@ -20,14 +20,16 @@ block content
           form(v-if='question.type === "ans"')
             span 答案：
             input(v-model='fill')
+            span(v-if="questionDesc.answerDesc ") {{questionDesc.answerDesc}}
           form(v-else)
             .radio.checkbox
               label.radio.paper-radio(v-for='(q, index) in question.answer')
                 input(v-if="!isMultiple" type="radio" :name="'question' + index" :value='index' v-model='selected')
                 input(v-else type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
-                span {{q.serialIndex}}.
+                span {{q.serialIndex}}
                 span.m-r-2 {{q.text}}
-                span(v-if="questionDesc.answerDesc && selected.includes(index)") {{questionDesc.answerDesc[index]}}
+                span(v-if="questionDesc.answerDesc && isMultiple && selected.includes(index)") {{questionDesc.answerDesc[index]}}
+                span(v-if="questionDesc.answerDesc && !isMultiple && selected ===index") {{questionDesc.answerDesc[index]}}
 
         footer
           button.btn.btn-default(@click='submit') 提交
