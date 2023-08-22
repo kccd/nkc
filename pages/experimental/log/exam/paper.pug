@@ -24,6 +24,7 @@ block eContent
             label.col-sm-5.control-label 用户：
             h5.col-sm-7
               a(
+                v-if="paperUser"
                 :href="getUrl('userHome', paper.uid)"
                 target="_blank"
                 data-global-mouseover="showUserPanel"
@@ -31,6 +32,7 @@ block eContent
                 :data-global-data="objToStr({ uid: paper.uid })"
                 )
                 strong {{paperUser.username}}
+              span(v-else) 游客
           .form-group
             label.col-sm-5.control-label 考试科目
             h5.col-sm-7

@@ -51,7 +51,10 @@ block content
                 tr
                   th=(paper.tlm || paper.toc).toLocaleString()
                   th
-                    a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
+                    if paper.user
+                      a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
+                    else
+                      span=`游客(${paper.ip})`
                   th= paper.category.name
                   th
                     if paper.category.volume === 'A'

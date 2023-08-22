@@ -39,7 +39,10 @@ block eContent
               tr
                 th=paper.toc.toLocaleString()
                 th
-                  a(href=`/u/${paper.uid}` target="_blank")=paper.user.username || paper.user.uid
+                  if paper.user
+                    a(href=`/u/${paper.uid}` target="_blank")=paper.user.username || paper.user.uid
+                  else
+                    span=`游客`
                 th=paper.category.name
                 th=paper.category.volume
                 th

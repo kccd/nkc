@@ -31,7 +31,7 @@ class PaperService {
     });
   }
   async setPaperUserId(paperId, uid) {
-    await this.ExamsPaperModel.updateOne(
+    await ExamsPaperModel.updateOne(
       {
         _id: paperId,
       },

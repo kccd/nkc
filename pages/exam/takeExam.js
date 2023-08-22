@@ -1,7 +1,10 @@
 import { nkcAPI } from '../lib/js/netAPI';
 import Vue from 'vue';
 import { sweetError, sweetSuccess } from '../lib/js/sweetAlert';
+import { getDataById } from '../lib/js/dataConversion';
 import { setRegisterActivationCodeToLocalstorage } from '../lib/js/activationCode';
+import { visitUrl } from '../lib/js/pageSwitch';
+
 new Vue({
   el: '#take-exam',
   data() {
@@ -23,7 +26,7 @@ new Vue({
   methods: {
     //获取考题
     getInit() {
-      const data = NKC.methods.getDataById('data');
+      const data = getDataById('data');
       this.pid = data.pid;
       nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${this.index}`, 'GET')
         .then((res) => {
@@ -85,9 +88,9 @@ new Vue({
                 ).then((res) => {
                   if (res) {
                     sweetSuccess('顺利完成');
-                    const { _id, src } = res.data;
-                    // setRegisterActivationCodeToLocalstorage(_id);
-                    // window.location.href = src;
+                    const { activationCode, redirectUrl } = res.data;
+                    setRegisterActivationCodeToLocalstorage(activationCode);
+                    visitUrl(redirectUrl);
                   }
                 });
               }
