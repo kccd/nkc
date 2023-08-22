@@ -72,7 +72,9 @@ registerRouter
     option.username = username;
     option.password = password;
     const user = await db.UserModel.createUser(option);
-    await activationCodeService.useActivationCode(activationCode, user.uid);
+    if (registerExamination) {
+      await activationCodeService.useActivationCode(activationCode, user.uid);
+    }
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,
