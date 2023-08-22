@@ -150,9 +150,10 @@ router
           score,
         },
       );
-      // const { _id } = await paperService.createActivationCodeByPaperId(pid);
+      const activationCode = await paperService.createActivationCodeByPaperId(pid);
       ctx.apiData = {
-        src: `/login?t=register`,
+        redirectUrl: `/login?t=register`,
+        activationCode: activationCode._id,
       };
     }
     await next();
