@@ -199,6 +199,7 @@ schema.statics.extendPapers = async (papers, options) => {
   return papers.map((paper) => {
     const p = {
       uid: paper.uid,
+      ip: paper.ip,
       user: userObj[paper.uid],
       category: categoriesObj[paper.cid],
       _id: paper._id,
