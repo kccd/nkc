@@ -18,7 +18,7 @@ block content
           img.paper-img(v-if='question.hasImage' :src='"/exam/question/" + question._id + "/image"')
           form(v-if='question.type === "ans"')
             span 答案：
-            input(v-model='this.fill')
+            input(v-model='fill')
           form(v-else)
             .radio.checkbox
               label.radio.paper-radio(v-for='(q, index) in question.answer')

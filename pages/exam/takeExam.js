@@ -44,6 +44,7 @@ new Vue({
             } else {
               this.question = question;
             }
+            console.log(this.question, 'this.question');
             this.questionTotal = questionTotal;
             this.isMultiple = isMultiple;
             this.paper = paper;
@@ -62,7 +63,6 @@ new Vue({
         selected = this.selected;
       }
       const { qid } = this.question;
-
       nkcAPI(`/api/v1/exam/public/result/${this.pid}`, 'POST', {
         index: this.index,
         qid,
@@ -85,9 +85,10 @@ new Vue({
                   'POST',
                 ).then((res) => {
                   if (res) {
+                    sweetSuccess('顺利完成');
                     const { _id, src } = res.data;
-                    setRegisterActivationCodeToLocalstorage(_id);
-                    window.location.href = src;
+                    // setRegisterActivationCodeToLocalstorage(_id);
+                    // window.location.href = src;
                   }
                 });
               }

@@ -16,7 +16,6 @@ router
     const {
       params: { pid },
       db,
-      query,
     } = ctx;
     const ip = ctx.address;
     await paperService.checkPaperLegal(pid, ip);
@@ -24,7 +23,6 @@ router
     const category = await db.ExamsCategoryModel.findOnly({ _id: paper.cid });
     const hasFinish = await paperService.checkIsFinishPaper(pid);
     let index = hasFinish === -1 ? 0 : hasFinish;
-    index += Number(query.index);
     const { record } = paper;
     const question = JSON.parse(JSON.stringify(record[index]));
     let isMultiple = [];
@@ -57,7 +55,6 @@ router
       params: { pid },
       db,
     } = ctx;
-
     const { index, qid, selected, fill } = body;
     const ip = ctx.address;
     await paperService.checkPaperLegal(pid, ip);
@@ -82,7 +79,7 @@ router
       // 判断用户的选项数量是否满足
       const correctQ = question.answer.filter((item) => item.correct);
       const picked = question.answer.filter(
-        (item, index) => selected.includes(index) && item.correct,
+        (item, indexQ) => selected.includes(indexQ) && item.correct,
       );
       // 判断是否答案有误
       const isAnswerIncorrect = correctQ.length !== picked.length;
@@ -134,14 +131,27 @@ router
   .post('/final-result/:pid', async (ctx, next) => {
     const {
       params: { pid },
+      db,
     } = ctx;
     const hasFinish = await paperService.checkIsFinishPaper(pid);
+    const paper = await db.ExamsPaperModel.findOnly({ _id: pid });
+    const { record } = paper;
     if (hasFinish !== -1) {
       ctx.throw('该用户还未完成试卷');
     } else {
-      const { _id } = await paperService.createActivationCodeByPaperId(pid);
+      const score = record.length;
+      const time = Date.now();
+      await db.ExamsPaperModel.updateOne(
+        { _id: pid },
+        {
+          submitted: true,
+          tlm: time,
+          passed: true,
+          score,
+        },
+      );
+      // const { _id } = await paperService.createActivationCodeByPaperId(pid);
       ctx.apiData = {
-        _id,
         src: `/login?t=register`,
       };
     }
