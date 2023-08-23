@@ -20,14 +20,18 @@ router
     const ip = ctx.address;
     await paperService.checkPaperLegal(pid, ip);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
-    const category = await db.ExamsCategoryModel.findOnly({ _id: paper.cid });
     const hasFinish = await paperService.checkIsFinishPaper(pid);
-    let index = hasFinish === -1 ? 0 : hasFinish;
+    if (hasFinish === -1) {
+      ctx.throw('当前试卷已经做完');
+    }
+    let index = hasFinish;
     const { record } = paper;
-    const question = JSON.parse(JSON.stringify(record[index]));
-    let isMultiple = [];
+    const question = record[index];
+    const { hasImage } = await db.QuestionModel.findOnly(
+      { _id: question.qid },
+      { hasImage: 1 },
+    );
     if (question.type === 'ch4') {
-      isMultiple = question.answer.filter((q) => q.correct);
       question.answer = question.answer.map((item) => {
         const { text, _id } = item;
         return { text, _id };
@@ -35,16 +39,10 @@ router
     } else {
       question.answer = [];
     }
-    const { answer, content, qid, type } = question;
+    const { answer, content, type, contentDesc, qid } = question;
     ctx.apiData = {
-      question: { answer, content, qid, type },
+      question: { answer, content, qid, type, contentDesc, hasImage },
       questionTotal: record.length,
-      paper: {
-        toc: paper.toc,
-        category: category,
-        _id: paper._id,
-      },
-      isMultiple: isMultiple.length > 1,
       index,
     };
     await next();
@@ -103,7 +101,7 @@ router
         ctx.apiData = {
           status: 403,
           message: '答案有误',
-          questionDesc: { contentDesc: question.contentDesc, answerDesc },
+          answerDesc,
         };
       } else {
         ctx.apiData = {
@@ -124,7 +122,7 @@ router
         ctx.apiData = {
           status: 403,
           message: '答案有误',
-          questionDesc: { contentDesc: question.contentDesc, answerDesc },
+          answerDesc,
         };
       } else {
         ctx.apiData = {
@@ -143,7 +141,8 @@ router
     } = ctx;
     const hasFinish = await paperService.checkIsFinishPaper(pid);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid });
-    const { record } = paper;
+    const { record, from } = paper;
+    const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (hasFinish !== -1) {
       ctx.throw('该用户还未完成试卷');
     } else {
@@ -158,13 +157,21 @@ router
           score,
         },
       );
-      const activationCode = await paperService.createActivationCodeByPaperId(
-        pid,
-      );
-      ctx.apiData = {
-        redirectUrl: `/login?t=register`,
-        activationCode: activationCode._id,
-      };
+
+      if (from === register) {
+        const activationCode = await paperService.createActivationCodeByPaperId(
+          pid,
+        );
+        ctx.apiData = {
+          redirectUrl: `/login?t=register`,
+          activationCode: activationCode._id,
+        };
+      } else if (from === exam) {
+        ctx.apiData = {
+          redirectUrl: `/exam`,
+          activationCode: '',
+        };
+      }
     }
     await next();
   });
