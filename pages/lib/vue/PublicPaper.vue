@@ -12,7 +12,7 @@
             span(v-if="answerDesc.length>0") {{answerDesc}}
         form(v-else)
           label.options(v-for='(q, index) in question.answer' :class="selected.includes(index)?'bg-info':'bg-secondary'")
-            input.m-r-05(v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
+            input.m-r-05(:disabled="isReselected" v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
             .option-content
               span {{q.serialIndex}}.
               span.m-r-2 {{q.text}}
