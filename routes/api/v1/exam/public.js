@@ -175,7 +175,7 @@ router
         ctx.apiData = {
           redirectUrl: `/exam`,
           activationCode: '',
-          from
+          from,
         };
       }
     }
