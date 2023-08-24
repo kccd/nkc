@@ -177,7 +177,6 @@ registerRouter
       c: { examSource, examNotice },
     } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
     data.cid = examSource[0]._id;
-    console.log(data.cid, 'data.cid ');
     data.examNotice = examNotice;
     ctx.template = 'exam/public.pug';
     await next();
