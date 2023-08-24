@@ -63,7 +63,7 @@ block eContent
                     input(type="checkbox" :value="true" v-model="regSettings.registerExamination")
                     span 开启
                   .form-group(v-if="regSettings.registerExamination" )
-                    h5 试题来源
+                    h5(style="font-weight: bold;") 试题来源
                     div(v-if='regSettings.examSource.length === 0')
                       h5.text-danger 暂未选择任何专业领域
                     div(v-else)
@@ -77,7 +77,7 @@ block eContent
                             th {{examSource.name}}
                             th
                               button(@click="deleteExam" :id=`examSource._id`) 移除
-                    h5 选择题库
+                    h5(style="font-weight: bold;") 选择题库
                     div
                       table.table.table-bordered
                         thead
@@ -89,6 +89,8 @@ block eContent
                             th {{categorie.name}}
                             th
                               button(@click='addExam' :id=`categorie._id` :name='categorie.name') 添加
+                    h5(style="font-weight: bold;") 考试须知
+                    textarea.form-control(v-model="regSettings.examNotice" rows=7)
 
         h4 四、注销设置
         .row

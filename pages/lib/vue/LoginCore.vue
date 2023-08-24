@@ -183,7 +183,7 @@ export default {
         nkcAPI(`/api/v1/register/exam?code=${registerActivationCode}`, 'GET')
           .then(res => {
             if(res.data.isExamRequired) {
-              visitUrl(`/exam/public`);
+              visitUrl(`/register/exam`);
             } else {
               this.type = type;
             }

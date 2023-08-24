@@ -3,11 +3,9 @@ block title
   title=`开卷考试说明`
   +includeCSS('/exam/public.css')
 block content
-  .container-fluid.max-width(id="exam-public")
-    .hidden#data= objToStr({examSource:data.examSource,publicExamNotes:data.publicExamNotes})
+  .container-fluid.max-width
     .examNotes
       h2.m-b-1 考试须知
-      .pre-content.m-b-1  {{publicExamNotes}}
-      a.btn.btn-default.fund-terms-button(:href="`/exam/paper?cid=${cid}&userFrom=register`") 参加考试
-block scripts
-  +includeJS('/exam/public.js')
+      .pre-content.m-b-1!=markdown_safe(data.examNotice)
+      a.btn.btn-default.fund-terms-button(href=`/exam/paper?cid=${data.cid}&userFrom=register`) 参加考试
+
