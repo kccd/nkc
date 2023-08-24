@@ -116,13 +116,25 @@ class PaperService {
   }
   //检测开卷的题是否满足需求
   async checkPaperLegal(pid, ip) {
-    const paper = await ExamsPaperModel.findOnly({ _id: pid });
+    const paper = await ExamsPaperModel.findOnly(
+      { _id: pid },
+      { from: 1, ip: 1, submitted: 1, cid: 1 },
+    );
+    const { from, submitted, cid } = paper;
+    const { register, exam } = await ExamsPaperModel.getFromType();
     if (ip !== paper.ip) {
       ThrowBadRequestResponseTypeError(ResponseTypes.QUESTION_DOES_NOT_EXIST);
-    } else if (paper.submitted) {
+    } else if (submitted && from === exam) {
       ThrowBadRequestResponseTypeError(ResponseTypes.EXAM_HAS_ENDED);
+    } else if (submitted && from === register) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.EXAM_CONCLUDED_REGISTER_NOW,
+      );
     }
-    const category = await ExamsCategoryModel.findOnly({ _id: paper.cid });
+    const category = await ExamsCategoryModel.findOnly(
+      { _id: cid },
+      { disabled: 1 },
+    );
     if (category.disabled) {
       ThrowBadRequestResponseTypeError(
         ResponseTypes.FORBIDDEN_BECAUSE_QUESTION_DISABLED,
