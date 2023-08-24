@@ -34,7 +34,9 @@ router
       { _id: question.qid },
       { hasImage: 1 },
     );
+    let isMultiple = [];
     if (question.type === 'ch4') {
+      isMultiple = question.answer.filter((item) => item.correct);
       question.answer = question.answer.map((item) => {
         const { text, _id } = item;
         return { text, _id };
@@ -45,14 +47,22 @@ router
     const { answer, content, type, contentDesc, qid } = question;
     const category = await categoryService.getCategoryById(paper.cid);
     ctx.apiData = {
-      question: { answer, content, qid, type, contentDesc, hasImage },
+      question: {
+        answer,
+        content,
+        qid,
+        type,
+        contentDesc,
+        hasImage,
+        isMultiple: isMultiple.length > 1,
+      },
       questionTotal: record.length,
       index,
       paperName: `${category.name} ${
         category.volume === 'A' ? '基础级' : '专业级'
       }`,
       paperTime: paper.toc,
-      paperQuestionCount: `${paper.record.length - index} / ${
+      paperQuestionCount: `${paper.record.length - index - 1} / ${
         paper.record.length
       }`,
     };
