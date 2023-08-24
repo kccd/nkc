@@ -178,16 +178,19 @@ export default {
       this.throwError("");
     },
     selectType(type = LoginType.SignIn) {
-      this.type = type;
       if(type === LoginType.SignUp) {
         const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
         nkcAPI(`/api/v1/register/exam?code=${registerActivationCode}`, 'GET')
           .then(res => {
             if(res.data.isExamRequired) {
               visitUrl(`/exam/public`);
+            } else {
+              this.type = type;
             }
           })
           .catch(sweetError);
+      } else {
+        this.type = type;
       }
     },
     throwError(error) {
