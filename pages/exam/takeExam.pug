@@ -3,12 +3,8 @@ block title
   title=`开卷考试`
   +includeCSS('/exam/takeExam.css')
 block content
-  .container-fluid.max-width(id='take-exam' v-cloak)
-    .row
-      .col-xs-12.col-md-5
-        img(src=tools.getUrl('siteFile', 'holy_exam.gif'))
-        h3 科创会员开卷考试
-      .col-xs-12.col-md-7
-        Public-Paper(pid=data.pid)
+  .container-fluid.max-width(id='take-exam' v-cloak).box-shadow-panel
+    .exam-container
+      Public-Paper(pid=data.pid)
 block scripts
   +includeJS('/exam/takeExam.js')

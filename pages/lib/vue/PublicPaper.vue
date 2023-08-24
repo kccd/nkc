@@ -1,6 +1,14 @@
 <template lang="pug">
   div
-    div.clearfix(v-if="!isFinished" id="question-box")
+    .exam-header-container
+      img(:src="getUrl('siteFile', 'holy_exam.gif')")
+      .exam-header-info
+        .h3 科创会员开卷考试
+        .h5 考试科目：{{paperName}}
+        .h5 开考时间：{{detailedTime(paperTime)}}
+        .h5 剩余考题：{{paperQuestionCount}}
+    hr
+    div.clearfix.question-box(v-if="!isFinished")
       .question-title
         .question-text 题目：{{question.content}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
@@ -15,7 +23,7 @@
             label.options(v-for='(q, index) in question.answer' :class="selected.includes(index)?'bg-info':'bg-secondary'")
               input.m-r-05(:disabled="isReselected" v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
-                span {{q.serialIndex}}.
+                span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
                 p.red-text(v-if="answerDesc.length>0 && selected.includes(index)") {{answerDesc.find((item)=>item._id === q._id).desc}}
         footer.clearfix
@@ -26,28 +34,48 @@
             button.btn.btn-default.btn-editor-block.btn-primary(v-else @click='submit') 提交
     div.clearfix(v-else id="finished-box" )
       .notice-content
-        span.m-r-2.glyphicon.glyphicon-ok.icon-success
-        span.notice-text 恭喜您考试通过了！
-        a.m-t-2.notice-link(v-if="from === 'register'" :href="redirectUrl") 点击参加注册
-        a.m-t-2.notice-link(v-else :href="redirectUrl") 返回到考试主页
+        .glyphicon.glyphicon-ok.icon-success.m-b-1
+        .notice-text.m-b-1 考试通过
+        div(v-if="form === 'register'")
+          span 恭喜您通过了 {{paperName}} 考试，请点击&nbsp;
+          a(:href="redirectUrl") 这里
+          span &nbsp;继续注册。
+        div(v-else)
+          .m-b-1 恭喜您通过了 {{paperName}} 考试。
+          a(:href="redirectUrl") 返回到考试主页
 
 
 </template>
 
 <style lang="less" scoped>
- #question-box{
-   border: 1px solid #ddd;
+  .exam-header-container{
+    @imgWidth: 10rem;
+    position: relative;
+    padding-left: @imgWidth + 1rem;
+    img{
+      max-height: 10rem;
+      max-width: 100%;
+      position: absolute;
+      top: 0.5rem;
+      left: 0;
+      width: @imgWidth;
+    }
+    .exam-header-info{
+      overflow: hidden;
+    }
+  }
+
+ .question-box{
+   //border: 1px solid #ddd;
    border-radius: 5px;
-   padding: 1rem;
-   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   //box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
    background-color: #fff;
    min-height: 30rem;
    .question-title{
      .question-text {
        font-size: 1.5rem;
-       color: #333;
+       color: #000;
        line-height: 1.6;
-       font-weight: bold;
        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
        margin-bottom: 10px;
      }
@@ -90,12 +118,13 @@
            }
          }
          .options {
+           cursor: pointer;
            display: block;
-           border: 2px solid #dcdcdc;
-           border-radius: 8px;
+           border: 1px solid #dcdcdc;
+           border-radius: 5px;
            padding: 15px;
            margin-top: 20px;
-           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+           //box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
            font-weight: normal;
          }
        }
@@ -127,11 +156,11 @@
    font-size: 14px;
  }
  #finished-box{
-   border: 1px solid #ddd;
-   border-radius: 5px;
-   padding: 1rem;
-   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-   background-color: #fff;
+   //border: 1px solid #ddd;
+   //border-radius: 5px;
+   //padding: 1rem;
+   //box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   //background-color: #fff;
    min-height: 30rem;
    position: relative;
    .notice-content{
@@ -141,7 +170,7 @@
      transform: translate(-50%,-50%);
      height: 50%;
      width: 80%;
-     border-radius: 8px;
+     border-radius: 3px;
      padding: 10px;
      text-align: center;
 
@@ -170,6 +199,8 @@
 import Vue from 'vue';
 import { nkcAPI } from '../js/netAPI.js';
 import { sweetError ,sweetSuccess} from '../js/sweetAlert.js'
+import {getUrl} from "../js/tools";
+import {detailedTime} from '../js/time'
 import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
 
 export default Vue.extend({
@@ -186,7 +217,10 @@ export default Vue.extend({
       type:'',
       isFinished:false,//用户是否做完
       redirectUrl:'', //跳转的路径
-      from:''
+      from:'',
+      paperTime: '',
+      paperQuestionCount: "",
+      paperName: '',
     };
   },
   props:['pid'],
@@ -194,12 +228,14 @@ export default Vue.extend({
     this.getInit();
   },
   methods: {
+    getUrl,
+    detailedTime,
     //获取考题
     getInit() {
       nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${this.index}`, 'GET')
         .then((res) => {
           if (res) {
-            const { question, questionTotal, index } =
+            const { question, questionTotal, index, paperName, paperTime, paperQuestionCount } =
               res.data;
             const { answer, type, ...params } = question;
             const oldAnswer = JSON.parse(JSON.stringify(answer));
@@ -220,6 +256,9 @@ export default Vue.extend({
             this.questionTotal = questionTotal;
             this.index = index;
             this.type = type;
+            this.paperName = paperName;
+            this.paperTime = paperTime;
+            this.paperQuestionCount = paperQuestionCount;
           }
         })
         .catch((error) => {

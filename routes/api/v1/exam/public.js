@@ -1,5 +1,8 @@
 const router = require('koa-router')();
 const { paperService } = require('../../../../services/exam/paper.service');
+const {
+  categoryService,
+} = require('../../../../services/exam/category.service');
 router
   .get('/register', async (ctx, next) => {
     const { db } = ctx;
@@ -40,10 +43,18 @@ router
       question.answer = [];
     }
     const { answer, content, type, contentDesc, qid } = question;
+    const category = await categoryService.getCategoryById(paper.cid);
     ctx.apiData = {
       question: { answer, content, qid, type, contentDesc, hasImage },
       questionTotal: record.length,
       index,
+      paperName: `${category.name} ${
+        category.volume === 'A' ? '基础级' : '专业级'
+      }`,
+      paperTime: paper.toc,
+      paperQuestionCount: `${paper.record.length - index} / ${
+        paper.record.length
+      }`,
     };
     await next();
   })
