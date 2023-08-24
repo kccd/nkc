@@ -33,6 +33,7 @@ router
       noticeForDestroy,
       registerExamination,
       examSource,
+      examNotice,
     } = regSettings;
     const { checkNumber, checkString } = nkcModules.checkData;
     const forums = await db.ForumModel.find({
@@ -104,6 +105,7 @@ router
           'c.noticeForDestroy': noticeForDestroy,
           'c.registerExamination': registerExamination,
           'c.examSource': examSource,
+          'c.examNotice': examNotice,
         },
       },
     );

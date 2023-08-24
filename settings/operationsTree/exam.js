@@ -53,7 +53,6 @@ module.exports = {
     GET: Operations.visitExamQuestionEditor,
   },
   public: {
-    GET: Operations.visitPublicExam,
     takeExam: {
       PARAMETER: {
         GET: Operations.visitPublicExam,

@@ -19,4 +19,7 @@ module.exports = {
   check: {
     POST: Operations.submitRegister,
   },
+  exam: {
+    GET: Operations.visitPublicExam,
+  },
 };
