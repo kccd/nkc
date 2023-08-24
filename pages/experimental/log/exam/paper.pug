@@ -66,7 +66,7 @@ block eContent
         div
           div.m-b-2(v-for='(record, index) in paper.record')
             div.question-content.m-b-05(v-html="markdownToHTML(`${index + 1}、${record.content || '太久远，未导入'}`)")
-            div.font-size-1rem.text-info.m-b-05(v-if='record.contentDesc.length > 0') 题干说明：{{record.contentDesc}}
+            div.font-size-1rem.text-info.m-b-05(v-if='record.contentDesc') 题干说明：{{record.contentDesc}}
             div.question-answers.m-b-1
               div.question.m-b-05(v-for="(answer, index) in record.answer" v-if='record.type === "ch4"')
                 //- 选择题
@@ -74,7 +74,7 @@ block eContent
                   v-html="markdownToHTML(`${optionIndex[index]}、${answer.text}${answer.selected? '【已选】': ''}`)"
                   :class="{'text-danger': !answer.correct, 'text-success': answer.correct}"
                   )
-                div.font-size-1rem.text-info(v-if='answer.desc.length > 0') 选项说明：{{answer.desc}}
+                div.font-size-1rem.text-info(v-if='answer.desc') 选项说明：{{answer.desc}}
               div.question-result.m-b-05(v-else)
                 //- 填空题
                 div.text-success 标准答案：{{record.answer[0].text}}
