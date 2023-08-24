@@ -74,10 +74,11 @@ router
       }
       // 生成一份答案描述数组
       const answerDesc = question.answer.map((item, index) => {
+        const { desc, _id } = item;
         if (selected.includes(index)) {
-          return item.desc;
+          return { desc, _id };
         } else {
-          return '';
+          return { desc: '', _id };
         }
       });
       // 判断用户的选项数量是否满足
@@ -117,7 +118,10 @@ router
       }
       const isAnswerIncorrect = question.answer[0].text !== fill;
       await paperService.updatePaperAns(pid, index, fill, !isAnswerIncorrect);
-      const answerDesc = question.answer[0].desc;
+      const answerDesc = {
+        desc: question.answer[0].desc,
+        _id: question.answer[0]._id,
+      };
       if (isAnswerIncorrect) {
         ctx.apiData = {
           status: 403,
@@ -165,11 +169,13 @@ router
         ctx.apiData = {
           redirectUrl: `/login?t=register`,
           activationCode: activationCode._id,
+          from,
         };
       } else if (from === exam) {
         ctx.apiData = {
           redirectUrl: `/exam`,
           activationCode: '',
+          from
         };
       }
     }

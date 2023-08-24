@@ -31,6 +31,7 @@ const FixedOperations = {
   getExamsPaper: 'getExamsPaper',
   postExamsPaper: 'postExamsPaper',
   registerExamCheck: 'registerExamCheck',
+  getQuestionImage: 'getQuestionImage',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -108,7 +109,6 @@ const DynamicOperations = {
   removeQuestion: 'removeQuestion',
   enabledQuestion: 'enabledQuestion',
   disabledQuestion: 'disabledQuestion',
-  getQuestionImage: 'getQuestionImage',
   modifyQuestionAuthStatus: 'modifyQuestionAuthStatus',
   visitExamQuestionManagement: 'visitExamQuestionManagement',
   visitExperimentalStatus: 'visitExperimentalStatus',
