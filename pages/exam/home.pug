@@ -71,7 +71,7 @@ block content
             if permission('visitExamQuestionManagement')
               a.m-t-1.btn.btn-default.btn-block(href=`/exam/questions`) 试题管理
             if permission('visitExamsQuestionAuth')
-              a.m-t-1.btn.btn-default.btn-block(href=`/exam/auth`)
+              a.m-t-1.btn.btn-default.btn-block(href=`/exam/questions?t=waiting`)
                 if data.unauthCount
                   span= `试题审核 `
                   span.red-point=data.unauthCount

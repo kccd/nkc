@@ -10,7 +10,9 @@
     hr
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
-        .question-text 题目：{{question.content}}
+        .question-text
+          .h4 题目：
+          span {{question.content}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
@@ -76,7 +78,7 @@
        font-size: 1.5rem;
        color: #000;
        line-height: 1.6;
-       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+       //text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
        margin-bottom: 10px;
      }
 
@@ -202,6 +204,7 @@ import { sweetError ,sweetSuccess} from '../js/sweetAlert.js'
 import {getUrl} from "../js/tools";
 import {detailedTime} from '../js/time'
 import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
+import {  renderFormula } from "../js/formula";
 
 export default Vue.extend({
   data() {
@@ -259,6 +262,10 @@ export default Vue.extend({
             this.paperName = paperName;
             this.paperTime = paperTime;
             this.paperQuestionCount = paperQuestionCount;
+
+            setTimeout(() => {
+              renderFormula()
+            }, 500)
           }
         })
         .catch((error) => {
