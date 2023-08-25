@@ -6,12 +6,12 @@
         .h3 科创会员开卷考试
         .h5 考试科目：{{paperName}}
         .h5 开考时间：{{detailedTime(paperTime)}}
-        .h5 剩余考题：{{paperQuestionCount}}
+        .h5 试题总数：{{paperQuestionCount}}
     hr
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
         .question-text
-          .h4 题目：
+          .h4.text-info 第 {{index}} 题：
           span {{question.content}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content

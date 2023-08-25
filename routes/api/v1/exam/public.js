@@ -52,9 +52,7 @@ router
         category.volume === 'A' ? '基础级' : '专业级'
       }`,
       paperTime: paper.toc,
-      paperQuestionCount: `${paper.record.length - index} / ${
-        paper.record.length
-      }`,
+      paperQuestionCount: `${paper.record.length}`,
     };
     await next();
   })
