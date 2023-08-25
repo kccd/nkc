@@ -12,7 +12,7 @@ paperRouter
     const timeLimit = 45 * 60 * 1000;
     cid = Number(cid);
     const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
-    const examCategoryTypes = await db.ExamsCategoryModel.getExamCategoryType();
+    const examCategoryTypes = await db.ExamsCategoryModel.getExamCategoryTypes();
     const { passScore, time, from, volume, type } = category;
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');

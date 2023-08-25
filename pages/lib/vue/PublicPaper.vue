@@ -11,7 +11,7 @@
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
         .question-text
-          .h4.text-info 第 {{index}} 题：
+          .h4.text-info 第 {{index + 1}} 题：
           span {{question.content}}{{question.isMultiple?'(多选)':''}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
