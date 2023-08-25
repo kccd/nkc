@@ -62,8 +62,8 @@ block eContent
                   label.m-r-1
                     input(type="checkbox" :value="true" v-model="regSettings.registerExamination")
                     span 开启
-                  .form-group(v-if="regSettings.registerExamination" )
-                    h5(style="font-weight: bold;") 试题来源
+                  .form-group
+                    h5(style="font-weight: bold;") 已选试卷
                     div(v-if='regSettings.examSource.length === 0')
                       h5.text-danger 暂未选择任何专业领域
                     div(v-else)
@@ -77,7 +77,7 @@ block eContent
                             th {{examSource.name}}
                             th
                               button(@click="deleteExam" :id=`examSource._id`) 移除
-                    h5(style="font-weight: bold;") 选择题库
+                    h5(style="font-weight: bold;") 全部试卷
                     div
                       table.table.table-bordered
                         thead

@@ -12,7 +12,7 @@
       .question-title
         .question-text
           .h4.text-info 第 {{index}} 题：
-          span {{question.content}}
+          span {{question.content}}{{question.isMultiple?'(多选)':''}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
@@ -22,14 +22,20 @@
               textarea(v-model='fill')
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
-            label.options(v-for='(q, index) in question.answer' :class="selected.includes(index)?'bg-info':'bg-secondary'")
+            label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="selected.includes(index)?'bg-info':'bg-secondary'")
               input.m-r-05(:disabled="isReselected" v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
                 p.red-text(v-if="answerDesc.length>0 && selected.includes(index)") {{answerDesc.find((item)=>item._id === q._id).desc}}
+            label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="selected === index?'bg-info':'bg-secondary'" )
+              input.m-r-05(:disabled="isReselected" v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
+              .option-content
+                span {{q.serialIndex}}、
+                span.m-r-2 {{q.text}}
+                p.red-text(v-if="answerDesc.length>0 && selected === index") {{answerDesc.find((item)=>item._id === q._id).desc}}
         footer.clearfix
-          h5.question-intro 当前题数: {{index+1}} / {{questionTotal}}
+          h5.question-intro(v-if="!isCorrect" ) 回答错误
           .button-group
             button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 提示
             button.btn.btn-default.btn-editor-block.btn-primary(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
@@ -142,7 +148,7 @@
    }
    .question-intro {
      font-size: 14px;
-     color: #777;
+     color: rgb(255, 102, 102);
      margin-top: 8px;
      font-style: italic;
    }
@@ -224,6 +230,7 @@ export default Vue.extend({
       paperTime: '',
       paperQuestionCount: "",
       paperName: '',
+      isCorrect:true
     };
   },
   props:['pid'],
@@ -273,16 +280,18 @@ export default Vue.extend({
         });
     },
     submit() {
+      const {isMultiple} = this.question
       let userSelected = [];
       let selected = [];
-      if (this.type === 'ch4'){
+      if (this.type === 'ch4') {
         userSelected = this.question.answer.reduce((selectedIds, item, index) => {
-          if (this.selected.includes(index)) {
+          if ((isMultiple && this.selected.includes(index)) || (!isMultiple && this.selected === index)) {
             selectedIds.push(item._id);
           }
           return selectedIds;
         }, []);
-         selected = this.answerOrder.reduce((result, item, index) => {
+
+        selected = this.answerOrder.reduce((result, item, index) => {
           if (userSelected.includes(item)) {
             result.push(index);
           }
@@ -302,6 +311,7 @@ export default Vue.extend({
             if (status === 403) {
               if (this.type === 'ch4'){
                 this.isReselected = true;
+                this.isCorrect = false
               }
               else {
                 sweetError('输入的问题有误')
@@ -348,6 +358,7 @@ export default Vue.extend({
       }
       this.answerDesc = [];
       this.isReselected = false;
+      this.isCorrect = true;
     },
     shuffle(arr){
       const length = arr.length;
