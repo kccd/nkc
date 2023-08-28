@@ -945,7 +945,7 @@ threadRouter
         tid: thread.tid,
         oc: thread.oc,
         uid: state.uid,
-        authLevel: data.user ? data.user.authLevel : 0,
+        gradeId: data.user ? data.user.grade._id : 0,
         address: ctx.address,
       });
     } else if (thread.type === 'fund') {
