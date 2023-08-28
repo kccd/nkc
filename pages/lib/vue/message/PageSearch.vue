@@ -20,7 +20,7 @@
             .user-description {{u.description || '暂无简介'}}
           .user-options
             div(@click="toChat(u.uid)") 发送消息
-            div(@click="toAddFriend(u.uid)" v-if="friendsUid.indexOf(u.uid) === -1") 添加好友
+            div(@click="toAddFriend(u.uid)" v-if="friendsUid.indexOf(u.uid) === -1") 添加联系人
 </template>
 
 <style lang="less" scoped>

@@ -15,7 +15,6 @@ const addFriend = require('./addFriend');
 const categoryRouter = require('./category');
 const listRouter = require('./list');
 const friendRouter = require('./friend');
-const moment = require('moment');
 messageRouter
   .get('/', async (ctx, next) => {
     const { query, data, db } = ctx;

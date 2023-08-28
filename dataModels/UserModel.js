@@ -1155,10 +1155,7 @@ userSchema.methods.getNewMessagesCount = async function () {
   }
   // 添加好友
   if (newFriends) {
-    newApplicationsCount = await FriendsApplicationModel.countDocuments({
-      agree: 'null',
-      respondentId: this.uid,
-    });
+    newApplicationsCount = 0;
   }
   // 用户信息
   const newUsersMessagesCount = await MessageModel.countDocuments({
