@@ -22,13 +22,13 @@
               textarea(v-model='fill')
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
-            label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="selected.includes(index)?'bg-info':'bg-secondary'")
+            label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
               input.m-r-05(:disabled="isReselected" v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
                 p.red-text(v-if="answerDesc.length>0 && selected.includes(index)") {{answerDesc.find((item)=>item._id === q._id).desc}}
-            label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="selected === index?'bg-info':'bg-secondary'" )
+            label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
               input.m-r-05(:disabled="isReselected" v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
@@ -38,13 +38,13 @@
           h5.question-intro(v-if="!isCorrect" ) 回答错误
           .button-group
             button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 提示
-            button.btn.btn-default.btn-editor-block.btn-primary(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
-            button.btn.btn-default.btn-editor-block.btn-primary(v-else @click='submit') 提交
+            button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
+            button.btn.btn-default.btn-editor-block.btn-primary(v-else @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
     div.clearfix(v-else id="finished-box" )
       .notice-content
         .glyphicon.glyphicon-ok.icon-success.m-b-1
         .notice-text.m-b-1 考试通过
-        div(v-if="form === 'register'")
+        div(v-if="from === 'register'")
           span 恭喜您通过了 {{paperName}} 考试，请点击&nbsp;
           a(:href="redirectUrl") 这里
           span &nbsp;继续注册。
@@ -72,8 +72,7 @@
       overflow: hidden;
     }
   }
-
- .question-box{
+  .question-box{
    //border: 1px solid #ddd;
    border-radius: 5px;
    //box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -153,17 +152,17 @@
      font-style: italic;
    }
  }
- .clearfix::after {
+  .clearfix::after {
    content: "";
    display: table;
    clear: both;
  }
- .red-text {
-   color: rgb(255, 102, 102);
+  .red-text {
+   color: #0e0e0e;
    font-weight: bold;
    font-size: 14px;
  }
- #finished-box{
+  #finished-box{
    //border: 1px solid #ddd;
    //border-radius: 5px;
    //padding: 1rem;
@@ -201,6 +200,23 @@
      }
    }
  }
+  .shake-animation {
+    animation: shake 0.5s ;
+  }
+  @keyframes shake {
+    0%, 100% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(-5px, -5px);
+    }
+    50% {
+      transform: translate(5px, 5px);
+    }
+    75% {
+      transform: translate(-5px, -5px);
+    }
+  }
 </style>
 
 <script>
@@ -236,6 +252,21 @@ export default Vue.extend({
   props:['pid'],
   mounted() {
     this.getInit();
+  },
+  computed:{
+    isDisabled(){
+      const {question:{isMultiple,type}, selected ,fill}  = this
+      //多选
+      if(type === 'ch4'){
+        if(isMultiple){
+          return selected.length === 0
+        }else {
+          return  Array.isArray(selected)
+        }
+      }else {
+        return  fill === ''
+      }
+    }
   },
   methods: {
     getUrl,
@@ -368,8 +399,20 @@ export default Vue.extend({
         arr[i] = arr[index];
         arr[index] = n;
       }
+    },
+    bgc(index,q){
+      const isMultiple = this.question.isMultiple;
+      const isInclude = isMultiple ? this.selected.includes(index) : this.selected === index;
+      const isFalse = this.answerDesc.length > 0;
+      if (!isInclude) {
+        return 'bg-secondary';
+      }
+      if (!isFalse) {
+        return 'bg-info';
+      }
+      const hasDesc = this.answerDesc.some(item => item._id === q._id && item.desc);
+      return hasDesc ? 'btn-danger' : 'btn-danger shake-animation';
     }
-
   },
 })
 </script>
