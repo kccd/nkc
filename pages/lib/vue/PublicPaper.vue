@@ -12,7 +12,7 @@
       .question-title
         .question-text
           .h4.text-info 第 {{index + 1}} 题：
-          span {{question.content}}{{question.isMultiple?'(多选)':''}}
+          question-text-content(:text="`${question.content}${question.isMultiple? '(多选)':''}`")
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
@@ -27,17 +27,21 @@
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                p.red-text(v-if="answerDesc.length>0 && selected.includes(index)") {{answerDesc.find((item)=>item._id === q._id).desc}}
+                .answer-desc.text-danger(v-if="answerDesc.length>0 && selected.includes(index)")
+                  .answer-desc-icon.fa.fa-lightbulb-o
+                  span {{answerDesc.find((item)=>item._id === q._id).desc}}
             label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
               input.m-r-05(:disabled="isReselected" v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                p.red-text(v-if="answerDesc.length>0 && selected === index") {{answerDesc.find((item)=>item._id === q._id).desc}}
+                .answer-desc.text-danger(v-if="answerDesc.length>0 && selected === index")
+                  .answer-desc-icon.fa.fa-lightbulb-o
+                  span {{answerDesc.find((item)=>item._id === q._id).desc}}
         footer.clearfix
-          h5.question-intro(v-if="!isCorrect" ) 回答错误
+          h4.question-intro.text-danger(v-if="!isCorrect" ) 回答错误
           .button-group
-            button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 提示
+            button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 查看提示
             button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
             button.btn.btn-default.btn-editor-block.btn-primary(v-else @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
     div.clearfix(v-else id="finished-box" )
@@ -146,22 +150,17 @@
      }
    }
    .question-intro {
-     font-size: 14px;
-     color: rgb(255, 102, 102);
-     margin-top: 8px;
-     font-style: italic;
+     //font-size: 1.4rem;
+     //color: rgb(255, 102, 102);
+     //margin-top: 8px;
+     //font-style: italic;
    }
  }
   .clearfix::after {
-   content: "";
-   display: table;
-   clear: both;
- }
-  .red-text {
-   color: #0e0e0e;
-   font-weight: bold;
-   font-size: 14px;
- }
+    content: "";
+    display: table;
+    clear: both;
+  }
   #finished-box{
    //border: 1px solid #ddd;
    //border-radius: 5px;
@@ -200,6 +199,17 @@
      }
    }
  }
+  .answer-desc{
+    margin-top: 1rem;
+    .answer-desc-icon{
+      margin-right: 0.5rem;
+      font-size: 1.3rem;
+    }
+  }
+  .answer-bg-danger{
+    background-color: #ffe1e1;
+    border-color: #efc3c3!important;
+  }
   .shake-animation {
     animation: shake 0.5s ;
   }
@@ -227,6 +237,21 @@ import {getUrl} from "../js/tools";
 import {detailedTime} from '../js/time'
 import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
 import {  renderFormula } from "../js/formula";
+
+Vue.component('question-text-content', {
+  props: ['text'],
+  data: function() {
+    return {
+      key: (Math.random() * 10000).toString()
+    }
+  },
+  watch: {
+    text() {
+      this.key = (Math.random() * 10000).toString();
+    }
+  },
+  template: `<span :key="key">{{text}}</span>`
+})
 
 export default Vue.extend({
   data() {
@@ -361,7 +386,7 @@ export default Vue.extend({
                   'POST',
                 ).then((res) => {
                   if (res) {
-                    sweetSuccess('顺利完成');
+                    // sweetSuccess('顺利完成');
                     const { activationCode, redirectUrl,from} = res.data;
                     if (activationCode) {
                       setRegisterActivationCodeToLocalstorage(activationCode);
@@ -411,7 +436,7 @@ export default Vue.extend({
         return 'bg-info';
       }
       const hasDesc = this.answerDesc.some(item => item._id === q._id && item.desc);
-      return hasDesc ? 'btn-danger' : 'btn-danger shake-animation';
+      return hasDesc ? 'answer-bg-danger' : 'answer-bg-danger shake-animation';
     }
   },
 })
