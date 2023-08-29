@@ -6,7 +6,7 @@ paperRouter
   .get('/', async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
-    let { cid, userFrom } = query;
+    let { cid, from: userFrom } = query;
     //问题总数
     let questionCount = 0;
     const timeLimit = 45 * 60 * 1000;
@@ -18,7 +18,9 @@ paperRouter
     const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');
-    } else if (userFrom && userFrom !== register && userFrom !== exam) {
+    }
+    userFrom = userFrom || exam;
+    if (userFrom !== register && userFrom !== exam) {
       ctx.throw(403, '当前来访参数不匹配，请刷新');
     }
     //闭卷考试
