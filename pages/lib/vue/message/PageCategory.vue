@@ -27,7 +27,7 @@
           .form-group
             .row
               .col-xs-6
-                span 全部好友
+                span 全部联系人
                 .category-edit-users-container
                   .category-edit-users(v-for="userGroup in users")
                     .category-edit-header {{userGroup.title.toUpperCase()}}
@@ -38,7 +38,7 @@
                       .category-edit-option
                         .fa.fa-angle-right
               .col-xs-6
-                span 已选好友
+                span 已选联系人
                 .category-edit-users-container
                   .category-edit-users
                     .category-edit-user(v-for="u in selectedUsers" @click="removeUser(u.uid)")

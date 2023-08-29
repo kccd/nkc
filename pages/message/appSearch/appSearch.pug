@@ -22,7 +22,7 @@ block content
                 .description UID:{{u.uid}} {{u.description}}
                 .buttons
                   button(@click="toSendMessage(u)") 发送消息
-                  button(v-if="friendsUid.indexOf(u.uid) === -1" @click='addFriend(u)') 添加为好友
+                  button(v-if="friendsUid.indexOf(u.uid) === -1" @click='addFriend(u)') 添加为联系人
             .load-more(v-if="page + 1 >= pageCount")
               span 到底儿了
             .load-more(@click='loadMore' v-else)
