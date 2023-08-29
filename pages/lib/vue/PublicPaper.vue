@@ -50,7 +50,7 @@
         .notice-text.m-b-1 考试通过
         div(v-if="from === 'register'")
           span 恭喜您通过了 {{paperName}} 考试，请点击&nbsp;
-          a(:href="redirectUrl") 这里
+          button.btn.btn-xs.btn-default(@click="redirectToPage") 这里
           span &nbsp;继续注册。
         div(v-else)
           .m-b-1 恭喜您通过了 {{paperName}} 考试。
@@ -237,6 +237,7 @@ import {getUrl} from "../js/tools";
 import {detailedTime} from '../js/time'
 import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
 import {  renderFormula } from "../js/formula";
+import { visitUrl } from "../js/pageSwitch";
 
 Vue.component('question-text-content', {
   props: ['text'],
@@ -437,6 +438,9 @@ export default Vue.extend({
       }
       const hasDesc = this.answerDesc.some(item => item._id === q._id && item.desc);
       return hasDesc ? 'answer-bg-danger' : 'answer-bg-danger shake-animation';
+    },
+    redirectToPage() {
+      visitUrl(this.redirectUrl)
     }
   },
 })

@@ -9,7 +9,8 @@ block content
   .container-fluid.max-width#app(v-cloak)
     .login-container
       .login-form-header(v-if="isApp")
-        .login-form-header-close(@click="close") 关闭
+        include ../publicModules/appNavbar/appNavbar
+        +appNavbar
       login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
 
 block footer

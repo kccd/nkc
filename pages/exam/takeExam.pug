@@ -3,8 +3,11 @@ block title
   title=`开卷考试`
   +includeCSS('/exam/takeExam.css')
 block content
-  .container-fluid.max-width(id='take-exam' v-cloak).box-shadow-panel
-    .exam-container
-      Public-Paper(pid=data.pid)
+  .container-fluid.max-width.box-shadow-panel(id='take-exam' class="isapp" v-cloak)
+    div
+      include ../publicModules/appNavbar/appNavbar
+      +appNavbar
+      .exam-container
+        Public-Paper(pid=data.pid)
 block scripts
   +includeJS('/exam/takeExam.js')

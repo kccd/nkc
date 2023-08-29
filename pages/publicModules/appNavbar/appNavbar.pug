@@ -1,0 +1,7 @@
+if !isIncluded("appNavbar")
+  +includeCSS('/publicModules/appNavbar/appNavbar.css')
+  +includeJS('/publicModules/appNavbar/appNavbar.js')
+  mixin appNavbar
+    if remoteState.isApp
+      .app-navbar-container
+        .app-navbar-button(onclick='window.closeAppPage()') 关闭

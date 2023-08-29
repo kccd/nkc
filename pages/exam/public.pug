@@ -4,7 +4,14 @@ block title
   +includeCSS('/exam/public.css')
 block content
   .container-fluid.max-width
+    include ../publicModules/appNavbar/appNavbar
+    +appNavbar
     .examNotes
-      h2.m-b-1 注册说明
+      h3.m-b-1 注册说明
       .pre-content.m-b-1!=markdown_safe(data.examNotice)
-      a.btn.btn-default.fund-terms-button(href=`/exam/paper?cid=${data.cid}&userFrom=register`) 参加考试
+      .btn.btn-default.fund-terms-button(onclick=`visitPublicExam('${data.cid}')`) 参加考试
+block scripts
+  script.
+    function visitPublicExam(cid) {
+      window.location.href = '/exam/paper?cid=' + cid + '&userFrom=register';
+    }
