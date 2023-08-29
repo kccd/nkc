@@ -14,8 +14,11 @@ paperRouter
     const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
     const examCategoryTypes = await db.ExamsCategoryModel.getExamCategoryType();
     const { passScore, time, from, volume, type } = category;
+    const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');
+    } else if (userFrom && userFrom !== register && userFrom !== exam) {
+      ctx.throw(403, '当前来访参数不匹配，请刷新');
     }
     //闭卷考试
     if (type === examCategoryTypes.secret) {
