@@ -5,14 +5,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const redisClient = require('../settings/redisClient');
 const { obtainPureText } = require('../nkcModules/apiFunction');
-
-const subscribeSources = {
-  forum: 'forum',
-  user: 'user',
-  column: 'column',
-  collectionArticle: 'collectionArticle',
-  collectionThread: 'collectionThread',
-};
+const { subscribeSources } = require('../settings/subscribe');
 
 const schema = new Schema(
   {
@@ -38,7 +31,7 @@ const schema = new Schema(
     // 6. article 关注的article文章
     type: {
       type: String,
-      required: true,
+      default: '',
       index: 1,
     },
     source: {
@@ -137,13 +130,13 @@ schema.statics.saveUserSubUsersId = async (uid) => {
   const SubscribeModel = mongoose.model('subscribes');
   const sub = await SubscribeModel.find(
     {
-      type: 'user',
+      source: subscribeSources.user,
       cancel: false,
       uid,
     },
-    { tUid: 1 },
+    { sid: 1 },
   ).sort({ toc: -1 });
-  const usersId = sub.map((s) => s.tUid);
+  const usersId = sub.map((s) => s.sid);
   setImmediate(async () => {
     await redisClient.resetSetAsync(`user:${uid}:subscribeUsersId`, usersId);
     /*await redisClient.delAsync(`user:${uid}:subscribeUsersId`);
@@ -178,9 +171,9 @@ schema.statics.saveUserFansId = async (uid) => {
   const SubscribeModel = mongoose.model('subscribes');
   const sub = await SubscribeModel.find(
     {
-      type: 'user',
+      source: subscribeSources.user,
       cancel: false,
-      tUid: uid,
+      sid: uid,
     },
     { uid: 1 },
   ).sort({ toc: -1 });
@@ -229,14 +222,14 @@ schema.statics.saveUserSubForumsId = async (uid) => {
     .model('subscribes')
     .find(
       {
-        type: 'forum',
+        source: subscribeSources.forum,
         cancel: false,
         uid,
       },
-      { fid: 1 },
+      { sid: 1 },
     )
     .sort({ toc: -1 });
-  const forumsId = subs.map((s) => s.fid);
+  const forumsId = subs.map((s) => s.sid);
   setImmediate(async () => {
     await redisClient.resetSetAsync(`user:${uid}:subscribeForumsId`, forumsId);
     /*await redisClient.delAsync(`user:${uid}:subscribeForumsId`);
@@ -304,14 +297,14 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
     .model('subscribes')
     .find(
       {
-        type: 'column',
+        source: subscribeSources.column,
         cancel: false,
         uid,
       },
-      { columnId: 1 },
+      { sid: 1 },
     )
     .sort({ toc: -1 });
-  const columnsId = subs.map((s) => s.columnId);
+  const columnsId = subs.map((s) => s.sid);
   setImmediate(async () => {
     await redisClient.resetSetAsync(
       `user:${uid}:subscribeColumnsId`,
@@ -332,7 +325,8 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
  * @return {[String]} 文章ID数组
  * */
 schema.statics.getUserSubThreadsId = async (uid, detail) => {
-  let key = `user:${uid}:subscribeThreadsId`;
+  return [];
+  /*let key = `user:${uid}:subscribeThreadsId`;
   if (['sub', 'replay'].includes(detail)) {
     key += `:${detail}`;
   }
@@ -342,7 +336,7 @@ schema.statics.getUserSubThreadsId = async (uid, detail) => {
       .model('subscribes')
       .saveUserSubThreadsId(uid, detail);
   }
-  return threadsId;
+  return threadsId;*/
 };
 /*
  * 将用户关注的文章ID存入redis
@@ -352,7 +346,8 @@ schema.statics.getUserSubThreadsId = async (uid, detail) => {
  * */
 
 schema.statics.saveUserSubThreadsId = async (uid, detail) => {
-  const total = [],
+  return [];
+  /*const total = [],
     reply = [],
     sub = [];
   const subs = await mongoose
@@ -377,22 +372,22 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
   setImmediate(async () => {
     let key = `user:${uid}:subscribeThreadsId`;
     await redisClient.resetSetAsync(key, total);
-    /*await redisClient.delAsync(key);
+    /!*await redisClient.delAsync(key);
     if(total.length) {
       await redisClient.saddAsync(key, total);
-    }*/
+    }*!/
     key = `user:${uid}:subscribeThreadsId:replay`;
     await redisClient.resetSetAsync(key, reply);
-    /*await redisClient.delAsync(key);
+    /!*await redisClient.delAsync(key);
     if(reply.length) {
       await redisClient.saddAsync(key, reply);
-    }*/
+    }*!/
     key = `user:${uid}:subscribeThreadsId:sub`;
     await redisClient.resetSetAsync(key, sub);
-    /*await redisClient.delAsync(key);
+    /!*await redisClient.delAsync(key);
     if(sub.length) {
       await redisClient.saddAsync(key, sub);
-    }*/
+    }*!/
     await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   if (detail === 'replay') {
@@ -401,7 +396,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
     return sub;
   } else {
     return total;
-  }
+  }*/
 };
 
 /*
@@ -428,14 +423,19 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
     .model('subscribes')
     .find(
       {
-        type: { $in: ['collection', 'article'] },
+        source: {
+          $in: [
+            subscribeSources.collectionThread,
+            subscribeSources.collectionArticle,
+          ],
+        },
         cancel: false,
         uid,
       },
-      { tid: 1 },
+      { sid: 1 },
     )
     .sort({ toc: -1 });
-  const threadsId = subs.map((s) => s.tid);
+  const threadsId = subs.map((s) => s.sid);
   setImmediate(async () => {
     await redisClient.resetSetAsync(
       `user:${uid}:collectionThreadsId`,
