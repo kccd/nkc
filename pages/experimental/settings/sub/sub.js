@@ -1,31 +1,35 @@
+import { getDataById } from '../../../lib/js/dataConversion';
+import Vue from 'vue';
+import { nkcAPI } from '../../../lib/js/netAPI';
+
+const data = getDataById('data');
+
 var app = new Vue({
-  el: "#app",
+  el: '#app',
   data: {
-    error: "",
-    info: "",
-    subSettings: ""
-  },
-  mounted: function() {
-    var data = NKC.methods.getDataById("data");
-    this.subSettings = data.subSettings;
+    error: '',
+    info: '',
+    subSettings: data.subSettings,
   },
   methods: {
-    save: function() {
-      this.error = "";
-      this.info = "";
+    save: function () {
+      this.error = '';
+      this.info = '';
       var subSettings = this.subSettings;
-      if(
+      if (
         subSettings.subUserCountLimit < 0 ||
         subSettings.subForumCountLimit < 0 ||
-        subSettings.subThreadCountLimit < 0
-      ) return this.error = "";
-      nkcAPI("/e/settings/sub", "PUT", subSettings)
-        .then(function() {
-          app.info = "保存成功";
+        subSettings.subColumnCountLimit < 0
+      ) {
+        return (this.error = '');
+      }
+      nkcAPI('/e/settings/sub', 'PUT', subSettings)
+        .then(function () {
+          app.info = '保存成功';
         })
-        .catch(function(data) {
+        .catch(function (data) {
           app.error = data.error || data;
         });
-    }
-  }
+    },
+  },
 });

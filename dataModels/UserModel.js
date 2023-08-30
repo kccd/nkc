@@ -1453,20 +1453,17 @@ userSchema.methods.ensureSubLimit = async function (type) {
   const SubscribeModel = mongoose.model('subscribes');
   const SettingModel = mongoose.model('settings');
   const subSettings = await SettingModel.findById('subscribe');
-  const {
-    subUserCountLimit,
-    subForumCountLimit,
-    subThreadCountLimit,
-    subColumnCountLimit,
-  } = subSettings.c;
+  const { subUserCountLimit, subForumCountLimit, subColumnCountLimit } =
+    subSettings.c;
+  const subscribeSources = await SubscribeModel.getSubscribeSources();
   if (type === 'user') {
     if (subUserCountLimit <= 0) {
       ThrowCommonError(400, '关注用户功能已关闭');
     }
     const userCount = await SubscribeModel.countDocuments({
       uid: this.uid,
+      source: subscribeSources.user,
       cancel: false,
-      type: 'user',
     });
     if (userCount >= subUserCountLimit) {
       ThrowCommonError(400, '关注用户数量已达上限');
@@ -1478,22 +1475,10 @@ userSchema.methods.ensureSubLimit = async function (type) {
     const forumCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       cancel: false,
-      type: 'forum',
+      source: subscribeSources.forum,
     });
     if (forumCount >= subForumCountLimit) {
       ThrowCommonError(400, '关注专业数量已达上限');
-    }
-  } else if (type === 'thread') {
-    if (subThreadCountLimit <= 0) {
-      ThrowCommonError(400, '关注文章功能已关闭');
-    }
-    const threadCount = await SubscribeModel.countDocuments({
-      uid: this.uid,
-      cancel: false,
-      type: 'thread',
-    });
-    if (threadCount >= subThreadCountLimit) {
-      ThrowCommonError(400, '关注文章数量已达上限');
     }
   } else if (type === 'column') {
     if (subColumnCountLimit <= 0) {
@@ -1502,7 +1487,7 @@ userSchema.methods.ensureSubLimit = async function (type) {
     const columnCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       cancel: false,
-      type: 'column',
+      source: subscribeSources.column,
     });
     if (columnCount >= subColumnCountLimit) {
       ThrowCommonError(400, '关注专栏数量已达上限');
