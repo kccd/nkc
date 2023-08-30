@@ -22,7 +22,6 @@ router.get('/', async (ctx, next) => {
     blacklist: null,
     collection: null,
     inColumn: null,
-    subscribe: null,
     hidePost: null,
     xsf: null,
     kcb: null,
@@ -52,11 +51,6 @@ router.get('/', async (ctx, next) => {
         user.uid,
         post.tid,
         'collection',
-      );
-      // 关注
-      optionStatus.subscribe = await db.SubscribeModel.checkSubscribeThread(
-        user.uid,
-        post.tid,
       );
     }
     if (isPost) {

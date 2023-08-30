@@ -6,12 +6,9 @@ const adRouter = require('./ad');
 const toppedRouter = require('./topped');
 const blockRouter = require('./block');
 const closeRouter = require('./close');
-const subscribeRouter = require('./subscribe');
 const Path = require('path');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
-const db = require('../../dataModels');
 const tools = require('../../nkcModules/tools');
-const { ThrowCommonError } = require('../../nkcModules/error');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -2339,10 +2336,5 @@ threadRouter
   .use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
   .use('/:tid/block', blockRouter.routes(), blockRouter.allowedMethods())
   .use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
-  .use(
-    '/:tid/subscribe',
-    subscribeRouter.routes(),
-    subscribeRouter.allowedMethods(),
-  )
   .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;
