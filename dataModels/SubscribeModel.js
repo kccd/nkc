@@ -143,7 +143,7 @@ schema.statics.saveUserSubUsersId = async (uid) => {
     if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeUsersId`, usersId);
     }*/
-    await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
+    // await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   return usersId;
 };
@@ -184,7 +184,7 @@ schema.statics.saveUserFansId = async (uid) => {
     if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:fansId`, usersId);
     }*/
-    await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
+    // await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   return usersId;
 };
@@ -236,7 +236,7 @@ schema.statics.saveUserSubForumsId = async (uid) => {
     if(forumsId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeForumsId`, forumsId);
     }*/
-    await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
+    // await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   return forumsId;
 };
@@ -314,7 +314,7 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
     if(columnsId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeColumnsId`, columnsId);
     }*/
-    await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
+    // await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   return columnsId;
 };
@@ -388,7 +388,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
     if(sub.length) {
       await redisClient.saddAsync(key, sub);
     }*!/
-    await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
+    // await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   if (detail === 'replay') {
     return reply;
@@ -445,7 +445,7 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
     if(threadsId.length) {
       await redisClient.saddAsync(`user:${uid}:collectionThreadsId`, threadsId);
     }*/
-    await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
+    // await mongoose.model('subscribes').saveUserSubscribeTypesToRedis(uid);
   });
   return threadsId;
 };
@@ -529,7 +529,7 @@ schema.statics.saveUserSubscribeTypeToRedis = async (uid, typeId, subType) => {
   return ids;
 };*/
 schema.statics.getUserSubscribeTypesResults = async (uid) => {
-  const SubscribeTypeModel = mongoose.model('subscribeTypes');
+  /*const SubscribeTypeModel = mongoose.model('subscribeTypes');
   const SubscribeModel = mongoose.model('subscribes');
   const ForumModel = mongoose.model('forums');
   const defaultTypes = [
@@ -554,6 +554,7 @@ schema.statics.getUserSubscribeTypesResults = async (uid) => {
         cancel: false,
       };
       if (t === 'all') {
+        // 全部
       } else if (t === 'other') {
         match.cid = [];
       } else {
@@ -603,10 +604,11 @@ schema.statics.getUserSubscribeTypesResults = async (uid) => {
     results,
     defaultTypes,
     newSubscribeTypes,
-  };
+  };*/
 };
 schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
-  setImmediate(async () => {
+  return;
+  /*setImmediate(async () => {
     if (!data) {
       data = await mongoose
         .model('subscribes')
@@ -632,7 +634,7 @@ schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
       }
       await redisClient.resetSetAsync(key, results[key]);
     }
-  });
+  });*/
 };
 /*
  * 从redis中读取用户关注分类，如1分类中的所有文章ID
@@ -643,7 +645,8 @@ schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
  * @author pengxiguaa 2019-8-1
  * */
 schema.statics.getUserSubscribeTypeFromRedis = async (uid, typeId, subType) => {
-  const SubscribeModel = mongoose.model('subscribes');
+  return [];
+  /*const SubscribeModel = mongoose.model('subscribes');
   const key = `user:${uid}:subscribeType:${typeId}:${subType}`;
   let ids = await redisClient.smembersAsync(key);
   if (!ids.length) {
@@ -656,7 +659,7 @@ schema.statics.getUserSubscribeTypeFromRedis = async (uid, typeId, subType) => {
       await SubscribeModel.saveUserSubscribeTypesToRedis(uid, data);
     }
   }
-  return ids;
+  return ids;*/
 };
 
 /**
