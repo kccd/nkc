@@ -49,7 +49,7 @@ class SubscribeUserService {
 
   async getSubscribeUserCategoriesId(uid, tUid) {
     let cid = [];
-    const subscribe = await subscribeService.getSubscribeBySource({
+    const subscribe = await subscribeService.getUserSubscribeBySource({
       uid,
       source: subscribeSources.user,
       sid: tUid,

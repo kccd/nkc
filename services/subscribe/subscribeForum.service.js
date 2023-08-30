@@ -49,7 +49,7 @@ class SubscribeForumService {
 
   async getSubscribeForumCategoriesId(uid, fid) {
     let cid = [];
-    const subscribe = await subscribeService.getSubscribeBySource({
+    const subscribe = await subscribeService.getUserSubscribeBySource({
       uid,
       source: subscribeSources.forum,
       sid: fid,

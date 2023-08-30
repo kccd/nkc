@@ -7,16 +7,36 @@ class SubscribeService {
   }
   async createSubscribe(props) {
     const { source, sid, uid, cancel = false, cid = [] } = props;
-    const subscribeId = await this.getNewSubscribeId();
-    const subscribe = new SubscribeModel({
-      _id: subscribeId,
+    let subscribe = await this.getUserSubscribeBySource({
       uid,
       source,
       sid,
-      cancel,
-      cid,
     });
-    await subscribe.save();
+    if (!subscribe) {
+      const subscribeId = await this.getNewSubscribeId();
+      subscribe = new SubscribeModel({
+        _id: subscribeId,
+        uid,
+        source,
+        sid,
+        cancel,
+        cid,
+      });
+      await subscribe.save();
+    } else {
+      subscribe.cid = cid;
+      subscribe.cancel = false;
+      await SubscribeModel.updateOne(
+        {
+          _id: subscribe._id,
+        },
+        {
+          cid: subscribe.cid,
+          cancel: subscribe.cancel,
+        },
+      );
+    }
+
     return subscribe;
   }
 
@@ -47,13 +67,22 @@ class SubscribeService {
     );
   }
 
-  async getSubscribeBySource(props) {
+  async getUserSubscribeBySource(props) {
     const { uid, source, sid } = props;
     return await SubscribeModel.findOne({ uid, source, sid });
   }
 
   getSubscribeSources() {
     return { ...subscribeSources };
+  }
+
+  async getSubscribeCountBySource(props) {
+    const { source, sid } = props;
+    return await SubscribeModel.countDocuments({
+      source,
+      cancel: false,
+      sid,
+    });
   }
 }
 module.exports = {

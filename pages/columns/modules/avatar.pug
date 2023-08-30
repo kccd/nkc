@@ -1,4 +1,4 @@
-mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner)
+mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner, columnSubscribeInfo)
   -subColumnsId = subColumnsId || []
   .column-avatar-body(class=hideBanner?'hide-banner':"")
     .column
@@ -27,13 +27,13 @@ mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner)
               data-number=column.subCount
               data-type='subscriptionNumber'
               data-column-id=column._id
-              )=briefNumber && briefNumber(column.subCount)
+              )=columnSubscribeInfo.subCount
           .column-name-number
             h5 获赞数
-            span=briefNumber && briefNumber(column.postVoteUp)
+            span=columnSubscribeInfo.postVoteUp
           .column-name-number
             h5 阅读数
-            span=briefNumber && briefNumber(column.postHits)
+            span=columnSubscribeInfo.postHits
 
         //-
           // 关注按钮
