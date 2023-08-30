@@ -33,7 +33,6 @@ router.post('/', async (ctx, next) => {
   data.subCount = await subscribeColumnService.getSubscribeColumnCount(
     column._id,
   );
-  console.log(data.subCount)
   await column.updateOne({ subCount: data.subCount });
   await db.SubscribeTypeModel.updateCount(cid);
   await next();
