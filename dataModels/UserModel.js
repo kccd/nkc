@@ -5,6 +5,7 @@ const getRedisKeys = require('../nkcModules/getRedisKeys');
 const redisClient = require('../settings/redisClient');
 const { defaultCerts } = require('../settings/userCerts');
 const filterResult = require('../nkcModules/xssFilters/filterResult');
+const { subscribeSources } = require('../settings/subscribe');
 const {
   ThrowCommonError,
   ThrowServerInternalError,
@@ -1455,8 +1456,7 @@ userSchema.methods.ensureSubLimit = async function (type) {
   const subSettings = await SettingModel.findById('subscribe');
   const { subUserCountLimit, subForumCountLimit, subColumnCountLimit } =
     subSettings.c;
-  const subscribeSources = await SubscribeModel.getSubscribeSources();
-  if (type === 'user') {
+  if (type === subscribeSources.user) {
     if (subUserCountLimit <= 0) {
       ThrowCommonError(400, '关注用户功能已关闭');
     }
@@ -1468,7 +1468,7 @@ userSchema.methods.ensureSubLimit = async function (type) {
     if (userCount >= subUserCountLimit) {
       ThrowCommonError(400, '关注用户数量已达上限');
     }
-  } else if (type === 'forum') {
+  } else if (type === subscribeSources.forum) {
     if (subForumCountLimit <= 0) {
       ThrowCommonError(400, '关注专业已关闭');
     }
@@ -1480,7 +1480,7 @@ userSchema.methods.ensureSubLimit = async function (type) {
     if (forumCount >= subForumCountLimit) {
       ThrowCommonError(400, '关注专业数量已达上限');
     }
-  } else if (type === 'column') {
+  } else if (type === subscribeSources.column) {
     if (subColumnCountLimit <= 0) {
       ThrowCommonError(400, '关注专栏功能已关闭');
     }
@@ -1493,7 +1493,7 @@ userSchema.methods.ensureSubLimit = async function (type) {
       ThrowCommonError(400, '关注专栏数量已达上限');
     }
   } else {
-    ThrowCommonError(500, `未知的type类型：${type}`);
+    ThrowCommonError(500, `未知的source类型：${type}`);
   }
 };
 

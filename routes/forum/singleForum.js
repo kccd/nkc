@@ -13,6 +13,9 @@ const nkcRender = require('../../nkcModules/nkcRender');
 const childRouter = require('./child');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
+const {
+  subscribeForumService,
+} = require('../../services/subscribe/subscribeForum.service');
 router
   .post('/', async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
@@ -447,13 +450,10 @@ router
       type: 'forum',
     });
     if (data.user) {
-      const sub = await db.SubscribeModel.countDocuments({
-        uid: data.user.uid,
-        cancel: false,
-        type: 'forum',
+      data.subscribed = await subscribeForumService.isSubscribedForum(
+        data.user.uid,
         fid,
-      });
-      data.subscribed = !!sub;
+      );
 
       // 用户发表的文章
       data.userThreads = await db.ThreadModel.getUserThreads(
