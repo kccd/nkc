@@ -13,7 +13,7 @@
         :data-global-data="objToStr({uid: userData.uid})"
          )
         a.username( :title="userData.username" :href="'/u/' + userData.uid" target="_blank") {{ userData.username }}
-      .grade( :title="userData.info?userData.info.certsName:''" ) {{ userData.info?userData.info.certsName:'' }}
+      .grade( :title="userData.certsName.join(' ')" ) {{ userData.certsName.join(' ')}}
       .introduce( :title="userData.description" ) {{ userData.description || "暂未填写个人简介"}}
     .follow-button(:title=`subUid.includes(userData.uid) ? "取关" : "关注" ` :class="{'active': !subUid.includes(userData.uid)}" @click="subscribe( userData.uid )" v-if="subUid" ) {{ subUid.includes(userData.uid) ? "取关" : "关注" }}
 </template>
