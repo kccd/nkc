@@ -726,20 +726,18 @@ schema.statics.extendSubscribes = async (subscribes) => {
     tid = new Set(),
     aid = new Set();
   subscribes.map((s) => {
-    const { type } = s;
-    if (type === 'user') {
+    const { source } = s;
+    if (source === subscribeSources.user) {
       uid.add(s.uid);
-      uid.add(s.tUid);
-    } else if (type === 'thread') {
-      tid.add(s.tid);
-    } else if (type === 'forum') {
-      fid.add(s.fid);
-    } else if (type === 'column') {
-      columnId.add(s.columnId);
-    } else if (type === 'collection') {
-      tid.add(s.tid);
-    } else if (type === 'article') {
-      aid.add(s.tid);
+      uid.add(s.sid);
+    } else if (source === subscribeSources.forum) {
+      fid.add(s.sid);
+    } else if (source === subscribeSources.column) {
+      columnId.add(s.sid);
+    } else if (source === subscribeSources.collectionThread) {
+      tid.add(s.sid);
+    } else if (source === subscribeSources.collectionArticle) {
+      aid.add(s.sid);
     }
   });
   let users = await UserModel.find({ uid: { $in: [...uid] } });
@@ -775,35 +773,31 @@ schema.statics.extendSubscribes = async (subscribes) => {
   const results = [];
   for (const s of subscribes) {
     const subscribe = s.toObject();
-    const { type, uid, tUid, tid, fid, columnId } = subscribe;
-    if (type === 'user') {
+    const { source, sid, uid } = subscribe;
+    if (source === subscribeSources.user) {
       subscribe.user = usersObj[uid];
-      subscribe.targetUser = usersObj[tUid];
+      subscribe.targetUser = usersObj[sid];
       if (!subscribe.targetUser) {
         continue;
       }
-    } else if (type === 'forum') {
-      subscribe.forum = forumsObj[fid];
+    } else if (source === subscribeSources.forum) {
+      subscribe.forum = forumsObj[sid];
       if (!subscribe.forum) {
         continue;
       }
-    } else if (type === 'column') {
-      subscribe.column = columnsObj[columnId];
+    } else if (source === subscribeSources.column) {
+      subscribe.column = columnsObj[sid];
       if (!subscribe.column) {
         continue;
       }
-    } else if (type === 'collection') {
-      subscribe.thread = threadsObj[tid];
+    } else if (source === subscribeSources.collectionThread) {
+      subscribe.thread = threadsObj[sid];
+      console.log(subscribe.thread)
       if (!subscribe.thread) {
         continue;
       }
-    } else if (type === 'thread') {
-      subscribe.thread = threadsObj[tid];
-      if (!subscribe.thread) {
-        continue;
-      }
-    } else if (type === 'article') {
-      if (!articleObj[tid]) {
+    } else if (source === subscribeSources.collectionArticle) {
+      if (!articleObj[sid]) {
         continue;
       }
       const {
@@ -812,14 +806,14 @@ schema.statics.extendSubscribes = async (subscribes) => {
         user,
         count,
         hits,
-        source,
+        source: articleSource,
         toc,
         tlm,
         url,
         voteDown,
         voteUp,
         _id,
-      } = articleObj[tid];
+      } = articleObj[sid];
       const { cover, title, content, abstract } = document;
       subscribe.article = {
         _id,
@@ -828,7 +822,7 @@ schema.statics.extendSubscribes = async (subscribes) => {
         user,
         count,
         hits,
-        source,
+        source: articleSource,
         toc,
         tlm,
         url,
@@ -839,8 +833,8 @@ schema.statics.extendSubscribes = async (subscribes) => {
         content: await obtainPureText(content, true, 100),
         abstract,
       };
-      if (source === 'column') {
-        subscribe.article.column = articleObj[tid].column;
+      if (articleSource === 'column') {
+        subscribe.article.column = articleObj[sid].column;
       }
     }
     results.push(subscribe);
