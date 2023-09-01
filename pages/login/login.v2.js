@@ -4,6 +4,7 @@ import { getState } from '../lib/js/state';
 import { RNCloseWebview, RNLogin } from '../lib/js/reactNative';
 import { getDataById } from '../lib/js/dataConversion';
 import { nkcAPI } from '../lib/js/netAPI';
+import { visitUrl } from '../lib/js/pageSwitch';
 const { referer, type } = getDataById('data');
 
 const { isApp, uid } = getState();
@@ -33,7 +34,11 @@ new Vue({
       }
     },
     onRegistered() {
-      this.onLogged();
+      if (this.isApp) {
+        RNLogin();
+      } else {
+        visitUrl('/register/subscribe');
+      }
     },
     visitReferer() {
       if (referer) {

@@ -58,7 +58,7 @@
   import {
     RNCloseWebview, RNLogin
   } from "../js/reactNative";
-  import {nkcAPI} from "../js/netAPI";
+  import {visitUrl} from "../js/pageSwitch";
   import LoginCore, {LoginType} from './LoginCore.vue'
   import {CloseSmall} from '@icon-park/vue'
   const {
@@ -107,7 +107,7 @@
         if(this.isApp) {
           RNLogin();
         } else {
-          window.location.href = "/register/subscribe";
+          visitUrl("/register/subscribe");
         }
       }
     }

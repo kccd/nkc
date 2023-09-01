@@ -140,7 +140,7 @@ registerRouter
       let users = await db.UserModel.aggregate([
         {
           $match: {
-            certs: { $ne: 'band' },
+            certs: { $ne: 'banned' },
             tlv: {
               $gte: new Date(
                 Date.now() - recommendUsers.lastVisitTime * 24 * 60 * 60 * 1000,
