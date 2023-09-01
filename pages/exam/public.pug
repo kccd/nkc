@@ -4,12 +4,14 @@ block title
   +includeCSS('/exam/public.css')
 block content
   .container-fluid.max-width
-    include ../publicModules/appNavbar/appNavbar
-    +appNavbar
-    .examNotes
-      h3.m-b-1 注册说明
-      .pre-content.m-b-1!=markdown_safe(data.examNotice)
-      .btn.btn-default.fund-terms-button(onclick=`visitPublicExam('${data.cid}')`) 参加考试
+    .row.box-shadow-panel
+      .col-xs-12.col-md-8.col-md-offset-2
+        include ../publicModules/appNavbar/appNavbar
+        +appNavbar
+        .examNotes
+          h3.m-b-2.text-center 注册说明
+          .pre-content.m-b-1!=markdown_safe(data.examNotice)
+          .btn.btn-default.fund-terms-button(onclick=`visitPublicExam('${data.cid}')`) 参加考试
 block scripts
   script.
     function visitPublicExam(cid) {
