@@ -877,6 +877,9 @@ userSchema.statics.createUser = async (option) => {
   const SubscribeTypeModel = mongoose.model('subscribeTypes');
   const SystemInfoLogModel = mongoose.model('systemInfoLogs');
   const serverSettings = await SettingModel.getSettings('server');
+  const {
+    subscribeForumService,
+  } = require('../services/subscribe/subscribeForum.service');
   const userObj = Object.assign({}, option);
 
   const toc = Date.now();
@@ -923,13 +926,7 @@ userSchema.statics.createUser = async (option) => {
 
     // 创建默认数据 关注专业
     for (const fid of defaultSubscribeForumsId) {
-      const sub = SubscribeModel({
-        _id: await SettingModel.operateSystemID('subscribes', 1),
-        uid,
-        type: 'forum',
-        fid,
-      });
-      await sub.save();
+      await subscribeForumService.subscribeForum(user.uid, fid);
     }
     // 创建默认数据 查看系统通知的记录
     /*const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
@@ -945,11 +942,10 @@ userSchema.statics.createUser = async (option) => {
     await UsersPersonalModel.deleteOne({ uid });
     await UsersGeneraModel.deleteOne({ uid });
     await SystemInfoLogModel.deleteOne({ uid });
-    await SubscribeModel.deleteMany({
-      uid,
-      type: 'forum',
-      fid: { $in: defaultSubscribeForumsId },
-    });
+    for (const fid of defaultSubscribeForumsId) {
+      await subscribeForumService.unsubscribeForum(user.uid, fid);
+    }
+
     await SubscribeTypeModel.deleteMany({ uid });
     ThrowServerInternalError(
       `Failed to create user: ${error.message || error}`,

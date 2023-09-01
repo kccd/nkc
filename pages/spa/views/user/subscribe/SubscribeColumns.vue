@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(v-if="!loading")
+  div.p-t-1(v-if="!loading")
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-columns
       .null(v-if="subscribes && !subscribes.length" ) 空空如也~~

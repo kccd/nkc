@@ -3,7 +3,10 @@ block sTitle
   title=`最新动态 - ${remoteState.serverSettings.websiteName}`
 block sContent
   div
-    if !data.activity || data.activity.length === 0
+    if data.type === 'thread'
+      include ../publicModules/subscribeThreadNotice
+      +subscribeThreadNotice(remoteState.isApp)
+    else if !data.activity || data.activity.length === 0
       .p-t-5.p-b-5.text-center
         h4
           b 空空如也~

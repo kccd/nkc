@@ -2,8 +2,8 @@
   //关注的用户
   .subscribe-user(v-if="targetUser")
     subscribe-types(ref="subscribeTypes")
-    nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="typeClick"  @edit-type="editType")
-    .subscribe-divide-lines
+    //nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" type="collection" :subscribe-types="subscribeTypes" @click-type="typeClick"  @edit-type="editType")
+    //.subscribe-divide-lines
     paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
     .subscribe-user-content
       .null(v-if="subscribes.length === 0" ) 空空如也~~
