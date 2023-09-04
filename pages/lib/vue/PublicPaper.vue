@@ -11,8 +11,11 @@
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
         .question-text
-          .h4.text-info 第 {{index + 1}} 题：
-          question-text-content(:text="`${question.content}${question.isMultiple? '(多选)':''}`")
+          .h4.text-info 第 {{index + 1}} 题（
+            span(v-if="question.type === 'ans'") 填空题
+            span(v-else) {{question.isMultiple? '多选题': '单选题'}}
+            | ）
+          question-text-content(:text="`${question.content}`")
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
@@ -27,17 +30,17 @@
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc.text-danger(v-if="answerDesc.length>0 && selected.includes(index)")
+                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected.includes(index)")
                   .answer-desc-icon.fa.fa-lightbulb-o
-                  span {{answerDesc.find((item)=>item._id === q._id).desc}}
+                  span {{answerDescObj[q._id].desc}}
             label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
               input.m-r-05(:disabled="isReselected" v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc.text-danger(v-if="answerDesc.length>0 && selected === index")
+                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected === index")
                   .answer-desc-icon.fa.fa-lightbulb-o
-                  span {{answerDesc.find((item)=>item._id === q._id).desc}}
+                  span {{answerDescObj[q._id].desc}}
         footer.clearfix
           h4.question-intro.text-danger(v-if="!isCorrect" ) 回答错误
           .button-group
@@ -291,6 +294,17 @@ export default Vue.extend({
         }
       }else {
         return  fill === ''
+      }
+    },
+    answerDescObj() {
+      if(typeof this.answerDesc === 'string') {
+        return {desc: this.answerDesc}
+      } else {
+        const obj = {};
+        for(const item of this.answerDesc) {
+          obj[item._id] = item;
+        }
+        return obj;
       }
     }
   },
