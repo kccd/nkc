@@ -1487,13 +1487,6 @@ threadRouter
     if (post._id) {
       db.DraftModel.updateToStableHistoryById(post._id, state.uid);
     }
-    // 回复自动关注文章
-    const subQuery = {
-      type: 'thread',
-      tid,
-      uid: data.user.uid,
-    };
-    await db.SubscribeModel.insertSubscribe('replay', data.user.uid, tid);
     // 推送回复、评论 仅推送无需审核的post
     if (_post.reviewed) {
       await nkcModules.socket.sendPostMessage(_post.pid);

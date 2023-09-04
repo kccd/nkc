@@ -1,6 +1,7 @@
 const mongoose = require('../settings/database');
 const moment = require('moment');
 const tools = require('../nkcModules/tools');
+const { subscribeSources } = require('../settings/subscribe');
 
 const articleSources = {
   column: 'column',
@@ -1599,9 +1600,9 @@ schema.methods.addArticleHits = async function () {
 schema.statics.getCollectedCountByAid = async function (aid) {
   const SubscribeModel = mongoose.model('subscribes');
   return await SubscribeModel.countDocuments({
-    type: 'article',
+    source: subscribeSources.collectionArticle,
     cancel: false,
-    tid: aid,
+    sid: aid,
   });
 };
 

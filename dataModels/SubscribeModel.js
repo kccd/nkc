@@ -902,13 +902,13 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
  * @return {Boolean}
  * @author pengxiguaa 2020-12-15
  * */
-schema.statics.checkCollectionThread = async (uid, tid, type) => {
+schema.statics.checkCollectionThread = async (uid, tid) => {
   const SubscribeModel = mongoose.model('subscribes');
   const count = await SubscribeModel.countDocuments({
     cancel: false,
     uid,
-    tid,
-    type,
+    sid: tid,
+    source: subscribeSources.collectionThread,
   });
   return count > 0;
 };
@@ -920,14 +920,7 @@ schema.statics.checkCollectionThread = async (uid, tid, type) => {
  * @author pengxiguaa 2020-12-15
  * */
 schema.statics.checkSubscribeThread = async (uid, tid) => {
-  const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.countDocuments({
-    cancel: false,
-    uid,
-    tid,
-    type: 'thread',
-  });
-  return count > 0;
+  return false;
 };
 
 /*

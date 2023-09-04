@@ -50,7 +50,6 @@ router.get('/', async (ctx, next) => {
       optionStatus.collection = await db.SubscribeModel.checkCollectionThread(
         user.uid,
         post.tid,
-        'collection',
       );
     }
     if (isPost) {
