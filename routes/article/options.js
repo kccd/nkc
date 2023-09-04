@@ -59,23 +59,12 @@ router.get('/', async (ctx, next) => {
     if (ctx.permission('digestPost')) {
       optionStatus.digest = article.digest;
     }
-    if (
-      uid === article.uid ||
-      permissionsOr([
-        'pushThread',
-        'moveThreads',
-        'movePostsToDraft',
-        'movePostsToRecycle',
-        'digestThread',
-        'unDigestThread',
-        'toppedThread',
-        'unToppedThread',
-        'homeTop',
-        'unHomeTop',
-      ])
-    ) {
-      optionStatus.edit = true;
+
+    if (uid === article.uid || ctx.permission('viewUserArticle')) {
       optionStatus.history = true;
+    }
+    if (uid === article.uid || ctx.permission('modifyOtherArticles')) {
+      optionStatus.edit = true;
     }
     // 评学术分
     if (ctx.permission('creditXsf')) {
