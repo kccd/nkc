@@ -7,6 +7,7 @@ module.exports = async (ctx, next) => {
   if (user.uid !== targetUser.uid) {
     ctx.throw(401, '权限不足');
   }
+  await db.SubscribeModel.saveUserSubUsersId(targetUser.uid);
   match.source = subscribeSources.user;
   match.uid = data.targetUser.uid;
   match.cancel = false;

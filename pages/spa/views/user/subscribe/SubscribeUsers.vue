@@ -15,19 +15,19 @@
                 :src="getUrl('userAvatar',followedUser.targetUser.avatar, 'sm')"
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
-                :data-global-data="objToStr({uid: followedUser.tUid})"
+                :data-global-data="objToStr({uid: followedUser.sid})"
                 )
             .subscribe-user-list-content
               .account-follower-name
                 a(
-                  :href="`/u/${followedUser.tUid}`"
+                  :href="`/u/${followedUser.sid}`"
                   data-global-mouseover="showUserPanel"
                   data-global-mouseout="hideUserPanel"
-                  :data-global-data="objToStr({uid: followedUser.tUid})"
+                  :data-global-data="objToStr({uid: followedUser.sid})"
                   ) {{followedUser.targetUser.username}}
                 .account-follower-buttons
-                  button.category(v-if="subUsersId.indexOf(followedUser.tUid)+1" @click="openTypesModal(followedUser._id,followedUser.cid)") 分类
-                  button.subscribe(:class="subUsersId.indexOf(followedUser.tUid)+1 ?'cancel':'focus'" @click="userFollowType(followedUser.tUid)") {{subUsersId.indexOf(followedUser.tUid)+1?'取关':'关注'}}
+                  button.category(v-if="subUsersId.includes(followedUser.sid)" @click="openTypesModal(followedUser._id,followedUser.cid)") 分类
+                  button.subscribe(:class="subUsersId.includes(followedUser.sid)?'cancel':'focus'" @click="userFollowType(followedUser.sid)") {{subUsersId.includes(followedUser.sid)?'取关':'关注'}}
               .account-follower-level
                 span(:style="{color:followedUser.targetUser.grade.color}") {{followedUser.targetUser.grade.displayName}}
                 img.grade-icon(:src="getUrl('gradeIcon', followedUser.targetUser.grade._id)" :title="followedUser.targetUser.grade.displayName" )
