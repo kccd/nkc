@@ -52,7 +52,7 @@ block eContent
               .form-group
                 label 学术分至少{{regSettings.recommendUsers.xsf}}分
                 input.form-control(type="text" v-model.number="regSettings.recommendUsers.xsf")
-        h4 三、注册考试设置
+        h4 三、注册前考试设置
         .row
           .col-xs-12.col-md-4
             .form
@@ -92,7 +92,7 @@ block eContent
                             th {{categorie.name}}
                             th
                               button(@click='addExam' :id=`categorie._id` :name='categorie.name') 添加
-                    h5(style="font-weight: bold;") 说明
+                    h5(style="font-weight: bold;") 说明（Markdown）
                     textarea.form-control(v-model="regSettings.examNotice" rows=7)
 
         h4 四、注销设置
