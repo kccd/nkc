@@ -297,8 +297,8 @@ export default Vue.extend({
       }
     },
     answerDescObj() {
-      if(typeof this.answerDesc === 'string') {
-        return {desc: this.answerDesc}
+      if(this.question.type === 'ans') {
+        return this.answerDesc;
       } else {
         const obj = {};
         for(const item of this.answerDesc) {
