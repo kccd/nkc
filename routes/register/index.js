@@ -171,8 +171,12 @@ registerRouter
     await next();
   })
   .get('/exam', async (ctx, next) => {
-    const { db, data } = ctx;
+    const { db, data, state } = ctx;
     //获取注册需要考哪些卷子
+    if (state.uid) {
+      // 已登录用户访问时跳转到首页
+      return ctx.redirect('/');
+    }
     const {
       c: { examSource, examNotice },
     } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });

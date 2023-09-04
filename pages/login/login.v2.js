@@ -44,13 +44,13 @@ new Vue({
       if (referer) {
         nkcAPI(referer, 'GET')
           .then(() => {
-            window.location.href = referer;
+            visitUrl(referer);
           })
           .catch(() => {
-            window.location.href = '/';
+            visitUrl('/');
           });
       } else {
-        window.location.href = '/';
+        visitUrl('/');
       }
     },
     close() {
