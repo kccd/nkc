@@ -39,6 +39,8 @@ block content
                 button.btn.btn-xs.btn-default(@click=`editQuestionTag(tag)`) 编辑
                 button.btn.btn-xs.btn-danger(@click=`deleteQuestionTag(tag)`) 删除
             .tag-count {{`总共/可用：${tag.allCount}/${tag.count}`}}
+        .m-b-1
+          button.btn.btn-block.btn-default(@click='addQuestionTag') 添加标签
       .col-xs-12.col-md-9
         ul.nav.nav-pills.m-b-1
           li(class=!data.v?'active': '')
