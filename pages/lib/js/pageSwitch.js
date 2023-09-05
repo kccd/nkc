@@ -21,6 +21,9 @@ export function visitUrl(url, blank) {
     }
   }
 }
+export function reloadPage() {
+  window.location.reload();
+}
 export function visitUrlReplace(url) {
   window.location.replace(url);
 }

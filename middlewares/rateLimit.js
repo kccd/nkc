@@ -4,7 +4,7 @@ const redis = require('ioredis');
 const redisConfig = require('../config/redis');
 const path = require('path');
 const rateLimitErrorInfo = fs.readFileSync(path.resolve(__dirname, `../pages/error/429.html`));
-const {files: fileOperations} = require('../settings/operationsType');
+const {files: fileOperations} = require('../settings/operationGroups');
 const {
   total: rateLimitTotal, // 总限制 包含：静态资源、图片、视频、音频、附件、html以及json
   totalFile: rateLimitTotalFile, // 总的文件限制 包含：图片、视频、音频以及附件

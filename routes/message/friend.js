@@ -10,6 +10,8 @@ router
     }
     await next();
   })
+  // 20230829
+  // 取消了短消息添加好友功能，此路由废弃
   .post('/', async (ctx, next) => {
     const { db, data, body, nkcModules } = ctx;
     const { uid, type } = body;
@@ -50,61 +52,22 @@ router
     await next();
   })
   .post('/apply', async (ctx, next) => {
-    const { db, body, data } = ctx;
-    const { uid, description = '' } = body;
+    const { nkcModules, db, body, data } = ctx;
+    const { uid } = body;
     const { user } = data;
     const targetUser = await db.UserModel.findOnly({ uid });
-    // 判断自己是否在对方黑名单中
-    const inBlackList = await db.BlacklistModel.inBlacklist(
-      targetUser.uid,
-      user.uid,
-    );
-    if (inBlackList) {
-      ctx.throw(403, `对方拒绝接收你的消息，你无法添加对方为好友`);
-    }
     // 判断对方是否在自己的黑名单中
     await db.BlacklistModel.removeUserFromBlacklist(user.uid, targetUser.uid);
-    if (description.length > 200) {
-      ctx.throw(400, `验证信息不能超过200个字`);
-    }
     const friend = await db.FriendModel.findOne({
       uid: user.uid,
       tUid: targetUser.uid,
     });
     if (friend) {
-      ctx.throw(400, `对方已在你的好友列表中，请勿重复添加`);
+      ctx.throw(400, `对方已在你的联系人列表中，请勿重复添加`);
     }
-    let applicationLog = await db.FriendsApplicationModel.findOne({
-      applicantId: user.uid,
-      respondentId: targetUser.uid,
-      agree: 'null',
-    });
-
-    const targetApplicationLog = await db.FriendsApplicationModel.findOne({
-      applicantId: targetUser.uid,
-      respondentId: user.uid,
-      agree: 'null',
-    });
-    if (targetApplicationLog) {
-      ctx.throw(400, `对方已向你发起添加好友请求，请在「新朋友」处查看`);
-    }
-    if (applicationLog) {
-      ctx.throw(400, `你已发起添加好友请求，请勿重复提交`);
-    } else {
-      applicationLog = db.FriendsApplicationModel({
-        _id: await db.SettingModel.operateSystemID('friendsApplications', 1),
-        applicantId: user.uid,
-        respondentId: targetUser.uid,
-        description,
-      });
-      await applicationLog.save();
-    }
-    await db.UsersGeneralModel.updateOne(
-      { uid: uid },
-      { $set: { 'messageSettings.chat.newFriends': true } },
-    );
-
-    await ctx.nkcModules.socket.sendNewFriendApplication(applicationLog._id);
+    await db.FriendModel.createFriend(user.uid, targetUser.uid);
+    await nkcModules.socket.sendEventUpdateUserList(user.uid);
+    await nkcModules.socket.sendEventUpdateChatList(user.uid);
     await next();
   })
   .put('/', async (ctx, next) => {
@@ -117,7 +80,7 @@ router
     const { cid, name, description, image, phone, location } = friendData;
     const friend = await db.FriendModel.findOne({ uid: user.uid, tUid: uid });
     if (!friend) {
-      ctx.throw(400, `你暂未与对方建立好友关系，请刷新后重试`);
+      ctx.throw(400, `该用户不在你的联系人列表中，无权操作`);
     }
     const { checkString } = nkcModules.checkData;
     checkString(name, {
@@ -191,8 +154,8 @@ router
     const { uid } = query;
     const { user } = data;
     const targetUser = await db.UserModel.findOnly({ uid });
-    await db.FriendModel.removeFriend(targetUser.uid, user.uid);
-    await nkcModules.socket.sendEventRemoveFriend(user.uid, uid);
+    await db.FriendModel.removeFriend(user.uid, targetUser.uid);
+    await nkcModules.socket.sendEventRemoveFriend(user.uid, targetUser.uid);
     await next();
   });
 

@@ -221,7 +221,7 @@ router
       await surveyPost.save();
       // 给予奖励
       if(data.user) {
-        const lock = await nkcModules.redLock.lock(`surveyPost:${survey._id}`, 10000);
+        const lock = await nkcModules.redLock.redLock.lock(`surveyPost:${survey._id}`, 10000);
         const record = await db.SurveyPostModel.rewardPost( {
           surveyId: survey._id,
           uid: data.user.uid,

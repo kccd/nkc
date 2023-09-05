@@ -12,4 +12,23 @@ redLock.on('clientError', (err) => {
     console.log(err);
   }
 });
-module.exports = redLock;
+
+async function createLock(name, ttl) {
+  return await redLock.lock(name, ttl);
+}
+
+async function getActivationCodeLock() {
+  return await createLock('getNewActivationCode', 6000);
+}
+async function getRegisterExamCheckLock(ip) {
+  const getRedisKeys = require('../nkcModules/getRedisKeys');
+  const key = getRedisKeys('registerExamLimitLock', ip);
+  return await createLock(key, 6000);
+}
+
+module.exports = {
+  createLock,
+  redLock,
+  getActivationCodeLock,
+  getRegisterExamCheckLock,
+};

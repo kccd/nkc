@@ -29,7 +29,7 @@ router
   })
   .post("/", async (ctx, next) => {
     const {nkcModules, data, db, body, state} = ctx;
-    const lock = await nkcModules.redLock.lock("withdraw", 6000);
+    const lock = await nkcModules.redLock.redLock.lock("withdraw", 6000);
     const {checkNumber} = nkcModules.checkData;
     try{
       const {user} = data;

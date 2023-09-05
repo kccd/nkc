@@ -23,7 +23,7 @@
           a(:href="tUser.homeUrl" target="_blank").btn.btn-block.btn-default 动态
           button.btn.btn-block.btn-default(@click="clickChatButton") 发消息
           button.btn.btn-block.btn-default(v-if="friend" @click="showFriendInfo = !showFriendInfo") 备注信息
-          .form.friend-info(v-if="showFriendInfo")
+          .form.friend-info(v-if="showFriendInfo && friend.info")
             .form-group
               label 备注：
               input.form-control(type="text" v-model="friend.info.name")
@@ -59,8 +59,8 @@
               button.btn.btn-primary.btn-sm.m-r-05(@click="saveFriendInfo") 保存
               button.btn.btn-default.btn-sm(@click="showFriendInfo = false") 取消
           button.btn.btn-block.btn-default(@click="toRemoveChat") 删除对话
-          button.btn.btn-block.btn-default(v-if="!friend" @click="addFriend") 添加好友
-          button.btn.btn-block.btn-default(v-if="friend" @click="removeFriend") 删除好友
+          button.btn.btn-block.btn-default(v-if="!friend" @click="addFriend") 添加联系人
+          button.btn.btn-block.btn-default(v-if="friend" @click="removeFriend") 删除联系人
           button.btn.btn-block.btn-default(v-if="!tUser.inBlacklist" @click="addToBlacklist") 加入黑名单
           button.btn.btn-block.btn-danger(v-else @click="removeFromBlacklist") 从黑名单移出
 
@@ -192,6 +192,7 @@
         this.phoneNumbers = arr;
       },
       init({type, uid}) {
+        this.showFriendInfo = false;
         // 暂仅支持UTU
         const app = this;
         app.type = type;
@@ -217,7 +218,7 @@
         const {displayName} = this;
         const {uid} = this.tUser;
         const app = this;
-        return sweetQuestion(`确定要删除好友「${displayName}」？`)
+        return sweetQuestion(`确定要删除联系人「${displayName}」？`)
           .then(() => {
             return nkcAPI(`/message/friend?uid=${uid}`, 'DELETE')
           })
@@ -229,11 +230,10 @@
       addFriend() {
         const {uid} = this;
         const app = this;
-        return sweetPrompt('请输入验证信息')
-          .then((description) => {
+        return sweetQuestion(`确定添加「${this.displayName}」为联系人吗？`)
+          .then(() => {
             return nkcAPI('/message/friend/apply', 'POST', {
               uid,
-              description
             });
           })
           .then(() => {

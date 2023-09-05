@@ -267,7 +267,9 @@ window.NKCHighlighter = class {
     try{
       // 屏蔽划词事件
       if(this.disabled) return;
-      const { range, sel } = this.getRange();
+      const rangeInfo = this.getRange();
+      if(!rangeInfo) return;
+      const { range, sel } = rangeInfo;
       if(!range || range.collapsed) return;
       if(
         range.startContainer === this.range.startContainer &&
@@ -283,7 +285,7 @@ window.NKCHighlighter = class {
         range
       });
     } catch(err) {
-      console.log(err.message || err);
+      console.log(err);
     }
   }
   contains(node) {

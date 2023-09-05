@@ -1,5 +1,11 @@
 <template lang="pug">
-  .subscribe-thread(v-if="targetUser")
+  .p-t-5.p-b-5.text-center 我们已经移除了关注文章功能，您之前关注的文章已自动转到了&nbsp;
+    if isApp
+      a(href='/app/profile/sub/collection' target='_blank') 我的收藏
+    else
+      a(href='/creation/collections' target='_blank') 我的收藏
+    | 。
+  //-.subscribe-thread(v-if="targetUser")
     subscribe-types(res="subscribeTypes")
     nav-types(ref="navTypes" :target-user="targetUser" :parent-type="parentType" :subscribe-types="subscribeTypes" @click-type="clickType")
     paging(ref="paging" :pages="pageButtons" @click-button="clickPage")

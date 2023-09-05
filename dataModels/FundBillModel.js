@@ -348,7 +348,7 @@ fundBillSchema.statics.getDonationBills = async (count = 12) => {
 };
 
 fundBillSchema.statics.getNewId = async () => {
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const lock = await redLock.lock(`createFundBillId`, 6000);
   const id = Date.now();
   setTimeout(() => {

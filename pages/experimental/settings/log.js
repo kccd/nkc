@@ -1,3 +1,4 @@
+/*
 function saveLogSettings(){
 	var dom = $("input[name='operation']");
 	var selectedOperationsId = [];
@@ -14,4 +15,4 @@ function saveLogSettings(){
 		.catch(sweetError)
 }
 
-window.saveLogSettings = saveLogSettings;
+window.saveLogSettings = saveLogSettings;*/

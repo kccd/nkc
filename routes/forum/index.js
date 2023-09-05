@@ -66,7 +66,6 @@ forumRouter
       forums.map((f) => {
         f.canSubscribe = !parentsId.includes(f.fid);
       });
-
       data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 
       data.disciplineForums = [];

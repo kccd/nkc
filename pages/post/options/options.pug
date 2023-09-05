@@ -32,10 +32,6 @@ if !isIncluded('options')
         .fa.fa-folder-o
         span(v-if='collection === false') 加入收藏
         span(v-else) 取消收藏
-      .option(v-if='subscribe !== null' @click='subscribeThread')
-        .fa.fa-bookmark-o
-        span(v-if='subscribe === false') 加入关注
-        span(v-else) 取消关注
       .option(v-if='hidePost !== null' @click='hidePostContent')
         .fa.fa-compress
         span 折叠回复

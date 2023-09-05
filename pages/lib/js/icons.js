@@ -1,8 +1,3 @@
-import {
-  Home,
-} from '@icon-park/vue';
+import { Home } from '@icon-park/vue';
 
-
-export {
-  Home
-}
+export { Home };

@@ -1,14 +1,9 @@
 <template lang="pug">
-  .module-dialog-body
-    .module-dialog-header
-      .module-dialog-title(ref="draggableHandle" v-if="edit") {{!type._id?"新建分类":"编辑分类"}}
-      .module-dialog-title(ref="draggableHandle" v-else) 选择分类
-      .module-dialog-close(@click="close")
-        .fa.fa-remove
-    .module-dialog-content
-      .modal-body(v-if="!loaded")
-        .m-t-3.m-b-3.text-center 加载中...
-      .modal-body(v-else)
+  draggable(:title="title" @close="close" ref="draggable" max-width="26rem")
+    .subscribe-types-container
+      div(v-if="!loaded")
+        .p-t-2.p-b-2.text-center 加载中...
+      div(v-else)
         .from(v-if="edit")
           .form-group
             label 分类名(不超过20字符)
@@ -22,110 +17,83 @@
             button.btn.btn-sm.btn-block.btn-primary(@click="save") 保存
             button.btn.btn-sm.btn-block.btn-default(@click="closeForm") 取消
         div(v-else)
-          .list(v-for="(t, index) in types")
-            label(v-if="!editType")
-              span(v-html="'&nbsp;&nbsp;&nbsp;'" v-if="t.pid")
-              input(type="checkbox" :value="t._id" v-model="selectedTypesId")
-              span {{t.name}}
+          .subscribe-type-item(v-for="(t, index) in types" :class="{'p-l-1': !!t.pid}")
+            .checkbox(v-if="!editType")
+              label
+                input(type="checkbox" :value="t._id" v-model="selectedTypesId")
+                span {{t.name}}
             .type-li(v-else)
-              span(v-html="'&nbsp;&nbsp;&nbsp;'" v-if="t.pid")
               span {{t.name}}
               .type-buttons
                 .fa.fa-pencil(@click="modifyType(index)" title="编辑")
                 .fa.fa-arrow-circle-o-up(@click="moveType(index, 'up')" title="上移")
                 .fa.fa-arrow-circle-o-down(@click="moveType(index, 'down')" title="下移")
                 .fa.fa-trash(@click="removeType(index)" title="删除")
-          .text-center
-            .pointer(@click="addType").m-t-05.m-b-05
-              .fa.fa-plus-circle &nbsp;添加分类
-      .modal-footer(v-if="!edit && !editType")
-        .checkbox.m-t-0.m-b-05.text-left(v-if="!hideInfo")
-          label
-            input(type="checkbox" :value="true" v-model="selectTypesWhenSubscribe")
-            span(style="font-size: 1rem;") 下次不再弹出（可在设置-偏好设置中开启）
-        button(type="button" class="btn btn-sm btn-default" @click="close") 取消
-        button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
+          div
+            .checkbox.m-t-0.m-b-05.text-left(v-if="!hideInfo && !editType")
+              label
+                input(type="checkbox" :value="true" v-model="selectTypesWhenSubscribe")
+                span(style="font-size: 1rem;") 下次不再弹出（可在设置-偏好设置中开启）
+            div
+              button(type="button" class="btn btn-sm btn-default" @click="addType") 添加分类
+              .pull-right(v-if="!editType")
+                button.m-r-05(type="button" class="btn btn-sm btn-default" @click="close") 取消
+                button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
 </template>
 
 <style lang="less" scoped>
 @import "../../publicModules/base";
-.module-dialog-body{
-  display: none;
-  position: fixed;
-  width: 34rem;
-  max-width: 100%;
-  top: 100px;
-  right: 0;
-  z-index: 1050;
-  background-color: #fff;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-  border: 1px solid #ddd;
-  margin: 1rem;
-  .module-dialog-header{
-    height: 3rem;
-    line-height: 3rem;
-    background-color: #f6f6f6;
-    padding-right: 3rem;
-    .module-dialog-close{
-      cursor: pointer;
-      color: #aaa;
-      width: 3rem;
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 3rem;
-      line-height: 3rem;
-      text-align: center;
-      &:hover{
-        background-color: rgba(0,0,0,0.08);
-        color: #777;
-      }
-    }
-    .module-dialog-title{
-      cursor: move;
-      font-weight: 700;
-      margin-left: 1rem;
+.subscribe-types-container{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.subscribe-type-item{
+  margin-bottom: 0.5rem;
+  &:last-child{
+    margin-bottom: 0;
+  }
+}
+@buttonWidth: 6rem;
+@typeLiHeight: 3rem;
+.type-buttons{
+  position: absolute;
+  top: 0;
+  right: 0.5rem;
+  height: @typeLiHeight;
+  line-height: @typeLiHeight;
+  .fa{
+    font-size: 1.4rem;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    &:last-child{
+      margin-right: 0;
     }
   }
-  .module-dialog-content{
-    padding: 0 1rem;
-    .type-li{
-      position: relative;
-      padding-right: 5.5rem;
-      height: 2rem;
-      line-height: 2rem;
-      word-break: break-word;
-      display: -webkit-box;
-      overflow: hidden;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 1;
-    }
-    .type-buttons{
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-    .type-buttons .fa{
-      color: #888;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .type-buttons .fa:hover{
-      color: #282c37;
-    }
-  }
+
+}
+.type-li{
+  background-color: #e1e1e1;
+  border-radius: 3px;
+  padding-left: 0.5rem;
+  position: relative;
+  padding-right: @buttonWidth;
+  height: @typeLiHeight;
+  line-height: @typeLiHeight;
 }
 </style>
 
 <script>
+import Draggable from '../vue/publicVue/draggable.vue';
 import {DraggableElement} from "../js/draggable";
 import {getState} from "../js/state";
 export default {
+  components: {
+    draggable: Draggable
+  },
   data: () => {
     return {
-      show: false,
       edit: false,
-      editType: false, // 无法选择分类，仅仅只能编辑分类
+      editType: false, // 管理分类
       fastAdd: false,
       uid: getState().uid,
       loaded: false,
@@ -140,13 +108,19 @@ export default {
       backdrop: "statics"
     }
   },
-  mounted() {
-    this.initDraggableElement();
-  },
-  destroyed(){
-    this.draggableElement && this.draggableElement.destroy();
-  },
   computed: {
+    draggable() {
+      return this.$refs.draggable;
+    },
+    title() {
+      if(this.edit) {
+        return this.type._id? '编辑分类': '添加分类'
+      } else if(!this.editType) {
+        return '选择分类'
+      } else {
+        return '管理分类'
+      }
+    },
     selectedTypes: function() {
       var arr = [];
       for(var i = 0; i < this.selectedTypesId.length; i++) {
@@ -168,10 +142,6 @@ export default {
   methods: {
     getSubscribeSettings() {
       return nkcAPI('/account/subscribe_settings', 'GET').then(res => res.subscribeSettings);
-    },
-    initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
-      this.draggableElement.setPositionCenter();
     },
     submit: function() {
       this.callback(this.data);
@@ -243,7 +213,7 @@ export default {
     removeType: function(index) {
       var type = this.types[index];
       var self = this;
-      sweetConfirm("确定要删除分类“"+type.name+"”吗？")
+      sweetQuestion("确定要删除分类“"+type.name+"”吗？")
         .then(function() {
           nkcAPI("/account/subscribe_types/" + type._id, "DELETE")
             .then(function() {
@@ -311,16 +281,17 @@ export default {
           }
         }
         self.callback = callback;
-        self.draggableElement.show();
-        self.show = true;
+        self.showPanel();
       } catch(err) {
         sweetError(err);
       }
 
     },
     close() {
-      this.draggableElement.hide();
-      this.show = false;
+      this.draggable.close();
+    },
+    showPanel() {
+      this.draggable.open();
     },
     //关注或者取关用户
     subscribeUser(id, sub) {

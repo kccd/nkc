@@ -154,7 +154,7 @@ router
           await db.ColumnPostCategoryModel.checkColumnCategory(toColumn);
         }
         const key = await nkcModules.getRedisKeys('commentOrder', article._id);
-        const lock = await nkcModules.redLock.lock(key, 6000);
+        const lock = await nkcModules.redLock.redLock.lock(key, 6000);
         try {
           // 获取最新评论的楼层
           let order;

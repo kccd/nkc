@@ -5,6 +5,7 @@ const getRedisKeys = require('../nkcModules/getRedisKeys');
 const redisClient = require('../settings/redisClient');
 const { defaultCerts } = require('../settings/userCerts');
 const filterResult = require('../nkcModules/xssFilters/filterResult');
+const { subscribeSources } = require('../settings/subscribe');
 const {
   ThrowCommonError,
   ThrowServerInternalError,
@@ -876,6 +877,9 @@ userSchema.statics.createUser = async (option) => {
   const SubscribeTypeModel = mongoose.model('subscribeTypes');
   const SystemInfoLogModel = mongoose.model('systemInfoLogs');
   const serverSettings = await SettingModel.getSettings('server');
+  const {
+    subscribeForumService,
+  } = require('../services/subscribe/subscribeForum.service');
   const userObj = Object.assign({}, option);
 
   const toc = Date.now();
@@ -922,13 +926,7 @@ userSchema.statics.createUser = async (option) => {
 
     // 创建默认数据 关注专业
     for (const fid of defaultSubscribeForumsId) {
-      const sub = SubscribeModel({
-        _id: await SettingModel.operateSystemID('subscribes', 1),
-        uid,
-        type: 'forum',
-        fid,
-      });
-      await sub.save();
+      await subscribeForumService.subscribeForum(user.uid, fid);
     }
     // 创建默认数据 查看系统通知的记录
     /*const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
@@ -944,11 +942,10 @@ userSchema.statics.createUser = async (option) => {
     await UsersPersonalModel.deleteOne({ uid });
     await UsersGeneraModel.deleteOne({ uid });
     await SystemInfoLogModel.deleteOne({ uid });
-    await SubscribeModel.deleteMany({
-      uid,
-      type: 'forum',
-      fid: { $in: defaultSubscribeForumsId },
-    });
+    for (const fid of defaultSubscribeForumsId) {
+      await subscribeForumService.unsubscribeForum(user.uid, fid);
+    }
+
     await SubscribeTypeModel.deleteMany({ uid });
     ThrowServerInternalError(
       `Failed to create user: ${error.message || error}`,
@@ -1155,10 +1152,7 @@ userSchema.methods.getNewMessagesCount = async function () {
   }
   // 添加好友
   if (newFriends) {
-    newApplicationsCount = await FriendsApplicationModel.countDocuments({
-      agree: 'null',
-      respondentId: this.uid,
-    });
+    newApplicationsCount = 0;
   }
   // 用户信息
   const newUsersMessagesCount = await MessageModel.countDocuments({
@@ -1456,62 +1450,46 @@ userSchema.methods.ensureSubLimit = async function (type) {
   const SubscribeModel = mongoose.model('subscribes');
   const SettingModel = mongoose.model('settings');
   const subSettings = await SettingModel.findById('subscribe');
-  const {
-    subUserCountLimit,
-    subForumCountLimit,
-    subThreadCountLimit,
-    subColumnCountLimit,
-  } = subSettings.c;
-  if (type === 'user') {
+  const { subUserCountLimit, subForumCountLimit, subColumnCountLimit } =
+    subSettings.c;
+  if (type === subscribeSources.user) {
     if (subUserCountLimit <= 0) {
       ThrowCommonError(400, '关注用户功能已关闭');
     }
     const userCount = await SubscribeModel.countDocuments({
       uid: this.uid,
+      source: subscribeSources.user,
       cancel: false,
-      type: 'user',
     });
     if (userCount >= subUserCountLimit) {
       ThrowCommonError(400, '关注用户数量已达上限');
     }
-  } else if (type === 'forum') {
+  } else if (type === subscribeSources.forum) {
     if (subForumCountLimit <= 0) {
       ThrowCommonError(400, '关注专业已关闭');
     }
     const forumCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       cancel: false,
-      type: 'forum',
+      source: subscribeSources.forum,
     });
     if (forumCount >= subForumCountLimit) {
       ThrowCommonError(400, '关注专业数量已达上限');
     }
-  } else if (type === 'thread') {
-    if (subThreadCountLimit <= 0) {
-      ThrowCommonError(400, '关注文章功能已关闭');
-    }
-    const threadCount = await SubscribeModel.countDocuments({
-      uid: this.uid,
-      cancel: false,
-      type: 'thread',
-    });
-    if (threadCount >= subThreadCountLimit) {
-      ThrowCommonError(400, '关注文章数量已达上限');
-    }
-  } else if (type === 'column') {
+  } else if (type === subscribeSources.column) {
     if (subColumnCountLimit <= 0) {
       ThrowCommonError(400, '关注专栏功能已关闭');
     }
     const columnCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       cancel: false,
-      type: 'column',
+      source: subscribeSources.column,
     });
     if (columnCount >= subColumnCountLimit) {
       ThrowCommonError(400, '关注专栏数量已达上限');
     }
   } else {
-    ThrowCommonError(500, `未知的type类型：${type}`);
+    ThrowCommonError(500, `未知的source类型：${type}`);
   }
 };
 

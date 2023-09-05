@@ -183,7 +183,7 @@ kcbsRecordSchema.virtual('fromUser')
 * */
 kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const lock = await redLock.lock('kcbsRecord', 6000);
   try{
     await KcbsRecordModel.insertSystemRecordContent(type, u, ctx, additionalReward);

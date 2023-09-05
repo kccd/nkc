@@ -4,6 +4,9 @@ const captcha = require('../../nkcModules/captcha');
 const {
   usernameCheckerService,
 } = require('../../services/user/usernameChecker.service');
+const {
+  activationCodeService,
+} = require('../../services/activationCode/activationCode.service');
 registerRouter
   .get(['/', '/mobile'], async (ctx, next) => {
     const { data, query } = ctx;
@@ -22,9 +25,18 @@ registerRouter
   .post('/', async (ctx, next) => {
     // 手机注册
     const { db, body } = ctx;
-    let user;
-    const { mobile, nationCode, code, username, password } = body;
+    const { mobile, nationCode, code, username, password, activationCode } =
+      body;
     delete body.password;
+
+    const { registerExamination } = await db.SettingModel.getSettings(
+      'register',
+    );
+
+    if (registerExamination) {
+      await activationCodeService.checkActivationCodeId(activationCode);
+    }
+
     await usernameCheckerService.checkNewUsername(username);
     await db.UserModel.checkNewPassword(password);
     if (!nationCode) {
@@ -59,7 +71,10 @@ registerRouter
     delete option.type;
     option.username = username;
     option.password = password;
-    user = await db.UserModel.createUser(option);
+    const user = await db.UserModel.createUser(option);
+    if (registerExamination) {
+      await activationCodeService.useActivationCode(activationCode, user.uid);
+    }
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,
@@ -125,7 +140,7 @@ registerRouter
       let users = await db.UserModel.aggregate([
         {
           $match: {
-            certs: { $ne: 'band' },
+            certs: { $ne: 'banned' },
             tlv: {
               $gte: new Date(
                 Date.now() - recommendUsers.lastVisitTime * 24 * 60 * 60 * 1000,
@@ -153,6 +168,21 @@ registerRouter
       users.map((u) => u.extendGrade());
       data.users = await db.UserModel.extendUsersInfo(users);
     }
+    await next();
+  })
+  .get('/exam', async (ctx, next) => {
+    const { db, data, state } = ctx;
+    //获取注册需要考哪些卷子
+    if (state.uid) {
+      // 已登录用户访问时跳转到首页
+      return ctx.redirect('/');
+    }
+    const {
+      c: { examSource, examNotice },
+    } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
+    data.cid = examSource[0]._id;
+    data.examNotice = examNotice;
+    ctx.template = 'exam/public.pug';
     await next();
   });
 module.exports = registerRouter;

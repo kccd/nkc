@@ -26,7 +26,7 @@ module.exports = async (ctx) => {
     isApp: state.isApp,
     appOS: state.appOS,
     platform: state.platform,
-    operationId: state.operation._id,
+    operationId: state.operationId,
     fileDomain: state.fileDomain,
     serverSettings: state.serverSettings,
     logoICO: state.logoICO,

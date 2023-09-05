@@ -218,7 +218,7 @@ schema.methods.updateResourceReferences = async function () {
  * */
 schema.statics.getNewId = async () => {
   const MomentModel = mongoose.model('moments');
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const getRedisKeys = require('../nkcModules/getRedisKeys');
   const { getRandomString } = require('../nkcModules/apiFunction');
   const key = getRedisKeys('newMomentId');
@@ -827,7 +827,7 @@ schema.methods.updateParentMomentRepostCount = async function () {
  * */
 schema.methods.updateMomentCommentOrder = async function () {
   const MomentModel = mongoose.model('moments');
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const getRedisKeys = require('../nkcModules/getRedisKeys');
   const { parent, parents } = this;
   if (!parent) {

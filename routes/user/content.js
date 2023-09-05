@@ -1,7 +1,8 @@
-const router = require("koa-router")();
+const { subscribeSources } = require('../../settings/subscribe');
+const router = require('koa-router')();
 router
   // 动态
-  .get("/moment", async (ctx, next) => {
+  .get('/moment', async (ctx, next) => {
     const { data, db, query, params, state, nkcModules, permission } = ctx;
     const { uid } = params;
     const { page = 0 } = query;
@@ -9,7 +10,7 @@ router
     const match = {
       uid: targetUser.uid,
       status: (await db.MomentModel.getMomentStatus()).normal,
-      parent: ""
+      parent: '',
     };
     const count = await db.MomentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -19,13 +20,13 @@ router
       .limit(paging.perpage);
     data.momentsData = await db.MomentModel.extendMomentsListData(
       moments,
-      state.uid
+      state.uid,
     );
     data.paging = paging;
     await next();
   })
   // 回复
-  .get("/post", async (ctx, next) => {
+  .get('/post', async (ctx, next) => {
     const { data, db, query, params, state, nkcModules } = ctx;
     const { uid } = params;
     const { user } = data;
@@ -35,37 +36,37 @@ router
     //获取用户回复列表
     if (Number(page) === 0) {
       data.userPostSummary = await db.UserModel.getUserPostSummary(
-        targetUser.uid
+        targetUser.uid,
       );
       // nkcModules.apiFunction.shuffle(data.userPostSummary);
     }
     const accessibleFid = await db.ForumModel.getAccessibleForumsId(
       data.userRoles,
       data.userGrade,
-      data.user
+      data.user,
     );
     let canManageFid = [];
     if (data.user) {
       canManageFid = await db.ForumModel.canManagerFid(
         data.userRoles,
         data.userGrade,
-        data.user
+        data.user,
       );
     }
     const q = {
       uid,
-      mainForumsId: { $in: accessibleFid }
+      mainForumsId: { $in: accessibleFid },
     };
     if (
       (!user || user.uid !== targetUser.uid) &&
-      !ctx.permission("getPostAuthor")
+      !ctx.permission('getPostAuthor')
     ) {
       q.anonymous = false;
     }
     // 如果是已登录用户
     if (user) {
       // 不具有特殊专家权限的用户
-      if (!ctx.permission("superModerator")) {
+      if (!ctx.permission('superModerator')) {
         // 获取用户能够管理的专业ID
         // 三种情况：
         // 1. 已审核
@@ -73,18 +74,18 @@ router
         // 3. 未审核，且是自己有权限管理的专业里的内容
         q.$or = [
           {
-            reviewed: true
+            reviewed: true,
           },
           {
             reviewed: false,
-            uid: user.uid
+            uid: user.uid,
           },
           {
             reviewed: false,
             mainForumsId: {
-              $in: canManageFid
-            }
-          }
+              $in: canManageFid,
+            },
+          },
         ];
       }
     } else {
@@ -94,7 +95,7 @@ router
     const paging = nkcModules.apiFunction.paging(
       page,
       count,
-      pageSettings.userCardThreadList
+      pageSettings.userCardThreadList,
     );
     const posts = await db.PostModel.find(q)
       .sort({ toc: -1 })
@@ -104,7 +105,7 @@ router
 
     const tids = new Set(),
       threadsObj = {};
-    posts.map(post => {
+    posts.map((post) => {
       tids.add(post.tid);
     });
     let threads = await db.ThreadModel.find({ tid: { $in: [...tids] } });
@@ -117,9 +118,9 @@ router
       lastPostUser: false,
       firstPostResource: true,
       htmlToText: true,
-      removeLink: true
+      removeLink: true,
     });
-    threads.map(thread => {
+    threads.map((thread) => {
       threadsObj[thread.tid] = thread;
     });
 
@@ -137,7 +138,9 @@ router
                 has = true;
               }
             }
-            if (!has) continue;
+            if (!has) {
+              continue;
+            }
           }
         } else {
           continue;
@@ -153,16 +156,16 @@ router
       } else {
         firstPost = thread.firstPost;
         const m = { pid: post.pid };
-        if (!ctx.permission("displayDisabledPosts")) {
+        if (!ctx.permission('displayDisabledPosts')) {
           m.disabled = false;
         }
         link = await db.PostModel.getUrl(post.pid);
       }
       if (firstPost.t.length > 20) {
-        firstPost.t = firstPost.t.slice(0, 20) + "...";
+        firstPost.t = firstPost.t.slice(0, 20) + '...';
       }
       const result = {
-        postType: thread.oc === post.pid ? "postToForum" : "postToThread",
+        postType: thread.oc === post.pid ? 'postToForum' : 'postToThread',
         parentPostId: post.parentPostId,
         tid: thread.tid,
         cover: firstPost.cover,
@@ -173,14 +176,14 @@ router
         content: nkcModules.nkcRender.replaceLink(post.c),
         title: nkcModules.nkcRender.replaceLink(firstPost.t),
         link,
-        reviewed: post.reviewed
+        reviewed: post.reviewed,
       };
       result.toDraft =
-        (result.postType === "postToForum" && thread.recycleMark) ||
-        (result.postType === "postToThread" && post.toDraft && post.disabled);
+        (result.postType === 'postToForum' && thread.recycleMark) ||
+        (result.postType === 'postToThread' && post.toDraft && post.disabled);
       result.disabled =
-        (result.postType === "postToForum" && thread.disabled) ||
-        (result.postType === "postToThread" && !post.toDraft && post.disabled);
+        (result.postType === 'postToForum' && thread.disabled) ||
+        (result.postType === 'postToThread' && !post.toDraft && post.disabled);
       results.push(result);
     }
     data.posts = results;
@@ -189,7 +192,7 @@ router
     await next();
   })
   // 文章
-  .get("/thread", async (ctx, next) => {
+  .get('/thread', async (ctx, next) => {
     const { data, db, query, params, state, nkcModules } = ctx;
     const { uid } = params;
     const { user } = data;
@@ -199,25 +202,25 @@ router
     const accessibleFid = await db.ForumModel.getAccessibleForumsId(
       data.userRoles,
       data.userGrade,
-      data.user
+      data.user,
     );
     let canManageFid = [];
     if (data.user) {
       canManageFid = await db.ForumModel.canManagerFid(
         data.userRoles,
         data.userGrade,
-        data.user
+        data.user,
       );
     }
     const q = {
       uid: targetUser.uid,
       mainForumsId: {
-        $in: accessibleFid
-      }
+        $in: accessibleFid,
+      },
     };
     if (user) {
       // 不具有特殊专家权限的用户
-      if (!ctx.permission("superModerator")) {
+      if (!ctx.permission('superModerator')) {
         // 获取用户能够管理的专业ID
         // 三种情况：
         // 1. 已审核
@@ -225,18 +228,18 @@ router
         // 3. 未审核，且是自己有权限管理的专业里的内容
         q.$or = [
           {
-            reviewed: true
+            reviewed: true,
           },
           {
             reviewed: false,
-            uid: user.uid
+            uid: user.uid,
           },
           {
             reviewed: false,
             mainForumsId: {
-              $in: canManageFid
-            }
-          }
+              $in: canManageFid,
+            },
+          },
         ];
       }
     } else {
@@ -246,7 +249,7 @@ router
     const paging = nkcModules.apiFunction.paging(
       page,
       count,
-      pageSettings.userCardThreadList
+      pageSettings.userCardThreadList,
     );
     let threads = await db.ThreadModel.find(q, {
       tid: 1,
@@ -257,7 +260,7 @@ router
       reviewed: 1,
       disabled: 1,
       recycleMark: 1,
-      mainForumsId: 1
+      mainForumsId: 1,
     })
       .sort({ toc: -1 })
       .skip(paging.start)
@@ -270,16 +273,17 @@ router
       lastPost: false,
       lastPostUser: false,
       firstPostResource: true,
-      htmlToText: true
+      htmlToText: true,
     });
     const results = [];
     for (const thread of threads) {
       if (
-        !ctx.permission("getPostAuthor") &&
+        !ctx.permission('getPostAuthor') &&
         (!user || user.uid !== targetUser.uid) &&
         thread.firstPost.anonymous
-      )
+      ) {
         continue;
+      }
       if (thread.disabled || thread.recycleMark) {
         // 根据权限过滤掉 屏蔽、退休的内容
         if (user) {
@@ -292,7 +296,9 @@ router
                 has = true;
               }
             }
-            if (!has) continue;
+            if (!has) {
+              continue;
+            }
           }
         } else {
           continue;
@@ -300,7 +306,7 @@ router
       }
 
       const result = {
-        postType: "postToForum",
+        postType: 'postToForum',
         tid: thread.tid,
         cover: thread.firstPost.cover,
         time: thread.toc,
@@ -310,7 +316,7 @@ router
         content: nkcModules.nkcRender.replaceLink(thread.firstPost.c),
         anonymous: thread.firstPost.anonymous,
         link: `/t/${thread.tid}`,
-        reviewed: thread.reviewed
+        reviewed: thread.reviewed,
       };
 
       result.toDraft = thread.recycleMark;
@@ -323,7 +329,7 @@ router
     await next();
   })
   // 关注
-  .get("/follow", async (ctx, next) => {
+  .get('/follow', async (ctx, next) => {
     const { data, db, query, params, state, nkcModules } = ctx;
     const { uid } = params;
     const { pageSettings } = state;
@@ -331,22 +337,22 @@ router
     const targetUser = await db.UserModel.findOnly({ uid });
     const q = {
       uid: targetUser.uid,
-      type: "user",
-      cancel: false
+      source: subscribeSources.user,
+      cancel: false,
     };
     const count = await db.SubscribeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(
       page,
       count,
-      pageSettings.userCardUserList
+      pageSettings.userCardUserList,
     );
     if (!data.noPromission) {
-      const subs = await db.SubscribeModel.find(q, { tUid: 1 })
+      const subs = await db.SubscribeModel.find(q, { sid: 1 })
         .sort({ toc: -1 })
         .skip(paging.start)
         .limit(paging.perpage);
       data.users = await db.UserModel.find({
-        uid: { $in: subs.map(s => s.tUid) }
+        uid: { $in: subs.map((s) => s.sid) },
       });
       data.users = await db.UserModel.extendUsersInfo(data.users);
       let newUsers = [];
@@ -372,22 +378,22 @@ router
   //   await next();
   // })
   // 粉丝
-  .get("/fans", async (ctx, next) => {
+  .get('/fans', async (ctx, next) => {
     const { data, db, query, params, state, nkcModules, permission } = ctx;
     const { uid } = params;
     const { pageSettings } = state;
     const { page = 0 } = query;
     const targetUser = await db.UserModel.findOnly({ uid });
     const q = {
-      tUid: targetUser.uid,
-      type: "user",
-      cancel: false
+      sid: targetUser.uid,
+      source: subscribeSources.user,
+      cancel: false,
     };
     const count = await db.SubscribeModel.countDocuments(q);
-    paging = nkcModules.apiFunction.paging(
+    const paging = nkcModules.apiFunction.paging(
       page,
       count,
-      pageSettings.userCardUserList
+      pageSettings.userCardUserList,
     );
     if (!data.noPromission) {
       const subs = await db.SubscribeModel.find(q, { uid: 1 })
@@ -395,13 +401,16 @@ router
         .skip(paging.start)
         .limit(paging.perpage);
       // 我的关注
-      const follow = await db.SubscribeModel.find({
-        uid: targetUser.uid,
-        type: "user",
-        cancel: false
-      }, { tUid: 1 })
+      const follow = await db.SubscribeModel.find(
+        {
+          uid: targetUser.uid,
+          source: subscribeSources.user,
+          cancel: false,
+        },
+        { sid: 1 },
+      );
       data.users = await db.UserModel.find({
-        uid: { $in: subs.map(s => s.uid) }
+        uid: { $in: subs.map((s) => s.uid) },
       });
       data.users = await db.UserModel.extendUsersInfo(data.users);
       let newUsers = [];
@@ -410,7 +419,7 @@ router
         // 如果我的关注中关注了粉丝,那么 =true
         newObj.mutualAttention = false;
         for (let f of follow) {
-          if (f.tUid === obj.uid) {
+          if (f.sid === obj.uid) {
             newObj.mutualAttention = true;
             break;
           }

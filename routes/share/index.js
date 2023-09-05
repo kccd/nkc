@@ -12,7 +12,7 @@ shareRouter
     const {params, db, data, nkcModules} = ctx;
     const {token} = params;
     const {user} = data;
-    const lock = await nkcModules.redLock.lock(`share:${token}`, 6000);
+    const lock = await nkcModules.redLock.redLock.lock(`share:${token}`, 6000);
     const share = await db.ShareModel.findOne({token});
     if(!share) {
       await lock.unlock();
@@ -101,7 +101,7 @@ shareRouter
     let {type, id} = query;
     const {user} = data;
     const uid = user? user.uid: 'visitor';
-    const lock = await nkcModules.redLock.lock(`getShareToken:${uid}`, 6000);
+    const lock = await nkcModules.redLock.redLock.lock(`getShareToken:${uid}`, 6000);
     const result = {};
     if(type === 'post') {
       const post = await db.PostModel.findOnly({pid: id});
@@ -255,7 +255,7 @@ shareRouter
       userGrade: data.userGrade,
       user
     });
-    const lock = await nkcModules.redLock.lock(`getShareToken:${uid}`, 6000);
+    const lock = await nkcModules.redLock.redLock.lock(`getShareToken:${uid}`, 6000);
     try{
       const referer = ctx.get('referer');
       // 加载奖励设置，判断当天分享次数是否达到上限

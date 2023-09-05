@@ -3,7 +3,7 @@
     subscribe-types(ref="subscribeTypes")
     nav-types(ref="navTypes")
     .account-thread(v-for="subscribe in subscribes")
-      .account-thread(:class="subscribe.article.status" v-if="subscribe.type === 'article'")
+      .account-thread(:class="subscribe.article.status" v-if="subscribe.source === 'collectionArticle'")
         .account-reason(v-if="subscribe.article.statue === 'disabled'") 已屏蔽，仅自己可见。
         .account-reason(v-else-if="subscribe.article.status === 'faulty'") 退修中，仅自己可见，修改后对所有人可见。
         .account-reason(v-else-if="subscribe.article.status === 'default'") 审核中，仅自己可见，通过后对所有人可见。
@@ -11,9 +11,9 @@
           div(:style="`background-image: url(${getUrl('postCover', subscribe.article.cover)})`" v-if="subscribe.article.cover")
         .account-thread-content(:style="!subscribe.article.cover?'display: block':''")
           .account-thread-title(:class="subscribe.article.digest?'digest':''")
-            .account-follower-buttons(:data-thread="subscribe.tid" :class="threadsId.includes(subscribe.tid) ? 'active' : ''")
-              button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
-              button.subscribe(@click="subArticle(subscribe.tid, 'article')" :class="{'collection-button': type === 'collection'}")
+            .account-follower-buttons(:data-thread="subscribe.tid" :class="threadsId.includes(subscribe.sid) ? 'active' : ''")
+              button.category.collection-button.m-r-05(@click="moveSub([subscribe.sid])") 分类
+              button.subscribe(@click="subArticle(subscribe.sid, 'article')" :class="{'collection-button': type === 'collection'}")
             a(:href="subscribe.article.url" :title="subscribe.article.title" target="_blank") {{subscribe.article.title}}
           .account-thread-abstract {{subscribe.article.abstract || subscribe.article.content}}
           .account-thread-info
@@ -46,9 +46,9 @@
           div(:style="`background-image: url(${getUrl('postCover', subscribe.thread.firstPost.cover)})`" v-if="subscribe.thread.firstPost.cover")
         .account-thread-content(:style="!subscribe.thread.firstPost.cover?'display: block':''")
           .account-thread-title(:class="subscribe.thread.digest?'digest':''")
-            .account-follower-buttons(:data-thread="subscribe.tid" :class="threadsId.includes(subscribe.tid) ? 'active' : ''")
-              button.category.collection-button.m-r-05(@click="moveSub([subscribe.tid])") 分类
-              button.subscribe(@click="subThread(subscribe.tid)" :class="{'collection-button': type === 'collection'}")
+            .account-follower-buttons(:data-thread="subscribe.sid" :class="threadsId.includes(subscribe.sid) ? 'active' : ''")
+              button.category.collection-button.m-r-05(@click="moveSub([subscribe.sid])") 分类
+              button.subscribe(@click="subThread(subscribe.sid)" :class="{'collection-button': type === 'collection'}")
             a(:href="`/t/${subscribe.thread.tid}`" :title="subscribe.thread.firstPost.t" target="_blank") {{subscribe.thread.firstPost.t}}
           .account-thread-abstract {{subscribe.thread.firstPost.abstractCN || subscribe.thread.firstPost.c}}
           .account-thread-info
@@ -459,7 +459,7 @@ export default {
       const self = this;
       const _subscribes = self.subscribes;
       _subscribes.map(s => {
-        _subscribesObj[s.tid] = s;
+        _subscribesObj[s.sid] = s;
       })
       subsId.map(id => {
         const s = _subscribesObj[id];

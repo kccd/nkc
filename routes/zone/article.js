@@ -1,5 +1,8 @@
 const router = require('koa-router')();
 const { renderMarkdown } = require('../../nkcModules/markdown');
+const {
+  collectionService,
+} = require('../../services/subscribe/collection.service');
 router
   .get('/:aid', async (ctx, next) => {
     //获取空间文章信息
@@ -132,15 +135,10 @@ router
         permissions.disabled = true;
       }
       //是否收藏该文章
-      const collection = await db.SubscribeModel.findOne({
-        cancel: false,
-        uid: data.user.uid,
-        tid: article._id,
-        type: 'article',
-      });
-      if (collection) {
-        data.columnPost.collected = true;
-      }
+      data.columnPost.collected = await collectionService.isCollectedArticle(
+        data.user.uid,
+        article._id,
+      );
     }
     let count = 0;
     //获取评论分页

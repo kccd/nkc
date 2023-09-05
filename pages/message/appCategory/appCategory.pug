@@ -17,7 +17,7 @@ block content
           .form-group
             .row
               .col-xs-6
-                .friend-header 全部好友
+                .friend-header 全部联系人
                 .friends
                   .user-group(v-for='ug in users')
                     .header {{ug.title}}
@@ -26,7 +26,7 @@ block content
                         img(:src="u.avatar")
                       .name {{u.username}}
               .col-xs-6
-                .friend-header 已选好友
+                .friend-header 已选联系人
                 .friends
                   .user(v-for="u in selectedUsers" @click="unSelectUser(u)")
                     .avatar

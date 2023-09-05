@@ -4,7 +4,7 @@
       .module-dialog-title(ref="draggableHandle") {{title}}
       .module-dialog-close(@click="close")
         .fa.fa-remove
-    .module-dialog-content
+    .module-dialog-content.p-t-1
       .form
         .form-group(v-for="(d, index) in data")
           h5(v-if="d.label") {{d.label}}

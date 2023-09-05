@@ -11,7 +11,7 @@ block content
     .row
       .col-xs-12.col-md-9.book-content-container
         include ../../columns/article/nav
-        +nav({})
+        +nav({docNumber: `D${data.document.did}`})
         //- .thread-nav-right
         //-   .nav-count(title=`浏览数`)
         //-     .fa.fa-eye

@@ -121,7 +121,7 @@ schema.statics.ensurePermission = async (options) => {
   const {
     type, username, ip, mobile, nationCode, email
   } = options;
-  const redLock = require("../nkcModules/redLock");
+  const { redLock } = require("../nkcModules/redLock");
   const lock = await redLock.lock(`accountBehaviorPermission:${type}`, 6000);
   try{
     const {

@@ -86,6 +86,7 @@
 
   const state = getState();
   const defaultUploadingOrder = Date.now() + Math.round(Math.random() * 10000);
+  const filterPasteHtml = require('../../../nkcModules/xssFilters/filterPasteHtml')
   export default {
     props: ['configs', 'plugs'],
     components: {
@@ -554,9 +555,9 @@
       removeEditorDropImageEvent() {
         this.editor.document.removeEventListener('drop', this.editorDropImageEventHandle);
       },
-      editorBeforePasteEventHandler(v1, v2) {
-        /*console.log("v1: ", v1)
-        console.log("v2: ", v2)*/
+      editorBeforePasteEventHandler(type, data) {
+        const pastedContent = data.html;
+        data.html  = filterPasteHtml(pastedContent)
       },
       editorAfterPasteEventHandler() {
         this.catchRemoteImage();

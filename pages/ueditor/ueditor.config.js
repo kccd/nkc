@@ -121,36 +121,44 @@
     //,emotionLocalization:false //是否开启表情本地化，默认关闭。若要开启请确保emotion文件夹下包含官网提供的images表情文件夹
 
     //粘贴只保留标签，去除标签所有属性
-    //,retainOnlyLabelPasted: false
+    // retainOnlyLabelPasted: true,
 
-    //,pasteplain:false  //是否默认为纯文本粘贴。false为不使用纯文本粘贴，true为使用纯文本粘贴
+    // pasteplain: true, //是否默认为纯文本粘贴。false为不使用纯文本粘贴，true为使用纯文本粘贴
     //纯文本粘贴模式下的过滤规则
-    //'filterTxtRules' : function(){
-    //    function transP(node){
-    //        node.tagName = 'p';
-    //        node.setStyle();
-    //    }
-    //    return {
-    //        //直接删除及其字节点内容
-    //        '-' : 'script style object iframe embed input select',
-    //        'p': {$:{}},
-    //        'br':{$:{}},
-    //        'div':{'$':{}},
-    //        'li':{'$':{}},
-    //        'caption':transP,
-    //        'th':transP,
-    //        'tr':transP,
-    //        'h1':transP,'h2':transP,'h3':transP,'h4':transP,'h5':transP,'h6':transP,
-    //        'td':function(node){
-    //            //没有内容的td直接删掉
-    //            var txt = !!node.innerText();
-    //            if(txt){
-    //                node.parentNode.insertAfter(UE.uNode.createText(' &nbsp; &nbsp;'),node);
-    //            }
-    //            node.parentNode.removeChild(node,node.innerText())
-    //        }
-    //    }
-    //}()
+    // filterTxtRules: (function () {
+    //   function transP(node) {
+    //     node.tagName = 'p';
+    //     node.setStyle();
+    //   }
+    //   return {
+    //     //直接删除及其字节点内容
+    //     '-': 'script style object iframe embed input select',
+    //     p: { $: {} },
+    //     br: { $: {} },
+    //     div: { $: {} },
+    //     li: { $: {} },
+    //     caption: transP,
+    //     th: transP,
+    //     tr: transP,
+    //     h1: transP,
+    //     h2: transP,
+    //     h3: transP,
+    //     h4: transP,
+    //     h5: transP,
+    //     h6: transP,
+    //     td: function (node) {
+    //       //没有内容的td直接删掉
+    //       var txt = !!node.innerText();
+    //       if (txt) {
+    //         node.parentNode.insertAfter(
+    //           UE.uNode.createText(' &nbsp; &nbsp;'),
+    //           node,
+    //         );
+    //       }
+    //       node.parentNode.removeChild(node, node.innerText());
+    //     },
+    //   };
+    // })(),
 
     //,allHtmlEnabled:false //提交到后台的数据是否包含整个html字符串
 

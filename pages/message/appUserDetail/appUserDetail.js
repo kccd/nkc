@@ -1,14 +1,15 @@
-import {RNToChat} from "../../lib/js/reactNative";
+import { RNToChat } from '../../lib/js/reactNative';
+import { reloadPage } from '../../lib/js/pageSwitch';
 
-const data = NKC.methods.getDataById("data");
-if(data.friend) {
-  data.friend.info._phone = data.friend.info.phone.map(p => {
+const data = NKC.methods.getDataById('data');
+if (data.friend) {
+  data.friend.info._phone = data.friend.info.phone.map((p) => {
     return {
-      number: p
-    }
+      number: p,
+    };
   });
-  if(!data.friend.info._phone.length) {
-    data.friend.info._phone = [{number: ''}]
+  if (!data.friend.info._phone.length) {
+    data.friend.info._phone = [{ number: '' }];
   }
 }
 window.app = new Vue({
@@ -23,12 +24,12 @@ window.app = new Vue({
     showNote: false,
 
     file: null,
-    fileUrl: ''
+    fileUrl: '',
   },
   methods: {
     // 访问用户首页
     visitUserHome() {
-      NKC.methods.visitUrl(`/u/${this.targetUser.uid}`, true)
+      NKC.methods.visitUrl(`/u/${this.targetUser.uid}`, true);
     },
     _removeFriend() {
       const tUid = this.targetUser.uid;
@@ -37,20 +38,30 @@ window.app = new Vue({
     // 添加、删除好友
     addFriend(isFriend) {
       const _removeFriend = this._removeFriend;
-      if(isFriend) {
+      if (isFriend) {
         // 删除好友
-        sweetQuestion('确定要删除该好友？')
+        sweetQuestion('确定要删除该联系人？')
           .then(() => {
             return _removeFriend();
           })
           .then(() => {
             NKC.methods.appToast('删除成功');
-            NKC.methods.appReloadPage();
+            reloadPage();
           })
-          .catch(NKC.methods.appToast)
+          .catch(NKC.methods.appToast);
       } else {
         // 添加好友
-        NKC.methods.visitUrl(`/message/addFriend?uid=${this.targetUser.uid}`, true);
+        return sweetQuestion(`确定添加「${this.targetUserName}」为联系人吗？`)
+          .then(() => {
+            return nkcAPI('/message/friend/apply', 'POST', {
+              uid: this.targetUser.uid,
+            });
+          })
+          .then(() => {
+            NKC.methods.appToast('添加成功');
+            reloadPage();
+          })
+          .catch(sweetError);
       }
     },
     // 添加、移除黑名单
@@ -61,23 +72,25 @@ window.app = new Vue({
       const _removeFriend = this._removeFriend;
       Promise.resolve()
         .then(() => {
-          if(!inBlacklist && friend) {
+          if (!inBlacklist && friend) {
             // return _removeFriend();
           }
         })
         .then(() => {
-          if(!inBlacklist) {
+          if (!inBlacklist) {
             return NKC.methods.addUserToBlacklist(tUid, 'message');
           } else {
             return NKC.methods.removeUserFromBlacklist(tUid);
           }
         })
         .then((data) => {
-          if(!data) return;
+          if (!data) {
+            return;
+          }
           // NKC.methods.appToast('操作成功');
-          NKC.methods.appReloadPage();
+          reloadPage();
         })
-        .catch(NKC.methods.appToast)
+        .catch(NKC.methods.appToast);
     },
     // 打开聊天页面
     sendToUser() {
@@ -86,21 +99,20 @@ window.app = new Vue({
       RNToChat({
         uid: uid,
         type: 'UTU',
-        username: targetUserName
+        username: targetUserName,
       });
     },
     // 选择地区
     selectLocation() {
       const self = this;
-      NKC.methods.appSelectLocation()
-        .then(data => {
-          self.friend.info.location = data.location.join('  ');
-        })
+      NKC.methods.appSelectLocation().then((data) => {
+        self.friend.info.location = data.location.join('  ');
+      });
     },
     // 添加联系电话
     addPhone() {
       this.friend.info._phone.push({
-        number: ''
+        number: '',
       });
     },
     // 删除联系电话
@@ -109,7 +121,9 @@ window.app = new Vue({
     },
     // 获取好友图片链接
     setFriendImageUrl() {
-      this.friendImageUrl = `/friend/${this.targetUser.uid}/image?t=${Date.now()}`;
+      this.friendImageUrl = `/friend/${
+        this.targetUser.uid
+      }/image?t=${Date.now()}`;
     },
     // 选择图片
     selectFriendImage() {
@@ -125,11 +139,14 @@ window.app = new Vue({
     // 选择完图片后
     selectedFriendImage() {
       const self = this;
-      const {files} = this.$refs.input;
-      if(!files.length) return;
+      const { files } = this.$refs.input;
+      if (!files.length) {
+        return;
+      }
       const file = files[0];
-      NKC.methods.fileToUrl(file)
-        .then(fileUrl => {
+      NKC.methods
+        .fileToUrl(file)
+        .then((fileUrl) => {
           self.fileUrl = fileUrl;
           self.file = file;
         })
@@ -141,31 +158,34 @@ window.app = new Vue({
     },
     // 保存好友信息
     saveFriendInfo() {
-      const {friend, file, fileUrl, targetUser} = this;
-      friend.info.phone = friend.info._phone.map(p => p.number);
-      const {info, cid} = friend;
-      const {name, description, location, phone, image} = info;
+      const { friend, file, fileUrl, targetUser } = this;
+      friend.info.phone = friend.info._phone.map((p) => p.number);
+      const { info, cid } = friend;
+      const { name, description, location, phone, image } = info;
       const formData = new FormData();
-      formData.append('friend', JSON.stringify({
-        cid,
-        name,
-        description,
-        location,
-        phone,
-        image: !!fileUrl || image
-      }));
+      formData.append(
+        'friend',
+        JSON.stringify({
+          cid,
+          name,
+          description,
+          location,
+          phone,
+          image: !!fileUrl || image,
+        }),
+      );
       formData.append('uid', targetUser.uid);
-      if(file) {
+      if (file) {
         formData.append('file', file);
       }
       nkcUploadFile(`/message/friend`, 'PUT', formData)
         .then(() => {
           NKC.methods.appToast('保存成功');
         })
-        .catch(NKC.methods.appToast)
-    }
+        .catch(NKC.methods.appToast);
+    },
   },
   mounted() {
     this.setFriendImageUrl();
-  }
-})
+  },
+});

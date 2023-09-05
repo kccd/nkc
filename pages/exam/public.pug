@@ -1,0 +1,19 @@
+extends ../bootstrap_base
+block title
+  title=`开卷考试说明`
+  +includeCSS('/exam/public.css')
+block content
+  .container-fluid.max-width
+    .row.box-shadow-panel
+      .col-xs-12.col-md-8.col-md-offset-2
+        include ../publicModules/appNavbar/appNavbar
+        +appNavbar
+        .examNotes
+          .m-b-1!=markdown_safe(data.examNotice)
+        .text-center
+          .btn.btn-default.fund-terms-button(onclick=`visitPublicExam('${data.cid}')`) 参加考试
+block scripts
+  script.
+    function visitPublicExam(cid) {
+      window.location.href = '/exam/paper?cid=' + cid + '&from=register';
+    }

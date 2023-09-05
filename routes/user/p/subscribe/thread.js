@@ -1,5 +1,5 @@
 module.exports = async (ctx, next) => {
-  //获取用户关注的文章
+  /*//获取用户关注的文章
   const {query, nkcModules, state, data, db} = ctx;
   const {page = 0} = query;
   const {match} = state;
@@ -17,6 +17,6 @@ module.exports = async (ctx, next) => {
   data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
   data.subscribesObj = subscribesObj;
   data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);
-  data.paging = paging;
+  data.paging = paging;*/
   await next();
 };

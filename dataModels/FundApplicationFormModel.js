@@ -1806,7 +1806,7 @@ fundApplicationFormSchema.methods.transfer = async function (props) {
   if (!status.adminSupport) {
     throwErr(403, `未通过管理员符合`);
   }
-  const redLock = require('../nkcModules/redLock');
+  const { redLock } = require('../nkcModules/redLock');
   const FundApplicationFormModel = mongoose.model('fundApplicationForms');
   const AliPayRecordModel = mongoose.model('aliPayRecords');
   const FundBillModel = mongoose.model('fundBills');

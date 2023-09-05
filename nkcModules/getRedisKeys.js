@@ -44,5 +44,11 @@ module.exports = (type, v1, v2) => {
       return `grades`;
     case 'sensitiveSettings':
       return `sensitiveSettings`;
+    case 'registerExamLimitLock':
+      return `register:exam:limit:lock:${v1}`;
+    case 'registerExamLimitTime':
+      return `register:exam:limit:time:${v1}`;
+    case 'registerExamLimitCount':
+      return `register:exam:limit:count:${v1}`;
   }
 };
