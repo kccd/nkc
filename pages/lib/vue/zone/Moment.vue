@@ -1,5 +1,4 @@
 <template lang="pug">
-
   .single-moment-container(v-if="momentData")
     moment-status(ref="momentStatus" :moment="momentData" :permissions="permissions")
     .single-moment-top-container#comment-content
@@ -27,10 +26,10 @@
             span &nbsp;IP:{{momentData.addr}}
           //- 其他操作
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
-            moment-option(
-              ref="momentOption"
-              @complaint="complaint"
-            )
+          moment-option(
+            ref="momentOption"
+            @complaint="complaint"
+          )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
         .single-moment-content.pointer(v-else v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")

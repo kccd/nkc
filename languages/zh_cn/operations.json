@@ -757,5 +757,7 @@
   "createExamQuestion": "创建考试系统试题",
   "modifyExamQuestion": "修改考试系统试题",
   "visitExamQuestionEditor": "访问考试系统试题编辑器",
-  "registerExamCheck": "注册前检测是否需要考试"
+  "registerExamCheck": "注册前检测是否需要考试",
+  "setMomentVisible": "设置电文可见状态",
+  "setMomentVisibleOther": "其他人设置电文可见状态"
 }

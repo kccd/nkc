@@ -32,6 +32,12 @@ const momentCommentPerPage = {
   complete: 50,
 };
 
+const visibleType = {
+  own: 'own',
+  attention: 'attention',
+  everyone: 'everyone',
+};
+
 const schema = new mongoose.Schema({
   _id: String,
   // 创建时间
@@ -145,6 +151,11 @@ const schema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  //电文可见状态
+  visibleType: {
+    type: String,
+    default: visibleType.everyone,
+  },
 });
 
 /*
@@ -185,6 +196,9 @@ schema.statics.getMomentCommentModes = async () => {
   return { ...momentCommentModes };
 };
 
+schema.statics.getMomentVisibleType = async () => {
+  return { ...visibleType };
+};
 /*
  * 检测引用类型是否合法
  * */

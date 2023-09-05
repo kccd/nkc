@@ -1,6 +1,6 @@
 <template lang="pug">
   .moment-files(
-    v-if="filesData.length > 0"
+    v-if="filesData && filesData.length > 0"
     :data-file-type="fileType"
     :data-file-count="fileCount"
     )
@@ -138,36 +138,38 @@
       filesData() {
         const {data, types} = this;
         const filesData = [];
-        for(const file of data) {
-          const fileData = JSON.parse(JSON.stringify(file));
+        if(data){
+          for(const file of data) {
+            const fileData = JSON.parse(JSON.stringify(file));
 
-          fileData.fileContainerStyle = '';
-          fileData.fileContainerClass = '';
+            fileData.fileContainerStyle = '';
+            fileData.fileContainerClass = '';
 
-          fileData.pictureContainerStyle = '';
-          fileData.pictureContainerClass = '';
+            fileData.pictureContainerStyle = '';
+            fileData.pictureContainerClass = '';
 
-          fileData.videoContainerStyle = '';
-          fileData.videoContainerClass = '';
+            fileData.videoContainerStyle = '';
+            fileData.videoContainerClass = '';
 
-          // 设置图片容器的上层容器
-          if(
-            fileData.type === types.picture &&
-            fileData.length === 1 &&
-            file.height &&
-            file.width
-          ) {
-            const fileContainerPaddingTop = fileData.height * 100 / fileData.width;
-            fileData.fileContainerStyle = `padding-top: ${fileContainerPaddingTop}%`;
-            fileData.fileContainerClass = `fix-size`;
-            fileData.pictureContainerClass = 'fix-size';
+            // 设置图片容器的上层容器
+            if(
+              fileData.type === types.picture &&
+              fileData.length === 1 &&
+              file.height &&
+              file.width
+            ) {
+              const fileContainerPaddingTop = fileData.height * 100 / fileData.width;
+              fileData.fileContainerStyle = `padding-top: ${fileContainerPaddingTop}%`;
+              fileData.fileContainerClass = `fix-size`;
+              fileData.pictureContainerClass = 'fix-size';
+            }
+
+            if(fileData.type === types.picture) {
+              fileData.pictureContainerStyle = `background-image: url(${fileData.url})`;
+            }
+
+            filesData.push(fileData);
           }
-
-          if(fileData.type === types.picture) {
-            fileData.pictureContainerStyle = `background-image: url(${fileData.url})`;
-          }
-
-          filesData.push(fileData);
         }
         return filesData
       }

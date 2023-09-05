@@ -15,5 +15,8 @@ module.exports = {
     ipInfo: {
       GET: Operations.getMomentIpInfo,
     },
+    visible: {
+      GET: Operations.setMomentVisible,
+    },
   },
 };
