@@ -792,7 +792,6 @@ schema.statics.extendSubscribes = async (subscribes) => {
       }
     } else if (source === subscribeSources.collectionThread) {
       subscribe.thread = threadsObj[sid];
-      console.log(subscribe.thread)
       if (!subscribe.thread) {
         continue;
       }
