@@ -2971,13 +2971,13 @@ threadSchema.statics.getThreadInfoByColumn = async function (columnPost) {
   };
 };
 
-threadSchema.statics.extendShopInfo = async function (praps) {
+threadSchema.statics.extendShopInfo = async function (props) {
   const ShopGoodsModel = mongoose.model('shopGoods');
   // const ShopCartModel = mongoose.model('shopCarts');
   const IPModel = mongoose.model('ips');
   // const UserModel = mongoose.model('users');
   const SettingModel = mongoose.model('settings');
-  const { tid, oc, uid, authLevel, address } = praps;
+  const { tid, oc, uid, address, gradeId } = props;
 
   let product = null;
   let vipDiscount = false;
@@ -2993,10 +2993,7 @@ threadSchema.statics.extendShopInfo = async function (praps) {
   if (product.vipDiscount) {
     vipDiscount = true;
     for (let v = 0; v < product.vipDisGroup.length; v++) {
-      if (
-        uid &&
-        Number(authLevel) === Number(product.vipDisGroup[v].vipLevel)
-      ) {
+      if (uid && gradeId === Number(product.vipDisGroup[v].vipLevel)) {
         vipNum = product.vipDisGroup[v].vipNum;
       }
     }
@@ -3025,7 +3022,9 @@ threadSchema.statics.extendShopInfo = async function (praps) {
     try {
       const ipInfo = await IPModel.getIPInfoByIP(address);
       userAddress = ipInfo.location;
-    } catch (err) {}
+    } catch (err) {
+      //
+    }
   }
   try {
     await SettingModel.checkShopSellerByUid(product.uid);

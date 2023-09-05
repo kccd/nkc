@@ -13,7 +13,7 @@ router.get('/', async (ctx, next) => {
     source: sources.search,
   });
 
-  const { nkcRender } = nkcModules;
+  const { elasticSearch } = nkcModules;
   let { page = 0, t = '', c = '', d = '', form = '' } = query;
   const { user } = data;
   // 通过mongodb精准搜索用户名
@@ -482,8 +482,8 @@ router.get('/', async (ctx, next) => {
           anonymous: post.anonymous,
           forums,
         };
-        r.title = nkcRender.replaceTextLinkToHTML(r.title + '');
-        r.abstract = nkcRender.replaceTextLinkToHTML(r.abstract + '');
+        r.title = elasticSearch.replaceSearchResultHTMLLink(r.title + '');
+        r.abstract = elasticSearch.replaceSearchResultHTMLLink(r.abstract + '');
         if (!post.anonymous) {
           r.postUser = {
             uid: postUser.uid,
@@ -514,8 +514,10 @@ router.get('/', async (ctx, next) => {
           user: u,
           uid: highlightObj[`${uid}_uid`] || u.uid,
         };
-        r.username = nkcRender.replaceTextLinkToHTML(r.username + '');
-        r.description = nkcRender.replaceTextLinkToHTML(r.description + '');
+        r.username = elasticSearch.replaceSearchResultHTMLLink(r.username + '');
+        r.description = elasticSearch.replaceSearchResultHTMLLink(
+          r.description + '',
+        );
       } else if (docType === 'column') {
         const column = columnObj[tid];
         if (!column) {
@@ -532,8 +534,8 @@ router.get('/', async (ctx, next) => {
           abbr: highlightObj[`${tid}_abbr`] || column.abbr,
           column,
         };
-        r.name = nkcRender.replaceTextLinkToHTML(r.name + '');
-        r.abbr = nkcRender.replaceTextLinkToHTML(r.abbr + '');
+        r.name = elasticSearch.replaceSearchResultHTMLLink(r.name + '');
+        r.abbr = elasticSearch.replaceSearchResultHTMLLink(r.abbr + '');
       } else if (docType === 'columnPage') {
         const page = columnPageObj[tid];
         if (!page) {
@@ -556,8 +558,8 @@ router.get('/', async (ctx, next) => {
           column,
           page,
         };
-        r.t = nkcRender.replaceTextLinkToHTML(r.t + '');
-        r.c = nkcRender.replaceTextLinkToHTML(r.c + '');
+        r.t = elasticSearch.replaceSearchResultHTMLLink(r.t + '');
+        r.c = elasticSearch.replaceSearchResultHTMLLink(r.c + '');
       } else if (docType === 'resource') {
         let resource = resourcesObj[tid];
         if (!resource) {
@@ -571,8 +573,8 @@ router.get('/', async (ctx, next) => {
           c: highlightObj[`${tid}_c`] || resource.description,
           resource,
         };
-        r.t = nkcRender.replaceTextLinkToHTML(r.t + '');
-        r.c = nkcRender.replaceTextLinkToHTML(r.c + '');
+        r.t = elasticSearch.replaceSearchResultHTMLLink(r.t + '');
+        r.c = elasticSearch.replaceSearchResultHTMLLink(r.c + '');
       } else if (docType === 'document_article') {
         //article文章搜索
         const article = articlesObj[tid];
@@ -621,8 +623,8 @@ router.get('/', async (ctx, next) => {
         if (column) {
           r.column = column;
         }
-        r.title = nkcRender.replaceTextLinkToHTML(r.title + '');
-        r.abstract = nkcRender.replaceTextLinkToHTML(r.abstract + '');
+        r.title = elasticSearch.replaceSearchResultHTMLLink(r.title + '');
+        r.abstract = elasticSearch.replaceSearchResultHTMLLink(r.abstract + '');
       } else if (docType === 'document_comment') {
         //comment搜索
         const comment = commentObj[tid];
@@ -655,8 +657,10 @@ router.get('/', async (ctx, next) => {
           commentTime: commentDocument.toc,
           user: commentUser,
         };
-        r.articleTitle = nkcRender.replaceTextLinkToHTML(r.articleTitle + '');
-        r.abstract = nkcRender.replaceTextLinkToHTML(r.abstract + '');
+        r.articleTitle = elasticSearch.replaceSearchResultHTMLLink(
+          r.articleTitle + '',
+        );
+        r.abstract = elasticSearch.replaceSearchResultHTMLLink(r.abstract + '');
         if (!commentDocument.anonymous) {
           r.commentUser = {
             uid: commentUser.uid,
