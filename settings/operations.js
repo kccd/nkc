@@ -770,6 +770,7 @@ const DynamicOperations = {
   columnManage: 'columnManage',
   getThreadCategories: 'getThreadCategories',
   manageQuestionTags: 'manageQuestionTags',
+  createQuestionTags: 'createQuestionTags',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

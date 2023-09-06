@@ -305,6 +305,7 @@
   "logout": "退出登录",
   "manageOauthApp": "管理第三方应用",
   "manageQuestionTags": "管理考试系统试题标签",
+  "createQuestionTags": "创建考试系统试题标签",
   "manageZoneArticleCategory": "修改空间文章多维分类",
   "managementMoment": "管理电文",
   "managementNote": "管理所有笔记(屏蔽、编辑和删除)",
