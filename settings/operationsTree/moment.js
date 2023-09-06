@@ -17,6 +17,7 @@ module.exports = {
     },
     visible: {
       GET: Operations.setMomentVisible,
+      PUT: Operations.setMomentVisible,
     },
   },
 };

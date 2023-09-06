@@ -4,30 +4,18 @@
       <div class="moment-visible">
         <header class="m-b-1">
           <label>
-            <input type="radio" value="own" v-model="status"></input>
+            <input type="radio" value="own" v-model="visibleType"></input>
             仅自己可见
           </label>
           <label>
-            <input type="radio" value="attention" v-model="status"></input>
+            <input type="radio" value="attention" v-model="visibleType"></input>
             关注可见
           </label>
           <label>
-            <input type="radio" value="everyone" v-model="status"></input>
+            <input type="radio" value="everyone" v-model="visibleType"></input>
             所有人可见
           </label>
         </header>
-<!--        <nav class="m-b-1">-->
-<!--          <span>锁定：</span>-->
-<!--          <label class="m-r-1">-->
-<!--            <input type="radio" :value=true v-model="lock"></input>-->
-<!--            开启-->
-<!--          </label>-->
-<!--          <label>-->
-<!--            <input type="radio" :value=false v-model="lock"></input>-->
-<!--            关闭-->
-<!--          </label>-->
-<!--        </nav>-->
-
         <footer>
           <button class="btn-secondary btn btn-xs m-r-05" @click="cancel">取消</button>
           <button class="btn-primary btn btn-xs" @click="submit">确定</button>
@@ -46,7 +34,7 @@ export default {
   name: "MomentVisible.vue",
   data:()=>({
     disabled:false,
-    status: "everyone",
+    visibleType:"everyone",
     mid:''
   }),
 
@@ -67,7 +55,7 @@ export default {
     open(mid){
       this.mid = mid
       nkcAPI(`/moment/${mid}/visible`,'GET').then((res)=>{
-        console.log(res, 'res');``
+        this.visibleType = res.visibleType
       }).catch((error)=>{
         sweetError(error)
       })
@@ -77,7 +65,11 @@ export default {
       this.draggable.close()
     },
     submit(){
-      console.log(this.status, 'status');
+      nkcAPI(`/moment/${this.mid}/visible?visibleType=${this.visibleType}`,'PUT').then(()=>{
+        this.close()
+      }).catch((error)=>{
+        sweetError(error)
+      })
     },
     cancel(){
       this.close()
