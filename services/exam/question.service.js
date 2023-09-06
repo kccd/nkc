@@ -6,7 +6,6 @@ const { ResponseTypes } = require('../../settings/response');
 const { checkString } = require('../../nkcModules/checkData');
 const QuestionModel = require('../../dataModels/QuestionModel');
 const SettingModel = require('../../dataModels/SettingModel');
-const QuestionTagModel = require('../../dataModels/QuestionTagModel');
 const { userInfoService } = require('../user/userInfo.service');
 const { questionTagService } = require('./questionTag.service');
 const { defaultCerts } = require('../../settings/userCerts');
@@ -38,12 +37,12 @@ class QuestionService {
   checkQuestionContentAndContentDesc(content = '', contentDesc = '') {
     checkString(content, {
       name: '试题题干内容',
-      minLength: 1,
-      maxLength: 500,
+      minTextLength: 1,
+      maxTextLength: 2000,
     });
     checkString(contentDesc, {
       name: '试题题干说明',
-      maxLength: 500,
+      maxTextLength: 2000,
     });
   }
   checkQuestionAnswer(type, answer) {
@@ -57,12 +56,12 @@ class QuestionService {
       for (const item of answer) {
         checkString(item.text, {
           name: '选项内容',
-          minLength: 1,
-          maxLength: 200,
+          minTextLength: 1,
+          maxTextLength: 2000,
         });
         checkString(item.desc, {
           name: '选项说明',
-          maxLength: 200,
+          maxTextLength: 2000,
         });
         if (item.correct) {
           hasCorrectAnswer = true;
@@ -81,12 +80,12 @@ class QuestionService {
       }
       checkString(answer[0].text, {
         name: '答案内容',
-        minLength: 1,
-        maxLength: 200,
+        minTextLength: 1,
+        maxTextLength: 2000,
       });
       checkString(answer[0].desc, {
         name: '答案说明',
-        maxLength: 200,
+        maxTextLength: 2000,
       });
     }
   }

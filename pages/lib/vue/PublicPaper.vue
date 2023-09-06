@@ -207,6 +207,7 @@
    }
  }
   .answer-desc{
+    color: #ff4e4b;
     margin-top: 1rem;
     .answer-desc-icon{
       margin-right: 0.5rem;

@@ -11,14 +11,14 @@ router
     ctx.apiData = {
       tags,
       manageQuestionTagsPermission: ctx.permission(
-        DynamicOperations.manageQuestionTags,
+        DynamicOperations.createQuestionTags,
       ),
     };
     await next();
   })
   .post(
     '/',
-    OnlyPermission(Operations.manageQuestionTags),
+    OnlyPermission(Operations.createQuestionTags),
     async (ctx, next) => {
       const { body } = ctx;
       const { name, desc } = body.tag;
