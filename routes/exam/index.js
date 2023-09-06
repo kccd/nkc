@@ -74,7 +74,7 @@ examRouter
     passRate = passRate || [];
     const passRateObj = {};
     for (const r of passRate) {
-      passRateObj[r.cid] = r.passRate;
+      passRateObj[r.cid] = Math.round(r.passRate * 10000) / 10000;
     }
     const examsCategories = {
       secretA: [],
@@ -86,6 +86,7 @@ examRouter
       const targetCategory = {
         _id: category._id,
         name: category.name,
+        desc: category.description,
         passRate: passRateObj[category._id] || 0,
         type: category.type,
         volume: category.volume,

@@ -20,7 +20,7 @@ block content
               tr
                 th
                   span(style='display: inline-block;')
-                    a(href=`/exam/paper?cid=${category._id}`)=`${category.name}`
+                    a(href=`/exam/paper?cid=${category._id}` title=category.desc)=`${category.name}`
                 th
                   if category.volume === 'A'
                     span 基础级
