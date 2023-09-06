@@ -439,6 +439,11 @@ export default Vue.extend({
         arr[i] = arr[index];
         arr[index] = n;
       }
+      const str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // 一个包含所有字母的字符串
+      const alphabetArray = str.split(''); // 将字符串拆分为单个字母字符的数组
+      arr.forEach((a, index) => {
+        a.serialIndex = alphabetArray[index];
+      });
     },
     bgc(index,q){
       const isMultiple = this.question.isMultiple;
