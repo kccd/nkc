@@ -72,14 +72,14 @@ block content
                 h5 题干内容
                 textarea(
                   class="form-control"
-                  placeholder="请输入题干内容，500字以内"
+                  placeholder="请输入题干内容，2000字以内"
                   v-model='question.content'
                   rows=4
                 )
                 h5 题干说明(选填)
                 textarea(
                   class="form-control"
-                  placeholder="请输入题干说明，500字以内"
+                  placeholder="请输入题干说明，2000字以内"
                   v-model='question.contentDesc'
                   rows=2
                 )
@@ -95,9 +95,9 @@ block content
               label(class="col-sm-2 control-label") 答案
               .col-sm-10
                 h5 正确答案
-                textarea(class="form-control m-b-1" placeholder="200字以内" v-model.trim='correctAnswer.text' rows=2)
+                textarea(class="form-control m-b-1" placeholder="2000字以内" v-model.trim='correctAnswer.text' rows=2)
                 h5 答案说明(选填)
-                textarea(class="form-control m-b-1" placeholder="200字以内" v-model.trim='correctAnswer.desc' rows=2)
+                textarea(class="form-control m-b-1" placeholder="2000字以内" v-model.trim='correctAnswer.desc' rows=2)
             .form-group(v-else)
               label(class="col-sm-2 control-label") 选项
               .col-sm-10
@@ -116,9 +116,9 @@ block content
 
                   div
                     h5 选项内容
-                    textarea(class="form-control m-b-1" placeholder="请输入选项内容，200字以内" v-model.trim='answer.text' rows=2)
+                    textarea(class="form-control m-b-1" placeholder="请输入选项内容，2000字以内" v-model.trim='answer.text' rows=2)
                     h5 选项说明(选填)
-                    textarea(class="form-control m-b-1" placeholder="请输入选项说明，200字以内" v-model.trim='answer.desc' rows=2)
+                    textarea(class="form-control m-b-1" placeholder="请输入选项说明，2000字以内" v-model.trim='answer.desc' rows=2)
                 div
                   button.btn.btn-default.btn-sm(@click='addAnswer') 添加选项
             .form-group
