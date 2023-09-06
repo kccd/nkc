@@ -16,37 +16,45 @@
             span(v-else) {{question.isMultiple? '多选题': '单选题'}}
             | ）
           question-text-content(:text="`${question.content}`")
+          .question-desc
+            i.fa.fa-question-circle-o.fa-sm.m-r-1(v-if="question.contentDesc" @click="showReminder"  aria-hidden="true" title="查看提示")
+            div(v-if="isShowReminder" )  {{this.question.contentDesc}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
           form(v-if='question.type === "ans"')
             .answer-form-group
               span 答案：
-              textarea(v-model='fill')
+              textarea(:disabled = "isCorrect"  v-model='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
             label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
-              input.m-r-05(:disabled="isReselected" v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
+              input.m-r-05(:disabled="isReselected || isCorrect " v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected.includes(index)")
+                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
             label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
-              input.m-r-05(:disabled="isReselected" v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
+              input.m-r-05(:disabled="isReselected || isCorrect " v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected === index")
+                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 ")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
+
         footer.clearfix
-          h4.question-intro.text-danger(v-if="!isCorrect" ) 回答错误
+          h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误
+          h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确
           .button-group
-            button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 查看提示
+            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题
             button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
-            button.btn.btn-default.btn-editor-block.btn-primary(v-else @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
+            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " ) 下一题
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' ) 完成
+
     div.clearfix(v-else id="finished-box" )
       .notice-content
         .glyphicon.glyphicon-ok.icon-success.m-b-1
@@ -231,6 +239,17 @@
       transform: translate(-5px, -5px);
     }
   }
+  .question-desc{
+    &>i{
+      cursor: pointer;
+      color: rgb(185, 185, 185);
+    }
+    &>div{
+      font-weight: normal;
+      font-size: 1.2rem;
+    }
+
+  }
 </style>
 
 <script>
@@ -267,7 +286,7 @@ export default Vue.extend({
       selected: [], //当前用户选择题所选
       fill: '', //当前填空题用户所填
       answerDesc: [], //题目的简介，每个选项的简介
-      isReselected:false, //是否重置
+      isReselected: false, //是否重置
       answerOrder:[], //存储选择题的题目顺序
       type:'',
       isFinished:false,//用户是否做完
@@ -276,7 +295,8 @@ export default Vue.extend({
       paperTime: '',
       paperQuestionCount: "",
       paperName: '',
-      isCorrect:true
+      isCorrect:null,
+      isShowReminder:false,
     };
   },
   props:['pid'],
@@ -313,13 +333,13 @@ export default Vue.extend({
     getUrl,
     detailedTime,
     //获取考题
-    getInit() {
-      nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${this.index}`, 'GET')
+    getInit(type='default',index = 0) {
+      nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${index}&&type=${type}`, 'GET')
         .then((res) => {
           if (res) {
             const { question, questionTotal, index, paperName, paperTime, paperQuestionCount } =
               res.data;
-            const { answer, type, ...params } = question;
+            const {correct ,answer, type, ...params } = question;
             const oldAnswer = JSON.parse(JSON.stringify(answer));
             //选择题
             if (type === 'ch4') {
@@ -335,13 +355,34 @@ export default Vue.extend({
             } else {
               this.question = question;
             }
+            //已经做过了,保留之前的状态
+            if(question.correct){
+              this.isCorrect = true
+              //多选
+              if(type === 'ch4'){
+                if(this.question.isMultiple){
+                  this.selected = question.answer
+                    .map((item, index) => (item.selected ? index : undefined))
+                    .filter(index => index !== undefined);
+                }else {
+                  this.selected = question.answer.findIndex(item => item.selected)
+                }
+                this.answerDesc =  this.question.answer.map((item) => {
+                  const { desc, _id } = item;
+                  return { desc, _id };
+                });
+              }
+              else {
+                this.answerDesc.desc = question.answer[0].desc
+                this.fill = question.answer[0].fill
+              }
+            }
             this.questionTotal = questionTotal;
-            this.index = index;
+            this.index = Number(index) ;
             this.type = type;
             this.paperName = paperName;
             this.paperTime = paperTime;
             this.paperQuestionCount = paperQuestionCount;
-
             setTimeout(() => {
               renderFormula()
             }, 500)
@@ -351,6 +392,7 @@ export default Vue.extend({
           sweetError(error);
         });
     },
+    //提交
     submit() {
       const {isMultiple} = this.question
       let userSelected = [];
@@ -362,7 +404,6 @@ export default Vue.extend({
           }
           return selectedIds;
         }, []);
-
         selected = this.answerOrder.reduce((result, item, index) => {
           if (userSelected.includes(item)) {
             result.push(index);
@@ -378,51 +419,29 @@ export default Vue.extend({
         fill: this.fill,
       })
         .then((res) => {
-          if (res.data) {
-            const { status, answerDesc, index } = res.data;
+            const { status, answerDesc} = res.data;
             if (status === 403) {
               if (this.type === 'ch4'){
                 this.isReselected = true;
                 this.isCorrect = false
               }
               else {
-                sweetError('输入的问题有误')
+                sweetError('输入的答案有误')
               }
               this.answerDesc = answerDesc;
             } else if (status === 200) {
-              this.answerDesc = [];
-              this.selected = [];
-              this.fill = '';
-              if (index <= this.questionTotal - 1) {
-                this.index = index;
-                this.getInit();
-              } else {
-                nkcAPI(
-                  `/api/v1/exam/public/final-result/${this.pid}`,
-                  'POST',
-                ).then((res) => {
-                  if (res) {
-                    // sweetSuccess('顺利完成');
-                    const { activationCode, redirectUrl,from} = res.data;
-                    if (activationCode) {
-                      setRegisterActivationCodeToLocalstorage(activationCode);
-                    }
-                    this.redirectUrl = redirectUrl
-                    this.isFinished = true;
-                    this.from = from;
-                  }
-                });
-              }
+              this.isCorrect = true;
+              this.answerDesc = answerDesc;
             }
-          }
         })
         .catch((error) => {
           sweetError(error);
         });
     },
     showReminder(){
-      sweetInfo(this.question.contentDesc)
+      this.isShowReminder = !this.isShowReminder
     },
+    //重置
     reselected(){
       if(this.type === 'ch4'){
         this.selected = [];
@@ -430,8 +449,9 @@ export default Vue.extend({
       }
       this.answerDesc = [];
       this.isReselected = false;
-      this.isCorrect = true;
+      this.isCorrect = null;
     },
+    //排序
     shuffle(arr){
       const length = arr.length;
       for(let i = 0; i < length; i++) {
@@ -446,21 +466,69 @@ export default Vue.extend({
         a.serialIndex = alphabetArray[index];
       });
     },
+    //背景颜色
     bgc(index,q){
+      //多选
       const isMultiple = this.question.isMultiple;
+      //是否选择
       const isInclude = isMultiple ? this.selected.includes(index) : this.selected === index;
-      const isFalse = this.answerDesc.length > 0;
+      const {isCorrect} = this
       if (!isInclude) {
         return 'bg-secondary';
+      } else if (isCorrect === null) {
+        return 'bg-info'
+      } else if (isCorrect === true) {
+        return 'bg-success';
+      } else {
+        return  'answer-bg-danger shake-animation';
       }
-      if (!isFalse) {
-        return 'bg-info';
-      }
-      const hasDesc = this.answerDesc.some(item => item._id === q._id && item.desc);
-      return hasDesc ? 'answer-bg-danger' : 'answer-bg-danger shake-animation';
     },
     redirectToPage() {
       visitUrl(this.redirectUrl)
+    },
+    //切换下一题
+    next(){
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isShowReminder = false;
+      if(this.index <= this.questionTotal - 1){
+        this.index +=1
+      }
+      this.getInit('down',this.index);
+    },
+    //上一题
+    pre(){
+      if(this.index -1 <0){
+        return sweetError('没有上一题')
+      }
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isReselected = false;
+      this.isShowReminder = false;
+      this.getInit('up',this.index -1);
+    },
+    //完成
+    finish(){
+      if (this.index === this.questionTotal - 1) {
+        nkcAPI(
+          `/api/v1/exam/public/final-result/${this.pid}`,
+          'POST',
+        ).then((res) => {
+          if (res) {
+            const { activationCode, redirectUrl,from} = res.data;
+            if (activationCode) {
+              setRegisterActivationCodeToLocalstorage(activationCode);
+            }
+            this.redirectUrl = redirectUrl
+            this.isFinished = true;
+            this.from = from;
+          }
+        });
+      }
     }
   },
 })
