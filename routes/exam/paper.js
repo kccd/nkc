@@ -6,7 +6,7 @@ paperRouter
   .get('/', async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
-    let { cid, from: userFrom } = query;
+    let { cid, from: userFrom, secret: verifySecret } = query;
     //问题总数
     let questionCount = 0;
     const timeLimit = 45 * 60 * 1000;
@@ -23,6 +23,15 @@ paperRouter
     if (userFrom !== register && userFrom !== exam) {
       ctx.throw(403, '当前来访参数不匹配，请刷新');
     }
+    // 创建开卷考试游标卡尺验证
+    if (type === examCategoryTypes.public) {
+      await db.VerificationModel.verifySecret({
+        uid: uid,
+        ip: ctx.address,
+        secret: verifySecret || '',
+      });
+    }
+
     //闭卷考试
     if (type === examCategoryTypes.secret) {
       let paper = await db.ExamsPaperModel.findOne({
