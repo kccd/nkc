@@ -16,13 +16,16 @@
             span(v-else) {{question.isMultiple? '多选题': '单选题'}}
             | ）
           question-text-content(:text="`${question.content}`")
+          .question-desc
+            i.fa.fa-question-circle-o.fa-sm.m-r-1(v-if="question.contentDesc" @click="showReminder"  aria-hidden="true" title="查看提示")
+            div(v-if="isShowReminder" )  {{this.question.contentDesc}}
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
           form(v-if='question.type === "ans"')
             .answer-form-group
               span 答案：
-              textarea(v-model='fill')
+              textarea(:disabled = "isCorrect"  v-model='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
             label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
@@ -41,15 +44,16 @@
                 .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 ")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
+
         footer.clearfix
           h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误
           h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确
           .button-group
-            button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 查看提示
+            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题
             button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
-            button.btn.btn-default.btn-editor-block.btn-primary(@click='pre' :disabled="!(index - 1 >= 0)" ) 上一题
-            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' :disabled="isCorrect !== true" ) 下一题
+            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " ) 下一题
             button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' ) 完成
 
     div.clearfix(v-else id="finished-box" )
       .notice-content
@@ -235,6 +239,17 @@
       transform: translate(-5px, -5px);
     }
   }
+  .question-desc{
+    &>i{
+      cursor: pointer;
+      color: rgb(185, 185, 185);
+    }
+    &>div{
+      font-weight: normal;
+      font-size: 1.2rem;
+    }
+
+  }
 </style>
 
 <script>
@@ -281,6 +296,7 @@ export default Vue.extend({
       paperQuestionCount: "",
       paperName: '',
       isCorrect:null,
+      isShowReminder:false,
     };
   },
   props:['pid'],
@@ -403,7 +419,6 @@ export default Vue.extend({
         fill: this.fill,
       })
         .then((res) => {
-          if (res.data) {
             const { status, answerDesc} = res.data;
             if (status === 403) {
               if (this.type === 'ch4'){
@@ -411,37 +426,20 @@ export default Vue.extend({
                 this.isCorrect = false
               }
               else {
-                sweetError('输入的问题有误')
+                sweetError('输入的答案有误')
               }
               this.answerDesc = answerDesc;
             } else if (status === 200) {
               this.isCorrect = true;
               this.answerDesc = answerDesc;
-              if (this.index === this.questionTotal - 1) {
-                nkcAPI(
-                  `/api/v1/exam/public/final-result/${this.pid}`,
-                  'POST',
-                ).then((res) => {
-                  if (res) {
-                    const { activationCode, redirectUrl,from} = res.data;
-                    if (activationCode) {
-                      setRegisterActivationCodeToLocalstorage(activationCode);
-                    }
-                    this.redirectUrl = redirectUrl
-                    this.isFinished = true;
-                    this.from = from;
-                  }
-                });
-              }
             }
-          }
         })
         .catch((error) => {
           sweetError(error);
         });
     },
     showReminder(){
-      sweetInfo(this.question.contentDesc)
+      this.isShowReminder = !this.isShowReminder
     },
     //重置
     reselected(){
@@ -494,11 +492,13 @@ export default Vue.extend({
       this.selected = [];
       this.fill = '';
       this.isCorrect = null;
+      this.isShowReminder = false;
       if(this.index <= this.questionTotal - 1){
         this.index +=1
       }
       this.getInit('down',this.index);
     },
+    //上一题
     pre(){
       if(this.index -1 <0){
         return sweetError('没有上一题')
@@ -507,7 +507,28 @@ export default Vue.extend({
       this.selected = [];
       this.fill = '';
       this.isCorrect = null;
+      this.isReselected = false;
+      this.isShowReminder = false;
       this.getInit('up',this.index -1);
+    },
+    //完成
+    finish(){
+      if (this.index === this.questionTotal - 1) {
+        nkcAPI(
+          `/api/v1/exam/public/final-result/${this.pid}`,
+          'POST',
+        ).then((res) => {
+          if (res) {
+            const { activationCode, redirectUrl,from} = res.data;
+            if (activationCode) {
+              setRegisterActivationCodeToLocalstorage(activationCode);
+            }
+            this.redirectUrl = redirectUrl
+            this.isFinished = true;
+            this.from = from;
+          }
+        });
+      }
     }
   },
 })

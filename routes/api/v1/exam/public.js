@@ -25,12 +25,12 @@ router
     await paperService.checkPaperLegal(pid, ip);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
     const hasFinish = await paperService.checkIsFinishPaper(pid);
-    if (hasFinish === -1) {
-      ctx.throw('当前试卷已经做完');
-    }
     let index = 0;
     if (query.type === 'default') {
       index = hasFinish;
+      if (hasFinish === -1) {
+        index = paper.record.length - 1;
+      }
     } else {
       index = query.index;
     }
