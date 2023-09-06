@@ -34,6 +34,7 @@ router.get('/', async (ctx, next) => {
   data.questions = await questionService.extendQuestions(questions);
   const tags = await questionTagService.getAllTag();
   data.tags = [];
+  let targetTag = null;
   for (const tag of tags) {
     const count = await db.QuestionModel.countDocuments({
       tags: tag._id,
@@ -43,14 +44,19 @@ router.get('/', async (ctx, next) => {
     const allCount = await db.QuestionModel.countDocuments({
       tags: tag._id,
     });
-    data.tags.push({
+    const newTag = {
       tagName: tag.name,
       tagDesc: tag.desc,
       tagId: tag._id,
       count,
       allCount,
-    });
+    };
+    if (fid === tag._id) {
+      targetTag = newTag;
+    }
+    data.tags.push(newTag);
   }
+  data.targetTag = targetTag;
   data.paging = paging;
   data.allCount = await db.QuestionModel.countDocuments();
   data.count = await db.QuestionModel.countDocuments({
