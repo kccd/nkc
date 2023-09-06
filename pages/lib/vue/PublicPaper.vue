@@ -16,9 +16,11 @@
             span(v-else) {{question.isMultiple? '多选题': '单选题'}}
             | ）
           question-text-content(:text="`${question.content}`")
-          .question-desc
-            i.fa.fa-question-circle-o.fa-sm.m-r-1(v-if="question.contentDesc" @click="showReminder"  aria-hidden="true" title="查看提示")
-            div(v-if="isShowReminder" )  {{this.question.contentDesc}}
+          .question-desc(v-if="question.contentDesc")
+            .text-info(v-if="isShowReminder" ).m-t-1.m-b-05
+              .answer-desc-icon.fa.fa-lightbulb-o
+              span {{this.question.contentDesc}}
+            button.btn.btn-default.btn-xs( @click="showReminder") 查看提示
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
@@ -33,7 +35,7 @@
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0")
+                .answer-desc.text-info(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
             label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
@@ -41,7 +43,7 @@
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 ")
+                .answer-desc.text-info(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 ")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
 
@@ -211,12 +213,11 @@
    }
  }
   .answer-desc{
-    color: #ff4e4b;
     margin-top: 1rem;
-    .answer-desc-icon{
-      margin-right: 0.5rem;
-      font-size: 1.3rem;
-    }
+  }
+  .answer-desc-icon{
+    margin-right: 0.5rem;
+    font-size: 1.3rem;
   }
   .answer-bg-danger{
     background-color: #ffe1e1;

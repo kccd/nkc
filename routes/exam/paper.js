@@ -24,7 +24,7 @@ paperRouter
       ctx.throw(403, '当前来访参数不匹配，请刷新');
     }
     // 创建开卷考试游标卡尺验证
-    if (type === examCategoryTypes.public) {
+    if (type === examCategoryTypes.public && from === register) {
       await db.VerificationModel.verifySecret({
         uid: uid,
         ip: ctx.address,
