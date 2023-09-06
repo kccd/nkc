@@ -30,7 +30,7 @@
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected.includes(index)")
+                .answer-desc(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected.includes(index)")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
             label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
@@ -38,7 +38,7 @@
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                .answer-desc.text-danger(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected === index")
+                .answer-desc(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 && selected === index")
                   .answer-desc-icon.fa.fa-lightbulb-o
                   span {{answerDescObj[q._id].desc}}
         footer.clearfix
@@ -203,6 +203,7 @@
    }
  }
   .answer-desc{
+    color: #ff4e4b;
     margin-top: 1rem;
     .answer-desc-icon{
       margin-right: 0.5rem;
