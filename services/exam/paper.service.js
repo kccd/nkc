@@ -115,15 +115,15 @@ class PaperService {
     }
   }
   //检测开卷的题是否满足需求
-  async checkPaperLegal(pid, ip) {
+  async checkPaperLegal(pid, ip, uid) {
     const paper = await ExamsPaperModel.findOnly(
       { _id: pid },
       { from: 1, ip: 1, submitted: 1, cid: 1 },
     );
     const { from, submitted, cid } = paper;
     const { register, exam } = await ExamsPaperModel.getFromType();
-    if (ip !== paper.ip) {
-      ThrowBadRequestResponseTypeError(ResponseTypes.QUESTION_DOES_NOT_EXIST);
+    if (ip !== paper.ip && !uid) {
+      ThrowBadRequestResponseTypeError(ResponseTypes.INVALID_IP);
     } else if (submitted && from === exam) {
       ThrowBadRequestResponseTypeError(ResponseTypes.EXAM_HAS_ENDED);
     } else if (submitted && from === register) {

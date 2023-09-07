@@ -20,9 +20,10 @@ router
       params: { pid },
       db,
       query,
+      state: { uid },
     } = ctx;
     const ip = ctx.address;
-    await paperService.checkPaperLegal(pid, ip);
+    await paperService.checkPaperLegal(pid, ip, uid);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
     const hasFinish = await paperService.checkIsFinishPaper(pid);
     let index = 0;
@@ -84,10 +85,11 @@ router
       body,
       params: { pid },
       db,
+      state: { uid },
     } = ctx;
     const { index, qid, selected, fill } = body;
     const ip = ctx.address;
-    await paperService.checkPaperLegal(pid, ip);
+    await paperService.checkPaperLegal(pid, ip, uid);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
     const { ch4, ans } = await db.QuestionModel.getQuestionType();
     const { record } = paper;
