@@ -254,13 +254,13 @@
 </style>
 
 <script>
-import Vue from 'vue';
-import { nkcAPI } from '../js/netAPI.js';
-import { sweetError ,sweetSuccess} from '../js/sweetAlert.js'
-import {getUrl} from "../js/tools";
-import {detailedTime} from '../js/time'
-import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
-import {  renderFormula } from "../js/formula";
+import Vue from "vue";
+import { nkcAPI } from "../js/netAPI.js";
+import { sweetError } from "../js/sweetAlert.js";
+import { getUrl } from "../js/tools";
+import { detailedTime } from "../js/time";
+import { setRegisterActivationCodeToLocalstorage } from "../js/activationCode.js";
+import { renderFormula } from "../js/formula";
 import { visitUrl } from "../js/pageSwitch";
 
 Vue.component('question-text-content', {
@@ -273,7 +273,7 @@ Vue.component('question-text-content', {
   watch: {
     text() {
       this.key = (Math.random() * 10000).toString();
-    }
+    },
   },
   template: `<span :key="key">{{text}}</span>`
 })
@@ -298,6 +298,7 @@ export default Vue.extend({
       paperName: '',
       isCorrect:null,
       isShowReminder:false,
+      url: window.location.href
     };
   },
   props:['pid'],
@@ -329,6 +330,12 @@ export default Vue.extend({
         return obj;
       }
     }
+  },
+  created() {
+    window.addEventListener('popstate', this.updateUrl);
+  },
+  beforeDestroy() {
+    window.removeEventListener('popstate', this.updateUrl);
   },
   methods: {
     getUrl,
@@ -496,8 +503,14 @@ export default Vue.extend({
       this.isShowReminder = false;
       if(this.index <= this.questionTotal - 1){
         this.index +=1
+        const currentUrl = window.location.pathname
+        const newUrl = currentUrl + `#question${this.index}`;
+        history.pushState({index:this.index}, '', newUrl);
+        this.getInit('down',this.index);
       }
-      this.getInit('down',this.index);
+      else {
+        sweetError('index混乱')
+      }
     },
     //上一题
     pre(){
@@ -510,7 +523,15 @@ export default Vue.extend({
       this.isCorrect = null;
       this.isReselected = false;
       this.isShowReminder = false;
-      this.getInit('up',this.index -1);
+      if(this.index >=1){
+        this.index -=1
+        history.back()
+        this.getInit('up',this.index);
+      }
+      else {
+        sweetError('index混乱')
+      }
+
     },
     //完成
     finish(){
@@ -530,6 +551,19 @@ export default Vue.extend({
           }
         });
       }
+    },
+    updateUrl(e) {
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isReselected = false;
+      this.isShowReminder = false;
+     if(!e.state){
+       this.getInit('up',0);
+     }else {
+       this.getInit('down',e.state.index)
+     }
     }
   },
 })
