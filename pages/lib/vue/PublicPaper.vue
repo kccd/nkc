@@ -333,9 +333,11 @@ export default Vue.extend({
   },
   created() {
     window.addEventListener('popstate', this.updateUrl);
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
   },
   beforeDestroy() {
     window.removeEventListener('popstate', this.updateUrl);
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
   },
   methods: {
     getUrl,
@@ -370,10 +372,10 @@ export default Vue.extend({
               if(type === 'ch4'){
                 if(this.question.isMultiple){
                   this.selected = question.answer
-                    .map((item, index) => (item.selected ? index : undefined))
+                    .map((item, index) => (item.correct ? index : undefined))
                     .filter(index => index !== undefined);
                 }else {
-                  this.selected = question.answer.findIndex(item => item.selected)
+                  this.selected = question.answer.findIndex(item => item.correct)
                 }
                 this.answerDesc =  this.question.answer.map((item) => {
                   const { desc, _id } = item;
@@ -525,7 +527,9 @@ export default Vue.extend({
       this.isShowReminder = false;
       if(this.index >=1){
         this.index -=1
-        history.back()
+        const currentUrl = window.location.pathname
+        const newUrl = currentUrl + `#question${this.index}`;
+        history.pushState({index:this.index}, '', newUrl);
         this.getInit('up',this.index);
       }
       else {
@@ -564,6 +568,11 @@ export default Vue.extend({
      }else {
        this.getInit('down',e.state.index)
      }
+    },
+    handleBeforeUnload(event) {
+      const confirmationMessage = '确定要离开页面吗？';
+      event.returnValue = confirmationMessage;
+      return confirmationMessage;
     }
   },
 })
