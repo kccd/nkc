@@ -180,6 +180,9 @@ registerRouter
     const {
       c: { examSource, examNotice },
     } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
+    if (examSource.length === 0) {
+      ctx.throw('并未添加考卷，请前往注册页设置添加');
+    }
     data.cid = examSource[0]._id;
     data.examNotice = examNotice;
     ctx.template = 'exam/public.pug';

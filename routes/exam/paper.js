@@ -170,7 +170,7 @@ paperRouter
     if (type === examCategoryTypes.secret) {
       return ctx.redirect(`/exam/paper/${newPaper._id}`);
     } else {
-      return ctx.redirect(`/exam/public/takeExam/${newPaper._id}`);
+      return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
     }
   })
   .get('/:_id', async (ctx, next) => {
