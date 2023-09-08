@@ -27,7 +27,7 @@
           form(v-if='question.type === "ans"')
             .answer-form-group
               span 答案：
-              textarea(:disabled = "isCorrect"  v-model='fill' )
+              textarea(:disabled = "isCorrect"  v-model.trim='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
             label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
