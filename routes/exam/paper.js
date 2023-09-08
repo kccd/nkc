@@ -1,12 +1,15 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
+const {
+  registerExamService,
+} = require('../../services/register/registerExam.service');
 const paperRouter = new Router();
 
 paperRouter
   .get('/', async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
-    let { cid, from: userFrom, secret: verifySecret } = query;
+    let { cid, from: userFrom, codeId, codeResult } = query;
     //问题总数
     let questionCount = 0;
     const timeLimit = 45 * 60 * 1000;
@@ -24,12 +27,8 @@ paperRouter
       ctx.throw(403, '当前来访参数不匹配，请刷新');
     }
     // 创建开卷考试游标卡尺验证
-    if (type === examCategoryTypes.public && from === register) {
-      await db.VerificationModel.verifySecret({
-        uid: uid,
-        ip: ctx.address,
-        secret: verifySecret || '',
-      });
+    if (type === examCategoryTypes.public && userFrom === register) {
+      await registerExamService.checkRegisterExamCode(codeId, codeResult);
     }
 
     //闭卷考试
@@ -42,7 +41,9 @@ paperRouter
       });
       // 该考卷下有未完成的考试
       if (paper) {
-        return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
+        ctx.data.redirectUrl = `/exam/paper/${paper._id}?created=true`;
+        return await next();
+        // return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
       }
       const examSettings = await db.SettingModel.findOnly({ _id: 'exam' });
       const { count, countOneDay, waitingTime } = examSettings.c;
@@ -109,7 +110,9 @@ paperRouter
         });
         await paper.save();
         // 跳转到考试页面
-        return ctx.redirect(`/exam/paper/${paper._id}`);
+        ctx.data.redirectUrl = `/exam/paper/${paper._id}`;
+        return await next();
+        // return ctx.redirect(`/exam/paper/${paper._id}`);
       }
     }
     // 加载不同考卷的题目
@@ -168,9 +171,13 @@ paperRouter
     await newPaper.save();
     // 跳转到考试页面
     if (type === examCategoryTypes.secret) {
-      return ctx.redirect(`/exam/paper/${newPaper._id}`);
+      ctx.data.redirectUrl = `/exam/paper/${newPaper._id}`;
+      return await next();
+      // return ctx.redirect(`/exam/paper/${newPaper._id}`);
     } else {
-      return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
+      ctx.data.redirectUrl = `/exam/public/public-paper/${newPaper._id}`;
+      return await next();
+      // return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
     }
   })
   .get('/:_id', async (ctx, next) => {
