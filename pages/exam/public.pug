@@ -12,7 +12,10 @@ block content
         .examNotes
           .m-b-1!=markdown_safe(data.examNotice)
         .text-center#app(v-cloak)
-          verifications(ref='verifications')
+          //- verifications(ref='verifications')
+          div(v-if="codeId")
+            span {codeValue[0]} + {codeValue[1]}
+            input(v-model.number='codeResult')
           .btn.btn-default.fund-terms-button(@click=`visitPublicExam()`) 参加考试
 block scripts
   +includeJS('/exam/public.js')
