@@ -2,7 +2,10 @@ const getRedisKeys = require('../../nkcModules/getRedisKeys');
 const redisClient = require('../../settings/redisClient');
 const SettingModel = require('../../dataModels/SettingModel');
 const { registerExamRateLimit } = require('../../settings/register');
-const { ThrowForbiddenResponseTypeError } = require('../../nkcModules/error');
+const {
+  ThrowForbiddenResponseTypeError,
+  ThrowBadRequestResponseTypeError,
+} = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
 const {
   activationCodeService,
@@ -60,6 +63,31 @@ class RegisterExamService {
       isExamEnabled,
       isValidCode,
     };
+  }
+
+  async getRegisterExamCode() {
+    const codeId = await SettingModel.getNewId();
+    const codeValue = [
+      Math.round(Math.random() * 10),
+      Math.round(Math.random() * 10),
+    ];
+    const sum = codeValue[0] + codeValue[1];
+    const codeKey = getRedisKeys('registerExamCode', codeId);
+    await redisClient.setWithTimeoutAsync(codeKey, sum, 120);
+    return {
+      codeId,
+      codeValue,
+    };
+  }
+
+  async checkRegisterExamCode(codeId, result) {
+    const codeKey = getRedisKeys('registerExamCode', codeId);
+    const sum = await redisClient.getAsync(codeKey);
+    if (Number(sum) !== result) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.INVALID_REGISTER_EXAM_CODE,
+      );
+    }
   }
 }
 
