@@ -8,6 +8,9 @@ const {
 const {
   activationCodeService,
 } = require('../../services/activationCode/activationCode.service');
+const {
+  registerExamService,
+} = require('../../services/register/registerExam.service.js');
 registerRouter
   .get(['/', '/mobile'], async (ctx, next) => {
     const { data, query } = ctx;
@@ -191,9 +194,10 @@ registerRouter
   })
   .get('/exam/code', async (ctx, next) => {
     const { data } = ctx;
-    const imageData = verificationCode.create();
-    data.codeId = '1111';
-    data.codeImage = imageData;
+    const { codeId, codeValue } =
+      await registerExamService.getRegisterExamCode();
+    data.codeId = codeId;
+    data.codeValue = codeValue;
     await next();
   });
 module.exports = registerRouter;
