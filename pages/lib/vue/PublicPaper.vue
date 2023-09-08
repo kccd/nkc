@@ -337,11 +337,14 @@ export default Vue.extend({
   },
   beforeDestroy() {
     window.removeEventListener('popstate', this.updateUrl);
-    window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    this.removeBeforeunloadEventListener();
   },
   methods: {
     getUrl,
     detailedTime,
+    removeBeforeunloadEventListener() {
+      window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    },
     //获取考题
     getInit(type='default',index = 0) {
       nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${index}&&type=${type}`, 'GET')
@@ -552,6 +555,7 @@ export default Vue.extend({
             this.redirectUrl = redirectUrl
             this.isFinished = true;
             this.from = from;
+            this.removeBeforeunloadEventListener();
           }
         });
       }
