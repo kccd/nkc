@@ -10,7 +10,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand.website-logo(href="/" )= remoteState.serverSettings.websiteName
+      a.navbar-brand.website-logo(href="/" )
+        img(src=tools.getUrl('siteIcon', 'sm') style="height: 3.5rem;width: 3.5rem;display: inline-block;")
+        span= remoteState.serverSettings.websiteName
 
       .navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline
         input.inline-block.form-control(type='text' id="navSearchInputSM" placeholder='关键词 文号 用户')
@@ -34,6 +36,13 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     //- 电脑屏幕
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav.navbar-md
+        li(class=navbar_highlight === 'community' ? 'active' : '')
+          a(href=`/c`) 社区
+        li(class=navbar_highlight === 'columns' ? 'active' : '')
+          a(href=`/m`) 专栏
+        li(class=navbar_highlight === 'zone' ? 'active' : '')
+          a(href=`/z`) 电波
+      //-ul.nav.navbar-nav.navbar-md
         li(class=navbar_highlight === 'latest' || navbar_highlight === 'reply' || navbar_highlight === 'column' || navbar_highlight === 'thread' ? 'active' : '')
           a(href='/n') 最新
         li(class=navbar_highlight === 'subscribe' ? 'active' : '')
