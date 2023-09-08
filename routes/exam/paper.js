@@ -1,12 +1,15 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
+const {
+  registerExamService,
+} = require('../../services/register/registerExam.service');
 const paperRouter = new Router();
 
 paperRouter
   .get('/', async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
-    let { cid, from: userFrom, secret: verifySecret } = query;
+    let { cid, from: userFrom, codeId, codeResult } = query;
     //问题总数
     let questionCount = 0;
     const timeLimit = 45 * 60 * 1000;
@@ -25,11 +28,7 @@ paperRouter
     }
     // 创建开卷考试游标卡尺验证
     if (type === examCategoryTypes.public && from === register) {
-      await db.VerificationModel.verifySecret({
-        uid: uid,
-        ip: ctx.address,
-        secret: verifySecret || '',
-      });
+      await registerExamService.checkRegisterExamCode(codeId, codeResult);
     }
 
     //闭卷考试
