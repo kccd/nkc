@@ -8,6 +8,7 @@ const paddingLeft = 5; // 主尺刻度距离左边的距离
 const { createCanvas } = require('canvas');
 const { isDevelopment } = require('../../settings/env');
 const unit = 'mm';
+
 function create() {
   // 主尺刻度范围 最小值在0到50，最大值在最小值的基础上增加30到35
   const minNumber = Math.round(Math.random() * 50);

@@ -32,6 +32,7 @@ const FixedOperations = {
   postExamsPaper: 'postExamsPaper',
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
+  getRegisterExamCode: 'getRegisterExamCode',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

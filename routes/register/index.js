@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
 const captcha = require('../../nkcModules/captcha');
+const verificationCode = require('../../nkcModules/verificationCode');
 const {
   usernameCheckerService,
 } = require('../../services/user/usernameChecker.service');
@@ -183,6 +184,17 @@ registerRouter
     data.cid = examSource[0]._id;
     data.examNotice = examNotice;
     ctx.template = 'exam/public.pug';
+    await next();
+  })
+  .get('/exam/code', async (ctx, next) => {
+    const { data } = ctx;
+    const imageData = verificationCode.create();
+    // data.codeId = '1111';
+    // data.codeImage = imageData;
+    ctx.apiData = {
+      a: 1,
+      b: 2,
+    };
     await next();
   });
 module.exports = registerRouter;

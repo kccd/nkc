@@ -1,4 +1,5 @@
-import Verifications from '../lib/vue/Verifications';
+// import Verifications from '../lib/vue/Verifications';
+import Verifications from '../lib/vue/VerificationCode.vue';
 import Vue from 'vue';
 import { visitUrl } from '../lib/js/pageSwitch';
 import { getDataById } from '../lib/js/dataConversion';
