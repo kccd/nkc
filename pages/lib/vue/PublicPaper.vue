@@ -27,7 +27,7 @@
           form(v-if='question.type === "ans"')
             .answer-form-group
               span 答案：
-              textarea(:disabled = "isCorrect"  v-model='fill' )
+              textarea(:disabled = "isCorrect"  v-model.trim='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
             label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
@@ -337,11 +337,14 @@ export default Vue.extend({
   },
   beforeDestroy() {
     window.removeEventListener('popstate', this.updateUrl);
-    window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    this.removeBeforeunloadEventListener();
   },
   methods: {
     getUrl,
     detailedTime,
+    removeBeforeunloadEventListener() {
+      window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    },
     //获取考题
     getInit(type='default',index = 0) {
       nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${index}&&type=${type}`, 'GET')
@@ -552,6 +555,7 @@ export default Vue.extend({
             this.redirectUrl = redirectUrl
             this.isFinished = true;
             this.from = from;
+            this.removeBeforeunloadEventListener();
           }
         });
       }
