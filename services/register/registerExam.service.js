@@ -1,8 +1,12 @@
 const getRedisKeys = require('../../nkcModules/getRedisKeys');
 const redisClient = require('../../settings/redisClient');
+const SettingModel = require('../../dataModels/SettingModel');
 const { registerExamRateLimit } = require('../../settings/register');
 const { ThrowForbiddenResponseTypeError } = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
+const {
+  activationCodeService,
+} = require('../activationCode/activationCode.service');
 class RegisterExamService {
   async accessRateLimit(address) {
     const timeKey = getRedisKeys('registerExamLimitTime', address);
@@ -32,6 +36,30 @@ class RegisterExamService {
     }
     await redisClient.setAsync(timeKey, time);
     await redisClient.setAsync(countKey, count);
+  }
+
+  async getRegisterCodeStatus(registerActivationCode) {
+    const { registerExamination: isExamEnabled } =
+      await SettingModel.getSettings('register');
+    let isExamRequired = false;
+    let isValidCode = false;
+    if (isExamEnabled) {
+      isExamRequired = true;
+      if (registerActivationCode) {
+        const valid = await activationCodeService.isActivationCodeValid(
+          registerActivationCode,
+        );
+        if (valid) {
+          isExamRequired = false;
+          isValidCode = true;
+        }
+      }
+    }
+    return {
+      isExamRequired,
+      isExamEnabled,
+      isValidCode,
+    };
   }
 }
 

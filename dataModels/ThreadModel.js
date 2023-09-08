@@ -1987,7 +1987,14 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
-  const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
+  const academicPost = await XsfsRecordModel.find(
+    {
+      num: {
+        $gte: 1,
+      },
+    },
+    { pid: 1 },
+  )
     .limit(100)
     .sort({ toc: -1 })
     .lean();

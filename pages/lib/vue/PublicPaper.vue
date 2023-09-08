@@ -27,7 +27,7 @@
           form(v-if='question.type === "ans"')
             .answer-form-group
               span 答案：
-              textarea(:disabled = "isCorrect"  v-model='fill' )
+              textarea(:disabled = "isCorrect"  v-model.trim='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
             label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
@@ -254,13 +254,13 @@
 </style>
 
 <script>
-import Vue from 'vue';
-import { nkcAPI } from '../js/netAPI.js';
-import { sweetError ,sweetSuccess} from '../js/sweetAlert.js'
-import {getUrl} from "../js/tools";
-import {detailedTime} from '../js/time'
-import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
-import {  renderFormula } from "../js/formula";
+import Vue from "vue";
+import { nkcAPI } from "../js/netAPI.js";
+import { sweetError } from "../js/sweetAlert.js";
+import { getUrl } from "../js/tools";
+import { detailedTime } from "../js/time";
+import { setRegisterActivationCodeToLocalstorage } from "../js/activationCode.js";
+import { renderFormula } from "../js/formula";
 import { visitUrl } from "../js/pageSwitch";
 
 Vue.component('question-text-content', {
@@ -273,7 +273,7 @@ Vue.component('question-text-content', {
   watch: {
     text() {
       this.key = (Math.random() * 10000).toString();
-    }
+    },
   },
   template: `<span :key="key">{{text}}</span>`
 })
@@ -298,6 +298,7 @@ export default Vue.extend({
       paperName: '',
       isCorrect:null,
       isShowReminder:false,
+      url: window.location.href
     };
   },
   props:['pid'],
@@ -330,9 +331,20 @@ export default Vue.extend({
       }
     }
   },
+  created() {
+    window.addEventListener('popstate', this.updateUrl);
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
+  },
+  beforeDestroy() {
+    window.removeEventListener('popstate', this.updateUrl);
+    this.removeBeforeunloadEventListener();
+  },
   methods: {
     getUrl,
     detailedTime,
+    removeBeforeunloadEventListener() {
+      window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    },
     //获取考题
     getInit(type='default',index = 0) {
       nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${index}&&type=${type}`, 'GET')
@@ -363,10 +375,10 @@ export default Vue.extend({
               if(type === 'ch4'){
                 if(this.question.isMultiple){
                   this.selected = question.answer
-                    .map((item, index) => (item.selected ? index : undefined))
+                    .map((item, index) => (item.correct ? index : undefined))
                     .filter(index => index !== undefined);
                 }else {
-                  this.selected = question.answer.findIndex(item => item.selected)
+                  this.selected = question.answer.findIndex(item => item.correct)
                 }
                 this.answerDesc =  this.question.answer.map((item) => {
                   const { desc, _id } = item;
@@ -496,8 +508,14 @@ export default Vue.extend({
       this.isShowReminder = false;
       if(this.index <= this.questionTotal - 1){
         this.index +=1
+        const currentUrl = window.location.pathname
+        const newUrl = currentUrl + `#question${this.index}`;
+        history.pushState({index:this.index}, '', newUrl);
+        this.getInit('down',this.index);
       }
-      this.getInit('down',this.index);
+      else {
+        sweetError('index混乱')
+      }
     },
     //上一题
     pre(){
@@ -510,7 +528,17 @@ export default Vue.extend({
       this.isCorrect = null;
       this.isReselected = false;
       this.isShowReminder = false;
-      this.getInit('up',this.index -1);
+      if(this.index >=1){
+        this.index -=1
+        const currentUrl = window.location.pathname
+        const newUrl = currentUrl + `#question${this.index}`;
+        history.pushState({index:this.index}, '', newUrl);
+        this.getInit('up',this.index);
+      }
+      else {
+        sweetError('index混乱')
+      }
+
     },
     //完成
     finish(){
@@ -527,9 +555,28 @@ export default Vue.extend({
             this.redirectUrl = redirectUrl
             this.isFinished = true;
             this.from = from;
+            this.removeBeforeunloadEventListener();
           }
         });
       }
+    },
+    updateUrl(e) {
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isReselected = false;
+      this.isShowReminder = false;
+     if(!e.state){
+       this.getInit('up',0);
+     }else {
+       this.getInit('down',e.state.index)
+     }
+    },
+    handleBeforeUnload(event) {
+      const confirmationMessage = '确定要离开页面吗？';
+      event.returnValue = confirmationMessage;
+      return confirmationMessage;
     }
   },
 })
