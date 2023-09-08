@@ -83,11 +83,12 @@ class RegisterExamService {
   async checkRegisterExamCode(codeId, result) {
     const codeKey = getRedisKeys('registerExamCode', codeId);
     const sum = await redisClient.getAsync(codeKey);
-    if (Number(sum) !== result) {
+    if (sum !== result) {
       ThrowBadRequestResponseTypeError(
         ResponseTypes.INVALID_REGISTER_EXAM_CODE,
       );
     }
+    await redisClient.delAsync(codeKey);
   }
 }
 

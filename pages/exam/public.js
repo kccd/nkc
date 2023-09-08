@@ -1,5 +1,4 @@
 // import Verifications from '../lib/vue/Verifications';
-import Verifications from '../lib/vue/VerificationCode.vue';
 import Vue from 'vue';
 import { visitUrl } from '../lib/js/pageSwitch';
 import { getDataById } from '../lib/js/dataConversion';
@@ -14,9 +13,6 @@ new Vue({
     codeId: '',
     codeValue: [],
     codeResult: '',
-  },
-  components: {
-    verifications: Verifications,
   },
   mounted() {
     this.getCode();
@@ -34,17 +30,18 @@ new Vue({
         })
         .catch(sweetError);
     },
-    getSecret() {
-      return this.$refs.verifications.open().then((res) => res.secret);
-    },
     visitPublicExam() {
-      this.getSecret()
-        .then((secret) => {
-          visitUrl(
-            `/exam/paper?cid=${this.cid}&from=register&secret=${secret}`,
-          );
+      nkcAPI(
+        `/exam/paper?cid=${this.cid}&from=register&codeId=${this.codeId}&codeResult=${this.codeResult}`,
+        HttpMethods.GET,
+      )
+        .then((data) => {
+          visitUrl(data.redirectUrl);
         })
-        .catch(sweetError);
+        .catch((err) => {
+          this.changeCode();
+          sweetError(err);
+        });
     },
   },
 });

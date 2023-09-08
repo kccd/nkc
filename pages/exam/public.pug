@@ -13,10 +13,11 @@ block content
           .m-b-1!=markdown_safe(data.examNotice)
         .text-center#app(v-cloak)
           //- verifications(ref='verifications')
-          div(v-if="codeId")
-            span {codeValue[0]} + {codeValue[1]}
-            input(v-model.number='codeResult')
-          .btn.btn-default.fund-terms-button(@click=`visitPublicExam()`) 参加考试
+          .m-b-1(v-if="codeId")
+            span.border-radius-3px(style="") {{codeValue[0]}} ＋ {{codeValue[1]}} =
+            input(v-model='codeResult' style='width: 4rem;')
+          .btn.btn-primary.fund-terms-button(v-if="!codeResult" :disabled="true" title='请填写计算结果') 参加考试
+          .btn.btn-primary.fund-terms-button(v-else @click=`visitPublicExam()`) 参加考试
 block scripts
   +includeJS('/exam/public.js')
   script.
