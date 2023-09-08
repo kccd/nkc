@@ -42,7 +42,9 @@ paperRouter
       });
       // 该考卷下有未完成的考试
       if (paper) {
-        return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
+        ctx.data.redirectUrl = `/exam/paper/${paper._id}?created=true`;
+        return await next();
+        // return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
       }
       const examSettings = await db.SettingModel.findOnly({ _id: 'exam' });
       const { count, countOneDay, waitingTime } = examSettings.c;
@@ -109,7 +111,9 @@ paperRouter
         });
         await paper.save();
         // 跳转到考试页面
-        return ctx.redirect(`/exam/paper/${paper._id}`);
+        ctx.data.redirectUrl = `/exam/paper/${paper._id}`;
+        return await next();
+        // return ctx.redirect(`/exam/paper/${paper._id}`);
       }
     }
     // 加载不同考卷的题目
@@ -168,9 +172,13 @@ paperRouter
     await newPaper.save();
     // 跳转到考试页面
     if (type === examCategoryTypes.secret) {
-      return ctx.redirect(`/exam/paper/${newPaper._id}`);
+      ctx.data.redirectUrl = `/exam/paper/${newPaper._id}`;
+      return await next();
+      // return ctx.redirect(`/exam/paper/${newPaper._id}`);
     } else {
-      return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
+      ctx.data.redirectUrl = `/exam/public/public-paper/${newPaper._id}`;
+      return await next();
+      // return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
     }
   })
   .get('/:_id', async (ctx, next) => {
