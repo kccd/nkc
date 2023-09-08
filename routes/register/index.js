@@ -189,12 +189,8 @@ registerRouter
   .get('/exam/code', async (ctx, next) => {
     const { data } = ctx;
     const imageData = verificationCode.create();
-    // data.codeId = '1111';
-    // data.codeImage = imageData;
-    ctx.apiData = {
-      a: 1,
-      b: 2,
-    };
+    data.codeId = '1111';
+    data.codeImage = imageData;
     await next();
   });
 module.exports = registerRouter;
