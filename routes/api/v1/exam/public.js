@@ -38,9 +38,9 @@ router
 
     const { record } = paper;
     const question = JSON.parse(JSON.stringify(record[index]));
-    const { hasImage } = await db.QuestionModel.findOnly(
+    const { hasImage, isIndefinite } = await db.QuestionModel.findOnly(
       { _id: question.qid },
-      { hasImage: 1 },
+      { hasImage: 1, isIndefinite: 1 },
     );
     let isMultiple = [];
     if (question.type === 'ch4') {
@@ -69,6 +69,7 @@ router
         hasImage,
         isMultiple: isMultiple.length > 1,
         correct,
+        isIndefinite,
       },
       questionTotal: record.length,
       index,

@@ -81,6 +81,7 @@ var app = new Vue({
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
         const questions = data.questions;
+        console.log(data.questions, 'data.questions');
         app.questions = questions.map((item, index) => {
           const obj = {
             type: item.type,
@@ -97,6 +98,7 @@ var app = new Vue({
             //判断是否为多选题
             obj.isMultiple = item.isMultiple;
             obj.selected = [];
+            obj.isIndefinite = item.isIndefinite;
             for (let j = 0; j < item.answer.length; j++) {
               obj.ans_[j] = NKC.methods.custom_xss_process(
                 NKC.methods.mdToHtml(

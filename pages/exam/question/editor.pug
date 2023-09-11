@@ -55,6 +55,16 @@ block content
                   label
                     input(type='radio' value='B' v-model='question.volume')
                     span 专业级
+            .form-group(v-if="question.type ==='ch4'" )
+              label(class="col-sm-2 control-label") 试题不定项
+              .col-sm-10
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model="question.isIndefinite" )
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model="question.isIndefinite")
+                    span 否
 
             .form-group
               label(class="col-sm-2 control-label") 试题标签
