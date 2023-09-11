@@ -20,7 +20,7 @@ block content
               tr
                 th
                   span(style='display: inline-block;')
-                    a(href=`/exam/paper?cid=${category._id}` title=category.desc)=`${category.name}`
+                    span.pointer(style='color:#337ab7;' onclick=`createPaper(${category._id})` title=category.desc)=`${category.name}`
                 th
                   if category.volume === 'A'
                     span 基础级
@@ -114,9 +114,4 @@ block content
               - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`${li.user.info.certsName}`;
               img.user-list-avatar(src=tools.getUrl('userAvatar', li.user.avatar, 'sm') title=title)
 block scripts
-  script.
-    $(function() {
-      if (!NKC.configs.uid) {
-        $(".exam-link a").removeAttr("href").attr("onclick", "RootApp.openLoginPanel('login')").addClass("pointer");
-      }
-    });
+  +includeJS('/exam/home.js')

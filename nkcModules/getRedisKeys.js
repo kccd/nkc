@@ -50,5 +50,7 @@ module.exports = (type, v1, v2) => {
       return `register:exam:limit:time:${v1}`;
     case 'registerExamLimitCount':
       return `register:exam:limit:count:${v1}`;
+    case 'registerExamCode':
+      return `register:exam:code:${v1}`;
   }
 };
