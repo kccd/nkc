@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
 const { getUrl } = require('../nkcModules/tools');
+const { subscribeSources } = require('../settings/subscribe');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -1986,7 +1987,14 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
-  const academicPost = await XsfsRecordModel.find({}, { pid: 1 })
+  const academicPost = await XsfsRecordModel.find(
+    {
+      num: {
+        $gte: 1,
+      },
+    },
+    { pid: 1 },
+  )
     .limit(100)
     .sort({ toc: -1 })
     .lean();
@@ -2165,25 +2173,23 @@ threadSchema.statics.getUserSubThreads = async (uid, fid) => {
   const SubscribeModel = mongoose.model('subscribes');
   const ThreadModel = mongoose.model('threads');
   const subs = await SubscribeModel.find(
-    { cancel: false, uid },
     {
-      fid: 1,
-      tid: 1,
-      tUid: 1,
-      type: 1,
+      cancel: false,
+      uid,
+      source: { $in: [subscribeSources.user, subscribeSources.forum] },
+    },
+    {
+      sid: 1,
+      source: 1,
     },
   ).sort({ toc: -1 });
-  const subFid = [],
-    subTid = [],
-    subUid = [];
+  const subFid = [];
+  const subUid = [];
   subs.map((s) => {
-    if (s.type === 'forum') {
+    if (s.source === subscribeSources.forum) {
       subFid.push(s.fid);
     }
-    if (s.type === 'thread') {
-      subTid.push(s.tid);
-    }
-    if (s.type === 'user') {
+    if (s.source === subscribeSources.user) {
       subUid.push(s.tUid);
     }
   });
@@ -2208,11 +2214,6 @@ threadSchema.statics.getUserSubThreads = async (uid, fid) => {
       {
         uid: {
           $in: subUid,
-        },
-      },
-      {
-        tid: {
-          $in: subTid,
         },
       },
     ],
@@ -2896,9 +2897,9 @@ threadSchema.methods.getThreadNav = async function () {
 threadSchema.statics.getCollectedCountByTid = async (tid) => {
   const SubscribeModel = mongoose.model('subscribes');
   return await SubscribeModel.countDocuments({
-    type: 'collection',
+    source: subscribeSources.collectionThread,
     cancel: false,
-    tid,
+    sid: tid,
   });
 };
 
@@ -2977,13 +2978,13 @@ threadSchema.statics.getThreadInfoByColumn = async function (columnPost) {
   };
 };
 
-threadSchema.statics.extendShopInfo = async function (praps) {
+threadSchema.statics.extendShopInfo = async function (props) {
   const ShopGoodsModel = mongoose.model('shopGoods');
   // const ShopCartModel = mongoose.model('shopCarts');
   const IPModel = mongoose.model('ips');
   // const UserModel = mongoose.model('users');
   const SettingModel = mongoose.model('settings');
-  const { tid, oc, uid, authLevel, address } = praps;
+  const { tid, oc, uid, address, gradeId } = props;
 
   let product = null;
   let vipDiscount = false;
@@ -2999,10 +3000,7 @@ threadSchema.statics.extendShopInfo = async function (praps) {
   if (product.vipDiscount) {
     vipDiscount = true;
     for (let v = 0; v < product.vipDisGroup.length; v++) {
-      if (
-        uid &&
-        Number(authLevel) === Number(product.vipDisGroup[v].vipLevel)
-      ) {
+      if (uid && gradeId === Number(product.vipDisGroup[v].vipLevel)) {
         vipNum = product.vipDisGroup[v].vipNum;
       }
     }
@@ -3031,7 +3029,9 @@ threadSchema.statics.extendShopInfo = async function (praps) {
     try {
       const ipInfo = await IPModel.getIPInfoByIP(address);
       userAddress = ipInfo.location;
-    } catch (err) {}
+    } catch (err) {
+      //
+    }
   }
   try {
     await SettingModel.checkShopSellerByUid(product.uid);

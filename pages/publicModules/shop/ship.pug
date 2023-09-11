@@ -38,11 +38,9 @@
             .form-group
               label 快递单号
               input.form-control(type="text" v-model.number="trackNumber")
-      .modal-footer
-        .options-button
-          a(data-dismiss="modal") 关闭
-          a.active(@click="submit") 保存
-
+      .modal-footer.text-right
+        button.btn.btn-default.btn-sm(data-dismiss="modal") 关闭
+        button.btn.btn-primary.btn-sm(@click='submit') 提交
 +includeJS("/publicModules/trackNames.js")
 +includeJS("/publicModules/shop/ship.js")
 +includeJS("/clipboard/clipboard.min.js")

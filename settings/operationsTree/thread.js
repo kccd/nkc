@@ -44,9 +44,9 @@ module.exports = {
       POST: Operations.closeThread,
       DELETE: Operations.openThread,
     },
-    subscribe: {
+    /*subscribe: {
       POST: Operations.subThread,
       DELETE: Operations.unSubThread,
-    },
+    },*/
   },
 };

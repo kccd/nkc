@@ -105,7 +105,7 @@ const schema = new Schema(
     collection: 'examsCategories',
   },
 );
-schema.statics.getExamCategoryType = async () => {
+schema.statics.getExamCategoryTypes = async () => {
   return { ...examCategoryTypes };
 };
 module.exports = mongoose.model('examsCategories', schema);

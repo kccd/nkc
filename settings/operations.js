@@ -33,6 +33,7 @@ const FixedOperations = {
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
   setMomentVisible: 'setMomentVisible',
+  getRegisterExamCode: 'getRegisterExamCode',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -771,6 +772,7 @@ const DynamicOperations = {
   columnManage: 'columnManage',
   getThreadCategories: 'getThreadCategories',
   manageQuestionTags: 'manageQuestionTags',
+  createQuestionTags: 'createQuestionTags',
   setMomentVisibleOther: 'setMomentVisibleOther',
 };
 

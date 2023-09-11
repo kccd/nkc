@@ -91,9 +91,8 @@ userRouter
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const { db, body, params, data, nkcModules, fsPromise, tools } = ctx;
+    const { db, body, params, data, nkcModules } = ctx;
     const { uid } = params;
-    const { ffmpeg } = tools;
     const targetUser = await db.UserModel.findOnly({ uid });
     if (targetUser.destroyed) {
       ctx.throw(403, '对方账号已注销');
@@ -111,7 +110,7 @@ userRouter
       ctx.throw(403, warningContent);
     }
 
-    let file, content, voiceTime, localId, isVoice;
+    let file, content, localId, isVoice;
 
     if (body.fields) {
       content = body.fields.content;

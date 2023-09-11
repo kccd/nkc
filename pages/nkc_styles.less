@@ -4189,18 +4189,25 @@ span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-name[data
 
 /*公式水平滚动*/
 .MathJax{
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  display: inline-block;
-  vertical-align: bottom;
-  padding: 1px 3px 2px 3px;
-  line-height: 1!important;
+  //max-width: 100%;
+  //overflow-x: auto;
+  //overflow-y: hidden;
+  //margin-right: 0.5rem;
+  //margin-left: 0.5rem;
+  vertical-align: middle;
+  //display: inline-block;
+  //vertical-align: middle;
+  //padding: 1px 3px 2px 3px;
+  //line-height: 1!important;
 }
 .MathJax>.MJX-TEX{
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
   /*overflow: hidden;*/
-  /*padding: 1px 3px 1px 3px;*/
+  padding: 0.5rem 0.5rem!important;
 }
+
 /* 学术分隐藏 旧*/
 .nkcHiddenBox{
   border-style: solid;

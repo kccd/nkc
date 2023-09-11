@@ -205,6 +205,7 @@ schema.statics.extendPapers = async (papers, options) => {
       _id: paper._id,
       tlm: paper.tlm,
       toc: paper.toc,
+      type: paper.type,
       passed: paper.passed,
       timeOut: paper.timeOut,
       submitted: paper.submitted,

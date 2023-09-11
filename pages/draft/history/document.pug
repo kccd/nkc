@@ -33,7 +33,7 @@ block content
           if data.history.length
 
             include ../../columns/article/nav
-            +nav({})
+            +nav({docNumber: data.document.desTypeId})
             //- threadCategory
             if data.document.threadCategoriesWarning && data.document.threadCategoriesWarning.length
               .bg-warning.text-warning.p-a-1.bg-border

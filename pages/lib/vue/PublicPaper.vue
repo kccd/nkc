@@ -6,45 +6,64 @@
         .h3 科创会员开卷考试
         .h5 考试科目：{{paperName}}
         .h5 开考时间：{{detailedTime(paperTime)}}
-        .h5 剩余考题：{{paperQuestionCount}}
+        .h5 试题总数：{{paperQuestionCount}}
     hr
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
-        .question-text 题目：{{question.content}} {{question.isMultiple?'(多选)':''}}
+        .question-text
+          .h4.text-info 第 {{index + 1}} 题（
+            span(v-if="question.type === 'ans'") 填空题
+            span(v-else) {{question.isMultiple? '多选题': '单选题'}}
+            | ）
+          question-text-content(:text="`${question.content}`")
+          .question-desc(v-if="question.contentDesc")
+            .text-info(v-if="isShowReminder" ).m-t-1.m-b-05
+              .answer-desc-icon.fa.fa-lightbulb-o
+              span {{this.question.contentDesc}}
+            button.btn.btn-default.btn-xs( @click="showReminder") 查看提示
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-content
         .question-answer.m-b-2
           form(v-if='question.type === "ans"')
             .answer-form-group
               span 答案：
-              textarea(v-model='fill')
+              textarea(:disabled = "isCorrect"  v-model.trim='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
             label.options(v-if="question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
-              input.m-r-05(:disabled="isReselected" v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
+              input.m-r-05(:disabled="isReselected || isCorrect " v-show="false" type="checkbox" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                p.red-text(v-if="answerDesc.length>0 && selected.includes(index)") {{answerDesc.find((item)=>item._id === q._id).desc}}
+                .answer-desc.text-info(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0")
+                  .answer-desc-icon.fa.fa-lightbulb-o
+                  span {{answerDescObj[q._id].desc}}
             label.options(v-if="!question.isMultiple" v-for='(q, index) in question.answer' :class="bgc(index,q)")
-              input.m-r-05(:disabled="isReselected" v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
+              input.m-r-05(:disabled="isReselected || isCorrect " v-show="false" type="radio" :name="'question' + index" :value='index' v-model='selected' )
               .option-content
                 span {{q.serialIndex}}、
                 span.m-r-2 {{q.text}}
-                p.red-text(v-if="answerDesc.length>0 && selected === index") {{answerDesc.find((item)=>item._id === q._id).desc}}
+                .answer-desc.text-info(v-if="answerDescObj[q._id] && answerDescObj[q._id].desc.length > 0 ")
+                  .answer-desc-icon.fa.fa-lightbulb-o
+                  span {{answerDescObj[q._id].desc}}
+
         footer.clearfix
-          h5.question-intro(v-if="!isCorrect" ) 回答错误
+          h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误
+          h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确
           .button-group
-            button.btn.btn-default.btn-editor-block.m-r-1(v-if="question.contentDesc" @click="showReminder") 提示
+            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题
             button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
-            button.btn.btn-default.btn-editor-block.btn-primary(v-else @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
+            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " ) 下一题
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' ) 完成
+
     div.clearfix(v-else id="finished-box" )
       .notice-content
         .glyphicon.glyphicon-ok.icon-success.m-b-1
         .notice-text.m-b-1 考试通过
         div(v-if="from === 'register'")
           span 恭喜您通过了 {{paperName}} 考试，请点击&nbsp;
-          a(:href="redirectUrl") 这里
+          button.btn.btn-xs.btn-default(@click="redirectToPage") 这里
           span &nbsp;继续注册。
         div(v-else)
           .m-b-1 恭喜您通过了 {{paperName}} 考试。
@@ -81,7 +100,7 @@
        font-size: 1.5rem;
        color: #000;
        line-height: 1.6;
-       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+       //text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
        margin-bottom: 10px;
      }
 
@@ -144,22 +163,17 @@
      }
    }
    .question-intro {
-     font-size: 14px;
-     color: rgb(255, 102, 102);
-     margin-top: 8px;
-     font-style: italic;
+     //font-size: 1.4rem;
+     //color: rgb(255, 102, 102);
+     //margin-top: 8px;
+     //font-style: italic;
    }
  }
   .clearfix::after {
-   content: "";
-   display: table;
-   clear: both;
- }
-  .red-text {
-   color: #0e0e0e;
-   font-weight: bold;
-   font-size: 14px;
- }
+    content: "";
+    display: table;
+    clear: both;
+  }
   #finished-box{
    //border: 1px solid #ddd;
    //border-radius: 5px;
@@ -198,6 +212,17 @@
      }
    }
  }
+  .answer-desc{
+    margin-top: 1rem;
+  }
+  .answer-desc-icon{
+    margin-right: 0.5rem;
+    font-size: 1.3rem;
+  }
+  .answer-bg-danger{
+    background-color: #ffe1e1;
+    border-color: #efc3c3!important;
+  }
   .shake-animation {
     animation: shake 0.5s ;
   }
@@ -215,15 +240,43 @@
       transform: translate(-5px, -5px);
     }
   }
+  .question-desc{
+    &>i{
+      cursor: pointer;
+      color: rgb(185, 185, 185);
+    }
+    &>div{
+      font-weight: normal;
+      font-size: 1.2rem;
+    }
+
+  }
 </style>
 
 <script>
-import Vue from 'vue';
-import { nkcAPI } from '../js/netAPI.js';
-import { sweetError ,sweetSuccess} from '../js/sweetAlert.js'
-import {getUrl} from "../js/tools";
-import {detailedTime} from '../js/time'
-import {setRegisterActivationCodeToLocalstorage} from '../js/activationCode.js'
+import Vue from "vue";
+import { nkcAPI } from "../js/netAPI.js";
+import { sweetError } from "../js/sweetAlert.js";
+import { getUrl } from "../js/tools";
+import { detailedTime } from "../js/time";
+import { setRegisterActivationCodeToLocalstorage } from "../js/activationCode.js";
+import { renderFormula } from "../js/formula";
+import { visitUrl } from "../js/pageSwitch";
+
+Vue.component('question-text-content', {
+  props: ['text'],
+  data: function() {
+    return {
+      key: (Math.random() * 10000).toString()
+    }
+  },
+  watch: {
+    text() {
+      this.key = (Math.random() * 10000).toString();
+    },
+  },
+  template: `<span :key="key">{{text}}</span>`
+})
 
 export default Vue.extend({
   data() {
@@ -234,7 +287,7 @@ export default Vue.extend({
       selected: [], //当前用户选择题所选
       fill: '', //当前填空题用户所填
       answerDesc: [], //题目的简介，每个选项的简介
-      isReselected:false, //是否重置
+      isReselected: false, //是否重置
       answerOrder:[], //存储选择题的题目顺序
       type:'',
       isFinished:false,//用户是否做完
@@ -243,7 +296,9 @@ export default Vue.extend({
       paperTime: '',
       paperQuestionCount: "",
       paperName: '',
-      isCorrect:true
+      isCorrect:null,
+      isShowReminder:false,
+      url: window.location.href
     };
   },
   props:['pid'],
@@ -263,19 +318,41 @@ export default Vue.extend({
       }else {
         return  fill === ''
       }
+    },
+    answerDescObj() {
+      if(this.question.type === 'ans') {
+        return this.answerDesc;
+      } else {
+        const obj = {};
+        for(const item of this.answerDesc) {
+          obj[item._id] = item;
+        }
+        return obj;
+      }
     }
+  },
+  created() {
+    window.addEventListener('popstate', this.updateUrl);
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
+  },
+  beforeDestroy() {
+    window.removeEventListener('popstate', this.updateUrl);
+    this.removeBeforeunloadEventListener();
   },
   methods: {
     getUrl,
     detailedTime,
+    removeBeforeunloadEventListener() {
+      window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    },
     //获取考题
-    getInit() {
-      nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${this.index}`, 'GET')
+    getInit(type='default',index = 0) {
+      nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${index}&&type=${type}`, 'GET')
         .then((res) => {
           if (res) {
             const { question, questionTotal, index, paperName, paperTime, paperQuestionCount } =
               res.data;
-            const { answer, type, ...params } = question;
+            const {correct ,answer, type, ...params } = question;
             const oldAnswer = JSON.parse(JSON.stringify(answer));
             //选择题
             if (type === 'ch4') {
@@ -291,18 +368,44 @@ export default Vue.extend({
             } else {
               this.question = question;
             }
+            //已经做过了,保留之前的状态
+            if(question.correct){
+              this.isCorrect = true
+              //多选
+              if(type === 'ch4'){
+                if(this.question.isMultiple){
+                  this.selected = question.answer
+                    .map((item, index) => (item.correct ? index : undefined))
+                    .filter(index => index !== undefined);
+                }else {
+                  this.selected = question.answer.findIndex(item => item.correct)
+                }
+                this.answerDesc =  this.question.answer.map((item) => {
+                  const { desc, _id } = item;
+                  return { desc, _id };
+                });
+              }
+              else {
+                this.answerDesc.desc = question.answer[0].desc
+                this.fill = question.answer[0].fill
+              }
+            }
             this.questionTotal = questionTotal;
-            this.index = index;
+            this.index = Number(index) ;
             this.type = type;
             this.paperName = paperName;
             this.paperTime = paperTime;
             this.paperQuestionCount = paperQuestionCount;
+            setTimeout(() => {
+              renderFormula()
+            }, 500)
           }
         })
         .catch((error) => {
           sweetError(error);
         });
     },
+    //提交
     submit() {
       const {isMultiple} = this.question
       let userSelected = [];
@@ -314,7 +417,6 @@ export default Vue.extend({
           }
           return selectedIds;
         }, []);
-
         selected = this.answerOrder.reduce((result, item, index) => {
           if (userSelected.includes(item)) {
             result.push(index);
@@ -330,51 +432,29 @@ export default Vue.extend({
         fill: this.fill,
       })
         .then((res) => {
-          if (res.data) {
-            const { status, answerDesc, index } = res.data;
+            const { status, answerDesc} = res.data;
             if (status === 403) {
               if (this.type === 'ch4'){
                 this.isReselected = true;
                 this.isCorrect = false
               }
               else {
-                sweetError('输入的问题有误')
+                sweetError('输入的答案有误')
               }
               this.answerDesc = answerDesc;
             } else if (status === 200) {
-              this.answerDesc = [];
-              this.selected = [];
-              this.fill = '';
-              if (index <= this.questionTotal - 1) {
-                this.index = index;
-                this.getInit();
-              } else {
-                nkcAPI(
-                  `/api/v1/exam/public/final-result/${this.pid}`,
-                  'POST',
-                ).then((res) => {
-                  if (res) {
-                    sweetSuccess('顺利完成');
-                    const { activationCode, redirectUrl,from} = res.data;
-                    if (activationCode) {
-                      setRegisterActivationCodeToLocalstorage(activationCode);
-                    }
-                    this.redirectUrl = redirectUrl
-                    this.isFinished = true;
-                    this.from = from;
-                  }
-                });
-              }
+              this.isCorrect = true;
+              this.answerDesc = answerDesc;
             }
-          }
         })
         .catch((error) => {
           sweetError(error);
         });
     },
     showReminder(){
-      sweetInfo(this.question.contentDesc)
+      this.isShowReminder = !this.isShowReminder
     },
+    //重置
     reselected(){
       if(this.type === 'ch4'){
         this.selected = [];
@@ -382,8 +462,9 @@ export default Vue.extend({
       }
       this.answerDesc = [];
       this.isReselected = false;
-      this.isCorrect = true;
+      this.isCorrect = null;
     },
+    //排序
     shuffle(arr){
       const length = arr.length;
       for(let i = 0; i < length; i++) {
@@ -392,19 +473,110 @@ export default Vue.extend({
         arr[i] = arr[index];
         arr[index] = n;
       }
+      const str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // 一个包含所有字母的字符串
+      const alphabetArray = str.split(''); // 将字符串拆分为单个字母字符的数组
+      arr.forEach((a, index) => {
+        a.serialIndex = alphabetArray[index];
+      });
     },
+    //背景颜色
     bgc(index,q){
+      //多选
       const isMultiple = this.question.isMultiple;
+      //是否选择
       const isInclude = isMultiple ? this.selected.includes(index) : this.selected === index;
-      const isFalse = this.answerDesc.length > 0;
+      const {isCorrect} = this
       if (!isInclude) {
         return 'bg-secondary';
+      } else if (isCorrect === null) {
+        return 'bg-info'
+      } else if (isCorrect === true) {
+        return 'bg-success';
+      } else {
+        return  'answer-bg-danger shake-animation';
       }
-      if (!isFalse) {
-        return 'bg-info';
+    },
+    redirectToPage() {
+      visitUrl(this.redirectUrl)
+    },
+    //切换下一题
+    next(){
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isShowReminder = false;
+      if(this.index <= this.questionTotal - 1){
+        this.index +=1
+        const currentUrl = window.location.pathname
+        const newUrl = currentUrl + `#question${this.index}`;
+        history.pushState({index:this.index}, '', newUrl);
+        this.getInit('down',this.index);
       }
-      const hasDesc = this.answerDesc.some(item => item._id === q._id && item.desc);
-      return hasDesc ? 'btn-danger' : 'btn-danger shake-animation';
+      else {
+        sweetError('index混乱')
+      }
+    },
+    //上一题
+    pre(){
+      if(this.index -1 <0){
+        return sweetError('没有上一题')
+      }
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isReselected = false;
+      this.isShowReminder = false;
+      if(this.index >=1){
+        this.index -=1
+        const currentUrl = window.location.pathname
+        const newUrl = currentUrl + `#question${this.index}`;
+        history.pushState({index:this.index}, '', newUrl);
+        this.getInit('up',this.index);
+      }
+      else {
+        sweetError('index混乱')
+      }
+
+    },
+    //完成
+    finish(){
+      if (this.index === this.questionTotal - 1) {
+        nkcAPI(
+          `/api/v1/exam/public/final-result/${this.pid}`,
+          'POST',
+        ).then((res) => {
+          if (res) {
+            const { activationCode, redirectUrl,from} = res.data;
+            if (activationCode) {
+              setRegisterActivationCodeToLocalstorage(activationCode);
+            }
+            this.redirectUrl = redirectUrl
+            this.isFinished = true;
+            this.from = from;
+            this.removeBeforeunloadEventListener();
+          }
+        });
+      }
+    },
+    updateUrl(e) {
+      this.answerDesc = [];
+      this.selected = [];
+      this.fill = '';
+      this.isCorrect = null;
+      this.isReselected = false;
+      this.isShowReminder = false;
+     if(!e.state){
+       this.getInit('up',0);
+     }else {
+       this.getInit('down',e.state.index)
+     }
+    },
+    handleBeforeUnload(event) {
+      const confirmationMessage = '确定要离开页面吗？';
+      event.returnValue = confirmationMessage;
+      return confirmationMessage;
     }
   },
 })

@@ -81,7 +81,7 @@ var app = new Vue({
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
         const questions = data.questions;
-        app.questions = questions.map((item, index) => {;
+        app.questions = questions.map((item, index) => {
           const obj = {
             type: item.type,
             content_: NKC.methods.custom_xss_process(
@@ -123,18 +123,22 @@ var app = new Vue({
   computed: {
     //未做完的题
     unfinished() {
-      let str = '';
-      this.questions.forEach((question, index) => {
+      let count = 0;
+      this.questions.forEach((question) => {
         const { type, selected, fill } = question;
         //选择题
         if (type === 'ch4' && selected.length === 0) {
-          str += `${index + 1}题未完成 `;
+          count += 1;
           //填空题
         } else if (type === 'ans' && !fill) {
-          str += `${index + 1}题未完成 `;
+          count += 1;
         }
       });
-      return str;
+      if (count > 0) {
+        return `您还有 ${count} 道题没有作答。`;
+      } else {
+        return '';
+      }
     },
   },
 });

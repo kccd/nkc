@@ -2,49 +2,53 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const chatSchema = new Schema(
+  {
+    _id: Number,
 
-  _id: Number,
+    uid: {
+      type: String,
+      index: 1,
+      required: true,
+    },
+    tUid: {
+      type: String,
+      index: 1,
+      required: true,
+    },
+    // last message id
+    lmId: {
+      type: Number,
+      default: null,
+    },
+    toc: {
+      type: Date,
+      index: 1,
+      default: Date.now,
+    },
+    tlm: {
+      type: Date,
+      index: 1,
+      default: Date.now,
+    },
+    total: {
+      type: Number,
+      default: 0,
+    },
+    unread: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    collection: 'createdChat',
+  },
+);
 
-  uid: {
-    type: String,
-    index: 1,
-    required: true
-  },
-  tUid: {
-    type: String,
-    index: 1,
-    required: true
-  },
-  // last message id
-  lmId: {
-    type: Number,
-    default: null
-  },
-  toc: {
-    type: Date,
-    index: 1,
-    default: Date.now
-  },
-  tlm: {
-    type: Date,
-    index: 1,
-    default: Date.now
-  },
-  total: {
-    type: Number,
-    default: 0
-  },
-  unread: {
-    type: Number,
-    default: 0
+chatSchema.pre('save', function (next) {
+  if (!this.tlm) {
+    this.tlm = this.toc;
   }
-}, {
-  collection: 'createdChat'
-});
-
-chatSchema.pre('save', function(next) {
-  if(!this.tlm) this.tlm = this.toc;
   next();
 });
 
@@ -59,25 +63,37 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
   const CreatedChatModel = mongoose.model('createdChat');
   const MessageModel = mongoose.model('messages');
   const SettingModel = mongoose.model('settings');
-  let chat = await CreatedChatModel.findOne({uid: uid, tUid: targetUid});
+  let chat = await CreatedChatModel.findOne({ uid: uid, tUid: targetUid });
   // 获取用户间的最新一条信息（可能不存在）
-  let message = await MessageModel.findOne({ty: 'UTU', $or: [{s: uid, r: targetUid}, {s: targetUid, r: uid}]}).sort({tc: -1});
+  let message = await MessageModel.findOne({
+    ty: 'UTU',
+    $or: [
+      { s: uid, r: targetUid },
+      { s: targetUid, r: uid },
+    ],
+  }).sort({ tc: -1 });
   // 获取用户间的信息总数
-  const total = await MessageModel.countDocuments({ty: 'UTU', $or: [{s: uid, r: targetUid}, {r: uid, s: targetUid}]});
+  const total = await MessageModel.countDocuments({
+    ty: 'UTU',
+    $or: [
+      { s: uid, r: targetUid },
+      { r: uid, s: targetUid },
+    ],
+  });
   // 没有发过信息
-  if(!message) {
+  if (!message) {
     message = {
       tc: Date.now(),
-      _id: null
-    }
+      _id: null,
+    };
   }
   // 不存在聊天
-  if(!chat) {
+  if (!chat) {
     chat = CreatedChatModel({
       _id: await SettingModel.operateSystemID('createdChat', 1),
       uid: uid,
       tUid: targetUid,
-      lmId: message._id
+      lmId: message._id,
     });
     await chat.save();
   }
@@ -86,17 +102,25 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
     tlm: message.tc,
     lmId: message._id,
     total,
-    unread: await MessageModel.countDocuments({ty: 'UTU', s: targetUid, r: uid, vd: false})
+    unread: await MessageModel.countDocuments({
+      ty: 'UTU',
+      s: targetUid,
+      r: uid,
+      vd: false,
+    }),
   });
   // 若对方也需要生成聊天记录，同理
-  if(both) {
-    let targetChat = await CreatedChatModel.findOne({uid: targetUid, tUid: uid});
-    if(!targetChat) {
+  if (both) {
+    let targetChat = await CreatedChatModel.findOne({
+      uid: targetUid,
+      tUid: uid,
+    });
+    if (!targetChat) {
       targetChat = CreatedChatModel({
         _id: await SettingModel.operateSystemID('createdChat', 1),
         uid: targetUid,
         tUid: uid,
-        lmId: message._id
+        lmId: message._id,
       });
       await targetChat.save();
     }
@@ -104,56 +128,64 @@ chatSchema.statics.createChat = async (uid, targetUid, both) => {
       tlm: message.tc,
       lmId: message._id,
       total,
-      unread: await MessageModel.countDocuments({ty: 'UTU', s: uid, r: targetUid, vd: false})
+      unread: await MessageModel.countDocuments({
+        ty: 'UTU',
+        s: uid,
+        r: targetUid,
+        vd: false,
+      }),
     });
   }
 };
 
 /*
-* 创建默认对话
-* @param {String} type systemInfo，reminder, newFriends
-* @param {String} uid 用户 ID
-* */
+ * 创建默认对话
+ * @param {String} type systemInfo，reminder, newFriends
+ * @param {String} uid 用户 ID
+ * */
 chatSchema.statics.createDefaultChat = async (type, uid) => {
-  if(!['systemInfo', 'reminder', 'newFriends'].includes(type)) {
+  if (!['systemInfo', 'reminder', 'newFriends'].includes(type)) {
     throwErr(500, `消息类型错误 type: ${type}`);
   }
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const obj = {};
   obj[`messageSettings.chat.${type}`] = true;
-  await UsersGeneralModel.updateOne({uid}, {
-    $set: obj
-  });
+  await UsersGeneralModel.updateOne(
+    { uid },
+    {
+      $set: obj,
+    },
+  );
 };
 
 /*
-* 获取单个对话
-* @param {String} 对话类型  UTU, STE, STU, newFriends
-* @param {String} uid 当前用户UID
-* @param {String} tUid 对方用户UID
-* @return {Object}
-*   {
-*     time: Date,
-*     type: String, STE, STU, UTU, newFriends
-*     uid: String or null,
-*     status: String or null
-*     count: Number,
-*     name: String,
-*     icon: String,
-*     abstract: String,
-*   }
-* */
+ * 获取单个对话
+ * @param {String} 对话类型  UTU, STE, STU, newFriends
+ * @param {String} uid 当前用户UID
+ * @param {String} tUid 对方用户UID
+ * @return {Object}
+ *   {
+ *     time: Date,
+ *     type: String, STE, STU, UTU, newFriends
+ *     uid: String or null,
+ *     status: String or null
+ *     count: Number,
+ *     name: String,
+ *     icon: String,
+ *     abstract: String,
+ *   }
+ * */
 chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
   const FriendModel = mongoose.model('friends');
   const UserModel = mongoose.model('users');
-  const {translate} = require('../nkcModules/translate');
-  const {getUrl} = require('../nkcModules/tools');
+  const { translate } = require('../nkcModules/translate');
+  const { getUrl } = require('../nkcModules/tools');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const MessageModel = mongoose.model('messages');
-  const user = await UserModel.findOne({uid});
+  const user = await UserModel.findOne({ uid });
   const MessageTypeModel = mongoose.model('messageTypes');
   const FriendsApplicationModel = mongoose.model('friendsApplications');
-  const usersGeneral = await UsersGeneralModel.findOne({uid});
+  const usersGeneral = await UsersGeneralModel.findOne({ uid });
   const chat = {
     time: new Date(),
     type,
@@ -162,47 +194,55 @@ chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
     count: 0,
     name: null,
     icon: '',
-    abstract: ''
+    abstract: '',
   };
-  if(type === 'STE') {
-    const {
-      newSystemInfoCount,
-    } = await user.getNewMessagesCount();
-    const message = await MessageModel.findOne({
-      ty: 'STE'
-    }, {
-      ip: 0,
-      port: 0
-    })
-      .sort({tc: -1});
-    if(message) {
+  if (type === 'STE') {
+    const { newSystemInfoCount } = await user.getNewMessagesCount();
+    const message = await MessageModel.findOne(
+      {
+        ty: 'STE',
+      },
+      {
+        ip: 0,
+        port: 0,
+      },
+    ).sort({ tc: -1 });
+    if (message) {
       chat.time = message.tc;
       chat.abstract = message.c;
     }
     chat.name = '系统通知';
     chat.icon = `/statics/message_type/STE.jpg`;
     chat.count = newSystemInfoCount;
-  } else if(type === 'STU') {
-    const {
-      newReminderCount
-    } = await user.getNewMessagesCount();
-    const message = await MessageModel.findOne({ty: 'STU', r: user.uid}, {ip: 0, port: 0}).sort({tc: -1});
-    const messageType = await MessageTypeModel.findOnly({_id: "STU"});
-    if(message) {
+  } else if (type === 'STU') {
+    const { newReminderCount } = await user.getNewMessagesCount();
+    const message = await MessageModel.findOne(
+      { ty: 'STU', r: user.uid },
+      { ip: 0, port: 0 },
+    ).sort({ tc: -1 });
+    const messageType = await MessageTypeModel.findOnly({ _id: 'STU' });
+    if (message) {
       chat.time = message.tc;
-      chat.abstract = translate(usersGeneral.language, "messageTypes", message.c.type);
+      chat.abstract = translate(
+        usersGeneral.language,
+        'messageTypes',
+        message.c.type,
+      );
     }
     chat.count = newReminderCount;
     chat.name = messageType.name;
     chat.icon = `/statics/message_type/STU.jpg`;
-  } else if(type === 'newFriends') {
-    const {
-      newApplicationsCount,
-    } = await user.getNewMessagesCount();
-    const friendsApplication = await FriendsApplicationModel.findOne({respondentId: user.uid}).sort({toc: -1});
-    if(friendsApplication) {
-      const targetUser = await UserModel.findOne({uid: friendsApplication.applicantId}, {username: 1});
-      if(targetUser) {
+  } else if (type === 'newFriends') {
+    const { newApplicationsCount } = await user.getNewMessagesCount();
+    const friendsApplication = await FriendsApplicationModel.findOne({
+      respondentId: user.uid,
+    }).sort({ toc: -1 });
+    if (friendsApplication) {
+      const targetUser = await UserModel.findOne(
+        { uid: friendsApplication.applicantId },
+        { username: 1 },
+      );
+      if (targetUser) {
         chat.time = friendsApplication.toc;
         chat.abstract = `${targetUser.username}申请添加你为好友`;
       }
@@ -211,29 +251,31 @@ chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
       chat.icon = `/statics/message_type/newFriends.jpg`;
     }
   } else {
-    const friend = await FriendModel.findOne({uid, tUid}, {info: 1});
-    const targetUser = await UserModel.findOne({uid: tUid});
+    const friend = await FriendModel.findOne({ uid, tUid }, { info: 1 });
+    const targetUser = await UserModel.findOne({ uid: tUid });
     const message = await MessageModel.findOne({
       $or: [
         {
           s: uid,
-          r: tUid
+          r: tUid,
         },
         {
           r: uid,
-          s: tUid
-        }
-      ]
-    }).sort({tc: -1});
-    if(message) {
+          s: tUid,
+        },
+      ],
+    }).sort({ tc: -1 });
+    if (message) {
       chat.time = message.tc;
-      if(message.withdrawn) {
-        chat.abstract = message.r === uid? '对方撤回一条消息': '你撤回了一条消息';
+      if (message.withdrawn) {
+        chat.abstract =
+          message.r === uid ? '对方撤回一条消息' : '你撤回了一条消息';
       } else {
-        chat.abstract = typeof message.c === 'string'? message.c: message.c.na;
+        chat.abstract =
+          typeof message.c === 'string' ? message.c : message.c.na;
       }
     }
-    if(friend && friend.info.name) {
+    if (friend && friend.info.name) {
       chat.name = friend.info.name;
     } else {
       chat.name = targetUser.username || targetUser.uid;
@@ -243,7 +285,7 @@ chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
     chat.count = await MessageModel.countDocuments({
       s: tUid,
       r: uid,
-      vd: false
+      vd: false,
     });
     chat.icon = getUrl('userAvatar', targetUser.avatar);
   }
@@ -251,8 +293,8 @@ chatSchema.statics.getSingleChat = async (type, uid, tUid = null) => {
 };
 
 /*
-* 获取已创建的对话列表
-* */
+ * 获取已创建的对话列表
+ * */
 
 chatSchema.statics.getCreatedChat = async (uid) => {
   const CreatedChatModel = mongoose.model('createdChat');
@@ -261,85 +303,90 @@ chatSchema.statics.getCreatedChat = async (uid) => {
   const FriendModel = mongoose.model('friends');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const MessageTypeModel = mongoose.model('messageTypes');
-  const FriendsApplicationModel = mongoose.model('friendsApplications');
-  const {translate} = require('../nkcModules/translate');
-  const user = await UserModel.findOnly({uid});
-  const {getUrl} = require('../nkcModules/tools');
-  const chats = await CreatedChatModel.find({uid}).sort({tlm: -1});
+  const { translate } = require('../nkcModules/translate');
+  const user = await UserModel.findOnly({ uid });
+  const { getUrl } = require('../nkcModules/tools');
+  const chats = await CreatedChatModel.find({ uid }).sort({ tlm: -1 });
   const uidArr = new Set();
   const midArr = new Set();
   const userObj = {};
   const messageObj = {};
   const friendObj = {};
   const chatList = [];
-  for(const c of chats) {
+  for (const c of chats) {
     uidArr.add(c.tUid);
-    if(c.lmId) midArr.add(c.lmId);
+    if (c.lmId) {
+      midArr.add(c.lmId);
+    }
   }
-  const users = await UserModel.find({
-    uid: {
-      $in: [...uidArr]
-    }
-  }, {
-    uid: 1,
-    username: 1,
-    avatar: 1,
-    online: 1,
-    onlineType: 1,
-    description: 1,
-  });
-  const messages = await MessageModel.find({
-    _id: {
-      $in: [...midArr]
-    }
-  }, {
-    ip: 0,
-    port: 0
-  });
+  const users = await UserModel.find(
+    {
+      uid: {
+        $in: [...uidArr],
+      },
+    },
+    {
+      uid: 1,
+      username: 1,
+      avatar: 1,
+      online: 1,
+      onlineType: 1,
+      description: 1,
+    },
+  );
+  const messages = await MessageModel.find(
+    {
+      _id: {
+        $in: [...midArr],
+      },
+    },
+    {
+      ip: 0,
+      port: 0,
+    },
+  );
   const friendsArr = await FriendModel.find({
     uid,
     tUid: {
-      $in: [...uidArr]
-    }
+      $in: [...uidArr],
+    },
   });
-  for(const u of users) {
+  for (const u of users) {
     userObj[u.uid] = u;
   }
-  for(const m of messages) {
+  for (const m of messages) {
     messageObj[m._id] = m;
   }
-  for(const f of friendsArr) {
+  for (const f of friendsArr) {
     friendObj[f.tUid] = f;
   }
-  for(const c of chats) {
-    if(c.tUid === uid) continue;
-    const {
-      unread,
-      tUid,
-      lmId,
-      tlm,
-      toc,
-    } = c;
+  for (const c of chats) {
+    if (c.tUid === uid) {
+      continue;
+    }
+    const { unread, tUid, lmId, tlm, toc } = c;
     let message = messageObj[lmId];
-    if(!message) {
+    if (!message) {
       message = {
         _id: null,
-        ty: "UTU",
-        c: "",
-        tc: c.toc
-      }
+        ty: 'UTU',
+        c: '',
+        tc: c.toc,
+      };
     }
     const targetUser = userObj[tUid];
-    if(!targetUser) continue;
+    if (!targetUser) {
+      continue;
+    }
     const friend = friendObj[tUid];
     let abstract;
-    if(message.withdrawn) {
-      abstract = message.r === uid? '对方撤回了一条消息': '你撤回了一条消息';
+    if (message.withdrawn) {
+      abstract = message.r === uid ? '对方撤回了一条消息' : '你撤回了一条消息';
     } else {
-      abstract = typeof message.c === 'string'? message.c: message.c.na;
+      abstract = typeof message.c === 'string' ? message.c : message.c.na;
     }
     let name;
-    if(friend) {
+    if (friend) {
       name = friend.info.name;
     }
     name = name || targetUser.username || targetUser.uid;
@@ -352,35 +399,34 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       icon: getUrl('appUserAvatar', targetUser.avatar), // 显示的头像
       status, // 在线状态
       abstract, // 摘要
-      count: unread // 未读条数
+      count: unread, // 未读条数
     });
   }
-  const usersGeneral = await UsersGeneralModel.findOne({uid});
-  const {
-    newSystemInfoCount,
-    newApplicationsCount,
-    newReminderCount
-  } = await user.getNewMessagesCount();
-  const {chat}= usersGeneral.messageSettings;
+  const usersGeneral = await UsersGeneralModel.findOne({ uid });
+  const { newSystemInfoCount, newReminderCount } =
+    await user.getNewMessagesCount();
+  const { chat } = usersGeneral.messageSettings;
 
   const insertChat = (arr, item) => {
     let itemTime = item.time.getTime();
-    for(let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
       const chat = arr[i];
-      if(itemTime > chat.time.getTime()) {
+      if (itemTime > chat.time.getTime()) {
         arr.splice(i, 0, item);
         itemTime = 'inserted';
         break;
       }
     }
-    if(itemTime !== 'inserted') {
+    if (itemTime !== 'inserted') {
       arr.push(item);
     }
   };
 
-  if(chat.systemInfo) {
-    const [message] = (await MessageModel.getUserSystemInfoMessages(uid)).reverse();
-    if(message) {
+  if (chat.systemInfo) {
+    const [message] = (
+      await MessageModel.getUserSystemInfoMessages(uid)
+    ).reverse();
+    if (message) {
       insertChat(chatList, {
         time: message.tc,
         type: 'STE',
@@ -393,10 +439,13 @@ chatSchema.statics.getCreatedChat = async (uid) => {
       });
     }
   }
-  if(chat.reminder) {
-    const message = await MessageModel.findOne({ty: 'STU', r: user.uid}, {ip: 0, port: 0}).sort({tc: -1});
-    const messageType = await MessageTypeModel.findOnly({_id: "STU"});
-    if(message) {
+  if (chat.reminder) {
+    const message = await MessageModel.findOne(
+      { ty: 'STU', r: user.uid },
+      { ip: 0, port: 0 },
+    ).sort({ tc: -1 });
+    const messageType = await MessageTypeModel.findOnly({ _id: 'STU' });
+    if (message) {
       insertChat(chatList, {
         time: message.tc,
         name: messageType.name,
@@ -405,15 +454,26 @@ chatSchema.statics.getCreatedChat = async (uid) => {
         status: null,
         count: newReminderCount,
         icon: '/statics/message_type/STU.jpg',
-        abstract: translate(usersGeneral.language, "messageTypes", message.c.type),
+        abstract: translate(
+          usersGeneral.language,
+          'messageTypes',
+          message.c.type,
+        ),
       });
     }
   }
-  if(chat.newFriends) {
-    const friendsApplication = await FriendsApplicationModel.findOne({respondentId: user.uid}).sort({toc: -1});
-    if(friendsApplication) {
-      const targetUser = await UserModel.findOne({uid: friendsApplication.applicantId}, {username: 1});
-      if(targetUser) {
+
+  /*// 2023-08-25 取消添加好友功能
+  if (chat.newFriends) {
+    const friendsApplication = await FriendsApplicationModel.findOne({
+      respondentId: user.uid,
+    }).sort({ toc: -1 });
+    if (friendsApplication) {
+      const targetUser = await UserModel.findOne(
+        { uid: friendsApplication.applicantId },
+        { username: 1 },
+      );
+      if (targetUser) {
         insertChat(chatList, {
           type: 'newFriends',
           time: friendsApplication.toc,
@@ -426,38 +486,49 @@ chatSchema.statics.getCreatedChat = async (uid) => {
         });
       }
     }
-  }
+  }*/
   return chatList;
 };
 
 /*
-* 删除与某人的对话
-* @param {String} type UTU, STU, STE, newFriends
-* @param {String} uid 自己
-* @param {String} tUid 对方的ID
-* @author pengxiguaa 2021-6-3
-* */
+ * 删除与某人的对话
+ * @param {String} type UTU, STU, STE, newFriends
+ * @param {String} uid 自己
+ * @param {String} tUid 对方的ID
+ * @author pengxiguaa 2021-6-3
+ * */
 chatSchema.statics.removeChat = async (type, uid, tUid) => {
   const CreatedChatModel = mongoose.model('createdChat');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const MessageModel = mongoose.model('messages');
   await MessageModel.markAsRead(type, uid, tUid);
-  if(type === 'UTU') {
-    const chat = await CreatedChatModel.findOne({uid, tUid});
-    if(chat) await chat.deleteOne();
-  } else if(type === 'STU') {
-    await UsersGeneralModel.updateOne({uid}, {
-      $set: {'messageSettings.chat.reminder': false}
-    });
-  } else if(type === 'STE') {
-    await UsersGeneralModel.updateOne({uid}, {
-      $set: {'messageSettings.chat.systemInfo': false}
-    });
-  } else if(type === 'newFriends') {
-    await UsersGeneralModel.updateOne({uid}, {
-      $set: {'messageSettings.chat.newFriends': false}
-    });
+  if (type === 'UTU') {
+    const chat = await CreatedChatModel.findOne({ uid, tUid });
+    if (chat) {
+      await chat.deleteOne();
+    }
+  } else if (type === 'STU') {
+    await UsersGeneralModel.updateOne(
+      { uid },
+      {
+        $set: { 'messageSettings.chat.reminder': false },
+      },
+    );
+  } else if (type === 'STE') {
+    await UsersGeneralModel.updateOne(
+      { uid },
+      {
+        $set: { 'messageSettings.chat.systemInfo': false },
+      },
+    );
+  } else if (type === 'newFriends') {
+    await UsersGeneralModel.updateOne(
+      { uid },
+      {
+        $set: { 'messageSettings.chat.newFriends': false },
+      },
+    );
   }
 };
 
-module.exports =  mongoose.model('createdChat', chatSchema);
+module.exports = mongoose.model('createdChat', chatSchema);

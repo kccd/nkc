@@ -305,6 +305,7 @@
   "logout": "退出登录",
   "manageOauthApp": "管理第三方应用",
   "manageQuestionTags": "管理考试系统试题标签",
+  "createQuestionTags": "创建考试系统试题标签",
   "manageZoneArticleCategory": "修改空间文章多维分类",
   "managementMoment": "管理电文",
   "managementNote": "管理所有笔记(屏蔽、编辑和删除)",
@@ -576,7 +577,7 @@
   "viewQuestionRecord": "查看出题记录",
   "viewSmscodeRecord": "查看短信验证码记录",
   "viewUserAllFansAndFollowers": "可任意查看用户所有的关注和粉丝",
-  "viewUserArticle": "查看任意用户的文章预览和历史",
+  "viewUserArticle": "查看任意用户的独立文章预览和历史",
   "viewUserCode": "验证用户动态码",
   "viewUserScores": "可在用户名片查看用户积分",
   "violationRecord": "查看用户违规记录",
@@ -758,6 +759,7 @@
   "modifyExamQuestion": "修改考试系统试题",
   "visitExamQuestionEditor": "访问考试系统试题编辑器",
   "registerExamCheck": "注册前检测是否需要考试",
+  "getRegisterExamCode": "获取注册前考试的图形验证码",
   "setMomentVisible": "设置电文可见状态",
   "setMomentVisibleOther": "其他人设置电文可见状态"
 }

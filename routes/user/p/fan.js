@@ -1,16 +1,21 @@
+const {
+  subscribeUserService,
+} = require('../../../services/subscribe/subscribeUser.service');
 module.exports = async (ctx, next) => {
-  const {data, db} = ctx;
-  const {targetUser} = data;
-  const sub = await db.SubscribeModel.find({
-    type: "user",
-    cancel: false,
-    tUid: targetUser.uid,
-  }, {uid: 1}).sort({toc: -1}).limit(9);
-  const targetUserFans = await db.UserModel.find({
-    uid: {
-      $in: sub.map(s => s.uid)
+  const { data, db, state, query } = ctx;
+  const { targetUser, user } = data;
+  const { page = 0 } = query;
+  if (user) {
+    if (user.uid === targetUser.uid) {
+      await db.SubscribeModel.saveUserFansId(state.uid);
     }
-  });
-  data.targetUserFans = await db.UserModel.extendUsersInfo(targetUserFans);
+    data.userSubUid = await db.SubscribeModel.getUserSubUsersId(user.uid);
+  }
+  const { paging, users } = await subscribeUserService.getUserFans(
+    targetUser.uid,
+    page,
+  );
+  data.paging = paging;
+  data.users = users;
   await next();
-}
+};

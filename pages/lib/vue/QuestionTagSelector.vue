@@ -119,7 +119,7 @@ export default {
     },
     title() {
       if(this.name === this.names.list) {
-        return '创建新标签';
+        return '选择标签';
       } else if(this.tag._id === null) {
         return '新建标签';
       } else {

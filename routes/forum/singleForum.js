@@ -13,6 +13,10 @@ const nkcRender = require('../../nkcModules/nkcRender');
 const childRouter = require('./child');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
+const {
+  subscribeForumService,
+} = require('../../services/subscribe/subscribeForum.service');
+const { subscribeSources } = require('../../settings/subscribe');
 router
   .post('/', async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
@@ -326,9 +330,9 @@ router
 
     // 获取最新关注的用户
     const subUsers = await db.SubscribeModel.find({
-      type: 'forum',
+      source: subscribeSources.forum,
+      sid: forum.fid,
       cancel: false,
-      fid: forum.fid,
     })
       .sort({ toc: -1 })
       .limit(9);
@@ -442,18 +446,15 @@ router
     ).sort({ order: 1 });
 
     data.subUsersCount = await db.SubscribeModel.countDocuments({
+      source: subscribeSources.forum,
+      sid: fid,
       cancel: false,
-      fid,
-      type: 'forum',
     });
     if (data.user) {
-      const sub = await db.SubscribeModel.countDocuments({
-        uid: data.user.uid,
-        cancel: false,
-        type: 'forum',
+      data.subscribed = await subscribeForumService.isSubscribedForum(
+        data.user.uid,
         fid,
-      });
-      data.subscribed = !!sub;
+      );
 
       // 用户发表的文章
       data.userThreads = await db.ThreadModel.getUserThreads(

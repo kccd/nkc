@@ -1,12 +1,16 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
 const captcha = require('../../nkcModules/captcha');
+const verificationCode = require('../../nkcModules/verificationCode');
 const {
   usernameCheckerService,
 } = require('../../services/user/usernameChecker.service');
 const {
   activationCodeService,
 } = require('../../services/activationCode/activationCode.service');
+const {
+  registerExamService,
+} = require('../../services/register/registerExam.service.js');
 registerRouter
   .get(['/', '/mobile'], async (ctx, next) => {
     const { data, query } = ctx;
@@ -140,7 +144,7 @@ registerRouter
       let users = await db.UserModel.aggregate([
         {
           $match: {
-            certs: { $ne: 'band' },
+            certs: { $ne: 'banned' },
             tlv: {
               $gte: new Date(
                 Date.now() - recommendUsers.lastVisitTime * 24 * 60 * 60 * 1000,
@@ -171,14 +175,29 @@ registerRouter
     await next();
   })
   .get('/exam', async (ctx, next) => {
-    const { db, data } = ctx;
+    const { db, data, state } = ctx;
     //获取注册需要考哪些卷子
+    if (state.uid) {
+      // 已登录用户访问时跳转到首页
+      return ctx.redirect('/');
+    }
     const {
       c: { examSource, examNotice },
     } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
+    if (examSource.length === 0) {
+      ctx.throw('并未添加考卷，请前往注册页设置添加');
+    }
     data.cid = examSource[0]._id;
     data.examNotice = examNotice;
     ctx.template = 'exam/public.pug';
+    await next();
+  })
+  .get('/exam/code', async (ctx, next) => {
+    const { data } = ctx;
+    const { codeId, codeValue } =
+      await registerExamService.getRegisterExamCode();
+    data.codeId = codeId;
+    data.codeValue = codeValue;
     await next();
   });
 module.exports = registerRouter;

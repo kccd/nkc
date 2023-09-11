@@ -7,6 +7,7 @@
       .null(v-if="!subscribes.length") 空空如也~
       .subscribe-thread-list(v-else)
         collection-list(ref="collectionList" :subscribes="subscribes" :threads-id="collectionThreadsId" type='collection')
+    paging(ref="paging" :pages="pageButtons" @click-button="clickPage")
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";

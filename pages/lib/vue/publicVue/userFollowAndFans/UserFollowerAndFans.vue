@@ -76,7 +76,10 @@ export default {
     },
     getUserCardInfo(page) {
       this.loading = true;
-      let url = `/u/${this.uid}/profile/followerData?t=${this.routeName}`;
+      let url = `/u/${this.uid}/profile/followerData`;
+      if(this.routeName === 'fan') {
+        url = `/u/${this.uid}/profile/fanData`;
+      }
       const self = this;
       if (page) {
         const index = url.indexOf("?");

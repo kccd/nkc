@@ -8,6 +8,7 @@ import { HttpMethods, nkcAPI } from '../../lib/js/netAPI';
 import { getDataById } from '../../lib/js/dataConversion';
 import QuestionTagSelector from '../../lib/vue/QuestionTagSelector.vue';
 import Vue from 'vue';
+import { reloadPage } from '../../lib/js/pageSwitch';
 const data = getDataById('data');
 
 new Vue({
@@ -26,6 +27,18 @@ new Vue({
     },
   },
   methods: {
+    addQuestionTag() {
+      this.questionTagSelector.open({
+        name: this.questionTagSelector.names.editor,
+        callback: () => {
+          this.questionTagSelector.close();
+          sweetSuccess('提交成功');
+          setTimeout(() => {
+            reloadPage();
+          }, 200);
+        },
+      });
+    },
     editQuestionTag(tag) {
       this.questionTagSelector.open({
         name: this.questionTagSelector.names.editor,

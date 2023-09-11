@@ -17,7 +17,7 @@ block content
               p.title-list()
                 a.book-list-item(href=`/document/history/${list._id}?source=${list.source}&sid=${list.sid}&page=${data.urlComponent.page}` )=`${list.title || "未填写标题"}`
                 span.history=`${list.type==='stableHistory'? '已发布' : '未发布' } `
-                span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
+                span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm || list.toc)}`
           if (data.paging.buttonValue && data.paging.buttonValue.length)
             .paging
               .post-list-paging
@@ -29,9 +29,9 @@ block content
         .col-xs-12.col-md-9.book-content-container.m-b-1
           if data.history.length
             include ../../columns/article/nav
-            +nav({})
-            -var {uid, origin: originState, originDesc, dt, title, type, authorInfos} = data.document
+            -var {uid, did, origin: originState, originDesc, dt, title, type, authorInfos} = data.document
             -var {user} = data;
+            +nav({docNumber: `D${did}`})
             include ../../columns/article/title
             +title({uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(dt)), allToc: tools.timeFormat(new Date(dt)),
               title, authorInfos, username: user.username, avatarUrl: user.avatarUrl})

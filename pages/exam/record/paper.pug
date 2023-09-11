@@ -69,7 +69,10 @@ block content
                     else if !paper.passed
                       if !paper.submitted && !paper.timeOut
                         span 未结束
-                          a.p-l-1(href=`/exam/paper/${paper._id}?created=true`) 继续考试
+                          if paper.category.type === 'secret'
+                            a.p-l-1(href=`/exam/paper/${paper._id}?created=true`) 继续考试
+                          else
+                            a.p-l-1(href=`/exam/public/takeExam/${paper._id}`) 继续考试
                       else
                         span.text-danger 未通过
           include ../../interface_navigation_paging

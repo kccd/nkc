@@ -5,6 +5,7 @@ const client = settings.redisClient;
 const getRedisKeys = require('../nkcModules/getRedisKeys');
 const { ThrowCommonError } = require('../nkcModules/error');
 const { getHTMLText } = require('../nkcModules/html');
+const { subscribeSources } = require("../settings/subscribe");
 const forumSchema = new Schema(
   {
     abbr: {
@@ -1668,7 +1669,7 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
   let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
   const subForums = await SubscribeModel.find({
     cancel: false,
-    type: 'forum',
+    source: subscribeSources.forum,
     uid: user.uid,
   });
   let forums = await ForumModel.find(
@@ -1731,7 +1732,7 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
   };
   for (let subf of subForums) {
     for (let forum of forums) {
-      if (forum.fid == subf.fid) {
+      if (forum.fid == subf.sid) {
         mySubForums.son.push(forum);
       }
     }

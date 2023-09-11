@@ -19,17 +19,25 @@ router
     const {
       params: { pid },
       db,
+      query,
+      state: { uid },
     } = ctx;
     const ip = ctx.address;
-    await paperService.checkPaperLegal(pid, ip);
+    await paperService.checkPaperLegal(pid, ip, uid);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
     const hasFinish = await paperService.checkIsFinishPaper(pid);
-    if (hasFinish === -1) {
-      ctx.throw('当前试卷已经做完');
+    let index = 0;
+    if (query.type === 'default') {
+      index = hasFinish;
+      if (hasFinish === -1) {
+        index = paper.record.length - 1;
+      }
+    } else {
+      index = query.index;
     }
-    let index = hasFinish;
+
     const { record } = paper;
-    const question = record[index];
+    const question = JSON.parse(JSON.stringify(record[index]));
     const { hasImage } = await db.QuestionModel.findOnly(
       { _id: question.qid },
       { hasImage: 1 },
@@ -37,14 +45,19 @@ router
     let isMultiple = [];
     if (question.type === 'ch4') {
       isMultiple = question.answer.filter((item) => item.correct);
-      question.answer = question.answer.map((item) => {
-        const { text, _id } = item;
-        return { text, _id };
-      });
-    } else {
-      question.answer = [];
     }
-    const { answer, content, type, contentDesc, qid } = question;
+    //判断这个题是否做过了
+    if (!question.correct) {
+      if (question.type === 'ch4') {
+        question.answer = question.answer.map((item) => {
+          const { text, _id } = item;
+          return { text, _id };
+        });
+      } else {
+        question.answer = [];
+      }
+    }
+    const { answer, content, type, contentDesc, qid, correct } = question;
     const category = await categoryService.getCategoryById(paper.cid);
     ctx.apiData = {
       question: {
@@ -55,6 +68,7 @@ router
         contentDesc,
         hasImage,
         isMultiple: isMultiple.length > 1,
+        correct,
       },
       questionTotal: record.length,
       index,
@@ -62,9 +76,7 @@ router
         category.volume === 'A' ? '基础级' : '专业级'
       }`,
       paperTime: paper.toc,
-      paperQuestionCount: `${paper.record.length - index - 1} / ${
-        paper.record.length
-      }`,
+      paperQuestionCount: `${paper.record.length}`,
     };
     await next();
   })
@@ -73,10 +85,11 @@ router
       body,
       params: { pid },
       db,
+      state: { uid },
     } = ctx;
     const { index, qid, selected, fill } = body;
     const ip = ctx.address;
-    await paperService.checkPaperLegal(pid, ip);
+    await paperService.checkPaperLegal(pid, ip, uid);
     const paper = await db.ExamsPaperModel.findOnly({ _id: pid, ip });
     const { ch4, ans } = await db.QuestionModel.getQuestionType();
     const { record } = paper;
@@ -94,13 +107,9 @@ router
         ctx.throw(403, '当前选项不能为空');
       }
       // 生成一份答案描述数组
-      const answerDesc = question.answer.map((item, index) => {
+      const answerDesc = question.answer.map((item) => {
         const { desc, _id } = item;
-        if (selected.includes(index)) {
-          return { desc, _id };
-        } else {
-          return { desc: '', _id };
-        }
+        return { desc, _id };
       });
       // 判断用户的选项数量是否满足
       const correctQ = question.answer.filter((item) => item.correct);
@@ -130,7 +139,7 @@ router
           status: 200,
           message: '答案正确',
           pid,
-          index: Number(index) + 1,
+          answerDesc,
         };
       }
     } else if (type === ans) {
@@ -153,7 +162,7 @@ router
         ctx.apiData = {
           status: 200,
           message: '答案正确',
-          index: Number(index) + 1,
+          answerDesc,
         };
       }
     }

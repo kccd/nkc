@@ -1,5 +1,5 @@
 mixin mixinColumnHeader(options)
-  -var {user, column, subColumnsId, navCategories, categories, hideBanner} = options;
+  -var {user, column, subColumnsId, navCategories, categories, hideBanner, columnSubscribeInfo} = options;
   include ./banner
   include ./avatar
   include ./navLink
@@ -11,5 +11,5 @@ mixin mixinColumnHeader(options)
         }
       +mixinColumnBanner(column.columnBanner)
     .max-width.container-fluid
-      +mixinColumnAvatar(user, column, subColumnsId, hideBanner)
+      +mixinColumnAvatar(user, column, subColumnsId, hideBanner, columnSubscribeInfo)
       +mixinColumnNavLink(column, navCategories, categories)

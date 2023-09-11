@@ -44,9 +44,67 @@ examRouter
   .get('/', async (ctx, next) => {
     const { data, db, state } = ctx;
     ctx.template = 'exam/home.pug';
-    data.examsCategories = await db.ExamsCategoryModel.find({
+    const categoryTypes = await db.ExamsCategoryModel.getExamCategoryTypes();
+    const categories = await db.ExamsCategoryModel.find({
       disabled: false,
     }).sort({ order: 1 });
+    const categoriesId = categories.map((c) => c._id);
+    let passRate = await db.ExamsPaperModel.aggregate([
+      {
+        $match: {
+          cid: { $in: categoriesId },
+          submitted: true,
+        },
+      },
+      {
+        $group: {
+          _id: '$cid',
+          total: { $sum: 1 },
+          passed: { $sum: { $cond: [{ $eq: ['$passed', true] }, 1, 0] } },
+        },
+      },
+      {
+        $project: {
+          cid: '$_id',
+          _id: 0,
+          passRate: { $divide: ['$passed', '$total'] },
+        },
+      },
+    ]);
+    passRate = passRate || [];
+    const passRateObj = {};
+    for (const r of passRate) {
+      passRateObj[r.cid] = Math.round(r.passRate * 10000) / 10000;
+    }
+    const examsCategories = {
+      secretA: [],
+      secretB: [],
+      publicA: [],
+      publicB: [],
+    };
+    for (const category of categories) {
+      const targetCategory = {
+        _id: category._id,
+        name: category.name,
+        desc: category.description,
+        passRate: passRateObj[category._id] || 0,
+        type: category.type,
+        volume: category.volume,
+      };
+      if (category.type === categoryTypes.secret) {
+        if (category.volume === 'A') {
+          examsCategories.secretA.push(targetCategory);
+        } else {
+          examsCategories.secretB.push(targetCategory);
+        }
+      } else {
+        if (category.volume === 'A') {
+          examsCategories.publicA.push(targetCategory);
+        } else {
+          examsCategories.publicB.push(targetCategory);
+        }
+      }
+    }
     const papers = await db.ExamsPaperModel.find({
       passed: true,
     })
@@ -91,6 +149,7 @@ examRouter
       });
     }
     await db.UserModel.extendUsersInfo(users);
+    data.examsCategories = examsCategories;
     data.usersList = usersList;
     data.examSettings = await db.SettingModel.getSettings('exam');
     data.hasPermissionToCreateQuestions =

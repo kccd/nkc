@@ -4,8 +4,8 @@
       .paging-button
         a.radius-left.button(@click="toRoute('subUsers')" :class="t === 'subUsers'?'active':''") 用户
         a.button(@click="toRoute('subForums')" :class="t === 'subForums'?'active':''") 专业
-        a.button(@click="toRoute('subColumns')" :class="t === 'subColumns'?'active':''") 专栏
-        a.button(@click="toRoute('subThreads')" :class="t === 'subThreads' ? 'active' : ''") 文章
+        a.button.radius-right(@click="toRoute('subColumns')" :class="t === 'subColumns'?'active':''") 专栏
+        //a.button(@click="toRoute('subThreads')" :class="t === 'subThreads' ? 'active' : ''") 文章
         //a.radius-right.button(@click="toRoute('blacklist')" :class="t === 'blacklist' ? 'active' : ''") 黑名单
       router-view
     .self(v-else)

@@ -5,6 +5,7 @@
       .module-dialog-close(@click="close")
         .fa.fa-remove
     .module-dialog-content
+      slot(name="default")
       slot(name="content")
 </template>
 <style lang="less" scoped>

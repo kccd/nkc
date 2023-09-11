@@ -2,6 +2,7 @@ const mongoose = require('../settings/database');
 const { ThrowServerInternalError } = require('../nkcModules/error');
 const moment = require('moment');
 const Schema = mongoose.Schema;
+const {subscribeSources} = require('../settings/subscribe')
 const schema = new Schema(
   {
     _id: Number,
@@ -541,8 +542,8 @@ schema.methods.getSubscriptionTrends = async function (minTime, maxTime) {
   let sub = await SubscribeModel.aggregate([
     {
       $match: {
-        type: 'column',
-        columnId: columnId,
+        source: subscribeSources.column,
+        sid: columnId,
         toc: {
           $gte: _minTime,
           $lt: _maxTime,
@@ -566,8 +567,8 @@ schema.methods.getSubscriptionTrends = async function (minTime, maxTime) {
   let unsub = await SubscribeModel.aggregate([
     {
       $match: {
-        type: 'column',
-        columnId: columnId,
+        source: subscribeSources.column,
+        sid: columnId,
         tlm: {
           $gte: _minTime,
           $lt: _maxTime,

@@ -66,6 +66,12 @@ router
       );
     }
 
+    data.columnSubscribeInfo = {
+      subCount: nkcModules.tools.briefNumber(data.column.subCount),
+      postVoteUp: nkcModules.tools.briefNumber(data.column.postVoteUp),
+      postHits: nkcModules.tools.briefNumber(data.column.postHits),
+    };
+
     await next();
   })
   .use(['/a', '/page'], async (ctx, next) => {

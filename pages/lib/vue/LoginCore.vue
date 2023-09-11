@@ -286,12 +286,27 @@ export default {
         nationCode: nationCode,
         mobile: mobile,
       };
-      const url = t === 'register'? "/sendMessage/register": "/sendMessage/login";
+      const isRegister = t === 'register';
+      const url =  isRegister? "/sendMessage/register": "/sendMessage/login";
 
-      this.$refs.verifications
-        .open()
-        .then(function(data) {
-          body.verifySecret = data.secret;
+      return Promise.resolve()
+        .then(() => {
+          if(isRegister) {
+            const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
+            body.registerCode = registerActivationCode;
+            return nkcAPI(`/api/v1/register/exam?code=${registerActivationCode}`, 'GET')
+              .then(res => {
+                if(!res.data.isExamEnabled || !res.data.isValidCode) {
+                  return this.$refs.verifications
+                    .open()
+                    .then((res) => {
+                      body.verifySecret = res.secret;
+                    })
+                }
+              })
+          }
+        })
+        .then(() => {
           return nkcAPI(url, "POST", body);
         })
         .then(function() {

@@ -6,7 +6,7 @@ router
     const regSettings = await db.SettingModel.findById('register');
     data.regSettings = regSettings.c;
     const { defaultSubscribeForumsId } = data.regSettings;
-    const examCategoryType = await db.ExamsCategoryModel.getExamCategoryType();
+    const examCategoryType = await db.ExamsCategoryModel.getExamCategoryTypes();
     data.selectedForums = await db.ForumModel.find({
       fid: { $in: defaultSubscribeForumsId },
     });

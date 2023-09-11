@@ -1,8 +1,15 @@
 const getRedisKeys = require('../../nkcModules/getRedisKeys');
 const redisClient = require('../../settings/redisClient');
+const SettingModel = require('../../dataModels/SettingModel');
 const { registerExamRateLimit } = require('../../settings/register');
-const { ThrowForbiddenResponseTypeError } = require('../../nkcModules/error');
+const {
+  ThrowForbiddenResponseTypeError,
+  ThrowBadRequestResponseTypeError,
+} = require('../../nkcModules/error');
 const { ResponseTypes } = require('../../settings/response');
+const {
+  activationCodeService,
+} = require('../activationCode/activationCode.service');
 class RegisterExamService {
   async accessRateLimit(address) {
     const timeKey = getRedisKeys('registerExamLimitTime', address);
@@ -32,6 +39,56 @@ class RegisterExamService {
     }
     await redisClient.setAsync(timeKey, time);
     await redisClient.setAsync(countKey, count);
+  }
+
+  async getRegisterCodeStatus(registerActivationCode) {
+    const { registerExamination: isExamEnabled } =
+      await SettingModel.getSettings('register');
+    let isExamRequired = false;
+    let isValidCode = false;
+    if (isExamEnabled) {
+      isExamRequired = true;
+      if (registerActivationCode) {
+        const valid = await activationCodeService.isActivationCodeValid(
+          registerActivationCode,
+        );
+        if (valid) {
+          isExamRequired = false;
+          isValidCode = true;
+        }
+      }
+    }
+    return {
+      isExamRequired,
+      isExamEnabled,
+      isValidCode,
+    };
+  }
+
+  async getRegisterExamCode() {
+    const codeId = await SettingModel.getNewId();
+    const codeValue = [
+      Math.round(Math.random() * 10),
+      Math.round(Math.random() * 10),
+    ];
+    const sum = codeValue[0] + codeValue[1];
+    const codeKey = getRedisKeys('registerExamCode', codeId);
+    await redisClient.setWithTimeoutAsync(codeKey, sum, 120);
+    return {
+      codeId,
+      codeValue,
+    };
+  }
+
+  async checkRegisterExamCode(codeId, result) {
+    const codeKey = getRedisKeys('registerExamCode', codeId);
+    const sum = await redisClient.getAsync(codeKey);
+    if (sum !== result) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.INVALID_REGISTER_EXAM_CODE,
+      );
+    }
+    await redisClient.delAsync(codeKey);
   }
 }
 

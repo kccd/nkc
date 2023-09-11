@@ -1,4 +1,4 @@
-const router = require("koa-router")();
+const router = require('koa-router')();
 router
   .get('/user', async (ctx, next) => {
     await next();
@@ -20,5 +20,5 @@ router
   })
   .get('/collection', async (ctx, next) => {
     await next();
-  })
+  });
 module.exports = router;

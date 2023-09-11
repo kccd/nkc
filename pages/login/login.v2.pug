@@ -6,11 +6,12 @@ block navbar
 
 block content
   .hidden#data=objToStr({referer: data.referer, type: data.type})
-  .container-fluid.max-width#app(v-cloak)
+  .container-fluid.max-width
     .login-container
-      .login-form-header(v-if="isApp")
-        .login-form-header-close(@click="close") 关闭
-      login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
+      include ../publicModules/appNavbar/appNavbar
+      +appNavbar
+      div#app(v-cloak)
+        login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
 
 block footer
 block scripts

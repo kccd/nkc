@@ -227,7 +227,7 @@ messageSchema.statics.getMessageCountLimitInfo = async (uid, tUid) => {
 messageSchema.statics.getUserLimitInfo = async (uid, tUid) => {
   const UserModel = mongoose.model('users');
   const SettingModel = mongoose.model('settings');
-  const FriendModel = mongoose.model('friends');
+  // const FriendModel = mongoose.model('friends');
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const BlacklistModel = mongoose.model('blacklists');
   const ThreadModel = mongoose.model('threads');
@@ -259,13 +259,13 @@ messageSchema.statics.getUserLimitInfo = async (uid, tUid) => {
   }
 
   // 好友间发消息无需防骚扰判断
-  const friendRelationship = await FriendModel.findOne({
+  /*const friendRelationship = await FriendModel.findOne({
     uid: user.uid,
     tUid: targetUser.uid,
   });
   if (friendRelationship) {
     return notLimitInfo;
-  }
+  }*/
 
   // 系统防骚扰
   const { customizeLimitInfo } = await SettingModel.getSettings('message');

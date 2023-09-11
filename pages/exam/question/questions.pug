@@ -39,7 +39,16 @@ block content
                 button.btn.btn-xs.btn-default(@click=`editQuestionTag(tag)`) 编辑
                 button.btn.btn-xs.btn-danger(@click=`deleteQuestionTag(tag)`) 删除
             .tag-count {{`总共/可用：${tag.allCount}/${tag.count}`}}
+        .m-b-1
+          button.btn.btn-block.btn-default(@click='addQuestionTag') 添加标签
       .col-xs-12.col-md-9
+        if data.targetTag
+          .bg-info.p-a-1.m-b-1.border-radius-3px
+            h3.m-t-1
+              span.m-r-05=data.targetTag.tagName
+              small=`共 ${data.targetTag.allCount} 道题, ${data.targetTag.count} 道题可用`
+            if data.targetTag.tagDesc
+              p=data.targetTag.tagDesc
         ul.nav.nav-pills.m-b-1
           li(class=!data.v?'active': '')
             a(href=`/exam/questions?${data.fid?'fid=' + data.fid + '&':''}${data.t?'t='+data.t: ''}`) 全部
