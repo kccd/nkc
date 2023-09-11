@@ -422,12 +422,11 @@ export default Vue.extend({
         }, []);
       }
       const { qid } = this.question;
-      const filteredText = this.fill.replace(/\s/g, '');
       nkcAPI(`/api/v1/exam/public/result/${this.pid}`, 'POST', {
         index: this.index,
         qid,
         selected,
-        fill: filteredText,
+        fill
       })
         .then((res) => {
             const { status, answerDesc} = res.data;
