@@ -156,6 +156,7 @@
     "transliteration": "^2.2.0",
     "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",
+    "ua-parser-js": "^1.0.36",
     "uglify-js": "^3.10.4",
     "url-search-params-polyfill": "^8.1.1",
     "urllib": "^2.37.0",

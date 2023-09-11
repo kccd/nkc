@@ -1,0 +1,14 @@
+include ../publicModules/mixin
+html
+  head
+    title Browser
+    +includeCSS('/browser/index.css')
+  body
+    .container
+      .header
+        img(src="/logo/sm")
+        .name=remoteState.serverSettings.websiteName
+      .body
+        h1 网站不支持您的浏览器或浏览器版本过低
+        p 推荐使用：Chrome/FireFox
+

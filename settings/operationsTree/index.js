@@ -95,6 +95,7 @@ const settings = require('./settings');
 const latest = require('./latest');
 const oauth = require('./oauth');
 const tc = require('./tc');
+const browser = require('./browser');
 
 const operationTree = {
   home: {
@@ -268,6 +269,7 @@ const operationTree = {
     oauth, // 第三方登录
     api, // 纯数据接口
     tc, // 多维分类
+    browser, // 浏览器版本检测
   },
 };
 module.exports = {

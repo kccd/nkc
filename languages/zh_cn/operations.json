@@ -758,5 +758,6 @@
   "createExamQuestion": "创建考试系统试题",
   "modifyExamQuestion": "修改考试系统试题",
   "visitExamQuestionEditor": "访问考试系统试题编辑器",
-  "registerExamCheck": "注册前检测是否需要考试"
+  "registerExamCheck": "注册前检测是否需要考试",
+  "browserDetection": "浏览器版本检测"
 }

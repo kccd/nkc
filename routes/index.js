@@ -96,6 +96,8 @@ const oauthRouter = routers.oauth;
 const apiRouter = routers.api;
 // 多维分裂
 const tcRouter = routers.tc;
+// 浏览器检测
+const browserRouter = routers.browser;
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -274,4 +276,5 @@ router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 router.use('/oauth', oauthRouter.routes(), oauthRouter.allowedMethods());
 router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
 router.use('/tc', tcRouter.routes(), tcRouter.allowedMethods());
+router.use('/browser', browserRouter.routes(), browserRouter.allowedMethods());
 module.exports = router;
