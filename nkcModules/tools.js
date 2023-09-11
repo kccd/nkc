@@ -173,6 +173,9 @@ var Tools = function () {
       case 'siteFile': {
         return '/statics/site/' + id;
       }
+      case 'browserLogo': {
+        return '/statics/browser-logo/' + id;
+      }
       case 'defaultFile': {
         return '/default/' + id;
       }

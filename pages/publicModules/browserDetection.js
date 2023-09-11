@@ -25,7 +25,7 @@ function checkBrowserCompatibility(userAgent, requiredVersions) {
 
 const userAgent = navigator.userAgent;
 const requiredVersions = {
-  Chrome: 80,
+  Chrome: 70,
   Firefox: 65,
   Safari: 12,
 };
