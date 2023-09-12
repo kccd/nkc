@@ -9,7 +9,7 @@ router.get('/exam', async (ctx, next) => {
   const { query, address } = ctx;
   const lock = await getRegisterExamCheckLock(address);
   try {
-    const { isExamRequired, isExamEnabled, isValidCode } =
+    const { isExamRequired, isExamEnabled, isValidCode, login, register } =
       await registerExamService.getRegisterCodeStatus(query.code);
     if (isExamEnabled) {
       await registerExamService.accessRateLimit(address);
@@ -18,6 +18,8 @@ router.get('/exam', async (ctx, next) => {
       isExamRequired,
       isExamEnabled,
       isValidCode,
+      login,
+      register,
     };
     await lock.unlock();
   } catch (err) {
