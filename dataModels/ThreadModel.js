@@ -4,8 +4,9 @@ const redisClient = require('../settings/redisClient');
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
-const { getUrl } = require('../nkcModules/tools');
+const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
+const tools = require('../nkcModules/tools');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -1880,7 +1881,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 3,
+        size: 5,
       },
     },
   ]);
@@ -1909,7 +1910,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 3,
+        size: 4,
       },
     },
   ]);
@@ -3100,6 +3101,25 @@ threadSchema.statics.clearThreadResourcesForumCache = async function (tid) {
       },
     },
   );
+};
+
+threadSchema.statics.extendCommunityThreadList = async function (threads) {
+  const anonymousInfo = getAnonymousInfo();
+  return threads.map((thread) => {
+    let uid = '';
+    let avatarUrl = anonymousInfo.avatarUrl;
+    if (!thread.anonymous) {
+      uid = thread.uid;
+      avatarUrl = getUrl('userAvatar', thread.firstPost.user.avatar);
+    }
+    return {
+      url: `/t/${thread.tid}`,
+      uid,
+      avatarUrl,
+      title: thread.firstPost.t,
+      digest: thread.firstPost.digest,
+    };
+  });
 };
 
 module.exports = mongoose.model('threads', threadSchema);

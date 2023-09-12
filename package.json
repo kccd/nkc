@@ -153,6 +153,7 @@
     "supertest": "^6.0.1",
     "svg-captcha": "^1.4.0",
     "sweetalert2": "^7.0.10",
+    "swiper": "^10.2.0",
     "transliteration": "^2.2.0",
     "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",

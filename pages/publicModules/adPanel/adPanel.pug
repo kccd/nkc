@@ -1,0 +1,28 @@
+if !isIncluded('adPanel')
+  +includeCSS('/publicModules/adPanel/adPanel.css')
+  +includeJS('/publicModules/adPanel/adPanel.js')
+  mixin movableAD(arr)
+    if arr.length !== 0
+      .nkc-movable-ad-container.nkc-ad-container
+        .swiper-wrapper
+          for item in arr
+            a.swiper-slide(
+              href=item.url
+              target="_blank"
+              style={
+              'background-image': `url(${item.coverUrl})`
+              })
+              .swiper-title= `${item.title}`
+        .swiper-pagination
+        .swiper-button-next
+        .swiper-button-prev
+  //-mixin fixedAD(arr)
+    if arr.length !== 0
+      .nkc-fixed-ad-container.nkc-ad-container
+        for item, index in arr
+          .nkc-fixed-ad-item
+            a(href=item.url target="_blank" title=item.title
+              class=index > 2 ? 'm-b-0' : ''
+            )
+              .nkc-fixed-ad-img(style=`background-image:url(${item.coverUrl})`)
+              .nkc-fixed-ad-title=item.title

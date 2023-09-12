@@ -4,9 +4,69 @@ block title
   +includeCSS('/community/community.css')
 block content
   include ./homeForumList
+  include ../publicModules/adPanel/adPanel
+
+  -
+    var movableThreads = data.ads.movable.map(thread => {
+      return {
+        url: `/t/${thread.tid}`,
+        coverUrl: tools.getUrl('recommendThreadCover', thread.cover),
+        title: thread.title,
+      }
+    });
+
+    var fixedThreads = data.ads.fixed.map(thread => {
+      return {
+        url: `/t/${thread.tid}`,
+        coverUrl: tools.getUrl('recommendThreadCover', thread.cover),
+        title: thread.title,
+      };
+    });
+
+  mixin threadTitleList(title, threads)
+    .thread-title-list
+      .thread-title-list-header=title
+      for thread in threads
+        .thread-title-list-item
+          img(
+            src=thread.avatarUrl
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            data-global-data=objToStr({ uid: thread.uid })
+            )
+          a(
+            href=thread.url
+            class=thread.digest? 'digest': ''
+            title=thread.title
+            target="_blank"
+            )=thread.title
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-8.box-shadow-panel
+      .col-xs-12.col-md-12
+        .row
+          //- 首页推荐
+          .col-xs-12.col-md-4.m-b-1.min-md-p-r-0.max-sm-p-a-0.min-md-p-r-0
+            +movableAD(movableThreads)
+          .col-xs-12.col-md-8.max-sm-p-a-0
+            .col-xs-12.col-md-4.m-b-1
+              .row.p-r-05.max-sm-p-a-0
+                +threadTitleList('最新发表', data.latestThreads)
+            .col-xs-12.col-md-4.m-b-1
+              .row.p-r-05.max-sm-p-a-0
+                +threadTitleList('最近回复', data.latestThreads)
+            .col-xs-12.col-md-4.m-b-1
+              .row
+                +threadTitleList('精选', data.digestThreads)
+      .col-xs-12.col-md-9.box-shadow-panel.min-md-p-r-0
+
+        .btn-group.btn-group-justified(role="group")
+          .btn-group(role="group")
+            button.btn.btn-default(type="button") 专业列表
+          .btn-group(role="group")
+            button.btn.btn-default(type="button") 最新文章
+          .btn-group(role="group")
+            button.btn.btn-default(type="button") 关注
+
         if data.communityToppedThreads && data.communityToppedThreads.length
           .m-b-1
             .panel-header 社区置顶
@@ -25,7 +85,7 @@ block content
                 +detailedForumList(f)
               else
                 +normalForumList(f)
-      .col-xs-12.col-md-4.box-shadow-panel.p-l-0
+      .col-xs-12.col-md-3.box-shadow-panel
         .m-b-1
           include ../publicModules/canvas_logo
           +renderCanvasLogo(data.homeBigLogo)

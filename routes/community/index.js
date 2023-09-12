@@ -11,7 +11,7 @@ router
     await next();
   })
   .get('/', async (ctx, next) => {
-    const { db, data, state, nkcModules } = ctx;
+    const { db, data } = ctx;
     const { user } = data;
     const toolSettings = await db.SettingModel.getSettings('tools');
     const homeSettings = await db.SettingModel.getSettings('home');
@@ -103,8 +103,15 @@ router
     data.originalThreads = await db.ThreadModel.getOriginalThreads(
       fidOfCanGetThreads,
     );
-    /*// 最新文章
-    data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);*/
+    // 最新文章
+    const latestThreads = await db.ThreadModel.getLatestThreads(
+      fidOfCanGetThreads,
+      'toc',
+      9,
+    );
+    data.latestThreads = await db.ThreadModel.extendCommunityThreadList(
+      latestThreads,
+    );
     // 最近活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 首页大Logo
@@ -121,6 +128,10 @@ router
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(
       fidOfCanGetThreads,
     );
+    // 精选
+    data.digestThreads = await db.ThreadModel.extendCommunityThreadList(
+      data.featuredThreads,
+    );
     // 含有最新回复的文章
     data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 6);
     // 拓展管理未读条数
@@ -130,6 +141,8 @@ router
     // 用户资料补全提示
     data.improveUserInfo =
       await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
+    // 首页推荐文章（轮播图、6宫格图）
+    data.ads = await db.ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
     data.navbar_highlight = 'community';
     ctx.template = 'community/community.pug';
     await next();

@@ -317,3 +317,45 @@
     }
   }
 }
+
+.thread-title-list{
+  height: 20rem;
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  .thread-title-list-header{
+    color: #b16161;
+    height: 3rem;
+    line-height: 3rem;
+  }
+}
+.thread-title-list-item{
+  @height: 1.5rem;
+  height: @height;
+  line-height: @height;
+  padding-left: @height + 0.5rem;
+  position: relative;
+  margin-bottom: 0.3rem;
+  .hideText(@line: 1);
+  overflow: hidden;
+  a{
+    color: #333;
+    &:visited{
+      color: #00827c;
+    }
+    &.digest{
+      color: red;
+    }
+  }
+  img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @height;
+    width: @height;
+    display: inline-block;
+    border-radius: 50%;
+  }
+}
