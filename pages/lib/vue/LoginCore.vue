@@ -304,6 +304,11 @@ export default {
                     })
                 }
               })
+          } else {
+            return this.$refs.verifications.open()
+              .then(res => {
+                body.verifySecret = res.secret;
+              })
           }
         })
         .then(() => {
