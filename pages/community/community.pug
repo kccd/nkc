@@ -57,22 +57,16 @@ block content
             .col-xs-12.col-md-4.m-b-1
               .row
                 +threadTitleList('精选', data.digestThreads)
+      .col-xs-12.col-md-12
+        //-.btn-group-justified
+        .m-b-1.box-shadow-panel-ignored.btn-group(role="group")
+          .btn-group(role="group")
+            button.btn.btn-sm.btn-primary(type="button") 专业列表
+          .btn-group(role="group")
+            button.btn.btn-sm.btn-default(type="button") 最新文章
+          .btn-group(role="group")
+            button.btn.btn-sm.btn-default(type="button") 文章推荐
       .col-xs-12.col-md-9.box-shadow-panel.min-md-p-r-0
-
-        .btn-group.btn-group-justified(role="group")
-          .btn-group(role="group")
-            button.btn.btn-default(type="button") 专业列表
-          .btn-group(role="group")
-            button.btn.btn-default(type="button") 最新文章
-          .btn-group(role="group")
-            button.btn.btn-default(type="button") 关注
-
-        if data.communityToppedThreads && data.communityToppedThreads.length
-          .m-b-1
-            .panel-header 社区置顶
-            .home-threads
-               for thread in data.communityToppedThreads
-                 include ../publicModules/thread_panel/thread_panel
         for cf in data.categoryForums
           .home-forums-list.m-b-1.category-forums
             .panel-header=cf.name
@@ -85,6 +79,12 @@ block content
                 +detailedForumList(f)
               else
                 +normalForumList(f)
+        if data.communityToppedThreads && data.communityToppedThreads.length
+          .m-b-1
+            .panel-header 社区置顶
+            .home-threads
+              for thread in data.communityToppedThreads
+                include ../publicModules/thread_panel/thread_panel
       .col-xs-12.col-md-3.box-shadow-panel
         .m-b-1
           include ../publicModules/canvas_logo
