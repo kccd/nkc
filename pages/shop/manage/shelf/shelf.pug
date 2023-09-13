@@ -132,7 +132,7 @@ block shopContent
                   thead
                     tr
                       th 用户等级
-                      th 折扣率（%）
+                      th 折扣率（%，精确到0.01%）
                   tbody
                     tr(v-for="g in vipDisGroup")
                       th {{g.grade.displayName}} v{{g.grade._id}}

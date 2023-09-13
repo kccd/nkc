@@ -1,41 +1,52 @@
 const Router = require('koa-router');
 const shelfRouter = new Router();
 shelfRouter
-	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
-    const {user} = data;
+  .get('/', async (ctx, next) => {
+    const { data, db, query } = ctx;
+    const { user } = data;
     // 检测是否被封禁商品上架功能
-    const homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
-    if(homeSetting.banList) {
-      if(homeSetting.banList.includes(user.uid)) {
-        ctx.throw(400, "你已被禁止上架商品");
+    const homeSetting = await db.ShopSettingsModel.findOne({
+      type: 'homeSetting',
+    });
+    if (homeSetting.banList) {
+      if (homeSetting.banList.includes(user.uid)) {
+        ctx.throw(400, '你已被禁止上架商品');
       }
     }
-    data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
-    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
+    data.forumList = await db.ForumModel.getAccessibleForums(
+      data.userRoles,
+      data.userGrade,
+      data.user,
+    );
+    data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({
+      order: 1,
+    });
     // 取出全部商城类别专业
-    data.shopForumTypes = await db.ForumModel.getAllShopForums(data.userRoles, data.userGrade, data.user);
+    data.shopForumTypes = await db.ForumModel.getAllShopForums(
+      data.userRoles,
+      data.userGrade,
+      data.user,
+    );
     // 取出全部vip等级
-    data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
-    const {productId} = query;
-    if(productId) {
-      const product = await db.ShopGoodsModel.findOne({productId});
-      if(!product) ctx.throw(400, `商品不存在，productId: ${productId}`);
+    data.grades = await db.UsersGradeModel.find({}).sort({ _id: 1 });
+    const { productId } = query;
+    if (productId) {
+      const product = await db.ShopGoodsModel.findOne({ productId });
+      if (!product) {
+        ctx.throw(400, `商品不存在，productId: ${productId}`);
+      }
       data.product = (await db.ShopGoodsModel.extendProductsInfo([product]))[0];
-      data.navType = "goods";
+      data.navType = 'goods';
     } else {
-      data.navType = "shelf";
+      data.navType = 'shelf';
     }
     ctx.template = 'shop/manage/shelf/shelf.pug';
-		await next();
+    await next();
   })
-	.post('/', async (ctx, next) => {
-    const {data, db, body, tools, nkcModules} = ctx;
-    const {
-      checkNumber,
-      checkString
-    } = nkcModules.checkData;
-    const {user} = data;
+  .post('/', async (ctx, next) => {
+    const { data, db, body, tools, nkcModules } = ctx;
+    const { checkNumber, checkString } = nkcModules.checkData;
+    const { user } = data;
     let {
       productName, // 商品标题
       attention, // 关键词
@@ -58,54 +69,73 @@ shelfRouter
       productSettings, // 价格的可见性 游客可见、停售可见
 
       productId, // 商品ID 就在编辑商品信息时有值
-
     } = body.post;
 
     let product;
 
-    if(productId) {
-      product = await db.ShopGoodsModel.findOne({productId, uid: user.uid});
-      if(!product) ctx.throw(400, `商品ID错误，productId: ${productId}`);
+    if (productId) {
+      product = await db.ShopGoodsModel.findOne({ productId, uid: user.uid });
+      if (!product) {
+        ctx.throw(400, `商品ID错误，productId: ${productId}`);
+      }
     }
 
-    if(!product) {
+    if (!product) {
       // 验证商品文字信息
       checkString(productName, {
-        name: "商品标题",
+        name: '商品标题',
         minLength: 6,
-        maxLength: 200
+        maxLength: 200,
       });
       // 验证商品简介
       checkString(productDescription, {
-        name: "商品简介",
+        name: '商品简介',
         minLength: 6,
-        maxLength: 1000
+        maxLength: 1000,
       });
       // 验证图文描述
       checkString(productDetails, {
-        name: "图文描述",
+        name: '图文描述',
         minLength: 1,
-        maxLength: 100000
+        maxLength: 100000,
       });
       // 专业权限判断
-      const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
-      for(const fid of mainForumsId) {
-        const forum = await db.ForumModel.findOne({fid});
-        if(!forum) ctx.throw(400, `专业ID错误, fid: ${fid}`);
-        if(!accessibleForumsId.includes(fid)) ctx.throw(400, `你无权在专业“${forum.displayName}”下发表内容`)
+      const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(
+        data.userRoles,
+        data.userGrade,
+        data.user,
+      );
+      for (const fid of mainForumsId) {
+        const forum = await db.ForumModel.findOne({ fid });
+        if (!forum) {
+          ctx.throw(400, `专业ID错误, fid: ${fid}`);
+        }
+        if (!accessibleForumsId.includes(fid)) {
+          ctx.throw(400, `你无权在专业“${forum.displayName}”下发表内容`);
+        }
       }
     }
     // 验证商品图
-    let resourcesId = imgIntroductions.filter(i => !!i);
+    let resourcesId = imgIntroductions.filter((i) => !!i);
     resourcesId = [...new Set(resourcesId)];
-    if(!resourcesId.length) ctx.throw(400, "请至少选择一张商品图");
-    const resourceCount = await db.ResourceModel.countDocuments({rid: {$in: resourcesId}, mediaType: "mediaPicture", ext: {$in: ["jpg", "jpeg", "png"]}});
-    if(resourcesId.length !== resourceCount) ctx.throw(400, "商品图错误，请重新选择");
+    if (!resourcesId.length) {
+      ctx.throw(400, '请至少选择一张商品图');
+    }
+    const resourceCount = await db.ResourceModel.countDocuments({
+      rid: { $in: resourcesId },
+      mediaType: 'mediaPicture',
+      ext: { $in: ['jpg', 'jpeg', 'png'] },
+    });
+    if (resourcesId.length !== resourceCount) {
+      ctx.throw(400, '商品图错误，请重新选择');
+    }
     const imgMaster = resourcesId[0];
     // 验证商品规格
-    if(!productParams.length) ctx.throw(400, "请至少添加一个商品规格");
+    if (!productParams.length) {
+      ctx.throw(400, '请至少添加一个商品规格');
+    }
     let isEnableCount = 0;
-    productParams = productParams.map(param => {
+    productParams = productParams.map((param) => {
       const {
         _id,
         name,
@@ -113,37 +143,41 @@ shelfRouter
         price,
         useDiscount,
         isEnable,
-        stocksTotal
+        stocksTotal,
       } = param;
       const p = {
-        isEnable: !!isEnable
+        isEnable: !!isEnable,
       };
 
-      if(p.isEnable) isEnableCount ++;
+      if (p.isEnable) {
+        isEnableCount++;
+      }
 
       checkString(name, {
-        name: "规格名称",
+        name: '规格名称',
         minLength: 1,
-        maxLength: 100
+        maxLength: 100,
       });
       p.name = name;
       checkNumber(stocksTotal, {
-        name: "规格库存",
-        min: 0
+        name: '规格库存',
+        min: 0,
       });
       p.stocksTotal = stocksTotal;
       checkNumber(originPrice, {
-        name: "规格价格",
+        name: '规格价格',
         min: 0.01,
-        fractionDigits: 2
+        fractionDigits: 2,
       });
       p.originPrice = originPrice * 100;
-      if(useDiscount) {
-        if(price >= originPrice) ctx.throw(400, "规格优惠价必须小于原价");
+      if (useDiscount) {
+        if (price >= originPrice) {
+          ctx.throw(400, '规格优惠价必须小于原价');
+        }
         checkNumber(price, {
-          name: "规格优惠价",
+          name: '规格优惠价',
           min: 0.01,
-          fractionDigits: 2
+          fractionDigits: 2,
         });
         p.price = price * 100;
       } else {
@@ -153,113 +187,118 @@ shelfRouter
       p.useDiscount = !!useDiscount;
       return p;
     });
-    if(isEnableCount === 0) ctx.throw(400, `不允许屏蔽所有规格`);
-    const grades = await db.UsersGradeModel.find().sort({_id: 1});
+    if (isEnableCount === 0) {
+      ctx.throw(400, `不允许屏蔽所有规格`);
+    }
+    const grades = await db.UsersGradeModel.find().sort({ _id: 1 });
     vipDiscount = !!vipDiscount;
-    if(vipDiscount) {
+    if (vipDiscount) {
       const vipDisGroupObj = {};
-      vipDisGroup.map(v => {
-        const {vipNum, vipLevel} = v;
+      vipDisGroup.map((v) => {
+        const { vipNum, vipLevel } = v;
         checkNumber(vipLevel, {
-          name: "会员等级",
-          min: 0
+          name: '会员等级',
+          min: 0,
         });
         checkNumber(vipNum, {
-          name: "会员折扣等级",
-          min: 0,
-          max: 100
+          name: '会员折扣率',
+          fractionDigits: 2,
+          min: 0.01,
+          max: 100,
         });
-        vipDisGroupObj[v.vipLevel] = v
+        vipDisGroupObj[v.vipLevel] = v;
       });
-      vipDisGroup = grades.map(g => {
-        const {_id} = g;
+      vipDisGroup = grades.map((g) => {
+        const { _id } = g;
         const vipGrade = vipDisGroup[_id];
         const group = {
           vipLevel: _id,
-          vipNum: 100
+          vipNum: 100,
         };
-        if(vipGrade) {
+        if (vipGrade) {
           group.vipNum = vipGrade.vipNum;
         }
         return group;
       });
     } else {
-      vipDisGroup = grades.map(grade => {
+      vipDisGroup = grades.map((grade) => {
         return {
           vipNum: 100,
-          vipLevel: grade._id
+          vipLevel: grade._id,
         };
       });
     }
     isFreePost = !!isFreePost;
-    if(!isFreePost) {
-      freightTemplates = freightTemplates.map(f => {
-        const {name, firstPrice, addPrice} = f;
+    if (!isFreePost) {
+      freightTemplates = freightTemplates.map((f) => {
+        const { name, firstPrice, addPrice } = f;
         checkString(name, {
-          name: "物流名称",
+          name: '物流名称',
           minLength: 1,
-          maxLength: 100
+          maxLength: 100,
         });
         checkNumber(firstPrice, {
-          name: "物流首件价格",
+          name: '物流首件价格',
           min: 0,
-          fractionDigits: 2
+          fractionDigits: 2,
         });
         checkNumber(addPrice, {
-          name: "物流每增加一件的价格",
+          name: '物流每增加一件的价格',
           min: 0,
-          fractionDigits: 2
+          fractionDigits: 2,
         });
         return {
           name,
           firstPrice: firstPrice * 100,
-          addPrice: addPrice  * 100
+          addPrice: addPrice * 100,
         };
       });
     } else {
       freightTemplates = [];
     }
     // 价格的显示
-    const {priceShowToVisit, priceShowAfterStop} = productSettings;
+    const { priceShowToVisit, priceShowAfterStop } = productSettings;
     productSettings = {
       priceShowAfterStop: !!priceShowAfterStop,
-      priceShowToVisit: !!priceShowToVisit
+      priceShowToVisit: !!priceShowToVisit,
     };
     // 减库存的方式
-    stockCostMethod = stockCostMethod === "orderReduceStock"? "orderReduceStock": "payReduceStock";
+    stockCostMethod =
+      stockCostMethod === 'orderReduceStock'
+        ? 'orderReduceStock'
+        : 'payReduceStock';
     // 购买限制
-    if(purchaseLimitCount !== -1) {
+    if (purchaseLimitCount !== -1) {
       checkNumber(purchaseLimitCount, {
-        name: "购买限制",
-        min: 1
+        name: '购买限制',
+        min: 1,
       });
     }
-    if(uploadCert) {
+    if (uploadCert) {
       checkString(uploadCertDescription, {
-        name: "凭证说明",
+        name: '凭证说明',
         minLength: 1,
-        maxLength: 1000
+        maxLength: 1000,
       });
     } else {
-      uploadCertDescription = "";
+      uploadCertDescription = '';
     }
 
-
-    if(!product) {
+    if (!product) {
       // 新上架
-      if(!["notonshelf", "insale"].includes(productStatus)) {
-        ctx.throw(400, "未知的上架类型");
+      if (!['notonshelf', 'insale'].includes(productStatus)) {
+        ctx.throw(400, '未知的上架类型');
       }
       const now = Date.now();
-      if(shelfTime) {
+      if (shelfTime) {
         checkNumber(shelfTime, {
-          name: "上架时间"
+          name: '上架时间',
         });
-        if(shelfTime <= now) {
-          ctx.throw(400, "定时上架的时间必须大于当前时间");
+        if (shelfTime <= now) {
+          ctx.throw(400, '定时上架的时间必须大于当前时间');
         }
       }
-      if(productStatus === "insale") {
+      if (productStatus === 'insale') {
         shelfTime = Date.now();
       }
       const options = {
@@ -271,15 +310,18 @@ shelfRouter
         fids: mainForumsId,
         cids: [],
         ip: ctx.address,
-        type: "product"
+        type: 'product',
       };
 
       // await db.ThreadModel.ensurePublishPermission(options);
       // 检查发表权限
-      await db.ForumModel.checkGlobalPostAndForumWritePermission(options.uid, options.fids);
+      await db.ForumModel.checkGlobalPostAndForumWritePermission(
+        options.uid,
+        options.fids,
+      );
       // 检测专业分类互斥
       await db.ForumModel.checkForumCategoryBeforePost(options.fids);
-      const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
+      const productId = await db.SettingModel.operateSystemID('shopGoods', 1);
       product = db.ShopGoodsModel({
         productId,
         purchaseLimitCount,
@@ -288,7 +330,7 @@ shelfRouter
         imgIntroductions,
         imgMaster,
         stockCostMethod,
-        productStatus: "notonshelf",
+        productStatus: 'notonshelf',
         uploadCert,
         uploadCertDescription,
         shelfTime,
@@ -298,22 +340,25 @@ shelfRouter
         threadInfo: options,
         vipDiscount,
         vipDisGroup,
-        productSettings
+        productSettings,
       });
       // 生成规格信息
-      for(let i = 0; i < productParams.length; i++) {
+      for (let i = 0; i < productParams.length; i++) {
         const param = productParams[i];
         param.productId = productId; // 规格所属商品的ID
         param.uid = user.uid; // 商品拥有者
         param.isEnable = true;
         param.order = i;
         param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
-        param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
+        param._id = await db.SettingModel.operateSystemID(
+          'shopProductsParams',
+          1,
+        );
         await db.ShopProductsParamModel(param).save();
       }
       await product.save();
       await product.updateResources(imgIntroductions);
-      if(productStatus === "insale") {
+      if (productStatus === 'insale') {
         await product.onshelf();
       }
     } else {
@@ -327,10 +372,10 @@ shelfRouter
         freightTemplates,
         vipDiscount,
         vipDisGroup,
-        productSettings
+        productSettings,
       });
       await product.updateResources(imgIntroductions);
-      for(let i = 0; i < productParams.length; i++) {
+      for (let i = 0; i < productParams.length; i++) {
         const param = productParams[i];
         const {
           _id,
@@ -339,28 +384,34 @@ shelfRouter
           price,
           isEnable,
           useDiscount,
-          stocksTotal
+          stocksTotal,
         } = param;
-        if(_id) {
+        if (_id) {
           // 修改已有规格
-          await db.ShopProductsParamModel.updateOne({_id, uid: user.uid, productId: product.productId}, {
-            $set: {
-              name,
-              originPrice,
-              order: i,
-              price,
-              isEnable: !!isEnable,
-              useDiscount: !!useDiscount,
-              stocksTotal
-            }
-          });
+          await db.ShopProductsParamModel.updateOne(
+            { _id, uid: user.uid, productId: product.productId },
+            {
+              $set: {
+                name,
+                originPrice,
+                order: i,
+                price,
+                isEnable: !!isEnable,
+                useDiscount: !!useDiscount,
+                stocksTotal,
+              },
+            },
+          );
         } else {
           param.productId = product.productId; // 规格所属商品的ID
           param.uid = user.uid; // 商品拥有者
           param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
           param.isEnable = true;
           param.order = i;
-          param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
+          param._id = await db.SettingModel.operateSystemID(
+            'shopProductsParams',
+            1,
+          );
           await db.ShopProductsParamModel(param).save();
         }
       }
@@ -507,5 +558,5 @@ shelfRouter
     data.product = product;
     await next();
     */
-	});
+  });
 module.exports = shelfRouter;
