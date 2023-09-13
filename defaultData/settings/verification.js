@@ -7,5 +7,13 @@ module.exports = {
       time: 60,
       count: 30,
     },
+    login: {
+      enabled: false,
+      type: 'vernierCaliper',
+    },
+    register: {
+      enabled: false,
+      type: 'vernierCaliper',
+    },
   },
 };
