@@ -30,6 +30,7 @@ function getDefaultQuestion() {
     answer: [],
     auth: null,
     reason: '',
+    isIndefinite: false,
   };
 }
 
@@ -53,6 +54,7 @@ if (data.question) {
     answer,
     auth,
     reason,
+    isIndefinite,
   } = data.question;
   targetQuestion = {
     ...targetQuestion,
@@ -67,6 +69,7 @@ if (data.question) {
       answer,
       auth,
       reason,
+      isIndefinite,
     },
   };
   if (type === questionTypes.ans) {
@@ -245,6 +248,7 @@ new Vue({
         content,
         contentDesc,
         answer,
+        isIndefinite,
       } = this.question;
       const { correctAnswer } = this;
       const form = {
@@ -254,6 +258,7 @@ new Vue({
         hasImage,
         content,
         contentDesc,
+        isIndefinite,
       };
       if (this.isCh4Type) {
         form.answer = answer;

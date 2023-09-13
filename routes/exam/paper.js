@@ -203,7 +203,10 @@ paperRouter
     const questions = [];
     const { record } = paper;
     for (const r of record) {
-      const { hasImage } = await db.QuestionModel.findOnly({ _id: r.qid });
+      const { hasImage, isIndefinite } = await db.QuestionModel.findOnly(
+        { _id: r.qid },
+        { isIndefinite: 1, hasImage: 1 },
+      );
       const { qid, type, content, answer } = r;
       let isMultiple = [];
       //判断该题是否为多选
@@ -223,6 +226,7 @@ paperRouter
         answer: newAnswer,
         isMultiple: isMultiple.length > 1,
         hasImage,
+        isIndefinite,
       });
     }
     data.questions = questions;
