@@ -340,13 +340,10 @@
         return nkcAPI(`/verifications?type=${this.verificationType}`, 'GET')
           .then(data => {
             if(this.verificationType==='login'&&data.verificationData.loginBan === 'ban') {
-              return self.done({secret:'unEnabled'});
+              return self.done({secret:'', enabled: false});
             }
             if(this.verificationType==='register'&&data.verificationData.registerBan === 'ban') {
-              return self.done({secret:'unEnabled'});
-            }
-            if(data.verificationData.type === 'unEnabled') {
-              return self.done({secret: data.verificationData.type});
+              return self.done({secret:'', enabled: false});
             }
             if(showModal) {
               self.showModalDom();
@@ -449,7 +446,8 @@
         })
           .then((data) => {
             self.done({
-              secret: data.secret
+              secret: data.secret,
+              enabled: true,
             });
             self.close();
           })
