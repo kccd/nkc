@@ -81,7 +81,6 @@ var app = new Vue({
         app.countToday = data.countToday;
         app.countOneDay = data.examSettings.countOneDay;
         const questions = data.questions;
-        console.log(data.questions, 'data.questions');
         app.questions = questions.map((item, index) => {
           const obj = {
             type: item.type,
