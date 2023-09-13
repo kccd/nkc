@@ -50,7 +50,7 @@ function create() {
     }
     result = Math.abs(num1 - num2);
   }
-  console.log(formula, result);
+  // console.log(formula, result);
   for (let i = 0; i < formula.length; i++) {
     // 随机生成字体颜色
     ctx.fillStyle = randomColor(50, 160);

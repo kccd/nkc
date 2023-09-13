@@ -300,14 +300,12 @@ export default {
               if (!res.data.isExamEnabled || !res.data.isValidCode) {
                 return this.$refs.verifications.open('register').then((res) => {
                   body.verifySecret = res.secret;
-                  body.registerIsBan = res.registerIsBan;
                 });
               }
             });
           } else {
             return this.$refs.verifications.open('login').then((res) => {
               body.verifySecret = res.secret;
-              body.loginIsBan = res.loginIsBan;
             });
           }
         })

@@ -11,17 +11,6 @@ const app = new Vue({
   },
   methods: {
     save() {
-      // 选中禁止 清空类型
-      if (!this.settings.login.enabled && this.settings.login.type != '') {
-        this.settings.login.type = '';
-      }
-      if (
-        !this.settings.register.enabled &&
-        this.settings.register.type != ''
-      ) {
-        this.settings.register.type = '';
-      }
-
       nkcAPI('/e/settings/verification', 'PUT', {
         verificationSettings: this.settings,
       })

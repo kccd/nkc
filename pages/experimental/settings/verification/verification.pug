@@ -18,12 +18,13 @@ block eContent
             label.col-xs-2.control-label 登录验证类型
             .col-xs-10
               .radios
-                label(v-for='(test,index) in ["禁用","启用"]').verificationBan
+                label(v-for='(test,index) in ["禁用","启用"]').verificationType
                   input(type='radio' :value='index==0?false:true' v-model='settings.login.enabled')
                   span {{test}}
                   //- input(type='radio' :value='true'  v-model='settings.login.enabled')
                   //- span 启用
-                label(v-for='type in types',v-show="settings.login.enabled").verificationType
+              .radios
+                label(v-for='type in types').verificationType
                   input(type='radio' :value='type.type' v-model='settings.login.type')
                   span {{type.name}}
                   
@@ -35,12 +36,13 @@ block eContent
               //-     input(type='checkbox' :value='type.type' v-model='settings.enabledTypes')
               //-     span {{type.name}}
               .radios
-                label(v-for='(test,index) in ["禁用","启用"]').verificationBan
+                label(v-for='(test,index) in ["禁用","启用"]').verificationType
                   input(type='radio' :value='index==0?false:true' v-model='settings.register.enabled')
                   span {{test}}
                   //- input(type='radio' :value='true'  v-model='settings.register.enabled')
                   //- span 启用
-                label(v-for='type in types',v-show="settings.register.enabled").verificationType
+              .radios
+                label(v-for='type in types').verificationType
                   input(type='radio' :value='type.type' v-model='settings.register.type')
                   span {{type.name}}
           .form-group

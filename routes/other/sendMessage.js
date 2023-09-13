@@ -12,7 +12,7 @@ sendMessageRouter
   })
   .post('/login', async (ctx, next) => {
     const { db, body } = ctx;
-    const { nationCode, mobile, verifySecret, loginIsBan } = body;
+    const { nationCode, mobile, verifySecret } = body;
     if (!nationCode) {
       ctx.throw(400, '国际区号不能为空');
     }
@@ -26,7 +26,9 @@ sendMessageRouter
     if (!otherPersonal) {
       ctx.throw(400, '暂未有用户绑定该手机号');
     }
-    if (loginIsBan !== 'ban') {
+    //从数据库里面取信息
+    const { login } = await db.SettingModel.getSettings('verification');
+    if (login.enabled) {
       await db.VerificationModel.verifySecret({
         uid: '',
         ip: ctx.address,
@@ -51,8 +53,7 @@ sendMessageRouter
   .post('/register', async (ctx, next) => {
     // 手机号码注册
     const { db, body } = ctx;
-    const { nationCode, mobile, verifySecret, registerCode, registerIsBan } =
-      body;
+    const { nationCode, mobile, verifySecret, registerCode } = body;
     if (!nationCode) {
       ctx.throw(400, '国际区号不能为空');
     }
@@ -63,7 +64,9 @@ sendMessageRouter
     const { isExamEnabled, isValidCode } =
       await registerExamService.getRegisterCodeStatus(registerCode);
 
-    if ((!isExamEnabled || !isValidCode) && registerIsBan !== 'ban') {
+    //从数据库里面取信息
+    const { register } = await db.SettingModel.getSettings('verification');
+    if ((!isExamEnabled || !isValidCode) && register.enabled) {
       await db.VerificationModel.verifySecret({
         uid: '',
         ip: ctx.address,
