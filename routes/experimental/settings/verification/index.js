@@ -24,7 +24,7 @@ router
     const { enabledTypes, login, register, countLimit } =
       body.verificationSettings;
     const { checkNumber } = nkcModules.checkData;
-    console.log('5555', body.verificationSettings);
+    // console.log('5555', body.verificationSettings);
 
     if (!types.includes(login.type) && login.enabled) {
       return ctx.throw(400, `登录验证类型错误 type: ${login.type}`);

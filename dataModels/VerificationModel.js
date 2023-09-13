@@ -136,8 +136,13 @@ schema.statics.getVerificationData = async (options) => {
   const types = verificationSettings.enabledTypes;
   const login = verificationSettings.login;
   const register = verificationSettings.register;
-  if (types.length === 0) {
-    return { type: 'unEnabled' };
+  // if (types.length === 0) {
+  //   return { type: 'unEnabled' };
+  // }
+  if (options.type == 'login' && !login.enabled) {
+    return { loginBan: 'ban' };
+  } else if (options.type == 'register' && !register.enabled) {
+    return { registerBan: 'ban' };
   }
   // const type = types[Math.round(Math.random() * (types.length - 1))];
   // 设置选中的验证类型

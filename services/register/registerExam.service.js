@@ -44,8 +44,6 @@ class RegisterExamService {
   async getRegisterCodeStatus(registerActivationCode) {
     const { registerExamination: isExamEnabled } =
       await SettingModel.getSettings('register');
-    const data = await SettingModel.getSettings('verification');
-    // console.log('5555', data);
     let isExamRequired = false;
     let isValidCode = false;
     if (isExamEnabled) {
@@ -64,8 +62,6 @@ class RegisterExamService {
       isExamRequired,
       isExamEnabled,
       isValidCode,
-      login: data.login,
-      register: data.register,
     };
   }
 

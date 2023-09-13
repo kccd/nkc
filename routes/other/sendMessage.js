@@ -26,7 +26,7 @@ sendMessageRouter
     if (!otherPersonal) {
       ctx.throw(400, '暂未有用户绑定该手机号');
     }
-    if (!loginIsBan) {
+    if (loginIsBan !== 'ban') {
       await db.VerificationModel.verifySecret({
         uid: '',
         ip: ctx.address,
@@ -63,7 +63,7 @@ sendMessageRouter
     const { isExamEnabled, isValidCode } =
       await registerExamService.getRegisterCodeStatus(registerCode);
 
-    if ((!isExamEnabled || !isValidCode) && !registerIsBan) {
+    if ((!isExamEnabled || !isValidCode) && registerIsBan !== 'ban') {
       await db.VerificationModel.verifySecret({
         uid: '',
         ip: ctx.address,

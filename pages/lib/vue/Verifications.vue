@@ -339,6 +339,12 @@
         const self = this;
         return nkcAPI(`/verifications?type=${this.verificationType}`, 'GET')
           .then(data => {
+            if(this.verificationType==='login'&&data.verificationData.loginBan === 'ban') {
+              return self.done({loginIsBan: data.verificationData.loginBan});
+            }
+            if(this.verificationType==='register'&&data.verificationData.registerBan === 'ban') {
+              return self.done({registerIsBan: data.verificationData.registerBan});
+            }
             if(data.verificationData.type === 'unEnabled') {
               return self.done({secret: data.verificationData.type});
             }

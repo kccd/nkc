@@ -297,32 +297,17 @@ export default {
               `/api/v1/register/exam?code=${registerActivationCode}`,
               'GET',
             ).then((res) => {
-              // 判断验证类型是否禁用
-              if (!res.data.register.enabled) {
-                body.registerIsBan = 'ban';
-                return;
-              }
               if (!res.data.isExamEnabled || !res.data.isValidCode) {
                 return this.$refs.verifications.open('register').then((res) => {
                   body.verifySecret = res.secret;
+                  body.registerIsBan = res.registerIsBan;
                 });
               }
             });
           } else {
-            //- const loginActivationCode =
-            //-   getRegisterActivationCodeFromLocalstorage();
-            //- body.registerCode = registerActivationCode;
-            return nkcAPI(`/api/v1/register/exam?code=`, 'GET').then((res) => {
-              // 判断验证类型是否禁用
-              if (!res.data.login.enabled) {
-                body.loginIsBan = 'ban';
-                return;
-              }
-              if (!res.data.isExamEnabled || !res.data.isValidCode) {
-                return this.$refs.verifications.open('login').then((res) => {
-                  body.verifySecret = res.secret;
-                });
-              }
+            return this.$refs.verifications.open('login').then((res) => {
+              body.verifySecret = res.secret;
+              body.loginIsBan = res.loginIsBan;
             });
           }
         })
