@@ -8,7 +8,16 @@ router.post('/', OnlyUser(), async (ctx, next) => {
   const { fields, files } = body;
   const form = JSON.parse(fields.form);
   const imageFile = files && files.image ? files.image : null;
-  const { type, volume, tags, hasImage, content, contentDesc, answer } = form;
+  const {
+    type,
+    volume,
+    tags,
+    hasImage,
+    content,
+    contentDesc,
+    answer,
+    isIndefinite,
+  } = form;
   await questionService.checkPermissionToCreateQuestions(state.uid);
   await questionService.checkQuestionInfo({
     type,
@@ -17,6 +26,7 @@ router.post('/', OnlyUser(), async (ctx, next) => {
     content,
     contentDesc,
     answer,
+    isIndefinite,
   });
   const question = await questionService.createQuestion({
     type,
@@ -27,6 +37,7 @@ router.post('/', OnlyUser(), async (ctx, next) => {
     answer,
     hasImage,
     uid: state.uid,
+    isIndefinite,
   });
   if (imageFile) {
     await question.updateImage(imageFile);

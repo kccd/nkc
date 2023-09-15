@@ -29,7 +29,16 @@ router.put('/', OnlyUser(), async (ctx, next) => {
   }
   const imageFile = files && files.image ? files.image : null;
   const form = JSON.parse(fields.form);
-  const { type, volume, tags, hasImage, content, contentDesc, answer } = form;
+  const {
+    type,
+    volume,
+    tags,
+    hasImage,
+    content,
+    contentDesc,
+    answer,
+    isIndefinite,
+  } = form;
   await questionService.checkQuestionInfo({
     type,
     volume,
@@ -37,6 +46,7 @@ router.put('/', OnlyUser(), async (ctx, next) => {
     content,
     contentDesc,
     answer,
+    isIndefinite,
   });
   const newQuestion = await questionService.modifyQuestion({
     _id: question._id,
@@ -48,6 +58,7 @@ router.put('/', OnlyUser(), async (ctx, next) => {
     content,
     contentDesc,
     answer,
+    isIndefinite,
   });
   if (imageFile) {
     await newQuestion.updateImage(imageFile);

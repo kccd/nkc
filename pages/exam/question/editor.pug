@@ -121,6 +121,16 @@ block content
                     textarea(class="form-control m-b-1" placeholder="请输入选项说明，2000字以内" v-model.trim='answer.desc' rows=2)
                 div
                   button.btn.btn-default.btn-sm(@click='addAnswer') 添加选项
+            .form-group(v-if="question.type ==='ch4'" )
+              label(class="col-sm-2 control-label") 题型显示
+              .col-sm-10
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='false' v-model="question.isIndefinite" )
+                    span 单选/多选（自动识别）
+                  label
+                    input(type='radio' :value='true' v-model="question.isIndefinite")
+                    span 不定项
             .form-group
               label(class="col-sm-2 control-label")
               .col-sm-10

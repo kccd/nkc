@@ -38,8 +38,8 @@
 
   mixin numberPlus
     .touch-captcha
-      .canvasCode 
-            p 请输入图片的最终结果
+      .canvasCode
+            p 请输入计算结果
             .canvasBox
                 img(:src='numberPlus.data.mainImageBase64')
                 input(type="text",autocomplete="off",v-model="numberPlus.answer")
@@ -119,8 +119,8 @@
                 display: flex;
                 justify-content: space-around;
                 input {
-                    text-align: center; 
-                    width: 50px;  
+                    text-align: center;
+                    width: 50px;
                     /* margin-top: 10px; */
                     height: 40px;
                     border: solid 1px #eee;
@@ -133,7 +133,7 @@
                     }
             }
             }
-            
+
         }
       .images{
         margin-bottom: 1rem;
@@ -349,7 +349,7 @@
               self.showModalDom();
             }
             // console.log('前端type:',data.verificationData.type);
-            
+
             self.type = data.verificationData.type;
             self[self.type].data = data.verificationData;
             const initFunc = self[`${self.type}Init`];
@@ -435,7 +435,7 @@
       submit() {
         const self = this;
         // console.log('前端提交的值',this[this.type].r);
-        
+
         const {data: verificationData, answer} = this[this.type];
         nkcAPI(`/verifications`, 'POST', {
           verificationData: {

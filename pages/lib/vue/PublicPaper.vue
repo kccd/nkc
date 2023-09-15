@@ -13,7 +13,8 @@
         .question-text
           .h4.text-info 第 {{index + 1}} 题（
             span(v-if="question.type === 'ans'") 填空题
-            span(v-else) {{question.isMultiple? '多选题': '单选题'}}
+            span(v-if="question.isIndefinite" ) 不定项
+            span(v-if="question.type === 'ch4' && !question.isIndefinite" ) {{question.isMultiple? '多选题': '单选题'}}
             | ）
           question-text-content(:text="`${question.content}`")
           .question-desc(v-if="question.contentDesc")
@@ -429,7 +430,7 @@ export default Vue.extend({
         index: this.index,
         qid,
         selected,
-        fill: this.fill,
+        fill:this.fill
       })
         .then((res) => {
             const { status, answerDesc} = res.data;

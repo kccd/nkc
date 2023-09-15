@@ -1,7 +1,7 @@
 const { createCanvas } = require('canvas');
 const codeWidth = 220;
 const codeHeight = 40;
-const codeRange = 100;
+const codeRange = 10;
 const codeOperate = ['+', '-'];
 
 let num1 = 0;
@@ -38,7 +38,6 @@ function create() {
   num1 = Math.floor(Math.random() * codeRange);
   num2 = Math.floor(Math.random() * codeRange);
   symbol = codeOperate[Math.floor(Math.random() * 2)];
-  // console.log(num1, num2, symbol);
   if (symbol === '+') {
     formula = `${num1}+${num2}=?`;
     result = num1 + num2;
