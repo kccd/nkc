@@ -21,5 +21,8 @@ module.exports = {
   },
   exam: {
     GET: Operations.visitPublicExam,
+    code: {
+      GET: Operations.getRegisterExamCode,
+    },
   },
 };

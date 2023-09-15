@@ -194,7 +194,7 @@
           this.setSort(this.nav[0].type);
           focus = focusCommentId;
         }
-        const url = `/zone/m/${momentId}/comments?sort=${this.sort}&page=${page}&focus=${focus}&mode=${listMode}`;
+        const url = `/z/m/${momentId}/comments?sort=${this.sort}&page=${page}&focus=${focus}&mode=${listMode}`;
         nkcAPI(url, 'GET')
           .then(res => {
             self.commentsData = res.commentsData;
@@ -209,7 +209,7 @@
         const {
           momentId
         } = this;
-        const url = `/zone/m/${momentId}/repost?page=${page}`;
+        const url = `/z/m/${momentId}/repost?page=${page}`;
         nkcAPI(url, 'GET')
           .then(res => {
             self.repostData = res.repostData;

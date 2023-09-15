@@ -214,7 +214,7 @@ export default {
     },
     visitCommentChild() {
       // this.$emit('visit-comment-child', this.commentData);
-      visitUrl(`/zone/m/${this.commentData._id}`, true);
+      visitUrl(`/z/m/${this.commentData._id}`, true);
     }
   }
 }

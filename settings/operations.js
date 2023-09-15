@@ -32,6 +32,8 @@ const FixedOperations = {
   postExamsPaper: 'postExamsPaper',
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
+  getRegisterExamCode: 'getRegisterExamCode',
+  visitZone: 'visitZone',
   browserDetection: 'browserDetection',
 };
 

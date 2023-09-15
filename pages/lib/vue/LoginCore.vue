@@ -107,22 +107,18 @@
 
 <script>
 import Verifications from './Verifications';
-import {getState} from '../js/state';
-import {nkcAPI} from "../js/netAPI";
-import {getNationCodes} from "../js/nationCodes";
-import { visitUrl } from "../js/pageSwitch";
-import { getRegisterActivationCodeFromLocalstorage } from "../js/activationCode";
-const {
-  isApp,
-  websiteBrief,
-  websiteName
-} = getState();
+import { getState } from '../js/state';
+import { nkcAPI } from '../js/netAPI';
+import { getNationCodes } from '../js/nationCodes';
+import { visitUrl } from '../js/pageSwitch';
+import { getRegisterActivationCodeFromLocalstorage } from '../js/activationCode';
+const { isApp, websiteBrief, websiteName } = getState();
 
 let timeout;
 
 export default {
   components: {
-    'verifications': Verifications
+    verifications: Verifications,
   },
   data: () => ({
     isApp,
@@ -131,58 +127,59 @@ export default {
     nationCodes: getNationCodes(),
     type: LoginType.SignIn,
     registerStep: 1,
-    category: "username", // username, mobile, mobileCode
-    username: "",
-    password: "",
+    category: 'username', // username, mobile, mobileCode
+    username: '',
+    password: '',
     repeatPassword: '',
-    nationCode: "86",
-    code: "",
-    mobile: "",
+    nationCode: '86',
+    code: '',
+    mobile: '',
     waiting: 0,
-    svgData: "",
-    error: "",
-    info : "",
+    svgData: '',
+    error: '',
+    info: '',
     submitting: false,
-    succeed: false
+    succeed: false,
   }),
   methods: {
     changeStep(number) {
-      if(number === 1) {
-        return this.registerStep = number;
+      if (number === 1) {
+        return (this.registerStep = number);
       }
       const _this = this;
       const throwError = this.throwError;
       return Promise.resolve()
-        .then(function() {
+        .then(function () {
           const username = _this.username;
           const password = _this.password;
           const repeatPassword = _this.repeatPassword;
-          if(!username) throw '请输入用户名';
-          if(!password) throw '请输入密码';
-          if(!repeatPassword) throw '请输入密码';
-          if(password !== repeatPassword) throw '两次输入的密码不相同';
+          if (!username) throw '请输入用户名';
+          if (!password) throw '请输入密码';
+          if (!repeatPassword) throw '请输入密码';
+          if (password !== repeatPassword) throw '两次输入的密码不相同';
           return nkcAPI('/register/check', 'POST', {
             username: username,
-            password: password
+            password: password,
           });
         })
-        .then(function() {
+        .then(function () {
           _this.registerStep = number;
         })
-        .catch(function(error) {
+        .catch(function (error) {
           throwError(error.error || error.message || error);
         });
     },
     selectCategory(category) {
       this.category = category;
-      this.throwError("");
+      this.throwError('');
     },
     selectType(type = LoginType.SignIn) {
-      if(type === LoginType.SignUp) {
-        const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
+      if (type === LoginType.SignUp) {
+        const registerActivationCode =
+          getRegisterActivationCodeFromLocalstorage();
         nkcAPI(`/api/v1/register/exam?code=${registerActivationCode}`, 'GET')
-          .then(res => {
-            if(res.data.isExamRequired) {
+          .then((res) => {
+            if (res.data.isExamRequired) {
               visitUrl(`/register/exam`);
             } else {
               this.type = type;
@@ -198,7 +195,7 @@ export default {
     },
     submit() {
       const throwError = this.throwError;
-      throwError("");
+      throwError('');
       const this_ = this;
       const type = this.type;
       const category = this.category;
@@ -209,54 +206,55 @@ export default {
       const mobile = this.mobile;
       const nationCode = this.nationCode;
       const code = this.code;
-      if(type === "login") {
-        if(category === "username") {
-          if(!username) return throwError("请输入用户名");
-          if(!password) return throwError("请输入密码");
+      if (type === 'login') {
+        if (category === 'username') {
+          if (!username) return throwError('请输入用户名');
+          if (!password) return throwError('请输入密码');
           body = {
             username: username,
             password: password,
           };
-        } else if(category === "mobile") {
-          if(!nationCode) return throwError("请选择国际区号");
-          if(!mobile) return throwError("请输入手机号");
-          if(!password) return throwError("请输入密码");
+        } else if (category === 'mobile') {
+          if (!nationCode) return throwError('请选择国际区号');
+          if (!mobile) return throwError('请输入手机号');
+          if (!password) return throwError('请输入密码');
           body = {
             nationCode: nationCode,
             mobile: mobile,
             password: password,
-            loginType: "mobile"
+            loginType: 'mobile',
           };
         } else {
-          if(!nationCode) return throwError("请选择国际区号");
-          if(!mobile) return throwError("请输入手机号");
-          if(!code) return throwError("请输入短信验证码");
+          if (!nationCode) return throwError('请选择国际区号');
+          if (!mobile) return throwError('请输入手机号');
+          if (!code) return throwError('请输入短信验证码');
           body = {
-            loginType: "code",
+            loginType: 'code',
             nationCode: nationCode,
             mobile: mobile,
             code: code,
-          }
+          };
         }
         this.submitting = true;
-        nkcAPI("/login", "POST", body)
-          .then(function() {
+        nkcAPI('/login', 'POST', body)
+          .then(function () {
             this_.succeed = true;
             this_.$emit('logged');
           })
-          .catch(function(data) {
+          .catch(function (data) {
             throwError(data);
             this_.submitting = false;
-          })
+          });
       } else {
-        if(!username) return throwError('请输入用户名');
-        if(!password) return throwError('请输入密码');
-        if(!nationCode) return throwError("请选择国际区号");
-        if(!mobile) return throwError("请输入手机号");
-        if(!code) return throwError("请输入短信验证码");
+        if (!username) return throwError('请输入用户名');
+        if (!password) return throwError('请输入密码');
+        if (!nationCode) return throwError('请选择国际区号');
+        if (!mobile) return throwError('请输入手机号');
+        if (!code) return throwError('请输入短信验证码');
         this.submitting = true;
-        const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
-        nkcAPI("/register", "POST", {
+        const registerActivationCode =
+          getRegisterActivationCodeFromLocalstorage();
+        nkcAPI('/register', 'POST', {
           nationCode: nationCode,
           mobile: mobile,
           code: code,
@@ -264,103 +262,106 @@ export default {
           password: password,
           activationCode: registerActivationCode,
         })
-          .then(function() {
+          .then(function () {
             this_.succeed = true;
             this_.$emit('registered');
           })
-          .catch(function(data) {
+          .catch(function (data) {
             throwError(data);
             this_.submitting = false;
-          })
+          });
       }
     },
     sendMobileCode(t) {
       const throwError = this.throwError;
-      throwError("");
+      throwError('');
       const this_ = this;
       const nationCode = this.nationCode;
       const mobile = this.mobile;
-      if(!nationCode) return throwError("请选择国际区号");
-      if(!mobile) return throwError("请输入手机号码");
+      if (!nationCode) return throwError('请选择国际区号');
+      if (!mobile) return throwError('请输入手机号码');
       const body = {
         nationCode: nationCode,
         mobile: mobile,
       };
       const isRegister = t === 'register';
-      const url =  isRegister? "/sendMessage/register": "/sendMessage/login";
+      const url = isRegister ? '/sendMessage/register' : '/sendMessage/login';
 
       return Promise.resolve()
         .then(() => {
-          if(isRegister) {
-            const registerActivationCode = getRegisterActivationCodeFromLocalstorage();
+          if (isRegister) {
+            const registerActivationCode =
+              getRegisterActivationCodeFromLocalstorage();
             body.registerCode = registerActivationCode;
-            return nkcAPI(`/api/v1/register/exam?code=${registerActivationCode}`, 'GET')
-              .then(res => {
-                if(!res.data.isExamEnabled || !res.data.isValidCode) {
-                  return this.$refs.verifications
-                    .open()
-                    .then((res) => {
-                      body.verifySecret = res.secret;
-                    })
-                }
-              })
+            return nkcAPI(
+              `/api/v1/register/exam?code=${registerActivationCode}`,
+              'GET',
+            ).then((res) => {
+              if (!res.data.isExamEnabled || !res.data.isValidCode) {
+                return this.$refs.verifications.open('register').then((res) => {
+                  body.verifySecret = res.secret;
+                });
+              }
+            });
+          } else {
+            return this.$refs.verifications.open('login').then((res) => {
+              body.verifySecret = res.secret;
+            });
           }
         })
         .then(() => {
-          return nkcAPI(url, "POST", body);
+          return nkcAPI(url, 'POST', body);
         })
-        .then(function() {
+        .then(function () {
           clearTimeout(timeout);
           this_.waiting = 120;
-          timeout = setInterval(function() {
-            if(this_.waiting !== 0) {
-              this_.waiting --;
+          timeout = setInterval(function () {
+            if (this_.waiting !== 0) {
+              this_.waiting--;
             } else {
               clearTimeout(timeout);
             }
           }, 1000);
         })
-        .catch(function(data) {
+        .catch(function (data) {
           throwError(data);
         });
     },
-  }
+  },
 };
-
 
 export const LoginType = {
   SignIn: 'login',
-  SignUp: 'register'
-}
-
+  SignUp: 'register',
+};
 </script>
 
 <style lang="less" scoped>
-@media (min-width: 768px){
-  .modal-dialog{
+@media (min-width: 768px) {
+  .modal-dialog {
     width: 370px;
   }
 }
-.login-core-container .login-types{
+.login-core-container .login-types {
   text-align: center;
 }
-.login-core-container .login-type{
+.login-core-container .login-type {
   cursor: pointer;
   width: 7rem;
   padding: 0.5rem 0;
   text-align: center;
   display: inline-block;
 }
-.login-core-container .login-type.active{
+.login-core-container .login-type.active {
   background-color: #f6f6f6;
   border-radius: 10px;
 }
-.login-core-container .login-type-info{
+.login-core-container .login-type-info {
   font-size: 1rem;
   margin-top: 0.5rem;
   color: #888;
 }
-.login-core-container .login-type-icon{
+.login-core-container .login-type-icon {
   margin: auto;
   height: 4rem;
   width: 4rem;
@@ -371,21 +372,21 @@ export const LoginType = {
   background-color: #fb5c62;
   color: #fff;
 }
-.login-core-container .login-form .form{
+.login-core-container .login-form .form {
   margin: 2rem auto 4rem auto;
   width: 25rem;
   max-width: 100%;
 }
-.login-core-container .login-form{
+.login-core-container .login-form {
   /*background-color: #f6f6f6;*/
   border-radius: 5px;
 }
-.login-core-container .login-form .input{
+.login-core-container .login-form .input {
   border-radius: 1.6rem;
   padding: 6px 20px;
   height: 3.2rem;
 }
-.login-core-container .login-form .post-button{
+.login-core-container .login-form .post-button {
   height: 3rem;
   border: 1px solid #fb5c62;
   color: #fff;
@@ -394,7 +395,7 @@ export const LoginType = {
   border-radius: 1.5rem;
 }
 
-.login-core-container .login-form .pull-left.link{
+.login-core-container .login-form .pull-left.link {
   height: 3rem;
   line-height: 3rem;
   font-size: 1.25rem;
@@ -402,20 +403,21 @@ export const LoginType = {
   cursor: pointer;
   color: #555;
 }
-.login-core-container .login-form .pull-left.link a{
+.login-core-container .login-form .pull-left.link a {
   color: #555;
 }
-.login-core-container .login-form .pull-left.link a:hover, .login-core-container .login-form .pull-left.link a:focus{
+.login-core-container .login-form .pull-left.link a:hover,
+.login-core-container .login-form .pull-left.link a:focus {
   text-decoration: none;
 }
-.login-core-container .svg-data{
+.login-core-container .svg-data {
   height: 3.2rem;
   cursor: pointer;
 }
-.login-core-container .svg-data svg{
+.login-core-container .svg-data svg {
   height: 100%;
 }
-.login-core-container .send-mobile-code{
+.login-core-container .send-mobile-code {
   height: 3.2rem;
   line-height: 3.2rem;
   display: inline-block;
@@ -424,29 +426,29 @@ export const LoginType = {
   border-radius: 5px;
   cursor: pointer;
 }
-.login-core-container .send-mobile-code.disabled{
+.login-core-container .send-mobile-code.disabled {
   color: #aaa;
 }
-.login-core-container .text-danger .fa{
+.login-core-container .text-danger .fa {
   font-size: 1.3rem;
   color: #fb5c62;
   margin-right: 0.3rem;
 }
-.login-core-container .text-danger span{
+.login-core-container .text-danger span {
   color: #fb5c62;
 }
-.login-core-container .button-icon{
+.login-core-container .button-icon {
   font-size: 1.4rem;
 }
-.login-core-container .button-icon.succeed{
+.login-core-container .button-icon.succeed {
   font-size: 1.2rem;
 }
-.login-core-container .register-step.register-step{
+.login-core-container .register-step.register-step {
   background-color: #fff;
   color: #555;
   border: 1px solid #555;
 }
-.login-site-name{
+.login-site-name {
   color: #fb5c62;
   font-size: 3rem;
   font-weight: 600;
