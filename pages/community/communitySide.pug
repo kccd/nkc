@@ -59,10 +59,14 @@ if !isIncluded('communitySide')
           for thread in notices
             .home-notice
               a(href=`/t/${thread.tid}`)= `${thread.firstPost.t}`
-    include ../publicModules/management/management
-    +managementPanel(managementData)
-    include ../publicModules/apps/apps
-    +appsPanel(appsData)
+    if managementData && managementData.length > 0
+      .box-shadow
+        include ../publicModules/management/management
+        +managementPanel(managementData)
+    if appsData && appsData.length > 0
+      .box-shadow
+        include ../publicModules/apps/apps
+        +appsPanel(appsData)
     //最新学术加分文章
     if academicThreads && academicThreads.length > 0
       +abstractThreadList('最近加分文章', academicThreads)

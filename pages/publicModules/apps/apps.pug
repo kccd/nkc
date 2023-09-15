@@ -3,7 +3,7 @@ if !isIncluded("publicModules/apps/apps.pug")
   mixin appsPanel(appData, options)
     -options = options || {}
     if appData && appData.length > 0
-      .module-apps.m-b-1.box-shadow
+      .module-apps.m-b-1
         if !options.hidePanelHeader
           .box-shadow-header 网站应用
         for app in appData
