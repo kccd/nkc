@@ -40,11 +40,6 @@ block content
         .m-t-3
           div.paper-panel(v-for='(q, index) in questions' :key='q._id')
             .question-content(v-html='q.content_')
-            .h4.text-info （
-              span(v-if="q.type === 'ans'") 填空题
-              span(v-if="q.isIndefinite" ) 不定项
-              span(v-if="q.type === 'ch4' && !q.isIndefinite" ) {{q.isMultiple? '多选题': '单选题'}}
-              | ）
             img.paper-img(v-if='q.hasImage' :src='"/exam/question/" + q._id + "/image"')
             form(v-if='q.type === "ans"')
               span 答案：
