@@ -1,0 +1,16 @@
+if !isIncluded('community/new/communityTypes')
+  mixin renderCommunityTypes(activeType, types)
+    -activeType = activeType || types.post;
+    .paging-button
+      a.button.radius-left(
+        href=`/c/new?t=post`
+        class=activeType === types.post ? 'active' : ''
+      ) 全部
+      a.button(
+        href=`/c/new?t=thread`
+        class=activeType === types.thread ? 'active' : ''
+      ) 文章
+      a.button.radius-right(
+        href=`/c/new?t=digest`
+        class=activeType === types.digest ? 'active' : ''
+      ) 精选
