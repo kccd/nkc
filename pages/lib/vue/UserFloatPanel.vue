@@ -256,6 +256,7 @@ import {getUrl, fromNow} from "../js/tools";
 import {timeFormat} from "../js/time";
 import {getState} from "../js/state";
 import {strToObj} from "../js/dataConversion";
+import { logger } from "../js/logger";
 export default {
   data: () => {
     return {
@@ -371,7 +372,7 @@ export default {
           });
         })
         .catch(err => {
-          console.log(err);
+          logger.debug(err);
         })
       dom.attr('data-float-init', 'true');
     },
