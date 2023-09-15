@@ -16,6 +16,9 @@ block head
   //- 标签页链接
   link(rel='shortcut icon' href=remoteState.logoICO)
 
+  //- 浏览器兼容性检测
+  +includeJS('/publicModules/browserDetection.js')
+
   // vue
   if remoteState.isProduction
     +includeJS("/external_pkgs/vue.min.js", true)

@@ -4,8 +4,9 @@ const redisClient = require('../settings/redisClient');
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
-const { getUrl } = require('../nkcModules/tools');
+const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
+const tools = require('../nkcModules/tools');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema({
     tid: {
@@ -1810,70 +1811,72 @@ threadSchema.statics.getNotice = async(fid) => {
  * @param {[String]} fid 能够从中读取文章的专业ID
  * @author pengxiguaa 2019-4-26
  * */
-threadSchema.statics.getFeaturedThreads = async(fid) => {
-    const ThreadModel = mongoose.model('threads');
-    const time = Date.now() - 15379200000; // 半年
-    const threads = await ThreadModel.aggregate([{
-            $match: {
-                digest: true,
-                mainForumsId: {
-                    $in: fid,
-                },
-                toc: {
-                    $gte: new Date(time),
-                },
-                disabled: false,
-                reviewed: true,
-            },
+threadSchema.statics.getFeaturedThreads = async (fid) => {
+  const ThreadModel = mongoose.model('threads');
+  const time = Date.now() - 15379200000; // 半年
+  const threads = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid,
         },
-        {
-            $project: {
-                tid: 1,
-                toc: 1,
-                oc: 1,
-                mainForumsId: 1,
-                uid: 1,
-            },
+        toc: {
+          $gte: new Date(time),
         },
-        {
-            $sample: {
-                size: 3,
-            },
+        disabled: false,
+        reviewed: true,
+      },
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1,
+      },
+    },
+    {
+      $sample: {
+        size: 5,
+      },
+    },
+  ]);
+  const threads_ = await ThreadModel.aggregate([
+    {
+      $match: {
+        digest: true,
+        mainForumsId: {
+          $in: fid,
         },
-    ]);
-    const threads_ = await ThreadModel.aggregate([{
-            $match: {
-                digest: true,
-                mainForumsId: {
-                    $in: fid,
-                },
-                toc: {
-                    $lt: new Date(time),
-                },
-                disabled: false,
-                reviewed: true,
-            },
+        toc: {
+          $lt: new Date(time),
         },
-        {
-            $project: {
-                tid: 1,
-                toc: 1,
-                oc: 1,
-                mainForumsId: 1,
-                uid: 1,
-            },
-        },
-        {
-            $sample: {
-                size: 3,
-            },
-        },
-    ]);
-    return await ThreadModel.extendThreads(threads.concat(threads_), {
-        lastPost: false,
-        category: false,
-        htmlToText: true,
-    });
+        disabled: false,
+        reviewed: true,
+      },
+    },
+    {
+      $project: {
+        tid: 1,
+        toc: 1,
+        oc: 1,
+        mainForumsId: 1,
+        uid: 1,
+      },
+    },
+    {
+      $sample: {
+        size: 4,
+      },
+    },
+  ]);
+  return await ThreadModel.extendThreads(threads.concat(threads_), {
+    lastPost: false,
+    category: false,
+    htmlToText: true,
+  });
 };
 /*
  * 获取最新原创文章，从最新的10篇里取3篇
@@ -1996,38 +1999,44 @@ threadSchema.statics.getLatestThreads = async(
     sort = 'toc',
     limit = 9,
 ) => {
-    const ThreadModel = mongoose.model('threads');
-    const PostModel = mongoose.model('posts');
-    const posts = await PostModel.find({
-            mainForumsId: { $in: fid },
-            disabled: false,
-            reviewed: true,
-            toDraft: { $ne: true },
-            type: 'thread',
-            originState: { $nin: ['0', '', '1', '2'] },
-        })
-        .sort({ toc: -1 })
-        .limit(limit);
-    const sortObj = {};
-    sortObj[sort] = -1;
-    const threads = await ThreadModel.find({
-        tid: { $in: posts.map((p) => p.tid) },
-        mainForumsId: { $in: fid },
-        disabled: false,
-        reviewed: true,
-    }).sort(sortObj);
-    return await ThreadModel.extendThreads(threads, {
-        lastPost: true,
-        lastPostUser: true,
-        category: true,
-        forum: true,
-        firstPost: true,
-        firstPostUser: true,
-        userInfo: false,
-        firstPostResource: false,
-        htmlToText: true,
-    });
+  const sortObj = {};
+  sortObj[sort] = -1;
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const posts = await PostModel.find(
+    {
+      mainForumsId: { $in: fid },
+      disabled: false,
+      reviewed: true,
+      toDraft: { $ne: true },
+      type: 'thread',
+      // originState: { $nin: ['0', '', '1', '2'] },
+    },
+    {
+      tid: 1,
+    },
+  )
+    .sort(sortObj)
+    .limit(limit);
+  const threads = await ThreadModel.find({
+    tid: { $in: posts.map((p) => p.tid) },
+    mainForumsId: { $in: fid },
+    disabled: false,
+    reviewed: true,
+  }).sort(sortObj);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    firstPostResource: false,
+    htmlToText: true,
+  });
 };
+
 /*
  * 获取"推荐文章列表"的查询条件
  * @param {[String]} fid 能够从中读取文章的专业ID
@@ -3023,6 +3032,25 @@ threadSchema.statics.clearThreadResourcesForumCache = async function(tid) {
             tou: null,
         },
     }, );
+};
+
+threadSchema.statics.extendCommunityThreadList = async function (threads) {
+  const anonymousInfo = getAnonymousInfo();
+  return threads.map((thread) => {
+    let uid = '';
+    let avatarUrl = anonymousInfo.avatarUrl;
+    if (!thread.anonymous) {
+      uid = thread.uid;
+      avatarUrl = getUrl('userAvatar', thread.firstPost.user.avatar);
+    }
+    return {
+      url: `/t/${thread.tid}`,
+      uid,
+      avatarUrl,
+      title: thread.firstPost.t,
+      digest: thread.firstPost.digest,
+    };
+  });
 };
 
 module.exports = mongoose.model('threads', threadSchema);

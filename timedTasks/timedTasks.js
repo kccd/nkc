@@ -1,6 +1,9 @@
 const db = require('../dataModels');
 const tasks = require('../tasks');
 const logger = require('../nkcModules/logger');
+const {
+  communityCountService,
+} = require('../services/community/communityCount.service');
 const func = {};
 /*
  * 定时更新活跃用户的信息 主要是头像
@@ -275,6 +278,23 @@ func.updateShopStatus = async () => {
       await func.updateShopStatus();
     }
   }, 70 * 1000);
+};
+
+/*
+ * 更新社区首页论坛总版的统计
+ * */
+func.updateCommunityContentCount = async () => {
+  setTimeout(async () => {
+    try {
+      logger.info('正在更新论坛总版统计...');
+      await communityCountService.saveCommunityContentCount();
+    } catch (err) {
+      logger.error(err);
+    } finally {
+      logger.info('论坛总版统计更新完成');
+      await func.updateCommunityContentCount();
+    }
+  }, 3 * 60 * 1000);
 };
 
 module.exports = func;
