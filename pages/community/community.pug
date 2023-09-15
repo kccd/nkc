@@ -101,10 +101,10 @@ block content
                           span /
                           span=data.communityContentCount.postCount
                           span )
-                        .community-new-desc 最新帖子、精选帖子
+                        .community-new-desc 论坛最新帖子、精选帖子
                       .col-xs-6
-                        a.community-new-title(href='/c/new')=`我的关注`
-                        .community-new-desc 关注专业最新帖子
+                        a.community-new-title(href='/c/sub')=`我的关注`
+                        .community-new-desc 关注专业下的最新帖子
               .col-xs-12.col-md-6
                 .box-shadow.m-b-1
                   +subscribeForumList('快捷入口', data.visitedForums)
