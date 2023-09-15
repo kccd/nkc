@@ -32,5 +32,5 @@ const requiredVersions = {
 
 const isCompatible = checkBrowserCompatibility(userAgent, requiredVersions);
 if (!isCompatible) {
-  visitUrl('/browser');
+  // visitUrl('/browser');
 }
