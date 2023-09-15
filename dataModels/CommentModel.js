@@ -1221,7 +1221,7 @@ schema.statics.getCommentsInfo = async function (comments) {
     if (articlePost.source === columnSource) {
       url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if (articlePost.source === zoneSource) {
-      url = `/zone/a/${articlePost.sid}`;
+      url = `/z/a/${articlePost.sid}`;
     }
     let credits = xsfsRecordsObj[_id] || [];
     credits = credits.concat(kcbsRecordsObj[_id] || []);

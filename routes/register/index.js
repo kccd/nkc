@@ -1,12 +1,16 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
 const captcha = require('../../nkcModules/captcha');
+const verificationCode = require('../../nkcModules/verificationCode');
 const {
   usernameCheckerService,
 } = require('../../services/user/usernameChecker.service');
 const {
   activationCodeService,
 } = require('../../services/activationCode/activationCode.service');
+const {
+  registerExamService,
+} = require('../../services/register/registerExam.service.js');
 registerRouter
   .get(['/', '/mobile'], async (ctx, next) => {
     const { data, query } = ctx;
@@ -186,6 +190,14 @@ registerRouter
     data.cid = examSource[0]._id;
     data.examNotice = examNotice;
     ctx.template = 'exam/public.pug';
+    await next();
+  })
+  .get('/exam/code', async (ctx, next) => {
+    const { data } = ctx;
+    const { codeId, codeValue } =
+      await registerExamService.getRegisterExamCode();
+    data.codeId = codeId;
+    data.codeValue = codeValue;
     await next();
   });
 module.exports = registerRouter;

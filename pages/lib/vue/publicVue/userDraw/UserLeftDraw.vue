@@ -14,6 +14,8 @@
             a(href=`/m`) 专栏
           .col-xs-3
             a(href=`/c`) 社区
+          .col-xs-3
+            a(href=`/z`) 电波
         .m-a-1#navbar_custom_dom
         .m-a-1
           Management(:management="management")

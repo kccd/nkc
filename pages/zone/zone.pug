@@ -1,0 +1,36 @@
+
+extends ../bootstrap_base
+block title
+  block telegraphTitle
+  //title=`电波 - ${state.serverSettings.websiteName}`
+block content
+  .container-fluid.max-width
+    .row
+      include ../publicModules/checkDefaultUsername
+      .col-xs-12.col-md-2.p-r-0.hidden-xs.hidden-sm.box-shadow-panel
+        //- include ../publicModules/forums_nav/forums_tree
+        //- +renderVisitedForums(data.visitedForums)
+        //- +renderSubscribeForums(data.subscribeForums)
+        //- +renderCategoryForums(data.categoriesWithForums)
+      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+        block telegraphContent
+      .col-xs-12.col-md-3.hidden-xs.hidden-sm.box-shadow-panel
+        //- .m-b-1
+        //-   include ../publicModules/canvas_logo
+        //-   +renderCanvasLogo(data.homeBigLogo)
+        //- include ../publicModules/improveUserInfo
+        //- +improveUserInfo(data.improveUserInfo)
+        //- include ../publicModules/management/management
+        //- +managementPanel(data.managementData)
+        //- include ../publicModules/apps/apps
+        //- +appsPanel(data.appsData)
+        //- include ../publicModules/side_thread_list
+        //- +sideThreadsPanel(data.noticeThreads, '公告通知', true)
+        //- +sideThreadsPanel(data.featuredThreads, '精选文章', false)
+        //- +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
+        //- include ../publicModules/activeUsers/activeUsers
+        //- +newUsersSmall(data.newUsers)
+
+block scripts
+  block telegraphScripts
+  include ../publicModules/moveThread/moveThread

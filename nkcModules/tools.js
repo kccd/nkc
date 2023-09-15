@@ -252,10 +252,10 @@ var Tools = function () {
         return '/creation/editor/zone/article?aid=' + size;
       }
       case 'zoneArticle': {
-        return '/zone/a/' + id;
+        return '/z/a/' + id;
       }
       case 'zoneMoment': {
-        return '/zone/m/' + id;
+        return '/z/m/' + id;
       }
       case 'columnThread': {
         return '/m/' + id + '/a/' + size;

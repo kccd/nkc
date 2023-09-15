@@ -134,10 +134,19 @@ schema.statics.getVerificationData = async (options) => {
   const SettingModel = mongoose.model('settings');
   const verificationSettings = await SettingModel.getSettings('verification');
   const types = verificationSettings.enabledTypes;
-  if (types.length === 0) {
-    return { type: 'unEnabled' };
+  const login = verificationSettings.login;
+  const register = verificationSettings.register;
+  // if (types.length === 0) {
+  //   return { type: 'unEnabled' };
+  // }
+  if (options.type == 'login' && !login.enabled) {
+    return { loginBan: 'ban' };
+  } else if (options.type == 'register' && !register.enabled) {
+    return { registerBan: 'ban' };
   }
-  const type = types[Math.round(Math.random() * (types.length - 1))];
+  // const type = types[Math.round(Math.random() * (types.length - 1))];
+  // 设置选中的验证类型
+  const type = options.type == 'login' ? login.type : register.type;
   const data = await verifications[type].create();
   const { uid, ip, port } = options;
   const verification = VerificationModel({

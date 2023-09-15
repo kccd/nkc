@@ -250,6 +250,7 @@ const operationTree = {
     payment, // 支付相关
     l: link, // 外链跳转
     c: community, // 社区
+    z: zone, // 电波
     wm: watermark, //水印
     logo, // 网站 logo
     creation, // 用户创作中心
@@ -260,7 +261,7 @@ const operationTree = {
     book, // 书籍
     rc, // 资源分组
     comment, // 评论系统
-    zone, // 空间
+    // zone, // 空间
     g: subscribe, // 关注
     article, // 独立文章
     moment, // 动态
