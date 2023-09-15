@@ -104,7 +104,7 @@ router
       fidOfCanGetThreads,
     );
     /*// 最新文章
-    data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);*/
+        data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);*/
     // 最近活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 首页大Logo

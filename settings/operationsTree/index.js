@@ -80,6 +80,7 @@ const verifications = require('./verifications');
 const payment = require('./payment');
 const link = require('./link');
 const community = require('./community');
+const telegraph = require('./telegraph');
 const watermark = require('./watermark');
 const drawData = require('./drawData');
 const logo = require('./logo');
@@ -249,6 +250,7 @@ const operationTree = {
     payment, // 支付相关
     l: link, // 外链跳转
     c: community, // 社区
+    z: telegraph, // 电报
     wm: watermark, //水印
     logo, // 网站 logo
     creation, // 用户创作中心

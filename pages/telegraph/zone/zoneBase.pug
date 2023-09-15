@@ -1,0 +1,14 @@
+extends ../zone
+block telegraphTitle
+  block zoneTitle
+block telegraphContent
+  div
+    //- include ../latestNav
+    //- +renderLatestNav('zone', remoteState.isApp)
+    #ZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
+      moment-editor(@published='published')
+    block zoneContent
+block telegraphScripts
+  +includeJS('/telegraph/zone/zone.js')
+  block zoneScripts
+
