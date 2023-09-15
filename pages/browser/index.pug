@@ -1,0 +1,19 @@
+include ../publicModules/mixin
+html
+  head
+    title Browser
+    meta(name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    +includeCSS('/browser/index.css')
+  body
+    .container
+        img.logo(src="/logo/sm")
+        .title=remoteState.serverSettings.websiteName
+          | 不支持您的浏览器或您的浏览器版本过低
+        .desc 推荐使用以下现代浏览器：
+        .browser-list
+          for item in data.browsers
+            a.browser-item(href=item.downloadUrl target="_blank")
+              img(src=item.logoUrl)
+              span=item.name
+
+

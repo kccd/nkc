@@ -4,7 +4,7 @@ const redisClient = require('../settings/redisClient');
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
-const { getUrl } = require('../nkcModules/tools');
+const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
@@ -1129,16 +1129,16 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       },
     );
     /* forums.map(forum => {
-      if(forum.parentId) {
-        if(o.parentForum) {
-          parentForumsId.add(forum.parentId);
-        }
-      }
-    }); */
+                  if(forum.parentId) {
+                    if(o.parentForum) {
+                      parentForumsId.add(forum.parentId);
+                    }
+                  }
+                }); */
     /* if(o.parentForum) {
-      const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
-      forums = forums.concat(parentForums);
-    } */
+                  const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
+                  forums = forums.concat(parentForums);
+                } */
     forums.map((forum) => {
       forumsObj[forum.fid] = forum;
     });
@@ -1726,7 +1726,7 @@ threadSchema.statics.getLatestToppedThreads = async (fid) => {
   return await mongoose.model('threads').getHomeToppedThreads(fid, 'latest');
 };
 /*
- * 获取社区置顶
+ * 获取论坛置顶
  * */
 threadSchema.statics.getCommunityToppedThreads = async (fid) => {
   return await mongoose.model('threads').getHomeToppedThreads(fid, 'community');
@@ -1880,7 +1880,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 3,
+        size: 5,
       },
     },
   ]);
@@ -1909,7 +1909,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 3,
+        size: 4,
       },
     },
   ]);
@@ -1943,11 +1943,11 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
     .limit(10);
   // const {getRandomNumber$2: getRandomNumber} = require("../nkcModules/apiFunction");
   /*const numbers = getRandomNumber({
-    min: 0,
-    max: posts.length - 1,
-    count: 10,
-    repeat: false
-  });*/
+          min: 0,
+          max: posts.length - 1,
+          count: 10,
+          repeat: false
+        });*/
   // const threadsId = numbers.map(n => posts[n].tid);
   const threadsId = posts.map((p) => p.tid);
   const threads = await ThreadModel.find({
@@ -1982,7 +1982,7 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
  *@param {[String]} fid 能够从中读取文章的专业ID
  *
  */
-threadSchema.statics.getNewAcademicThread = async (fid) => {
+threadSchema.statics.getNewacademicThreads = async (fid) => {
   //获取最新加学术分文章
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const ThreadModel = mongoose.model('threads');
@@ -2017,7 +2017,7 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
     return item.pid;
   });
 
-  const academicThread = await ThreadModel.find({
+  const academicThreads = await ThreadModel.find({
     mainForumsId: { $in: fid },
     disabled: false,
     reviewed: true,
@@ -2027,10 +2027,10 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
     .sort({ toc: -1 })
     .lean();
 
-  const sortedAcademicThread = filterPid
-    .map((pid) => academicThread.find((thread) => thread.oc === pid))
+  const sortedacademicThreads = filterPid
+    .map((pid) => academicThreads.find((thread) => thread.oc === pid))
     .filter(Boolean);
-  const finalArr = sortedAcademicThread.slice(0, 10);
+  const finalArr = sortedacademicThreads.slice(0, 10);
   return await ThreadModel.extendThreads(finalArr, {
     lastPost: true,
     lastPostUser: true,
@@ -2049,26 +2049,22 @@ threadSchema.statics.getLatestThreads = async (
   sort = 'toc',
   limit = 9,
 ) => {
-  const ThreadModel = mongoose.model('threads');
-  const PostModel = mongoose.model('posts');
-  const posts = await PostModel.find({
-    mainForumsId: { $in: fid },
-    disabled: false,
-    reviewed: true,
-    toDraft: { $ne: true },
-    type: 'thread',
-    originState: { $nin: ['0', '', '1', '2'] },
-  })
-    .sort({ toc: -1 })
-    .limit(limit);
   const sortObj = {};
   sortObj[sort] = -1;
+  const ThreadModel = mongoose.model('threads');
   const threads = await ThreadModel.find({
-    tid: { $in: posts.map((p) => p.tid) },
-    mainForumsId: { $in: fid },
+    mainForumsId: {
+      $in: fid,
+    },
     disabled: false,
     reviewed: true,
-  }).sort(sortObj);
+    recycleMark: {
+      $ne: true,
+    },
+  })
+    .sort(sortObj)
+    .limit(limit);
+  console.log({ length: threads.length });
   return await ThreadModel.extendThreads(threads, {
     lastPost: true,
     lastPostUser: true,
@@ -2081,6 +2077,7 @@ threadSchema.statics.getLatestThreads = async (
     htmlToText: true,
   });
 };
+
 /*
  * 获取"推荐文章列表"的查询条件
  * @param {[String]} fid 能够从中读取文章的专业ID
@@ -2515,19 +2512,19 @@ threadSchema.methods.createNewPost = async function (post) {
   const user = await UserModel.findOnly({ uid: post.uid });
   await user.setRedEnvelope();
   /*const userGeneral = await UserGeneralModel.findOne({uid: post.uid});
-  if(!userGeneral.lotterySettings.close) {
-    const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
-    if(!redEnvelopeSettings.c.random.close) {
-      const {chance} = redEnvelopeSettings.c.random;
-      const number = Math.ceil(Math.random()*100);
-      if(number <= chance) {
-        const postCountToday = await PostModel.countDocuments({uid: post.uid, toc: {$gte: apiFn.today()}});
-        if(postCountToday === 1) {
-          await userGeneral.updateOne({'lotterySettings.status': true});
-        }
-      }
-    }
-  }*/
+        if(!userGeneral.lotterySettings.close) {
+          const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
+          if(!redEnvelopeSettings.c.random.close) {
+            const {chance} = redEnvelopeSettings.c.random;
+            const number = Math.ceil(Math.random()*100);
+            if(number <= chance) {
+              const postCountToday = await PostModel.countDocuments({uid: post.uid, toc: {$gte: apiFn.today()}});
+              if(postCountToday === 1) {
+                await userGeneral.updateOne({'lotterySettings.status': true});
+              }
+            }
+          }
+        }*/
   return _post;
 };
 /*
@@ -3010,20 +3007,20 @@ threadSchema.statics.extendShopInfo = async function (props) {
     vipDisNum = vipNum;
   }
   /*// 选定规格
-  let paId = 0;
-  for(let a = 0; a < product.productParams.length; a ++){
-    if(paraId === product.productParams[a]._id){
-      paId = a;
-    }
-  }
-  data.paId = paId;
-  data.paraId = paraId;*/
+        let paId = 0;
+        for(let a = 0; a < product.productParams.length; a ++){
+          if(paraId === product.productParams[a]._id){
+            paId = a;
+          }
+        }
+        data.paId = paId;
+        data.paraId = paraId;*/
 
   /*if(uid) {
-    data.shopInfo = {
-      cartProductCount: await ShopCartModel.getProductCount(uid)
-    }
-  }*/
+          data.shopInfo = {
+            cartProductCount: await ShopCartModel.getProductCount(uid)
+          }
+        }*/
   // 获取用户地址信息
   if (uid) {
     try {
@@ -3100,6 +3097,25 @@ threadSchema.statics.clearThreadResourcesForumCache = async function (tid) {
       },
     },
   );
+};
+
+threadSchema.statics.extendCommunityThreadList = async function (threads) {
+  const anonymousInfo = getAnonymousInfo();
+  return threads.map((thread) => {
+    let uid = '';
+    let avatarUrl = anonymousInfo.avatarUrl;
+    if (!thread.anonymous) {
+      uid = thread.uid;
+      avatarUrl = getUrl('userAvatar', thread.firstPost.user.avatar);
+    }
+    return {
+      url: `/t/${thread.tid}`,
+      uid,
+      avatarUrl,
+      title: thread.firstPost.t,
+      digest: thread.firstPost.digest,
+    };
+  });
 };
 
 module.exports = mongoose.model('threads', threadSchema);

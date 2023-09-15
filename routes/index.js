@@ -96,6 +96,8 @@ const oauthRouter = routers.oauth;
 const apiRouter = routers.api;
 // 多维分裂
 const tcRouter = routers.tc;
+// 浏览器检测
+const browserRouter = routers.browser;
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -261,7 +263,7 @@ router.use(
   resourceCategoryRouter.allowedMethods(),
 );
 router.use('/comment', commentRouter.routes(), commentRouter.allowedMethods());
-router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
+// router.use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/g', subscribeRouter.routes(), subscribeRouter.allowedMethods());
 router.use('/article', articleRouter.routes(), articleRouter.allowedMethods());
 router.use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
@@ -274,4 +276,7 @@ router.use('/n', latestRouter.routes(), latestRouter.allowedMethods());
 router.use('/oauth', oauthRouter.routes(), oauthRouter.allowedMethods());
 router.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
 router.use('/tc', tcRouter.routes(), tcRouter.allowedMethods());
+// router.use('/z', telegraphRouter.routes(), telegraphRouter.allowedMethods());
+router.use('/z', zoneRouter.routes(), zoneRouter.allowedMethods());
+router.use('/browser', browserRouter.routes(), browserRouter.allowedMethods());
 module.exports = router;

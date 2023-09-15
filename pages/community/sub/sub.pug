@@ -1,0 +1,35 @@
+extends ../../bootstrap_base
+block title
+  title=`我的关注 - 论坛 - ${remoteState.serverSettings.websiteName}`
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.min-md-p-r-0
+        .box-shadow
+          .m-b-1
+            include ../communityNav
+            +communityNav([{name: '我的关注'}])
+          .m-b-1
+            -showPagingSortButton = false;
+            include ../../publicModules/paging/paging
+              include ../../subscribe/postActivity
+                for a in data.activity
+                  +postActivity(a)
+              include ../../publicModules/paging/paging_input
+      .col-xs-12.col-md-3
+        include ../communitySide
+        -
+          var communitySideProps = {
+            homeBigLogo: data.homeBigLogo,
+            improveUserInfo: data.improveUserInfo,
+            notices: data.notices,
+            managementData: data.managementData,
+            appsData: data.appsData,
+            academicThreads: data.academicThreads,
+            featuredThreads: data.featuredThreads,
+            enableFund: data.enableFund,
+            fundApplicationForms: data.fundApplicationForms,
+            activeUsers: data.activeUsers,
+            fundName: data.fundName,
+          };
+        +communitySide(communitySideProps)

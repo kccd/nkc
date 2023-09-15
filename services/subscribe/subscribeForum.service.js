@@ -1,7 +1,10 @@
 const { subscribeService } = require('./subscribe.service');
 const { subscribeSources } = require('../../settings/subscribe');
 const { ResponseTypes } = require('../../settings/response');
+const SubscribeModel = require('../../dataModels/SubscribeModel');
+const ForumModel = require('../../dataModels/ForumModel');
 const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
+const tools = require('../../nkcModules/tools');
 
 class SubscribeForumService {
   async isSubscribedForum(uid, fid) {
@@ -58,6 +61,26 @@ class SubscribeForumService {
       cid = subscribe.cid;
     }
     return cid;
+  }
+
+  async getSubscribeForumsIdFromCache(uid) {
+    return await SubscribeModel.getUserSubForumsId(uid);
+  }
+
+  async getSubscribeForumsFromCache(uid) {
+    const subscribeForumsId = await this.getSubscribeForumsIdFromCache(uid);
+    const forums = await ForumModel.getForumsByIdFromRedis(subscribeForumsId);
+    return forums.map((forum) => {
+      return {
+        fid: forum.fid,
+        name: forum.displayName,
+        desc: forum.description,
+        url: tools.getUrl('forumHome', forum.fid),
+        color: forum.color,
+        logo: forum.logo,
+        logoUrl: forum.logo ? tools.getUrl('forumLogo', forum.logo) : '',
+      };
+    });
   }
 }
 

@@ -165,7 +165,7 @@ export default {
       const self = this;
       return Promise.resolve()
         .then(() => {
-          return nkcAPI(`/zone/m/${commentId}/comments/child?page=${page}&sort=${sort}&focus=${_focusCommentId}`, 'GET')
+          return nkcAPI(`/z/m/${commentId}/comments/child?page=${page}&sort=${sort}&focus=${_focusCommentId}`, 'GET')
         })
         .then(res => {
           const {commentData, commentsData, paging, permissions} = res;

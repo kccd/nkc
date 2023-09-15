@@ -49,9 +49,9 @@ module.exports = async (ctx, next) => {
 
   // 由于历史原因，ctx.data 中包含了很多渲染页面所需要的数据，例如user、userOperations等。
   // 这部分数据可能不是接口所需要的，所以有必要创建一个字段用于返回接口所需要的、干净的数据。
-  // 并且需要兼容旧代码，所以最终返回数据时，会优先判断是否走的 /api/.. 路由。
-  // 如果走了 /api/.. 则会将 ctx.apiData 字段中的值作为响应数据。
-  ctx.apiData = {};
+  // 并且需要兼容旧代码，所以最终返回数据时，会优先判断ctx.apiData是否存用数据。
+  // 如果ctx.apiData不为null，则在返回数据时会将ctx.apiData赋值给ctx.body作为响应数据。
+  ctx.apiData = null;
 
   try {
     ctx.data.operationId = nkcModules.permission.getOperationId(

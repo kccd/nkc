@@ -1,5 +1,6 @@
 const { Operations } = require('../operations.js');
 module.exports = {
+  GET: Operations.visitZone,
   a: {
     PARAMETER: {
       GET: Operations.visitZoneArticle,

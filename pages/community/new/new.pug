@@ -1,0 +1,80 @@
+extends ../../bootstrap_base
+block title
+  title=data.pageTitle
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.min-md-p-r-0
+        .box-shadow
+          .m-b-1
+            include ../communityNav
+            +communityNav([{name: '快捷总版'}])
+          .m-b-1
+          if data.communityTypes.post === data.t
+            include ./communityTypes
+              +renderCommunityTypes(data.t, data.communityTypes)
+            include ../../publicModules/paging/paging
+            if !data.posts || data.posts.length === 0
+              .p-t-5.p-b-5.text-center 空空如也~
+            else
+              include ../../home/postlatest
+              for a in data.posts
+                +postlatest(a)
+
+            if data.paging && data.paging.buttonValue.length > 0
+              .m-t-1
+              include ../../publicModules/paging/paging_input
+
+          else
+            include ./communityTypes
+            +renderCommunityTypes(data.t, data.communityTypes)
+            //- 文章排序方式
+            .paging-button
+              a.button.radius-left(
+                href=`/c/new?t=${data.t}&s=tlm`
+                class=data.s !== 'toc'? 'active': ''
+                ) 复序
+              a.button.radius-right(
+                href=`/c/new?t=${data.t}&s=toc`
+                class=data.s === 'toc'? 'active': ''
+                ) 贴序
+
+            include ../../publicModules/paging/paging
+
+            //- 社区最新页置顶
+            if data.toppedArticlesData && data.toppedArticlesData.length > 0
+              include ../../publicModules/articlePanel/articlePanel
+              +ArticlesPanel(data.toppedArticlesData, data.latestCommunityToppedArticlePanelStyle)
+              .topped-thread-header - 以上是置顶 -
+            //- 社区最新文章
+            if data.articlesPanelData && data.articlesPanelData.length > 0
+              include ../../publicModules/articlePanel/articlePanel
+              +ArticlesPanel(data.articlesPanelData, data.latestCommunityArticlePanelStyle)
+            else
+              .p-t-5.p-b-5.text-center 空空如也~
+
+            if data.paging && data.paging.buttonValue.length > 0
+              .m-t-1
+                include ../../publicModules/paging/paging_input
+
+
+      .col-xs-12.col-md-3
+        include ../communitySide
+        -
+          var communitySideProps = {
+            homeBigLogo: data.homeBigLogo,
+            improveUserInfo: data.improveUserInfo,
+            notices: data.notices,
+            managementData: data.managementData,
+            appsData: data.appsData,
+            academicThreads: data.academicThreads,
+            featuredThreads: data.featuredThreads,
+            enableFund: data.enableFund,
+            fundApplicationForms: data.fundApplicationForms,
+            activeUsers: data.activeUsers,
+            fundName: data.fundName,
+          };
+        +communitySide(communitySideProps)
+
+block scripts
+  include ../../publicModules/moveThread/moveThread

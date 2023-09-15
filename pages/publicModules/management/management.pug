@@ -9,13 +9,12 @@ if !isIncluded('/publicModules/management/management.pug')
   mixin managementPanel(managementData, options)
     - options = options || {};
     if managementData && managementData.length > 0
-      .m-b-1
-        if !options.hidePanelHeader
-          .panel-header 管理
-        .module-managements
-          for m in managementData
-            a.module-management(href=m.url target="_blank")
-              .fa(class=m.icon)
-              span=` ${m.name}`
-              if m.count
-                .management-count=m.count
+      if !options.hidePanelHeader
+        .box-shadow-header 管理
+      .module-managements
+        for m in managementData
+          a.module-management(href=m.url target="_blank")
+            .fa(class=m.icon)
+            span=` ${m.name}`
+            if m.count
+              .management-count=m.count
