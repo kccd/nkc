@@ -14,8 +14,8 @@ if !isIncluded('activeUsers')
               img(src=u.avatarUrl)
 
   mixin activeUsers(users, name)
-    .m-b-1
-      .panel-header=name || '最近活跃用户'
+    .m-b-1.box-shadow
+      .box-shadow-header=name || '最近活跃用户'
       .active-users
         for u in users
           a(href=u.homeUrl

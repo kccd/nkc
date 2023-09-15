@@ -2050,20 +2050,25 @@ threadSchema.statics.getLatestThreads = async (
   sort = 'toc',
   limit = 9,
 ) => {
-  const ThreadModel = mongoose.model('threads');
-  const PostModel = mongoose.model('posts');
-  const posts = await PostModel.find({
-    mainForumsId: { $in: fid },
-    disabled: false,
-    reviewed: true,
-    toDraft: { $ne: true },
-    type: 'thread',
-    originState: { $nin: ['0', '', '1', '2'] },
-  })
-    .sort({ toc: -1 })
-    .limit(limit);
   const sortObj = {};
   sortObj[sort] = -1;
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const posts = await PostModel.find(
+    {
+      mainForumsId: { $in: fid },
+      disabled: false,
+      reviewed: true,
+      toDraft: { $ne: true },
+      type: 'thread',
+      // originState: { $nin: ['0', '', '1', '2'] },
+    },
+    {
+      tid: 1,
+    },
+  )
+    .sort(sortObj)
+    .limit(limit);
   const threads = await ThreadModel.find({
     tid: { $in: posts.map((p) => p.tid) },
     mainForumsId: { $in: fid },
@@ -2082,6 +2087,7 @@ threadSchema.statics.getLatestThreads = async (
     htmlToText: true,
   });
 };
+
 /*
  * 获取"推荐文章列表"的查询条件
  * @param {[String]} fid 能够从中读取文章的专业ID

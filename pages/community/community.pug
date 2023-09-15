@@ -40,6 +40,21 @@ block content
             title=thread.title
             target="_blank"
             )=thread.title
+  mixin subscribeForumList(title, forums)
+    .box-shadow-header=title
+    .community-new-container
+      for forum in forums
+        .community-forum-item(
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
+          data-global-data=objToStr({ fid: forum.fid })
+        )
+          .community-forum-item-avatar
+            if forum.logoUrl
+              img(src=forum.logoUrl)
+            else
+              div(style=`background-color: ${forum.color};`)
+          a.community-forum-item-name(href=forum.url)=forum.name
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
@@ -53,23 +68,49 @@ block content
                 +threadTitleList('最新发表', data.latestThreads)
             .col-xs-12.col-md-4.m-b-1
               .row.p-r-05.max-sm-p-a-0
-                +threadTitleList('最近回复', data.latestThreads)
+                +threadTitleList('最近回复', data.latestPostThreads)
             .col-xs-12.col-md-4.m-b-1
               .row
                 +threadTitleList('精选', data.digestThreads)
-      .col-xs-12.col-md-12
-        //-.btn-group-justified
-        .m-b-1.box-shadow-panel-ignored.btn-group(role="group")
-          .btn-group(role="group")
-            button.btn.btn-sm.btn-primary(type="button") 专业列表
-          .btn-group(role="group")
-            button.btn.btn-sm.btn-default(type="button") 最新文章
-          .btn-group(role="group")
-            button.btn.btn-sm.btn-default(type="button") 文章推荐
-      .col-xs-12.col-md-9.box-shadow-panel.min-md-p-r-0
+
+      .col-xs-12.col-md-9.min-md-p-r-0
+
+        if data.communityToppedThreads && data.communityToppedThreads.length
+          .m-b-1.box-shadow
+            .box-shadow-header 置顶帖子
+            .home-threads
+              for thread in data.communityToppedThreads
+                include ../publicModules/thread_panel/thread_panel
+        if data.user
+          div
+            .row
+              .col-xs-12.col-md-6.min-md-p-r-0
+                .box-shadow.m-b-1
+                  .box-shadow-header 总览
+                  .community-new-container
+                    .row
+                      .col-xs-6
+
+                        a.community-new-title(href='/c/new')=`快捷总版`
+                        span(title='更新/文章/回复')
+                          span  (
+                          if data.communityContentCount.postCountToday > 0
+                            span.text-danger=data.communityContentCount.postCountToday
+                            span /
+                          span=data.communityContentCount.threadCount
+                          span /
+                          span=data.communityContentCount.postCount
+                          span )
+                        .community-new-desc 最新帖子、精选帖子
+                      .col-xs-6
+                        a.community-new-title(href='/c/new')=`我的关注`
+                        .community-new-desc 关注专业最新帖子
+              .col-xs-12.col-md-6
+                .box-shadow.m-b-1
+                  +subscribeForumList('快捷入口', data.visitedForums)
         for cf in data.categoryForums
-          .home-forums-list.m-b-1.category-forums
-            .panel-header=cf.name
+          .home-forums-list.m-b-1.category-forums.box-shadow
+            .box-shadow-header=cf.name
             //-.home-header
               .header-name(title=cf.description)=cf.name
             for f in cf.forums
@@ -79,28 +120,23 @@ block content
                 +detailedForumList(f)
               else
                 +normalForumList(f)
-        if data.communityToppedThreads && data.communityToppedThreads.length
-          .m-b-1
-            .panel-header 社区置顶
-            .home-threads
-              for thread in data.communityToppedThreads
-                include ../publicModules/thread_panel/thread_panel
-      .col-xs-12.col-md-3.box-shadow-panel
-        .m-b-1
+
+      .col-xs-12.col-md-3
+        .m-b-1.box-shadow
           include ../publicModules/canvas_logo
           +renderCanvasLogo(data.homeBigLogo)
         include ../publicModules/improveUserInfo
         +improveUserInfo(data.improveUserInfo)
         if data.notices && data.notices.length
-          .home-forums-other.m-b-1
-            .panel-header 公告通知
+          .home-forums-other.m-b-1.box-shadow
+            .box-shadow-header 公告通知
             .home-notices
               for thread in data.notices
                 .home-notice
                   a(href=`/t/${thread.tid}`)= thread.firstPost.t
-        if data.user && data.subForums.length
-          .m-b-1
-            .panel-header 关注的专业
+        //-if data.user && data.subForums.length
+          .m-b-1.box-shadow
+            .box-shadow-header 关注的专业
             .home-forums-list
               //-.home-header
                 //.fa.fa-tags
@@ -136,23 +172,23 @@ block content
         +appsPanel(data.appsData)
         //最新学术加分文章
         if data.academicThread && data.academicThread.length>0
-          .home-forums-list.m-b-1
-            .panel-header.m-b-0 最近加分文章
+          .home-forums-list.m-b-1.box-shadow
+            .box-shadow-header.m-b-0 最近加分文章
             .home-threads
               -const defaultThreadListStyle = {type: 'brief'}
               for thread in data.academicThread
                 include ../publicModules/thread_panel/thread_panel
         //- 最新发表
-        if data.originalThreads && data.originalThreads.length > 0
-          .home-forums-list.m-b-1
-            .panel-header.m-b-0 最新发表
+        //-if data.originalThreads && data.originalThreads.length > 0
+          .home-forums-list.m-b-1.box-shadow
+            .box-shadow-header.m-b-0 最新发表
             .home-threads
               -const defaultThreadListStyle = {type: 'brief'}
               for thread in data.originalThreads
                 include ../publicModules/thread_panel/thread_panel
               a.home-threads-more-link(href=`/n/community`) 查看全部新讨论
-        .home-forums-other.m-b-1
-          .panel-header 最新回复
+        //-.home-forums-other.m-b-1.box-shadow
+          .box-shadow-header 最新回复
           .home-posts
             for post in data.latestPosts
               .home-post
@@ -188,8 +224,8 @@ block content
                   div=post.c
 
         //- 推荐阅读
-        .home-forums-other.m-b-1
-          .panel-header 推荐阅读
+        .home-forums-other.m-b-1.box-shadow
+          .box-shadow-header 推荐阅读
           .home-threads
             for thread in data.featuredThreads
               .home-thread
@@ -219,8 +255,8 @@ block content
                     ).home-thread-forum=thread.forums[0].displayName
         //- 最新基金申请
         if data.enableFund
-          .m-b-1
-            .panel-header 最新基金申请
+          .m-b-1.box-shadow
+            .box-shadow-header 最新基金申请
             .home-funds
               for form in data.fundApplicationForms
                 .home-fund

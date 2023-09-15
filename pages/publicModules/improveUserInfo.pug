@@ -8,8 +8,8 @@ if !isIncluded('publicModules/improveUserInfo.pug')
         } = props;
 
       if !setUsername || !setPassword || !boundEmail || !boundMobile || !setAvatar || !setBanner || !setDescription || !verifyPhoneNumber
-        .improve.m-t-1.m-b-1
-          .panel-header 完善资料
+        .improve.m-t-1.m-b-1.box-shadow
+          .box-shadow-header 完善资料
           p 由于你还未完善以下资料，可能无法使用网站的全部功能。
           if !setUsername
             .improve-info
