@@ -1983,7 +1983,7 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
  *@param {[String]} fid 能够从中读取文章的专业ID
  *
  */
-threadSchema.statics.getNewAcademicThread = async (fid) => {
+threadSchema.statics.getNewacademicThreads = async (fid) => {
   //获取最新加学术分文章
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const ThreadModel = mongoose.model('threads');
@@ -2018,7 +2018,7 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
     return item.pid;
   });
 
-  const academicThread = await ThreadModel.find({
+  const academicThreads = await ThreadModel.find({
     mainForumsId: { $in: fid },
     disabled: false,
     reviewed: true,
@@ -2028,10 +2028,10 @@ threadSchema.statics.getNewAcademicThread = async (fid) => {
     .sort({ toc: -1 })
     .lean();
 
-  const sortedAcademicThread = filterPid
-    .map((pid) => academicThread.find((thread) => thread.oc === pid))
+  const sortedacademicThreads = filterPid
+    .map((pid) => academicThreads.find((thread) => thread.oc === pid))
     .filter(Boolean);
-  const finalArr = sortedAcademicThread.slice(0, 10);
+  const finalArr = sortedacademicThreads.slice(0, 10);
   return await ThreadModel.extendThreads(finalArr, {
     lastPost: true,
     lastPostUser: true,

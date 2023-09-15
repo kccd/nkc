@@ -1,0 +1,94 @@
+if !isIncluded('communitySide')
+  +includeCSS('/community/communitySide.css')
+  mixin abstractThreadList(title, threads)
+    .m-b-1.box-shadow
+      .box-shadow-header=title
+      .home-threads
+        for thread in threads
+          .home-thread
+            a(
+              href=`/t/${thread.tid}`
+              target="_blank"
+              class=thread.firstPost.digest ? 'digest' : ''
+            ).home-thread-title=thread.firstPost.t
+            if thread.firstPost.cover
+              .home-thread-cover
+                img(src=tools.getUrl("postCover", thread.firstPost.cover))
+            .home-thread-content
+              .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
+              .home-thread-info
+                if thread.firstPost.anonymous
+                  a.home-thread-user
+                    img(src=anonymousInfo.avatar)
+                else
+                  a(href=`/u/${thread.firstPost.uid}` target="_blank").home-thread-user
+                    img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar)
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({ uid: thread.firstPost.uid })
+                    )
+                a(href=`/f/${thread.forums[0].fid}` target="_blank"
+                  data-global-mouseover="showForumPanel"
+                  data-global-mouseout="hideForumPanel"
+                  data-global-data=objToStr({ fid: thread.forums[0].fid })
+                ).home-thread-forum=thread.forums[0].displayName
+  mixin communitySide(props)
+    -
+      var {
+        homeBigLogo,
+        improveUserInfo,
+        notices,
+        managementData,
+        appsData,
+        academicThreads,
+        featuredThreads,
+        enableFund,
+        fundApplicationForms,
+        activeUsers,
+        fundName,
+      } = props;
+    .m-b-1.box-shadow
+      include ../publicModules/canvas_logo
+      +renderCanvasLogo(homeBigLogo)
+    include ../publicModules/improveUserInfo
+    +improveUserInfo(improveUserInfo)
+    if notices && notices.length
+      .home-forums-other.m-b-1.box-shadow
+        .box-shadow-header 公告通知
+        .home-notices
+          for thread in notices
+            .home-notice
+              a(href=`/t/${thread.tid}`)= `${thread.firstPost.t}`
+    include ../publicModules/management/management
+    +managementPanel(managementData)
+    include ../publicModules/apps/apps
+    +appsPanel(appsData)
+    //最新学术加分文章
+    if academicThreads && academicThreads.length > 0
+      +abstractThreadList('最近加分文章', academicThreads)
+    //- 推荐阅读
+    if featuredThreads && featuredThreads.length
+      +abstractThreadList('推荐阅读', featuredThreads)
+    //- 最新基金申请
+    if enableFund
+      .m-b-1.box-shadow
+        .box-shadow-header 最新基金申请
+        .home-funds
+          for form in fundApplicationForms
+            .home-fund
+              a.home-fund-name(href=`/fund/a/${form._id}` target="_blank")=form.project.t
+              .home-fund-info
+                a(href=`/u/${form.uid}` target="_blank").home-fund-user
+                  img(src=tools.getUrl("userAvatar", form.applicant.user.avatar)
+                    data-global-mouseover="showUserPanel"
+                    data-global-mouseout="hideUserPanel"
+                    data-global-data=objToStr({ uid: form.uid })
+                  )
+                a(href=`/fund/list/${form.fund._id}` target="_blank").home-fund-link.fund-name=form.fund.name
+                .home-fund-code=`- ${form.code}`
+                .home-fund-money=`¥${form.money}`
+          a.home-fund-donation(href=`/fund/donation` target="_blank")= `赞助${fundName}`
+    // 最近活跃用户
+    if activeUsers && activeUsers.length > 0
+      include ../publicModules/activeUsers/activeUsers
+      +activeUsersSmall(activeUsers)

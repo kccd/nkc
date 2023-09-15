@@ -33,6 +33,8 @@ const FixedOperations = {
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
   browserDetection: 'browserDetection',
+  visitCommunityNew: 'visitCommunityNew',
+  visitCommunitySub: 'visitCommunitySub',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

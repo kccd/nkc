@@ -1,0 +1,166 @@
+@import "../publicModules/base";
+.home-notices{
+  .home-notice{
+    margin-bottom: 0.3rem;
+    a{
+      color: #666;
+      font-size: 1.25rem;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @dark;
+      }
+    }
+  }
+}
+
+.home-threads{
+
+  .home-thread:last-child{
+    margin-bottom: 0;
+  }
+  .home-thread{
+    margin-bottom: 1.5rem;
+    .home-thread-title{
+      font-size: 1.3rem;
+      color: #3a3a3a;
+      transition: color 100ms;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @accent;
+      }
+      &.digest{
+        color: red;
+      }
+    }
+    .home-thread-cover{
+      display: table-cell;
+      vertical-align: top;
+      padding-top: 0.3rem;
+      img{
+        width: 8rem;
+        height: 5rem;
+        border-radius: 2px;
+        margin-right: 0.7rem;
+        box-sizing: border-box;
+        //border: 2px solid #eee;
+      }
+    }
+    .home-thread-content{
+      display: table-cell;
+      width: 100%;
+      padding-top: 0.4rem;
+      vertical-align: top;
+      .home-thread-abstract{
+        height: 3rem;
+        font-size: 1.1rem;
+        overflow: hidden;
+        color: #777;
+        .hideText(@line: 2);
+        word-break: break-word;
+      }
+    }
+    .home-thread-info{
+      margin-top: 0.2rem;
+      position: relative;
+      .home-thread-user{
+        color: #aaa;
+        &:hover, &:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+        img{
+          height: 1.4rem;
+          width: 1.4rem;
+          border-radius: 50%;
+          margin-right: 0.3rem;
+          margin-top: -3px;
+        }
+        span{
+        }
+      }
+      .home-thread-forum{
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #777;
+        &:hover,&:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+      }
+    }
+  }
+}
+
+.home-funds{
+  .home-fund-donation{
+    height: 4rem;
+    display: block;
+    line-height: 4rem;
+    text-align: center;
+    background-color: @primary;
+    color: #fff;
+    font-size: 1.4rem;
+    transition: background-color 100ms;
+    border-radius: 3px;
+    &:hover, &:focus{
+      text-decoration: none;
+      background-color: #277dbb;
+    }
+  }
+  .home-fund{
+    margin-bottom: 1rem;
+    .home-fund-name{
+      font-size: 1.3rem;
+      color: #333;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @accent;
+      }
+    }
+    .home-fund-info{
+      position: relative;
+      .home-fund-code{
+        display: inline-block;
+        color: #555;
+        margin-right: 1rem;
+      }
+      .home-fund-money{
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: inline-block;
+        margin-right: 1rem;
+        font-weight: 700;
+        color: #ff6262;
+      }
+      .home-fund-link{
+        color: #888;
+        display: inline-block;
+        &:hover,&:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+        &.fund-name{
+          color: #555;
+        }
+      }
+      .home-fund-user{
+        display: inline-block;
+        color: #888;
+        &:hover,&:focus{
+          color: @accent;
+          text-decoration: none!important;
+        }
+        margin-right: 0.5rem;
+        img{
+          width: 1.6rem;
+          height: 1.6rem;
+          margin-top: -2px;
+          margin-right: 2px;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
