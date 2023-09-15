@@ -148,7 +148,7 @@ router
       );
     }
 
-    // 社区置顶
+    // 论坛置顶
     data.communityToppedThreads =
       await db.ThreadModel.getCommunityToppedThreads(fidOfCanGetThreads);
     // 精选

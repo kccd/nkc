@@ -23,9 +23,11 @@ block content
       };
     });
 
-  mixin threadTitleList(title, threads)
+  mixin threadTitleList(title, threads, url)
     .thread-title-list
       .thread-title-list-header=title
+        if url
+          a(href=url) 查看更多
       for thread in threads
         .thread-title-list-item
           img(
@@ -66,19 +68,19 @@ block content
           .col-xs-12.col-md-8.max-sm-p-a-0
             .col-xs-12.col-md-4.m-b-1
               .row.p-r-05.max-sm-p-a-0
-                +threadTitleList('最新发表', data.latestThreads)
+                +threadTitleList('最新发表', data.latestThreads, '/c/new?t=thread&s=toc')
             .col-xs-12.col-md-4.m-b-1
               .row.p-r-05.max-sm-p-a-0
-                +threadTitleList('最近回复', data.latestPostThreads)
+                +threadTitleList('最近回复', data.latestPostThreads, '/c/new?t=thread')
             .col-xs-12.col-md-4.m-b-1
               .row
-                +threadTitleList('精选', data.digestThreads)
+                +threadTitleList('精选', data.digestThreads, '/c/new?t=digest')
 
       .col-xs-12.col-md-9.min-md-p-r-0
 
         if data.communityToppedThreads && data.communityToppedThreads.length
           .m-b-1.box-shadow
-            .box-shadow-header 置顶帖子
+            .box-shadow-header 置顶
             .home-threads
               for thread in data.communityToppedThreads
                 include ../publicModules/thread_panel/thread_panel
