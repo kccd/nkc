@@ -122,6 +122,10 @@ const schema = new Schema(
       default: false,
       index: 1,
     },
+    isIndefinite: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     collection: 'questions',

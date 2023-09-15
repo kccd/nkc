@@ -36,6 +36,14 @@
             span.user-point-index {{index + 1}}
       +buttons
 
+  mixin numberPlus
+    .touch-captcha
+      .canvasCode
+            p 请输入计算结果
+            .canvasBox
+                img(:src='numberPlus.data.mainImageBase64')
+                input(type="text",autocomplete="off",v-model="numberPlus.answer")
+      +buttons
   mixin error
     .vernier-caliper.error
       .text-center 加载失败
@@ -50,6 +58,8 @@
         +vernierCaliper
       div(v-else-if='type === "touchCaptcha"')
         +touchCaptcha
+      div(v-else-if='type === "numberPlus"')
+        +numberPlus
       div(v-else-if='type === "error"')
         +error
       div(v-else)
@@ -102,6 +112,29 @@
           font-weight: 700;
         }
       }
+      .canvasCode{
+            margin: 30px 0px;
+            .canvasBox{
+                margin: 40px 0px;
+                display: flex;
+                justify-content: space-around;
+                input {
+                    text-align: center;
+                    width: 50px;
+                    /* margin-top: 10px; */
+                    height: 40px;
+                    border: solid 1px #eee;
+                    border-radius: 4px;
+                    outline: none;
+                    :focus{
+                        /* caret-color: #2b90d9; */
+                        border: solid 1px #2b90d9;
+                        /* outline: solid 1px #2b90d9; */
+                    }
+            }
+            }
+
+        }
       .images{
         margin-bottom: 1rem;
         font-size: 0;
@@ -220,6 +253,13 @@
       modalDom: null,
       reject: null,
       resolve: null,
+      verificationType:"",
+      numberPlus:{
+        answer: "",
+        data:{
+          mainImageBase64: ''
+        }
+      },
 
       vernierCaliper: {
         init: false,
@@ -260,7 +300,9 @@
       hideModalDom() {
         this.modalDom.modal('hide');
       },
-      open(callback) {
+      open(type,callback) {
+        // console.log('66666',callback,test);
+        this.verificationType=type;
         const self = this;
         if(callback) {
           this.resolve = undefined;
@@ -295,14 +337,19 @@
       getData(showModal = false) {
         this.error = '';
         const self = this;
-        return nkcAPI(`/verifications`, 'GET')
+        return nkcAPI(`/verifications?type=${this.verificationType}`, 'GET')
           .then(data => {
-            if(data.verificationData.type === 'unEnabled') {
-              return self.done({secret: data.verificationData.type});
+            if(this.verificationType==='login'&&data.verificationData.loginBan === 'ban') {
+              return self.done({secret:'', enabled: false});
+            }
+            if(this.verificationType==='register'&&data.verificationData.registerBan === 'ban') {
+              return self.done({secret:'', enabled: false});
             }
             if(showModal) {
               self.showModalDom();
             }
+            // console.log('前端type:',data.verificationData.type);
+
             self.type = data.verificationData.type;
             self[self.type].data = data.verificationData;
             const initFunc = self[`${self.type}Init`];
@@ -387,6 +434,8 @@
       },
       submit() {
         const self = this;
+        // console.log('前端提交的值',this[this.type].r);
+
         const {data: verificationData, answer} = this[this.type];
         nkcAPI(`/verifications`, 'POST', {
           verificationData: {
@@ -397,7 +446,8 @@
         })
           .then((data) => {
             self.done({
-              secret: data.secret
+              secret: data.secret,
+              enabled: true,
             });
             self.close();
           })

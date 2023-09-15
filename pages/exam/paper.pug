@@ -47,7 +47,7 @@ block content
             form(v-else)
               .radio.checkbox
                 label.radio.paper-radio(v-for='(a, index) in q.ans_')
-                  input(v-if="!q.isMultiple" type="radio" :name="'question' + index" :value='index' v-model='q.selected')
+                  input(v-if="!q.isMultiple && !q.isIndefinite " type="radio" :name="'question' + index" :value='index' v-model='q.selected')
                   input(v-else type="checkbox" :name="'question' + index" :value='index' v-model='q.selected' )
                   .paper-answer(v-html='a')
           .m-t-2

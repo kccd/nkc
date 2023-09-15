@@ -48,7 +48,7 @@ var CheckData = function () {
     var length = (dataArr || "").length;
     if(length > fractionDigits) {
       if(fractionDigits === 0) self.te(400, name + "数值必须为整数");
-      self.te(400, name + "小数点位数不符合规定");
+      self.te(400, name + "仅支持最多" + fractionDigits + "位小数的数字");
     }
   };
   /*

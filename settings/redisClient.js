@@ -1,7 +1,7 @@
 const redis = require('./redis');
 const redisClient = redis();
 redisClient.on('error', err => {
-  console.error(err);
+    console.error(err);
 });
 module.exports = redisClient;
 /**/

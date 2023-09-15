@@ -45,6 +45,14 @@ class QuestionService {
       maxTextLength: 2000,
     });
   }
+  async checkQuestionIsIndefinite(type, isIndefinite) {
+    const { ans } = await QuestionModel.getQuestionType();
+    if (type === ans && isIndefinite) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.IS_INDEFINITE_TYPE_IN_CORRECT,
+      );
+    }
+  }
   checkQuestionAnswer(type, answer) {
     if (type === this.questionTypes.ch4) {
       if (answer.length <= 1) {
@@ -110,16 +118,27 @@ class QuestionService {
     }
   }
   async checkQuestionInfo(props) {
-    const { type, volume, tags, content, contentDesc, answer } = props;
+    const { type, volume, tags, content, contentDesc, answer, isIndefinite } =
+      props;
     await this.checkQuestionType(type);
     await this.checkQuestionVolume(volume);
     await this.checkQuestionTag(tags);
     await this.checkQuestionContentAndContentDesc(content, contentDesc);
     await this.checkQuestionAnswer(type, answer);
+    await this.checkQuestionIsIndefinite(type, isIndefinite);
   }
   async createQuestion(props) {
-    const { type, volume, tags, content, contentDesc, answer, hasImage, uid } =
-      props;
+    const {
+      type,
+      volume,
+      tags,
+      content,
+      contentDesc,
+      answer,
+      hasImage,
+      uid,
+      isIndefinite,
+    } = props;
     const _id = await SettingModel.operateSystemID('questions', 1);
     const question = new QuestionModel({
       _id,
@@ -137,6 +156,7 @@ class QuestionService {
       }),
       hasImage,
       uid,
+      isIndefinite,
     });
     await question.save();
     return question;
@@ -152,6 +172,7 @@ class QuestionService {
       contentDesc,
       answer,
       hasImage,
+      isIndefinite,
     } = props;
     const updateBody = {
       tags,
@@ -165,6 +186,7 @@ class QuestionService {
         };
       }),
       hasImage,
+      isIndefinite,
     };
     if (oldAuth !== true) {
       updateBody.type = type;
