@@ -2064,7 +2064,6 @@ threadSchema.statics.getLatestThreads = async (
   })
     .sort(sortObj)
     .limit(limit);
-  console.log({ length: threads.length });
   return await ThreadModel.extendThreads(threads, {
     lastPost: true,
     lastPostUser: true,
