@@ -23,6 +23,8 @@ block content
       };
     });
 
+    var showVisitedForum = data.user && data.visitedForums && data.visitedForums.length > 0
+
   mixin threadTitleList(title, threads, url)
     .thread-title-list
       .thread-title-list-header=title
@@ -86,7 +88,7 @@ block content
                 include ../publicModules/thread_panel/thread_panel
         div
           .row
-            .col-xs-12(class=data.user? 'col-md-6 min-md-p-r-0': '')
+            .col-xs-12(class=showVisitedForum? 'col-md-6 min-md-p-r-0': '')
               .box-shadow.m-b-1
                 .box-shadow-header 总览
                 .community-new-container
@@ -107,7 +109,7 @@ block content
                       .col-xs-6
                         a.community-new-title(href='/c/sub')=`我的关注`
                         .community-new-desc 已关注专业下的最新帖子
-            if data.user
+            if showVisitedForum
               .col-xs-12.col-md-6
                 .box-shadow.m-b-1
                   +subscribeForumList('快捷入口', data.visitedForums)
