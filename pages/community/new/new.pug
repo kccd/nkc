@@ -1,6 +1,6 @@
 extends ../../bootstrap_base
 block title
-  block communityTitle
+  title=data.pageTitle
 block content
   .container-fluid.max-width
     .row
@@ -25,7 +25,7 @@ block content
               .m-t-1
               include ../../publicModules/paging/paging_input
 
-          else 
+          else
             include ./communityTypes
             +renderCommunityTypes(data.t, data.communityTypes)
             //- 文章排序方式
