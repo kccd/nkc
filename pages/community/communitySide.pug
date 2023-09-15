@@ -60,11 +60,11 @@ if !isIncluded('communitySide')
             .home-notice
               a(href=`/t/${thread.tid}`)= `${thread.firstPost.t}`
     if managementData && managementData.length > 0
-      .box-shadow
+      .box-shadow.m-b-1
         include ../publicModules/management/management
         +managementPanel(managementData)
     if appsData && appsData.length > 0
-      .box-shadow
+      .box-shadow.m-b-1
         include ../publicModules/apps/apps
         +appsPanel(appsData)
     //最新学术加分文章
