@@ -210,7 +210,7 @@ import { routesName } from "../routes/creation"
             },
             {
               type: routesName.creationCommunityThreadEditor,
-              title: '社区发帖',
+              title: '论坛发帖',
               url: '/creation/editor/community',
               icon: 'fa fa-columns'
             },
@@ -248,7 +248,7 @@ import { routesName } from "../routes/creation"
             },
             {
               type: routesName.creationCommunity,
-              title: '社区内容',
+              title: '论坛内容',
               url: '/creation/community',
               icon: 'fa fa-columns'
             },

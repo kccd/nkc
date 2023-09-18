@@ -6,7 +6,7 @@
         .item-name 学术分
         .item-count {{targetUser.xsf}}
       .item
-        .item-name 社区文章
+        .item-name 论坛文章
         .item-count {{targetUser.threadCount}}
       .item
         .item-name 空间文章

@@ -40,7 +40,7 @@ block content
             li(class=data.nav === 'post' ? "active" : "")
               a(href=`/nkc/post`)
                 .fa.fa-paper-plane
-                | 社区内容
+                | 论坛内容
                 if !permission("nkcManagementPost")
                   | （无权）
             li(class=data.nav === 'document' ? "active" : "")

@@ -13,7 +13,7 @@
           .col-xs-3
             a(href=`/m`) 专栏
           .col-xs-3
-            a(href=`/c`) 社区
+            a(href=`/c`) 论坛
           .col-xs-3
             a(href=`/z`) 电波
         .m-a-1#navbar_custom_dom
