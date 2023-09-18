@@ -34,7 +34,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
     //- 电脑屏幕
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
-      //-ul.nav.navbar-nav.navbar-md
+      ul.nav.navbar-nav.navbar-md
         li(class=navbar_highlight === 'community' ? 'active' : '')
           a(href=`/c`) 论坛
         li(class=navbar_highlight === 'zone' ? 'active' : '')
@@ -42,7 +42,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         li(class=navbar_highlight === 'columns' ? 'active' : '')
           a(href=`/m`) 专栏
 
-      ul.nav.navbar-nav.navbar-md
+      //ul.nav.navbar-nav.navbar-md
         li(class=navbar_highlight === 'latest' || navbar_highlight === 'reply' || navbar_highlight === 'column' || navbar_highlight === 'thread' ? 'active' : '')
           a(href='/n') 最新
         li(class=navbar_highlight === 'subscribe' ? 'active' : '')
