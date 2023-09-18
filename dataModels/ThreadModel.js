@@ -2044,6 +2044,36 @@ threadSchema.statics.getNewacademicThreads = async (fid) => {
   });
 };
 
+threadSchema.statics.getLatestPostThreads = async (fid, limit = 9) => {
+  const ThreadModel = mongoose.model('threads');
+  const threads = await ThreadModel.find({
+    mainForumsId: {
+      $in: fid,
+    },
+    disabled: false,
+    reviewed: true,
+    recycleMark: {
+      $ne: true,
+    },
+    count: {
+      $gte: 1,
+    },
+  })
+    .sort({ tlm: -1 })
+    .limit(limit);
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    firstPostResource: false,
+    htmlToText: true,
+  });
+};
+
 threadSchema.statics.getLatestThreads = async (
   fid,
   sort = 'toc',
