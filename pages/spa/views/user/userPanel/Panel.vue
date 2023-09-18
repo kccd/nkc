@@ -63,7 +63,7 @@
                   .account-nav-item-name 空间
                   .account-nav-item-value {{targetUser.momentCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}")
-                  .account-nav-item-name 社区
+                  .account-nav-item-name 论坛
                   .account-nav-item-value {{targetUser.postCount + targetUser.threadCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('column')" :class="{'active': $route.name === 'column'}" v-if="targetUser.column")
                   .account-nav-item-name 专栏

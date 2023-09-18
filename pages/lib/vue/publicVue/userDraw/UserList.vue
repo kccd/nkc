@@ -25,7 +25,7 @@
 
       li
         a(:href="'/creation/community/draft'")
-          span.fa.fa-inbox &nbsp;社区草稿
+          span.fa.fa-inbox &nbsp;论坛草稿
             span(v-if="user && user.draftCount > 0") ({{user.draftCount}})
           span.pull-right.fa.fa-angle-right
       li
