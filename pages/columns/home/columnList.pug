@@ -51,7 +51,7 @@ if !isIncluded('pages/columns/home/columnList.pug')
         .column-list-item-sm-number=`${column.subCount} 人关注 ${column.postCount} 篇文章`
       .column-list-item-sm-sub
         if !logged
-          button.btn.btn-default.btn-xs(onclick="NKC.methods.toLogin()") 关注
+          button.btn.btn-default.btn-xs(onclick="RootApp.openLoginPanel('login')") 关注
         else
           -
             var dataSubscribed = subscribed ? 'true' : 'false';

@@ -1,7 +1,7 @@
 if !isIncluded('columnHomeNav')
   mixin homeNav(props)
     -
-      var {activeType, showSub} = props;
+      var {activeType, logged} = props;
 
     .btn-group.btn-group-justified.m-b-1
       .btn-group(role="group")
@@ -9,11 +9,16 @@ if !isIncluded('columnHomeNav')
           href=`/m?t=new`
           class=activeType === 'new' ? 'btn-primary': 'btn-default'
         ) 最新文章
-      if showSub
+      if logged
         .btn-group(role="group")
           a.btn.btn-default(
             href=`/m?t=sub`
             class=activeType === 'sub' ? 'btn-primary': 'btn-default'
+          ) 我的关注
+      else
+        .btn-group(role="group")
+          button.btn.btn-default(
+            onclick="RootApp.openLoginPanel()"
           ) 我的关注
       .btn-group(role="group")
         a.btn.btn-default(

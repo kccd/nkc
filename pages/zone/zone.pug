@@ -14,10 +14,15 @@ block content
                 href=`/z?t=${data.type}-a`
               ) 全部
             .btn-group(role="group")
-              a.btn.btn-default(
-                class=data.tab === data.zoneTab.subscribe? 'btn-primary': ''
-                href=`z?t=${data.type}-s`
-              ) 我的关注
+              if data.user
+                a.btn.btn-default(
+                  class=data.tab === data.zoneTab.subscribe? 'btn-primary': ''
+                  href=`z?t=${data.type}-s`
+                ) 我的关注
+              else
+                button.btn.btn-default(
+                onclick="RootApp.openLoginPanel('login')"
+                ) 我的关注
 
           #ZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
             moment-editor(@published='published')

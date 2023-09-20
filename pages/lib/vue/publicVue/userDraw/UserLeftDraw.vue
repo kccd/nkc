@@ -5,17 +5,12 @@
       .left-draw-container(v-if="show && !loading")
         .m-a-1
         .navbar-link
-          .col-xs-3
-            a(href='/n') 最新
-          .col-xs-3
-            a(href='/g/moment' v-if="logged" ) 关注
-            a(onclick="RootApp.openLoginPanel()" v-else) 关注
-          .col-xs-3
+          .col-xs-4
+            a(href='/c') 论坛
+          .col-xs-4
+            a(href='/z') 电波
+          .col-xs-4
             a(href=`/m`) 专栏
-          .col-xs-3
-            a(href=`/c`) 论坛
-          .col-xs-3
-            a(href=`/z`) 电波
         .m-a-1#navbar_custom_dom
         .m-a-1
           Management(:management="management")
