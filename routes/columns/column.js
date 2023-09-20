@@ -102,7 +102,7 @@ router
     if (mcid) {
       mcid = parseInt(mcid);
     }
-    ctx.remoteTemplate = 'columns/column.pug';
+    ctx.template = 'columns/column.pug';
     const { column } = data;
     data.column = await column.extendColumn();
     const q = {
