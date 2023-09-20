@@ -102,19 +102,18 @@ if !isIncluded('publicModules/articlePanel')
     -var {type = ArticlePanelStyleType.abstract} = style;
     .articles-panel
       for article in articles
-        .box-shadow-panel
-          if article.status && article.status.type !== articleStatus.normal
-            .articles-panel-item-status(class=article.status.type)=article.status.desc
-          .articles-panel-item(
-            class=`style-${type}`
-            data-article-type=article.type
-            data-article-id=article.pid
-            data-article-tid=article.id
-            data-checkbox-show='false'
-            )
-            .articles-panel-checkbox
-              input(type='checkbox')
-            +ArticlePanel(article, style)
+        if article.status && article.status.type !== articleStatus.normal
+          .articles-panel-item-status(class=article.status.type)=article.status.desc
+        .articles-panel-item(
+          class=`style-${type}`
+          data-article-type=article.type
+          data-article-id=article.pid
+          data-article-tid=article.id
+          data-checkbox-show='false'
+          )
+          .articles-panel-checkbox
+            input(type='checkbox')
+          +ArticlePanel(article, style)
 
   mixin ArticlePanel(article, style)
     -style = style || DefaultStyle;
