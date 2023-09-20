@@ -306,22 +306,32 @@ block content
         .m-b-1
           .panel-header 分享
           include ../publicModules/share/forum
-        +sideThreadsPanel(data.featuredThreads, "精选文章")
-        +sideThreadsPanel(data.latestThreads, "最新文章")
-        +sideThreadsPanel(data.recommendThreads, "推荐文章")
+        if data.featuredThreads && data.featuredThreads.length > 0
+          .box-shadow.m-b-1
+            +sideThreadsPanel(data.featuredThreads, "精选文章")
+        if data.latestThreads && data.latestThreads.length > 0
+          .box-shadow.m-b-1
+            +sideThreadsPanel(data.latestThreads, "最新文章")
+        if data.recommendThreads && data.recommendThreads.length > 0
+          .box-shadow.m-b-1
+            +sideThreadsPanel(data.recommendThreads, "推荐文章")
         if data.user
-          +sideThreadsPanel(data.subThreads, "关注的文章")
-          +sideThreadsPanel(data.userThreads, "我的文章")
+          if data.subThreads && data.subThreads.length > 0
+            .box-shadow
+              +sideThreadsPanel(data.subThreads, "关注的文章")
+          if data.userThreads && data.userThreads.length > 0
+            .box-shadow
+              +sideThreadsPanel(data.userThreads, "我的文章")
         if data.subUsers && data.subUsers.length > 0
-          .m-t-1
-            .panel-header 关注者
+          .m-t-1.box-shadow
+            .box-shadow-header 关注者
             -let sideUsers = data.subUsers;
             include ../publicModules/side_users_list
             if data.subUsers.length > 8
               a.side-link(href=`/f/${data.forum.fid}/followers`) 查看更多
         if data.users && data.users.length > 0
-          .m-t-1
-            .panel-header 今日来访
+          .m-t-1.box-shadow
+            .box-shadow-header 今日来访
             -let sideUsers = data.users;
             include ../publicModules/side_users_list
             if data.users.length > 8

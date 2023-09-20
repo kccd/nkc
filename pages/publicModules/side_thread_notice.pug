@@ -3,8 +3,8 @@
 if !isIncluded('publicModules/side_thread_notice.pug')
   mixin sideThreadNotice(noticeContent,threadHistory,canEditNotice,shieldNotice)
     if noticeContent
-      div.m-b-1
-        .panel-header 新版本公告
+      div.m-b-1.box-shadow
+        .box-shadow-header 新版本公告
         div
           for notice in noticeContent
             .thread-notice.notice-clearfix(class={'shield-box': notice.status === 'shield'} data-nid=notice.nid data-pid=notice.pid)
