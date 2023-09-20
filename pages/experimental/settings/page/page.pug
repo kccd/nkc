@@ -64,7 +64,7 @@ block eContent
               input.form-control(type='text' v-model.number="pageSettings.threadPostCommentList")
       .col-xs-12.col-md-12
         h4 文章列表风格设置
-        mixin radio(name, listStyle)
+        mixin radio(name, listStyle, link)
           tr
             th=name
             th
@@ -89,6 +89,9 @@ block eContent
                 label
                   input(type='radio' value='null' v-model=`pageSettings.${listStyle}.cover`)
                   span 不显示
+            th
+              if link
+                a(href=link target="_blank") 页面链接
 
         .table-responsive
           table.table.table-bordered
@@ -97,12 +100,13 @@ block eContent
                 th 类型
                 th 显示模式
                 th 封面图
+                th 其他
             tbody
               +radio('默认', 'threadListStyle')
-              +radio('最新页社区文章', 'articlePanelStyle.latestCommunity')
-              +radio('最新页社区置顶文章', 'articlePanelStyle.latestCommunityTopped')
+              +radio('论坛快捷总版文章列表', 'articlePanelStyle.latestCommunity', '/c/new')
+              +radio('论坛快捷总版置顶文章列表', 'articlePanelStyle.latestCommunityTopped', '/c/new')
               +radio('最新页空间文章', 'articlePanelStyle.latestZone')
-              +radio('最新页专栏文章', 'articlePanelStyle.latestColumn')
+              +radio('专栏主页最新文章列表', 'articlePanelStyle.latestColumn', '/m')
       .col-xs-12.col-md-12
         button.btn.btn-primary(@click='save') 保存
 block scripts
