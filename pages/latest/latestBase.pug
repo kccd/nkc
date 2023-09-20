@@ -12,20 +12,25 @@ block content
         +renderCategoryForums(data.categoriesWithForums)
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         block latestContent
-      .col-xs-12.col-md-3.hidden-xs.hidden-sm.box-shadow-panel
-        .m-b-1
+      .col-xs-12.col-md-3.hidden-xs.hidden-sm
+        .m-b-1.box-shadow
           include ../publicModules/canvas_logo
           +renderCanvasLogo(data.homeBigLogo)
         include ../publicModules/improveUserInfo
         +improveUserInfo(data.improveUserInfo)
-        include ../publicModules/management/management
-        +managementPanel(data.managementData)
-        include ../publicModules/apps/apps
-        +appsPanel(data.appsData)
+        .box-shadow.m-b-1
+          include ../publicModules/management/management
+          +managementPanel(data.managementData)
+        .box-shadow.m-b-1
+          include ../publicModules/apps/apps
+          +appsPanel(data.appsData)
         include ../publicModules/side_thread_list
-        +sideThreadsPanel(data.noticeThreads, '公告通知', true)
-        +sideThreadsPanel(data.featuredThreads, '精选文章', false)
-        +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
+        .box-shadow.m-b-1
+          +sideThreadsPanel(data.noticeThreads, '公告通知', true)
+        .box-shadow.m-b-1
+          +sideThreadsPanel(data.featuredThreads, '精选文章', false)
+        .box-shadow.m-b-1
+          +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
         include ../publicModules/activeUsers/activeUsers
         +newUsersSmall(data.newUsers)
 

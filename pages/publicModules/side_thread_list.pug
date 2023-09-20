@@ -2,7 +2,7 @@ if !isIncluded('publicModules/side_thread_list.pug')
   mixin sideThreadsPanel(sideThreads, sideThreadsHeader, sideThreadsHideInfo)
     if sideThreads && sideThreads.length > 0
       .side-thread-list.m-b-1
-        .panel-header=sideThreadsHeader
+        .box-shadow-header=sideThreadsHeader
         for t in sideThreads
           .side-thread
             a(href=`/t/${t.tid}`).side-thread-title= t.firstPost.t

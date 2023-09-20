@@ -11,6 +11,7 @@ export function getState() {
     websiteName: '',
     websiteBrief: '',
     column: '',
+    isProduction: true,
     record: [],
   };
   try {
@@ -34,6 +35,7 @@ export function getState() {
     state.statement = windowData.statement;
     state.copyright = windowData.copyright;
     state.record = windowData.record;
+    state.isProduction = windowData.isProduction;
     return state;
   } catch (err) {
     console.error(`获取 state 数据失败`);

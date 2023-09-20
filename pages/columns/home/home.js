@@ -1,6 +1,9 @@
-import { nkcAPI } from '../lib/js/netAPI';
-import { sweetError } from '../lib/js/sweetAlert';
-import { getState } from '../lib/js/state';
+import { nkcAPI } from '../../lib/js/netAPI';
+import { sweetError } from '../../lib/js/sweetAlert';
+import { getState } from '../../lib/js/state';
+import { toLogin } from '../../lib/js/account';
+import { visitUrl } from '../../lib/js/pageSwitch';
+
 const state = getState();
 
 if (!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
@@ -10,9 +13,7 @@ window.subscribeColumn = function (columnId) {
   if (!state.uid) {
     return window.RootApp.openLoginPanel();
   }
-  var dom = $(
-    '.column[data-column-id="' + columnId + '"] .column-subscription',
-  );
+  var dom = $('[data-column-id="' + columnId + '"] .column-subscription');
   var subscribed = dom.attr('data-subscribed');
   if (subscribed === 'true') {
     // 取消关注
@@ -21,7 +22,7 @@ window.subscribeColumn = function (columnId) {
         dom
           .attr('data-subscribed', 'false')
           .removeClass('btn-default')
-          .addClass('btn-primary')
+          .addClass('btn-default')
           .text('关注');
       })
       .catch(sweetError);
@@ -31,7 +32,7 @@ window.subscribeColumn = function (columnId) {
       .then(function () {
         dom
           .attr('data-subscribed', 'true')
-          .removeClass('btn-primary')
+          .removeClass('btn-default')
           .addClass('btn-default')
           .text('已关注');
       })
@@ -83,5 +84,13 @@ window.setColumnTopped = function (columnId) {
         dom.removeClass('btn-default').addClass('btn-danger');
       })
       .catch(sweetError);
+  }
+};
+
+window.createColumn = () => {
+  if (state.uid) {
+    visitUrl('/column', true);
+  } else {
+    toLogin();
   }
 };

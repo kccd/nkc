@@ -123,9 +123,8 @@ router
     );
 
     // 最新文章复序
-    const latestPostThreads = await db.ThreadModel.getLatestThreads(
+    const latestPostThreads = await db.ThreadModel.getLatestPostThreads(
       fidOfCanGetThreads,
-      'tlm',
       9,
     );
     data.latestPostThreads = await db.ThreadModel.extendCommunityThreadList(

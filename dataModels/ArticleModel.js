@@ -1525,6 +1525,10 @@ schema.statics.getArticlesDataByArticlesId = async function (
     }
     const { title, content, cover } = stableDocument;
     let articleData;
+    // 暂时屏蔽被撤稿的文章，待专栏改进时一同调整
+    if (!articleUrl.articleUrl) {
+      article.status = articleStatus.deleted;
+    }
     if (article.status === articleStatus.normal) {
       articleData = {
         status: articleStatus.normal,

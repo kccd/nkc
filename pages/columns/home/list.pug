@@ -1,0 +1,108 @@
+if !isIncluded("columnHomeList")
+  mixin columnHomeList(props)
+    -
+      var {
+        sortType,
+        columns,
+        toppedColumns,
+        sortTypes,
+        pageType,
+        subColumnsId,
+        showCreateColumn
+      } = props;
+
+    include ../../publicModules/paging/paging
+    //-.m-b-1
+      .btn-group
+        .btn-group(role="group")
+          a.btn.btn-sm(href=`/m?t=${pageType}&s=${sortTypes.new}` class=sortType === sortTypes.new ? "btn-primary": "btn-default") 最近更新
+        .btn-group(role="group")
+          a.btn.btn-sm(href=`/m?t=${pageType}&s=${sortTypes.sub}` class=sortType === sortTypes.sub ? "btn-primary": "btn-default") 最多订阅
+        .btn-group(role="group")
+          a.btn.btn-sm(href=`/m?t=${pageType}&s=${sortTypes.port}` class=sortType === sortTypes.port ? "btn-primary": "btn-default") 最多文章
+      button.btn.btn-sm.btn-default(href=`/column` target="_blank") 开设专栏
+    .paging-button
+      a.button.radius-left(href=`/m?t=${pageType}&s=${sortTypes.new}` class=sortType === sortTypes.new ? "active" : "") 最近更新
+      a.button(href=`/m?t=${pageType}&s=${sortTypes.sub}` class=sortType === sortTypes.sub ? 'active' : "") 最多订阅
+      a.button.radius-right(href=`/m?t=${pageType}&s=${sortTypes.post}` class=sortType === sortTypes.post ? 'active' : '') 最多文章
+    if showCreateColumn
+      .paging-button
+        a.button.radius-right.radius-left(href=`/column` target="_blank") 开设专栏
+    if toppedColumns && toppedColumns.length > 0
+      +columnHomeColumnList({subColumnsId, columns: toppedColumns})
+      .topped-column-hr 以上为置顶
+    +columnHomeColumnList({subColumnsId, columns})
+    include ../../publicModules/paging/paging_input
+
+  mixin columnHomeColumnList(props)
+    -var {subColumnsId, columns} = props;
+    .columns-container
+      for column in columns
+        -var klass = '';
+        -var pre = '';
+        if column.disabled
+          -klass += 'column-list-disabled';
+          -pre = `「已被屏蔽」`
+        if column.closed
+          -klass += 'column-list-closed';
+          -pre = `「已被关闭」`
+        .column(data-column-id=column._id class=klass)
+          .row
+            .col-xs-12.col-md-6
+              .column-top-container
+                .column-top-left-container
+                  img.column-avatar(src=tools.getUrl('columnAvatar', column.avatar))
+                .column-top-right-container
+                  a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
+                  .column-abbr
+                    -var subscribed = subColumnsId.includes(column._id);
+                    -var klass = subscribed ? 'btn-default' : 'btn-default';
+                    -var text = subscribed ? '已关注' : '关注'
+                    button.m-r-05.column-subscription.btn.btn-xs(
+                      data-subscribed=subscribed ? 'true' : 'false'
+                      class=klass
+                      onclick=`subscribeColumn(${column._id})`
+                    )=`${text}`
+                    span.text-danger=pre
+                    span.accent=column.subCount
+                    span &nbsp;人关注&nbsp;
+                    span.accent=column.postCount
+                    span &nbsp;篇文章
+                    //-span
+                      +fromNow(column.tlm)
+                      | 更新
+                  .column-description(title=column.abbr)=column.abbr
+              //-.column-bottom-container
+                .column-buttons
+                  a.m-r-05.btn.btn-xs.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏
+                  -var subscribed = data.subColumnsId ? data.subColumnsId.includes(column._id) : false;
+                  -var klass = subscribed ? 'btn-default' : 'btn-primary';
+                  -var text = subscribed ? '已关注' : '关注'
+                  button.m-r-05.column-subscription.btn.btn-xs(
+                    data-subscribed=subscribed ? 'true' : 'false'
+                    class=klass
+                    onclick=`subscribeColumn(${column._id})`
+                  )=text
+                  if data.permissionHomeHotColumn
+                    -var klass = column.hot ? 'btn-danger' : 'btn-default';
+                    -var text = column.hot ? '取消热门' : '设为热门';
+                    button.m-r-05.column-hot.btn.btn-default.btn-xs(
+                      data-hot=column.hot ? 'true' : 'false'
+                      class=klass
+                      onclick=`setColumnHot(${column._id})`
+                    )=text
+                  if data.permissionHomeToppedColumn
+                    -var klass = column.top ? 'btn-danger' : 'btn-default';
+                    -var text = column.top ? '取消置顶' : '置顶';
+                    button.column-top.btn.btn-default.btn-xs(
+                      data-top=column.top ? 'true' : 'false'
+                      class=klass
+                      onclick=`setColumnTopped(${column._id})`
+                    )=text
+            .col-xs-12.col-md-6
+              .column-threads
+                for thread in column.latestThreads
+                  a(href=thread.url title=thread.title target="_blank")
+                    span=thread.title
+                    span.time
+                      +fromNow(thread.toc)
