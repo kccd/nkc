@@ -238,7 +238,9 @@
           this.$emit('post-comment');
           this.setTimerToScrollPage();
         } else {
-          visitUrl(`/g/moment`);
+          // visitUrl(`/g/moment`);
+          // visitUrl(`/z`);
+          this.refresh();
         }
       },
       vote(commentData) {
@@ -281,6 +283,9 @@
         this.setFocusCommentId(commentId);
         this.setActiveNav(this.nav[0].type);
         this.setTimerToScrollPage();
+      },
+      refresh(){
+        visitUrl(`${window.location.pathname}${window.location.search}`);
       }
     },
   }
