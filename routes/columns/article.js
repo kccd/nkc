@@ -5,7 +5,7 @@ router.get('/:aid', async (ctx, next)=>{
   const {highlight, t, last_page, token} = query;
   let {page = 0} = query;
   // ctx.template = 'columns/article.pug';
-  ctx.remoteTemplate = 'columns/article.pug';
+  ctx.template = 'columns/article.pug';
   const { user } = data;
   const {_id, aid} = params;
   data.highlight = highlight;
