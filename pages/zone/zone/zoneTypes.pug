@@ -3,10 +3,10 @@ if !isIncluded('zone/zone/zoneTypes')
     -activeType = activeType || types.moment;
     .paging-button
       a.button.radius-left(
-        href=`/z`
-        class=activeType === types.moment ? 'active' : ''
+        href=`/z?t=${activeType.split('-')[0]}-moment`
+        class=activeType.split('-')[1] === types.moment ? 'active' : ''
       ) 电文
       a.button.radius-right(
-        href=`/z?t=article`
-        class=activeType === types.article ? 'active' : ''
+        href=`/z?t=${activeType.split('-')[0]}-article`
+        class=activeType.split('-')[1] === types.article ? 'active' : ''
       ) 长电文
