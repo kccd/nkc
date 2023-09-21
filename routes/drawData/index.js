@@ -2,37 +2,12 @@ const router = require('koa-router')();
 router
   // 小屏左侧抽屉
   .get('/leftDraw', async (ctx, next) => {
-    const { data, state, db, permission } = ctx;
+    const { data, state, db } = ctx;
     const homeSettings = await db.SettingModel.getSettings('home');
     // 是否启用了基金
     const fundSettings = await db.SettingModel.getSettings('fund');
     // 是否启用了网站工具
     const toolSettings = await db.SettingModel.getSettings('tools');
-    //构建专业树
-    data.forumsTree = await db.ForumModel.getForumsTree(
-      data.userRoles,
-      data.userGrade,
-      data.user,
-    );
-    const forumsObj = {};
-    data.forumsTree.map((f) => {
-      const { categoryId } = f;
-      if (!forumsObj[categoryId]) {
-        forumsObj[categoryId] = [];
-      }
-      forumsObj[categoryId].push(f);
-    });
-    data.forumCategories = await db.ForumCategoryModel.getCategories();
-    data.categoryForums = [];
-    data.forumCategories.map((fc) => {
-      const _fc = Object.assign({}, fc);
-      const { _id } = _fc;
-      _fc.forums = forumsObj[_id] || [];
-      if (_fc.forums.length) {
-        data.categoryForums.push(_fc);
-      }
-    });
-
     data.managementData = await db.SettingModel.getManagementData(data.user);
     data.permission = {
       fundSettings: fundSettings,
@@ -48,7 +23,7 @@ router
   .get('/userDraw', async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
-    const { uid, username, info, avatar } = user;
+    const { uid, username, avatar } = user;
     const {
       newSystemInfoCount,
       newApplicationsCount,

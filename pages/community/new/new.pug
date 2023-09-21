@@ -26,6 +26,9 @@ block content
               include ../../publicModules/paging/paging_input
 
           else
+            if data.permissions.isSuperModerator
+              include ../../latest/latestManagement
+              +renderLatestArticleManagement()
             include ./communityTypes
             +renderCommunityTypes(data.t, data.communityTypes)
             //- 文章排序方式
