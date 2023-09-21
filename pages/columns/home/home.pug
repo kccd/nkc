@@ -11,8 +11,8 @@ block content
             include ./homeNav
             +homeNav({activeType: data.t, logged: !!data.user})
           div
-            if data.t === data.homePageTypes.new
-              include ./new
+            if [data.homePageTypes.new, data.homePageTypes.sub].includes(data.t)
+              include ./article
               -
                 var homeNewProps = {
                   reviewedPermission: data.permissions.reviewed,
@@ -34,15 +34,6 @@ block content
                 }
 
               +columnHomeList(homeListProps)
-
-
-            else if data.t === data.homePageTypes.sub
-              include ./sub
-              -
-                var homeSubProps = {
-                  activity: data.activity,
-                }
-              +columnHomeSub(homeSubProps)
 
       .col-xs-12.col-md-3
         .box-shadow.m-b-1
