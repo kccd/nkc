@@ -85,8 +85,11 @@ if thread.type !== 'newArticle'
   -lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
   -hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
--var postCoverPosition = 'null';
+-var postCoverPosition = 'none';
 -var styleType = threadListStyle.type;
+- if(styleType === 'refreshing') {
+  -styleType = 'abstract';
+-}
 - if (styleType === 'abstract') {
   -postCoverPosition = threadListStyle.cover;
 -}
