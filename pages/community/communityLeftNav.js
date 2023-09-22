@@ -57,29 +57,29 @@ function initVueInstance(el) {
         }
         return forums;
       },
-      setSelectedForumsId(arr) {
-        for (let i = 0; i < this.selectedForumsId.length; i++) {
-          this.selectedForumsId[i].fid = arr[i] || '';
-        }
-      },
       selectForum(e) {
         const index = Number(e.target.getAttribute('data-index'));
         const value = e.target.value;
 
-        this.selectedForumsId.length = index;
-        this.selectedForumsId.push(value);
+        this.setSelectedForumsId(index, value);
       },
       getForumsTree() {
         nkcAPI('/api/v1/forums/tree', HttpMethods.GET)
           .then((res) => {
             this.forumsTree = res.data.forumsTree;
-            this.selectedForumsId = [this.forumsTree[0].fid];
-            console.log(this.forumsTree);
-            console.log(this.selectedForumsId);
+            this.setSelectedForumsId(0, this.forumsTree[0].fid);
           })
           .catch((err) => {
             logger.error(err);
           });
+      },
+      setSelectedForumsId(index, fid) {
+        this.selectedForumsId.length = index;
+        this.selectedForumsId.push(fid);
+        const forum = this.allForumsObj[fid];
+        if (forum.childrenForums && forum.childrenForums.length > 0) {
+          this.setSelectedForumsId(index + 1, forum.childrenForums[0].fid);
+        }
       },
       visit() {
         const targetFid =
