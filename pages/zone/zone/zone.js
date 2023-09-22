@@ -9,7 +9,9 @@ const app = new Vue({
   },
   methods: {
     published() {
-      visitUrl(`/z`);
+      // visitUrl(`/z`);
+      // 刷新
+      visitUrl(`${window.location.pathname}${window.location.search}`);
     },
   },
   components: {

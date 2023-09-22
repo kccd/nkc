@@ -7,23 +7,8 @@ block content
     .row
       .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
-          .btn-group.btn-group-justified.m-b-1
-            .btn-group(role="group")
-              a.btn.btn-default(
-                class=data.tab === data.zoneTab.all? 'btn-primary': ''
-                href=`/z?t=${data.type}-a`
-              ) 全部
-            .btn-group(role="group")
-              if data.user
-                a.btn.btn-default(
-                  class=data.tab === data.zoneTab.subscribe? 'btn-primary': ''
-                  href=`z?t=${data.type}-s`
-                ) 我的关注
-              else
-                button.btn.btn-default(
-                onclick="RootApp.openLoginPanel('login')"
-                ) 我的关注
-
+          include ./zone/zoneAppTab
+          +renderZoneAppTab(state.isApp)
           #ZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
             moment-editor(@published='published')
           if data.type ===data.zoneTypes.moment

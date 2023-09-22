@@ -9,7 +9,7 @@ block content
         .box-shadow
           .m-b-1
             include ./homeNav
-            +homeNav({activeType: data.t, logged: !!data.user})
+            +homeNav({activeType: data.t, logged: !!data.user,isApp: state.isApp})
           div
             if data.t === data.homePageTypes.new
               include ./new
