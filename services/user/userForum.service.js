@@ -1,23 +1,33 @@
 const UsersGeneralModel = require('../../dataModels/UsersGeneralModel');
-const ForumModel = require('../../dataModels/ForumModel');
-const tools = require('../../nkcModules/tools');
+
 class UserForumService {
   async getVisitedForumsFromCache(uid, count) {
+    const { forumListService } = require('../forum/forumList.service');
+    return await forumListService.getUserVisitedForums(uid, count);
+  }
+
+  async saveVisitedForumIdToCache(uid, fid) {
     const visitedForumsId = await UsersGeneralModel.getUserVisitedForumsId(uid);
-    const forums = await ForumModel.getForumsByIdFromRedis(
-      visitedForumsId.slice(0, count),
+    const index = visitedForumsId.indexOf(fid);
+    if (index !== -1) {
+      visitedForumsId.splice(index, 1);
+    }
+    visitedForumsId.unshift(fid);
+    await UsersGeneralModel.updateOne(
+      { uid },
+      {
+        $set: {
+          visitedForumsId: visitedForumsId,
+        },
+      },
     );
-    return forums.map((forum) => {
-      return {
-        fid: forum.fid,
-        name: forum.displayName,
-        desc: forum.description,
-        url: tools.getUrl('forumHome', forum.fid),
-        color: forum.color,
-        logo: forum.logo,
-        logoUrl: forum.logo ? tools.getUrl('forumLogo', forum.logo) : '',
-      };
-    });
+  }
+
+  async getSubscribeForumsFromCache(uid) {
+    const {
+      subscribeForumService,
+    } = require('../subscribe/subscribeForum.service');
+    return await subscribeForumService.getSubscribeForumsFromCache(uid);
   }
 }
 module.exports = {

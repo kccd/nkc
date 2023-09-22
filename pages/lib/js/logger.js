@@ -18,6 +18,9 @@ class Logger {
   warning(...any) {
     this.print('WARN', ...any);
   }
+  error(...any) {
+    this.print('ERROR', ...any);
+  }
 }
 
 export const logger = new Logger();

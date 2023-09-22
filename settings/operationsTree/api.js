@@ -101,5 +101,10 @@ module.exports = {
         GET: Operations.registerExamCheck,
       },
     },
+    forums: {
+      tree: {
+        GET: Operations.getForumsTree,
+      },
+    },
   },
 };
