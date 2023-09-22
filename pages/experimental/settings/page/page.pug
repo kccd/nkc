@@ -4,7 +4,13 @@ block eTitle
   title 列表设置
 block eContent
   .container-fluid.max-width
-    #data.hidden=objToStr({pageSettings: data.pageSettings})
+    -
+      var props = {
+        pageSettings: data.pageSettings,
+        articlePanelStyleTypes: data.articlePanelStyleTypes,
+        articlePanelCoverTypes: data.articlePanelCoverTypes,
+      };
+    #data.hidden=objToStr(props)
     .row#app(v-cloak)
       .col-xs-12.col-md-12
         .form-horizontal
@@ -70,24 +76,27 @@ block eContent
             th
               .radio
                 label.m-r-1
-                  input(type='radio' value='abstract' v-model=`pageSettings.${listStyle}.type`)
+                  input(type='radio' :value='articlePanelStyleTypes.refreshing' v-model=`pageSettings.${listStyle}.type`)
+                  span 清爽模式
+                label.m-r-1
+                  input(type='radio' :value='articlePanelStyleTypes.abstract' v-model=`pageSettings.${listStyle}.type`)
                   span 摘要模式
                 label.m-r-1
-                  input(type='radio' value='brief' v-model=`pageSettings.${listStyle}.type`)
+                  input(type='radio' :value='articlePanelStyleTypes.brief' v-model=`pageSettings.${listStyle}.type`)
                   span 简要模式
                 label
-                  input(type='radio' value='minimalist' v-model=`pageSettings.${listStyle}.type`)
+                  input(type='radio' :value='articlePanelStyleTypes.minimalist' v-model=`pageSettings.${listStyle}.type`)
                   span 极简模式
             th
               .radio
                 label.m-r-1
-                  input(type='radio' value='left' v-model=`pageSettings.${listStyle}.cover`)
+                  input(type='radio' :value='articlePanelCoverTypes.left' v-model=`pageSettings.${listStyle}.cover`)
                   span 左侧
                 label.m-r-1
-                  input(type='radio' value='right' v-model=`pageSettings.${listStyle}.cover`)
+                  input(type='radio' :value='articlePanelCoverTypes.right' v-model=`pageSettings.${listStyle}.cover`)
                   span 右侧
                 label
-                  input(type='radio' value='null' v-model=`pageSettings.${listStyle}.cover`)
+                  input(type='radio' :value='articlePanelCoverTypes.none' v-model=`pageSettings.${listStyle}.cover`)
                   span 不显示
             th
               if link

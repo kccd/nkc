@@ -1,8 +1,11 @@
+const { getUrl } = require('../../../nkcModules/tools');
 module.exports = async function (ctx, next) {
   //获取最新专栏文章列表信息
   const { db, data, query, nkcModules, state, permission } = ctx;
   const { user } = data;
   const { page = 0 } = query;
+
+  const { homePageTypes } = data;
 
   const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
     data.userRoles,
@@ -29,32 +32,85 @@ module.exports = async function (ctx, next) {
   const aidArr = [];
 
   const pageSettings = await db.SettingModel.getSettings('page');
-  //查找所有专栏引用
-  const count = await db.ColumnPostModel.countDocuments().sort({ toc: -1 });
+
+  const postMatch = {
+    type: {
+      $in: [threadType, articleType],
+    },
+    hidden: false,
+  };
+  if (data.t === homePageTypes.sub) {
+    const subColumnsId = await db.SubscribeModel.getUserSubColumnsId(state.uid);
+    postMatch.columnId = {
+      $in: subColumnsId,
+    };
+  }
+
+  const count = await db.ColumnPostModel.countDocuments(postMatch);
   const paging = nkcModules.apiFunction.paging(
     page,
     count,
     pageSettings.homeThreadList,
   );
-  //查找文章专栏引用
-  const columnPosts = await db.ColumnPostModel.find({
-    type: { $in: [threadType, articleType] },
-    hidden: false,
-  })
+
+  const columnPosts = await db.ColumnPostModel.find(postMatch)
     .skip(paging.start)
     .limit(paging.perpage)
     .sort({ toc: -1 });
-
+  const columnPostCategoriesId = [];
   const columnPostsObj = {};
-  columnPosts.map((c) => {
-    columnPostsObj[c.pid] = c;
-  });
+  const columnsId = [];
   for (const c of columnPosts) {
+    columnPostsObj[c.pid] = c;
     if (c.type === threadType) {
       tidArr.push(c.pid);
     } else if (c.type === articleType) {
       aidArr.push(c.pid);
     }
+    columnPostCategoriesId.push(...c.cid);
+    columnsId.push(c.columnId);
+  }
+  const columns = await db.ColumnModel.find(
+    {
+      _id: {
+        $in: columnsId,
+      },
+    },
+    {
+      _id: 1,
+      name: 1,
+      avatar: 1,
+    },
+  );
+  const columnsObj = {};
+  for (const column of columns) {
+    columnsObj[column._id] = {
+      uid: '',
+      avatarUrl: getUrl('columnAvatar', column.avatar),
+      homeUrl: getUrl('columnHome', column._id),
+      username: column.name,
+    };
+  }
+  const columnPostCategoriesObj = {};
+  const categories = await db.ColumnPostCategoryModel.find(
+    {
+      _id: {
+        $in: columnPostCategoriesId,
+      },
+    },
+    {
+      name: 1,
+      _id: 1,
+      columnId: 1,
+    },
+  );
+  for (const category of categories) {
+    columnPostCategoriesObj[category._id] = {
+      id: category._id,
+      type: 'columnCategory',
+      name: category.name,
+      url: getUrl('columnCategory', category.columnId, category._id),
+    };
   }
   const q = {
     oc: { $in: tidArr },
@@ -177,6 +233,16 @@ module.exports = async function (ctx, next) {
       thread = articleObj[c.pid];
     }
     if (thread) {
+      const categories = [];
+      for (const cid of c.cid) {
+        const category = columnPostCategoriesObj[cid];
+        if (category) {
+          categories.push(category);
+          break;
+        }
+      }
+      thread.categories = categories;
+      thread.user = columnsObj[c.columnId];
       threads.push(thread);
     }
   }

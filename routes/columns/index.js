@@ -1,9 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
-const { getUrl } = require('../../nkcModules/tools');
 const columnRouter = require('./column');
-const homeNew = require('./home/new');
-const homeSub = require('./home/sub');
+const homeArticle = require('./home/article');
 const homeList = require('./home/list');
 const {
   columnListService,
@@ -35,6 +33,7 @@ router
     const { data, query } = ctx;
     const { t = homePageTypes.new } = query;
     data.t = t;
+    data.homePageTypes = { homePageTypes };
     if (t === homePageTypes.sub) {
       await onlyUserPermission(ctx, next);
     } else {
@@ -57,22 +56,13 @@ router
     data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(state.uid);
 
     ctx.template = 'columns/home/home.pug';
-    switch (data.t) {
-      // 最新文章
-      case homePageTypes.new: {
-        return await homeNew(ctx, next);
-      }
-      // 我的关注
-      case homePageTypes.sub: {
-        return await homeSub(ctx, next);
-      }
-      // 专栏列表
-      case homePageTypes.list: {
-        return await homeList(ctx, next);
-      }
-      default: {
-        ctx.throw(400, `Unknown type(t=${data.t})`);
-      }
+
+    if (data.t === homePageTypes.list) {
+      return await homeList(ctx, next);
+    } else if ([homePageTypes.new, homePageTypes.sub].includes(data.t)) {
+      return await homeArticle(ctx, next);
+    } else {
+      ctx.throw(400, `Unknown type(t=${data.t})`);
     }
   })
   .use('/:_id', columnRouter.routes(), columnRouter.allowedMethods());

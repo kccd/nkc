@@ -3,7 +3,16 @@ block eTitle
   title 专业设置
   +includeCSS('/experimental/settings/forum/forum.css')
 block eContent
-  #data.hidden=objToStr({forumCategories: data.forumCategories, forums: data.forums, forumSettings: data.forumSettings, certs: data.certs})
+  -
+    var props = {
+      forumCategories: data.forumCategories,
+      forums: data.forums,
+      forumSettings: data.forumSettings,
+      certs: data.certs,
+      articlePanelStyleTypes: data.articlePanelStyleTypes,
+      articlePanelCoverTypes: data.articlePanelCoverTypes,
+    };
+  #data.hidden=objToStr(props)
   .container-fluid.max-width#app(v-cloak)
     .row
       .col-xs-12.col-md-12
@@ -97,24 +106,27 @@ block eContent
                 th 文章列表模式
                   .radio
                     label.m-r-05
-                      input(type='radio' :checked="listTypeCount.abstract === forums.length" onclick='app.selectAllThreadListStyle("abstract")')
+                      input(type='radio' :checked="listTypeCount.refreshing === forums.length" onclick=`app.selectAllThreadListStyle("${data.articlePanelStyleTypes.refreshing}")`)
+                      span 清爽
+                    label.m-r-05
+                      input(type='radio' :checked="listTypeCount.abstract === forums.length" onclick=`app.selectAllThreadListStyle("${data.articlePanelStyleTypes.abstract}")`)
                       span 摘要
                     label.m-r-05
-                      input(type='radio' :checked="listTypeCount.brief === forums.length" onclick='app.selectAllThreadListStyle("brief")')
+                      input(type='radio' :checked="listTypeCount.brief === forums.length" onclick=`app.selectAllThreadListStyle("${data.articlePanelStyleTypes.brief}")`)
                       span 简略
                     label
-                      input(type='radio' :checked="listTypeCount.minimalist === forums.length" onclick='app.selectAllThreadListStyle("minimalist")')
+                      input(type='radio' :checked="listTypeCount.minimalist === forums.length" onclick=`app.selectAllThreadListStyle("${data.articlePanelStyleTypes.minimalist}")`)
                       span 极简
                 th 文章列表封面图
                   .radio
                     label.m-r-05
-                      input(type='radio' :checked="coverCount.left === forums.length" onclick='app.selectAllCover("left")')
+                      input(type='radio' :checked="coverCount.left === forums.length" onclick=`app.selectAllCover("${data.articlePanelCoverTypes.left}")`)
                       span 左侧
                     label.m-r-05
-                      input(type='radio' :checked="coverCount.right === forums.length" onclick='app.selectAllCover("right")')
+                      input(type='radio' :checked="coverCount.right === forums.length" onclick=`app.selectAllCover("${data.articlePanelCoverTypes.right}")`)
                       span 右侧
                     label
-                      input(type='radio' :checked="coverCount.null === forums.length" onclick='app.selectAllCover("null")')
+                      input(type='radio' :checked="coverCount.null === forums.length" onclick=`app.selectAllCover("${data.articlePanelCoverTypes.none}")`)
                       span 不显示
             tbody
               tr(v-for='f in forums' v-if='selectedLevels.includes(f.level)')
@@ -128,24 +140,27 @@ block eContent
                 th
                   .radio
                     label.m-r-05
-                      input(type='radio' value='abstract' v-model='f.threadListStyle.type')
+                      input(type='radio' :value='articlePanelStyleTypes.refreshing' v-model='f.threadListStyle.type')
+                      span 清爽
+                    label.m-r-05
+                      input(type='radio' :value='articlePanelStyleTypes.abstract' v-model='f.threadListStyle.type')
                       span 摘要
                     label.m-r-05
-                      input(type='radio' value='brief' v-model='f.threadListStyle.type')
+                      input(type='radio' :value='articlePanelStyleTypes.brief' v-model='f.threadListStyle.type')
                       span 简略
                     label
-                      input(type='radio' value='minimalist' v-model='f.threadListStyle.type')
+                      input(type='radio' :value='articlePanelStyleTypes.minimalist' v-model='f.threadListStyle.type')
                       span 极简
                 th
                   .radio
                     label.m-r-05
-                      input(type='radio' value='left' v-model='f.threadListStyle.cover')
+                      input(type='radio' :value='articlePanelCoverTypes.left' v-model='f.threadListStyle.cover')
                       span 左侧
                     label.m-r-05
-                      input(type='radio' value='right' v-model='f.threadListStyle.cover')
+                      input(type='radio' :value='articlePanelCoverTypes.right' v-model='f.threadListStyle.cover')
                       span 右侧
                     label
-                      input(type='radio' value='null' v-model='f.threadListStyle.cover')
+                      input(type='radio' :value='articlePanelCoverTypes.none' v-model='f.threadListStyle.cover')
                       span 不显示
               //+renderForums(data.forums)
         h4 申请开办新专业

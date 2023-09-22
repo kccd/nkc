@@ -1,0 +1,34 @@
+if !isIncluded('communityLeftNav')
+  mixin communityLeftNav(props)
+    -
+      var {
+        visitedForums = [],
+        subscribeForums = [],
+        recommendForums = [],
+      } = props;
+    if visitedForums.length > 0
+      .box-shadow.m-b-1.p-l-05.p-r-05.text-center.p-b-05
+        .box-shadow-header 最近访问
+        .m-b-05
+          +forumList(visitedForums)
+    if subscribeForums.length > 0
+      .box-shadow.m-b-1.p-l-05.p-r-05.text-center.p-b-05
+        .box-shadow-header 我的关注
+        .m-b-05
+          +forumList(subscribeForums)
+    if recommendForums.length > 0
+      .box-shadow.m-b-1.p-l-05.p-r-05.text-center.p-b-05
+        .box-shadow-header 推荐关注
+        .m-b-05
+          +forumList(recommendForums)
+
+  mixin forumList(forums)
+    for forum in forums
+      .m-b-05
+        a.text-info(
+          href=forum.url
+          target="_blank"
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
+          data-global-data=objToStr({ fid: forum.fid })
+        )=forum.name

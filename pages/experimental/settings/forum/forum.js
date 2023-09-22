@@ -1,6 +1,13 @@
-import {getDataById} from "../../../lib/js/dataConversion";
-import {getUrl} from "../../../lib/js/tools";
-import {objToStr} from "../../../lib/js/dataConversion";
+import { getDataById } from '../../../lib/js/dataConversion';
+import { getUrl } from '../../../lib/js/tools';
+import { objToStr } from '../../../lib/js/dataConversion';
+import Vue from 'vue';
+import {
+  sweetError,
+  sweetSuccess,
+  sweetQuestion,
+} from '../../../lib/js/sweetAlert';
+import { nkcAPI } from '../../../lib/js/netAPI';
 
 const data = getDataById('data');
 
@@ -10,11 +17,13 @@ const levels = [];
 
 const func = (arr, level = 1) => {
   const index = levels.indexOf(level);
-  if(index === -1) levels.push(level);
-  for(const f of arr) {
+  if (index === -1) {
+    levels.push(level);
+  }
+  for (const f of arr) {
     f.level = level;
     forums.push(f);
-    if(f.childForums && f.childForums.length) {
+    if (f.childForums && f.childForums.length) {
       func(f.childForums, level + 1);
     }
   }
@@ -40,6 +49,8 @@ window.app = new Vue({
     reviewNewForumGuide: data.forumSettings.reviewNewForumGuide,
     founderGuide: data.forumSettings.founderGuide,
     updating: false,
+    articlePanelStyleTypes: data.articlePanelStyleTypes,
+    articlePanelCoverTypes: data.articlePanelCoverTypes,
   },
   mounted() {
     /*setTimeout(() => {
@@ -48,29 +59,30 @@ window.app = new Vue({
   },
   computed: {
     listTypeCount() {
-      const {forums} = this;
+      const { forums } = this;
       const type = {
         abstract: 0,
         brief: 0,
-        minimalist: 0
+        minimalist: 0,
+        refreshing: 0,
       };
-      for(const f of forums) {
-        type[f.threadListStyle.type] ++;
+      for (const f of forums) {
+        type[f.threadListStyle.type]++;
       }
       return type;
     },
     coverCount() {
-      const {forums} = this;
+      const { forums } = this;
       const type = {
         left: 0,
         right: 0,
-        "null": 0
+        null: 0,
       };
-      for(const f of forums) {
-        type[f.threadListStyle.cover] ++;
+      for (const f of forums) {
+        type[f.threadListStyle.cover]++;
       }
       return type;
-    }
+    },
   },
   methods: {
     getUrl,
@@ -86,19 +98,21 @@ window.app = new Vue({
           sweetSuccess(`刷新成功`);
           self.updating = false;
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
           self.updating = false;
         });
     },
     move(index, arr, direction) {
-      if(
+      if (
         (index === 0 && direction === 'left') ||
         (index + 1 === arr.length && direction === 'right')
-      ) return;
+      ) {
+        return;
+      }
       const forum = arr[index];
       let _index;
-      if(direction === 'left') {
+      if (direction === 'left') {
         _index = index - 1;
       } else {
         _index = index + 1;
@@ -108,7 +122,7 @@ window.app = new Vue({
       Vue.set(arr, index, _forum);
     },
     save() {
-      const fidArr = this.forums.map(f => f.fid);
+      const fidArr = this.forums.map((f) => f.fid);
       const {
         forumCategories,
         forumSettings,
@@ -117,25 +131,29 @@ window.app = new Vue({
         founderGuide,
         selectedNewForumCert,
         selectedNewForumGrade,
-        selectedRelationship
+        selectedRelationship,
       } = this;
-      const {recycle, archive} = forumSettings;
-      const {checkString} = NKC.methods.checkData;
+      const { recycle, archive } = forumSettings;
+      const { checkString } = NKC.methods.checkData;
       const forumsInfo = this.getForumsInfo();
       Promise.resolve()
         .then(() => {
-          if(!recycle) throw '请输入回收站专业ID';
-          if(!archive) throw '请输入归档专业ID';
-          for(const fc of forumCategories) {
+          if (!recycle) {
+            throw '请输入回收站专业ID';
+          }
+          if (!archive) {
+            throw '请输入归档专业ID';
+          }
+          for (const fc of forumCategories) {
             checkString(fc.name, {
               name: '分类名',
               minLength: 1,
-              maxLength: 20
+              maxLength: 20,
             });
             checkString(fc.description, {
               name: '分类介绍',
               minLength: 0,
-              maxLength: 100
+              maxLength: 100,
             });
           }
 
@@ -149,7 +167,7 @@ window.app = new Vue({
             founderGuide,
             selectedNewForumCert,
             selectedNewForumGrade,
-            selectedRelationship
+            selectedRelationship,
           });
         })
         .then(() => {
@@ -162,13 +180,15 @@ window.app = new Vue({
       const self = this;
       Promise.resolve()
         .then(() => {
-          if(!forumName) throw '专业名称不能为空';
+          if (!forumName) {
+            throw '专业名称不能为空';
+          }
           return sweetQuestion(`确定要创建专业「${forumName}」吗？`);
         })
         .then(() => {
-          return nkcAPI('/f', 'POST', {displayName: forumName})
+          return nkcAPI('/f', 'POST', { displayName: forumName });
         })
-        .then(data => {
+        .then((data) => {
           sweetSuccess('创建成功');
           // self.forums = data.forums;
         })
@@ -178,7 +198,7 @@ window.app = new Vue({
       this.forumCategories.push({
         name: '',
         description: '',
-        displayStyle: 'simple'
+        displayStyle: 'simple',
       });
     },
     remove(index, arr) {
@@ -191,53 +211,53 @@ window.app = new Vue({
         allStyle: [],
         cover: [],
         allCover: [],
-        order: []
+        order: [],
       };
-      for(let i = 0; i < input.length; i++) {
+      for (let i = 0; i < input.length; i++) {
         const dom = $(input[i]);
         const name = dom.attr('data-name');
-        if(name === 'forumThreadList') {
+        if (name === 'forumThreadList') {
           results.style.push(dom);
-        } else if(name === 'forumCover') {
+        } else if (name === 'forumCover') {
           results.cover.push(dom);
-        } else if(name === 'allThreadList') {
+        } else if (name === 'allThreadList') {
           results.allStyle.push(dom);
-        } else if(name === 'allCover') {
+        } else if (name === 'allCover') {
           results.allCover.push(dom);
-        } else if(name === 'forumOrder') {
+        } else if (name === 'forumOrder') {
           results.order.push(dom);
         }
       }
       return results;
     },
     selectAllThreadListStyle(t) {
-      const {forums} = this;
-      for(const f of forums) {
+      const { forums } = this;
+      for (const f of forums) {
         f.threadListStyle.type = t;
       }
     },
     selectAllCover(t) {
-      const {forums} = this;
-      for(const f of forums) {
+      const { forums } = this;
+      for (const f of forums) {
         f.threadListStyle.cover = t;
       }
     },
     getForumsInfo() {
-      const {forums} = this;
+      const { forums } = this;
       const results = [];
-      for(const forum of forums) {
+      for (const forum of forums) {
         results.push({
           fid: forum.fid,
           threadListStyle: {
             type: forum.threadListStyle.type,
             cover: forum.threadListStyle.cover,
           },
-          order: forum.order
+          order: forum.order,
         });
       }
       return results;
     },
-  }
+  },
 });
 
 window.func = func;
