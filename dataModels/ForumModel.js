@@ -2897,7 +2897,7 @@ forumSchema.methods.getForumNav = async function (cid) {
         fid: f.fid,
         name: f.displayName,
       });
-      getParentForum(f.parentsId);
+      await getParentForum(f.parentsId);
     }
   };
   await getParentForum(this.parentsId);

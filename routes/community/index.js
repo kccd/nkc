@@ -141,8 +141,6 @@ router
 
     // 获取与用户有关的数据
     if (user) {
-      data.subscribeForums =
-        await subscribeForumService.getSubscribeForumsFromCache(user.uid);
       data.visitedForums = await userForumService.getVisitedForumsFromCache(
         user.uid,
         10,

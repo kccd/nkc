@@ -38,7 +38,20 @@ block content
   .hidden#forumInfo=objToStr({fid: data.forum.fid, page: data.paging?data.paging.page:{}, digest: !!data.d, sort: data.s === 'toc'? 'toc': 'tlm'})
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
+      .col-xs-12.col-md-1.min-md-p-r-0.hidden-xs.hidden-sm
+        include ../community/communityLeftNav
+        -
+          var props = {
+            visitedForums: data.visitedForums,
+            subscribeForums: data.subscribeForums,
+            recommendForums: data.recommendForums,
+            sameLevelForums: data.sameLevelForums,
+            childrenForums: data.childrenForums,
+            parentForums: data.navParentForums,
+          };
+        +forumLeftNav(props)
+
+      //-.col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
         +renderVisitedForums(data.visitedForums)
         +renderSubscribeForums(data.subForums)
@@ -46,7 +59,7 @@ block content
         +renderForumsPanel("同级专业", data.sameLevelForums)
         +renderForumsBreadcrumb("上级专业", data.forumNav)
         +renderForumsPanel("顶级专业", data.topForums)
-      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+      .col-xs-12.col-md-8.box-shadow-panel.p-r-0
         .forum-info-panel.m-b-1
           .forum-banner
             .forum-banner-cover

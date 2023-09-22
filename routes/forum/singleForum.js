@@ -1,4 +1,3 @@
-'use strict';
 const subscribeRouter = require('./subscribe');
 const settingsRouter = require('./settings');
 const homeRouter = require('./home');
@@ -17,6 +16,8 @@ const {
   subscribeForumService,
 } = require('../../services/subscribe/subscribeForum.service');
 const { subscribeSources } = require('../../settings/subscribe');
+const { forumListService } = require('../../services/forum/forumList.service');
+const { userForumService } = require('../../services/user/userForum.service');
 router
   .post('/', async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
@@ -248,6 +249,21 @@ router
 
     const forum = await db.ForumModel.findOnly({ fid });
     data.forumNav = await forum.getForumNav(query.cat);
+    // 加载上级专业导航
+    const navParentForumsId = [];
+    for (const item of data.forumNav) {
+      if (item.cid || item.fid === fid) {
+        continue;
+      }
+      navParentForumsId.push(item.fid);
+    }
+    const navParentForums = await forumListService.getForumsByForumsIdFromCache(
+      navParentForumsId,
+    );
+    data.navParentForums = await forumListService.extendForumsBaseInfo(
+      navParentForums,
+    );
+
     // 专业权限判断: 若不是该专业的专家，走正常的权限判断
     if (!(await db.ShareModel.hasPermission(token, fid))) {
       await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
@@ -410,26 +426,15 @@ router
         parentForum.fid,
       );
       // 拿到parentForum专业下一级能看到入口的专业
-      data.sameLevelForums = await parentForum.extendChildrenForums({
+      let sameLevelForums = await parentForum.extendChildrenForums({
         fid: { $in: visibleFidArr },
       });
       //排除当前专业
-      if (data.sameLevelForums && data.sameLevelForums.length) {
-        data.sameLevelForums = data.sameLevelForums.filter(
-          (c) => c.fid !== forum.fid,
-        );
-      }
-    } else {
-      // 拿到能看到入口的所有专业id
-      // let visibleFidArr = await db.ForumModel.visibleFid(data.userRoles, data.userGrade, data.user);
-      // visibleFidArr = visibleFidArr.filter(f => f !== forum.fid);
-      // 拿到能看到入口的顶级专业
-      // data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
+      sameLevelForums = sameLevelForums.filter((f) => f.fid !== forum.fid);
+      data.sameLevelForums = await forumListService.extendForumsBaseInfo(
+        sameLevelForums,
+      );
     }
-    // //排除当前专业
-    // if(data.sameLevelForums && data.sameLevelForums.length){
-    // 	data.sameLevelForums = data.sameLevelForums.filter(c => c.fid !== forum.fid)
-    // }
 
     data.topForums = await db.ForumModel.find(
       {
@@ -477,34 +482,34 @@ router
       data.userGrade,
       data.user,
     );
+
+    // 细分专业
+    data.childrenForums = await forumListService.extendForumsBaseInfo(
+      forum.childrenForums,
+    );
+
     // 加载文章分类
     data.threadTypes = await db.ThreadTypeModel.find({ fid: forum.fid }).sort({
       order: 1,
     });
     data.threadTypesId = data.threadTypes.map((threadType) => threadType.cid);
 
-    // 记录专业访问记录
+    // 登录用户
     if (data.user) {
-      const visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(
-        data.user.uid,
+      // 更新专业访问记录
+      await userForumService.saveVisitedForumIdToCache(state.uid, fid);
+      // 获取最新访问的5个专业
+      data.visitedForums = await userForumService.getVisitedForumsFromCache(
+        state.uid,
+        5,
       );
-      const index = visitedForumsId.indexOf(fid);
-      if (index !== -1) {
-        visitedForumsId.splice(index, 1);
-      }
-      visitedForumsId.unshift(fid);
-      await db.UsersGeneralModel.updateOne(
-        { uid: data.user.uid },
-        {
-          $set: {
-            visitedForumsId: visitedForumsId,
-          },
-        },
+      // 获取关注的专业
+      data.subscribeForums = await userForumService.getSubscribeForumsFromCache(
+        state.uid,
       );
-      // 最近访问的专业
-      data.visitedForums = await db.ForumModel.getForumsByFid(
-        visitedForumsId.slice(0, 5),
-      );
+    } else {
+      // 游客获取推荐专业
+      data.recommendForums = await forumListService.getDefaultSubscribeForums();
     }
     // 渲染最新板块公告
     let latestBlockNotice = data.forum.latestBlockNotice;
@@ -531,6 +536,7 @@ router
     if (!permit) {
       data.noPermissionReason = warning.join('<br/>');
     }
+
     ctx.template = 'forum/forum.pug';
     await next();
   })

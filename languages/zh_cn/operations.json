@@ -763,5 +763,6 @@
   "registerExamCheck": "注册前检测是否需要考试",
   "browserDetection": "浏览器版本检测",
   "visitCommunityNew": "访问论坛最新页（快捷总版）",
-  "visitCommunitySub": "访问论坛我的关注页"
+  "visitCommunitySub": "访问论坛我的关注页",
+  "getForumsTree": "获取专业列表树状结构"
 }

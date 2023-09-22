@@ -9,11 +9,13 @@ const columnRouter = require('./column');
 const recycleRouter = require('./recycle');
 const usersRouter = require('./users');
 const examRouter = require('./exam');
+const forumsRouter = require('./forums');
 const registerRouter = require('./register');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
   .use('/user', userRouter.routes(), userRouter.allowedMethods())
+  .use('/forums', forumsRouter.routes(), forumsRouter.allowedMethods())
   .use('/users', usersRouter.routes(), usersRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/threads', threadsRouter.routes(), threadsRouter.allowedMethods())
