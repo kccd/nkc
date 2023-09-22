@@ -1,0 +1,64 @@
+if !isIncluded('pages/columns/home/columnList.pug')
+
+  style.
+    .column-list-item-sm{
+      position: relative;
+      padding-left: 5rem;
+      padding-right: 4rem;
+      margin: 1rem 0;
+    }
+    .column-list-item-sm-avatar{
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3.6rem;
+      width: 3.6rem;
+    }
+    .column-list-item-sm-avatar img{
+      height: 100%;
+      width: 100%;
+      border-radius: 3px;
+    }
+    .column-list-item-sm-name{
+      margin-bottom: 0.5rem;
+
+    }
+    .column-list-item-sm-name a{
+      text-decoration: none;
+      color: #333;
+    }
+    .column-list-item-sm-number{
+      font-size: 1rem;
+      color: #333;
+    }
+    .column-list-item-sm-sub{
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4rem;
+      text-align: right;
+    }
+
+  mixin columnListItemSM(props)
+    -var {logged, column, subscribed} = props;
+    .column-list-item-sm(data-column-id=column._id)
+      .column-list-item-sm-avatar
+        a(href=column.homeUrl target="_blank")
+          img(src=column.avatarUrl)
+      .column-list-item-sm-info
+        .column-list-item-sm-name
+          a(href=column.homeUrl target="_blank")=column.name
+        .column-list-item-sm-number=`${column.subCount} 人关注 ${column.postCount} 篇文章`
+      .column-list-item-sm-sub
+        if !logged
+          button.btn.btn-default.btn-xs(onclick="RootApp.openLoginPanel('login')") 关注
+        else
+          -
+            var dataSubscribed = subscribed ? 'true' : 'false';
+            var text = subscribed? '已关注': '关注';
+          button.btn.btn-default.btn-xs.column-subscription(
+            data-subscribed=dataSubscribed
+            onclick=`subscribeColumn(${column._id})`
+          )=text
+
+

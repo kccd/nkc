@@ -1,6 +1,21 @@
 const Router = require('koa-router');
 const router = new Router();
 const columnRouter = require('./column');
+const homeArticle = require('./home/article');
+const homeList = require('./home/list');
+const {
+  columnListService,
+} = require('../../services/column/columnList.service');
+
+const homePageTypes = {
+  new: 'new',
+  sub: 'sub',
+  list: 'list',
+};
+
+const { OnlyUser } = require('../../middlewares/permission');
+
+const onlyUserPermission = OnlyUser();
 
 router
   .use('/', async (ctx, next) => {
@@ -11,65 +26,44 @@ router
       gradeId: state.uid ? data.userGrade._id : undefined,
       isApp: state.isApp,
     });
-    data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(state.uid);
+    data.navbar_highlight = 'columns';
     await next();
   })
   .get('/', async (ctx, next) => {
-    const { query, data, db, state } = ctx;
-    const { page = 0 } = query;
-    let { t } = query;
-    const match = {};
-    const columnSettings = await db.SettingModel.getSettings('column');
-    if (!ctx.permission('column_single_disabled')) {
-      match.closed = false;
-      match.disabled = false;
+    const { data, query } = ctx;
+    const { t = homePageTypes.new } = query;
+    data.t = t;
+    data.homePageTypes = { homePageTypes };
+    if (t === homePageTypes.sub) {
+      await onlyUserPermission(ctx, next);
+    } else {
+      await next();
     }
-    const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(
-      data.user ? data.user.uid : '',
-    );
-    data.permissionHomeHotColumn = ctx.permission('homeHotColumn');
-    data.permissionHomeToppedColumn = ctx.permission('homeToppedColumn');
-    match.postCount = { $gte: columnSettings.columnHomePostCountMin };
-    const count = await db.ColumnModel.countDocuments(match);
-    const paging = ctx.nkcModules.apiFunction.paging(page, count);
-    const sort = {};
-    if (t === undefined) {
-      if (columnSettings.columnHomeSort === 'updateTime') {
-        t = 'l';
-      } else {
-        t = 's';
+  })
+  .get('/', async (ctx, next) => {
+    const { data, state, db } = ctx;
+    data.column = null;
+    if (state.uid) {
+      const column = await db.UserModel.getUserColumn(state.uid);
+      if (column) {
+        data.column = await columnListService.extendColumnBaseInfo(column);
       }
     }
-    if (t === 'l') {
-      sort.tlm = -1;
-    } else if (t === 's') {
-      sort.subCount = -1;
+    data.homePageTypes = { ...homePageTypes };
+    // 热门专栏
+    const hotColumns = await columnListService.getHotColumns();
+    data.hotColumns = await columnListService.extendColumnsBaseInfo(hotColumns);
+    data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(state.uid);
+
+    ctx.template = 'columns/home/home.pug';
+
+    if (data.t === homePageTypes.list) {
+      return await homeList(ctx, next);
+    } else if ([homePageTypes.new, homePageTypes.sub].includes(data.t)) {
+      return await homeArticle(ctx, next);
     } else {
-      sort.postCount = -1;
+      ctx.throw(400, `Unknown type(t=${data.t})`);
     }
-    const homeSettings = await db.SettingModel.getSettings('home');
-    data.columns = await db.ColumnModel.find(match, { _v: 0 })
-      .sort(sort)
-      .skip(paging.start)
-      .limit(paging.perpage);
-    data.columns = await Promise.all(
-      data.columns.map(async (column) => {
-        column = column.toObject();
-        column.hot = homeSettings.columnsId.includes(column._id);
-        column.top = homeSettings.toppedColumnsId.includes(column._id);
-        column.latestThreads = await db.ColumnPostModel.getLatestThreads(
-          column._id,
-          3,
-          fidOfCanGetThread,
-        );
-        return column;
-      }),
-    );
-    data.navbar_highlight = 'columns';
-    ctx.template = 'columns/columns.pug';
-    data.t = t;
-    data.paging = paging;
-    await next();
   })
   .use('/:_id', columnRouter.routes(), columnRouter.allowedMethods());
 module.exports = router;

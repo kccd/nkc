@@ -38,7 +38,20 @@ block content
   .hidden#forumInfo=objToStr({fid: data.forum.fid, page: data.paging?data.paging.page:{}, digest: !!data.d, sort: data.s === 'toc'? 'toc': 'tlm'})
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
+      .col-xs-12.col-md-1.min-md-p-r-0.hidden-xs.hidden-sm
+        include ../community/communityLeftNav
+        -
+          var props = {
+            visitedForums: data.visitedForums,
+            subscribeForums: data.subscribeForums,
+            recommendForums: data.recommendForums,
+            sameLevelForums: data.sameLevelForums,
+            childrenForums: data.childrenForums,
+            parentForums: data.navParentForums,
+          };
+        +forumLeftNav(props)
+
+      //-.col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
         +renderVisitedForums(data.visitedForums)
         +renderSubscribeForums(data.subForums)
@@ -306,22 +319,32 @@ block content
         .m-b-1
           .panel-header 分享
           include ../publicModules/share/forum
-        +sideThreadsPanel(data.featuredThreads, "精选文章")
-        +sideThreadsPanel(data.latestThreads, "最新文章")
-        +sideThreadsPanel(data.recommendThreads, "推荐文章")
+        if data.featuredThreads && data.featuredThreads.length > 0
+          .box-shadow.m-b-1
+            +sideThreadsPanel(data.featuredThreads, "精选文章")
+        if data.latestThreads && data.latestThreads.length > 0
+          .box-shadow.m-b-1
+            +sideThreadsPanel(data.latestThreads, "最新文章")
+        if data.recommendThreads && data.recommendThreads.length > 0
+          .box-shadow.m-b-1
+            +sideThreadsPanel(data.recommendThreads, "推荐文章")
         if data.user
-          +sideThreadsPanel(data.subThreads, "关注的文章")
-          +sideThreadsPanel(data.userThreads, "我的文章")
+          if data.subThreads && data.subThreads.length > 0
+            .box-shadow
+              +sideThreadsPanel(data.subThreads, "关注的文章")
+          if data.userThreads && data.userThreads.length > 0
+            .box-shadow
+              +sideThreadsPanel(data.userThreads, "我的文章")
         if data.subUsers && data.subUsers.length > 0
-          .m-t-1
-            .panel-header 关注者
+          .m-t-1.box-shadow
+            .box-shadow-header 关注者
             -let sideUsers = data.subUsers;
             include ../publicModules/side_users_list
             if data.subUsers.length > 8
               a.side-link(href=`/f/${data.forum.fid}/followers`) 查看更多
         if data.users && data.users.length > 0
-          .m-t-1
-            .panel-header 今日来访
+          .m-t-1.box-shadow
+            .box-shadow-header 今日来访
             -let sideUsers = data.users;
             include ../publicModules/side_users_list
             if data.users.length > 8

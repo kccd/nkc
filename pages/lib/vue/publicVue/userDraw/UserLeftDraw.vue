@@ -5,22 +5,16 @@
       .left-draw-container(v-if="show && !loading")
         .m-a-1
         .navbar-link
-          .col-xs-3
-            a(href='/n') 最新
-          .col-xs-3
-            a(href='/g/moment' v-if="logged" ) 关注
-            a(onclick="RootApp.openLoginPanel()" v-else) 关注
-          .col-xs-3
+          .col-xs-4
+            a(href='/z') 电波
+          .col-xs-4
+            a(href='/c') 论坛
+          .col-xs-4
             a(href=`/m`) 专栏
-          .col-xs-3
-            a(href=`/c`) 论坛
-          .col-xs-3
-            a(href=`/z`) 电波
         .m-a-1#navbar_custom_dom
         .m-a-1
           Management(:management="management")
           Apps(:permission="permission")
-          Forums(:forums="categoryForums")
       .left-draw-loading(v-else)
         .loading
           .fa.fa-spinner.fa-spin.fa-fw
@@ -60,7 +54,6 @@
 <script>
 import ManagementVue from "./ManagementVue";
 import AppsVue from "./AppsVue";
-import ForumTreeVue from "./ForumTreeVue";
 import {nkcAPI} from "../../../js/netAPI";
 import {getState} from "../../../js/state";
 const {uid} = getState();
@@ -84,7 +77,6 @@ export default {
   components: {
     Management: ManagementVue,
     Apps: AppsVue,
-    Forums: ForumTreeVue
   },
   mounted() {
   },
@@ -109,7 +101,6 @@ export default {
       const _this = this;
       nkcAPI('/draw/leftDraw', 'GET' , {})
         .then(res => {
-          _this.categoryForums = res.categoryForums;
           _this.permission = res.permission;
           _this.management = res.managementData;
           _this.loading = false;

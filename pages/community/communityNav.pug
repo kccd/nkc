@@ -4,6 +4,6 @@ if !isIncluded('communityNav')
     for item, index in arr
       span.m-r-05 /
       if item.url
-        a.m-r-05(href=url title=item.title style='font-size: 1.25rem;')=item.name
+        a.m-r-05(href=item.url title=item.title style='font-size: 1.25rem;color: #333;')=item.name
       else
-        span.m-r-05(title=item.title style='font-size: 1.25rem;')=item.name
+        span.m-r-05(title=item.title style='font-size: 1.25rem;color: #333;')=item.name

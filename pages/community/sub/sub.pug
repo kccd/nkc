@@ -4,11 +4,21 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-9.min-md-p-r-0
+      .col-xs-12.col-md-1.min-md-p-r-0.hidden-xs.hidden-sm
+        //- 游客显示推荐关注
+        include ../communityLeftNav
+        -
+          var communityLeftNavProps = {
+            visitedForums: data.visitedForums,
+            subscribeForums: data.subscribeForums,
+            recommendForums: data.recommendForums,
+          };
+        +communityLeftNav(communityLeftNavProps)
+      .col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
           .m-b-1
             include ../communityNav
-            +communityNav([{name: '我的关注'}])
+            +communityNav([{name: '我的关注', url: '/c/sub'}])
           .m-b-1
             -showPagingSortButton = false;
             include ../../publicModules/paging/paging

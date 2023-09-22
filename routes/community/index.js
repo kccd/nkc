@@ -9,6 +9,7 @@ const {
 const { userForumService } = require('../../services/user/userForum.service');
 const newRouter = require('./new');
 const subRouter = require('./sub');
+const { forumListService } = require('../../services/forum/forumList.service');
 router
   // 访问控制，判断后台是否禁用了社区的访问
   .use('/', async (ctx, next) => {
@@ -85,6 +86,7 @@ router
     }
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
     data.enableFund = enableFund;
+    data.navbar_highlight = 'community';
     await next();
   })
   // 论坛首页
@@ -139,8 +141,6 @@ router
 
     // 获取与用户有关的数据
     if (user) {
-      data.subscribeForums =
-        await subscribeForumService.getSubscribeForumsFromCache(user.uid);
       data.visitedForums = await userForumService.getVisitedForumsFromCache(
         user.uid,
         10,
@@ -155,8 +155,21 @@ router
       data.featuredThreads,
     );
 
-    data.navbar_highlight = 'community';
     ctx.template = 'community/community.pug';
+    await next();
+  })
+  .use(['/new', '/sub'], async (ctx, next) => {
+    const { data, state } = ctx;
+    if (state.uid) {
+      data.visitedForums = await forumListService.getUserVisitedForums(
+        state.uid,
+        5,
+      );
+      data.subscribeForums =
+        await subscribeForumService.getSubscribeForumsFromCache(state.uid);
+    } else {
+      data.recommendForums = await forumListService.getDefaultSubscribeForums();
+    }
     await next();
   })
   .use('/new', newRouter.routes(), newRouter.allowedMethods())

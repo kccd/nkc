@@ -1,6 +1,13 @@
 @import '../base';
 
 .articles-panel{
+  .box-shadow-panel{
+    margin-bottom:1.5rem;
+    transition: box-shadow 0.3s;
+    &:hover{
+      box-shadow: 5px 2px 10px 0 rgba(0,0,0,0.1);
+    }
+  }
   .articles-panel-item-status{
     padding: 0.3rem 0.3rem;
     text-align: center;
@@ -128,7 +135,7 @@
       }
       .article-panel-time{
         font-size: 1rem;
-        color: #7b7b7b;
+        color: #333;
       }
       .article-panel-category{
         a{
@@ -452,4 +459,25 @@ a.article-panel-title-page{
   display: inline-block;
   font-size: 1rem;
   color: #0e0e0e;
+}
+.articles-panel-item.style-refreshing{
+  margin: 2.5rem 0;
+  .article-panel-md{
+    .article-panel-title{
+      margin-bottom: 1rem;
+    }
+    .article-panel-abstract{
+      margin-bottom: 1rem;
+    }
+    .article-panel-title{
+      .article-panel-title-content{
+        font-size: 1.6rem;
+      }
+    }
+    .article-panel-username{
+      a{
+        color: #333;
+      }
+    }
+  }
 }

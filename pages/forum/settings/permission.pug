@@ -4,7 +4,19 @@ block title
   +includeCSS('/forum/settings/permission.css')
 block content
   .container-fluid.max-width
-    #data.hidden=objToStr({libraryClosed: data.libraryClosed, forum: data.forum, roles: data.roles, grades: data.grades, permission: data.permission, operations: data.operations, moderators: data.moderators})
+    -
+      var props = {
+        libraryClosed: data.libraryClosed,
+        forum: data.forum,
+        roles: data.roles,
+        grades: data.grades,
+        permission: data.permission,
+        operations: data.operations,
+        moderators: data.moderators,
+        articlePanelStyleTypes: data.articlePanelStyleTypes,
+        articlePanelCoverTypes: data.articlePanelCoverTypes,
+      };
+    #data.hidden=objToStr(props)
     .row
       .col-xs-12.col-md-2
         include ../../module_forum_settings
@@ -344,26 +356,29 @@ block content
                 .col-sm-7
                   .radio
                     label.m-r-1
-                      input(type='radio' value='abstract' v-model='forum.threadListStyle.type')
+                      input(type='radio' :value='articlePanelStyleTypes.refreshing' v-model='forum.threadListStyle.type')
+                      span 清爽模式
+                    label.m-r-1
+                      input(type='radio' :value='articlePanelStyleTypes.abstract' v-model='forum.threadListStyle.type')
                       span 摘要模式
                     label.m-r-1
-                      input(type='radio' value='brief' v-model='forum.threadListStyle.type')
+                      input(type='radio' :value='articlePanelStyleTypes.brief' v-model='forum.threadListStyle.type')
                       span 简略模式
                     label
-                      input(type='radio' value='minimalist' v-model='forum.threadListStyle.type')
+                      input(type='radio' :value='articlePanelStyleTypes.minimalist' v-model='forum.threadListStyle.type')
                       span 极简模式
               .form-group
                 label.col-sm-3.control-label 文章列表封面图
                 .col-sm-7
                   .radio
                     label.m-r-1
-                      input(type='radio' value='left' v-model='forum.threadListStyle.cover')
+                      input(type='radio' :value='articlePanelCoverTypes.left' v-model='forum.threadListStyle.cover')
                       span 左侧
                     label.m-r-1
-                      input(type='radio' value='right' v-model='forum.threadListStyle.cover')
+                      input(type='radio' :value='articlePanelCoverTypes.right' v-model='forum.threadListStyle.cover')
                       span 右侧
                     label
-                      input(type='radio' value='null' v-model='forum.threadListStyle.cover')
+                      input(type='radio' :value='articlePanelCoverTypes.none' v-model='forum.threadListStyle.cover')
                       span 不显示
               .form-group
                 label.col-sm-3.control-label 高赞列表

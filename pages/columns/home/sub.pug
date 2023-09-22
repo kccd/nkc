@@ -1,0 +1,13 @@
+if !isIncluded('columnHomeSub')
+  mixin columnHomeSub(props)
+    -
+      var {
+        activity
+      } = props;
+
+    -showPagingSortButton = false;
+    include ../../publicModules/paging/paging
+    include ../../subscribe/postActivity
+      for a in activity
+        +postActivity(a)
+    include ../../publicModules/paging/paging_input

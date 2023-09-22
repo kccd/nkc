@@ -1,36 +1,64 @@
-
 extends ../bootstrap_base
 block title
-  block telegraphTitle
-  //title=`电波 - ${state.serverSettings.websiteName}`
+  title=`电波 - ${remoteState.serverSettings.websiteName}`
+  +includeCSS('/zone/zone.css')
 block content
   .container-fluid.max-width
     .row
-      include ../publicModules/checkDefaultUsername
-      .col-xs-12.col-md-2.p-r-0.hidden-xs.hidden-sm.box-shadow-panel
-        //- include ../publicModules/forums_nav/forums_tree
-        //- +renderVisitedForums(data.visitedForums)
-        //- +renderSubscribeForums(data.subscribeForums)
-        //- +renderCategoryForums(data.categoriesWithForums)
-      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
-        block telegraphContent
-      .col-xs-12.col-md-3.hidden-xs.hidden-sm.box-shadow-panel
-        //- .m-b-1
-        //-   include ../publicModules/canvas_logo
-        //-   +renderCanvasLogo(data.homeBigLogo)
-        //- include ../publicModules/improveUserInfo
-        //- +improveUserInfo(data.improveUserInfo)
-        //- include ../publicModules/management/management
-        //- +managementPanel(data.managementData)
-        //- include ../publicModules/apps/apps
-        //- +appsPanel(data.appsData)
-        //- include ../publicModules/side_thread_list
-        //- +sideThreadsPanel(data.noticeThreads, '公告通知', true)
-        //- +sideThreadsPanel(data.featuredThreads, '精选文章', false)
-        //- +sideThreadsPanel(data.recommendThreads, '推荐文章', false)
-        //- include ../publicModules/activeUsers/activeUsers
-        //- +newUsersSmall(data.newUsers)
+      .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
+        .box-shadow
+          .btn-group.btn-group-justified.m-b-1
+            .btn-group(role="group")
+              a.btn.btn-default(
+                class=data.tab === data.zoneTab.all? 'btn-primary': ''
+                href=`/z?t=${data.type}-a`
+              ) 全部
+            .btn-group(role="group")
+              if data.user
+                a.btn.btn-default(
+                  class=data.tab === data.zoneTab.subscribe? 'btn-primary': ''
+                  href=`z?t=${data.type}-s`
+                ) 我的关注
+              else
+                button.btn.btn-default(
+                onclick="RootApp.openLoginPanel('login')"
+                ) 我的关注
+
+          #ZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
+            moment-editor(@published='published')
+          if data.type ===data.zoneTypes.moment
+            -
+              var dataString = objToStr({
+                momentsData: data.momentsData,
+                permissions: data.permissions
+              });
+
+            #ZoneMoments(v-cloak)
+              include ./zone/zoneTypes
+              +renderZoneTypes(data.type, data.tab, data.zoneTypes)
+
+              include ../publicModules/paging/paging
+              moments(:moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
+              .p-t-5.p-b-5.text-center(v-else) 空空如也~
+            if data.paging && data.paging.buttonValue.length > 0
+              .m-t-1
+                include ../publicModules/paging/paging_input
+            .hidden#data=dataString
+            +includeJS('/zone/zone/moment.js')
+          else
+            .m-b-1
+              include ./zone/zoneTypes
+              +renderZoneTypes(data.type, data.tab, data.zoneTypes)
+              include ../publicModules/paging/paging
+              if data.articlesPanelData && data.articlesPanelData.length > 0
+                include ../publicModules/articlePanel/articlePanel
+                +ArticlesPanel(data.articlesPanelData, data.latestZoneArticlePanelStyle)
+              else
+                .p-t-5.p-b-5.text-center 空空如也~
+              if data.paging && data.paging.buttonValue.length > 0
+                .m-t-1
+                include ../publicModules/paging/paging_input
+
 
 block scripts
-  block telegraphScripts
-  include ../publicModules/moveThread/moveThread
+  +includeJS('/zone/zone/zone.js')

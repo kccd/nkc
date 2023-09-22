@@ -1,5 +1,9 @@
 const Router = require('koa-router');
 const permissionRouter = new Router();
+const {
+  articlePanelStyleTypes,
+  articlePanelCoverTypes,
+} = require('../../../settings/articlePanel');
 permissionRouter
   .get('/', async (ctx, next) => {
     const { data, db } = ctx;
@@ -20,6 +24,8 @@ permissionRouter
     data.moderators = await db.UserModel.find({
       uid: { $in: forum.moderators },
     });
+    data.articlePanelStyleTypes = { ...articlePanelStyleTypes };
+    data.articlePanelCoverTypes = { ...articlePanelCoverTypes };
     await next();
   })
   .put(`/`, async (ctx, next) => {
@@ -95,10 +101,12 @@ permissionRouter
     ) {
       ctx.throw(400, '请选择证书等级关系');
     }
-    if (!['abstract', 'brief', 'minimalist'].includes(threadListStyle.type)) {
+    if (!Object.values(articlePanelStyleTypes).includes(threadListStyle.type)) {
       ctx.throw(400, `文章列表显示模式设置错误 type: ${threadListStyle.type}`);
     }
-    if (!['left', 'right', 'null'].includes(threadListStyle.cover)) {
+    if (
+      !Object.values(articlePanelCoverTypes).includes(threadListStyle.cover)
+    ) {
       ctx.throw(400, `文章列表封面图设置错误 cover: ${threadListStyle.cover}`);
     }
     if (!['hide', 'show', 'inherit'].includes(voteUpPost.status)) {

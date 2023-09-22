@@ -564,8 +564,12 @@ block content
             include ../publicModules/side_thread_notice
             include ../publicModules/side_thread_list
             +sideThreadNotice(data.noticeContent,data.threadHistory,data.canEditNotice,data.shieldNotice)
-            +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
-            +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
+            if data.targetUserThreads && data.targetUserThreads.length > 0
+              .box-shadow.m-b-1
+                +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
+            if data.sameThreads && data.sameThreads.length > 0
+              .box-shadow.m-b-1
+                +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
 
           .hidden-sm.hidden-xs
             include ../publicModules/footer/footer_sm

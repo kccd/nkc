@@ -68,19 +68,10 @@ class SubscribeForumService {
   }
 
   async getSubscribeForumsFromCache(uid) {
+    const { forumListService } = require('../forum/forumList.service');
     const subscribeForumsId = await this.getSubscribeForumsIdFromCache(uid);
     const forums = await ForumModel.getForumsByIdFromRedis(subscribeForumsId);
-    return forums.map((forum) => {
-      return {
-        fid: forum.fid,
-        name: forum.displayName,
-        desc: forum.description,
-        url: tools.getUrl('forumHome', forum.fid),
-        color: forum.color,
-        logo: forum.logo,
-        logoUrl: forum.logo ? tools.getUrl('forumLogo', forum.logo) : '',
-      };
-    });
+    return await forumListService.extendForumsBaseInfo(forums);
   }
 }
 

@@ -1,0 +1,68 @@
+extends ../../bootstrap_base
+block title
+  title=`专栏 - ${remoteState.serverSettings.websiteName}`
+  +includeCSS('/columns/home/home.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.min-md-p-r-0.m-b-1
+        .box-shadow
+          .m-b-1
+            include ./homeNav
+            +homeNav({activeType: data.t, logged: !!data.user})
+          div
+            if [data.homePageTypes.new, data.homePageTypes.sub].includes(data.t)
+              include ./article
+              -
+                var homeNewProps = {
+                  reviewedPermission: data.permissions.reviewed,
+                  articlesPanelData: data.articlesPanelData,
+                };
+              +columnHomeNew(homeNewProps)
+            else if data.t === data.homePageTypes.list
+              include ./list
+
+              -
+                var homeListProps = {
+                  pageType: data.t,
+                  sortType: data.s,
+                  sortTypes: data.listSortTypes,
+                  columns: data.columns,
+                  toppedColumns: data.toppedColumns,
+                  subColumnsId: data.subColumnsId,
+                  showCreateColumn: !!data.user && !data.column
+                }
+
+              +columnHomeList(homeListProps)
+
+      .col-xs-12.col-md-3
+        .box-shadow.m-b-1
+          .box-shadow-header 我的专栏
+          if !data.column
+            div
+              .text-center.m-b-1.text-info 您还没有专栏
+              button.btn.btn-block.btn-success(onclick='createColumn()') 开设专栏
+          else
+            .my-column
+              .column-avatar
+                a(href=data.column.homeUrl target="_blank")
+                  img(src=data.column.avatarUrl)
+              .column-name
+                a(href=data.column.homeUrl target="_blank")=data.column.name
+              .column-info=`${data.column.subCount} 人关注 ${data.column.postCount} 篇文章`
+        if data.hotColumns && data.hotColumns.length > 0
+          .box-shadow.m-b-1
+            .box-shadow-header 热门专栏
+            div
+              include ./columnList
+              for column in data.hotColumns
+                +columnListItemSM({
+                  column,
+                  subscribed: data.subColumnsId.includes(column._id),
+                  logged: !!data.user,
+                })
+block scripts
+  include ../../publicModules/moveThread/moveThread
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  +includeJS('/columns/home/home.js')
+

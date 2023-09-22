@@ -1,0 +1,77 @@
+if !isIncluded('communityLeftNav')
+  +includeJS('/community/communityLeftNav.js')
+  mixin communityLeftNav(props)
+    -
+      var {
+        visitedForums = [],
+        subscribeForums = [],
+        recommendForums = [],
+      } = props;
+
+    +forumsList('最近访问', visitedForums)
+    +forumsList('我的关注', subscribeForums)
+    +forumsList('推荐关注', recommendForums)
+    +forumSelector()
+
+  mixin forumLeftNav(props)
+    -
+      var {
+        visitedForums = [],
+        subscribeForums = [],
+        recommendForums = [],
+        sameLevelForums = [],
+        childrenForums = [],
+        parentForums = [],
+      } = props;
+
+    +forumsList('最近访问', visitedForums)
+    +forumsList('我的关注', subscribeForums)
+    +forumsList('推荐关注', recommendForums)
+    +forumsList('同级专业', sameLevelForums)
+    +forumsList('细分专业', childrenForums)
+    +forumsList('上级专业', parentForums)
+    +forumSelector()
+
+  mixin forumListItem(forums)
+    for forum in forums
+      .m-b-05
+        a.text-info(
+          href=forum.url
+          target="_blank"
+          data-global-mouseover="showForumPanel"
+          data-global-mouseout="hideForumPanel"
+          data-global-data=objToStr({ fid: forum.fid })
+        )=forum.name
+
+  mixin forumsList(title, forums)
+    if forums && forums.length > 0
+      .box-shadow.m-b-1.p-l-05.p-r-05.text-center.p-b-05
+        .box-shadow-header=title
+        .m-b-05
+          +forumListItem(forums)
+
+  mixin forumSelector
+    style.
+      [data-type='communityLeftNavForumSelector'] select{
+        padding: 0.2rem 0;
+        margin-bottom: 0.5rem;
+        border: 1px solid #bbb;
+      }
+    .box-shadow.m-b-1.p-l-05.p-r-05.text-center.p-b-05(data-type='communityLeftNavForumSelector' v-cloak)
+      .box-shadow-header 快捷跳转
+      select.text-info(
+        style="width: 100%;"
+        data-index="0"
+        @change="selectForum"
+      )
+        option(v-for='forum in forumsTree' :value="forum.fid") {{forum.displayName}}
+
+      div(v-for='(fid, index) in selectedForumsId')
+        select.text-info(
+          style="width: 100%;"
+          :data-index="index + 1"
+          v-if="allForumsObj[fid] && allForumsObj[fid].childrenForums && allForumsObj[fid].childrenForums.length > 0"
+          @change="selectForum"
+          )
+          option(v-for='childForum in allForumsObj[fid].childrenForums' :value="childForum.fid") {{childForum.displayName}}
+      button.btn.btn-xs.btn-default.btn-block(@click="visit") 跳转
