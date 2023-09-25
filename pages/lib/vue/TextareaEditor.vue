@@ -89,6 +89,9 @@
         const self = this;
         setTimeout(() => {
           const ghostElement = self.$refs.ghostTextarea;
+          if(!self.$refs.ghostTextarea){
+            return
+          }
           const scrollHeight = ghostElement.scrollHeight;
           self.textareaHeight = scrollHeight + 'px';
         });

@@ -1,18 +1,20 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const { query, db, data, state, nkcModules, permission } = ctx;
+    const { query, db, data, state, nkcModules, permission, body } = ctx;
     const { user } = data;
     const { from, page, mid } = query;
     // 编辑器获取待发布的动态
     if (from === 'editor') {
       let moment;
       if (mid) {
+        //检测一下是否有没有提交的版本
         moment = await db.MomentModel.getUnPublishedMomentCommentDataById(
           state.uid,
           mid,
         );
       } else {
+        //暂存的moment
         moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
       }
       if (moment) {
@@ -58,6 +60,7 @@ router
       moments,
       state.uid,
     );
+    console.log(data.momentsData, 'momentsData');
     data.paging = paging;
     data.permissions = permissions;
     await next();
@@ -110,6 +113,7 @@ router
         resourcesId,
       });
       await moment.publish();
+      await db.MomentModel.findOnly({ _id: momentId }, { status: 1 });
     }
     await next();
   })

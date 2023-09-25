@@ -759,5 +759,10 @@
   "modifyExamQuestion": "修改考试系统试题",
   "visitExamQuestionEditor": "访问考试系统试题编辑器",
   "registerExamCheck": "注册前检测是否需要考试",
-  "getRegisterExamCode": "获取注册前考试的图形验证码"
+  "getRegisterExamCode": "获取注册前考试的图形验证码",
+  "setMomentVisible": "设置电文可见状态",
+  "setMomentVisibleOther": "其他人设置电文可见状态",
+  "viewAllUserMoment": "查看用户所有电文",
+  "editorUserMoment": "管理员辑用户的电文内容",
+  "editorMoment": "编辑电文"
 }

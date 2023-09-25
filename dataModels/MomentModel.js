@@ -32,6 +32,12 @@ const momentCommentPerPage = {
   complete: 50,
 };
 
+const visibleType = {
+  own: 'own',
+  attention: 'attention',
+  everyone: 'everyone',
+};
+
 const schema = new mongoose.Schema({
   _id: String,
   // 创建时间
@@ -145,6 +151,11 @@ const schema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  //电文可见状态
+  visibleType: {
+    type: String,
+    default: visibleType.everyone,
+  },
 });
 
 /*
@@ -185,6 +196,9 @@ schema.statics.getMomentCommentModes = async () => {
   return { ...momentCommentModes };
 };
 
+schema.statics.getMomentVisibleType = async () => {
+  return { ...visibleType };
+};
 /*
  * 检测引用类型是否合法
  * */
@@ -693,6 +707,76 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
   }
 };
 
+/*
+ * 通过电文的ID获取已经发布的动态数据
+ * @param {String} mid 当前编辑动态
+ * @return {Object or null}
+ *  @param {String} momentId 动态 ID
+ *  @param {Date} toc 动态创建时间
+ *  @param {Date} tlm 动态最后修改时间
+ *  @param {String} uid 发表人 ID
+ *  @param {String} content 动态内容 ID
+ *  @param {[String]} picturesId 动态附带的图片 ID（resourceId）
+ *  @param {[String]} videosId 动态附带的视频 ID（resourceId）
+ */
+schema.statics.getEditorMomentDataByMid = async (mid) => {
+  const MomentModel = mongoose.model('moments');
+  const DocumentModel = mongoose.model('documents');
+  const ResourceModel = mongoose.model('resources');
+  const { moment: momentSource } = await DocumentModel.getDocumentSources();
+  const moment = await MomentModel.findOnly(
+    {
+      _id: mid,
+      status: momentStatus.normal,
+    },
+    { files: 1, _id: 1, status: 1, did: 1 },
+  );
+  if (moment) {
+    let picturesId = [];
+    let videosId = [];
+    let resources = [];
+    const oldResourcesId = moment.files;
+    if (oldResourcesId.length > 0) {
+      resources = await ResourceModel.find(
+        { rid: { $in: oldResourcesId } },
+        {
+          rid: 1,
+          mediaType: 1,
+        },
+      );
+      const resourcesId = resources.map((r) => r.rid);
+      if (resources.length > 0) {
+        if (resources[0].mediaType === 'mediaPicture') {
+          picturesId = resourcesId;
+        } else {
+          videosId = resourcesId;
+        }
+      }
+    }
+    //检查内容是否有编辑版本且没有提交过
+    let document = await DocumentModel.getBetaDocumentBySource(
+      momentSource,
+      mid,
+    );
+    //获取正式版的内容
+    if (!document) {
+      document = await DocumentModel.findOnly({ did: moment.did });
+    }
+    const { toc, tlm, uid, content, files } = document;
+    return {
+      momentId: moment._id,
+      toc,
+      tlm,
+      uid,
+      content,
+      picturesId,
+      videosId,
+      momentStatus: moment.status,
+      files,
+      mediaType: resources[0] ? resources[0].mediaType : '',
+    };
+  }
+};
 /*
  * 获取动态的编辑版 document
  * @return {document schema}
@@ -1374,6 +1458,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       repost,
       quoteType,
       status,
+      visibleType,
     } = moment;
 
     let f = moment[field];
@@ -1474,6 +1559,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       source: 'moment',
       files: filesData,
       url: getUrl('zoneMoment', _id),
+      visibleType,
     };
 
     if (moment.status !== momentStatus.normal) {

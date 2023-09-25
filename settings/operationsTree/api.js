@@ -101,5 +101,14 @@ module.exports = {
         GET: Operations.registerExamCheck,
       },
     },
+    editor: {
+      moment: {
+        PARAMETER: {
+          GET: Operations.editorMoment,
+          PUT: Operations.editorMoment,
+          POST: Operations.editorMoment,
+        },
+      },
+    },
   },
 };

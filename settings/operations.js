@@ -32,7 +32,9 @@ const FixedOperations = {
   postExamsPaper: 'postExamsPaper',
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
+  setMomentVisible: 'setMomentVisible',
   getRegisterExamCode: 'getRegisterExamCode',
+  editorMoment: 'editorMoment',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -772,6 +774,9 @@ const DynamicOperations = {
   getThreadCategories: 'getThreadCategories',
   manageQuestionTags: 'manageQuestionTags',
   createQuestionTags: 'createQuestionTags',
+  setMomentVisibleOther: 'setMomentVisibleOther',
+  viewAllUserMoment: 'viewAllUserMoment',
+  editorUserMoment: 'editorUserMoment',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

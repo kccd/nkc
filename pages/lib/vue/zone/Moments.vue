@@ -30,7 +30,7 @@
   import ViolationRecord from "../ViolationRecord";
   // import MomentOption from "./momentOption/MomentOption";
   import MomentStatus from "./MomentStatus";
-  import {EventBus} from "../../../spa/eventBus";
+  import {EventBus} from "../../../spa/eventBus";``
   export default {
     props: ['moments', 'permissions'],
     components: {
