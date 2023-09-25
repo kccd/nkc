@@ -38,6 +38,7 @@ const FixedOperations = {
   visitCommunityNew: 'visitCommunityNew',
   visitCommunitySub: 'visitCommunitySub',
   getForumsTree: 'getForumsTree',
+  visitAppsPage: 'visitAppsPage',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

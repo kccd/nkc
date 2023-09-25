@@ -764,5 +764,6 @@
   "browserDetection": "浏览器版本检测",
   "visitCommunityNew": "访问论坛最新页（快捷总版）",
   "visitCommunitySub": "访问论坛我的关注页",
-  "getForumsTree": "获取专业列表树状结构"
+  "getForumsTree": "获取专业列表树状结构",
+  "visitAppsPage": "访问资源主页"
 }
