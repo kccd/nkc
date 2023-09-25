@@ -102,6 +102,11 @@ const schema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    //用于存储音频文件的或者图片文件的rid
+    files: {
+      type: [String],
+      default: [],
+    },
     // 文档内容
     content: {
       type: String,
@@ -323,6 +328,7 @@ schema.statics.createBetaDocument = async (props) => {
     sid,
     ip,
     port,
+    files = [],
   } = props;
   const IPModel = mongoose.model('ips');
   const DocumentModel = mongoose.model('documents');
@@ -356,6 +362,7 @@ schema.statics.createBetaDocument = async (props) => {
     ip: ipId,
     port,
     addr,
+    files,
   });
   await document.save();
   await document.updateResourceReferences();

@@ -13,7 +13,7 @@
           :data-global-data="objToStr({uid: momentData.uid})"
         )
           img(:src="momentData.avatarUrl")
-      .single-moment-right
+      .single-moment-right(v-if="selectedMomentId !== momentData.momentId || submitting" )
         .single-moment-header
           .single-moment-user(
             data-global-mouseover="showUserPanel"
@@ -29,15 +29,14 @@
           moment-option(
             ref="momentOption"
             @complaint="complaint"
+            @selectedMomentId="handleMid"
           )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
         .single-moment-content.pointer(v-else v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
-
         //- 图片视频
         .single-moment-files
           moment-files(:data="momentData.files")
-
         //- 引用内容
         .single-moment-quote(v-if="momentData.quoteData")
           moment-quote(:data="momentData.quoteData" :uid="momentData.uid")
@@ -76,6 +75,8 @@
             :permissions="permissions"
             :mode="mode"
             )
+      moment-editor(v-if="selectedMomentId === momentData.momentId && !submitting" :mid="momentData.momentId" @published="onPublished" ref="momentEditor")
+
 </template>
 
 <style lang="less" scoped>
@@ -319,6 +320,7 @@
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
+  import MomentEditor from "./MomentEditor.vue";
 
   const state = getState();
   export default {
@@ -328,7 +330,8 @@
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
       'moment-status': MomentStatus,
-      'moment-option': MomentOptionFixed
+      'moment-option': MomentOptionFixed,
+      "moment-editor":MomentEditor
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -344,7 +347,9 @@
         comment: 'comment',
         repost: 'repost'
       },
+      submitting:false,
       timer: null,
+      selectedMomentId:''
     }),
     mounted() {
       this.initData();
@@ -419,6 +424,20 @@
       complaint(mid) {
         this.$emit('complaint', mid);
       },
+      handleMid(mid){
+        this.submitting = false;
+        this.selectedMomentId = mid;
+      },
+      onPublished(data) {
+        const {content,submitting,files,status,tlm} = data
+        this.momentData.content = content;
+        this.momentData.status = status
+        this.submitting = submitting;
+        this.momentData.files = files
+        this.momentData.tlm = tlm;
+        this.$refs.momentEditor.reset();
+      }
+
     }
   }
 </script>

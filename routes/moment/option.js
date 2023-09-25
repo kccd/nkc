@@ -42,6 +42,8 @@ router.get('/', async (ctx, next) => {
     blacklist: null,
     disable: null,
     delete: null,
+    visibleMoment: null,
+    editorMoment: null,
   };
   if (user) {
     //审核权限
@@ -66,11 +68,14 @@ router.get('/', async (ctx, next) => {
         optionStatus.visibleMoment = permission('setMomentVisibleOther')
           ? true
           : null;
+        optionStatus.editorMoment =
+          permission('editorUserMoment') && !moment.quoteType ? true : null;
       } else {
         // 违规记录
         optionStatus.violation = permission('violationRecord') ? true : null;
         // 电文可见状态设置
         optionStatus.visibleMoment = true;
+        optionStatus.editorMoment = !moment.quoteType;
       }
     }
   }

@@ -1,5 +1,5 @@
 const router = require('koa-router')();
-const articleRouter = require("./article");
+const articleRouter = require('./article');
 const momentRouter = require('./moment');
 const draftRouter = require('./draft');
 router
@@ -17,5 +17,5 @@ router
   })
   .use('/article', articleRouter.routes(), articleRouter.allowedMethods())
   .use('/draft', draftRouter.routes(), draftRouter.allowedMethods())
-  .use('/moment', momentRouter.routes(), momentRouter.allowedMethods())
+  .use('/moment', momentRouter.routes(), momentRouter.allowedMethods());
 module.exports = router;

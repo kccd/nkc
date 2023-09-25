@@ -26,6 +26,9 @@
         .option(v-if="options.visibleMoment" @click="visibleMoment")
           .fa.fa-eye
           span 可见状态
+        .option(v-if="options.editorMoment" @click="editorMoment")
+          .fa.fa-edit
+          span 编辑
         .option(v-if='options.blacklist !== null' @click='userBlacklist')
           .fa.fa-ban
           span(v-if='options.blacklist === false') 加入黑名单
@@ -348,6 +351,14 @@ export default {
     visibleMoment(){
       const mid = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId
       this.$refs.momentVisible.open(mid)
+    },
+    //编辑电文
+    editorMoment(){
+      if(this.moment.status !== 'normal'){
+        return sweetError('当前电文不可编辑')
+      }
+      const mid = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId
+      this.$emit('selectedMomentId', mid);
     }
   }
 }

@@ -10,6 +10,7 @@ const recycleRouter = require('./recycle');
 const usersRouter = require('./users');
 const examRouter = require('./exam');
 const registerRouter = require('./register');
+const editorRouter = require('./editor');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
@@ -20,5 +21,6 @@ router
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/exam', examRouter.routes(), examRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
-  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods());
+  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods());
 module.exports = router;

@@ -255,7 +255,7 @@
   };
 
   export default {
-    props: ['published'],
+    props: ['published','mid'],
     components: {
       'resource-selector': ResourceSelector,
       'emoji-selector': EmojiSelector,
@@ -274,9 +274,10 @@
       maxVideoCount: 1,
       momentId: '',
       content: '',
+      momentStatus:'',
       picturesId: [],
       videosId: [],
-
+      files:[],
       icons: {
         image: {
           fill: iconFill.normal,
@@ -368,22 +369,47 @@
         this.setTextareaEditorContent('');
         this.picturesId = [];
         this.videosId = [];
+        this.momentStatus = '';
       },
       initData() {
         const self = this;
-        nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
-          .then(res => {
-            const {momentId, content, picturesId, videosId} = res;
+        if(!this.mid){
+          nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
+            .then(res => {
+              const {momentId, content, picturesId, videosId} = res;
+              if(!momentId) return;
+              self.momentId = momentId;
+              self.content = content;
+              self.syncTextareaEditorContent();
+              self.picturesId = picturesId;
+              self.videosId = videosId;
+            })
+            .catch(err => {
+              sweetError(err);
+            });
+        }else {
+          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'GET').then((res)=>{
+            const {momentId, content, picturesId, videosId,momentStatus,files,mediaType} = res.data;
             if(!momentId) return;
             self.momentId = momentId;
             self.content = content;
             self.syncTextareaEditorContent();
-            self.picturesId = picturesId;
-            self.videosId = videosId;
+            self.momentStatus = momentStatus
+            if(files.length>0){
+              if(mediaType === 'mediaPicture'){
+                self.picturesId = files
+              }else {
+                self.videosId =  files
+              }
+            }else {
+              self.picturesId = picturesId;
+              self.videosId = videosId;
+            }
+
+          }).catch(err=>{
+            sweetError(err,'err')
           })
-          .catch(err => {
-            sweetError(err);
-          });
+        }
       },
       lockButton() {
         this.submitting = true;
@@ -440,10 +466,21 @@
       },
       publishContent() {
         const self = this;
-        const {content, picturesId, videosId, momentId} = this;
+        const {content, picturesId, videosId, momentId,momentStatus} = this;
         const resourcesId = picturesId.length > 0? picturesId: videosId;
-        self.lockButton();
-        return nkcAPI(`/creation/zone/moment`, 'POST', {
+        if(momentStatus === 'normal'){
+          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'POST',{
+            content,
+            resourcesId
+          }).then((res)=>{
+            self.sendPublishedEvent(res.data);
+            self.unlockButton();
+          }).catch(err=>{
+            sweetError(err, 'err');
+            self.unlockButton();
+          })
+        }else {
+          nkcAPI(`/creation/zone/moment`, 'POST', {
           type: 'publish',
           momentId,
           content,
@@ -457,9 +494,12 @@
             sweetError(err);
             self.unlockButton();
           });
+        }
+        self.lockButton();
       },
-      sendPublishedEvent() {
-        this.$emit('published')
+      sendPublishedEvent(data) {
+        const newData = {...data,submitting:this.submitting}
+        this.$emit('published',newData)
       },
       onTextareaEditorContentChange(content) {
         this.content = content;
@@ -477,25 +517,39 @@
         this.saveContent();
       }, 2000),
       saveContent() {
-        const {content, picturesId, videosId, momentId} = this;
         const self = this;
-        const type = momentId? 'modify': 'create';
+        //暂存的
+        const {content, picturesId, videosId, momentId,momentStatus } = this;
         const resourcesId = picturesId.length > 0? picturesId: videosId;
-        return nkcAPI(`/creation/zone/moment`, 'POST', {
-          type,
-          content,
-          momentId,
-          resourcesId
-        })
-        .then((res) => {
-          if(type === 'create') {
-            self.momentId = res.momentId;
-          }
-          console.log(`电文已自动保存`);
-        })
-        .catch(err => {
-          screenTopWarning(`实时保存失败：${err.error || err.message || err}`);
-        });
+        //判断是否是已发表的电文的编辑
+        if(momentStatus === 'normal'){
+          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'PUT',{
+            content,
+            resourcesId
+          }).then(()=>{
+            console.log('电文自动保存')
+          })
+            .catch(err=>{
+            sweetError(err, 'err')
+          })
+        }else {
+          const type = momentId? 'modify': 'create';
+          return nkcAPI(`/creation/zone/moment`, 'POST', {
+            type,
+            content,
+            momentId,
+            resourcesId
+          })
+            .then((res) => {
+              if(type === 'create') {
+                self.momentId = res.momentId;
+              }
+              console.log(`电文已自动保存`);
+            })
+            .catch(err => {
+              screenTopWarning(`实时保存失败：${err.error || err.message || err}`);
+            });
+        }
       }
     }
   }
