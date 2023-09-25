@@ -64,22 +64,23 @@ if !isIncluded('publicModules/articlePanel')
 
 
   -
-    var ArticlePanelStyleType = {
+    var ArticlePanelStyleTypes = {
+      refreshing: 'refreshing',
       abstract: 'abstract',
       brief: 'brief',
-      minimalist: 'minimalist'
+      minimalist: 'minimalist',
     };
-    var ArticlePanelStyleCover = {
+    var ArticlePanelCoverTypes = {
       left: 'left',
       right: 'right',
-      none: 'null',
+      none: 'none',
     };
     var ArticlePanelCategoryType = {
       forum: 'forum'
     };
     var DefaultStyle = {
-      type: ArticlePanelStyleType.brief,
-      cover: ArticlePanelStyleCover.right
+      type: ArticlePanelStyleTypes.brief,
+      cover: ArticlePanelCoverTypes.right,
     };
     var mouseEvent = {
       showUserPanel: 'showUserPanel',
@@ -98,8 +99,8 @@ if !isIncluded('publicModules/articlePanel')
       集成了多选框
       文章状态显示
   mixin ArticlesPanel(articles, style)
-    -style = style || DefaultStyle;
-    -var {type = ArticlePanelStyleType.abstract} = style;
+    -style = style || {...DefaultStyle};
+    -var {type = ArticlePanelStyleTypes.abstract} = style;
     .articles-panel
       for article in articles
         if article.status && article.status.type !== articleStatus.normal
@@ -116,27 +117,32 @@ if !isIncluded('publicModules/articlePanel')
           +ArticlePanel(article, style)
 
   mixin ArticlePanel(article, style)
-    -style = style || DefaultStyle;
-    -var {type = ArticlePanelStyleType.abstract, cover = ArticlePanelStyleCover.right} = style;
+    -
+      style = style || {...DefaultStyle};
+      var {
+        type = ArticlePanelStyleTypes.abstract,
+        cover = ArticlePanelCoverTypes.right,
+      } = style;
+    if style.type === ArticlePanelStyleTypes.minimalist
+      +ArticlePanelMinimalist(article)
+    else if style.type === ArticlePanelStyleTypes.abstract
+      +ArticlePanelAbstract(article, style.cover)
+    else if style.type === ArticlePanelStyleTypes.brief
+      +ArticlePanelBrief(article)
+    else if style.type === ArticlePanelStyleTypes.refreshing
+      +ArticlePanelRefreshing(article, style.cover)
 
-    if style.type === ArticlePanelStyleType.minimalist
-      +ArticlePanelXS(article)
-    else if style.type === ArticlePanelStyleType.abstract
-      +ArticlePanelMD(article, style.cover)
-    else if style.type === ArticlePanelStyleType.brief
-      +ArticlePanelSM(article)
-
-  mixin ArticlePanelMD(article, coverPosition)
+  mixin ArticlePanelAbstract(article, coverPosition)
     -var {user, categories, content, reply, pages} = article;
 
     -var coverClass = '';
     if content.coverUrl
       -coverClass = `cover-${coverPosition}`;
-      -coverPosition = coverPosition || ArticlePanelStyleCover.right;
+      -coverPosition = coverPosition || ArticlePanelCoverTypes.right;
     else
-       -coverPosition = ArticlePanelStyleCover.none;
+       -coverPosition = ArticlePanelCoverTypes.none;
     .article-panel-md(class=coverClass)
-      if coverPosition === ArticlePanelStyleCover.left
+      if coverPosition === ArticlePanelCoverTypes.left
         .article-panel-left
           .article-panel-cover(style=`background-image: url(${content.coverUrl})`)
       .article-panel-center
@@ -191,7 +197,7 @@ if !isIncluded('publicModules/articlePanel')
           for page in pages
             a.article-panel-title-page(class=page.url?'active':'' target='_blank' href=page.url)=page.name
         .article-panel-content(class=coverClass)
-          if coverPosition === ArticlePanelStyleCover.left
+          if coverPosition === ArticlePanelCoverTypes.left
             .article-panel-content-left
               .article-panel-content-cover(style=`background-image: url(${content.coverUrl})`)
           .article-panel-content-center
@@ -211,17 +217,17 @@ if !isIncluded('publicModules/articlePanel')
                   )
                   a(href=reply.user.homeUrl target='_blank')
                     img(src=reply.user.avatarUrl)
-          if coverPosition === ArticlePanelStyleCover.right
+          if coverPosition === ArticlePanelCoverTypes.right
             .article-panel-content-right
               .article-panel-content-cover(style=`background-image: url(${content.coverUrl})`)
-      if coverPosition === ArticlePanelStyleCover.right
+      if coverPosition === ArticlePanelCoverTypes.right
         .article-panel-right
           .article-panel-cover(style=`background-image: url(${content.coverUrl})`)
 
 
 
 
-  mixin ArticlePanelSM(data)
+  mixin ArticlePanelBrief(data)
     -var {user, content, categories, pages, reply} = data;
     .article-panel-sm
       -var data_global_mouseover = mouseEvent.showUserPanel;
@@ -293,7 +299,7 @@ if !isIncluded('publicModules/articlePanel')
 
 
 
-  mixin ArticlePanelXS(data)
+  mixin ArticlePanelMinimalist(data)
     -var {user, content, reply, pages} = data;
 
     .article-panel-xs
@@ -321,3 +327,70 @@ if !isIncluded('publicModules/articlePanel')
               target='_blank'
               )=tools.briefTime(reply.content.time)
 
+
+  mixin ArticlePanelRefreshing(article, coverPosition)
+    -var { user, categories, content, reply, pages } = article;
+
+    -var coverClass = '';
+    if content.coverUrl
+      -coverClass = `cover-${coverPosition}`;
+      -coverPosition = coverPosition || ArticlePanelCoverTypes.right;
+    else
+      -coverPosition = ArticlePanelCoverTypes.none;
+    .article-panel-md(class=coverClass)
+      if coverPosition === ArticlePanelCoverTypes.left
+        .article-panel-left
+          .article-panel-cover(style=`background-image: url(${content.coverUrl})`)
+      .article-panel-center
+
+        .article-panel-title
+          a.article-panel-title-content(href=content.url target='_blank' class=pages.length > 0 ? 'm-r-05' : '')
+            span(class=content.digest ? 'digest' : '')=content.title
+          for page in pages
+            a.article-panel-title-page(class=page.url ? 'active' : '' target='_blank' href=page.url)=page.name
+        .article-panel-content(class=coverClass)
+          if coverPosition === ArticlePanelCoverTypes.left
+            .article-panel-content-left
+              .article-panel-content-cover(style=`background-image: url(${content.coverUrl})`)
+          .article-panel-content-center
+            .article-panel-abstract
+              a(href=content.url target='_blank')=content.abstract
+          if coverPosition === ArticlePanelCoverTypes.right
+            .article-panel-content-right
+              .article-panel-content-cover(style=`background-image: url(${content.coverUrl})`)
+        .article-panel-header
+          -var data_global_mouseover = mouseEvent.showUserPanel;
+          -var data_global_mouseout = mouseEvent.hideUserPanel;
+          -var data_global_data = objToStr({ uid: user.uid });
+          .article-panel-avatar(
+            data-global-mouseover=data_global_mouseover
+            data-global-mouseout=data_global_mouseout
+            data-global-data=data_global_data
+          )
+            img(src=user.avatarUrl)
+          .article-panel-username(
+            data-global-mouseover=data_global_mouseover
+            data-global-mouseout=data_global_mouseout
+            data-global-data=data_global_data
+          )
+            a(href=user.homeUrl target='_blank')=user.username
+          .article-panel-time
+            +fromNow(content.time)
+          .pull-right
+            for c in categories
+              -var data_global_mouseover = '';
+              -var data_global_mouseout = '';
+              -var data_global_data = '';
+              if c.type === ArticlePanelCategoryType.forum
+                -data_global_mouseover = mouseEvent.showForumPanel;
+                -data_global_mouseout = mouseEvent.hideForumPanel;
+                -data_global_data = objToStr({ fid: c.id });
+              .article-panel-category(
+                data-global-mouseover=data_global_mouseover
+                data-global-mouseout=data_global_mouseout
+                data-global-data=data_global_data
+              )
+                a(href=c.url target='_blank')=c.name
+      if coverPosition === ArticlePanelCoverTypes.right
+        .article-panel-right
+          .article-panel-cover(style=`background-image: url(${content.coverUrl})`)

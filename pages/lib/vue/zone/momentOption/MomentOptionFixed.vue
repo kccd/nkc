@@ -315,6 +315,8 @@ export default {
           })
             .then(() => {
               sweetSuccess('操作成功');
+              // 刷新
+              visitUrl(`${window.location.pathname}${window.location.search}`);
             })
             .catch(err => {
               sweetError(err);

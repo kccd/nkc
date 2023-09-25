@@ -7,10 +7,12 @@ router
     return ctx.redirect('/n/community');
   })
   .use('/', async (ctx, next) => {
-    const {data, db, state, internalData} = ctx;
+    const { data, db, state, internalData } = ctx;
     let visitedForums = [];
-    if(data.user) {
-      let visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(data.user.uid);
+    if (data.user) {
+      let visitedForumsId = await db.UsersGeneralModel.getUserVisitedForumsId(
+        data.user.uid,
+      );
       visitedForumsId = visitedForumsId.slice(0, 5);
       visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
@@ -21,38 +23,53 @@ router
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
-      data.user
+      data.user,
     );
 
     // 筛选出没有开启流控的专业
-    let forumInReduceVisits = await db.ForumModel.find({openReduceVisits: true}, {fid: 1});
-    forumInReduceVisits = forumInReduceVisits.map(forum => forum.fid);
-    fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !forumInReduceVisits.includes(fid));
-    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
-    data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+    let forumInReduceVisits = await db.ForumModel.find(
+      { openReduceVisits: true },
+      { fid: 1 },
+    );
+    forumInReduceVisits = forumInReduceVisits.map((forum) => forum.fid);
+    fidOfCanGetThreads = fidOfCanGetThreads.filter(
+      (fid) => !forumInReduceVisits.includes(fid),
+    );
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(
+      fidOfCanGetThreads,
+    );
+    data.recommendThreads = await db.ThreadModel.getRecommendThreads(
+      fidOfCanGetThreads,
+    );
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     data.managementData = await db.SettingModel.getManagementData(data.user);
     data.appsData = await db.SettingModel.getAppsData();
     data.homeBigLogo = await db.SettingModel.getHomeBigLogo();
     data.visitedForums = visitedForums;
-    data.categoriesWithForums = await db.ForumModel.getUserCategoriesWithForums({
-      user: data.user,
-      userRoles: data.userRoles,
-      userGrade: data.userGrade,
-    });
+    data.categoriesWithForums = await db.ForumModel.getUserCategoriesWithForums(
+      {
+        user: data.user,
+        userRoles: data.userRoles,
+        userGrade: data.userGrade,
+      },
+    );
     data.subscribeForums = [];
-    if(state.uid) {
-      data.subscribeForums = await db.ForumModel.getUserSubForums(state.uid, fidOfCanGetThreads);
+    if (state.uid) {
+      data.subscribeForums = await db.ForumModel.getUserSubForums(
+        state.uid,
+        fidOfCanGetThreads,
+      );
     }
-    data.improveUserInfo = await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
+    data.improveUserInfo =
+      await db.UserModel.getImproveUserInfoByMiddlewareUser(data.user);
     data.permissions = {
-      isSuperModerator: ctx.permission("superModerator")
+      isSuperModerator: ctx.permission('superModerator'),
     };
-    data.pageTitle = pageTitle
+    data.pageTitle = pageTitle;
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
 
     data.navbar = {
-      highlight: 'latest'
+      highlight: 'latest',
     };
 
     // 新用户

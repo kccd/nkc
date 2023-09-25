@@ -1,22 +1,27 @@
-const data = NKC.methods.getDataById("data");
+import { getDataById } from '../../lib/js/dataConversion';
+import Vue from 'vue';
+import { nkcAPI } from '../../lib/js/netAPI';
+import { sweetSuccess, sweetError } from '../../lib/js/sweetAlert';
+
+const data = getDataById('data');
 const modifyAd = (ad, type) => {
   ad.type = type;
 };
 
-for(let i = 0; i < data.ads.movable.length; i++) {
+for (let i = 0; i < data.ads.movable.length; i++) {
   const ad = data.ads.movable[i];
-  modifyAd(ad, "movable");
+  modifyAd(ad, 'movable');
 }
 
-for(let i = 0; i < data.ads.fixed.length; i++) {
+for (let i = 0; i < data.ads.fixed.length; i++) {
   const ad = data.ads.fixed[i];
-  modifyAd(ad, "fixed");
+  modifyAd(ad, 'fixed');
 }
 
 const app = new Vue({
-  el: "#app",
+  el: '#app',
   data: {
-    page: {id: 'other', name: '其他'},
+    page: { id: 'other', name: '其他' },
     recommendThreads: data.recommendThreads,
     ads: data.ads,
     recommendForums: data.recommendForums,
@@ -26,17 +31,17 @@ const app = new Vue({
     goods: data.goods,
     toppedThreads: data.toppedThreads,
     latestToppedThreads: data.latestToppedThreads,
-    showShopGoods: (data.showGoods? "t": ""),
+    showShopGoods: data.showGoods ? 't' : '',
     // 首页“最新原创”文章条目显示模式，为空就默认为简略显示
     originalThreadDisplayMode: data.originalThreadDisplayMode,
     // 是否在首页显示“活动”入口
-    showActivityEnter: data.showActivityEnter ? "show" : "hidden",
+    showActivityEnter: data.showActivityEnter ? 'show' : 'hidden',
     updating: false,
     columnUpdating: false,
     columnListPosition: data.columnListPosition,
     columnCount: data.columnCount,
     columnListSort: data.columnListSort,
-    columnPool: data.columnPool
+    columnPool: data.columnPool,
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -45,45 +50,48 @@ const app = new Vue({
   },
   computed: {
     selectedRecommendForumsId() {
-      return data.recommendForums.map(f => f.fid);
+      return data.recommendForums.map((f) => f.fid);
     },
     nav() {
-      const {page} = this;
+      const { page } = this;
       const arr = [
         {
           id: 'other',
-          name: '其他'
+          name: '其他',
         },
         {
           id: 'movable',
-          name: '轮播图'
+          name: '轮播图',
         },
         {
           id: 'fixed',
-          name: '固定图'
+          name: '固定图',
         },
         {
           id: 'hotColumn',
-          name: '热门专栏'
+          name: '热门专栏',
         },
         {
           id: 'toppedColumn',
-          name: '置顶专栏'
-        }
+          name: '置顶专栏',
+        },
       ];
-      arr.map(a => {
+      arr.map((a) => {
         a.active = a.id === page.id;
       });
       return arr;
     },
     threadCount() {
-      const {automaticProportion, count} = this.recommendThreads[this.page.id];
-      const automaticCount = Math.round(count * automaticProportion / (automaticProportion + 1));
+      const { automaticProportion, count } =
+        this.recommendThreads[this.page.id];
+      const automaticCount = Math.round(
+        (count * automaticProportion) / (automaticProportion + 1),
+      );
       return {
         automaticCount,
-        manualCount: count - automaticCount
+        manualCount: count - automaticCount,
       };
-    }
+    },
   },
   methods: {
     checkString: NKC.methods.checkData.checkString,
@@ -97,10 +105,14 @@ const app = new Vue({
     },
     moveFromArr(arr, index, type) {
       const count = arr.length;
-      if(index === 0 && type === 'left') return;
-      if(index + 1 === count && type === 'right') return;
+      if (index === 0 && type === 'left') {
+        return;
+      }
+      if (index + 1 === count && type === 'right') {
+        return;
+      }
       let _index;
-      if(type === 'left') {
+      if (type === 'left') {
         _index = index - 1;
       } else {
         _index = index + 1;
@@ -113,19 +125,19 @@ const app = new Vue({
     getRecommendTypeName(id) {
       return {
         movable: '轮播图',
-        fixed: '固定图'
-      }[id]
+        fixed: '固定图',
+      }[id];
     },
     selectPage(page) {
       this.page = page;
     },
     saveRecommendThreads() {
-      const {page} = this;
+      const { page } = this;
       const options = this.recommendThreads[page.id];
       nkcAPI(`/nkc/home`, 'PUT', {
         operation: 'saveRecommendThreads',
         type: page.id,
-        options
+        options,
       })
         .then(() => {
           sweetSuccess('保存成功');
@@ -133,21 +145,22 @@ const app = new Vue({
         .catch(sweetError);
     },
     updateThreadList() {
-      const {page} = this;
+      const { page } = this;
       this.updating = true;
       const pageId = page.id;
       const self = this;
       nkcAPI('/nkc/home', 'PUT', {
         operation: 'updateThreadList',
-        type: pageId
+        type: pageId,
       })
-        .then(data => {
-          self.recommendThreads[pageId].automaticallySelectedThreads = data.automaticallySelectedThreads;
+        .then((data) => {
+          self.recommendThreads[pageId].automaticallySelectedThreads =
+            data.automaticallySelectedThreads;
           Vue.set(self.saveRecommendThreads);
           sweetSuccess('更新成功');
           self.updating = false;
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
           self.updating = false;
         });
@@ -158,29 +171,29 @@ const app = new Vue({
       nkcAPI('/nkc/home', 'PUT', {
         operation: 'updateHomeHotColumns',
       })
-        .then(data => {
+        .then((data) => {
           self.poolColumns = data.poolColumns;
           this.columnUpdating = false;
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
           this.columnUpdating = false;
-        })
+        });
     },
     selectLocalFile(ad) {
       const options = {};
-      if(ad.type === "movable") {
-        options.aspectRatio = 800/336;
+      if (ad.type === 'movable') {
+        options.aspectRatio = 800 / 336;
       } else {
-        options.aspectRatio = 400/253;
+        options.aspectRatio = 400 / 253;
       }
-      SelectImage.show(data => {
+      SelectImage.show((data) => {
         const formData = new FormData();
-        formData.append("cover", data);
-        formData.append("topType", ad.type);
-        formData.append("tid", ad.tid);
-        nkcUploadFile("/nkc/home", "POST", formData)
-          .then(data => {
+        formData.append('cover', data);
+        formData.append('topType', ad.type);
+        formData.append('tid', ad.tid);
+        nkcUploadFile('/nkc/home', 'POST', formData)
+          .then((data) => {
             ad.cover = data.coverHash;
             console.log(ad.cover);
           })
@@ -190,15 +203,20 @@ const app = new Vue({
     },
     move(ad, type) {
       let ads;
-      if(ad.type === "movable") {
+      if (ad.type === 'movable') {
         ads = this.ads.movable;
       } else {
         ads = this.ads.fixed;
       }
       const index = ads.indexOf(ad);
-      if((type === "left" && index === 0) || (type === "right" && index+1 === ads.length)) return;
+      if (
+        (type === 'left' && index === 0) ||
+        (type === 'right' && index + 1 === ads.length)
+      ) {
+        return;
+      }
       let newIndex;
-      if(type === "left") {
+      if (type === 'left') {
         newIndex = index - 1;
       } else {
         newIndex = index + 1;
@@ -207,61 +225,72 @@ const app = new Vue({
       ads.splice(index, 1, otherAd);
       ads.splice(newIndex, 1, ad);
     },
-    saveAds(){
-      const {movable, fixed, movableOrder, fixedOrder} = this.ads;
+    saveAds() {
+      const { movable, fixed, movableOrder, fixedOrder } = this.ads;
       const self = this;
       Promise.resolve()
         .then(() => {
-          movable.concat(fixed).map(ad => {
+          movable.concat(fixed).map((ad) => {
             self.checkString(ad.title, {
-              name: "标题",
+              name: '标题',
               minLength: 1,
-              maxLength: 200
+              maxLength: 200,
             });
-            if(!ad.cover) throw "封面图不能为空";
-            if(!ad.tid) throw "文章ID不能为空";
+            if (!ad.cover) {
+              throw '封面图不能为空';
+            }
+            if (!ad.tid) {
+              throw '文章ID不能为空';
+            }
           });
-          return nkcAPI("/nkc/home", "PUT", {
-            operation: "saveAds",
+          return nkcAPI('/nkc/home', 'PUT', {
+            operation: 'saveAds',
             movable,
             fixed,
             movableOrder,
-            fixedOrder
+            fixedOrder,
           });
         })
         .then(() => {
-          sweetSuccess("保存成功");
+          sweetSuccess('保存成功');
         })
         .catch(sweetError);
     },
-    remove(ads, index){
-      ads.splice(index, 1)
+    remove(ads, index) {
+      ads.splice(index, 1);
       /*sweetQuestion("确定要执行删除操作？")
         .then(() => {
           ads.splice(index, 1)
         })
         .catch(() => {})*/
-
     },
     addForum() {
       const self = this;
-      MoveThread.open(data => {
-        const {originForums} = data;
-        originForums.map(forum => {
-          if(!self.selectedRecommendForumsId.includes(forum.fid)) {
-            self.recommendForums.push(forum)
-          }
-        });
-        MoveThread.close();
-      }, {
-        hideMoveType: true
-      })
+      MoveThread.open(
+        (data) => {
+          const { originForums } = data;
+          originForums.map((forum) => {
+            if (!self.selectedRecommendForumsId.includes(forum.fid)) {
+              self.recommendForums.push(forum);
+            }
+          });
+          MoveThread.close();
+        },
+        {
+          hideMoveType: true,
+        },
+      );
     },
     moveForum(arr, f, type) {
       const index = arr.indexOf(f);
-      if((type === "left" && index === 0) || (type === "right" && index+1 === arr.length)) return;
+      if (
+        (type === 'left' && index === 0) ||
+        (type === 'right' && index + 1 === arr.length)
+      ) {
+        return;
+      }
       let newIndex;
-      if(type === "left") {
+      if (type === 'left') {
         newIndex = index - 1;
       } else {
         newIndex = index + 1;
@@ -280,21 +309,21 @@ const app = new Vue({
         .catch(() => {})*/
     },
     saveRecommendForums() {
-      const forumsId = this.recommendForums.map(forum => forum.fid);
-      nkcAPI("/nkc/home", "PUT", {
-        operation: "saveRecommendForums",
-        forumsId
+      const forumsId = this.recommendForums.map((forum) => forum.fid);
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveRecommendForums',
+        forumsId,
       })
-        .then(function() {
-          sweetSuccess("保存成功");
+        .then(function () {
+          sweetSuccess('保存成功');
         })
         .catch(sweetError);
     },
-    saveColumns(){
-      const columnsId = this.columns.map(c => c._id);
-      const poolColumnsId = this.poolColumns.map(c => c._id);
-      nkcAPI("/nkc/home", "PUT", {
-        operation: "saveColumns",
+    saveColumns() {
+      const columnsId = this.columns.map((c) => c._id);
+      const poolColumnsId = this.poolColumns.map((c) => c._id);
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveColumns',
         columnsId,
         columnListPosition: this.columnListPosition,
         columnCount: this.columnCount,
@@ -303,12 +332,12 @@ const app = new Vue({
         poolColumnsId: poolColumnsId,
       })
         .then(() => {
-          sweetSuccess("保存成功");
+          sweetSuccess('保存成功');
         })
         .catch(sweetError);
     },
     saveToppedColumns() {
-      const columnsId = this.toppedColumns.map(c => c._id);
+      const columnsId = this.toppedColumns.map((c) => c._id);
       nkcAPI('/nkc/home', 'PUT', {
         operation: 'saveToppedColumns',
         columnsId,
@@ -319,53 +348,63 @@ const app = new Vue({
         .catch(sweetError);
     },
     saveGoods() {
-      const goodsId = this.goods.map(g => g.productId);
+      const goodsId = this.goods.map((g) => g.productId);
       const showShopGoods = !!this.showShopGoods;
-      nkcAPI("/nkc/home", "PUT", {
-        operation: "saveGoods",
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveGoods',
         goodsId,
-        showShopGoods
+        showShopGoods,
       })
         .then(() => {
-          sweetSuccess("保存成功");
+          sweetSuccess('保存成功');
         })
         .catch(sweetError);
     },
     saveToppedThreads() {
-      const toppedThreadsId = this.toppedThreads.map(t => t.tid);
-      const latestToppedThreadsId = this.latestToppedThreads.map(t => t.tid);
-      nkcAPI("/nkc/home", "PUT", {
-        operation: "saveToppedThreads",
+      const toppedThreadsId = this.toppedThreads.map((item) => {
+        return {
+          type: item.type,
+          id: item.id,
+        };
+      });
+      const latestToppedThreadsId = this.latestToppedThreads.map((item) => {
+        return {
+          type: item.type,
+          id: item.id,
+        };
+      });
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveToppedThreads',
         toppedThreadsId,
-        latestToppedThreadsId
+        latestToppedThreadsId,
       })
         .then(() => {
-          sweetSuccess("保存成功");
+          sweetSuccess('保存成功');
         })
-        .catch(sweetError)
+        .catch(sweetError);
     },
     saveOriginalThreadDisplayMode() {
       const originalThreadDisplayMode = this.originalThreadDisplayMode;
-      nkcAPI("/nkc/home", "PUT", {
-        operation: "saveOriginalThreadDisplayMode",
-        originalThreadDisplayMode
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveOriginalThreadDisplayMode',
+        originalThreadDisplayMode,
       })
         .then(() => {
-          sweetSuccess("保存成功");
+          sweetSuccess('保存成功');
         })
-        .catch(sweetError)
+        .catch(sweetError);
     },
     saveShowActivityEnter() {
-      let value = this.showActivityEnter === "show";
-      nkcAPI("/nkc/home/showActivityEnter", "PUT", {
-        showActivityEnter: value
+      let value = this.showActivityEnter === 'show';
+      nkcAPI('/nkc/home/showActivityEnter', 'PUT', {
+        showActivityEnter: value,
       })
-      .then(() => {
-        sweetSuccess("保存成功");
-      })
-      .catch(sweetError)
-    }
-  }
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+  },
 });
 
 window.modifyAd = modifyAd;

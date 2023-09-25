@@ -5,7 +5,7 @@ if !isIncluded("publicModules/apps/apps.pug")
     if appData && appData.length > 0
       .module-apps.m-b-1
         if !options.hidePanelHeader
-          .panel-header 网站应用
+          .box-shadow-header 网站应用
         for app in appData
           a.module-app(href=app.url)
             img(src=app.icon)

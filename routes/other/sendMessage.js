@@ -26,11 +26,16 @@ sendMessageRouter
     if (!otherPersonal) {
       ctx.throw(400, '暂未有用户绑定该手机号');
     }
-    await db.VerificationModel.verifySecret({
-      uid: '',
-      ip: ctx.address,
-      secret: verifySecret,
-    });
+    //从数据库里面取信息
+    const { login } = await db.SettingModel.getSettings('verification');
+    if (login.enabled) {
+      await db.VerificationModel.verifySecret({
+        uid: '',
+        ip: ctx.address,
+        secret: verifySecret,
+      });
+    }
+
     const smsCodeObj = {
       nationCode,
       mobile,
@@ -59,7 +64,9 @@ sendMessageRouter
     const { isExamEnabled, isValidCode } =
       await registerExamService.getRegisterCodeStatus(registerCode);
 
-    if (!isExamEnabled || !isValidCode) {
+    //从数据库里面取信息
+    const { register } = await db.SettingModel.getSettings('verification');
+    if ((!isExamEnabled || !isValidCode) && register.enabled) {
       await db.VerificationModel.verifySecret({
         uid: '',
         ip: ctx.address,

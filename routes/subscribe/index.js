@@ -33,6 +33,7 @@ router
 
     data.homeBigLogo = await db.SettingModel.getHomeBigLogo();
     data.managementData = await db.SettingModel.getManagementData(data.user);
+    data.appsData = await db.SettingModel.getAppsData();
     // 公告通知
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 全站精选

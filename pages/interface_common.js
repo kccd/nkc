@@ -540,7 +540,7 @@ function unHomeAd(tid) {
     .catch(sweetError);
 }
 
-// 社区置顶
+// 论坛置顶
 function communityTop(tid, topped) {
   if(topped) {
     homeTop(tid, 'community');

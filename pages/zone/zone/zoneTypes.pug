@@ -1,0 +1,11 @@
+if !isIncluded('zone/zone/zoneTypes')
+  mixin renderZoneTypes(activeType, tab,types)
+    .paging-button
+      a.button.radius-left(
+        href=`/z?t=m-${tab}`
+        class=activeType === types.moment ? 'active' : ''
+      ) 电文
+      a.button.radius-right(
+        href=`/z?t=a-${tab}`
+        class=activeType === types.article ? 'active' : ''
+      ) 长电文

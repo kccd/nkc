@@ -591,6 +591,7 @@
   "visitAuthList": "查看身份认证申请列表",
   "visitBehaviorLogs": "查看用户行为记录",
   "visitCommunity": "访问社区页",
+  "visitZone": "访问电波页",
   "visitDisabledFundList": "查看被封禁的基金项目",
   "visitDraftList": "访问草稿箱",
   "visitEMessageSettings": "访问后台聊天设置页面",
@@ -758,11 +759,15 @@
   "createExamQuestion": "创建考试系统试题",
   "modifyExamQuestion": "修改考试系统试题",
   "visitExamQuestionEditor": "访问考试系统试题编辑器",
-  "registerExamCheck": "注册前检测是否需要考试",
   "getRegisterExamCode": "获取注册前考试的图形验证码",
+  "registerExamCheck": "注册前检测是否需要考试",
   "setMomentVisible": "设置电文可见状态",
   "setMomentVisibleOther": "其他人设置电文可见状态",
   "viewAllUserMoment": "查看用户所有电文",
   "editorUserMoment": "管理员辑用户的电文内容",
-  "editorMoment": "编辑电文"
+  "editorMoment": "编辑电文",
+  "browserDetection": "浏览器版本检测",
+  "visitCommunityNew": "访问论坛最新页（快捷总版）",
+  "visitCommunitySub": "访问论坛我的关注页",
+  "getForumsTree": "获取专业列表树状结构"
 }

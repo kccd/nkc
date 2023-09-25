@@ -235,7 +235,7 @@ schema.statics.getDocumentInfoById = async (_id) => {
   const { getOriginLevel } = require('../nkcModules/apiFunction');
   let articleInfo = await ArticleModel.findOne({ _id });
   articleInfo = articleInfo.toObject();
-  articleInfo.url = `/zone/a/${_id}`;
+  articleInfo.url = `/z/a/${_id}`;
   if (!articleInfo) {
     throwErr(500, '未查找到对应文章');
   }
@@ -682,11 +682,11 @@ schema.methods.publishArticle = async function (options) {
     articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
   } else if (source === articleSources.zone) {
     /*await this.updateOne({
-      $set: {
-        sid: momentId,
-      }
-    });*/
-    articleUrl = `/zone/a/${articleId}`;
+          $set: {
+            sid: momentId,
+          }
+        });*/
+    articleUrl = `/z/a/${articleId}`;
   }
 
   //更新文章的最后修改时间
@@ -863,7 +863,7 @@ schema.statics.extendArticles = async function (articles) {
         url = `/m/${columnPostObj[_id].columnId}/a/${columnPostObj[_id]._id}`;
       }
     } else if (article.source === articleSource.zone) {
-      url = `/zone/a/${article._id}`;
+      url = `/z/a/${article._id}`;
     }
     const result = {
       _id,
@@ -1411,7 +1411,7 @@ schema.statics.getArticlesInfo = async function (articles) {
       url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if (article.source === zoneSource) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
-      url = `/zone/a/${article._id}`;
+      url = `/z/a/${article._id}`;
     }
     let credits = xsfsRecordsObj[article._id] || [];
     credits = credits.concat(...(kcbsRecordsObj[article._id] || []));
@@ -1525,6 +1525,10 @@ schema.statics.getArticlesDataByArticlesId = async function (
     }
     const { title, content, cover } = stableDocument;
     let articleData;
+    // 暂时屏蔽被撤稿的文章，待专栏改进时一同调整
+    if (!articleUrl.articleUrl) {
+      article.status = articleStatus.deleted;
+    }
     if (article.status === articleStatus.normal) {
       articleData = {
         status: articleStatus.normal,

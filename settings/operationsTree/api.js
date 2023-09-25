@@ -110,5 +110,10 @@ module.exports = {
         },
       },
     },
+    forums: {
+      tree: {
+        GET: Operations.getForumsTree,
+      },
+    },
   },
 };

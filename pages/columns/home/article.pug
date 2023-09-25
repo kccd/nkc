@@ -1,0 +1,19 @@
+if !isIncluded('columnHomeNew')
+  mixin columnHomeNew(props)
+    -
+      var {
+        reviewedPermission,
+        articlesPanelData,
+      } = props;
+    if reviewedPermission
+      include ../../latest/latestManagement
+      +renderLatestArticleManagement()
+    include ../../publicModules/paging/paging
+    if articlesPanelData && articlesPanelData.length > 0
+      include ../../publicModules/articlePanel/articlePanel
+      +ArticlesPanel(data.articlesPanelData, data.latestColumnArticlePanelStyle)
+    else
+      .p-t-5.p-b-5.text-center 空空如也~
+    if data.paging && data.paging.buttonValue.length > 0
+      .m-t-1
+        include ../../publicModules/paging/paging_input

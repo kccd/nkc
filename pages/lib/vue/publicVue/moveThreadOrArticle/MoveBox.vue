@@ -53,7 +53,7 @@ export default {
     },
     submit(){
       const tcId = this.selectedCategories.map(item=>item.nodeId).filter(item=>typeof item === 'number');
-      nkcAPI('/zone/a/'+this.article._id+'/category', 'PUT',{
+      nkcAPI('/z/a/'+this.article._id+'/category', 'PUT',{
         tcId
       }).then(()=>{
         sweetSuccess('操作成功');

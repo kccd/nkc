@@ -10,12 +10,16 @@ class Logger {
       return;
     }
     this.print('DEBUG', ...any);
+    console.trace();
   }
   info(...any) {
     this.print('INFO', ...any);
   }
   warning(...any) {
     this.print('WARN', ...any);
+  }
+  error(...any) {
+    this.print('ERROR', ...any);
   }
 }
 

@@ -34,6 +34,7 @@ const run = async () => {
   await timedTasks.modifyProjectCycle();
   await timedTasks.initHomeBlocksTimeout();
   await timedTasks.updateShopStatus();
+  await timedTasks.updateCommunityContentCount();
   if (process.connected) {
     process.send('ready');
   }

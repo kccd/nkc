@@ -4,7 +4,13 @@ block eTitle
   title 列表设置
 block eContent
   .container-fluid.max-width
-    #data.hidden=objToStr({pageSettings: data.pageSettings})
+    -
+      var props = {
+        pageSettings: data.pageSettings,
+        articlePanelStyleTypes: data.articlePanelStyleTypes,
+        articlePanelCoverTypes: data.articlePanelCoverTypes,
+      };
+    #data.hidden=objToStr(props)
     .row#app(v-cloak)
       .col-xs-12.col-md-12
         .form-horizontal
@@ -64,31 +70,37 @@ block eContent
               input.form-control(type='text' v-model.number="pageSettings.threadPostCommentList")
       .col-xs-12.col-md-12
         h4 文章列表风格设置
-        mixin radio(name, listStyle)
+        mixin radio(name, listStyle, link)
           tr
             th=name
             th
               .radio
                 label.m-r-1
-                  input(type='radio' value='abstract' v-model=`pageSettings.${listStyle}.type`)
+                  input(type='radio' :value='articlePanelStyleTypes.refreshing' v-model=`pageSettings.${listStyle}.type`)
+                  span 清爽模式
+                label.m-r-1
+                  input(type='radio' :value='articlePanelStyleTypes.abstract' v-model=`pageSettings.${listStyle}.type`)
                   span 摘要模式
                 label.m-r-1
-                  input(type='radio' value='brief' v-model=`pageSettings.${listStyle}.type`)
+                  input(type='radio' :value='articlePanelStyleTypes.brief' v-model=`pageSettings.${listStyle}.type`)
                   span 简要模式
                 label
-                  input(type='radio' value='minimalist' v-model=`pageSettings.${listStyle}.type`)
+                  input(type='radio' :value='articlePanelStyleTypes.minimalist' v-model=`pageSettings.${listStyle}.type`)
                   span 极简模式
             th
               .radio
                 label.m-r-1
-                  input(type='radio' value='left' v-model=`pageSettings.${listStyle}.cover`)
+                  input(type='radio' :value='articlePanelCoverTypes.left' v-model=`pageSettings.${listStyle}.cover`)
                   span 左侧
                 label.m-r-1
-                  input(type='radio' value='right' v-model=`pageSettings.${listStyle}.cover`)
+                  input(type='radio' :value='articlePanelCoverTypes.right' v-model=`pageSettings.${listStyle}.cover`)
                   span 右侧
                 label
-                  input(type='radio' value='null' v-model=`pageSettings.${listStyle}.cover`)
+                  input(type='radio' :value='articlePanelCoverTypes.none' v-model=`pageSettings.${listStyle}.cover`)
                   span 不显示
+            th
+              if link
+                a(href=link target="_blank") 页面链接
 
         .table-responsive
           table.table.table-bordered
@@ -97,12 +109,13 @@ block eContent
                 th 类型
                 th 显示模式
                 th 封面图
+                th 其他
             tbody
               +radio('默认', 'threadListStyle')
-              +radio('最新页社区文章', 'articlePanelStyle.latestCommunity')
-              +radio('最新页社区置顶文章', 'articlePanelStyle.latestCommunityTopped')
-              +radio('最新页空间文章', 'articlePanelStyle.latestZone')
-              +radio('最新页专栏文章', 'articlePanelStyle.latestColumn')
+              +radio('论坛快捷总版文章列表', 'articlePanelStyle.latestCommunity', '/c/new')
+              +radio('论坛快捷总版置顶文章列表', 'articlePanelStyle.latestCommunityTopped', '/c/new')
+              +radio('电波长电文列表', 'articlePanelStyle.latestZone', '/z?t=a-a')
+              +radio('专栏主页最新文章列表', 'articlePanelStyle.latestColumn', '/m')
       .col-xs-12.col-md-12
         button.btn.btn-primary(@click='save') 保存
 block scripts

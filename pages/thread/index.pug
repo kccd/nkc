@@ -55,7 +55,7 @@ block content
                 -const showManagement = data.permissions.showManagement;
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
-                    a.nav-link(href='/?t=home' title=data.serverBrief) 主页
+                    a.nav-link(href='/c') 论坛
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >
@@ -116,9 +116,9 @@ block content
                                 else
                                   button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
                                 if data.communityTopped
-                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', false)`) 取消社区置顶
+                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', false)`) 取消论坛置顶
                                 else
-                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', true)`) 社区置顶
+                                  button.btn.btn-default.btn-sm(onclick=`communityTop('${data.thread.tid}', true)`) 论坛置顶
                                 if data.latestTopped
                                   button.btn.btn-default.btn-sm(onclick=`unLatestTop('${data.thread.tid}')`) 取消最新页置顶
                                 else
@@ -564,8 +564,12 @@ block content
             include ../publicModules/side_thread_notice
             include ../publicModules/side_thread_list
             +sideThreadNotice(data.noticeContent,data.threadHistory,data.canEditNotice,data.shieldNotice)
-            +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
-            +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
+            if data.targetUserThreads && data.targetUserThreads.length > 0
+              .box-shadow.m-b-1
+                +sideThreadsPanel(data.targetUserThreads, "作者最新文章", false)
+            if data.sameThreads && data.sameThreads.length > 0
+              .box-shadow.m-b-1
+                +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
 
           .hidden-sm.hidden-xs
             include ../publicModules/footer/footer_sm

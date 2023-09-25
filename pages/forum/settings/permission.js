@@ -1,6 +1,16 @@
 import { objToStr } from '../../lib/js/tools';
-const data = NKC.methods.getDataById('data');
+import { getDataById } from '../../lib/js/dataConversion';
+import Vue from 'vue';
+import {
+  sweetSuccess,
+  sweetQuestion,
+  sweetError,
+} from '../../lib/js/sweetAlert';
+import { nkcAPI } from '../../lib/js/netAPI';
+
+const data = getDataById('data');
 const selectUser = new NKC.modules.SelectUser();
+
 const app = new Vue({
   el: '#app',
   data: {
@@ -12,6 +22,8 @@ const app = new Vue({
     libraryClosed: data.libraryClosed,
     saving: false,
     moderators: data.moderators,
+    articlePanelStyleTypes: data.articlePanelStyleTypes,
+    articlePanelCoverTypes: data.articlePanelCoverTypes,
   },
   computed: {
     users() {
@@ -31,7 +43,6 @@ const app = new Vue({
     },
   },
   mounted() {
-    console.log(this.forum, 'forum');
     this.initUserPanel();
   },
   updated() {

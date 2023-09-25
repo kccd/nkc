@@ -11,17 +11,13 @@ block content
       if !state.isApp
         .app-top
           .navbar-link
-            .col-xs-3
-              a(href='/n') 最新
-            .col-xs-3
-              if data.user
-                a(href='/g/moment') 关注
-              else
-                a(onclick="RootApp.openLoginPanel()") 关注
-            .col-xs-3
-              a(href=`/m`) 专栏
-            .col-xs-3
-              a(href=`/c`) 社区
+            .col-xs-4
+              a(href='/z') 电波
+            .col-xs-4
+              a(href='/c') 论坛
+            .col-xs-4
+              a(href='/m') 专栏
+
       if permission("nkcManagementHome")
         .admin-operate
           button.admin-create(onclick=`create()`) 新建

@@ -23,14 +23,28 @@ block content
             +renderCanvasLogo(data.homeBigLogo)
           include ../publicModules/improveUserInfo
           +improveUserInfo(data.improveUserInfo)
-          include ../publicModules/management/management
-          +managementPanel(data.managementData)
-          include ../publicModules/apps/apps
+          if data.managementData && data.managementData.length > 0
+            include ../publicModules/management/management
+            .m-b-1.box-shadow
+              +managementPanel(data.managementData)
+
+          if data.appsData && data.appsData.length > 0
+            include ../publicModules/apps/apps
+            .m-b-1.box-shadow
+              +appsPanel(data.appsData)
           include ../publicModules/side_thread_list
-          +sideThreadsPanel(data.noticeThreads, "公告通知", true)
-          +sideThreadsPanel(data.featuredThreads, "精选文章", false)
-          +sideThreadsPanel(data.articleThreads, "最新文章", false)
-          +sideThreadsPanel(data.recommendThreads, "推荐文章", false)
+          if data.noticeThreads && data.noticeThreads.length > 0
+            .box-shadow.m-b-1
+              +sideThreadsPanel(data.noticeThreads, "公告通知", true)
+          if data.featuredThreads && data.featuredThreads.length > 0
+            .box-shadow.m-b-1
+              +sideThreadsPanel(data.featuredThreads, "精选文章", false)
+          if data.articleThreads && data.articleThreads.length > 0
+            .box-shadow.m-b-1
+              +sideThreadsPanel(data.articleThreads, "最新文章", false)
+          if data.recommendThreads && data.recommendThreads.length > 0
+            .box-shadow.m-b-1
+              +sideThreadsPanel(data.recommendThreads, "推荐文章", false)
         include ../publicModules/scrollTo
 
 block scripts

@@ -264,7 +264,8 @@ window.app = new Vue({
               const {vipNum} = v;
               checkNumber(vipNum, {
                 name: "折扣率",
-                min: 1,
+                fractionDigits: 2,
+                min: 0.01,
                 max: 100
               });
             });

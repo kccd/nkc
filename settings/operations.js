@@ -35,6 +35,11 @@ const FixedOperations = {
   setMomentVisible: 'setMomentVisible',
   getRegisterExamCode: 'getRegisterExamCode',
   editorMoment: 'editorMoment',
+  visitZone: 'visitZone',
+  browserDetection: 'browserDetection',
+  visitCommunityNew: 'visitCommunityNew',
+  visitCommunitySub: 'visitCommunitySub',
+  getForumsTree: 'getForumsTree',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

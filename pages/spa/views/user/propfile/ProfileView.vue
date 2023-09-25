@@ -3,7 +3,7 @@
     .account-nav-middle.hidden
       .nav.p-t-1
         span(@click="toRoute('moment')" :class="{'active': $route.name === 'moment'}") 动态
-        span(@click="toRoute('post')" :class="{'active': $route.name === 'post'}") 社区
+        span(@click="toRoute('post')" :class="{'active': $route.name === 'post'}") 论坛
         span(@click="toRoute('column')" :class="{'active': $route.name === 'column'}") 专栏
     .post-panel-item
       router-view

@@ -1,86 +1,6 @@
 @import "../publicModules/base";
-.home-funds{
-  .home-fund-donation{
-    height: 4rem;
-    display: block;
-    line-height: 4rem;
-    text-align: center;
-    background-color: @primary;
-    color: #fff;
-    font-size: 1.4rem;
-    transition: background-color 100ms;
-    border-radius: 3px;
-    &:hover, &:focus{
-      text-decoration: none;
-      background-color: #277dbb;
-    }
-  }
-  .home-fund{
-    margin-bottom: 1rem;
-    .home-fund-name{
-      font-size: 1.3rem;
-      color: #555;
-      &:hover, &:focus{
-        text-decoration: none;
-        color: @accent;
-      }
-    }
-    .home-fund-info{
-      position: relative;
-      .home-fund-code{
-        font-size: 1.25rem;
-        display: inline-block;
-        font-weight: 700;
-        margin-right: 1rem;
-      }
-      .home-fund-money{
-        display: inline-block;
-        margin-right: 1rem;
-        color: #ee8b42;
-      }
-      .home-fund-link{
-        color: #888;
-        display: inline-block;
-        &:hover,&:focus{
-          text-decoration: none;
-          color: @accent;
-        }
-        &.fund-name{
-          position: absolute;
-          top: 0;
-          right: 0;
-        }
-      }
-      .home-fund-user{
-        display: inline-block;
-        color: #888;
-        &:hover,&:focus{
-          color: @accent;
-          text-decoration: none!important;
-        }
-        img{
-          width: 1.6rem;
-          height: 1.6rem;
-          margin-top: -2px;
-          margin-right: 2px;
-          border-radius: 50%;
-        }
-      }
-    }
-  }
-}
-.home-notices{
-  .home-notice{
-    a{
-      color: #666;
-      font-size: 1.3rem;
-      &:hover, &:focus{
-        text-decoration: none;
-        color: @dark;
-      }
-    }
-  }
-}
+
+
 
 .home-subscribe-forum{
   display: inline-block;
@@ -242,78 +162,109 @@
   }
 }
 
-.home-threads{
 
-  .home-thread:last-child{
-    margin-bottom: 0;
+
+.thread-title-list{
+  height: 20rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  .thread-title-list-header{
+    color: #b16161;
+    height: 3rem;
+    line-height: 3rem;
+    position: relative;
+    a{
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: #555;
+      font-size: 1rem;
+    }
   }
-  .home-thread{
-    margin-bottom: 1.5rem;
-    .home-thread-title{
-      font-size: 1.3rem;
-      color: #3a3a3a;
-      transition: color 100ms;
-      &:hover, &:focus{
-        text-decoration: none;
-        color: @accent;
-      }
+}
+.thread-title-list-item{
+  @height: 1.5rem;
+  height: @height;
+  line-height: @height;
+  padding-left: @height + 0.5rem;
+  position: relative;
+  margin-bottom: 0.3rem;
+  .hideText(@line: 1);
+  overflow: hidden;
+  a{
+    color: #333;
+    &:visited{
+      color: #00827c;
     }
-    .home-thread-cover{
-      display: table-cell;
-      vertical-align: top;
-      padding-top: 0.3rem;
-      img{
-        width: 8rem;
-        height: 5rem;
-        border-radius: 2px;
-        margin-right: 0.7rem;
-        box-sizing: border-box;
-        //border: 2px solid #eee;
-      }
+    &.digest{
+      color: red;
     }
-    .home-thread-content{
-      display: table-cell;
+  }
+  img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @height;
+    width: @height;
+    display: inline-block;
+    border-radius: 50%;
+  }
+}
+
+.community-new-container{
+  .community-new-title{
+    font-size: 1.35rem;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    display: inline-block;
+    &:hover{
+      color: @accent;
+    }
+  }
+  .community-new-desc{
+    font-size: 1rem;
+    color: #777;
+  }
+  height:5rem;
+  overflow: hidden;
+}
+.community-forum-item{
+  @height: 2.2rem;
+  height: @height;
+  line-height: @height;
+  position: relative;
+  padding-left: @height + 0.3rem;
+  padding-right: 0.7rem;
+  display: inline-block;
+  font-size: 0;
+  margin: 0 0.3rem 0.5rem 0;
+  border-radius: @height / 2;
+  background-color: #fff2f2;
+  .community-forum-item-avatar{
+    border-radius: 50%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @height;
+    width: @height;
+    &>* {
+      height: 100%;
       width: 100%;
-      padding-top: 0.4rem;
-      vertical-align: top;
-      .home-thread-abstract{
-        height: 3rem;
-        font-size: 1.1rem;
-        overflow: hidden;
-        color: #777;
-        .hideText(@line: 2);
-        word-break: break-word;
-      }
     }
-    .home-thread-info{
-      margin-top: 0.2rem;
-      position: relative;
-      .home-thread-user{
-        color: #aaa;
-        &:hover, &:focus{
-          text-decoration: none;
-          color: @accent;
-        }
-        img{
-          height: 1.4rem;
-          width: 1.4rem;
-          border-radius: 50%;
-          margin-right: 0.3rem;
-          margin-top: -3px;
-        }
-        span{
-        }
-      }
-      .home-thread-forum{
-        position: absolute;
-        top: 0;
-        right: 0;
-        color: #777;
-        &:hover,&:focus{
-          text-decoration: none;
-          color: @accent;
-        }
-      }
+    display: inline-block;
+  }
+  .community-forum-item-name{
+    color: #333;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.2rem;
+    &:hover{
+      color: @accent;
     }
   }
 }

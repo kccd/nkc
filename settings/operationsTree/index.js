@@ -95,6 +95,7 @@ const settings = require('./settings');
 const latest = require('./latest');
 const oauth = require('./oauth');
 const tc = require('./tc');
+const browser = require('./browser');
 
 const operationTree = {
   home: {
@@ -249,6 +250,7 @@ const operationTree = {
     payment, // 支付相关
     l: link, // 外链跳转
     c: community, // 社区
+    z: zone, // 电波
     wm: watermark, //水印
     logo, // 网站 logo
     creation, // 用户创作中心
@@ -259,7 +261,7 @@ const operationTree = {
     book, // 书籍
     rc, // 资源分组
     comment, // 评论系统
-    zone, // 空间
+    // zone, // 空间
     g: subscribe, // 关注
     article, // 独立文章
     moment, // 动态
@@ -268,6 +270,7 @@ const operationTree = {
     oauth, // 第三方登录
     api, // 纯数据接口
     tc, // 多维分类
+    browser, // 浏览器版本检测
   },
 };
 module.exports = {

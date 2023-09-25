@@ -5,7 +5,7 @@
       .title 学术分
     .col-xs-2
       .number {{targetUser.threadCount - targetUser.disabledThreadsCount}}
-      .title 社区文章
+      .title 论坛文章
     .col-xs-2
       .number {{targetUser.columnThreadCount}}
       .title 专栏文章
