@@ -1,8 +1,17 @@
 import { openCreditPanel } from '../../global/methods';
 import { creditTypes, contentTypes } from '../../lib/vue/Credit';
+import Vue from 'vue';
+import { sweetSuccess, sweetError } from '../../lib/js/sweetAlert';
+import { nkcAPI } from '../../lib/js/netAPI';
+import { getState } from '../../lib/js/state';
+import ThreadOrderModifier from '../../lib/vue/ThreadOrderModifier.vue';
+const state = getState();
 
 window.PostOption = new Vue({
   el: '#modulePostOptions',
+  components: {
+    'thread-order-modifier': ThreadOrderModifier,
+  },
   data: {
     show: false,
 
@@ -10,7 +19,7 @@ window.PostOption = new Vue({
 
     jqDOM: null,
 
-    uid: NKC.configs.uid,
+    uid: state.uid,
     // 类型 thread、post
     pid: '',
     postType: '',
@@ -51,6 +60,7 @@ window.PostOption = new Vue({
     ipInfo: null,
     reviewed: null,
     commentControl: null,
+    modifyOrder: null,
     editType: '',
   },
   computed: {
@@ -63,15 +73,16 @@ window.PostOption = new Vue({
         };
       }
       const { top, left } = jqDOM.offset();
+      const scrollY = 0; // window.scrollY;
       if (direction === 'up') {
         const position = {
-          top: top - domHeight,
+          top: top - domHeight - scrollY,
           left: left - domWidth + jqDOM.width(),
         };
         return position;
       } else {
         return {
-          top: top + jqDOM.height(),
+          top: top - scrollY + jqDOM.height(),
           left: left + jqDOM.width() - domWidth,
         };
       }
@@ -84,7 +95,7 @@ window.PostOption = new Vue({
     });
   },
   updated() {
-    const dom = $(this.$el);
+    const dom = $(this.$refs.container);
     this.domHeight = dom.height();
     this.domWidth = dom.width();
   },
@@ -148,6 +159,7 @@ window.PostOption = new Vue({
           self.ipInfo = options.ipInfo;
           self.reviewed = options.reviewed;
           self.commentControl = options.commentControl;
+          self.modifyOrder = options.modifyOrder;
 
           self.userColumnId = userColumnId;
           self.postType = postType;
@@ -311,6 +323,16 @@ window.PostOption = new Vue({
         complaintSelector.open('post', this.pid);
       }
       self.close();
+    },
+    modifyThreadOrder() {
+      this.$refs.threadOrderModifier.open(
+        () => {
+          this.$refs.threadOrderModifier.close();
+        },
+        {
+          threadId: this.tid,
+        },
+      );
     },
   },
 });

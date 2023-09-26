@@ -1,3 +1,4 @@
+const { Operations } = require('../../settings/operations');
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
   const { state, data, db, params } = ctx;
@@ -34,6 +35,7 @@ router.get('/', async (ctx, next) => {
     reviewed: null,
     ipInfo: null,
     commentControl: null,
+    modifyOrder: null,
   };
   if (user) {
     // 推送到专栏
@@ -151,6 +153,9 @@ router.get('/', async (ctx, next) => {
     optionStatus.ipInfo = ctx.permission('ipinfo')
       ? post.iplm || post.ipoc
       : null;
+    if (isThread) {
+      optionStatus.modifyOrder = ctx.permission(Operations.modifyThreadOrder);
+    }
   }
   data.options = optionStatus;
   data.toc = post.toc;

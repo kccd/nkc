@@ -636,7 +636,7 @@ router
     const skip = paging.start;
     let sort;
     if (s === 'toc') {
-      sort = { toc: -1 };
+      sort = { ttoc: -1 };
     } else if (s === 'tlm') {
       sort = { tlm: -1 };
     } else {

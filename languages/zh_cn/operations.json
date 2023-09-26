@@ -765,5 +765,8 @@
   "visitCommunityNew": "访问论坛最新页（快捷总版）",
   "visitCommunitySub": "访问论坛我的关注页",
   "getForumsTree": "获取专业列表树状结构",
-  "visitAppsPage": "访问资源主页"
+  "visitAppsPage": "访问资源主页",
+  "modifyThreadOrder": "调整论坛文章排序时间",
+  "getThreadOrder": "获取论坛文章排序时间",
+  "checkAccountPermission": "检查账户的权限"
 }
