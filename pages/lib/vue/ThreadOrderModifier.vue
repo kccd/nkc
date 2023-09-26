@@ -118,7 +118,6 @@ export default {
           if(isNaN(tlm)) {
             throw new Error('复序时间格式错误');
           }
-          console.log({ttoc, tlm})
           return nkcAPI(`/api/v1/thread/${this.tid}/order`, HttpMethods.PUT, {
             ttoc,
             tlm,
@@ -126,11 +125,13 @@ export default {
         })
         .then(() => {
           sweetSuccess("提交成功");
+          this.callback && this.callback();
         })
         .catch(sweetError);
     },
     open(callback, props) {
       const {threadId} = props;
+      this.errorInfo = '';
       this.callback = callback;
       this.tid = threadId;
       this.draggable.open();
