@@ -54,7 +54,6 @@ router
     data.t = t;
     data.zoneTypes = zoneTypes;
     data.zoneTab = zoneTab;
-    data.navbar_highlight = 'zone';
     ctx.template = 'zone/zone.pug';
 
     if (data.tab === zoneTab.subscribe && !state.uid) {

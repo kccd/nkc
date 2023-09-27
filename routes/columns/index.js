@@ -26,7 +26,6 @@ router
       gradeId: state.uid ? data.userGrade._id : undefined,
       isApp: state.isApp,
     });
-    data.navbar_highlight = 'columns';
     await next();
   })
   .get('/', async (ctx, next) => {

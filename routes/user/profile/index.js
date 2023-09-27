@@ -63,7 +63,6 @@ router
     data.targetColumnPermission =
       await db.UserModel.ensureApplyColumnPermission(targetUser.uid);
 
-    data.navbar_highlight = 'profile';
     if (state.isApp) {
       data.appLinks = [
         {
