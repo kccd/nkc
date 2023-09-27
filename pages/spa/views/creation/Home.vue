@@ -1,17 +1,17 @@
 <template lang="pug">
 .standard-fluid-max-container.clear-float
   .row
-    .article-common.col-xs-12.col-md-9.m-b-1.box-shadow-panel.xs-p
-      .calendar.overflow-x
+    .article-common.col-xs-12.col-md-9.m-b-1.xs-p
+      .box-shadow.calendar.overflow-x.m-b-1
         .min-h(ref="canvasDom")
         #set-year
           select(@change="summaryCalendar", v-model="selected")
             template(v-for="year in years")
               option(:key="year", :value="year") {{ year }}
-      .pie.overflow-x
+      .box-shadow.pie.overflow-x.m-b-1
         #pie.min-h(ref="renderPie")
-      .account-logs.m-b-2
-        .account-header 最近阅读
+      .box-shadow.account-logs.m-b-1
+        .box-shadow-header 最近阅读
         .account-description
         div
           div(v-if="!visitThreadLogs.length")
@@ -20,8 +20,8 @@
             span {{ vt.time }}
             span 看过
             a.article-title(:title="vt.thread.firstPost.t" :href="'/t/' + vt.thread.tid") {{ vt.thread.firstPost.t }}
-      .account-logs.m-b-1
-        .account-header 看过的用户
+      .box-shadow.account-logs.m-b-1
+        .box-shadow-header 看过的用户
         .account-description
         div
           div(v-if="!visitUserLogs.length")
@@ -34,8 +34,8 @@
               a.account-logs-user-name(:href="log.userHome") {{ log.username }}
               .account-logs-user-time {{ log.time }}
 
-      .account-logs
-        .account-header 我的读者排名
+      .box-shadow.account-logs.m-b-1
+        .box-shadow-header 我的读者排名
         .account-description
         div
           div(v-if="!visitSelfLogs.length")
