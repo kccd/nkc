@@ -33,7 +33,7 @@
           )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
-        .single-moment-content(v-else  ref="momentDetails")
+        .single-moment-content.simple(v-else  ref="momentDetails")
           span(v-html="momentData.content" ref="momentDetailsContent" )
         .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
         //- 图片视频
@@ -77,7 +77,11 @@
             :permissions="permissions"
             :mode="mode"
             )
-      moment-editor(v-if="selectedMomentId === momentData.momentId && !submitting" :mid="momentData.momentId" @published="onPublished" ref="momentEditor")
+      div(v-if="selectedMomentId === momentData.momentId && !submitting")
+        .moment-editor-header
+          .moment-editor-header-title 正在编辑电文：
+          button.btn.btn-default.btn-xs(@click="submitting = true") 取消
+        moment-editor(:mid="momentData.momentId" @published="onPublished" ref="momentEditor")
 
 </template>
 
@@ -283,7 +287,9 @@
     }
   }
   .single-moment-content{
-    .hideText(@line: 4);
+    &.simple{
+      .hideText(@line: 8);
+    }
     font-size: 1.25rem;
     color: #000;
     line-height: 2rem;
@@ -315,6 +321,21 @@
   }
   .singe-moment-details:hover{
     text-decoration: underline;
+  }
+  .moment-editor-header{
+    @momentEditorHeader: 2.5rem;
+    height: @momentEditorHeader;
+    padding-right: 6rem;
+    position: relative;
+    .moment-editor-header-title{
+      height: @momentEditorHeader;
+      line-height: @momentEditorHeader;
+    }
+    button{
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
   }
   //.content-fold{
   //  height: 200px;
