@@ -1,0 +1,29 @@
+@itemHeight: 18rem;
+.apps-item {
+  height: @itemHeight;
+  position: relative;
+  text-align: center;
+  display: block;
+  text-decoration: none!important;
+  img {
+    margin-top: 3rem;
+    height: 6rem;
+    width: 6rem;
+    margin-bottom: 1rem;
+  }
+  .name {
+    display: block;
+    font-size: 1.3rem;
+    color: #333;
+  }
+  .name-info{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    font-size: 1.3rem;
+    line-height: @itemHeight;
+  }
+}

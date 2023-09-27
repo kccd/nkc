@@ -98,8 +98,9 @@ block content
                       span(title='更新/文章/回复')
                         span  (
                         if data.communityContentCount.postCountToday > 0
-                          span.text-danger=data.communityContentCount.postCountToday
-                          span /
+                          span.text-danger
+                            strong=data.communityContentCount.postCountToday
+                        span /
                         span=data.communityContentCount.threadCount
                         span /
                         span=data.communityContentCount.postCount

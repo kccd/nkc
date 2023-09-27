@@ -98,6 +98,8 @@ const apiRouter = routers.api;
 const tcRouter = routers.tc;
 // 浏览器检测
 const browserRouter = routers.browser;
+// 资源页
+const appsRouter = routers.apps;
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -279,4 +281,5 @@ router.use('/tc', tcRouter.routes(), tcRouter.allowedMethods());
 // router.use('/z', telegraphRouter.routes(), telegraphRouter.allowedMethods());
 router.use('/z', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/browser', browserRouter.routes(), browserRouter.allowedMethods());
+router.use('/apps', appsRouter.routes(), appsRouter.allowedMethods());
 module.exports = router;

@@ -12,6 +12,7 @@ const tools = require('../../nkcModules/tools');
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
+const { Operations } = require('../../settings/operations');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -1015,6 +1016,7 @@ threadRouter
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
       review: ctx.permission('review'),
       fundBlacklistPost: ctx.permission('fundBlacklistPost'),
+      modifyThreadOrder: ctx.permission(Operations.modifyThreadOrder),
     };
 
     // 学术分 鼓励

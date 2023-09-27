@@ -13,6 +13,8 @@ import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
 import Lottery from '../lib/vue/lottery.vue';
 import { toChat } from '../lib/js/chat';
+import { sweetSuccess, sweetError } from '../lib/js/sweetAlert';
+import Vue from 'vue';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,

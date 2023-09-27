@@ -38,6 +38,9 @@ const FixedOperations = {
   visitCommunityNew: 'visitCommunityNew',
   visitCommunitySub: 'visitCommunitySub',
   getForumsTree: 'getForumsTree',
+  visitAppsPage: 'visitAppsPage',
+  checkAccountPermission: 'checkAccountPermission',
+  getThreadOrder: 'getThreadOrder',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -777,6 +780,7 @@ const DynamicOperations = {
   getThreadCategories: 'getThreadCategories',
   manageQuestionTags: 'manageQuestionTags',
   createQuestionTags: 'createQuestionTags',
+  modifyThreadOrder: 'modifyThreadOrder',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };
