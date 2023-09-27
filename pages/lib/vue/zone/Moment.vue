@@ -33,7 +33,7 @@
           )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
-        .single-moment-content.simple(v-else  ref="momentDetails")
+        .single-moment-content.simple.pointer(v-else  ref="momentDetails" @click.prevent="handleClick")
           span(v-html="momentData.content" ref="momentDetailsContent" )
         .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
         //- 图片视频
@@ -288,7 +288,14 @@
   }
   .single-moment-content{
     &.simple{
-      .hideText(@line: 8);
+      /* 移动端的样式 */
+      @media (max-width: 767px) {
+        .hideText(@line: 10);
+      }
+      /* PC 端样式 */
+      @media (min-width: 767px) {
+        .hideText(@line: 8);
+      }
     }
     font-size: 1.25rem;
     color: #000;
@@ -391,7 +398,6 @@
     }),
     mounted() {
       this.initData();
-
     },
     computed: {
       focusCommentId() {
@@ -406,6 +412,15 @@
       visitUrl,
       clearTimer() {
         clearTimeout(this.timer);
+      },
+      handleClick(){
+        // 检查是否为选中文本
+        const selectedText = window.getSelection().toString();
+        if (selectedText) {
+          // 用户选中了文本，不执行后续操作
+          return;
+        }
+        this.visitUrl(this.momentData.url, true);
       },
       initData() {
         const {data} = this;
@@ -520,7 +535,6 @@
         this.$refs.momentEditor.reset();
         this.showLoadMore()
       },
-
     }
   }
 </script>
