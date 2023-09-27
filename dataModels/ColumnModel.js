@@ -2,7 +2,7 @@ const mongoose = require('../settings/database');
 const { ThrowServerInternalError } = require('../nkcModules/error');
 const moment = require('moment');
 const Schema = mongoose.Schema;
-const {subscribeSources} = require('../settings/subscribe')
+const { subscribeSources } = require('../settings/subscribe');
 const schema = new Schema(
   {
     _id: Number,
@@ -239,19 +239,42 @@ schema.statics.getTimeline = async (columnId) => {
     if (n > 1000) {
       break;
     }
-    const t = {
-      begin: new Date(`${begin.year}-${begin.month}-1 00:00:00`),
-    };
-    begin.month++;
-    if (begin.month >= 13) {
+    if (begin.year === end.year) {
+      const t = {
+        begin: new Date(`${begin.year}-${begin.month}-1 00:00:00`),
+      };
+      begin.month++;
+      if (begin.month >= 13) {
+        begin.year++;
+        begin.month = 1;
+      }
+      t.end = new Date(`${begin.year}-${begin.month}-1 00:00:00`);
+      time.push(t);
+    } else if (begin.year < end.year) {
+      const t = {
+        begin: new Date(`${begin.year}-${begin.month}-1 00:00:00`),
+      };
       begin.year++;
       begin.month = 1;
+      t.end = new Date(`${begin.year}-${begin.month}-1 00:00:00`);
+      time.push(t);
     }
-    t.end = new Date(`${begin.year}-${begin.month}-1 00:00:00`);
-    time.push(t);
     if (begin.year > end.year && begin.month > end.month) {
       break;
     }
+    // const t = {
+    //   begin: new Date(`${begin.year}-${begin.month}-1 00:00:00`),
+    // };
+    // begin.month++;
+    // if (begin.month >= 13) {
+    //   begin.year++;
+    //   begin.month = 1;
+    // }
+    // t.end = new Date(`${begin.year}-${begin.month}-1 00:00:00`);
+    // time.push(t);
+    // if (begin.year > end.year && begin.month > end.month) {
+    //   break;
+    // }
   }
   const results = [];
   for (const t of time) {
@@ -266,7 +289,11 @@ schema.statics.getTimeline = async (columnId) => {
       continue;
     }
     results.push({
-      time: moment(t.begin).format('YYYY年MM月'),
+      // time:moment(t.begin).format('YYYY年MM月'),
+      time:
+        t.begin.getFullYear() === end.year
+          ? moment(t.begin).format('YYYY年MM月')
+          : moment(t.begin).format('YYYY年'),
       count,
     });
   }
@@ -462,9 +489,9 @@ schema.methods.updateBasicInfo = async function () {
   });
   const columnPostCount = columnPosts.length;
   /*const hits = await UsersBehaviorModel.countDocuments({
-    tid: {$in: threadsId},
-    operationId: 'visitThread'
-  });*/
+                                        tid: {$in: threadsId},
+                                        operationId: 'visitThread'
+                                      });*/
   let hits = await ThreadModel.aggregate([
     {
       $match: {

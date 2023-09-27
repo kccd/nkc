@@ -1,0 +1,21 @@
+if !isIncluded('zone/zone/zoneAppTab')
+  mixin renderZoneAppTab(isApp,tab,zoneTab,type,user)
+    if !isApp
+      .btn-group.btn-group-justified.m-b-1
+        .btn-group(role="group")
+          a.btn.btn-default(
+            class=tab === zoneTab.all? 'btn-primary': ''
+            href=`/z?t=${type}-a`
+            onclick=`RootApp.keepZoneRoute('a')`
+          ) 全部
+        .btn-group(role="group")
+          if user
+            a.btn.btn-default(
+              class=tab === zoneTab.subscribe? 'btn-primary': ''
+              href=`z?t=${type}-s`
+              onclick=`RootApp.keepZoneRoute('s')`
+            ) 我的关注
+          else
+            button.btn.btn-default(
+            onclick="RootApp.openLoginPanel('login')"
+            ) 我的关注
