@@ -5,17 +5,17 @@
         a.selected-table-span.button.radius-left(
           @click.stop='selectSource("threads")'
           :class="{active : selectedSource === 'threads'}"
-        ) 社区
+        ) {{source.thread}}
         a.selected-table-span.button(
           v-if="articleSource && articleSource.includes('zone')"
           @click.stop='selectSource("zone")'
           :class="{active : selectedSource === 'zone', 'radius-right': articleSource && !articleSource.includes('column')}"
-        ) 空间
+        ) {{source.zone}}
         a.selected-table-span.button.radius-right(
           v-if="articleSource && articleSource.includes('column')"
           @click.stop='selectSource("column")'
           :class="{active : selectedSource === 'column'}"
-        ) 专栏
+        ) {{source.column}}
         a.selected-table-span.button.m-l-1.relative(
           @click.stop='selectSource("choose")'
           :class="{active : selectedSource === 'choose', 'radius-left': true, 'radius-right': true}"
@@ -157,8 +157,8 @@ export default {
     number: 0,
     loading: true,
     source: {
-      'thread': '社区',
-      'zone': '空间',
+      'thread': '论坛',
+      'zone': '电波',
       'column': '专栏',
     }
   }),
