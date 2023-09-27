@@ -1477,11 +1477,9 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       );
       addr = betaDocument.addr;
     }
-
     if (!content && quoteType) {
       content = await MomentModel.getQuoteDefaultContent(quoteType);
     }
-
     const filesData = [];
     for (const rid of files) {
       const resource = resourcesObj[rid];

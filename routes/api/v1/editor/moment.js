@@ -236,8 +236,9 @@ router
         filesData.push(fileData);
       }
     }
+    const newContent = await db.MomentModel.renderContent(newDocument.content);
     ctx.apiData = {
-      content: newDocument.content,
+      content: newContent,
       files: filesData,
       status: newMoment.status,
       tlm: newMoment.tlm,

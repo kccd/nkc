@@ -60,7 +60,6 @@ router
       moments,
       state.uid,
     );
-    console.log(data.momentsData, 'momentsData');
     data.paging = paging;
     data.permissions = permissions;
     await next();

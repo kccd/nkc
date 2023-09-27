@@ -33,7 +33,8 @@
           )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
-        .single-moment-content.pointer(v-else v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
+        .single-moment-content(v-else v-html="momentData.content" ref="momentDetails")
+        .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
         //- 图片视频
         .single-moment-files
           moment-files(:data="momentData.files")
@@ -305,6 +306,18 @@
     border-radius: 5px;
     margin-bottom: 1rem
   }
+  .singe-moment-details{
+    color: rgb(29, 155, 240);
+    cursor: pointer;
+  }
+  .singe-moment-details:hover{
+    text-decoration: underline;
+  }
+  //.content-fold{
+  //  height: 200px;
+  //  overflow: hidden;
+  //}
+
 </style>
 
 <script>
@@ -349,15 +362,18 @@
       },
       submitting:false,
       timer: null,
-      selectedMomentId:''
+      selectedMomentId:'',
+      isFold:false //是否折叠
     }),
     mounted() {
       this.initData();
+
     },
     computed: {
       focusCommentId() {
         return this.focus;
-      }
+      },
+
     },
     destroyed() {
       this.clearTimer();
@@ -371,6 +387,7 @@
       initData() {
         const {data} = this;
         this.momentData = JSON.parse(JSON.stringify(data));
+        this.setFold()
       },
       vote() {
         if(!this.logged) return toLogin();
@@ -428,6 +445,40 @@
         this.submitting = false;
         this.selectedMomentId = mid;
       },
+      setFold(){
+        if(this.type !== 'details'){
+          this.$nextTick(() => {
+            const childNodes =  Array.from(this.$refs.momentDetails.childNodes);
+            let text = ''
+            let startIndex = -1;
+            let lastNode;
+            for (let i = 0; i < childNodes.length; i++ ) {
+              const node = childNodes[i]
+              if (node.nodeType === Node.TEXT_NODE && text.length<=200) {
+                text += node.textContent;
+                lastNode = node
+              }
+              if (startIndex === -1 && text.length > 200) {
+                startIndex = i + 1; // 记录要删除的起始下标
+                break;
+              }
+            }
+            if (startIndex !== -1) {
+              for (let i = startIndex; i < childNodes.length; i++) {
+                const node = childNodes[i];
+                this.$refs.momentDetails.removeChild(node); // 从 DOM 中删除节点
+              }
+            }
+            if(text.length>200){
+              const overLength = text.length - 200;
+              const newNodeText = lastNode.textContent.substring(0,lastNode.textContent.length - overLength) + '...';
+              const newNode = document.createTextNode(newNodeText);
+              this.$refs.momentDetails.replaceChild(newNode, lastNode); // 替换超出部分的节点
+            }
+            this.isFold = text.length>200
+          });
+        }
+      },
       onPublished(data) {
         const {content,submitting,files,status,tlm} = data
         this.momentData.content = content;
@@ -436,7 +487,8 @@
         this.momentData.files = files
         this.momentData.tlm = tlm;
         this.$refs.momentEditor.reset();
-      }
+        this.setFold();
+      },
 
     }
   }
