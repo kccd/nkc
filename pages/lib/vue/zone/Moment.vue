@@ -79,7 +79,7 @@
             )
       div(v-if="selectedMomentId === momentData.momentId && !submitting")
         .moment-editor-header
-          .moment-editor-header-title 正在编辑电文：
+          .moment-editor-header-title.text-info 正在编辑电文：
           button.btn.btn-default.btn-xs(@click="submitting = true") 取消
         moment-editor(:mid="momentData.momentId" @published="onPublished" ref="momentEditor")
 
