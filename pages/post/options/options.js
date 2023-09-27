@@ -4,14 +4,10 @@ import Vue from 'vue';
 import { sweetSuccess, sweetError } from '../../lib/js/sweetAlert';
 import { nkcAPI } from '../../lib/js/netAPI';
 import { getState } from '../../lib/js/state';
-import ThreadOrderModifier from '../../lib/vue/ThreadOrderModifier.vue';
 const state = getState();
 
 window.PostOption = new Vue({
   el: '#modulePostOptions',
-  components: {
-    'thread-order-modifier': ThreadOrderModifier,
-  },
   data: {
     show: false,
 
@@ -60,7 +56,6 @@ window.PostOption = new Vue({
     ipInfo: null,
     reviewed: null,
     commentControl: null,
-    modifyOrder: null,
     editType: '',
   },
   computed: {
@@ -159,7 +154,6 @@ window.PostOption = new Vue({
           self.ipInfo = options.ipInfo;
           self.reviewed = options.reviewed;
           self.commentControl = options.commentControl;
-          self.modifyOrder = options.modifyOrder;
 
           self.userColumnId = userColumnId;
           self.postType = postType;
@@ -323,16 +317,6 @@ window.PostOption = new Vue({
         complaintSelector.open('post', this.pid);
       }
       self.close();
-    },
-    modifyThreadOrder() {
-      this.$refs.threadOrderModifier.open(
-        () => {
-          this.$refs.threadOrderModifier.close();
-        },
-        {
-          threadId: this.tid,
-        },
-      );
     },
   },
 });

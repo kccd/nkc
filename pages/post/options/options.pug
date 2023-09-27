@@ -2,7 +2,6 @@ if !isIncluded('options')
   include ../../publicModules/complaint/complaintBox.pug
   +includeCSS('/post/options/options.css')
   #modulePostOptions(v-cloak)
-    thread-order-modifier(ref='threadOrderModifier')
     .module-post-options-container(:style="'top:'+position.top+'px;left:'+position.left+'px'" @click='clickElement' v-show='show' ref='container')
       .post-options-panel(v-if='loading')
         .loading 加载中...
@@ -13,9 +12,6 @@ if !isIncluded('options')
         a.option(@click='visitUrl(getUrl("post", pid), true)' target='_blank' v-else)
           .fa.fa-newspaper-o
           span 详情
-        .option(v-if='modifyOrder' @click='modifyThreadOrder')
-          .fa.fa-sort
-          span 调整排序
         .option(v-if='inColumn !== null' @click='toColumn')
           .fa.fa-share-square-o
           span(v-if='inColumn === false') 推送到专栏

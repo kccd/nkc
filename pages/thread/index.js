@@ -7,6 +7,8 @@ import Sortable from 'sortablejs';
 import { sweetError, sweetQuestion, sweetSuccess } from '../lib/js/sweetAlert';
 import { debounce } from '../lib/js/execution';
 import { visitUrlReplace } from '../lib/js/pageSwitch';
+import ThreadOrderModifier from '../lib/vue/ThreadOrderModifier.vue';
+import Vue from 'vue';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -1690,7 +1692,31 @@ if ($('#productAppRoot').length > 0) {
   });
 }
 
+const threadVueApp = new Vue({
+  el: '#threadVueApp',
+  components: {
+    'thread-order-modifier': ThreadOrderModifier,
+  },
+  methods: {
+    openThreadOrderModifier(tid) {
+      this.$refs.threadOrderModifier.open(
+        () => {
+          this.$refs.threadOrderModifier.close();
+        },
+        {
+          threadId: tid,
+        },
+      );
+    },
+  },
+});
+
+function modifyThreadOrder(tid) {
+  threadVueApp.openThreadOrderModifier(tid);
+}
+
 Object.assign(window, {
+  modifyThreadOrder,
   addToColumn,
   removeToColumn,
   get_selection,
