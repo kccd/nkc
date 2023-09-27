@@ -27,7 +27,7 @@
         span {{remainingWords}}
         button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-if="submitting" title="发表中，请稍候")
           .fa.fa-spinner.fa-spin
-        button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-else) 提交
+        button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-else) 发射
 </template>
 
 <style lang="less" scoped>

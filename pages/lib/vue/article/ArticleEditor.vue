@@ -149,6 +149,7 @@ import {visitUrl} from "../../js/pageSwitch";
 import {immediateDebounce} from "../../js/execution";
 import EditorCategories from "../publicVue/moveThreadOrArticle/EditorCategories";
 
+
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
@@ -614,17 +615,21 @@ export default {
     },
     //检测标题
     checkTitle() {
-      if (this.article.title.length < 3) sweetError('标题不能少于3个字');
-      if (this.article.title.length > 100) sweetError('标题不能超过100个字');
+      if (this.article.title.length < 3){
+        throw ('标题不能少于4个字')
+      }
+      else if (this.article.title.length > 100) {
+        throw ('标题不能超过100个字')
+      }
     },
     //检测内容
     checkContent() {
       let contentText = this.article.content;
       if(contentText.length > 100000) {
-        sweetError('内容不能超过10万字');
+        throw ('内容不能超过10万字');
       }
       if(contentText.length < 2) {
-        sweetError('内容不能少于2个字');
+        throw ('内容不能少于2个字');
       }
     },
     // 检测关键词
@@ -646,13 +651,21 @@ export default {
     },
     //表单验证
     checkPost() {
-      this.checkTitle();
-      this.checkContent();
+      try {
+        this.checkTitle();
+        this.checkContent();
+      } catch (error) {
+        throw error
+      }
     },
     //发布文章 需要进行表单验证
-    publish() {
+    async publish () {
       //表单验证
-      this.checkPost()
+      try {
+        this.checkPost();
+      }catch (error){
+       return  sweetError(error)
+      }
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
       if(this.articleStatus === 'default' && this.source === 'column' && !this.selectCategory

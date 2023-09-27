@@ -32,7 +32,9 @@ const FixedOperations = {
   postExamsPaper: 'postExamsPaper',
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
+  setMomentVisible: 'setMomentVisible',
   getRegisterExamCode: 'getRegisterExamCode',
+  editorMoment: 'editorMoment',
   visitZone: 'visitZone',
   browserDetection: 'browserDetection',
   visitCommunityNew: 'visitCommunityNew',
@@ -781,6 +783,9 @@ const DynamicOperations = {
   manageQuestionTags: 'manageQuestionTags',
   createQuestionTags: 'createQuestionTags',
   modifyThreadOrder: 'modifyThreadOrder',
+  setMomentVisibleOther: 'setMomentVisibleOther',
+  viewAllUserMoment: 'viewAllUserMoment',
+  editorUserMoment: 'editorUserMoment',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

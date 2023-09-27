@@ -49,5 +49,6 @@
   "FORBIDDEN_BECAUSE_COLLECTED_THREAD": "您已收藏过当前文章",
   "FORBIDDEN_BECAUSE_UN_COLLECTED_THREAD": "您未收藏当前文章",
   "INVALID_REGISTER_EXAM_CODE": "计算结果错误或验证已过期",
-  "IS_INDEFINITE_TYPE_IN_CORRECT": "当前填空题不应有不定项类型"
+  "IS_INDEFINITE_TYPE_IN_CORRECT": "当前填空题不应有不定项类型",
+  "Moment_CAN_NOT_BE_EDITED": "当前电文状态异常无法编辑"
 }

@@ -3,6 +3,9 @@ const router = new Router();
 const { OnlyUser } = require('../../middlewares/permission');
 const articleRouter = require('./article');
 const momentRouter = require('./moment');
+const {
+  subscribeUserService,
+} = require('../../services/subscribe/subscribeUser.service');
 const zoneTypes = {
   moment: 'm',
   article: 'a',
@@ -63,13 +66,14 @@ router
   .get('/', async (ctx, next) => {
     const { state, db, data, query, nkcModules, permission } = ctx;
     const { zoneTypes, zoneTab, type, tab } = data;
+    const { page = 0 } = query;
     if (type !== zoneTypes.moment) {
       return await next();
     }
-
     const momentStatus = await db.MomentModel.getMomentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
-
+    const { own, everyone, attention } =
+      await db.MomentModel.getMomentVisibleType();
     const match = {
       parent: '',
       quoteType: {
@@ -77,31 +81,68 @@ router
       },
       $or: [],
     };
-
+    //判断是否当前用有相应证书可以查看所有内容,或设置电文可见状态
+    const hasPermission =
+      ctx.permission('setMomentVisibleOther') ||
+      ctx.permission('viewAllUserMoment');
+    //获取当前用户的电文
     if (state.uid) {
       match.$or.push({
         uid: state.uid,
         status: {
           $in: [momentStatus.normal, momentStatus.faulty, momentStatus.unknown],
         },
-      });
-    }
-
-    if (tab === zoneTab.all) {
-      match.$or.push({
-        status: momentStatus.normal,
-      });
-    } else {
-      const subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
-      match.$or.push({
-        uid: {
-          $in: subUid,
+        visibleType: {
+          $in: [own, everyone, attention],
         },
-        status: momentStatus.normal,
       });
     }
-
-    const { page = 0 } = query;
+    if (hasPermission) {
+      match.$or.push({
+        status: {
+          $in: [momentStatus.normal],
+        },
+        visibleType: {
+          $in: [own, everyone, attention],
+        },
+      });
+    }
+    //获取当前用户的关注列表
+    const subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
+    const condition = {
+      uid: {
+        $in: subUid,
+      },
+      status: momentStatus.normal,
+    };
+    //查看全部
+    if (tab === zoneTab.all) {
+      //查看全部
+      match.$or.push(
+        //所有人可见
+        {
+          status: momentStatus.normal,
+          visibleType: {
+            $in: [everyone],
+          },
+        },
+        //仅关注可见
+        {
+          ...condition,
+          visibleType: {
+            $in: [attention],
+          },
+        },
+      );
+    } else {
+      //查看关注
+      match.$or.push({
+        ...condition,
+        visibleType: {
+          $in: [everyone, attention],
+        },
+      });
+    }
 
     //获取当前用户对动态的审核权限
     const permissions = {
@@ -112,8 +153,9 @@ router
         permissions.reviewed = true;
       }
     }
-    let count;
 
+    let count;
+    //缓存
     if (tab === zoneTab.all) {
       const now = Date.now();
       if (now - momentsCount.timestamp > momentsCount.interval) {
@@ -128,7 +170,6 @@ router
     }
 
     const paging = nkcModules.apiFunction.paging(page, count);
-
     const moments = await db.MomentModel.find(match)
       .sort({ top: -1 })
       .skip(paging.start)
@@ -137,7 +178,6 @@ router
       moments,
       state.uid,
     );
-
     data.paging = paging;
     data.permissions = permissions;
     await next();
