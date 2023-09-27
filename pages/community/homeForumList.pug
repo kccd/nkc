@@ -52,7 +52,8 @@ if !isIncluded('homeForumList')
                     span(title=`更新/文章/回复`)
                       | (
                       if f.countPostsToday !== 0
-                        span.text-danger=f.countPostsToday
+                        span.text-danger
+                          strong=f.countPostsToday
                         | /
                       span=f.countThreads
                       | /
