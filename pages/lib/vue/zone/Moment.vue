@@ -370,7 +370,6 @@
     }),
     mounted() {
       this.initData();
-
     },
     computed: {
       focusCommentId() {
@@ -499,7 +498,6 @@
         this.$refs.momentEditor.reset();
         this.showLoadMore()
       },
-
     }
   }
 </script>

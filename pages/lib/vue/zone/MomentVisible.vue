@@ -17,8 +17,8 @@
           </label>
         </header>
         <footer>
-          <button class="btn-secondary btn btn-xs m-r-05" @click="cancel">取消</button>
-          <button class="btn-primary btn btn-xs" @click="submit">确定</button>
+          <button class="btn-secondary btn btn-xs m-r-05 btn-default" @click="cancel">取消</button>
+          <button class="btn-primary btn btn-xs btn-default" @click="submit">确定</button>
         </footer>
       </div>
     </template>
