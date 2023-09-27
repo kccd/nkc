@@ -6,7 +6,7 @@
         .m-a-1
         .navbar-link
           .col-xs-3
-            a(href='/z') 电波
+            a(href='/z' onclick="return RootApp.visitZone()" ) 电波
           .col-xs-3
             a(href='/c') 论坛
           .col-xs-3
