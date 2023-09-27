@@ -100,6 +100,7 @@ const tcRouter = routers.tc;
 const browserRouter = routers.browser;
 // 资源页
 const appsRouter = routers.apps;
+const navbarRouter = require('./navbar');
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -282,4 +283,5 @@ router.use('/tc', tcRouter.routes(), tcRouter.allowedMethods());
 router.use('/z', zoneRouter.routes(), zoneRouter.allowedMethods());
 router.use('/browser', browserRouter.routes(), browserRouter.allowedMethods());
 router.use('/apps', appsRouter.routes(), appsRouter.allowedMethods());
+router.use('', navbarRouter.routes(), navbarRouter.allowedMethods());
 module.exports = router;

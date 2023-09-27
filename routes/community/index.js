@@ -86,7 +86,6 @@ router
     }
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
     data.enableFund = enableFund;
-    data.navbar_highlight = 'community';
     await next();
   })
   // 论坛首页
