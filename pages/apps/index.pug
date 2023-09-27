@@ -1,0 +1,15 @@
+extends ../bootstrap_base
+block title
+  title=`资源 - ${remoteState.serverSettings.websiteName}`
+  +includeCSS('/apps/index.css')
+block content
+  .container-fluid.max-width
+    .row
+      for app in data.appsData
+        .col-xs-12.col-md-3
+          a.apps-item.box-shadow.text-center(href=app.url target="_blank")
+            img(src=app.icon)
+            .name=app.name
+      .col-xs-12.col-md-3
+        .apps-item.box-shadow.text-center
+          span.name-info.text-info 增加中，敬请期待

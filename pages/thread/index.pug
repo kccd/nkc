@@ -47,6 +47,8 @@ block content
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_digest
+      #threadVueApp(v-cloak)
+        thread-order-modifier(ref="threadOrderModifier")
       .row
         .col-xs-12.col-md-9#wrap.box-shadow-panel
           .m-b-1
@@ -136,6 +138,8 @@ block content
                                 button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
                               if data.permissions.moveThreads
                                 button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
+                              if data.permissions.modifyThreadOrder
+                                button.btn-sm.btn.btn-default(onclick=`modifyThreadOrder("${data.thread.tid}")`) 调整排序
                               if data.permissions.toDraftOrToRecycle
                                 button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
                             if data.thread.type === "fund"
