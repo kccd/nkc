@@ -8,7 +8,7 @@ block content
       .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
           include ./zone/zoneAppTab
-          +renderZoneAppTab(state.isApp)
+          +renderZoneAppTab(state.isApp,data.tab,data.zoneTab,data.type,data.user)
           #ZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
             moment-editor(@published='published')
           if data.type ===data.zoneTypes.moment
