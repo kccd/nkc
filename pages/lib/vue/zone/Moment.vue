@@ -288,7 +288,14 @@
   }
   .single-moment-content{
     &.simple{
-      .hideText(@line: 8);
+      /* 移动端的样式 */
+      @media (max-width: 767px) {
+        .hideText(@line: 10);
+      }
+      /* PC 端样式 */
+      @media (min-width: 767px) {
+        .hideText(@line: 8);
+      }
     }
     font-size: 1.25rem;
     color: #000;
