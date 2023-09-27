@@ -15,7 +15,7 @@
             .icon-remove(@click="removeFromArr(videosId, index)" title="取消选择")
               .fa.fa-trash-o
             video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
-    .buttons-container
+    .buttons-container.m-b-1
       .button-icon(
         @click="selectPicture"
         :class="{'disabled': !allowedToSelectPicture}"
