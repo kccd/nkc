@@ -29,7 +29,6 @@
             span(v-if="momentData.tlm>momentData.toc" ) 编辑于
             from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
-
           //- 其他操作
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
           moment-option(
