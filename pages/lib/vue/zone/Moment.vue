@@ -23,7 +23,10 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
+            span(v-if="momentData.tlm>momentData.toc" ) 编辑于
+            from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
+
           //- 其他操作
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
           moment-option(
@@ -531,6 +534,7 @@
         this.momentData.status = status
         this.submitting = submitting;
         this.momentData.files = files
+        console.log(tlm,'tlm');
         this.momentData.tlm = tlm;
         this.$refs.momentEditor.reset();
         this.showLoadMore()
