@@ -123,7 +123,6 @@ router
       {
         $set: {
           type: stableHistoryDocumentTypes,
-          tlm,
         },
       },
     );

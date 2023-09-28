@@ -157,6 +157,11 @@ const schema = new mongoose.Schema({
     type: String,
     default: visibleType.everyone,
   },
+  //电文展示量
+  hits: {
+    type: Number,
+    default: 0,
+  },
 });
 
 /*
@@ -1464,6 +1469,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       status,
       visibleType,
       tlm,
+      hits,
     } = moment;
 
     let f = moment[field];
@@ -1559,6 +1565,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       voteUp,
       status,
       addr,
+      hits,
       statusInfo: '',
       voteType: votesType[_id],
       commentCount: commentAll,
@@ -1922,6 +1929,13 @@ schema.statics.getPageByMomentCommentId = async (mode, momentCommentId) => {
     order = parentComment.order;
   }
   return MomentModel.getPageByOrder(mode, order);
+};
+
+/*
+ * 电文阅读数量增加
+ * */
+schema.methods.addMomentHits = async function () {
+  await this.updateOne({ $inc: { hits: 1 } });
 };
 
 /*

@@ -13,6 +13,9 @@
           :data-global-data="objToStr({uid: momentData.uid})"
         )
           img(:src="momentData.avatarUrl")
+        .single-moment-hits.m-t-05(v-if="type === 'details'")
+          span 阅读
+          span {{momentData.hits}}
       .single-moment-right(v-if="selectedMomentId !== momentData.momentId || submitting" )
         .single-moment-header
           .single-moment-user(
@@ -347,6 +350,15 @@
       right: 0;
     }
   }
+  .single-moment-hits{
+    &>span:first-of-type{
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    text-align: center;
+    color: rgb(85,85,85);
+    font-size: 12px;
+  }
   //.content-fold{
   //  height: 200px;
   //  overflow: hidden;
@@ -534,7 +546,6 @@
         this.momentData.status = status
         this.submitting = submitting;
         this.momentData.files = files
-        console.log(tlm,'tlm');
         this.momentData.tlm = tlm;
         this.$refs.momentEditor.reset();
         this.showLoadMore()
