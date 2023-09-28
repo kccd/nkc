@@ -257,6 +257,9 @@ var Tools = function () {
       case 'zoneMoment': {
         return '/z/m/' + id;
       }
+      case 'zoneMomentHistory': {
+        return '/z/m/' + id + '/history';
+      }
       case 'columnThread': {
         return '/m/' + id + '/a/' + size;
       }

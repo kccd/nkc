@@ -18,7 +18,7 @@ block content
         .box-shadow
           .m-b-1
             include ../communityNav
-            +communityNav([{name: '我的关注', url: '/c/sub'}])
+            +communityNav([{name: '我的关注', url: '/c/sub'},{isEqual:true,name: '快捷总版', url: '/c/new'}])
           .m-b-1
             -showPagingSortButton = false;
             include ../../publicModules/paging/paging

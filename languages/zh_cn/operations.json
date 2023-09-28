@@ -761,8 +761,19 @@
   "visitExamQuestionEditor": "访问考试系统试题编辑器",
   "getRegisterExamCode": "获取注册前考试的图形验证码",
   "registerExamCheck": "注册前检测是否需要考试",
+  "setMomentVisible": "设置电文可见状态",
+  "setMomentVisibleOther": "设置其他人的电文可见状态",
+  "viewOtherUserAbnormalMoment": "查看其他人非正常状态的电文",
+  "editOtherUserMoment": "编辑其他人的电文内容",
+  "editorMoment": "编辑电文内容",
   "browserDetection": "浏览器版本检测",
   "visitCommunityNew": "访问论坛最新页（快捷总版）",
   "visitCommunitySub": "访问论坛我的关注页",
-  "getForumsTree": "获取专业列表树状结构"
+  "getForumsTree": "获取专业列表树状结构",
+  "visitAppsPage": "访问资源主页",
+  "modifyThreadOrder": "调整论坛文章排序时间",
+  "getThreadOrder": "获取论坛文章排序时间",
+  "checkAccountPermission": "检查账户的权限",
+  "visitZoneMomentHistory": "查看电文修改历史",
+  "visitOtherUserZoneMomentHistory": "查看其他人的电文修改历史"
 }

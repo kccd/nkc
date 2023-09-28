@@ -5,12 +5,14 @@ const serverRouter = require('./server');
 const accountRouter = require('./account');
 const articlesRouter = require('./articles');
 const threadsRouter = require('./threads');
+const threadRouter = require('./thread');
 const columnRouter = require('./column');
 const recycleRouter = require('./recycle');
 const usersRouter = require('./users');
 const examRouter = require('./exam');
 const forumsRouter = require('./forums');
 const registerRouter = require('./register');
+const editorRouter = require('./editor');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
@@ -22,5 +24,7 @@ router
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/exam', examRouter.routes(), examRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
-  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods());
+  .use('/thread/:tid', threadRouter.routes(), threadRouter.allowedMethods())
+  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods());
 module.exports = router;

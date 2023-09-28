@@ -1,5 +1,10 @@
 import { openCreditPanel } from '../../global/methods';
 import { creditTypes, contentTypes } from '../../lib/vue/Credit';
+import Vue from 'vue';
+import { sweetSuccess, sweetError } from '../../lib/js/sweetAlert';
+import { nkcAPI } from '../../lib/js/netAPI';
+import { getState } from '../../lib/js/state';
+const state = getState();
 
 window.PostOption = new Vue({
   el: '#modulePostOptions',
@@ -10,7 +15,7 @@ window.PostOption = new Vue({
 
     jqDOM: null,
 
-    uid: NKC.configs.uid,
+    uid: state.uid,
     // 类型 thread、post
     pid: '',
     postType: '',
@@ -63,15 +68,16 @@ window.PostOption = new Vue({
         };
       }
       const { top, left } = jqDOM.offset();
+      const scrollY = 0; // window.scrollY;
       if (direction === 'up') {
         const position = {
-          top: top - domHeight,
+          top: top - domHeight - scrollY,
           left: left - domWidth + jqDOM.width(),
         };
         return position;
       } else {
         return {
-          top: top + jqDOM.height(),
+          top: top - scrollY + jqDOM.height(),
           left: left + jqDOM.width() - domWidth,
         };
       }
@@ -84,7 +90,7 @@ window.PostOption = new Vue({
     });
   },
   updated() {
-    const dom = $(this.$el);
+    const dom = $(this.$refs.container);
     this.domHeight = dom.height();
     this.domWidth = dom.width();
   },

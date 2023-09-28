@@ -5,12 +5,14 @@
       .left-draw-container(v-if="show && !loading")
         .m-a-1
         .navbar-link
-          .col-xs-4
-            a(href='/z') 电波
-          .col-xs-4
+          .col-xs-3
+            a(href='/z' onclick="return RootApp.visitZone()" ) 电波
+          .col-xs-3
             a(href='/c') 论坛
-          .col-xs-4
+          .col-xs-3
             a(href=`/m`) 专栏
+          .col-xs-3
+            a(href=`/apps`) 资源
         .m-a-1#navbar_custom_dom
         .m-a-1
           Management(:management="management")

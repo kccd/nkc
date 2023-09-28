@@ -16,10 +16,21 @@ module.exports = {
       drawer: {
         GET: Operations.getAccountDrawer,
       },
+      permission: {
+        GET: Operations.checkAccountPermission,
+      },
     },
     threads: {
       selector: {
         GET: Operations.getUserArticles,
+      },
+    },
+    thread: {
+      PARAMETER: {
+        order: {
+          GET: Operations.getThreadOrder,
+          PUT: Operations.modifyThreadOrder,
+        },
       },
     },
     articles: {
@@ -99,6 +110,15 @@ module.exports = {
     register: {
       exam: {
         GET: Operations.registerExamCheck,
+      },
+    },
+    editor: {
+      moment: {
+        PARAMETER: {
+          GET: Operations.editorMoment,
+          PUT: Operations.editorMoment,
+          POST: Operations.editorMoment,
+        },
       },
     },
     forums: {

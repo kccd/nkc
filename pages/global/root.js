@@ -13,6 +13,8 @@ import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
 import Lottery from '../lib/vue/lottery.vue';
 import { toChat } from '../lib/js/chat';
+import { sweetSuccess, sweetError } from '../lib/js/sweetAlert';
+import Vue from 'vue';
 import {
   initAppGlobalClickLinkEvent,
   initGlobalClickEvent,
@@ -21,6 +23,7 @@ import {
 } from './event';
 import { initUserPanel } from './userPanel';
 import { subUsers } from '../lib/js/subscribe';
+import { visitUrl } from '../lib/js/pageSwitch';
 const { isApp, platform, uid } = getState();
 
 window.RootApp = new Vue({
@@ -118,6 +121,20 @@ window.RootApp = new Vue({
             sweetError(err);
           });
       }
+    },
+    // 保存路由信息
+    keepZoneRoute(tab) {
+      localStorage.setItem('zoneTab', `${tab}`);
+    },
+    // 跳转到离开时的路由
+    visitZone() {
+      const zoneTab = localStorage.getItem('zoneTab');
+      if (!zoneTab || (!uid && zoneTab === 's') || zoneTab !== 's') {
+        visitUrl(`/z`);
+        return false;
+      }
+      visitUrl(`/z?t=m-${zoneTab}`);
+      return false;
     },
   },
 });

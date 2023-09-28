@@ -1,5 +1,6 @@
 <template lang="pug">
   div(:data-id="commentData._id")
+    emoji-selector(ref="emojiSelector")
     .moment-comment-item(
       :class=`{'active': focus === commentData._id, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted', 'disable-hover': replyEditorStatus}`
     )
@@ -55,12 +56,23 @@
           @content-change="onReplyEditorContentChange"
           @click-ctrl-enter="submitReplyContent"
         )
+        .button-icon(
+          @click="selectEmoji"
+          @mouseover="iconMouseOver(icons.face)"
+          @mouseleave="iconMouseLeave(icons.face)"
+          title="表情"
+        )
+          winking-face(
+            :theme="icons.face.theme"
+            :size="icons.face.size"
+            :fill="icons.face.fill"
+          )
         .submit-button-container.text-right
           button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
-          button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 提交
+          button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 发射
           button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled)
             .fa.fa-spinner.fa-spin
-          button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 提交
+          button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 发射
 
     .moment-comment-comments(v-if="commentData.commentsData && commentData.commentsData.length > 0")
       moment-comment(
@@ -88,7 +100,13 @@ import {getState} from "../../js/state";
 import {objToStr} from "../../js/tools";
 import TextareaEditor from '../../vue/TextareaEditor';
 import {nkcAPI} from "../../js/netAPI";
+import { WinkingFace } from "@icon-park/vue";
+import EmojiSelector from "../EmojiSelector.vue";
 const state = getState();
+const iconFill = {
+  normal: '#555',
+  active: '#000'
+};
 export default {
   name: 'moment-comment',
   props: {
@@ -118,12 +136,36 @@ export default {
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
     'textarea-editor': TextareaEditor,
+    'winking-face': WinkingFace,
+    'emoji-selector': EmojiSelector,
   },
   data: () => ({
     logged: !!state.uid,
     replyEditorStatus: false,
     replyContent: '',
     submitting: false,
+    icons: {
+      image: {
+        fill: iconFill.normal,
+        size: 22,
+        theme: 'outline'
+      },
+      video: {
+        fill: iconFill.normal,
+        size: 22,
+        theme: 'outline'
+      },
+      face: {
+        fill: iconFill.normal,
+        size: 14,
+        theme: 'outline'
+      },
+      article: {
+        fill: iconFill.normal,
+        size: 22,
+        theme: 'outline'
+      }
+    }
   }),
   computed: {
     commentData() {
@@ -215,7 +257,23 @@ export default {
     visitCommentChild() {
       // this.$emit('visit-comment-child', this.commentData);
       visitUrl(`/z/m/${this.commentData._id}`, true);
-    }
+    },
+    insertContent(text) {
+      return this.$refs.replyEditor.insertContent(text);
+    },
+    iconMouseOver(e) {
+      e.fill = iconFill.active;
+    },
+    iconMouseLeave(e) {
+      e.fill = iconFill.normal;
+    },
+    selectEmoji() {
+      const self = this;
+      this.$refs.emojiSelector.open(res => {
+        const {code} = res;
+        self.insertContent(`[${code}]`);
+      });
+    },
   }
 }
 </script>
@@ -336,6 +394,42 @@ export default {
 .submit-button-container{
   button{
     width: 4rem;
+  }
+}
+.button-icon{
+  height: 1rem;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  color: #333;
+  margin-right: 1rem;
+  .icon{
+    font-size: 1.2rem;
+    margin-right: 0.3rem;
+    color: #333;
+    transition: color 100ms;
+    &.icon-face{
+      font-size: 1.3rem;
+    }
+  }
+  span{
+    font-size: 1rem;
+    transition: color 100ms;
+  }
+  &:hover{
+    .icon, span{
+      color: #000;
+    }
+
+  }
+  &.disabled{
+    cursor: not-allowed;
+    .icon{
+      color: #aaa;
+    }
+    span{
+      color: #aaa;
+    }
   }
 }
 </style>

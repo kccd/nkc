@@ -239,7 +239,7 @@ shareSchema.statics.ensureEffective = async function (token, id) {
         reg = RegExp(/\/comment\/([0-9a-zA-Z]*)/gi);
         break;
       case 'moment':
-        reg = RegExp(/\/z\/m\/([0-9a-z]*)/gi);
+        reg = RegExp(/\/zone\/m\/([0-9a-z]*)/gi);
         break;
       default:
         throwErr(500, `分享类型错误`);
@@ -493,7 +493,7 @@ shareSchema.methods.getShareUrl = async function () {
  * 获取分享类型
  * */
 shareSchema.statics.getShareTypes = async function () {
-  return shareTypes;
+  return { ...shareTypes };
 };
 
 /*

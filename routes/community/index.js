@@ -67,10 +67,14 @@ router
       const queryOfFunding = {
         disabled: false,
         'status.adminSupport': true,
-        'status.completed': { $ne: true },
+        'status.completed': {
+          $ne: true,
+        },
       };
       const funding = await db.FundApplicationFormModel.find(queryOfFunding)
-        .sort({ toc: -1 })
+        .sort({
+          toc: -1,
+        })
         .limit(5);
       data.fundApplicationForms = [];
       for (const a of funding) {
@@ -86,7 +90,6 @@ router
     }
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
     data.enableFund = enableFund;
-    data.navbar_highlight = 'community';
     await next();
   })
   // 论坛首页
@@ -122,6 +125,7 @@ router
     );
     data.latestThreads = await db.ThreadModel.extendCommunityThreadList(
       latestThreads,
+      false,
     );
 
     // 最新文章复序
@@ -131,6 +135,7 @@ router
     );
     data.latestPostThreads = await db.ThreadModel.extendCommunityThreadList(
       latestPostThreads,
+      true,
     );
 
     // 首页推荐文章（轮播图、6宫格图）
@@ -153,6 +158,7 @@ router
     // 精选
     data.digestThreads = await db.ThreadModel.extendCommunityThreadList(
       data.featuredThreads,
+      false,
     );
 
     ctx.template = 'community/community.pug';

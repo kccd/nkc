@@ -259,7 +259,7 @@ userRouter
     productionRouter.routes(),
     productionRouter.allowedMethods(),
   )
-  // .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
+  //.use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
   .use('/:uid/destroy', destroyRouter.routes(), destroyRouter.allowedMethods())
   .use(
     '/:uid/myProblems',

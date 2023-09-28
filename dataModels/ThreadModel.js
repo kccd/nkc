@@ -1129,16 +1129,16 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       },
     );
     /* forums.map(forum => {
-                  if(forum.parentId) {
-                    if(o.parentForum) {
-                      parentForumsId.add(forum.parentId);
-                    }
-                  }
-                }); */
+                                                                                                                                                                                  if(forum.parentId) {
+                                                                                                                                                                                    if(o.parentForum) {
+                                                                                                                                                                                      parentForumsId.add(forum.parentId);
+                                                                                                                                                                                    }
+                                                                                                                                                                                  }
+                                                                                                                                                                                }); */
     /* if(o.parentForum) {
-                  const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
-                  forums = forums.concat(parentForums);
-                } */
+                                                                                                                                                                                  const parentForums = await ForumModel.find({fid: {$in: [...parentForumsId]}});
+                                                                                                                                                                                  forums = forums.concat(parentForums);
+                                                                                                                                                                                } */
     forums.map((forum) => {
       forumsObj[forum.fid] = forum;
     });
@@ -1943,11 +1943,11 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
     .limit(10);
   // const {getRandomNumber$2: getRandomNumber} = require("../nkcModules/apiFunction");
   /*const numbers = getRandomNumber({
-          min: 0,
-          max: posts.length - 1,
-          count: 10,
-          repeat: false
-        });*/
+                                                                                          min: 0,
+                                                                                          max: posts.length - 1,
+                                                                                          count: 10,
+                                                                                          repeat: false
+                                                                                        });*/
   // const threadsId = numbers.map(n => posts[n].tid);
   const threadsId = posts.map((p) => p.tid);
   const threads = await ThreadModel.find({
@@ -2541,19 +2541,19 @@ threadSchema.methods.createNewPost = async function (post) {
   const user = await UserModel.findOnly({ uid: post.uid });
   await user.setRedEnvelope();
   /*const userGeneral = await UserGeneralModel.findOne({uid: post.uid});
-        if(!userGeneral.lotterySettings.close) {
-          const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
-          if(!redEnvelopeSettings.c.random.close) {
-            const {chance} = redEnvelopeSettings.c.random;
-            const number = Math.ceil(Math.random()*100);
-            if(number <= chance) {
-              const postCountToday = await PostModel.countDocuments({uid: post.uid, toc: {$gte: apiFn.today()}});
-              if(postCountToday === 1) {
-                await userGeneral.updateOne({'lotterySettings.status': true});
-              }
-            }
-          }
-        }*/
+                                                                                        if(!userGeneral.lotterySettings.close) {
+                                                                                          const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
+                                                                                          if(!redEnvelopeSettings.c.random.close) {
+                                                                                            const {chance} = redEnvelopeSettings.c.random;
+                                                                                            const number = Math.ceil(Math.random()*100);
+                                                                                            if(number <= chance) {
+                                                                                              const postCountToday = await PostModel.countDocuments({uid: post.uid, toc: {$gte: apiFn.today()}});
+                                                                                              if(postCountToday === 1) {
+                                                                                                await userGeneral.updateOne({'lotterySettings.status': true});
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }*/
   return _post;
 };
 /*
@@ -3036,20 +3036,20 @@ threadSchema.statics.extendShopInfo = async function (props) {
     vipDisNum = vipNum;
   }
   /*// 选定规格
-        let paId = 0;
-        for(let a = 0; a < product.productParams.length; a ++){
-          if(paraId === product.productParams[a]._id){
-            paId = a;
-          }
-        }
-        data.paId = paId;
-        data.paraId = paraId;*/
+                                                                                        let paId = 0;
+                                                                                        for(let a = 0; a < product.productParams.length; a ++){
+                                                                                          if(paraId === product.productParams[a]._id){
+                                                                                            paId = a;
+                                                                                          }
+                                                                                        }
+                                                                                        data.paId = paId;
+                                                                                        data.paraId = paraId;*/
 
   /*if(uid) {
-          data.shopInfo = {
-            cartProductCount: await ShopCartModel.getProductCount(uid)
-          }
-        }*/
+                                                                                          data.shopInfo = {
+                                                                                            cartProductCount: await ShopCartModel.getProductCount(uid)
+                                                                                          }
+                                                                                        }*/
   // 获取用户地址信息
   if (uid) {
     try {
@@ -3128,8 +3128,40 @@ threadSchema.statics.clearThreadResourcesForumCache = async function (tid) {
   );
 };
 
-threadSchema.statics.extendCommunityThreadList = async function (threads) {
+threadSchema.statics.extendCommunityThreadList = async function (
+  threads,
+  highlight,
+) {
   const anonymousInfo = getAnonymousInfo();
+  if (highlight) {
+    const SettingModel = mongoose.model('settings');
+    const pageSettings = await SettingModel.getSettings('page');
+    return threads.map((thread) => {
+      let uid = '';
+      let avatarUrl = anonymousInfo.avatarUrl;
+      if (!thread.anonymous) {
+        uid = thread.uid;
+        avatarUrl = getUrl('userAvatar', thread.firstPost.user.avatar);
+      }
+      const eachPage = pageSettings.threadPostList;
+      let total = 0;
+      for (let item of thread.postIds) {
+        total++;
+      }
+      if (Number(total) % Number(eachPage) === 0 && Number(total) !== 0) {
+        total--;
+      }
+      const page = Math.floor(total / eachPage);
+
+      return {
+        url: `/t/${thread.tid}?page=${page}&highlight=${thread.lastPost.pid}#highlight`,
+        uid,
+        avatarUrl,
+        title: thread.firstPost.t,
+        digest: thread.firstPost.digest,
+      };
+    });
+  }
   return threads.map((thread) => {
     let uid = '';
     let avatarUrl = anonymousInfo.avatarUrl;

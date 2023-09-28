@@ -1,5 +1,4 @@
 <template lang="pug">
-
   .single-moment-container(v-if="momentData")
     moment-status(ref="momentStatus" :moment="momentData" :permissions="permissions")
     .single-moment-top-container#comment-content
@@ -14,7 +13,10 @@
           :data-global-data="objToStr({uid: momentData.uid})"
         )
           img(:src="momentData.avatarUrl")
-      .single-moment-right
+        .single-moment-hits.m-t-1(v-if="type === 'details'")
+          span 阅读
+          span {{momentData.hits}}
+      .single-moment-right(v-if="selectedMomentId !== momentData.momentId || submitting" )
         .single-moment-header
           .single-moment-user(
             data-global-mouseover="showUserPanel"
@@ -24,21 +26,25 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
+            span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于
+            from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
           //- 其他操作
+          .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'") {{visitType[momentData.visibleType]}}
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
-            moment-option(
-              ref="momentOption"
-              @complaint="complaint"
-            )
+          moment-option(
+            ref="momentOption"
+            @complaint="complaint"
+            @selectedMomentId="handleMid"
+          )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
-        .single-moment-content.pointer(v-else v-html="momentData.content" @click.self="visitUrl(momentData.url, true)")
-
+        .single-moment-content.simple.pointer(v-else  ref="momentDetails" @click.prevent="handleClick")
+          span(v-html="momentData.content" ref="momentDetailsContent" )
+        .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
         //- 图片视频
         .single-moment-files
           moment-files(:data="momentData.files")
-
         //- 引用内容
         .single-moment-quote(v-if="momentData.quoteData")
           moment-quote(:data="momentData.quoteData" :uid="momentData.uid")
@@ -77,6 +83,12 @@
             :permissions="permissions"
             :mode="mode"
             )
+      div(v-if="selectedMomentId === momentData.momentId && !submitting")
+        .moment-editor-header
+          .moment-editor-header-title.text-info 正在编辑电文：
+          button.btn.btn-default.btn-xs(@click="submitting = true") 取消
+        moment-editor(:mid="momentData.momentId" @published="onPublished" ref="momentEditor")
+
 </template>
 
 <style lang="less" scoped>
@@ -222,6 +234,7 @@
   }
 
   .single-moment-header{
+    padding-right: 8rem;
     margin-bottom: 0.5rem;
     @optionHeight: 2rem;
     position: relative;
@@ -238,6 +251,35 @@
       display: inline-block;
       font-size: 1rem;
       color: #555;
+    }
+    .single-moment-tag{
+      display:inline-block;
+      position:absolute;
+      right: 2.2rem;
+      top: 0;
+      cursor: default;
+      border-width: 1px;
+      border-style: solid;
+      font-size: 1rem;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      vertical-align: middle;
+      border-radius: 4px;
+      padding: 0 9px;
+      height: 2rem;
+      line-height: 2rem;
+    }
+    .own{
+      border-color:#d9ecff;
+      border-radius: 4px;
+      background-color: #ecf5ff;
+      color: #409eff;
+    }
+    .attention{
+      border-color:#faecd8;
+      background-color: #fdf6ec;
+      color: #e6a23c;
     }
     .single-moment-header-options{
       height: @optionHeight;
@@ -281,6 +323,16 @@
     }
   }
   .single-moment-content{
+    &.simple{
+      /* 移动端的样式 */
+      @media (max-width: 767px) {
+        .hideText(@line: 10);
+      }
+      /* PC 端样式 */
+      @media (min-width: 767px) {
+        .hideText(@line: 8);
+      }
+    }
     font-size: 1.25rem;
     color: #000;
     line-height: 2rem;
@@ -305,6 +357,43 @@
     border-radius: 5px;
     margin-bottom: 1rem
   }
+  .singe-moment-details{
+    color: rgb(29, 155, 240);
+    display: inline-block;
+    cursor: pointer;
+  }
+  .singe-moment-details:hover{
+    text-decoration: underline;
+  }
+  .moment-editor-header{
+    @momentEditorHeader: 2.5rem;
+    height: @momentEditorHeader;
+    padding-right: 6rem;
+    position: relative;
+    .moment-editor-header-title{
+      height: @momentEditorHeader;
+      line-height: @momentEditorHeader;
+    }
+    button{
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+  .single-moment-hits{
+    &>span:first-of-type{
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    text-align: center;
+    color: rgb(85,85,85);
+    font-size: 12px;
+  }
+  //.content-fold{
+  //  height: 200px;
+  //  overflow: hidden;
+  //}
+
 </style>
 
 <script>
@@ -320,6 +409,7 @@
   import MomentOptionFixed from "./momentOption/MomentOptionFixed";
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
+  import MomentEditor from "./MomentEditor.vue";
 
   const state = getState();
   export default {
@@ -329,7 +419,8 @@
       'moment-comments': MomentComments,
       'moment-quote': MomentQuote,
       'moment-status': MomentStatus,
-      'moment-option': MomentOptionFixed
+      'moment-option': MomentOptionFixed,
+      "moment-editor":MomentEditor
     },
     /*
     * prop {Object} data 动态用于显示的数据 组装自 MomentModel.statics.extendMomentsListData
@@ -345,7 +436,14 @@
         comment: 'comment',
         repost: 'repost'
       },
+      submitting:false,
       timer: null,
+      selectedMomentId:'',
+      isFold:false, //是否折叠
+      visitType:{
+        own:'自己可见',
+        attention:'关注可见'
+      }
     }),
     mounted() {
       this.initData();
@@ -353,7 +451,7 @@
     computed: {
       focusCommentId() {
         return this.focus;
-      }
+      },
     },
     destroyed() {
       this.clearTimer();
@@ -364,9 +462,19 @@
       clearTimer() {
         clearTimeout(this.timer);
       },
+      handleClick(){
+        // 检查是否为选中文本
+        const selectedText = window.getSelection().toString();
+        if (selectedText) {
+          // 用户选中了文本，不执行后续操作
+          return;
+        }
+        this.visitUrl(this.momentData.url, true);
+      },
       initData() {
         const {data} = this;
         this.momentData = JSON.parse(JSON.stringify(data));
+        this.showLoadMore();
       },
       vote() {
         if(!this.logged) return toLogin();
@@ -419,6 +527,62 @@
       //投诉或举报
       complaint(mid) {
         this.$emit('complaint', mid);
+      },
+      handleMid(mid){
+        this.submitting = false;
+        this.selectedMomentId = mid;
+      },
+      // setFold(){
+      //   if(this.type !== 'details'){
+      //     this.$nextTick(() => {
+      //       const childNodes =  Array.from(this.$refs.momentDetails.childNodes);
+      //       let text = ''
+      //       let startIndex = -1;
+      //       let lastNode;
+      //       for (let i = 0; i < childNodes.length; i++ ) {
+      //         const node = childNodes[i]
+      //         if (node.nodeType === Node.TEXT_NODE && text.length<=200) {
+      //           text += node.textContent;
+      //           lastNode = node
+      //         }
+      //         if (startIndex === -1 && text.length > 200) {
+      //           startIndex = i + 1; // 记录要删除的起始下标
+      //           break;
+      //         }
+      //       }
+      //       if (startIndex !== -1) {
+      //         for (let i = startIndex; i < childNodes.length; i++) {
+      //           const node = childNodes[i];
+      //           this.$refs.momentDetails.removeChild(node); // 从 DOM 中删除节点
+      //         }
+      //       }
+      //       if(text.length>200){
+      //         const overLength = text.length - 200;
+      //         const newNodeText = lastNode.textContent.substring(0,lastNode.textContent.length - overLength) + '...';
+      //         const newNode = document.createTextNode(newNodeText);
+      //         this.$refs.momentDetails.replaceChild(newNode, lastNode); // 替换超出部分的节点
+      //       }
+      //       this.isFold = text.length>200
+      //     });
+      //   }
+      // },
+      //显示是否加载更多
+      showLoadMore(){
+        this.$nextTick(()=>{
+          const momentDetailsHeight = this.$refs.momentDetails.clientHeight
+          const momentDetailsContentHeight = this.$refs.momentDetailsContent.getBoundingClientRect().height
+          this.isFold = momentDetailsContentHeight > momentDetailsHeight;
+        })
+      },
+      onPublished(data) {
+        const {content,submitting,files,status,tlm} = data
+        this.momentData.content = content;
+        this.momentData.status = status
+        this.submitting = submitting;
+        this.momentData.files = files
+        this.momentData.tlm = tlm;
+        this.$refs.momentEditor.reset();
+        this.showLoadMore()
       },
     }
   }

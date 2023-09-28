@@ -1,0 +1,51 @@
+extends ../../../bootstrap_base
+block title
+  title 电文历史
+  +includeCSS('/zone/moment/history/history.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        .m-b-1
+          a(href=data.momentUrl) 电文详情
+          span &nbsp;/&nbsp;
+          a(href=data.momentUrl) 历史
+        include ../../../publicModules/paging/paging
+        div
+          if data.histories.length === 0
+            .p-t-2.p-b-2.text-center 空空如也~
+          for history in data.histories
+            .moment-history-item.box-shadow.m-b-1
+              .box-shadow-header=history.time
+              .moment-content
+                h5.text-info 文本内容：
+                div!=history.contentDiff
+              .moment-files
+                h5
+                  span.text-info=`图片/视频：`
+                  span=`${history.filesData.length === 0? '无': ''}`
+                .moment-file-container
+                  -
+                    var images = [];
+                    for(const file of history.filesData)
+                      if (file.type === 'picture') {
+                        images.push({
+                          url: file.url,
+                          name: file.filename,
+                        });
+                      }
+                  for file, index in history.filesData
+                    if file.type === 'picture'
+                      .moment-file-picture(
+                        data-global-click="viewImages"
+                        data-global-data=objToStr({images, index})
+                        )
+                        img(src=file.url)
+                    else
+                      .moment-file-video
+                        video(src=file.sources[file.sources.length - 1].url poster=file.coverUrl controls='controls')
+
+
+        include ../../../publicModules/paging/paging_input
+block scripts
+  +includeJS('/zone/moment/history/history.js')
