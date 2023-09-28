@@ -255,12 +255,12 @@
     .single-moment-tag{
       display:inline-block;
       position:absolute;
-      right: 2rem;
-      top: 0rem;
+      right: 2.2rem;
+      top: 0;
       cursor: default;
       border-width: 1px;
       border-style: solid;
-      font-size: 12px;
+      font-size: 1rem;
       display: inline-flex;
       justify-content: center;
       align-items: center;
@@ -268,6 +268,7 @@
       border-radius: 4px;
       padding: 0 9px;
       height: 2rem;
+      line-height: 2rem;
     }
     .own{
       border-color:#d9ecff;
