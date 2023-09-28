@@ -67,9 +67,10 @@ router.get('/', async (ctx, next) => {
         );
         //投诉权限
         optionStatus.complaint = permission('complaintPost') ? true : null;
-        optionStatus.visibleMoment = permission('setMomentVisibleOther')
-          ? true
-          : null;
+        optionStatus.visibleMoment =
+          !moment.parents.length && permission('setMomentVisibleOther')
+            ? true
+            : null;
         optionStatus.editorMoment =
           !moment.parents.length &&
           permission('editOtherUserMoment') &&
@@ -83,7 +84,7 @@ router.get('/', async (ctx, next) => {
         // 违规记录
         optionStatus.violation = permission('violationRecord') ? true : null;
         // 电文可见状态设置
-        optionStatus.visibleMoment = true;
+        optionStatus.visibleMoment = !moment.parents.length;
         optionStatus.editorMoment = !moment.parents.length && !moment.quoteType;
         optionStatus.visitHistory = permission(
           Operations.visitOtherUserZoneMomentHistory,
