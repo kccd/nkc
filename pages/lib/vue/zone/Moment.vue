@@ -13,7 +13,7 @@
           :data-global-data="objToStr({uid: momentData.uid})"
         )
           img(:src="momentData.avatarUrl")
-        .single-moment-hits.m-t-05(v-if="type === 'details'")
+        .single-moment-hits.m-t-1(v-if="type === 'details'")
           span 阅读
           span {{momentData.hits}}
       .single-moment-right(v-if="selectedMomentId !== momentData.momentId || submitting" )
@@ -26,7 +26,7 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
-            span(v-if="momentData.tlm>momentData.toc" ) 编辑于
+            span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于
             from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
 
