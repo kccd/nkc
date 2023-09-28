@@ -67,7 +67,8 @@ if !isIncluded('homeForumList')
                 for thread, index in f.latestThreads
                   .detailed-forum-latest-thread
                     .latest-thread-point
-                    a(href=`/t/${thread.tid}` title=thread.post.t)=thread.post.t
+                    -var threadUrl = (thread.lm || thread.oc)? `/p/${thread.lm || thread.oc}?redirect=true`: `/t/${thread.tid}`; 
+                    a(href=threadUrl title=thread.post.t)=thread.post.t
                     span.time
                       //-=fromNow(thread.tlm)
                       +fromNow(thread.tlm)
