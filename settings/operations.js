@@ -785,7 +785,7 @@ const DynamicOperations = {
   modifyThreadOrder: 'modifyThreadOrder',
   setMomentVisibleOther: 'setMomentVisibleOther',
   viewAllUserMoment: 'viewAllUserMoment',
-  editorUserMoment: 'editorUserMoment',
+  editOtherUserMoment: 'editOtherUserMoment',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

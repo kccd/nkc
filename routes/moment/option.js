@@ -70,7 +70,7 @@ router.get('/', async (ctx, next) => {
           : null;
         optionStatus.editorMoment =
           !moment.parents.length &&
-          permission('editorUserMoment') &&
+          permission('editOtherUserMoment') &&
           !moment.quoteType
             ? true
             : null;

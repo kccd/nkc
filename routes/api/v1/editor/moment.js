@@ -14,7 +14,7 @@ router
       state: { uid },
     } = ctx;
     //判断用户是否拥有编辑电文的权限
-    await EditorMomentService.checkEditorUserMomentPermission(
+    await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
       mid,
       permission,
@@ -32,7 +32,7 @@ router
       body: { content, resourcesId },
     } = ctx;
     //判断用户是否拥有编辑电文的权限
-    await EditorMomentService.checkEditorUserMomentPermission(
+    await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
       mid,
       permission,
@@ -84,7 +84,7 @@ router
       db,
     } = ctx;
     //判断用户是否拥有编辑电文的权限
-    await EditorMomentService.checkEditorUserMomentPermission(
+    await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
       mid,
       permission,
