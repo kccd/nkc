@@ -25,6 +25,7 @@
             from-now(:time="momentData.toc")
             span &nbsp;IP:{{momentData.addr}}
           //- 其他操作
+          .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'") {{visitType[momentData.visibleType]}}
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
           moment-option(
             ref="momentOption"
@@ -228,6 +229,7 @@
   }
 
   .single-moment-header{
+    padding-right: 8rem;
     margin-bottom: 0.5rem;
     @optionHeight: 2rem;
     position: relative;
@@ -244,6 +246,34 @@
       display: inline-block;
       font-size: 1rem;
       color: #555;
+    }
+    .single-moment-tag{
+      display:inline-block;
+      position:absolute;
+      right: 2rem;
+      top: 0rem;
+      cursor: default;
+      border-width: 1px;
+      border-style: solid;
+      font-size: 12px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      vertical-align: middle;
+      border-radius: 4px;
+      padding: 0 9px;
+      height: 2rem;
+    }
+    .own{
+      border-color:#d9ecff;
+      border-radius: 4px;
+      background-color: #ecf5ff;
+      color: #409eff;
+    }
+    .attention{
+      border-color:#faecd8;
+      background-color: #fdf6ec;
+      color: #e6a23c;
     }
     .single-moment-header-options{
       height: @optionHeight;
@@ -394,7 +424,11 @@
       submitting:false,
       timer: null,
       selectedMomentId:'',
-      isFold:false //是否折叠
+      isFold:false, //是否折叠
+      visitType:{
+        own:'自己可见',
+        attention:'关注可见'
+      }
     }),
     mounted() {
       this.initData();
