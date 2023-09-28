@@ -75,7 +75,6 @@ class MomentHistoryService {
   }
 
   filterHistoryContentDiff(content) {
-    return content;
     return xss(content, {
       whiteList: {
         span: ['class'],
