@@ -1,0 +1,35 @@
+@mdWidth: 25%;
+@xsWidth: 32.3%;
+.moment-file-container{
+  font-size: 0;
+  .moment-file-picture{
+    width: @mdWidth;
+    display: inline-block;
+    padding-top: @mdWidth;
+    margin: 0.5%;
+    position: relative;
+    background-color: #000;
+    cursor: pointer;
+    @media(max-width: 768px) {
+      width: @xsWidth;
+      padding-top: @xsWidth;
+    }
+    img{
+      position: absolute;
+      max-height: 100%;
+      max-width: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+    }
+  }
+  .moment-file-video{
+    width: 100%;
+    position: relative;
+    video{
+      max-width: 100%;
+    }
+  }
+}

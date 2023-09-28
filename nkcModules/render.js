@@ -2,7 +2,6 @@ const render = require('./nkc_render');
 const nkcRender = require('./nkcRender');
 const moment = require('moment');
 const pug = require('pug');
-const jsdiff = require('diff');
 const settings = require('../settings');
 const { isProduction, NODE_ENV } = require('../settings/env');
 moment.locale('zh-cn');
@@ -12,6 +11,7 @@ const tools = require('./tools');
 const htmlFilter = require('./nkcRender/htmlFilter');
 const hexToRgba = require('hex-to-rgba');
 const { startTime } = require('../settings/time');
+const { contentDiff } = require('./diff');
 const filters = {
   markdown: render.commonmark_render,
   markdown_safe: render.commonmark_safe,
@@ -56,27 +56,7 @@ function toQueryString(object) {
 }
 
 function htmlDiff(earlier, later) {
-  let diff;
-  // jsdiff.diffChars方法虽然比较效果好但是非常耗资源
-  if (earlier.length >= 10000 || later.length >= 10000) {
-    diff = jsdiff.diffWords(earlier, later);
-  } else {
-    diff = jsdiff.diffChars(earlier, later);
-  }
-  let outputHTML = '';
-
-  diff.forEach(function (part) {
-    let stylestr = part.added
-      ? 'DiffAdded'
-      : part.removed
-      ? 'DiffRemoved'
-      : null;
-    part.value = render.plain_render(part.value);
-    outputHTML += stylestr
-      ? `<span class="${stylestr}">${part.value}</span>`
-      : part.value;
-  });
-  return outputHTML;
+  return contentDiff(earlier, later);
 }
 
 function testModifyTimeLimit(time, ownership, toc) {

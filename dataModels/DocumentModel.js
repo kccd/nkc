@@ -5,35 +5,17 @@ const {
 } = require('../nkcModules/error');
 const cheerio = require('cheerio');
 const markNotes = require('../nkcModules/nkcRender/markNotes');
+const documentSettings = require('../settings/document');
 
 /*
  * document状态
  * 当document状态发生改变时会同步当前状态到上层
  * 上层 documentSources
  * */
-const documentStatus = {
-  default: 'default', // 默认状态 创建了但未进行任何操作
-  disabled: 'disabled', // 禁用
-  unknown: 'unknown', // 未审核
-  normal: 'normal', // 正常状态 能被所有用户查看的文档
-  faulty: 'faulty', // 退修
-  cancelled: 'cancelled', // 取消发布
-  deleted: 'deleted', // 已删除
-};
+const documentStatus = { ...documentSettings.documentStatus };
 
-const documentTypes = {
-  stable: 'stable',
-  beta: 'beta',
-  betaHistory: 'betaHistory',
-  stableHistory: 'stableHistory',
-};
-
-const documentSources = {
-  article: 'article',
-  draft: 'draft',
-  comment: 'comment',
-  moment: 'moment',
-};
+const documentTypes = { ...documentSettings.documentTypes };
+const documentSources = { ...documentSettings.documentSources };
 
 const schema = new mongoose.Schema(
   {

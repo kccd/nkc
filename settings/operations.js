@@ -786,6 +786,8 @@ const DynamicOperations = {
   setMomentVisibleOther: 'setMomentVisibleOther',
   viewAllUserMoment: 'viewAllUserMoment',
   editOtherUserMoment: 'editOtherUserMoment',
+  visitZoneMomentHistory: 'visitZoneMomentHistory',
+  visitOtherUserZoneMomentHistory: 'visitZoneOtherUserMomentHistory',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

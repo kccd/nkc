@@ -38,6 +38,9 @@ module.exports = {
           },
         },
       },
+      history: {
+        GET: Operations.visitZoneMomentHistory,
+      },
     },
   },
 };
