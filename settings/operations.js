@@ -784,8 +784,10 @@ const DynamicOperations = {
   createQuestionTags: 'createQuestionTags',
   modifyThreadOrder: 'modifyThreadOrder',
   setMomentVisibleOther: 'setMomentVisibleOther',
-  viewAllUserMoment: 'viewAllUserMoment',
-  editorUserMoment: 'editorUserMoment',
+  viewOtherUserAbnormalMoment: 'viewOtherUserAbnormalMoment',
+  editOtherUserMoment: 'editOtherUserMoment',
+  visitZoneMomentHistory: 'visitZoneMomentHistory',
+  visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

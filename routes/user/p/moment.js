@@ -48,7 +48,7 @@ module.exports = async (ctx, next) => {
     if (
       isAuthor ||
       ctx.permission('setMomentVisibleOther') ||
-      ctx.permission('viewAllUserMoment')
+      ctx.permission('viewOtherUserAbnormalMoment')
     ) {
       match.visibleType.$in = [own, everyone, attention];
     } else if (isSubscribedUser) {

@@ -36,7 +36,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav.navbar-md
         li(class=navbar_highlight === 'zone' ? 'active' : '')
-          a(href=`/z`) 电波
+          a(href=`/z` onclick="return RootApp.visitZone()" ) 电波
         li(class=navbar_highlight === 'community' ? 'active' : '')
           a(href=`/c`) 论坛
         li(class=navbar_highlight === 'columns' ? 'active' : '')

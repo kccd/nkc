@@ -1,3 +1,4 @@
+const { Operations } = require('../../settings/operations');
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
   const { db, data, params, state, permission } = ctx;
@@ -44,6 +45,7 @@ router.get('/', async (ctx, next) => {
     delete: null,
     visibleMoment: null,
     editorMoment: null,
+    visitHistory: null,
   };
   if (user) {
     //审核权限
@@ -70,16 +72,22 @@ router.get('/', async (ctx, next) => {
           : null;
         optionStatus.editorMoment =
           !moment.parents.length &&
-          permission('editorUserMoment') &&
+          permission('editOtherUserMoment') &&
           !moment.quoteType
             ? true
             : null;
+        optionStatus.visitHistory = permission(
+          Operations.visitZoneMomentHistory,
+        );
       } else {
         // 违规记录
         optionStatus.violation = permission('violationRecord') ? true : null;
         // 电文可见状态设置
         optionStatus.visibleMoment = true;
         optionStatus.editorMoment = !moment.parents.length && !moment.quoteType;
+        optionStatus.visitHistory = permission(
+          Operations.visitOtherUserZoneMomentHistory,
+        );
       }
     }
   }

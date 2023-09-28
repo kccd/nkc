@@ -2,6 +2,7 @@ const router = require('koa-router')();
 const commentRouter = require('./comments');
 const repostRouter = require('./repost');
 const voteRouter = require('./vote');
+const historyRouter = require('./history');
 router
   .use('/:mid', async (ctx, next) => {
     const { internalData, db, params } = ctx;
@@ -44,5 +45,6 @@ router
   })
   .use('/:mid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:mid/comments', commentRouter.routes(), commentRouter.allowedMethods())
+  .use('/:mid/history', historyRouter.routes(), historyRouter.allowedMethods())
   .use('/:mid/repost', repostRouter.routes(), repostRouter.allowedMethods());
 module.exports = router;

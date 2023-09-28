@@ -10,7 +10,6 @@ router
     await next();
   })
   .get('/zone/moment', async (ctx, next) => {
-    console.log(ctx.query, '123');
     await next();
   })
   .get('/zone/article', async (ctx, next) => {

@@ -29,6 +29,9 @@
         .option(v-if="options.editorMoment" @click="editorMoment")
           .fa.fa-edit
           span 编辑
+        .option(v-if="options.visitHistory" @click="visitHistory")
+          .fa.fa-history
+          span 历史
         .option(v-if='options.blacklist !== null' @click='userBlacklist')
           .fa.fa-ban
           span(v-if='options.blacklist === false') 加入黑名单
@@ -112,6 +115,7 @@ import {nkcAPI} from "../../../js/netAPI";
 import {timeFormat, objToStr} from "../../../js/tools";
 import {EventBus} from "../../../../spa/eventBus";
 import {visitUrl} from "../../../js/pageSwitch";
+import {getUrl} from "../../../js/tools";
 import MomentVisible from "../MomentVisible.vue";
 export default {
   data: () => ({
@@ -361,6 +365,10 @@ export default {
       }
       const mid = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId
       this.$emit('selectedMomentId', mid);
+    },
+    // 访问历史
+    visitHistory() {
+      visitUrl(getUrl('zoneMomentHistory', this.moment.momentId), true);
     }
   }
 }

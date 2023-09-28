@@ -209,7 +209,6 @@ resourceRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    console.log('走的这');
     //用户上传文件
     const { db, data, nkcModules, state } = ctx;
     const { user } = data;
