@@ -40,6 +40,7 @@ router
     data.focusCommentId = focusCommentId;
     data.momentListData = momentListData;
     ctx.remoteTemplate = 'zone/moment/moment.pug';
+    await moment.addMomentHits();
     await next();
   })
   .use('/:mid/vote', voteRouter.routes(), voteRouter.allowedMethods())

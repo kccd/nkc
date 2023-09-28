@@ -23,6 +23,9 @@
               span {{this.question.contentDesc}}
             button.btn.btn-default.btn-xs( @click="showReminder") 查看提示
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
+      .question-status
+        h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误，请阅读所有提示，理解其内容，再重新作答
+        h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确
       .question-content
         .question-answer.m-b-2
           form(v-if='question.type === "ans"')
@@ -49,8 +52,6 @@
                   span {{answerDescObj[q._id].desc}}
 
         footer.clearfix
-          h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误
-          h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确
           .button-group
             button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题
             button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
@@ -494,7 +495,7 @@ export default Vue.extend({
       } else if (isCorrect === true) {
         return 'bg-success';
       } else {
-        return  'answer-bg-danger shake-animation';
+        return  'shake-animation';
       }
     },
     redirectToPage() {

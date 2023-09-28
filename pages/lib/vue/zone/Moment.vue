@@ -13,6 +13,9 @@
           :data-global-data="objToStr({uid: momentData.uid})"
         )
           img(:src="momentData.avatarUrl")
+        .single-moment-hits.m-t-05(v-if="type === 'details'")
+          span 阅读
+          span {{momentData.hits}}
       .single-moment-right(v-if="selectedMomentId !== momentData.momentId || submitting" )
         .single-moment-header
           .single-moment-user(
@@ -23,7 +26,10 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
+            span(v-if="momentData.tlm>momentData.toc" ) 编辑于
+            from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
+
           //- 其他操作
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
           moment-option(
@@ -343,6 +349,15 @@
       top: 0;
       right: 0;
     }
+  }
+  .single-moment-hits{
+    &>span:first-of-type{
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    text-align: center;
+    color: rgb(85,85,85);
+    font-size: 12px;
   }
   //.content-fold{
   //  height: 200px;

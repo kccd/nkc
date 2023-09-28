@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const { twemoji } = require('../settings/editor');
+const { fromNow } = require('../nkcModules/tools');
 
 // 包含所有document的状态
 // 并且额外包含 deleted, cancelled
@@ -55,7 +56,7 @@ const schema = new mongoose.Schema({
   // 最后修改时间
   tlm: {
     type: Date,
-    default: null,
+    default: Date.now,
     index: 1,
   },
   // 发表人
@@ -155,6 +156,11 @@ const schema = new mongoose.Schema({
   visibleType: {
     type: String,
     default: visibleType.everyone,
+  },
+  //电文展示量
+  hits: {
+    type: Number,
+    default: 0,
   },
 });
 
@@ -433,12 +439,15 @@ schema.methods.modifyMoment = async function (props) {
     content,
     tlm: time,
   });
-  await this.updateOne({
+  const match = {
     $set: {
       files: newResourcesId,
-      tlm: time,
     },
-  });
+  };
+  if (this.status !== momentStatus.default) {
+    match.$set.tlm = time;
+  }
+  await this.updateOne(match);
 };
 
 // 限制动态图片和视频的数量
@@ -1459,6 +1468,8 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       quoteType,
       status,
       visibleType,
+      tlm,
+      hits,
     } = moment;
 
     let f = moment[field];
@@ -1537,6 +1548,9 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
 
       filesData.push(fileData);
     }
+    //toc 数据创建时间
+    //tlm 数据编辑时间
+    //top 数据第一次发布时间
     results[f] = {
       momentId: _id,
       uid,
@@ -1546,10 +1560,12 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       userHome: getUrl('userHome', uid),
       time: fromNow(top),
       toc: top,
+      tlm,
       content,
       voteUp,
       status,
       addr,
+      hits,
       statusInfo: '',
       voteType: votesType[_id],
       commentCount: commentAll,
@@ -1913,6 +1929,13 @@ schema.statics.getPageByMomentCommentId = async (mode, momentCommentId) => {
     order = parentComment.order;
   }
   return MomentModel.getPageByOrder(mode, order);
+};
+
+/*
+ * 电文阅读数量增加
+ * */
+schema.methods.addMomentHits = async function () {
+  await this.updateOne({ $inc: { hits: 1 } });
 };
 
 /*

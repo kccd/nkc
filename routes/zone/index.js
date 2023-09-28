@@ -187,7 +187,6 @@ router
     if (type !== zoneTypes.article) {
       return await next();
     }
-
     const articleStatus = await db.ArticleModel.getArticleStatus();
     const articleSources = await db.ArticleModel.getArticleSources();
 
@@ -218,7 +217,6 @@ router
     data.articlesPanelData = await db.ArticleModel.extendArticlesPanelData(
       articles,
     );
-
     data.paging = paging;
     await next();
   })
