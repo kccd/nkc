@@ -23,6 +23,7 @@ class MomentHistoryService {
       _id: 1,
       did: 1,
       tlm: 1,
+      toc: 1,
       content: 1,
       files: 1,
     })
@@ -41,7 +42,7 @@ class MomentHistoryService {
     const histories = [];
     for (let i = 0; i < documents.length; i++) {
       const document = documents[i];
-      const { files, content, _id, did, tlm } = document;
+      const { files, content, _id, did, tlm, toc } = document;
       const filesData = [];
       for (const rid of files) {
         const resource = resourcesObj[rid];
@@ -61,7 +62,7 @@ class MomentHistoryService {
       histories.push({
         _id,
         did,
-        time: timeFormat(tlm),
+        time: timeFormat(tlm || toc),
         content,
         contentDiff,
         filesData,
