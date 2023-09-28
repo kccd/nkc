@@ -83,7 +83,7 @@ router
     //判断是否当前用有相应证书可以查看所有内容,或设置电文可见状态
     const hasPermission =
       ctx.permission('setMomentVisibleOther') ||
-      ctx.permission('viewAllUserMoment');
+      ctx.permission('viewOtherUserAbnormalMoment');
     //获取当前用户的电文
     if (state.uid) {
       match.$or.push({

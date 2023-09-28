@@ -763,7 +763,7 @@
   "registerExamCheck": "注册前检测是否需要考试",
   "setMomentVisible": "设置电文可见状态",
   "setMomentVisibleOther": "设置其他人的电文可见状态",
-  "viewAllUserMoment": "查看用户所有电文",
+  "viewOtherUserAbnormalMoment": "查看其他人非正常状态的电文",
   "editOtherUserMoment": "编辑其他人的电文内容",
   "editorMoment": "编辑电文内容",
   "browserDetection": "浏览器版本检测",

@@ -784,10 +784,10 @@ const DynamicOperations = {
   createQuestionTags: 'createQuestionTags',
   modifyThreadOrder: 'modifyThreadOrder',
   setMomentVisibleOther: 'setMomentVisibleOther',
-  viewAllUserMoment: 'viewAllUserMoment',
+  viewOtherUserAbnormalMoment: 'viewOtherUserAbnormalMoment',
   editOtherUserMoment: 'editOtherUserMoment',
   visitZoneMomentHistory: 'visitZoneMomentHistory',
-  visitOtherUserZoneMomentHistory: 'visitZoneOtherUserMomentHistory',
+  visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };
