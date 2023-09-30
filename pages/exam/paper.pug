@@ -40,7 +40,7 @@ block content
         .m-t-3
           div.paper-panel(v-for='(q, index) in questions' :key='q._id')
             .question-content(v-html='q.content_')
-            img.paper-img(v-if='q.hasImage' :src='"/exam/question/" + q._id + "/image"')
+            img.paper-img.m-b-1(v-if='q.hasImage' :src='"/exam/question/" + q._id + "/image"')
             form(v-if='q.type === "ans"')
               span 答案：
               input(v-model='q.fill')

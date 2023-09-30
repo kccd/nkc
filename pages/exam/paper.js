@@ -92,6 +92,7 @@ var app = new Vue({
           }
           const obj = {
             type: item.type,
+            hasImage: item.hasImage,
             content_: NKC.methods.custom_xss_process(
               NKC.methods.mdToHtml(
                 index + 1 + '、' + `【${questionInfo}】` + item.content,
