@@ -48,31 +48,29 @@
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
       .moment-comment-reply-editor(v-if="replyEditorStatus")
-        textarea-editor(
-          ref="replyEditor"
-          :placeholder="editorPlaceholder"
-          max-height="20rem"
-          height="2rem"
-          @content-change="onReplyEditorContentChange"
-          @click-ctrl-enter="submitReplyContent"
-        )
-        .button-icon(
-          @click="selectEmoji"
-          @mouseover="iconMouseOver(icons.face)"
-          @mouseleave="iconMouseLeave(icons.face)"
-          title="表情"
-        )
-          winking-face(
-            :theme="icons.face.theme"
-            :size="icons.face.size"
-            :fill="icons.face.fill"
+        .m-b-05
+          textarea-editor(
+            ref="replyEditor"
+            :placeholder="editorPlaceholder"
+            max-height="20rem"
+            height="2rem"
+            @content-change="onReplyEditorContentChange"
+            @click-ctrl-enter="submitReplyContent"
           )
-        .submit-button-container.text-right
-          button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
-          button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 发射
-          button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled)
-            .fa.fa-spinner.fa-spin
-          button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 发射
+        .button-container
+          .button-icon(
+            @click="selectEmoji"
+            @mouseover="iconMouseOver(icons.face)"
+            @mouseleave="iconMouseLeave(icons.face)"
+            title="表情"
+          )
+            .fa.fa-smile-o
+          .submit-button-container.text-right
+            button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
+            button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 发射
+            button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled)
+              .fa.fa-spinner.fa-spin
+            button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 发射
 
     .moment-comment-comments(v-if="commentData.commentsData && commentData.commentsData.length > 0")
       moment-comment(
@@ -366,6 +364,9 @@ export default {
     }
   }
 }
+.button-container{
+  position: relative;
+}
 .moment-comment-reply-editor{
   margin-top: 0.5rem;
 }
@@ -397,7 +398,11 @@ export default {
   }
 }
 .button-icon{
+  position: absolute;
+  left: 0;
+  top: 0;
   height: 1rem;
+  line-height: 1rem;
   border-radius: 50%;
   display: inline-block;
   cursor: pointer;

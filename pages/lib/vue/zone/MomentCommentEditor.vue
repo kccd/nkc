@@ -2,7 +2,7 @@
   .moment-comment-editor
     emoji-selector(ref="emojiSelector")
     .moment-comment-editor-container
-      .moment-comment-textaea-ditor-container
+      .moment-comment-textaea-ditor-container.m-b-05
         textarea-editor(
           ref="textareaEditor"
           :placeholder="placeholder"
