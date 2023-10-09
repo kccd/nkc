@@ -83,6 +83,8 @@ router
       params: { mid },
       db,
     } = ctx;
+    const ip = await db.IPModel.saveIPAndGetToken(ctx.address);
+    const addr = await db.IPModel.getIpAddr(ctx.address);
     //判断用户是否拥有编辑电文的权限
     await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
@@ -133,6 +135,8 @@ router
       type: stableDocumentTypes,
       status: normalDocumentStatus,
       tlm,
+      ip,
+      addr,
     };
     let matchMoment = {
       files: newResourcesId,
@@ -167,7 +171,7 @@ router
     newMoment.updateResourceReferences();
     const newDocument = await db.DocumentModel.findOnly(
       { did: newMoment.did },
-      { content: 1 },
+      { content: 1, addr: 1 },
     );
     if (!needReview) {
       //检测document中的@用户并发送消息给用户
@@ -241,6 +245,7 @@ router
       files: filesData,
       status: newMoment.status,
       tlm: newMoment.tlm,
+      addr: newDocument.addr,
     };
     await next();
   });
