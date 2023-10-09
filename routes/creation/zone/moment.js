@@ -66,6 +66,7 @@ router
   })
   // 发表动态
   .post('/', async (ctx, next) => {
+    console.log('又走了一遍');
     const { db, body, state, data } = ctx;
     const { type, content, resourcesId, momentId } = body;
     if (!['create', 'modify', 'publish'].includes(type)) {
