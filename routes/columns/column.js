@@ -130,10 +130,10 @@ router
       data.childCategories = await category.getChildCategories();
       data.category = category;
       //分类下的文章数量
-      data.categoryPostCount = await db.ColumnPostModel.countDocuments({
-        columnId: column._id,
-        cid: category._id,
-      });
+      // data.categoryPostCount = await db.ColumnPostModel.countDocuments({
+      //   columnId: column._id,
+      //   cid: category._id,
+      // });
       //分类导航
       data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(
         category._id,
@@ -146,12 +146,19 @@ router
           true,
         );
       data.minorCategories = minorCategories.filter((mc) => {
-        data.categoryPostCount += mc.count;
+        // data.categoryPostCount += mc.count;
         return mc.count > 0;
       });
       const childCategoryId =
         await db.ColumnPostCategoryModel.getChildCategoryId(cid);
       childCategoryId.push(cid);
+      //分类下的文章数量
+      data.categoryPostCount = await db.ColumnPostModel.countDocuments({
+        columnId: column._id,
+        cid: { $in: childCategoryId },
+      });
+      // console.log('111',childCategoryId);
+      
       let minorCategory;
       if (mcid) {
         minorCategory = await db.ColumnPostCategoryModel.findOne({ _id: mcid });
@@ -202,6 +209,17 @@ router
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(
       column._id,
     );
+    
+    if(data.categories.length>0){
+      data.categories.forEach(async item=>{
+        const childId = await db.ColumnPostCategoryModel.getChildCategoryId(item._id);
+        childId.push(item._id);
+        item.count = await db.ColumnPostModel.countDocuments({
+          columnId: column._id,
+          cid: { $in: childId },
+        });
+      })
+    } 
     data.timeline = await db.ColumnModel.getTimeline(column._id);
     const homeSettings = await db.SettingModel.getSettings('home');
     if (ctx.permission('homeHotColumn')) {

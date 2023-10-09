@@ -79,10 +79,13 @@ router
     const {
       state: { uid },
       permission,
-      body: { content, resourcesId },
+      body: { content, resourcesId, isBack },
       params: { mid },
       db,
     } = ctx;
+    if (isBack) {
+      return await next();
+    }
     //判断用户是否拥有编辑电文的权限
     await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
@@ -119,6 +122,7 @@ router
     await db.DocumentModel.updateOne(
       {
         did: moment.did,
+        // type: stableDocumentTypes,
       },
       {
         $set: {
@@ -241,6 +245,71 @@ router
       files: filesData,
       status: newMoment.status,
       tlm: newMoment.tlm,
+    };
+    await next();
+  })
+  .post('/', OnlyUser(), async (ctx, next) => {
+    const {
+      state: { uid },
+      permission,
+      body: { content, resourcesId, isBack, documentId },
+      params: { mid },
+      db,
+    } = ctx;
+    if (!isBack) {
+      return await next();
+    }
+    //document类型
+    const {
+      stable: stableDocumentTypes,
+      stableHistory: stableHistoryDocumentTypes,
+    } = await db.DocumentModel.getDocumentTypes();
+    // //电文状态
+    const { normal: normalMomentStatus } =
+      await db.MomentModel.getMomentStatus();
+    //获取现在的moment
+    const moment = await db.MomentModel.findOnly({ _id: mid }, { did: 1 });
+    //如何没有找到 moment--后期需要抛出错误
+    if (!moment) {
+      return await next();
+    }
+    //将原来的正式版本变为历史版本
+    await db.DocumentModel.updateOne(
+      {
+        did: moment.did,
+        type: stableDocumentTypes,
+      },
+      {
+        $set: {
+          type: stableHistoryDocumentTypes,
+        },
+      },
+    );
+    //将选中的历史版本的document 克隆添加 并变成正式版
+    const newStableDocument =
+      await db.DocumentModel.createStableDocumentByStableHistoryDocument(
+        documentId,
+      );
+    //更新正式版moment的内容
+    await db.MomentModel.updateOne(
+      { _id: mid },
+      {
+        $set: {
+          did: newStableDocument.did,
+          files: newStableDocument.files,
+          status: normalMomentStatus,
+          tlm: new Date(),
+        },
+      },
+    );
+    const newMoment = await db.MomentModel.findOnly(
+      { _id: mid },
+      { files: 1, did: 1, status: 1, tlm: 1 },
+    );
+    //更新resource
+    newMoment.updateResourceReferences();
+    ctx.apiData = {
+      backSuccess: true,
     };
     await next();
   });

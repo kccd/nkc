@@ -275,6 +275,86 @@ schema.statics.checkDocumentType = async (type) => {
 };
 
 /*
+ * 复制历史版内容生成正式版
+ * @param {Number} id 文档的_id
+ * @return {Object} document schema 对象
+ * */
+schema.statics.createStableDocumentByStableHistoryDocument = async (id) => {
+  const DocumentModel = mongoose.model('documents');
+  //选中的历史版
+  const stableHistoryDocument = await DocumentModel.findOne({ _id: id });
+  // 如没有找到需要报错
+  if(!stableHistoryDocument){
+    ThrowServerInternalError(`文档 ${id} 不存在历史正式版，无法回滚成正式版`);
+  }
+  const {
+    did,
+    title = '',
+    status,
+    content = '',
+    cover = '',
+    coverFile = '',
+    keywords = [],
+    keywordsEN = [],
+    abstract = '',
+    abstractEN = '',
+    origin = '',
+    authorInfos = [],
+    uid,
+    dt,
+    source,
+    sid,
+    ip,
+    port,
+    files = [],
+    quoteDid,
+    atUsers,
+  } = stableHistoryDocument.toObject();
+  const IPModel = mongoose.model('ips');
+  const AttachmentModel = mongoose.model('attachments');
+  const { getHTMLTextLength } = require('../nkcModules/checkData');
+  await DocumentModel.checkDocumentSource(source);
+  const wordCount = getHTMLTextLength(content);
+  const _id = await DocumentModel.getId();
+  // const did = await DocumentModel.getDid();
+  const ipId = await IPModel.saveIPAndGetToken(ip);
+  const addr = await IPModel.getIpAddr(ip);
+  const document = await DocumentModel({
+    _id,
+    did,
+    status,
+    uid,
+    title,
+    content,
+    wordCount,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin,
+    authorInfos,
+    dt,
+    tlm: new Date(),
+    type: (await DocumentModel.getDocumentTypes()).stable,
+    source,
+    sid,
+    ip: ipId,
+    port,
+    addr,
+    files,
+    quoteDid,
+    atUsers,
+  });
+  await document.save();
+  await document.updateResourceReferences();
+  if (coverFile) {
+    await AttachmentModel.saveDocumentCover(document._id, coverFile);
+  }
+  return document;
+};
+
+/*
  * 新建编辑版文档
  * @param {Object} props
  *   @param {String} title 标题
@@ -353,7 +433,6 @@ schema.statics.createBetaDocument = async (props) => {
   }
   return document;
 };
-
 /*
  * 复制当前文档数据创建历史文档
  * @return {Object} betaHistory document schema

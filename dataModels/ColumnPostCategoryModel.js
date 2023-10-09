@@ -107,6 +107,15 @@ schema.statics.getCategoryTree = async (columnId) => {
   });
   for(const c of categories) {
     c.count = await ColumnPostModel.countDocuments({cid: c._id});
+    // const childCategoryId = await ColumnPostCategoryModel.getChildCategoryId(c._id);
+    // console.log('999',childCategoryId);
+    
+    // childCategoryId.push(c._id);
+    // c.count = await ColumnPostModel.countDocuments({ columnId, cid: { $in: c._id}});
+    // const childCategoryId = await ColumnPostCategoryModel.getChildCategoryId(c._id);
+    //   childCategoryId.push(cid);
+    // console.log('999',c);
+
     let insert = false;
     if(c.parentId) {
       const parent = categoriesObj[c.parentId];
@@ -124,6 +133,8 @@ schema.statics.getCategoryTree = async (columnId) => {
 * */
 schema.statics.getCategoryList = async (columnId) => {
   const categories = await mongoose.model("columnPostCategories").getCategoryTree(columnId);
+  // console.log('666',categories );
+  
   const {getUrl} = require('../nkcModules/tools');
   const arr = [];
   const func = (cc, index) => {
