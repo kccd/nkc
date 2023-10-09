@@ -319,7 +319,7 @@ schema.statics.createBetaDocument = async (props) => {
   await DocumentModel.checkDocumentSource(source);
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
-  const did = await DocumentModel.getDid();
+  const did = props.did ? props.did : await DocumentModel.getDid();
   const ipId = await IPModel.saveIPAndGetToken(ip);
   const addr = await IPModel.getIpAddr(ip);
   const document = await DocumentModel({

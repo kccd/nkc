@@ -45,6 +45,8 @@ router
       momentSource,
       mid,
     );
+    //获取目前编辑的moment的did
+    const { did } = await db.MomentModel.findOnly({ _id: mid }, { did: 1 });
     //限制动态图片和视频的数量
     const newResourcesId = await db.MomentModel.replaceMomentResourcesId(
       resourcesId,
@@ -60,11 +62,12 @@ router
         sid: mid,
         content,
         files: newResourcesId,
+        did,
       });
     } else {
-      const { did } = document;
+      const { _id } = document;
       await db.DocumentModel.updateOne(
-        { did },
+        { _id },
         {
           $set: {
             content,
@@ -121,6 +124,8 @@ router
     await db.DocumentModel.updateOne(
       {
         did: moment.did,
+        source: momentSource,
+        type: stableDocumentTypes,
       },
       {
         $set: {
@@ -140,7 +145,6 @@ router
     };
     let matchMoment = {
       files: newResourcesId,
-      did: document.did,
       status: normalMomentStatus,
       tlm,
     };
@@ -151,7 +155,7 @@ router
     }
     //将编辑版本的document变成正式版
     await db.DocumentModel.updateOne(
-      { did: document.did },
+      { _id: document._id },
       {
         $set: matchDocument,
       },
@@ -170,7 +174,7 @@ router
     //更新resource
     newMoment.updateResourceReferences();
     const newDocument = await db.DocumentModel.findOnly(
-      { did: newMoment.did },
+      { did: newMoment.did, source: momentSource, type: stableDocumentTypes },
       { content: 1, addr: 1 },
     );
     if (!needReview) {
