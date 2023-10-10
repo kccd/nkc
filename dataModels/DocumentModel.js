@@ -759,6 +759,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     origin,
     authorInfos,
     quoteDid,
+    resourcesId = [],
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const DocumentModel = mongoose.model('documents');
@@ -775,21 +776,57 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     content,
     betaDocument._id,
   );
-  const updateObject = {
-    $set: {
-      title,
-      content: html,
-      cover,
-      abstract,
-      abstractEN,
-      keywords,
-      keywordsEN,
-      wordCount,
-      tlm,
-      origin,
-      authorInfos,
-    },
-  };
+  let updateObject = {};
+  // 没有传入files资源参数,目前先不更改document的files
+  if (resourcesId.length > 0) {
+    updateObject = {
+      $set: {
+        title,
+        content: html,
+        cover,
+        abstract,
+        abstractEN,
+        keywords,
+        keywordsEN,
+        wordCount,
+        tlm,
+        origin,
+        authorInfos,
+        files: resourcesId,
+      },
+    };
+  } else {
+    updateObject = {
+      $set: {
+        title,
+        content: html,
+        cover,
+        abstract,
+        abstractEN,
+        keywords,
+        keywordsEN,
+        wordCount,
+        tlm,
+        origin,
+        authorInfos,
+      },
+    };
+  }
+  // const updateObject = {
+  //   $set: {
+  //     title,
+  //     content: html,
+  //     cover,
+  //     abstract,
+  //     abstractEN,
+  //     keywords,
+  //     keywordsEN,
+  //     wordCount,
+  //     tlm,
+  //     origin,
+  //     authorInfos,
+  //   },
+  // };
   //如果上层函数没有传入quoteDid，就代表是编辑模式，不用去更改引用字段
   if (quoteDid !== undefined) {
     updateObject.quoteDid = quoteDid;

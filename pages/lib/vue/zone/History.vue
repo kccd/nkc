@@ -16,16 +16,16 @@
             span {{ history.filesData.length === 0? '无': ''}}
           .moment-file-container
             .moment-file-picture(
-              v-for="file, index in history.filesData"
+              v-for="file, number in history.filesData"
               v-if="file.type === 'picture'"
               data-global-click="viewImages"
-              :data-global-data="{'url': file.url,'name': file.filename,}"
+              :data-global-data="renderObjToStr(index,number)"
               )
-              img(src="file.url")
+              img(:src="file.url")
             .moment-file-video(
-              v-for="file, index in history.filesData"
+              v-for="file, order in history.filesData"
               v-if="file.type !== 'picture'"
-            )
+              )
               video(:src="file.sources[file.sources.length - 1].url" :poster="file.coverUrl" controls='controls')
 </template>
 
@@ -33,6 +33,7 @@
 </style>
 
 <script>
+import {objToStr } from '../../js/dataConversion';
 import { nkcAPI } from '../../js/netAPI';
 import { visitUrl } from '../../js/pageSwitch';
 import { sweetSuccess } from '../../js/sweetAlert';
@@ -71,6 +72,12 @@ import { sweetSuccess } from '../../js/sweetAlert';
       },
       refresh(){
         visitUrl(`${window.location.pathname}${window.location.search}`);
+      },
+      renderObjToStr(index,number){
+        const self=this;
+        return objToStr({images: self.histories[index].filesData.map(file=>{
+          return {url: file.url,  name: file.filename};
+        }),index: number});
       }
     }
   }

@@ -316,6 +316,7 @@ schema.statics.createMomentCore = async (props) => {
     toc,
     source: momentSource,
     sid: momentId,
+    files: resourcesId,
   });
   const moment = MomentModel({
     _id: momentId,
@@ -437,6 +438,7 @@ schema.methods.modifyMoment = async function (props) {
 
   await DocumentModel.updateDocumentByDid(this.did, {
     content,
+    resourcesId: newResourcesId,
     tlm: time,
   });
   const match = {
@@ -746,7 +748,39 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
     let picturesId = [];
     let videosId = [];
     let resources = [];
-    const oldResourcesId = moment.files;
+    // const oldResourcesId = moment.files;
+    // if (oldResourcesId.length > 0) {
+    //   resources = await ResourceModel.find(
+    //     { rid: { $in: oldResourcesId } },
+    //     {
+    //       rid: 1,
+    //       mediaType: 1,
+    //     },
+    //   );
+    //   const resourcesId = resources.map((r) => r.rid);
+    //   if (resources.length > 0) {
+    //     if (resources[0].mediaType === 'mediaPicture') {
+    //       picturesId = resourcesId;
+    //     } else {
+    //       videosId = resourcesId;
+    //     }
+    //   }
+    // }
+    //检查内容是否有编辑版本且没有提交过
+    let document = await DocumentModel.getBetaDocumentBySource(
+      momentSource,
+      mid,
+    );
+    //获取正式版的内容
+    if (!document) {
+      document = await DocumentModel.findOnly({
+        did: moment.did,
+        source: momentSource,
+        type: stableDocumentTypes,
+      });
+    }
+    const { toc, tlm, uid, content, files } = document;
+    const oldResourcesId = files;
     if (oldResourcesId.length > 0) {
       resources = await ResourceModel.find(
         { rid: { $in: oldResourcesId } },
@@ -764,20 +798,6 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
         }
       }
     }
-    //检查内容是否有编辑版本且没有提交过
-    let document = await DocumentModel.getBetaDocumentBySource(
-      momentSource,
-      mid,
-    );
-    //获取正式版的内容
-    if (!document) {
-      document = await DocumentModel.findOnly({
-        did: moment.did,
-        source: momentSource,
-        type: stableDocumentTypes,
-      });
-    }
-    const { toc, tlm, uid, content, files } = document;
     return {
       momentId: moment._id,
       toc,
@@ -1432,23 +1452,37 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   const usersId = [];
   const momentsId = [];
   let resourcesId = [];
+  // for (const moment of moments) {
+  //   const { uid, files, _id } = moment;
+  //   usersId.push(uid);
+  //   resourcesId = resourcesId.concat(files);
+  //   momentsId.push(_id);
+  // }
   for (const moment of moments) {
-    const { uid, files, _id } = moment;
+    const { uid, _id } = moment;
     usersId.push(uid);
-    resourcesId = resourcesId.concat(files);
     momentsId.push(_id);
   }
   // 准备用户数据
   const usersObj = await UserModel.getUsersObjectByUsersId(usersId);
-  // 准备附件数据
-  const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(
-    resourcesId,
-  );
+  // // 准备附件数据
+  // const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(
+  //   resourcesId,
+  // );
   // 准备动态内容
   const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(
     momentSource,
     momentsId,
     'object',
+  );
+  for (const moment of moments) {
+    const { _id } = moment;
+    moment.files = [...stableDocumentsObj[_id].files];
+    resourcesId = resourcesId.concat(moment.files);
+  }
+  // 准备附件数据
+  const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(
+    resourcesId,
   );
   // 点赞内容
   const { moment: momentVoteSource } = await PostsVoteModel.getVoteSources();

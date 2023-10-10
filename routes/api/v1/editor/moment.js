@@ -293,10 +293,9 @@ router
       },
     );
     //将选中的历史版本的document 克隆添加 并变成正式版
-    const newStableDocument =
-      await db.DocumentModel.createStableDocumentByStableHistoryDocument(
-        documentId,
-      );
+    await db.DocumentModel.createStableDocumentByStableHistoryDocument(
+      documentId,
+    );
     //更新正式版moment的内容
     // await db.MomentModel.updateOne(
     //   { _id: mid },
