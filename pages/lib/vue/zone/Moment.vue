@@ -586,12 +586,13 @@
         })
       },
       onPublished(data) {
-        const {content,submitting,files,status,tlm} = data
+        const {content,submitting,files,status,tlm,addr} = data
         this.momentData.content = content;
         this.momentData.status = status
         this.submitting = submitting;
         this.momentData.files = files
         this.momentData.tlm = tlm;
+        this.momentData.addr = addr;
         this.$refs.momentEditor.reset();
         this.showLoadMore()
       },
