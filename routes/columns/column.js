@@ -157,8 +157,6 @@ router
         columnId: column._id,
         cid: { $in: childCategoryId },
       });
-      // console.log('111',childCategoryId);
-      
       let minorCategory;
       if (mcid) {
         minorCategory = await db.ColumnPostCategoryModel.findOne({ _id: mcid });
