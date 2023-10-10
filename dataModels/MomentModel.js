@@ -732,6 +732,8 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
+  const { stable: stableDocumentTypes } =
+    await DocumentModel.getDocumentTypes();
   const { moment: momentSource } = await DocumentModel.getDocumentSources();
   const moment = await MomentModel.findOnly(
     {
@@ -769,7 +771,11 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
     );
     //获取正式版的内容
     if (!document) {
-      document = await DocumentModel.findOnly({ did: moment.did });
+      document = await DocumentModel.findOnly({
+        did: moment.did,
+        source: momentSource,
+        type: stableDocumentTypes,
+      });
     }
     const { toc, tlm, uid, content, files } = document;
     return {
