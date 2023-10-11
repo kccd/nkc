@@ -277,14 +277,18 @@ schema.statics.checkDocumentType = async (type) => {
 /*
  * 复制历史版内容生成正式版
  * @param {Number} id 文档的_id
+ * @param {Date} tlm 文档的修改时间
  * @return {Object} document schema 对象
  * */
-schema.statics.createStableDocumentByStableHistoryDocument = async (id) => {
+schema.statics.createStableDocumentByStableHistoryDocument = async (
+  id,
+  tlm = new Date(),
+) => {
   const DocumentModel = mongoose.model('documents');
   //选中的历史版
   const stableHistoryDocument = await DocumentModel.findOne({ _id: id });
   // 如没有找到需要报错
-  if(!stableHistoryDocument){
+  if (!stableHistoryDocument) {
     ThrowServerInternalError(`文档 ${id} 不存在历史正式版，无法回滚成正式版`);
   }
   const {
@@ -335,7 +339,8 @@ schema.statics.createStableDocumentByStableHistoryDocument = async (id) => {
     origin,
     authorInfos,
     dt,
-    tlm: new Date(),
+    tlm,
+    toc: tlm,
     type: (await DocumentModel.getDocumentTypes()).stable,
     source,
     sid,
@@ -391,6 +396,7 @@ schema.statics.createBetaDocument = async (props) => {
     ip,
     port,
     files = [],
+    dt = toc,
   } = props;
   const IPModel = mongoose.model('ips');
   const DocumentModel = mongoose.model('documents');
@@ -417,7 +423,8 @@ schema.statics.createBetaDocument = async (props) => {
     origin,
     authorInfos,
     toc,
-    dt: toc,
+    // dt: toc,
+    dt,
     type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
