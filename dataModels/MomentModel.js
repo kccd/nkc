@@ -676,7 +676,17 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
   if (moment) {
     let picturesId = [];
     let videosId = [];
-    const oldResourcesId = moment.files;
+    const DocumentModel = mongoose.model('documents');
+    const { moment: momentSource } = await DocumentModel.getDocumentSources();
+    const betaDocument = await DocumentModel.getBetaDocumentBySource(
+      momentSource,
+      moment._id,
+    );
+    if (!betaDocument) {
+      await moment.deleteMoment();
+      return null;
+    }
+    const oldResourcesId = betaDocument.files;
     if (oldResourcesId.length > 0) {
       const resources = await ResourceModel.find(
         { rid: { $in: oldResourcesId } },
@@ -693,16 +703,6 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
           videosId = resourcesId;
         }
       }
-    }
-    const DocumentModel = mongoose.model('documents');
-    const { moment: momentSource } = await DocumentModel.getDocumentSources();
-    const betaDocument = await DocumentModel.getBetaDocumentBySource(
-      momentSource,
-      moment._id,
-    );
-    if (!betaDocument) {
-      await moment.deleteMoment();
-      return null;
     }
     return {
       momentId: moment._id,
