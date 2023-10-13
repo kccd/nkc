@@ -275,6 +275,91 @@ schema.statics.checkDocumentType = async (type) => {
 };
 
 /*
+ * 复制历史版内容生成正式版
+ * @param {Number} id 文档的_id
+ * @param {Date} tlm 文档的修改时间
+ * @return {Object} document schema 对象
+ * */
+schema.statics.createStableDocumentByStableHistoryDocument = async (
+  id,
+  tlm = new Date(),
+) => {
+  const DocumentModel = mongoose.model('documents');
+  //选中的历史版
+  const stableHistoryDocument = await DocumentModel.findOne({ _id: id });
+  // 如没有找到需要报错
+  if (!stableHistoryDocument) {
+    ThrowServerInternalError(`文档 ${id} 不存在历史正式版，无法回滚成正式版`);
+  }
+  const {
+    did,
+    title = '',
+    status,
+    content = '',
+    cover = '',
+    coverFile = '',
+    keywords = [],
+    keywordsEN = [],
+    abstract = '',
+    abstractEN = '',
+    origin = '',
+    authorInfos = [],
+    uid,
+    dt,
+    source,
+    sid,
+    ip,
+    port,
+    files = [],
+    quoteDid,
+    atUsers,
+  } = stableHistoryDocument.toObject();
+  const IPModel = mongoose.model('ips');
+  const AttachmentModel = mongoose.model('attachments');
+  const { getHTMLTextLength } = require('../nkcModules/checkData');
+  await DocumentModel.checkDocumentSource(source);
+  const wordCount = getHTMLTextLength(content);
+  const _id = await DocumentModel.getId();
+  // const did = await DocumentModel.getDid();
+  const ipId = await IPModel.saveIPAndGetToken(ip);
+  const addr = await IPModel.getIpAddr(ip);
+  const document = await DocumentModel({
+    _id,
+    did,
+    status,
+    uid,
+    title,
+    content,
+    wordCount,
+    cover,
+    keywords,
+    keywordsEN,
+    abstract,
+    abstractEN,
+    origin,
+    authorInfos,
+    dt,
+    tlm,
+    toc: tlm,
+    type: (await DocumentModel.getDocumentTypes()).stable,
+    source,
+    sid,
+    ip: ipId,
+    port,
+    addr,
+    files,
+    quoteDid,
+    atUsers,
+  });
+  await document.save();
+  await document.updateResourceReferences();
+  if (coverFile) {
+    await AttachmentModel.saveDocumentCover(document._id, coverFile);
+  }
+  return document;
+};
+
+/*
  * 新建编辑版文档
  * @param {Object} props
  *   @param {String} title 标题
@@ -311,6 +396,7 @@ schema.statics.createBetaDocument = async (props) => {
     ip,
     port,
     files = [],
+    dt = toc,
   } = props;
   const IPModel = mongoose.model('ips');
   const DocumentModel = mongoose.model('documents');
@@ -319,7 +405,7 @@ schema.statics.createBetaDocument = async (props) => {
   await DocumentModel.checkDocumentSource(source);
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
-  const did = await DocumentModel.getDid();
+  const did = props.did ? props.did : await DocumentModel.getDid();
   const ipId = await IPModel.saveIPAndGetToken(ip);
   const addr = await IPModel.getIpAddr(ip);
   const document = await DocumentModel({
@@ -337,7 +423,8 @@ schema.statics.createBetaDocument = async (props) => {
     origin,
     authorInfos,
     toc,
-    dt: toc,
+    // dt: toc,
+    dt,
     type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
@@ -353,7 +440,6 @@ schema.statics.createBetaDocument = async (props) => {
   }
   return document;
 };
-
 /*
  * 复制当前文档数据创建历史文档
  * @return {Object} betaHistory document schema
@@ -680,6 +766,7 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     origin,
     authorInfos,
     quoteDid,
+    resourcesId = [],
   } = props;
   const AttachmentModel = mongoose.model('attachments');
   const DocumentModel = mongoose.model('documents');
@@ -696,21 +783,57 @@ schema.statics.updateDocumentByDid = async (did, props) => {
     content,
     betaDocument._id,
   );
-  const updateObject = {
-    $set: {
-      title,
-      content: html,
-      cover,
-      abstract,
-      abstractEN,
-      keywords,
-      keywordsEN,
-      wordCount,
-      tlm,
-      origin,
-      authorInfos,
-    },
-  };
+  let updateObject = {};
+  // 没有传入files资源参数,目前先不更改document的files
+  if (resourcesId.length > 0) {
+    updateObject = {
+      $set: {
+        title,
+        content: html,
+        cover,
+        abstract,
+        abstractEN,
+        keywords,
+        keywordsEN,
+        wordCount,
+        tlm,
+        origin,
+        authorInfos,
+        files: resourcesId,
+      },
+    };
+  } else {
+    updateObject = {
+      $set: {
+        title,
+        content: html,
+        cover,
+        abstract,
+        abstractEN,
+        keywords,
+        keywordsEN,
+        wordCount,
+        tlm,
+        origin,
+        authorInfos,
+      },
+    };
+  }
+  // const updateObject = {
+  //   $set: {
+  //     title,
+  //     content: html,
+  //     cover,
+  //     abstract,
+  //     abstractEN,
+  //     keywords,
+  //     keywordsEN,
+  //     wordCount,
+  //     tlm,
+  //     origin,
+  //     authorInfos,
+  //   },
+  // };
   //如果上层函数没有传入quoteDid，就代表是编辑模式，不用去更改引用字段
   if (quoteDid !== undefined) {
     updateObject.quoteDid = quoteDid;

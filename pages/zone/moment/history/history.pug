@@ -14,11 +14,20 @@ block content
         div
           if data.histories.length === 0
             .p-t-2.p-b-2.text-center 空空如也~
-          for history in data.histories
+          #MomentHistory(v-cloak)
+            history(:histories="histories" :mid="mid")
+          .hidden#historyData=objToStr({histories:data.histories,mid:data.mid})
+          //- +includeJS('/zone/moment/history/history.js')
+          //for history,index in data.histories
             .moment-history-item.box-shadow.m-b-1
               .box-shadow-header=history.time
-              .moment-content
-                h5.text-info 文本内容：
+              .moment-content 
+                .text-content 
+                  h5.text-info 文本内容：
+                  if(index!==0)
+                    .text-action
+                      button.text-back 回滚
+                      button.text-delete 删除
                 div!=history.contentDiff
               .moment-files
                 h5

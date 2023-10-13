@@ -30,7 +30,8 @@
             from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
           //- 其他操作
-          .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'") {{visitType[momentData.visibleType]}}
+          .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'||(momentData.visibleType==='everyone'&&isShowPublicTag)") {{visitType[momentData.visibleType]}}
+          //- .single-moment-tag(:class="momentData.visibleType") {{visitType[momentData.visibleType]}}
           .single-moment-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
           moment-option(
             ref="momentOption"
@@ -281,6 +282,11 @@
       background-color: #fdf6ec;
       color: #e6a23c;
     }
+    .everyone{
+      border-color:#e1f3d8;
+      background-color: #f0f9eb;
+      color: #67c23a;
+    }
     .single-moment-header-options{
       height: @optionHeight;
       line-height: @optionHeight;
@@ -442,8 +448,10 @@
       isFold:false, //是否折叠
       visitType:{
         own:'自己可见',
-        attention:'关注可见'
-      }
+        attention:'关注可见',
+        everyone:'完全公开'
+      },
+      isShowPublicTag:false
     }),
     mounted() {
       this.initData();
@@ -474,6 +482,9 @@
       initData() {
         const {data} = this;
         this.momentData = JSON.parse(JSON.stringify(data));
+        if(this.logged&&window.location.pathname===`/u/${state.uid}/profile/moment`){
+        this.isShowPublicTag=true;
+        }
         this.showLoadMore();
       },
       vote() {
@@ -575,12 +586,13 @@
         })
       },
       onPublished(data) {
-        const {content,submitting,files,status,tlm} = data
+        const {content,submitting,files,status,tlm,addr} = data
         this.momentData.content = content;
         this.momentData.status = status
         this.submitting = submitting;
         this.momentData.files = files
         this.momentData.tlm = tlm;
+        this.momentData.addr = addr;
         this.$refs.momentEditor.reset();
         this.showLoadMore()
       },

@@ -369,7 +369,6 @@
         this.setTextareaEditorContent('');
         this.picturesId = [];
         this.videosId = [];
-        this.momentStatus = '';
       },
       initData() {
         const self = this;
