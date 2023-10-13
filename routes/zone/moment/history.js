@@ -32,6 +32,7 @@ router.get('/', async (ctx, next) => {
   data.momentHistory = getUrl('zoneMomentHistory', mid);
   data.histories = histories;
   data.paging = paging;
+  data.mid = mid;
   ctx.remoteTemplate = 'zone/moment/history/history.pug';
   await next();
 });

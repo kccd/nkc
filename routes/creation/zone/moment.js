@@ -79,6 +79,7 @@ router
           resourcesId,
         });
       } else {
+        // file==>resourceId可以不放在moment，后期可以优化
         moment = await db.MomentModel.createMoment({
           ip: ctx.address,
           port: ctx.port,

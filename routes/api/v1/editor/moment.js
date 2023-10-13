@@ -39,18 +39,32 @@ router
     );
     const { moment: momentSource } =
       await db.DocumentModel.getDocumentSources();
+    //document类型
+    const { stable: stableDocumentTypes } =
+      await db.DocumentModel.getDocumentTypes();
     const toc = new Date();
     //检查内容是否有编辑版本且没有提交过
     const document = await db.DocumentModel.getBetaDocumentBySource(
       momentSource,
       mid,
     );
+    //获取目前编辑的moment的did
+    const { did } = await db.MomentModel.findOnly({ _id: mid }, { did: 1 });
     //限制动态图片和视频的数量
     const newResourcesId = await db.MomentModel.replaceMomentResourcesId(
       resourcesId,
     );
     //生成document的beta版本
     if (!document) {
+      // 先获取正式版拿到正式版的dt
+      const { dt } = await db.DocumentModel.findOnly(
+        {
+          did,
+          source: momentSource,
+          type: stableDocumentTypes,
+        },
+        { dt: 1 },
+      );
       await db.DocumentModel.createBetaDocument({
         ip,
         port,
@@ -60,11 +74,13 @@ router
         sid: mid,
         content,
         files: newResourcesId,
+        did,
+        dt,
       });
     } else {
-      const { did } = document;
+      const { _id } = document;
       await db.DocumentModel.updateOne(
-        { did },
+        { _id },
         {
           $set: {
             content,
@@ -83,6 +99,8 @@ router
       params: { mid },
       db,
     } = ctx;
+    const ip = await db.IPModel.saveIPAndGetToken(ctx.address);
+    const addr = await db.IPModel.getIpAddr(ctx.address);
     //判断用户是否拥有编辑电文的权限
     await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
@@ -119,6 +137,8 @@ router
     await db.DocumentModel.updateOne(
       {
         did: moment.did,
+        source: momentSource,
+        type: stableDocumentTypes,
       },
       {
         $set: {
@@ -133,10 +153,11 @@ router
       type: stableDocumentTypes,
       status: normalDocumentStatus,
       tlm,
+      ip,
+      addr,
     };
     let matchMoment = {
       files: newResourcesId,
-      did: document.did,
       status: normalMomentStatus,
       tlm,
     };
@@ -147,7 +168,7 @@ router
     }
     //将编辑版本的document变成正式版
     await db.DocumentModel.updateOne(
-      { did: document.did },
+      { _id: document._id },
       {
         $set: matchDocument,
       },
@@ -166,8 +187,8 @@ router
     //更新resource
     newMoment.updateResourceReferences();
     const newDocument = await db.DocumentModel.findOnly(
-      { did: newMoment.did },
-      { content: 1 },
+      { did: newMoment.did, source: momentSource, type: stableDocumentTypes },
+      { content: 1, addr: 1 },
     );
     if (!needReview) {
       //检测document中的@用户并发送消息给用户
@@ -241,6 +262,62 @@ router
       files: filesData,
       status: newMoment.status,
       tlm: newMoment.tlm,
+    };
+    await next();
+  })
+  .post('/rollback', async (ctx, next) => {
+    const {
+      body: { documentId },
+      params: { mid },
+      db,
+    } = ctx;
+
+    //document类型
+    const {
+      stable: stableDocumentTypes,
+      stableHistory: stableHistoryDocumentTypes,
+    } = await db.DocumentModel.getDocumentTypes();
+    //获取现在的moment
+    const moment = await db.MomentModel.findOnly({ _id: mid }, { did: 1 });
+    //如何没有找到 moment--后期需要抛出错误
+    if (!moment) {
+      return await next();
+    }
+    //将原来的正式版本变为历史版本
+    await db.DocumentModel.updateOne(
+      {
+        did: moment.did,
+        type: stableDocumentTypes,
+      },
+      {
+        $set: {
+          type: stableHistoryDocumentTypes,
+        },
+      },
+    );
+    const tlm = new Date();
+    //将选中的历史版本的document 克隆添加 并变成正式版
+    await db.DocumentModel.createStableDocumentByStableHistoryDocument(
+      documentId,
+      tlm,
+    );
+    //更新moment的修改时间-tlm
+    await db.MomentModel.updateOne(
+      { _id: mid },
+      {
+        $set: {
+          tlm,
+        },
+      },
+    );
+    const newMoment = await db.MomentModel.findOnly(
+      { _id: mid },
+      { files: 1, did: 1, status: 1, tlm: 1 },
+    );
+    //更新resource
+    newMoment.updateResourceReferences();
+    ctx.apiData = {
+      backSuccess: true,
     };
     await next();
   });

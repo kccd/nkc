@@ -23,6 +23,7 @@
 
 <style lang="less" scoped>
   .textarea-editor{
+    overflow: hidden;
     position: relative;
     .textarea-editor-container{
       background-color: #fff;
@@ -34,7 +35,6 @@
         z-index: -1;
       }
       &>div{
-        margin-bottom: 0.5rem;
         padding: 0.5rem 0.8rem;
         border: 1px solid #ccc;
         border-radius: 0.5rem;

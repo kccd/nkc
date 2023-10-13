@@ -18,10 +18,10 @@
             | ）
           question-text-content(:text="`${question.content}`")
           .question-desc(v-if="question.contentDesc")
-            .text-info(v-if="isShowReminder" ).m-t-1.m-b-05
+            .text-info(v-if="isShowReminder || isCorrect === false " ).m-t-1.m-b-05
               .answer-desc-icon.fa.fa-lightbulb-o
               span {{this.question.contentDesc}}
-            button.btn.btn-default.btn-xs( @click="showReminder") 查看提示
+            button.btn.btn-default.btn-xs(@click="showReminder") 查看提示
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-status
         h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误，请阅读所有提示，理解其内容，再重新作答
