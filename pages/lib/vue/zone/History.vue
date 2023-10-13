@@ -6,8 +6,7 @@
           .text-content 
             h5.text-info 文本内容：
             .text-action(v-if="index!==0")
-              button.text-back(@click="momentBack(history)" v-show="!lockBack") 回滚
-              button.text-back(@click="momentBack(history)" v-show="lockBack" disabled) 回滚
+              button.text-back(@click="momentBack(history)" ) 回滚
               //button.text-delete 删除
           div(v-html="history.contentDiff")
         .moment-files
@@ -36,37 +35,33 @@
 import {objToStr } from '../../js/dataConversion';
 import { nkcAPI } from '../../js/netAPI';
 import { visitUrl } from '../../js/pageSwitch';
-import { sweetSuccess } from '../../js/sweetAlert';
+import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
   export default {
     props: ['histories','mid'],
     components: {
     },
     data: () => ({
-      // images:[],
-      lockBack:false
     }),
     mounted() {
     },
     methods: {
       momentBack(e) {
         const {_id}=e;
-        // console.log('1111',e,this.mid);
-        this.lockBack=true;
-        // 访问api调用回滚接口，刷新页面
-        nkcAPI(`/api/v1/editor/moment/${this.mid}`,'POST',{
-            // content,
-            // resourcesId
-            isBack:true,
-            documentId:_id
-          }).then((res)=>{
-            if(res.data.backSuccess){
-              this.refresh();
-            }
-          }).catch(err=>{
-            sweetError(err, 'err');
-            this.lockBack=false;
-          });
-        // sweetSuccess('会滚成功');
+        const self=this;
+        sweetQuestion("确定要执行当前操作？")
+        .then(() => {
+          // 访问api调用回滚接口，刷新页面
+          return nkcAPI(`/api/v1/editor/moment/${self.mid}`,'POST',{
+              isBack:true,
+              documentId:_id
+            });
+        })
+        .then((res)=>{
+          if(res.data.backSuccess){
+            self.refresh();
+          }
+        })
+        .catch(sweetError);
 
         
       },
