@@ -51,16 +51,15 @@ import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
         sweetQuestion("确定要执行当前操作？")
         .then(() => {
           // 访问api调用回滚接口，刷新页面
-          nkcAPI(`/api/v1/editor/moment/${self.mid}`,'POST',{
+          return nkcAPI(`/api/v1/editor/moment/${self.mid}`,'POST',{
               isBack:true,
               documentId:_id
-            }).then((res)=>{
-              if(res.data.backSuccess){
-                self.refresh();
-              }
-            }).catch(err=>{
-              sweetError(err, 'err');
             });
+        })
+        .then((res)=>{
+          if(res.data.backSuccess){
+            self.refresh();
+          }
         })
         .catch(sweetError);
 
