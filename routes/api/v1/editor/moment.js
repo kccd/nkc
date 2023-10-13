@@ -95,15 +95,12 @@ router
     const {
       state: { uid },
       permission,
-      body: { content, resourcesId, isBack },
+      body: { content, resourcesId },
       params: { mid },
       db,
     } = ctx;
     const ip = await db.IPModel.saveIPAndGetToken(ctx.address);
     const addr = await db.IPModel.getIpAddr(ctx.address);
-    if (isBack) {
-      return await next();
-    }
     //判断用户是否拥有编辑电文的权限
     await EditorMomentService.checkeditOtherUserMomentPermission(
       uid,
@@ -268,17 +265,13 @@ router
     };
     await next();
   })
-  .post('/', OnlyUser(), async (ctx, next) => {
+  .post('/rollback', async (ctx, next) => {
     const {
-      state: { uid },
-      permission,
-      body: { content, resourcesId, isBack, documentId },
+      body: { documentId },
       params: { mid },
       db,
     } = ctx;
-    if (!isBack) {
-      return await next();
-    }
+
     //document类型
     const {
       stable: stableDocumentTypes,

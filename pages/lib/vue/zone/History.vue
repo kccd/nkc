@@ -2,8 +2,8 @@
     .history-container
       .moment-history-item.box-shadow.m-b-1(v-for="history,index in histories" :key="index")
         .box-shadow-header {{history.time}}
-        .moment-content 
-          .text-content 
+        .moment-content
+          .text-content
             h5.text-info 文本内容：
             .text-action(v-if="index!==0")
               button.text-back(@click="momentBack(history)" ) 回滚
@@ -51,10 +51,9 @@ import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
         sweetQuestion("确定要执行当前操作？")
         .then(() => {
           // 访问api调用回滚接口，刷新页面
-          return nkcAPI(`/api/v1/editor/moment/${self.mid}`,'POST',{
-              isBack:true,
-              documentId:_id
-            });
+          return nkcAPI(`/api/v1/editor/moment/${self.mid}/rollback`,'POST',{
+            documentId:_id
+          });
         })
         .then((res)=>{
           if(res.data.backSuccess){
@@ -63,7 +62,7 @@ import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
         })
         .catch(sweetError);
 
-        
+
       },
       refresh(){
         visitUrl(`${window.location.pathname}${window.location.search}`);

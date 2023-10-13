@@ -118,6 +118,9 @@ module.exports = {
           GET: Operations.editorMoment,
           PUT: Operations.editorMoment,
           POST: Operations.editorMoment,
+          rollback: {
+            POST: Operations.rollbackZoneMomentHistory,
+          },
         },
       },
     },

@@ -9,18 +9,16 @@ $(function () {
 });
 
 function initHistoryVueApp() {
-  const {histories,mid}  = getDataById('historyData');
+  const { histories, mid } = getDataById('historyData');
   const app = new Vue({
     el: `#${momentElementId}`,
     components: {
       history: History,
     },
     data: {
-      histories:histories,
-      mid:mid
+      histories: histories,
+      mid: mid,
     },
-    mounted() {
-      
-    },
+    mounted() {},
   });
 }

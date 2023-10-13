@@ -787,6 +787,7 @@ const DynamicOperations = {
   viewOtherUserAbnormalMoment: 'viewOtherUserAbnormalMoment',
   editOtherUserMoment: 'editOtherUserMoment',
   visitZoneMomentHistory: 'visitZoneMomentHistory',
+  rollbackZoneMomentHistory: 'rollbackZoneMomentHistory',
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
 };
 
