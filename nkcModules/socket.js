@@ -4,10 +4,10 @@ const {
   ServiceActionNames,
   GetSocketServiceRoomName,
 } = require('../comm/modules/comm');
-const FriendsApplicationModel = require("../dataModels/FriendsApplicationModel");
-const MessageModel = require("../dataModels/MessageModel");
-const CreatedChatModel = require("../dataModels/CreatedChatModel");
-const UserModel = require("../dataModels/UserModel");
+const FriendsApplicationModel = require('../dataModels/FriendsApplicationModel');
+const MessageModel = require('../dataModels/MessageModel');
+const CreatedChatModel = require('../dataModels/CreatedChatModel');
+const UserModel = require('../dataModels/UserModel');
 
 function SendMessageToWebsocketServiceRoom(roomName, eventName, data) {
   BrokerCall(ServiceActionNames.v1_websocket_send_message_to_room, {
@@ -37,6 +37,10 @@ async function sendResourcesMessage(uid) {
 async function sendConsoleMessage(data) {
   const roomName = GetSocketServiceRoomName('console');
   return SendMessageToWebsocketServiceRoom(roomName, 'consoleMessage', data);
+}
+async function sendMomentMessage(data) {
+  const roomName = GetSocketServiceRoomName('zoneHome');
+  return SendMessageToWebsocketServiceRoom(roomName, 'zoneHomeMessage', data);
 }
 
 async function sendUserMessage(channel, messageObject) {
@@ -419,4 +423,5 @@ module.exports = {
   getMediaServiceInfo,
   getMediaServiceUrl,
   getPageFromRenderService,
+  sendMomentMessage,
 };

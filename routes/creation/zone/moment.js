@@ -1,4 +1,6 @@
 const router = require('koa-router')();
+const { eventEmitter } = require('../../../events');
+const { getMomentPublishType } = require('../../../events/moment');
 router
   .get('/', async (ctx, next) => {
     const { query, db, data, state, nkcModules, permission, body } = ctx;
@@ -113,7 +115,12 @@ router
         resourcesId,
       });
       await moment.publish();
-      await db.MomentModel.findOnly({ _id: momentId }, { status: 1 });
+      const { momentBubble } = getMomentPublishType();
+
+      await eventEmitter.emit(momentBubble, {
+        uid: state.uid,
+        momentId,
+      });
     }
     await next();
   })

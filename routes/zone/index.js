@@ -141,6 +141,7 @@ router
           $in: [everyone, attention],
         },
       });
+      data.subUid = subUid;
     }
 
     //获取当前用户对动态的审核权限
