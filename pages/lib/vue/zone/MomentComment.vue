@@ -1,5 +1,6 @@
 <template lang="pug">
   div(:data-id="commentData._id")
+    resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
     .moment-comment-item(
       :class=`{'active': focus === commentData._id, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted', 'disable-hover': replyEditorStatus}`
@@ -46,6 +47,9 @@
               @complaint="complaint"
             )
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
+      //- 图片视频
+      .moment-comment-item-files(v-if="type === 'comment'")
+        moment-files(:data="commentData.files")
       .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
       .moment-comment-reply-editor(v-if="replyEditorStatus")
         .m-b-05
@@ -57,14 +61,26 @@
             @content-change="onReplyEditorContentChange"
             @click-ctrl-enter="submitReplyContent"
           )
+        .moment-comment-reply-pictures-container
+          .pictures(v-if="picturesUrl.length > 0")
+            .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
+              .icon-remove(@click="clearReplyPicture" title="取消选择")
+                .fa.fa-trash-o
         .button-container
-          .button-icon(
-            @click="selectEmoji"
-            @mouseover="iconMouseOver(icons.face)"
-            @mouseleave="iconMouseLeave(icons.face)"
-            title="表情"
-          )
-            .fa.fa-smile-o
+          .button-icon
+            .fa.fa-picture-o(
+              @click="selectPicture"
+              @mouseover="iconMouseOver(icons.image)"
+              @mouseleave="iconMouseLeave(icons.image)"
+              :class="{'disabled':picturesId.length>0}"
+              title="图片"
+              )
+            .fa.fa-smile-o(
+              @click="selectEmoji"
+              @mouseover="iconMouseOver(icons.face)"
+              @mouseleave="iconMouseLeave(icons.face)"
+              title="表情"
+              )
           .submit-button-container.text-right
             button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
             button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 发射
@@ -100,6 +116,9 @@ import TextareaEditor from '../../vue/TextareaEditor';
 import {nkcAPI} from "../../js/netAPI";
 import { WinkingFace } from "@icon-park/vue";
 import EmojiSelector from "../EmojiSelector.vue";
+import MomentFiles from './MomentFiles';
+import ResourceSelector from '../ResourceSelector';
+import { getUrl } from '../../js/tools';
 const state = getState();
 const iconFill = {
   normal: '#555',
@@ -136,6 +155,8 @@ export default {
     'textarea-editor': TextareaEditor,
     'winking-face': WinkingFace,
     'emoji-selector': EmojiSelector,
+    'moment-files': MomentFiles,
+    'resource-selector': ResourceSelector,
   },
   data: () => ({
     logged: !!state.uid,
@@ -163,7 +184,8 @@ export default {
         size: 22,
         theme: 'outline'
       }
-    }
+    },
+    picturesId:[],
   }),
   computed: {
     commentData() {
@@ -171,7 +193,16 @@ export default {
     },
     editorPlaceholder() {
       return `回复 ${this.commentData.username}`
-    }
+    },
+    picturesUrl() {
+        const {picturesId} = this;
+        const filesUrl = [];
+        for(const rid of picturesId) {
+          const url = getUrl('resource', rid);
+          filesUrl.push(url);
+        }
+        return filesUrl;
+      }
   },
   methods: {
     objToStr,
@@ -180,19 +211,21 @@ export default {
       this.replyContent = content;
     },
     submitReplyContent() {
-      const {replyContent, commentData} = this;
+      const {replyContent, commentData, picturesId} = this;
       const self = this;
       return Promise.resolve()
         .then(() => {
           if(!replyContent) throw new Error('请输入评论内容');
           self.submitting = true;
           return nkcAPI(`/creation/zone/moment/${commentData._id}/comment`, 'POST', {
-            content: replyContent
+            content: replyContent,
+            resourcesId: picturesId,
           });
         })
         .then((res) => {
           self.hideReplyEditor();
           self.clearReplyContent();
+          self.clearReplyPicture();
           self.onReplyComment(res.commentId);
           if(self.mode === 'simple') {
             sweetSuccess('提交成功');
@@ -210,11 +243,15 @@ export default {
     clearReplyContent() {
       this.replyContent = '';
     },
+    clearReplyPicture() {
+      this.picturesId = [];
+    },
     hideReplyEditor() {
       this.replyEditorStatus = false;
     },
     showReplyEditor() {
       this.replyEditorStatus = true;
+      this.clearReplyPicture();
       Vue.nextTick(() => {
         this.$refs.replyEditor.focus();
       });
@@ -270,6 +307,17 @@ export default {
       this.$refs.emojiSelector.open(res => {
         const {code} = res;
         self.insertContent(`[${code}]`);
+      });
+    },
+    selectPicture() {
+      if(this.picturesId.length>0) return;
+      const self= this;
+      this.$refs.resourceSelector.open(res => {
+        self.picturesId=[...new Set(res.resourcesId)].slice(0, 1);
+        self.$refs.resourceSelector.close();
+      }, {
+        allowedExt: ['picture'],
+        countLimit: 1 - self.picturesId.length
       });
     },
   }
@@ -348,8 +396,15 @@ export default {
       vertical-align: middle;
     }
   }
+  .moment-comment-item-files{
+      font-size: 0;
+      max-width: 50%;
+      @media(max-width: 768px) {
+        max-width: 80%;
+      }
+    }
   .moment-comment-item-content {
-    //margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
     word-break: keep-all;
     word-wrap: break-word;
     white-space: pre-wrap;
@@ -365,10 +420,46 @@ export default {
   }
 }
 .button-container{
-  position: relative;
+  // position: relative;
+  display: flex;
+  justify-content:space-between;
 }
 .moment-comment-reply-editor{
   margin-top: 0.5rem;
+  .moment-comment-reply-pictures-container{
+    .pictures{
+        margin-bottom: 1rem;
+        .picture-item{
+          @pictureHeight: 8rem;
+          position: relative;
+          display: inline-block;
+          height: @pictureHeight;
+          width: @pictureHeight;
+          background-color: #000;
+          overflow: hidden;
+          margin-right: 0.5rem;
+          border-radius: 10px;
+          background-size: cover;
+          background-position: center;
+          .icon-remove{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 100ms;
+            &:hover{
+              background-color: rgba(0, 0, 0, 0.5);
+            }
+          }
+        }
+      }
+  }
 }
 .moment-comment-comments{
   padding-left: 2rem;
@@ -398,13 +489,14 @@ export default {
   }
 }
 .button-icon{
-  position: absolute;
-  left: 0;
-  top: 0;
+  // position: absolute;
+  // left: 0;
+  // top: 0;
   height: 1rem;
   line-height: 1rem;
   border-radius: 50%;
-  display: inline-block;
+  display: flex;
+  gap: 1rem;
   cursor: pointer;
   color: #333;
   margin-right: 1rem;
@@ -426,6 +518,10 @@ export default {
       color: #000;
     }
 
+  }
+  .disabled{
+    opacity: 0.7;
+    cursor: not-allowed;
   }
   &.disabled{
     cursor: not-allowed;

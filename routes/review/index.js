@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
+const { eventEmitter } = require('../../events');
+const { getMomentPublishType } = require('../../events/moment');
 router
   .get('/', async (ctx, next) => {
     ctx.template = 'review/review.pug';
@@ -426,6 +428,11 @@ router
           }
         } else if (document.source === 'moment') {
           passType = 'momentPass';
+          const { momentBubble } = getMomentPublishType();
+          await eventEmitter.emit(momentBubble, {
+            uid: document.uid,
+            momentId: document.sid,
+          });
         }
         message = await db.MessageModel({
           _id: await db.SettingModel.operateSystemID('messages', 1),

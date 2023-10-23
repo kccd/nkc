@@ -11,7 +11,11 @@ const app = new Vue({
     published() {
       // visitUrl(`/z`);
       // 刷新
-      visitUrl(`${window.location.pathname}${window.location.search}`);
+      visitUrl(
+        `${window.location.pathname}?t=m-${
+          localStorage.getItem('zoneTab') || 'a'
+        }`,
+      );
     },
   },
   components: {
