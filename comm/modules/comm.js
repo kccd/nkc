@@ -19,6 +19,7 @@ const SocketServiceRoomMap = {
   post: (pid) => `POST:${pid}`,
   comment: (cid) => `COMMENT:${cid}`,
   article: (aid) => `ARTICLE:${aid}`,
+  zoneHome: () => `ZONEHOME`,
 };
 
 function GetSocketServiceRoomName(type, ...params) {

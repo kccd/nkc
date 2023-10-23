@@ -10,6 +10,7 @@ const http = require('http');
 const dbStatus = require('./settings/dbStatus');
 
 const { port: NKCPort, host: NKCHost } = require('./nkcModules/config');
+const { initEvents } = require('./events');
 
 const start = async () => {
   try {
@@ -19,6 +20,7 @@ const start = async () => {
     logger.info(`database connected`);
     await comm.StartBroker();
     await elasticSearch.init();
+    await initEvents();
     const app = require('./app');
     const server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;

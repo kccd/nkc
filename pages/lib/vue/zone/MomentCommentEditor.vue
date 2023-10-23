@@ -1,5 +1,6 @@
 <template lang="pug">
   .moment-comment-editor
+    resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
     .moment-comment-editor-container
       .moment-comment-textaea-ditor-container.m-b-05
@@ -10,7 +11,15 @@
           @content-change="onTextareaEditorContentChange"
           @click-ctrl-enter="onClickEnter"
           )
+    .moment-comment-pictures-container
+        .pictures(v-if="picturesUrl.length > 0")
+          .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
+            .icon-remove(@click="removeFromArr(picturesId, index)" title="取消选择")
+              .fa.fa-trash-o
     .moment-comment-option-container
+      .option-box(@click="selectPicture" :class="{'disabled':picturesId.length>0}")
+        .fa.fa-picture-o
+        span 图片
       .option-box(@click="selectEmoji")
         .fa.fa-smile-o
         span 表情
@@ -37,6 +46,40 @@
     .moment-comment-editor-container{
       position: relative;
       min-height: @buttonContainerHeight;
+    }
+    .moment-comment-pictures-container{
+      .pictures{
+        margin-bottom: 1rem;
+        .picture-item{
+          @pictureHeight: 8rem;
+          position: relative;
+          display: inline-block;
+          height: @pictureHeight;
+          width: @pictureHeight;
+          background-color: #000;
+          overflow: hidden;
+          margin-right: 0.5rem;
+          border-radius: 10px;
+          background-size: cover;
+          background-position: center;
+          .icon-remove{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 100ms;
+            &:hover{
+              background-color: rgba(0, 0, 0, 0.5);
+            }
+          }
+        }
+      }
     }
     .moment-comment-option-container{
       @height: 3rem;
@@ -74,6 +117,10 @@
           }
         }
       }
+      .disabled{
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
     }
   }
 </style>
@@ -84,15 +131,21 @@
   import {immediateDebounce} from "../../js/execution";
   import {getLength} from "../../js/checkData";
   import EmojiSelector from '../EmojiSelector';
+  import ResourceSelector from '../ResourceSelector';
+  import { getUrl } from '../../js/tools';
+  import MomentFiles from './MomentFiles';
   export default {
     props: ['mid', 'type'],
     components: {
       'textarea-editor': TextareaEditor,
-      'emoji-selector': EmojiSelector
+      'emoji-selector': EmojiSelector,
+      'resource-selector': ResourceSelector,
+      'moment-files': MomentFiles,
     },
     data: () => ({
       maxContentLength: 1000,
       content: '',
+      picturesId:[],
       alsoPost: false,
       momentCommentId: '',
       submitting: false,
@@ -103,7 +156,8 @@
       disableSavingCount: 0,
     }),
     watch: {
-      content: 'onContentChange'
+      content: 'onContentChange',
+      'picturesId.length': 'onContentChange',
     },
     mounted() {
       this.getMomentComment()
@@ -137,6 +191,15 @@
       },
       disablePostChecked() {
         return this.content.length === 0;
+      },
+      picturesUrl() {
+        const {picturesId} = this;
+        const filesUrl = [];
+        for(const rid of picturesId) {
+          const url = getUrl('resource', rid);
+          filesUrl.push(url);
+        }
+        return filesUrl;
       }
     },
     methods: {
@@ -144,6 +207,7 @@
         this.lockAutoSaving(1);
         this.momentCommentId = '';
         this.setTextareaEditorContent('');
+        this.picturesId=[];
       },
       lockAutoSaving(num) {
         this.disableSavingCount = num;
@@ -158,6 +222,20 @@
           self.insertContent(`[${code}]`);
         });
       },
+      selectPicture(){
+        if(this.picturesId.length>0) return;
+        const self= this;
+        this.$refs.resourceSelector.open(res => {
+          self.picturesId=[...new Set(res.resourcesId)].slice(0, 1);
+          self.$refs.resourceSelector.close();
+        }, {
+          allowedExt: ['picture'],
+          countLimit: 1 - self.picturesId.length
+        });
+      },
+      removeFromArr(arr, index) {
+        arr.splice(index, 1)
+      },
       insertContent(text) {
         this.$refs.textareaEditor.insertContent(text);
       },
@@ -166,9 +244,10 @@
         const self = this;
         nkcAPI(`/creation/zone/moment?from=editor&mid=${momentId}`, 'GET')
           .then(res => {
-            const {content, momentCommentId} = res;
+            const {content, momentCommentId,picturesId} = res;
             if(!momentCommentId) return;
             self.content = content;
+            self.picturesId = picturesId;
             self.momentCommentId = momentCommentId;
             self.syncTextareaEditorContent();
           })
@@ -191,7 +270,8 @@
           content,
           momentId,
           disableSavingCount,
-          momentCommentId
+          momentCommentId,
+          picturesId
         } = this;
         const self = this;
         if(disableSavingCount > 0) {
@@ -208,6 +288,7 @@
           type,
           content,
           momentCommentId,
+          resourcesId:[...picturesId],
         })
         .then(res => {
           console.log(`动态已自动保存`);
@@ -230,7 +311,7 @@
       },
       async publish() {
         const self = this;
-        const {postType, alsoPost, content, momentId, momentCommentId} = this;
+        const {postType, alsoPost, content, momentId, momentCommentId,picturesId} = this;
         this.lockPost();
         return Promise.resolve()
           .then(() => {
@@ -241,6 +322,7 @@
               postType,
               alsoPost,
               momentCommentId,
+              resourcesId:[...picturesId]
             })
           })
           .then(res => {

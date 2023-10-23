@@ -54,7 +54,7 @@
             .fa.fa-trash-o
       .list-item-container(v-show="activeListId === listId.user")
         .list-info(v-if="userListData.length === 0") 空空如也
-        .list-item-users(v-for="usersData in userListData")
+        .list-item-users(v-for="usersData in userListDataShow")
           .list-item-header {{usersData.title.toUpperCase()}}
           .list-item(:key="usersData._id" v-for="userData in usersData.data" @click="clickUserItem(userData.type, userData.uid)")
             .list-item-avatar
@@ -67,7 +67,7 @@
                 .list-item-abstract {{userData.abstract}}
       .list-item-container(v-show="activeListId === listId.category")
         .list-info(v-if="categoryListData.length === 0") 空空如也
-        .list-item(:key="categoryData._id" v-for="categoryData in categoryListData" @click="clickCategoryItem(categoryData._id)")
+        .list-item(:key="categoryData._id" v-for="categoryData in categoryListDataShow" @click="clickCategoryItem(categoryData._id)")
           .list-item-avatar.category
             img(:src="i" v-for="i in categoryData.icon" v-if="!!i")
           .list-item-right
@@ -490,6 +490,42 @@
           ) {
             chat.timeStr = briefTime(chat.time);
             arr.push(chat);
+          }
+        }
+        return arr;
+      },
+      userListDataShow() {
+        const {userListData, keyword} = this;
+        const listArr = [];
+        const keywordLowerCase = keyword.toLowerCase().trim();
+        for(const usersData of userListData) {
+          const arr = [];
+          for(const user of usersData.data ){
+            if(
+            !keyword ||
+            user.name.toLowerCase().trim().includes(keywordLowerCase) ||
+            user.uid === keyword
+          ) {
+            arr.push(user);
+          }
+          }
+          if(arr.length>0){
+            listArr.push({data:arr,title:usersData.title});
+          }
+        }
+        return listArr
+      },
+      categoryListDataShow() {
+        const {categoryListData, keyword} = this;
+        const arr = [];
+        const keywordLowerCase = keyword.toLowerCase().trim();
+        for(const category of categoryListData) {
+          if(
+            !keyword ||
+            category.name.toLowerCase().trim().includes(keywordLowerCase) ||
+            category.friendsId.includes(keyword)
+          ) {
+            arr.push(category);
           }
         }
         return arr;

@@ -1,4 +1,6 @@
 const router = require('koa-router')();
+const { eventEmitter } = require('../../../events');
+const { getMomentPublishType } = require('../../../events/moment');
 router
   .get('/', async (ctx, next) => {
     const { query, db, data, state, nkcModules, permission, body } = ctx;
@@ -113,7 +115,12 @@ router
         resourcesId,
       });
       await moment.publish();
-      await db.MomentModel.findOnly({ _id: momentId }, { status: 1 });
+      const { momentBubble } = getMomentPublishType();
+
+      await eventEmitter.emit(momentBubble, {
+        uid: state.uid,
+        momentId,
+      });
     }
     await next();
   })
@@ -121,9 +128,19 @@ router
   .post('/:mid', async (ctx, next) => {
     const { db, params, body, state, data } = ctx;
     const { mid: momentId } = params;
-    const { type, content, postType, alsoPost, momentCommentId } = body;
+    const {
+      type,
+      content,
+      postType,
+      alsoPost,
+      momentCommentId,
+      resourcesId = [],
+    } = body;
     if (!['create', 'modify', 'publish', 'forward'].includes(type)) {
       ctx.throw(403, `类型指定错误 type=${type}`);
+    }
+    if (resourcesId.length > 1) {
+      ctx.throw(400, `上传图片长度超过最大长度`);
     }
     let momentComment;
     if (type === 'create' || type === 'forward') {
@@ -134,7 +151,7 @@ router
       if (momentComment) {
         await momentComment.modifyMoment({
           content,
-          resourcesId: [],
+          resourcesId,
         });
       } else {
         momentComment = await db.MomentModel.createMomentComment({
@@ -160,7 +177,7 @@ router
       }
       await momentComment.modifyMoment({
         content,
-        resourcesId: [],
+        resourcesId,
       });
       if (type === 'publish' || type === 'forward') {
         await momentComment.publishMomentComment(postType, alsoPost);
@@ -173,19 +190,23 @@ router
   // 发表评论回复
   .post('/:parent/comment', async (ctx, next) => {
     const { body, db, state, params, nkcModules, data } = ctx;
-    const { content } = body;
+    const { content, resourcesId = [] } = body;
     const { parent } = params;
     nkcModules.checkData.checkString(content, {
       name: '内容',
       minLength: 1,
       maxLength: 1000,
     });
+    if (resourcesId.length > 1) {
+      ctx.throw(400, `上传图片长度超过最大长度`);
+    }
     const comment = await db.MomentModel.createMomentCommentChildAndPublish({
       ip: ctx.address,
       port: ctx.port,
       uid: state.uid,
       content,
       parent,
+      resourcesId,
     });
 
     data.commentId = comment._id;

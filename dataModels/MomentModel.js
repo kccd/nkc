@@ -384,7 +384,7 @@ schema.statics.createQuoteMoment = async (props) => {
 };
 
 schema.statics.createCommentChild = async (props) => {
-  const { time, uid, content, parent, parents, ip, port } = props;
+  const { time, uid, content, parent, parents, ip, port, resourcesId } = props;
   const MomentModel = mongoose.model('moments');
   return await MomentModel.createMomentCore({
     ip,
@@ -395,6 +395,7 @@ schema.statics.createCommentChild = async (props) => {
     content,
     parent,
     parents,
+    resourcesId,
   });
 };
 
@@ -614,6 +615,24 @@ schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
       await moment.deleteMoment();
       return null;
     }
+    let picturesId = [];
+    const ResourceModel = mongoose.model('resources');
+    const oldResourcesId = betaDocument.files;
+    if (oldResourcesId.length > 0) {
+      const resources = await ResourceModel.find(
+        { rid: { $in: oldResourcesId } },
+        {
+          rid: 1,
+          mediaType: 1,
+        },
+      );
+      const resourcesId = resources.map((r) => r.rid);
+      if (resources.length > 0) {
+        if (resources[0].mediaType === 'mediaPicture') {
+          picturesId = resourcesId;
+        }
+      }
+    }
     return {
       momentCommentId: moment._id,
       momentId: moment.parent,
@@ -621,6 +640,7 @@ schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
       tlm: betaDocument.tlm,
       uid: betaDocument.uid,
       content: betaDocument.content,
+      picturesId,
     };
   } else {
     return null;
@@ -1175,7 +1195,7 @@ schema.statics.createQuoteMomentAndPublish = async (props) => {
 };
 
 schema.statics.createMomentCommentChildAndPublish = async (props) => {
-  const { uid, content, parent, ip, port } = props;
+  const { uid, content, parent, ip, port, resourcesId } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
   const parentComment = await MomentModel.findOne(
@@ -1200,6 +1220,7 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
     content,
     parent: parentComment._id,
     parents: [...parentComment.parents, parentComment._id],
+    resourcesId,
   });
   const top = time;
 
@@ -1840,6 +1861,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const PostsVoteModel = mongoose.model('postsVotes');
   const ReviewModel = mongoose.model('reviews');
   const IPModel = mongoose.model('ips');
+  const ResourceModel = mongoose.model('resources');
   const localAddr = await IPModel.getLocalAddr();
   const momentStatus = await MomentModel.getMomentStatus();
   const { getUrl, timeFormat } = require('../nkcModules/tools');
@@ -1896,6 +1918,36 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     addr = stableDocument.addr;
     let content = await stableDocument.renderAtUsers();
     content = await MomentModel.renderContent(content);
+    const filesData = [];
+    for (const rid of stableDocument.files) {
+      // 附件数据
+      const resourcesObj = await ResourceModel.getResourcesObjectByResourcesId(
+        stableDocument.files,
+      );
+      const resource = resourcesObj[rid];
+      if (!resource) {
+        continue;
+      }
+      await resource.setFileExist();
+      const { mediaType, defaultFile, disabled, isFileExist } = resource;
+      let fileData;
+
+      if (mediaType === 'mediaPicture') {
+        const { height, width, name: filename } = defaultFile;
+        fileData = {
+          rid,
+          type: 'picture',
+          url: getUrl('resource', rid),
+          urlLG: getUrl('resource', rid, 'lg'),
+          height,
+          width,
+          filename,
+          disabled,
+          lost: !isFileExist,
+        };
+      }
+      filesData.push(fileData);
+    }
     const data = {
       _id,
       momentId: parents[0],
@@ -1919,6 +1971,7 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       latest,
       commentsData: [],
       parentData: null,
+      files: filesData,
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if (status === unknown) {
