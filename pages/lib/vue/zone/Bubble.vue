@@ -16,7 +16,7 @@
   transform: translate3d(-50%, 0%,0);
   top: 4rem;
   display:flex;
-  height: 3.5rem;
+  height: 3rem;
   line-height: 3rem;
   background-color: rgba(43,144,217,0.73);
   border-radius: 2.5rem;

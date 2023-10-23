@@ -10,8 +10,11 @@ function initMomentEvents(eventEmitter) {
     const moment = await MomentModel.find({
       _id: momentId,
     });
-    const momentsData = await MomentModel.extendMomentsListData(moment, uid);
-    if (momentsData[0].status === momentStatus.normal) {
+    if (
+      moment[0].status === momentStatus.normal &&
+      moment[0].parents.length === 0
+    ) {
+      const momentsData = await MomentModel.extendMomentsListData(moment, uid);
       await socket.sendMomentMessage({
         momentsData,
       });

@@ -9,12 +9,12 @@
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
     moment-status(ref="momentStatus" :permissions="permissions")
-    .moment-latest-container(:key="latestMoment.momentId" v-for="latestMoment in latests")
+    .moment-latest-container(:key="latestMoment.momentId" v-for="latestMoment in latestData")
       moment(
           :data="latestMoment"
           :permissions="permissions"
         )
-    .moment-divider(v-if="latests.length>0") - 以上是最新电文 -   
+    .moment-divider(v-if="latestData.length>0") - 以上是最新电文 -   
     .moment-container(:key="momentData.momentId" v-for="momentData in moments")
       moment(
         :data="momentData"
@@ -69,6 +69,15 @@
       EventBus.$on('violation-record', function(uid) {
         self.$refs.violationRecord.open({uid});
       });
+    },
+    computed:{
+      latestData(){
+        if(!!this.latests){
+          return [...this.latests];
+        }else{
+          return [];
+        }
+      }
     },
     methods: {
       // openOption(data) {
