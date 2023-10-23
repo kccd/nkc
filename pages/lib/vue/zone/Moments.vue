@@ -14,7 +14,7 @@
           :data="latestMoment"
           :permissions="permissions"
         )
-    .moment-divider(v-if="latestData.length>0") - 以上是最新电文 -   
+    .moment-divider(v-if="latestData.length>0") 以上是新内容
     .moment-container(:key="momentData.momentId" v-for="momentData in moments")
       moment(
         :data="momentData"
@@ -31,7 +31,7 @@
   .moment-divider{
     height: 2rem;
     line-height: 2rem;
-    background-color: #d9e1e8;
+    background-color: #3085d624;
     border-radius: 2px;
     margin-top: 0.5rem;
     margin-bottom: 1rem;

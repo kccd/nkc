@@ -1,65 +1,63 @@
 <template lang="pug">
   .zone-bubble-container(@click="scroll" :style="{'width':`${getBubbleWidth}`}")
-    span.bubble-up.fa.fa-arrow-up
-    .bubble-avatars
-      img(v-for='url,index in displayAvatars' :src='url' :style="{'z-index':-index}") 
-    span.bubble-text 已发布
+    //span.bubble-up.fa.fa-arrow-up
+    .bubble-body
+      .bubble-avatars
+        img(v-for='url,index in displayAvatars' :src='url' :style="{'z-index':-index}")
+      span.bubble-text 有更新
 </template>
 
 <style lang="less" scoped>
+@height: 3rem;
 .zone-bubble-container{
-  
   position: fixed;
   // top: 50%;
   left: 50%;
   // margin: auto;
   transform: translate3d(-50%, 0%,0);
-  top: 4rem;
-  display:flex;
-  height: 3rem;
-  line-height: 3rem;
+  top: 5rem;
   background-color: rgba(43,144,217,0.73);
   border-radius: 2.5rem;
   z-index: 1000;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0.5rem 0.5rem;
-  // gap: 1rem;
   color: #fff;
-  transition: width 0.3s ease;
-  // &:hover{
-  //   width: 16rem !important;
-  //   .bubble-up,.bubble-text{
-  //     display: inline;
-  //   }
-  // }
   cursor: pointer;
-  .bubble-up{
-    cursor: pointer;
-    // display: none;
-    overflow: hidden;
-  }
-  .bubble-avatars{
+  .bubble-body{
+    @textWidth: 5rem;
+    padding-left: 0.5rem;
+    height: @height;
+    line-height: @height;
+    position: relative;
+    padding-right: @textWidth;
+    .bubble-avatars{
     // width: 7rem;
+    display: inline-block;
     overflow: hidden;
-    height: 3rem;
+    height: @height;
     img{
       vertical-align: middle;
       width: 2.5rem;
       height: 2.5rem;
       border: #fff solid 1px;
+      display: inline-block;
       border-radius: 50%;
-      position: relative; 
+      position: relative;
       &:not(:first-child) {
-      margin-left: -1rem;
+        margin-left: -1rem;
       }
     }
   }
-  .bubble-text{
-    overflow: hidden;
-    height:3rem;
-    // display: none;
+    .bubble-text{
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: @textWidth;
+    }
   }
+  /*.bubble-up{
+    cursor: pointer;
+    // display: none;
+    overflow: hidden;
+  }*/
 }
 </style>
 
