@@ -65,18 +65,18 @@
           .pictures(v-if="picturesUrl.length > 0")
             .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
               .icon-remove(@click="clearReplyPicture" title="取消选择")
-                .fa.fa-trash-o  
+                .fa.fa-trash-o
         .button-container
           .button-icon
             .fa.fa-picture-o(
-              @click="selectPicture" 
+              @click="selectPicture"
               @mouseover="iconMouseOver(icons.image)"
               @mouseleave="iconMouseLeave(icons.image)"
-              :class="{'disabled':picturesId.length>0}" 
+              :class="{'disabled':picturesId.length>0}"
               title="图片"
               )
             .fa.fa-smile-o(
-              @click="selectEmoji" 
+              @click="selectEmoji"
               @mouseover="iconMouseOver(icons.face)"
               @mouseleave="iconMouseLeave(icons.face)"
               title="表情"
@@ -404,7 +404,7 @@ export default {
       }
     }
   .moment-comment-item-content {
-    //margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
     word-break: keep-all;
     word-wrap: break-word;
     white-space: pre-wrap;

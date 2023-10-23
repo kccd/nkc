@@ -21,6 +21,7 @@
   z-index: 1000;
   color: #fff;
   cursor: pointer;
+  transition: width 300ms;
   .bubble-body{
     @textWidth: 5rem;
     padding-left: 0.5rem;
