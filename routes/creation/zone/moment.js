@@ -192,11 +192,19 @@ router
     const { body, db, state, params, nkcModules, data } = ctx;
     const { content, resourcesId = [] } = body;
     const { parent } = params;
-    nkcModules.checkData.checkString(content, {
+    const { html } = nkcModules.nkcRender.markNotes.getMark(content);
+    nkcModules.checkData.checkString(html, {
       name: '内容',
-      minLength: 1,
+      minLength: 0,
       maxLength: 1000,
     });
+    // 检测文字和图片是否都没有
+    if (
+      nkcModules.checkData.getLength(html) === 0 &&
+      resourcesId.length === 0
+    ) {
+      ctx.throw(400, `回复内容不能为空`);
+    }
     if (resourcesId.length > 1) {
       ctx.throw(400, `上传图片长度超过最大长度`);
     }
@@ -204,7 +212,7 @@ router
       ip: ctx.address,
       port: ctx.port,
       uid: state.uid,
-      content,
+      content: html,
       parent,
       resourcesId,
     });

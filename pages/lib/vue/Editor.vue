@@ -371,13 +371,27 @@
         const images = this.editor.document.getElementsByTagName('img');
         for(let i = 0; i < images.length; i++) {
           const imageNode = images[i];
-          if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+          const TestSrc = imageNode.getAttribute('src');
+          // 文章中的(/r)图片添加属性信息
+          if(TestSrc.indexOf(`${window.location.origin}/r/`)===0 ){
+            imageNode.setAttribute("src",TestSrc.replace(`${window.location.origin}`,""));
+            imageNode.setAttribute("_src",TestSrc.replace(`${window.location.origin}`,""));
+            imageNode.setAttribute("data-tag","nkcsource");
+            imageNode.setAttribute("data-type","picture");
+            imageNode.setAttribute("data-id",TestSrc.replace(`${window.location.origin}/r/`,"").split("?")[0]);
+          }
           const src = imageNode.getAttribute('src');
-          if(isFileDomain(src)) continue;
+          if(isFileDomain(src)
+          &&imageNode.getAttribute('data-tag') === 'nkcsource'
+          &&imageNode.getAttribute('data-type') === 'picture') 
+          continue;
+          // if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+          // if(isFileDomain(src)) continue;
           // 外链图片
           if(isBase64.test(src)){
             this.editorPasteBase64ToImageEventHandle(imageNode)
           }else{
+            // 站内非/r的图片以及其他网站的图片
             this.clearImageNodeStyle(imageNode);
             this.downloadRemoteImage(imageNode, src);
           }
@@ -386,7 +400,7 @@
       clearImageNodeStyle(imageNode) {
         imageNode.removeAttribute('style');
       },
-      downloadRemoteImage(imageNode, url) {
+      downloadRemoteImage(imageNode, url) { 
         this.setImageNodeStatusIsUploading(imageNode);
         return nkcAPI('/download', 'POST', {
           loadsrc: url

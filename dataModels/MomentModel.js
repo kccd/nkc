@@ -860,12 +860,16 @@ schema.methods.checkBeforePublishing = async function () {
   // 检测发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if (!this.quoteType || !this.quoteId) {
-    const { checkString } = require('../nkcModules/checkData');
+    const { checkString, getLength } = require('../nkcModules/checkData');
     checkString(betaDocument.content, {
       name: '动态内容',
-      minLength: 1,
+      minLength: 0,
       maxLength: 1000,
     });
+    // 检测文字和图片/视频是否都没有
+    if (getLength(betaDocument.content) === 0 && this.files.length === 0) {
+      throwErr(400, `内容不能为空`);
+    }
   }
   if (this.files.length > 0) {
     let mediaType;
