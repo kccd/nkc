@@ -1,5 +1,5 @@
 <template lang="pug">
-  .zone-bubble-container(@click="scroll" :style="{'width':`${getBubbleWidth}`}")
+  .zone-bubble-container(@click="scroll" :style="{'width':`${getBubbleWidth}`,'top':`${getBubbleTop}`}")
     //span.bubble-up.fa.fa-arrow-up
     .bubble-body
       .bubble-avatars
@@ -15,7 +15,7 @@
   left: 50%;
   // margin: auto;
   transform: translate3d(-50%, 0%,0);
-  top: 5rem;
+  // top: 0.5rem;
   background-color: rgba(43,144,217,0.73);
   border-radius: 2.5rem;
   z-index: 1000;
@@ -68,7 +68,7 @@ import { nkcAPI } from '../../js/netAPI';
 import { visitUrl } from '../../js/pageSwitch';
 import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
 export default {
-  props: ['avatars'],
+  props: ['avatars','isapp'],
   components: {
   },
   data: () => ({
@@ -92,6 +92,9 @@ export default {
         default:
           return '12rem';
       }
+    },
+    getBubbleTop(){
+      return this.isapp? '0.5rem':'5rem';
     }
   },
   methods: {

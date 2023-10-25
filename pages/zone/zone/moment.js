@@ -18,7 +18,7 @@ $(function () {
 });
 
 function initMomentVueApp() {
-  const { momentsData, permissions, subUid } = getDataById('data');
+  const { momentsData, permissions, subUid, isApp } = getDataById('data');
   const app = new Vue({
     el: `#${momentElementId}`,
     components: {
@@ -30,6 +30,7 @@ function initMomentVueApp() {
       latestData: [],
       permissions,
       avatars: [],
+      isApp,
     },
     mounted() {
       if (uid) {

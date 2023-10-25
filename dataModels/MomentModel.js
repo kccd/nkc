@@ -1088,7 +1088,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   const IPModel = mongoose.model('ips');
   const { moment: quoteType } = momentQuoteTypes;
   const { uid, resourcesId, parent } = this;
-  const { content, ip: ipId, port } = await this.getBetaDocument();
+  const { content, ip: ipId, port, files } = await this.getBetaDocument();
   const { uid: parentUid } = await MomentModel.findOne(
     { _id: parent },
     { uid: 1 },
@@ -1110,7 +1110,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
       port,
       uid,
       content,
-      resourcesId,
+      resourcesId: files,
       quoteType,
       quoteId: parent,
     });
@@ -1135,6 +1135,16 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
         ).catch(console.log);
       }
     }
+  }
+  if (postType === 'repost' && repostMomentId) {
+    // 首页推送电文
+    const { eventEmitter } = require('../events');
+    const { getMomentPublishType } = require('../events/moment');
+    const { momentBubble } = getMomentPublishType();
+    await eventEmitter.emit(momentBubble, {
+      uid,
+      momentId: repostMomentId,
+    });
   }
 };
 
