@@ -1136,7 +1136,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
       }
     }
   }
-  if (postType === 'repost' && repostMomentId) {
+  if ((postType === 'repost' || alsoPost) && repostMomentId) {
     // 首页推送电文
     const { eventEmitter } = require('../events');
     const { getMomentPublishType } = require('../events/moment');
