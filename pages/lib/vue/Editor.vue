@@ -71,7 +71,7 @@
   import DraftsSelector from "./DraftsSelector";
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
-  import { isFileDomain } from "../js/url";
+  import { isFileDomain ,isNotFormatLink} from "../js/url";
   import {screenTopWarning} from "../js/topAlert";
   import {
     replaceTwemojiCharWithImage,
@@ -373,16 +373,17 @@
           const imageNode = images[i];
           const TestSrc = imageNode.getAttribute('src');
           // 文章中的(/r)图片添加属性信息
-          if(TestSrc.indexOf(`${window.location.origin}/r/`)===0 ){
-            imageNode.setAttribute("src",TestSrc.replace(`${window.location.origin}`,""));
-            imageNode.setAttribute("_src",TestSrc.replace(`${window.location.origin}`,""));
+          if(isNotFormatLink(TestSrc)){
+            const { fileDomain }=getState();
+            const fileLink = fileDomain || window.location.origin;
+            imageNode.setAttribute("src",TestSrc.replace(`${fileLink}`,""));
+            imageNode.setAttribute("_src",TestSrc.replace(`${fileLink}`,""));
             imageNode.setAttribute("data-tag","nkcsource");
             imageNode.setAttribute("data-type","picture");
-            imageNode.setAttribute("data-id",TestSrc.replace(`${window.location.origin}/r/`,"").split("?")[0]);
+            imageNode.setAttribute("data-id",TestSrc.replace(`${fileLink}/r/`,"").split("?")[0]);
           }
           const src = imageNode.getAttribute('src');
-          if(isFileDomain(src)
-          &&imageNode.getAttribute('data-tag') === 'nkcsource'
+          if(imageNode.getAttribute('data-tag') === 'nkcsource'
           &&imageNode.getAttribute('data-type') === 'picture') 
           continue;
           // if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;

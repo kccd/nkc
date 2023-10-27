@@ -25,15 +25,25 @@ export function isAbsolutePath(url) {
  * 判断连接是否为本站链接
  * */
 export function isSameDomain(url) {
-  return url.indexOf(location.host) !== -1 || /(^\.)|(^\/)/.test(url);
+  return url.indexOf(location.host) === 0 || /(^\.)|(^\/)/.test(url);
 }
 
 // 判断链接是否为本站的文件链接
 export function isFileDomain(url) {
   const { fileDomain } = getState();
   if (fileDomain) {
-    return url.indexOf(fileDomain) !== -1;
+    return url.indexOf(fileDomain) === 0;
   } else {
     return isSameDomain(url);
+  }
+}
+
+// 判断链接是否为富文本中格式化文章图片链接
+export function isNotFormatLink(url) {
+  const { fileDomain } = getState();
+  if (fileDomain) {
+    return url.indexOf(`${fileDomain}/r/`) === 0;
+  } else {
+    return url.indexOf(`${window.location.origin}/r/`) === 0;
   }
 }
