@@ -38,12 +38,3 @@ export function isFileDomain(url) {
   }
 }
 
-// 判断链接是否为富文本中格式化文章图片链接
-export function isNotFormatLink(url) {
-  const { fileDomain } = getState();
-  if (fileDomain) {
-    return url.indexOf(`${fileDomain}/r/`) === 0;
-  } else {
-    return url.indexOf(`${window.location.origin}/r/`) === 0;
-  }
-}

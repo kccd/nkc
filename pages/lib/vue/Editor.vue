@@ -71,7 +71,7 @@
   import DraftsSelector from "./DraftsSelector";
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
-  import { isFileDomain ,isNotFormatLink} from "../js/url";
+  import { isFileDomain } from "../js/url";
   import {screenTopWarning} from "../js/topAlert";
   import {
     replaceTwemojiCharWithImage,
@@ -372,20 +372,27 @@
         for(let i = 0; i < images.length; i++) {
           const imageNode = images[i];
           const TestSrc = imageNode.getAttribute('src');
-          // 文章中的(/r)图片添加属性信息
-          if(isNotFormatLink(TestSrc)){
+          // 修复文章中带http的(/r)图片添加属性信息
+          if(this.isNotFormatLink(TestSrc)){
             const { fileDomain }=getState();
             const fileLink = fileDomain || window.location.origin;
-            imageNode.setAttribute("src",TestSrc.replace(`${fileLink}`,""));
-            imageNode.setAttribute("_src",TestSrc.replace(`${fileLink}`,""));
+            const imageSrc=TestSrc.replace(`${fileLink}`,"");
+            const dataId= TestSrc.replace(`${fileLink}/r/`,"").split("?")[0];
+            imageNode.setAttribute("src",imageSrc);
+            imageNode.setAttribute("_src",imageSrc);
             imageNode.setAttribute("data-tag","nkcsource");
             imageNode.setAttribute("data-type","picture");
-            imageNode.setAttribute("data-id",TestSrc.replace(`${fileLink}/r/`,"").split("?")[0]);
+            imageNode.setAttribute("data-id",dataId);
           }
           const src = imageNode.getAttribute('src');
+          // 本地资源图片
+          if(this.isLocalPictureLink(src))
+            continue;
+          // 属性正确的文章图片
           if(imageNode.getAttribute('data-tag') === 'nkcsource'
-          &&imageNode.getAttribute('data-type') === 'picture') 
-          continue;
+            &&imageNode.getAttribute('data-type') === 'picture'
+            &&imageNode.getAttribute('data-id')) 
+            continue;
           // if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
           // if(isFileDomain(src)) continue;
           // 外链图片
@@ -779,6 +786,24 @@
           this.initXsfSelector();
         }
       },
+      // 判断链接是否为富文本中格式化文章图片链接
+      isNotFormatLink(url){
+        const { fileDomain } = getState();
+        if (fileDomain) {
+          return url.indexOf(`${fileDomain}/r/`) === 0;
+        } else {
+          return url.indexOf(`${window.location.origin}/r/`) === 0;
+        }
+      },
+      // 判断是否为本地资源的图片链接
+      isLocalPictureLink(url){
+        const { fileDomain } = getState();
+        if (fileDomain) {
+          return url.indexOf(`blob:${fileDomain}`) === 0;
+        } else {
+          return url.indexOf(`blob:${window.location.origin}`) === 0;
+        }
+      }
     },
   }
 </script>
