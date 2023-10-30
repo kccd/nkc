@@ -867,7 +867,10 @@ schema.methods.checkBeforePublishing = async function () {
       maxLength: 1000,
     });
     // 检测文字和图片/视频是否都没有
-    if (getLength(betaDocument.content) === 0 && this.files.length === 0) {
+    if (
+      getLength(betaDocument.content) === 0 &&
+      betaDocument.files.length === 0
+    ) {
       throwErr(400, `内容不能为空`);
     }
   }
