@@ -776,6 +776,5 @@
   "checkAccountPermission": "检查账户的权限",
   "visitZoneMomentHistory": "查看电文修改历史",
   "rollbackZoneMomentHistory": "回滚电文历史",
-  "visitOtherUserZoneMomentHistory": "查看其他人的电文修改历史",
-  "getZoneMoment": "获取实时化推送的电文"
+  "visitOtherUserZoneMomentHistory": "查看其他人的电文修改历史"
 }

@@ -4,9 +4,6 @@ import { getState } from '../../lib/js/state';
 import { visitUrl } from '../../lib/js/pageSwitch';
 import { getSocket } from '../../lib/js/socket';
 import Bubble from '../../lib/vue/zone/Bubble';
-import { hasScrollBar } from '../../lib/js/scrollBar';
-import { nkcAPI } from '../../lib/js/netAPI';
-import { sweetError } from '../../lib/js/sweetAlert';
 
 const { uid } = getState();
 const socket = getSocket();
@@ -30,7 +27,7 @@ function initMomentVueApp() {
     data: {
       momentsData,
       latestData: [],
-      beforeLatestIds: [],
+      //beforeLatestIds: [],
       permissions,
       avatars: [],
       isApp,
@@ -55,28 +52,7 @@ function initMomentVueApp() {
         );
       },
       scroll() {
-        // 请求推送的数据
-        const self = this;
-        const { beforeLatestIds } = this;
-        let latestArray = this.latestData;
-        // 得到数据后进行追加到最新数据中，清空待请求数据的ids
-        let arrayString = '';
-        for (let index in beforeLatestIds) {
-          arrayString += `momentIds=${beforeLatestIds[index]}&`;
-        }
-        nkcAPI(`/api/v1/zone/moment?${arrayString}`, `GET`)
-          .then((res) => {
-            latestArray.unshift(...res.data);
-            self.latestData = latestArray;
-          })
-          .catch((err) => {
-            sweetError(err);
-          });
-        this.avatars = [];
-        self.beforeLatestIds = [];
-        if (hasScrollBar) {
-          window.scroll({ top: 0, left: 0, behavior: 'smooth' });
-        }
+        this.refresh();
       },
       joinRoom() {
         socket.emit('joinRoom', {
@@ -103,18 +79,14 @@ function initMomentVueApp() {
           }
 
           let avatarsArray = [...self.avatars];
-          let latestArray = [...self.beforeLatestIds];
           if (subUid) {
             const index = subUid.indexOf(data.uid);
             if (index !== -1 && subUid[index] !== uid) {
               avatarsArray.unshift(data.avatarUrl);
-              latestArray.unshift(data.momentId);
             }
           } else {
             avatarsArray.unshift(data.avatarUrl);
-            latestArray.unshift(data.momentId);
           }
-          self.beforeLatestIds = [...latestArray];
           // 需要去重
           self.avatars = [...new Set(avatarsArray)];
         });

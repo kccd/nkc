@@ -129,10 +129,5 @@ module.exports = {
         GET: Operations.getForumsTree,
       },
     },
-    zone: {
-      moment: {
-        GET: Operations.getZoneMoment,
-      },
-    },
   },
 };
