@@ -371,13 +371,35 @@
         const images = this.editor.document.getElementsByTagName('img');
         for(let i = 0; i < images.length; i++) {
           const imageNode = images[i];
-          if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+          const TestSrc = imageNode.getAttribute('src');
+          // 修复文章中带http的(/r)图片添加属性信息
+          if(this.isNotFormatLink(TestSrc)){
+            const { fileDomain }=getState();
+            const fileLink = fileDomain || window.location.origin;
+            const imageSrc=TestSrc.replace(`${fileLink}`,"");
+            const dataId= TestSrc.replace(`${fileLink}/r/`,"").split("?")[0];
+            imageNode.setAttribute("src",imageSrc);
+            imageNode.setAttribute("_src",imageSrc);
+            imageNode.setAttribute("data-tag","nkcsource");
+            imageNode.setAttribute("data-type","picture");
+            imageNode.setAttribute("data-id",dataId);
+          }
           const src = imageNode.getAttribute('src');
-          if(isFileDomain(src)) continue;
+          // 本地资源图片
+          if(this.isLocalPictureLink(src))
+            continue;
+          // 属性正确的文章图片
+          if(imageNode.getAttribute('data-tag') === 'nkcsource'
+            &&imageNode.getAttribute('data-type') === 'picture'
+            &&imageNode.getAttribute('data-id')) 
+            continue;
+          // if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
+          // if(isFileDomain(src)) continue;
           // 外链图片
           if(isBase64.test(src)){
             this.editorPasteBase64ToImageEventHandle(imageNode)
           }else{
+            // 站内非/r的图片以及其他网站的图片
             this.clearImageNodeStyle(imageNode);
             this.downloadRemoteImage(imageNode, src);
           }
@@ -386,7 +408,7 @@
       clearImageNodeStyle(imageNode) {
         imageNode.removeAttribute('style');
       },
-      downloadRemoteImage(imageNode, url) {
+      downloadRemoteImage(imageNode, url) { 
         this.setImageNodeStatusIsUploading(imageNode);
         return nkcAPI('/download', 'POST', {
           loadsrc: url
@@ -764,6 +786,24 @@
           this.initXsfSelector();
         }
       },
+      // 判断链接是否为富文本中格式化文章图片链接
+      isNotFormatLink(url){
+        const { fileDomain } = getState();
+        if (fileDomain) {
+          return url.indexOf(`${fileDomain}/r/`) === 0;
+        } else {
+          return url.indexOf(`${window.location.origin}/r/`) === 0;
+        }
+      },
+      // 判断是否为本地资源的图片链接
+      isLocalPictureLink(url){
+        const { fileDomain } = getState();
+        if (fileDomain) {
+          return url.indexOf(`blob:${fileDomain}`) === 0;
+        } else {
+          return url.indexOf(`blob:${window.location.origin}`) === 0;
+        }
+      }
     },
   }
 </script>

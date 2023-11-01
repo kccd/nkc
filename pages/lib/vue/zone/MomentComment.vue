@@ -83,7 +83,7 @@
               )
           .submit-button-container.text-right
             button.btn.btn-sm.btn-default.m-r-05(@click="hideReplyEditor") 取消
-            button.btn.btn-sm.btn-primary(disabled v-if="!replyContent") 发射
+            button.btn.btn-sm.btn-primary(disabled v-if="disabledButton") 发射
             button.btn.btn-sm.btn-primary(v-else-if="submitting" disabled)
               .fa.fa-spinner.fa-spin
             button.btn.btn-sm.btn-primary(v-else @click="submitReplyContent") 发射
@@ -202,7 +202,10 @@ export default {
           filesUrl.push(url);
         }
         return filesUrl;
-      }
+      },
+    disabledButton(){
+      return this.replyContent.length === 0 && this.picturesUrl.length === 0;
+    }
   },
   methods: {
     objToStr,
@@ -211,11 +214,11 @@ export default {
       this.replyContent = content;
     },
     submitReplyContent() {
-      const {replyContent, commentData, picturesId} = this;
+      const {replyContent, commentData, picturesId, disabledButton} = this;
       const self = this;
       return Promise.resolve()
         .then(() => {
-          if(!replyContent) throw new Error('请输入评论内容');
+          if(disabledButton) throw new Error('请输入评论内容');
           self.submitting = true;
           return nkcAPI(`/creation/zone/moment/${commentData._id}/comment`, 'POST', {
             content: replyContent,
