@@ -860,12 +860,19 @@ schema.methods.checkBeforePublishing = async function () {
   // 检测发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if (!this.quoteType || !this.quoteId) {
-    const { checkString } = require('../nkcModules/checkData');
+    const { checkString, getLength } = require('../nkcModules/checkData');
     checkString(betaDocument.content, {
       name: '动态内容',
-      minLength: 1,
+      minLength: 0,
       maxLength: 1000,
     });
+    // 检测文字和图片/视频是否都没有
+    if (
+      getLength(betaDocument.content) === 0 &&
+      betaDocument.files.length === 0
+    ) {
+      throwErr(400, `内容不能为空`);
+    }
   }
   if (this.files.length > 0) {
     let mediaType;
@@ -1084,7 +1091,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   const IPModel = mongoose.model('ips');
   const { moment: quoteType } = momentQuoteTypes;
   const { uid, resourcesId, parent } = this;
-  const { content, ip: ipId, port } = await this.getBetaDocument();
+  const { content, ip: ipId, port, files } = await this.getBetaDocument();
   const { uid: parentUid } = await MomentModel.findOne(
     { _id: parent },
     { uid: 1 },
@@ -1106,7 +1113,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
       port,
       uid,
       content,
-      resourcesId,
+      resourcesId: files,
       quoteType,
       quoteId: parent,
     });
@@ -1131,6 +1138,16 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
         ).catch(console.log);
       }
     }
+  }
+  if ((postType === 'repost' || alsoPost) && repostMomentId) {
+    // 首页推送电文
+    const { eventEmitter } = require('../events');
+    const { getMomentPublishType } = require('../events/moment');
+    const { momentBubble } = getMomentPublishType();
+    await eventEmitter.emit(momentBubble, {
+      uid,
+      momentId: repostMomentId,
+    });
   }
 };
 

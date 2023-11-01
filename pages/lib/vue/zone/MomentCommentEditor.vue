@@ -190,7 +190,7 @@
         return this.submitting || (this.type === this.types.comment && this.disablePostChecked);
       },
       disablePostChecked() {
-        return this.content.length === 0;
+        return this.content.length === 0 && this.picturesUrl.length === 0;
       },
       picturesUrl() {
         const {picturesId} = this;

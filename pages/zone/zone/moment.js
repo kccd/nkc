@@ -4,7 +4,6 @@ import { getState } from '../../lib/js/state';
 import { visitUrl } from '../../lib/js/pageSwitch';
 import { getSocket } from '../../lib/js/socket';
 import Bubble from '../../lib/vue/zone/Bubble';
-import { hasScrollBar } from '../../lib/js/scrollBar';
 
 const { uid } = getState();
 const socket = getSocket();
@@ -18,7 +17,7 @@ $(function () {
 });
 
 function initMomentVueApp() {
-  const { momentsData, permissions, subUid } = getDataById('data');
+  const { momentsData, permissions, subUid, isApp } = getDataById('data');
   const app = new Vue({
     el: `#${momentElementId}`,
     components: {
@@ -28,8 +27,10 @@ function initMomentVueApp() {
     data: {
       momentsData,
       latestData: [],
+      //beforeLatestIds: [],
       permissions,
       avatars: [],
+      isApp,
     },
     mounted() {
       if (uid) {
@@ -51,10 +52,7 @@ function initMomentVueApp() {
         );
       },
       scroll() {
-        this.avatars = [];
-        if (hasScrollBar) {
-          window.scroll({ top: 0, left: 0, behavior: 'smooth' });
-        }
+        this.refresh();
       },
       joinRoom() {
         socket.emit('joinRoom', {
@@ -74,25 +72,21 @@ function initMomentVueApp() {
           });
         }
 
-        socket.on('zoneHomeMessage', ({ momentsData }) => {
-          const data = momentsData[0];
+        socket.on('zoneHomeMessage', ({ bubbleData }) => {
+          const data = bubbleData;
           if (uid === data.uid || data.status !== 'normal') {
             return;
           }
 
           let avatarsArray = [...self.avatars];
-          let latestArray = [...self.latestData];
           if (subUid) {
             const index = subUid.indexOf(data.uid);
             if (index !== -1 && subUid[index] !== uid) {
               avatarsArray.unshift(data.avatarUrl);
-              latestArray.unshift(data);
             }
           } else {
             avatarsArray.unshift(data.avatarUrl);
-            latestArray.unshift(data);
           }
-          self.latestData = [...latestArray];
           // 需要去重
           self.avatars = [...new Set(avatarsArray)];
         });

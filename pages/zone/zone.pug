@@ -17,6 +17,7 @@ block content
                 momentsData: data.momentsData,
                 permissions: data.permissions,
                 subUid: data.subUid,
+                isApp: state.isApp,
               });
 
             #ZoneMoments(v-cloak)
@@ -24,7 +25,7 @@ block content
               +renderZoneTypes(data.type, data.tab, data.zoneTypes)
 
               include ../publicModules/paging/paging
-              bubble(@scroll='scroll' :avatars="avatars" v-if='updated')
+              bubble(@scroll='scroll' :avatars="avatars" v-if='updated' :isapp='isApp')
               moments(:latests="latestData" :moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
               .p-t-5.p-b-5.text-center(v-else) 空空如也~
             if data.paging && data.paging.buttonValue.length > 0

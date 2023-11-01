@@ -345,8 +345,8 @@
         return filesUrl;
       },
       disablePublish() {
-        const {submitting, momentId, content} = this;
-        return submitting || !momentId || content.length === 0
+        const {submitting, momentId, content,picturesUrl,videosUrl} = this;
+        return submitting || !momentId || (content.length === 0 && picturesUrl.length === 0 && videosUrl.length === 0)
       }
     },
     watch: {
