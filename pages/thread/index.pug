@@ -50,7 +50,7 @@ block content
       #threadVueApp(v-cloak)
         thread-order-modifier(ref="threadOrderModifier")
       .row
-        .col-xs-12.col-md-9#wrap.box-shadow-panel
+        .col-xs-12.col-md-9#wrap.box-shadow-panel.m-b-1
           .m-b-1
             .row
               .thread-div
@@ -561,7 +561,7 @@ block content
             +managerOperationCenter(form, data.userFundRoles, fundBlacklistPostPermission)
 
           if data.targetUser
-            .m-b-1
+            .m-b-1.box-shadow
               //- .panel-header 作者
               -const author = data.targetUser;
               include ./authorInfo
@@ -575,7 +575,7 @@ block content
               .box-shadow.m-b-1
                 +sideThreadsPanel(data.sameThreads, "相似文章推荐", false)
 
-          .hidden-sm.hidden-xs
+          .hidden-sm.hidden-xs.box-shadow
             include ../publicModules/footer/footer_sm
 
           include ../module_scrollTo
