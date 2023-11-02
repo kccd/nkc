@@ -797,12 +797,7 @@
       },
       // 判断是否为本地资源的图片链接
       isLocalPictureLink(url){
-        const { fileDomain } = getState();
-        if (fileDomain) {
-          return url.indexOf(`blob:${fileDomain}`) === 0;
-        } else {
-          return url.indexOf(`blob:${window.location.origin}`) === 0;
-        }
+        return url.indexOf(`blob:${window.location.origin}`) === 0;
       }
     },
   }
