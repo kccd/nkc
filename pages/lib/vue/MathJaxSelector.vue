@@ -6,8 +6,16 @@
     .module-body
       .bg-warning.text-warning.p-a-05.m-b-1
         .warning-header 温馨提示
-        .warning-content 1. 公式行内显示(inline)：请使用 $....$ 或 \(....\) 包裹代码
-        .warning-content 2. 公式独占一行显示(display)：请使用 $$....$$ 或 \[....\] 包裹代码
+        .warning-content 1. 公式行内显示(inline)：请使用 
+          span $....
+          span $ 或 
+          span \(....
+          span \) 包裹代码
+        .warning-content 2. 公式独占一行显示(display)：请使用 
+          span $$....
+          span $$ 或 
+          span \[....
+          span \] 包裹代码
         .warning-content 3. 插入的公式在编辑时不会渲染，请检查无误后再插入。
       .math-jax-input.m-b-1
         label 请输入公式：
