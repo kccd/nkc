@@ -790,13 +790,17 @@
       isNotFormatLink(url){
         const { fileDomain } = getState();
         if (fileDomain) {
-          return url.indexOf(`${fileDomain}/r/`) === 0;
-        } else {
-          return url.indexOf(`${window.location.origin}/r/`) === 0;
-        }
+          return url.indexOf(`${fileDomain}/r/`) === 0 || url.indexOf(`${window.location.origin}/r/`) === 0;
+        } 
+        return url.indexOf(`${window.location.origin}/r/`) === 0;
+        
       },
       // 判断是否为本地资源的图片链接
       isLocalPictureLink(url){
+        const { fileDomain } = getState();
+        if(fileDomain){
+          return url.indexOf(`blob:${window.location.origin}`) === 0 || url.indexOf(`blob:${fileDomain}`) === 0;
+        }
         return url.indexOf(`blob:${window.location.origin}`) === 0;
       }
     },
