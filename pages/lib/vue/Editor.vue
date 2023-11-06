@@ -375,7 +375,12 @@
           // 修复文章中带http的(/r)图片添加属性信息
           if(this.isNotFormatLink(TestSrc)){
             const { fileDomain }=getState();
-            const fileLink = fileDomain || window.location.origin;
+            let fileLink=''; 
+            if(TestSrc.indexOf(`${fileDomain}/r/`) === 0){
+              fileLink = fileDomain;
+            }else if(TestSrc.indexOf(`${window.location.origin}/r/`) === 0){
+              fileLink = window.location.origin;
+            }
             const imageSrc=TestSrc.replace(`${fileLink}`,"");
             const dataId= TestSrc.replace(`${fileLink}/r/`,"").split("?")[0];
             imageNode.setAttribute("src",imageSrc);
