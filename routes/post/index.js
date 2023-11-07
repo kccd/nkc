@@ -62,6 +62,75 @@ router
       ipId: post.ip,
     });
     const thread = await post.extendThread();
+    // 屏蔽公告权限
+    const shieldNotice = ctx.permission('disablePostNotice');
+    // 编辑公告权限
+    const canEditNotice =
+      post.uid === state.uid || ctx.permission('disablePostNotice');
+    const noticeMatch = { pid: pid, status: 'normal' };
+    if (shieldNotice || post.uid === state.uid) {
+      noticeMatch.status = { $in: ['normal', 'shield'] };
+    }
+    const notices = await db.NewNoticesModel.find(noticeMatch)
+      .sort({ toc: -1 })
+      .lean();
+    // 查看详情历史权限
+    let postHistory = null;
+    if (notices.length !== 0) {
+      const isExpert = await db.PostModel.isModerator(state.uid, pid);
+      if (
+        post.tlm > post.toc &&
+        ctx.permission('visitPostHistory') &&
+        isExpert
+      ) {
+        postHistory =
+          !post.hideHistories || ctx.permission('displayPostHideHistories')
+            ? true
+            : null;
+      }
+      const userId = Array.from(new Set(notices.map((item) => item.uid)));
+      //获取公告用户信息
+      const users = await db.UserModel.find(
+        { uid: { $in: userId } },
+        { avatar: 1, uid: 1, username: 1 },
+      ).lean();
+      //获取历史版本
+      const cv = Array.from(
+        new Set(notices.map((item) => item.cv).filter(Boolean)),
+      );
+      //获取hid数组对象
+      const hidArr = await db.HistoriesModel.find(
+        { pid, cv: { $in: cv } },
+        { _id: 1, cv: 1 },
+      ).lean();
+      //筛选出来的hid对象
+      const uniqueArr = hidArr.filter((item, index, self) => {
+        return index === self.findIndex((t) => t.cv === item.cv);
+      });
+      data.noticeContent = notices.map(
+        ({ toc, noticeContent, cv, uid, pid, nid, status, reason }) => {
+          const user = users.find((item) => item.uid === uid);
+          const hidObj = uniqueArr.find((item) => item.cv === cv);
+          const updatedUser = {
+            ...user,
+            avatar: nkcModules.tools.getUrl('userAvatar', user.avatar),
+          };
+          return {
+            toc,
+            noticeContent,
+            hid: hidObj ? hidObj._id : null,
+            user: updatedUser,
+            pid,
+            nid,
+            status,
+            reason,
+          };
+        },
+      );
+      data.shieldNotice = shieldNotice;
+      data.canEditNotice = canEditNotice;
+      data.postHistory = postHistory;
+    }
     await thread.extendFirstPost();
     data.thread = {
       tid: thread.tid,

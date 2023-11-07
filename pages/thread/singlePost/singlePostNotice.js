@@ -174,3 +174,14 @@ window.onload = function () {
     });
   });
 };
+
+// 文章标题点击显示新版本公告
+$(function () {
+  const threadVersionNotice = document.getElementById('threadVersionNotice');
+  if (threadVersionNotice) {
+    const pid = threadVersionNotice.getAttribute('data-pid');
+    threadVersionNotice.addEventListener('click', () => {
+      vueInstance.checkNotice(pid);
+    });
+  }
+});
