@@ -1103,6 +1103,7 @@ threadRouter
             nid,
             status,
             reason,
+            cv,
           };
         },
       );
