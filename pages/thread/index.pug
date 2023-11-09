@@ -164,7 +164,7 @@ block content
                         .h3.thread-title.text-center!= thread.firstPost.t
                           -var showVersionLogo = data.noticeContent ? thread.firstPost.cv === data.noticeContent[0].cv ? true : false : false
                           if showVersionLogo
-                            sup.fa.fa-bookmark#threadVersionNotice(title='点击查看新版本公告'  data-pid=thread.firstPost.pid style='position:absolute;font-size:1.3rem;color:#e85a71;')
+                            sup.fa.fa-bookmark#threadVersionNotice(title='点击查看新版本公告'  data-pid=thread.firstPost.pid)
                       -const post = thread.firstPost;
                       if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
                         -var agencyIndex = 1;
