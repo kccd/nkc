@@ -891,30 +891,26 @@ schema.statics.checkColumnPostOrder = async function (columnId, cid, mcid) {
   if (mcid) {
     match.mcid = mcid === 'other' ? [] : mcid;
   }
+  match[`order.${keyName}`] = {
+    $exists: false,
+  };
   const sort = {};
   sort[`order.${keyName}`] = -1;
   const columnPosts = await ColumnPostModel.find(match).sort(sort).lean();
-  let mustCheck = false;
   for (const columnPost of columnPosts) {
-    if (mustCheck || !columnPost.order[keyName]) {
-      const obj = {};
-      obj[`order.${keyName}`] = await SettingModel.operateSystemID(
-        'columnPostDownOrders',
-        -1,
-      );
-      await ColumnPostModel.updateOne(
-        {
-          _id: columnPost._id,
-        },
-        {
-          $set: obj,
-        },
-      );
-    }
-    if (columnPost.order[keyName]) {
-      continue;
-    }
-    mustCheck = true;
+    const obj = {};
+    obj[`order.${keyName}`] = await SettingModel.operateSystemID(
+      'columnPostDownOrders',
+      -1,
+    );
+    await ColumnPostModel.updateOne(
+      {
+        _id: columnPost._id,
+      },
+      {
+        $set: obj,
+      },
+    );
   }
 };
 module.exports = mongoose.model('columnPosts', schema);
