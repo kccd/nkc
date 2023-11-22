@@ -15,7 +15,7 @@
           :permissions="permissions"
         )
     .moment-divider(v-if="latestData.length>0") 以上是新内容
-    .moment-container(:key="momentData.momentId" v-for="momentData in moments")
+    .moment-container(:key="momentData.momentId" v-for="momentData in moments" v-if="!momentData.quoteData || momentData.quoteData.data.status!=='permission'")
       moment(
         :data="momentData"
         @complaint="complaint"

@@ -60,29 +60,31 @@
     from-now(:time="threadHeaderInfo.toc")
     |）
 
-  .moment-quote-lost(v-if="!quoteData.data")
-    .fa.fa-exclamation-circle
-    span 引用丢失
-  .moment-quote-lost(v-else-if="quoteData.data.status !== 'normal'")
-    .fa.fa-exclamation-circle
-    span {{quoteData.data.statusInfo}}
-  .moment-quote(v-else)
-    div(v-if="['article', 'post', 'comment'].includes(quoteData.quoteType)")
-      .moment-quote-header(v-if="showTopHeader")
-        +topHeader
-      .moment-quote-body
-        +articleBody
-    div(v-else)
-      .moment-quote-header
-        +topHeader
-      .moment-quote-body
-        +momentBody
+  .moment-quote-permission(v-if="quoteData.data.quoteData && quoteData.data.quoteData.data.status==='permission'" ) 根据相关法律法规和政策，内容不予显示。
+  div(v-else)
+    .moment-quote-lost(v-if="!quoteData.data")
+      .fa.fa-exclamation-circle
+      span 引用丢失
+    .moment-quote-lost(v-else-if="quoteData.data.status !== 'normal'")
+      .fa.fa-exclamation-circle
+      span {{quoteData.data.statusInfo}}
+    .moment-quote(v-else)
+      div(v-if="['article', 'post', 'comment'].includes(quoteData.quoteType)")
+        .moment-quote-header(v-if="showTopHeader")
+          +topHeader
+        .moment-quote-body
+          +articleBody
+      div(v-else)
+        .moment-quote-header
+          +topHeader
+        .moment-quote-body
+          +momentBody
 
-    moment-quote(
-      v-if="quoteData.data.quoteData"
-      :data="quoteData.data.quoteData"
-      :uid="quoteData.data.uid"
-      )
+      moment-quote(
+        v-if="quoteData.data.quoteData"
+        :data="quoteData.data.quoteData"
+        :uid="quoteData.data.uid"
+        )
 
 
 
@@ -90,6 +92,12 @@
 
 <style lang="less" scoped>
   @import "../../../publicModules/base";
+  .moment-quote-permission{
+    text-align: center;
+    color: #282c37;
+    font-size: 1.3rem;
+    line-height: 2.4rem;
+  }
   .moment-quote-lost{
     text-align: center;
     font-size: 1rem;
