@@ -31,6 +31,7 @@ router
           "c.certsId": certsId
         }
       });
+      await db.SettingModel.saveSettingsToRedis("review");
       return await next();
     }
     if(!["thread", "post"].includes(tab)) ctx.throw(400, "参数错误，服务器无法确定是发表文章还是发表回复的审核设置");

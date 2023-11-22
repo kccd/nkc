@@ -109,7 +109,8 @@ var app = new Vue({
       nkcAPI("/m/" + this.column._id + "/post", "POST", {
         type: type,
         postsId: id,
-        categoryId: app.category._id==="all"? "": app.category._id
+        categoryId: app.category._id==="all"? "": app.category._id,
+        minorCategoriesId: app.minorCategory._id==="all"? "": app.minorCategory._id
       })
         .then(function(data) {
           if(data.columnTopped) app.column.topped = data.columnTopped;
