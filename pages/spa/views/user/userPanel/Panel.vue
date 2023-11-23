@@ -60,7 +60,7 @@
                   .account-nav-item-name 动态
                   .account-nav-item-value {{targetUser.timelineCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}")
-                  .account-nav-item-name 空间
+                  .account-nav-item-name 电波
                   .account-nav-item-value {{targetUser.momentCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('post')" :class="{'active': ($route.name === 'post' || $route.name === 'thread')}")
                   .account-nav-item-name 论坛

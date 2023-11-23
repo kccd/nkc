@@ -11,10 +11,23 @@ router
     };
     const sort = {};
     if(cid) {
-      q.cid = cid;
-      sort[`order.cid_${cid}`] = -1;
+      // q.cid = cid;
+      // 分类下的子分类
+      const childCategoryId =
+        await db.ColumnPostCategoryModel.getChildCategoryId(cid);
+      childCategoryId.push(cid);
+      q.cid = { $in: childCategoryId };
+      if(mcid){
+        sort[`order.cid_${cid}_${mcid}`] = -1;
+      }else{
+        sort[`order.cid_${cid}_default`] = -1;
+      }
     } else {
-      sort[`order.cid_default`] = -1;
+      if(mcid){
+        sort[`order.cid_default_${mcid}`] = -1;
+      }else{
+        sort[`order.cid_default_default`] = -1;
+      }
     }
     if(mcid) {
       q.mcid = mcid === 'other'? []: mcid;
@@ -33,6 +46,11 @@ router
       mainCategoriesId, minorCategoriesId, categoryType, operationType
     } = body;
     const {column, user} = data;
+    let childCategoryId = [];
+    if(categoryId){
+      childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(categoryId);
+      childCategoryId.push(categoryId);
+    }
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     if(!postsId || postsId.length === 0) {
       if(!["sortByPostTimeDES", "sortByPostTimeASC"].includes(type)) {
@@ -47,12 +65,12 @@ router
       }
       for(const pid of postsId) {
         let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid});
-        const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
+        // const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
         if(columnPost) {
           await columnPost.updateOne({
             cid: mainCategoriesId,
             mcid: minorCategoriesId,
-            order
+            order: await db.ColumnPostModel.getColumnPostOrder(mainCategoriesId,minorCategoriesId),
           });
           continue;
         }
@@ -167,12 +185,23 @@ router
     ].includes(type)) {
       let keyName = ``;
       if(!categoryId) {
-        keyName = "order.cid_default";
+        if(minorCategoriesId){
+          keyName = `order.cid_default_${minorCategoriesId}`;
+        }else{
+          keyName = `order.cid_default_default`;
+        }
+        // keyName = "order.cid_default";
       } else {
         const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoryId});
         if(!category) ctx.throw(400, `文章分类ID错误 ID: ${categoryId}`);
-        keyName = `order.cid_${categoryId}`;
+        // keyName = `order.cid_${categoryId}`;
+        if(minorCategoriesId){
+          keyName = `order.cid_${categoryId}_${minorCategoriesId}`;
+        }else{
+          keyName = `order.cid_${categoryId}_default`;
+        }
       }
+      await db.ColumnPostModel.checkColumnPostOrder(column._id,categoryId,minorCategoriesId);
       const arr = [];
       for(const _id of postsId) {
         const p = await db.ColumnPostModel.findOne({columnId: column._id, _id});
@@ -197,18 +226,37 @@ router
       if(categoryId) {
         const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoryId});
         if(!category) ctx.throw(400, `文章分类ID错误 ID: ${categoryId}`);
-        keyName = `order.cid_${categoryId}`;
-        orderKeyName = `cid_${categoryId}`;
+        // keyName = `order.cid_${categoryId}`;
+        // orderKeyName = `cid_${categoryId}`;
+        if(minorCategoriesId){
+          keyName = `order.cid_${categoryId}_${minorCategoriesId}`;
+          orderKeyName = `cid_${categoryId}_${minorCategoriesId}`;
+        }else{
+          keyName = `order.cid_${categoryId}_default`;
+          orderKeyName = `cid_${categoryId}_default`;
+        }
       } else {
-        keyName = "order.cid_default";
-        orderKeyName = `cid_default`
+        if(minorCategoriesId){
+          keyName = `order.cid_default_${minorCategoriesId}`;
+          orderKeyName = `cid_default_${minorCategoriesId}`;
+        }else{
+          keyName = `order.cid_default_default`;
+          orderKeyName = `cid_default_default`;
+        }
+        // keyName = "order.cid_default";
+        // orderKeyName = `cid_default`
 
       }
-      const columnPost = await db.ColumnPostModel.findOne({columnId: column._id, _id: postsId});
+      // 检查当前页面数据中order是否正确
+      await db.ColumnPostModel.checkColumnPostOrder(column._id,categoryId,minorCategoriesId);
+      let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, _id: postsId});
       if(!columnPost) ctx.throw(400, `找不到ID为${postsId}的专栏文章记录`);
       const match = {
         columnId: column._id
       };
+      if(minorCategoriesId){
+        match.mcid = minorCategoriesId === 'other'? []: minorCategoriesId;
+      }
       const sort = {};
       if(type === "categoryUp") {
         match[keyName] = {$gt: columnPost.order[orderKeyName] || 0};
@@ -232,7 +280,8 @@ router
     } else if(["categoryTop", "unCategoryTop"].includes(type)) { // 专栏置顶、取消专栏置顶
       const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoryId});
       if(!category) ctx.throw(400, `文章分类ID错误 ID: ${categoryId}`);
-      const columnPost = await db.ColumnPostModel.findOne({columnId: column._id, _id: postsId, cid: categoryId});
+      // 查询条件不应该有cid:categoryId,很多子孙级categoryId并没有放在cid中
+      const columnPost = await db.ColumnPostModel.findOne({columnId: column._id, _id: postsId});
       if(!columnPost) ctx.throw(400, `找不到ID为${postsId}的专栏文章记录`);
       if(type === "categoryTop") {
         await category.updateOne({
@@ -254,12 +303,24 @@ router
         columnId: column._id
       };
       if(!categoryId) {
-        keyName = "order.cid_default";
+        if(minorCategoriesId){
+          keyName = `order.cid_default_${minorCategoriesId}`;
+          match.mcid = minorCategoriesId === 'other'? []: minorCategoriesId;
+        }else{
+          keyName = `order.cid_default_default`;
+        }
       } else {
         const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoryId});
         if(!category) ctx.throw(400, `文章分类ID错误 ID: ${categoryId}`);
-        keyName = `order.cid_${categoryId}`;
-        match.cid = categoryId;
+        if(minorCategoriesId){
+          keyName = `order.cid_${categoryId}_${minorCategoriesId}`;
+          match.mcid = minorCategoriesId === 'other'? []: minorCategoriesId;
+        }else{
+          keyName = `order.cid_${categoryId}_default`;
+        }
+        
+        // match.cid = categoryId;
+        match.cid = { $in: childCategoryId };
       }
       const sort = {
         toc: -1

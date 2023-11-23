@@ -262,6 +262,7 @@ router
       files: filesData,
       status: newMoment.status,
       tlm: newMoment.tlm,
+      addr: newDocument.addr,
     };
     await next();
   })

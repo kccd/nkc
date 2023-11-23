@@ -548,6 +548,26 @@ schema.statics.getCategoriesOrder = async (categoriesId) => {
 };
 
 /*
+ * 生成在各主分类和辅分类交叉页面数据的排序
+ * @param {[String]} categoriesId 主分类数组
+ * @param {[String]} categoriesId 辅分类数组
+ * */
+schema.statics.getColumnPostOrder = async (mainIds, minorIds) => {
+  const SettingModel = mongoose.model('settings');
+  const cIds = ['default', ...mainIds];
+  const mcIds = ['default', 'other', ...minorIds];
+  const order = {};
+  for (const cid of cIds) {
+    for (const mcid of mcIds) {
+      order[`cid_${cid}_${mcid}`] = await SettingModel.operateSystemID(
+        'columnPostOrders',
+        1,
+      );
+    }
+  }
+  return order;
+};
+/*
  * 拓展专栏首页专栏引用文章
  * @params {string} columnId 专栏 ID
  * @params {string} fidOfCanGetThread 当前用户能访问的专业ID
@@ -629,12 +649,15 @@ schema.statics.addColumnPosts = async (
   for (const pid of postsId) {
     let columnPost = await ColumnPostModel.findOne({ columnId, pid });
     //获取著分类排序
-    const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
+    // const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
     if (columnPost) {
       await columnPost.updateOne({
         cid: categoriesId_,
         mcid: minorCategoriesId_,
-        order,
+        order: await ColumnPostModel.getColumnPostOrder(
+          categoriesId,
+          minorCategoriesId,
+        ),
       });
       continue;
     }
@@ -647,7 +670,10 @@ schema.statics.addColumnPosts = async (
       _id: await SettingModel.operateSystemID('columnPosts', 1),
       tid: '',
       top: post.toc,
-      order,
+      order: await ColumnPostModel.getColumnPostOrder(
+        categoriesId,
+        minorCategoriesId,
+      ),
       tUid: thread.uid,
       pid,
       type: thread.oc === pid ? 'thread' : 'post',
@@ -777,12 +803,15 @@ schema.statics.createColumnPost = async function (article, selectCategory) {
   }
   //如果article存在sid,通过sid查找专栏
   const column = await ColumnModel.findOnly({ _id: sid });
-  const order = await ColumnPostModel.getCategoriesOrder(
-    selectCategory.selectedMainCategoriesId,
-  );
+  // const order = await ColumnPostModel.getCategoriesOrder(
+  //   selectCategory.selectedMainCategoriesId,
+  // );
   const columnPost = ColumnPostModel({
     _id: await SettingModel.operateSystemID('columnPosts', 1),
-    order,
+    order: await ColumnPostModel.getColumnPostOrder(
+      selectCategory.selectedMainCategoriesId,
+      selectCategory.selectedMinorCategoriesId,
+    ),
     columnId: sid,
     from: article.uid === column.uid ? 'own' : 'reprint',
     top: toc,
@@ -830,4 +859,58 @@ schema.methods.extendColumnPost = async function () {
   return ColumnModel.findOne({ _id: columnId });
 };
 
+/*
+ * 检查专栏文章列表中的order字段排序是否正确
+ * */
+schema.statics.checkColumnPostOrder = async function (columnId, cid, mcid) {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const ColumnPostCategoryModel = mongoose.model('columnPostCategories');
+  const SettingModel = mongoose.model('settings');
+  let keyName = '';
+  const match = {
+    columnId,
+  };
+  if (cid) {
+    const childCategoryId = await ColumnPostCategoryModel.getChildCategoryId(
+      cid,
+    );
+    childCategoryId.push(cid);
+    match.cid = { $in: childCategoryId };
+    if (mcid) {
+      keyName = `cid_${cid}_${mcid}`;
+    } else {
+      keyName = `cid_${cid}_default`;
+    }
+  } else {
+    if (mcid) {
+      keyName = `cid_default_${mcid}`;
+    } else {
+      keyName = `cid_default_default`;
+    }
+  }
+  if (mcid) {
+    match.mcid = mcid === 'other' ? [] : mcid;
+  }
+  match[`order.${keyName}`] = {
+    $exists: false,
+  };
+  const sort = {};
+  sort[`order.${keyName}`] = -1;
+  const columnPosts = await ColumnPostModel.find(match).sort(sort).lean();
+  for (const columnPost of columnPosts) {
+    const obj = {};
+    obj[`order.${keyName}`] = await SettingModel.operateSystemID(
+      'columnPostDownOrders',
+      -1,
+    );
+    await ColumnPostModel.updateOne(
+      {
+        _id: columnPost._id,
+      },
+      {
+        $set: obj,
+      },
+    );
+  }
+};
 module.exports = mongoose.model('columnPosts', schema);

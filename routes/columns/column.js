@@ -160,6 +160,9 @@ router
       let minorCategory;
       if (mcid) {
         minorCategory = await db.ColumnPostCategoryModel.findOne({ _id: mcid });
+        sort[`order.cid_${category._id}_${mcid}`] = -1;
+      } else {
+        sort[`order.cid_${category._id}_default`] = -1;
       }
       if (minorCategory) {
         q.mcid = minorCategory._id;
@@ -174,7 +177,7 @@ router
         isModerator,
       });
       data.toppedId = data.category.topped;
-      sort[`order.cid_${category._id}`] = -1;
+      // sort[`order.cid_${category._id}`] = -1;
     } else {
       data.topped = await db.ColumnPostModel.getToppedColumnPosts({
         columnId: column._id,
@@ -182,7 +185,12 @@ router
         isModerator,
       });
       data.toppedId = data.column.topped;
-      sort[`order.cid_default`] = -1;
+      if (mcid) {
+        sort[`order.cid_default_${mcid}`] = -1;
+      } else {
+        sort[`order.cid_default_default`] = -1;
+      }
+      // sort[`order.cid_default`] = -1;
     }
     if (page === 0 && !query.c) {
       data.homePage = await db.ColumnModel.getHomePageByColumnId(column._id);

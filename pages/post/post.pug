@@ -20,7 +20,7 @@ block content
     include ../module_digest
     include ../module_credit
     .row
-      .col-xs-12.col-md-9.box-shadow-panel
+      .col-xs-12.col-md-9.box-shadow-panel.m-b-1
         .ThreadBox.post
           if !post.reviewed
             -let reviewData = {reviewPid: post.pid, reviewType: "post"}
@@ -42,6 +42,9 @@ block content
                   .username.anonymous-name= anonymousInfo.username
                 span
                   +fromNow(post.toc)
+                  if post.tlm > post.toc
+                    | &nbsp;修改于&nbsp;
+                    +fromNow(post.tlm)
                 span=` IP:${post.addr}`
               .options
                 include ../module_vote
@@ -108,8 +111,8 @@ block content
             include ../thread/comments
 
             include ../publicModules/paging/paging_input
-      .col-xs-12.col-md-3.box-shadow-panel
-        .m-b-1
+      .col-xs-12.col-md-3
+        .m-b-1.box-shadow
           .pid=`文号 / ${post.pid}`
           hr
           #postShare(v-cloak)
@@ -118,8 +121,10 @@ block content
           -var user = post.user
           -var accountRegisterInfo = data.authorAccountRegisterInfo;
           include ../interface_thread_userpatch.pug
+        include ../publicModules/side_thread_notice
+        +sideThreadNotice(data.noticeContent,data.postHistory,data.canEditNotice,data.shieldNotice)
         if data.voteUpUsers.length !== 0
-          .vote-user.m-b-1
+          .vote-user.m-b-1.box-shadow
             h4 点赞的用户
             for u, index in data.voteUpUsers
               if index < 30

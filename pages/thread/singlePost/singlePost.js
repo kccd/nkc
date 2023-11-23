@@ -260,6 +260,7 @@ class SinglePostModule {
     NKC.methods.initPostOption();
     NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
+    NKC.methods.renderFormula();
   }
   // 移除所有评论框和定时事件
   removeAllEditorApp(pid) {

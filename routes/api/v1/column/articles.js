@@ -16,7 +16,7 @@ router
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
-    const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
+    // const order = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
     const columnPostTypes = await db.ColumnPostModel.getColumnPostTypes();
     const threadColumnPostArr = await db.ThreadModel.aggregate([
       {
@@ -101,11 +101,26 @@ router
       }
     }
     if(oldColumnPostIds.size > 0){
-      await db.ColumnPostModel.updateMany({_id: {$in: [...oldColumnPostIds]}},{
-        cid: mainCategoriesId,
-        mcid: minorCategoriesId,
-        order
-      });
+      for(const _id of oldColumnPostIds){
+        const order = await db.ColumnPostModel.getColumnPostOrder(mainCategoriesId,minorCategoriesId);
+        await db.ColumnPostModel.updateOne(
+          {
+            _id,
+          },
+          {
+            $set: {
+              cid: mainCategoriesId,
+              mcid: minorCategoriesId,
+              order,
+            },
+          },
+        );
+      }
+      // await db.ColumnPostModel.updateMany({_id: {$in: [...oldColumnPostIds]}},{
+      //   cid: mainCategoriesId,
+      //   mcid: minorCategoriesId,
+      //   order
+      // });
     }
     if(newColumnPost.length > 0){
       for(const columnPost of newColumnPost){
@@ -116,7 +131,7 @@ router
           pid: columnPost.type==='thread'?columnPost.oc: columnPost._id,
           columnId: column._id,
           type: columnPost.type,
-          order,
+          order: await db.ColumnPostModel.getColumnPostOrder(mainCategoriesId,minorCategoriesId),
           top: columnPost.toc,
           cid: mainCategoriesId,
           mcid: minorCategoriesId,
