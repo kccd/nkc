@@ -1,7 +1,87 @@
 <template lang="pug">
   .single-moment-container(v-if="momentData")
     moment-status(ref="momentStatus" :moment="momentData" :permissions="permissions")
-    .single-moment-top-container#comment-content
+    .single-moment-detail-container#comment-content(v-if="type === 'details'")
+      .single-moment-detail-top
+        .single-moment-detail-avatar-left
+          .single-moment-detail-avatar(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({uid: momentData.uid})"
+          )
+            img(:src="momentData.avatarUrl")
+        .single-moment-detail-header
+          .single-moment-user(
+            data-global-mouseover="showUserPanel"
+            data-global-mouseout="hideUserPanel"
+            :data-global-data="objToStr({uid: momentData.uid})"
+          )
+            a(:href="momentData.userHome" target="_blank") {{momentData.username}}
+          .single-moment-detail-time
+            from-now(:time="momentData.toc")
+            span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于&nbsp;
+            from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
+          //- 其他操作
+          .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'||(momentData.visibleType==='everyone'&&isShowPublicTag)") {{visitType[momentData.visibleType]}}
+          .single-moment-detail-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
+          moment-option(
+            ref="momentOption"
+            @complaint="complaint"
+            @selectedMomentId="handleMid"
+          )
+          .single-moment-detail-hits.m-t-1
+            span 阅读 {{momentData.hits}}&nbsp;·
+            span &nbsp;IP:{{momentData.addr}}&nbsp;
+      .single-moment-detail-bottom(v-if="selectedMomentId !== momentData.momentId || submitting" )
+        //- 动态内容
+        .single-moment-content(v-html="momentData.content")
+        //- 图片视频
+        .single-moment-detail-files
+          moment-files(:data="momentData.files")
+        //- 引用内容
+        .single-moment-detail-quote(v-if="momentData.quoteData")
+          moment-quote(:data="momentData.quoteData" :uid="momentData.uid")
+        //- 底部的操作按钮
+        .single-moment-detail-options
+          .single-moment-options-left(
+            title="评论"
+            :class="{'active': showPanelType === panelTypes.comment}"
+            @click="showPanel(panelTypes.comment)"
+          )
+            .fa.fa-comment-o
+            span(v-if="momentData.commentCount > 0") {{momentData.commentCount}}
+          .single-moment-options-center(
+            title="转发"
+            :class="{'active': showPanelType === panelTypes.repost}"
+            @click="showPanel(panelTypes.repost)"
+          )
+            .fa.fa-retweet
+            span(v-if="momentData.repostCount > 0") {{momentData.repostCount}}
+          .single-moment-options-right(
+            title="点赞"
+            :class="{'active': momentData.voteType === 'up'}"
+            @click="vote"
+          )
+            .fa.fa-thumbs-o-up
+            span(v-if="momentData.voteUp > 0") {{momentData.voteUp}}
+
+        // 评论列表
+        .single-moment-moments(v-if="showPanelType")
+          moment-comments(
+            ref="momentComments"
+            :mid="momentData.momentId"
+            :type="showPanelType"
+            @post-comment="onPostComment"
+            :focus="focus"
+            :permissions="permissions"
+            :mode="mode"
+          )
+      div(v-if="selectedMomentId === momentData.momentId && !submitting")
+        .moment-editor-header
+          .moment-editor-header-title.text-info 正在编辑电文：
+          button.btn.btn-default.btn-xs(@click="submitting = true") 取消
+        moment-editor(:mid="momentData.momentId" @published="onPublished" ref="momentEditor")
+    .single-moment-top-container#comment-content(v-else)
       //moment-option(
       //  ref="momentOption"
       //  @complaint="complaint"
@@ -137,6 +217,176 @@
       }
     }
     .single-moment-options{
+      position: relative;
+      @padding: 3rem;
+      height: @padding;
+      line-height: @padding;
+      padding-left: @padding;
+      padding-right: @padding;
+      font-size: 1.3rem;
+      text-align: center;
+      color: #3f3f3f;
+      &>*{
+        cursor: pointer;
+        &.active{
+          color: @accent;
+        }
+      }
+      .single-moment-options-left{
+        text-align: left;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: @padding;
+        line-height: @padding;
+        cursor: pointer;
+        .fa{
+          margin-right: 0.5rem;
+        }
+        span{
+          font-size: 1.1rem;
+        }
+      }
+      .single-moment-options-center{
+        display: inline-block;
+        padding: 0 1rem;
+        .fa{
+          margin-right: 0.5rem;
+        }
+        span{
+          font-size: 1.1rem;
+        }
+      }
+      .single-moment-options-right{
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: @padding;
+        line-height: @padding;
+        cursor: pointer;
+        text-align: right;
+        .fa{
+          margin-right: 0.5rem;
+        }
+        span{
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+  .single-moment-detail-container{
+    @avatarWidth: 4rem;
+    @avatarWidthMin: 3rem;
+    min-height: @avatarWidth;
+
+    .single-moment-detail-top{
+      .single-moment-detail-avatar-left{
+        position: absolute;
+        .single-moment-detail-avatar{
+          height: @avatarWidth;
+          width: @avatarWidth;
+          border-radius: 50%;
+          overflow: hidden;
+          img{
+            height: 100%;
+            width: 100%;
+          }
+      }
+      }
+      .single-moment-detail-header{
+        padding-right: 8rem;
+        padding-left: @avatarWidth + 1rem;
+        margin-bottom: 0.5rem;
+        @optionHeight: 2rem;
+        position: relative;
+        .single-moment-user{
+          display: inline-block;
+          margin-right: 0.5rem;
+          font-weight: 700;
+          font-size: 1.25rem;
+          a{
+            color: @primary;
+          }
+        }
+        .single-moment-detail-time{
+          display: inline-block;
+          font-size: 9pt;
+          color: #555;
+        }
+        .single-moment-tag{
+          display:inline-block;
+          position:absolute;
+          right: 2.2rem;
+          top: 0;
+          cursor: default;
+          border-width: 1px;
+          border-style: solid;
+          font-size: 1rem;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          vertical-align: middle;
+          border-radius: 4px;
+          padding: 0 9px;
+          height: 2rem;
+          line-height: 2rem;
+        }
+        .own{
+          border-color:#d9ecff;
+          border-radius: 4px;
+          background-color: #ecf5ff;
+          color: #409eff;
+        }
+        .attention{
+          border-color:#faecd8;
+          background-color: #fdf6ec;
+          color: #e6a23c;
+        }
+        .everyone{
+          border-color:#e1f3d8;
+          background-color: #f0f9eb;
+          color: #67c23a;
+        }
+        .single-moment-detail-header-options{
+          height: @optionHeight;
+          line-height: @optionHeight;
+          text-align: center;
+          width: @optionHeight;
+          position: absolute;
+          font-size: 1.5rem;
+          color: #555;
+          top: 0;
+          right: 0;
+          cursor: pointer;
+        }
+        .single-moment-detail-hits{
+          display: inline-block;
+          color: rgb(85,85,85);
+          font-size: 12px;
+        }
+      }
+
+    }
+    .single-moment-detail-bottom{
+
+    }
+
+    .single-moment-detail-quote{
+      width: 100%;
+      max-width: 100%;
+      padding: 1rem;
+      border: 1px solid #d5d5d5;
+      border-radius: 5px;
+      background-color: #f6f2ee;
+    }
+    .single-moment-detail-files{
+      font-size: 0;
+      max-width: 100%;
+      // @media(max-width: 768px) {
+      //   max-width: 100%;
+      // }
+    }
+    .single-moment-detail-options{
       position: relative;
       @padding: 3rem;
       height: @padding;

@@ -67,7 +67,7 @@ router
           p = await db.ColumnPostModel.findOne({columnId: column._id, pid: thread._id, type: _contribute.source});
         }
         if(p) continue;
-        const categoriesOrder = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
+        // const categoriesOrder = await db.ColumnPostModel.getCategoriesOrder(mainCategoriesId);
         await db.ColumnPostModel({
           _id: await db.SettingModel.operateSystemID("columnPosts", 1),
           tid: '',
@@ -75,7 +75,7 @@ router
           pid: _contribute.source === 'thread' ? thread.oc : thread._id,
           columnId: column._id,
           type: _contribute.source,
-          order: categoriesOrder,
+          order: await db.ColumnPostModel.getColumnPostOrder(mainCategoriesId,minorCategoriesId),
           top: thread.toc,
           cid: mainCategoriesId,
           mcid: minorCategoriesId,

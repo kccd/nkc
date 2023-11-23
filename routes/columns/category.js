@@ -10,6 +10,44 @@ router
       let {cid} = query;
       if (cid) cid = parseInt(cid);
       data.mainCategories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+      const categories = await db.ColumnPostCategoryModel.find({
+        columnId: column._id,
+        type: 'main',
+      });
+      const columnPosts = await db.ColumnPostModel.find({ columnId: column._id });
+      const categoriesObject = {};
+      categories.forEach((item) => {
+        categoriesObject[item._id] = item;
+      });
+
+      const categoriesChildObject = {};
+      for (const item of data.mainCategories) {
+        if (categoriesObject[item._id]) {
+          const childIds = [];
+          const findChildId = (category) => {
+            for (const c of data.mainCategories) {
+              if (c.parentId === category._id) {
+                childIds.push(c._id);
+                findChildId(c);
+              }
+            }
+          };
+          findChildId(categoriesObject[item._id]);
+          childIds.push(item._id);
+          categoriesChildObject[item._id] = childIds;
+        }
+        if (categoriesChildObject[item._id]) {
+          let count = 0;
+          for (const columnPost of columnPosts) {
+            if (
+              columnPost.cid.some((cid) => categoriesChildObject[item._id].some((id) => id === cid))
+            ) {
+              count++;
+            }
+          }
+          item.count = count;
+        }
+      }
       const mainCategoryPostCount = await db.ColumnPostModel.countDocuments({columnId: column._id});
       data.mainCategories.unshift({
         _id: 'all',
@@ -32,10 +70,13 @@ router
         mcid: []
       };
       if(cid) {
-        match.cid = cid;
+        const childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(cid);
+        childCategoryId.push(cid);
+        // match.cid = cid;
+        match.cid = { $in: childCategoryId };
       }
       const minorCategoryPostCountOther = await db.ColumnPostModel.countDocuments(match);
-      data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, cid);
+      data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id, cid,true);
       data.minorCategories.unshift({
         _id: 'other',
         name: '未分类',
