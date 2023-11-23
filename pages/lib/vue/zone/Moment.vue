@@ -2,7 +2,7 @@
   .single-moment-container(v-if="momentData")
     moment-status(ref="momentStatus" :moment="momentData" :permissions="permissions")
     .single-moment-detail-container#comment-content(v-if="type === 'details'")
-      .single-moment-detail-top
+      .single-moment-detail-top.m-b-1
         .single-moment-detail-avatar-left
           .single-moment-detail-avatar(
             data-global-mouseover="showUserPanel"
@@ -29,7 +29,7 @@
             @complaint="complaint"
             @selectedMomentId="handleMid"
           )
-          .single-moment-detail-hits.m-t-1
+          .single-moment-detail-hits.m-t-05
             span 阅读 {{momentData.hits}}&nbsp;·
             span &nbsp;IP:{{momentData.addr}}&nbsp;
       .single-moment-detail-bottom(v-if="selectedMomentId !== momentData.momentId || submitting" )
@@ -106,9 +106,10 @@
             a(:href="momentData.userHome" target="_blank") {{momentData.username}}
           .single-moment-time
             from-now(:time="momentData.toc")
-            span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于
-            from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
+            //span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于
+            //from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
             span &nbsp;IP:{{momentData.addr}}
+            span(v-if="momentData.tlm>momentData.toc" ) &nbsp;已编辑
           //- 其他操作
           .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'||(momentData.visibleType==='everyone'&&isShowPublicTag)") {{visitType[momentData.visibleType]}}
           //- .single-moment-tag(:class="momentData.visibleType") {{visitType[momentData.visibleType]}}
@@ -280,8 +281,10 @@
     min-height: @avatarWidth;
 
     .single-moment-detail-top{
+      min-height: @avatarWidth;
       .single-moment-detail-avatar-left{
         position: absolute;
+        width: @avatarWidth;
         .single-moment-detail-avatar{
           height: @avatarWidth;
           width: @avatarWidth;
@@ -294,9 +297,10 @@
       }
       }
       .single-moment-detail-header{
+        min-height: @avatarWidth;
         padding-right: 8rem;
         padding-left: @avatarWidth + 1rem;
-        margin-bottom: 0.5rem;
+        //margin-bottom: 0.5rem;
         @optionHeight: 2rem;
         position: relative;
         .single-moment-user{
