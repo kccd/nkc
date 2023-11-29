@@ -260,6 +260,19 @@ func.init = async () => {
         },
       },
     });
+
+    //已有索引数据迁移
+    const copyData = await client.reindex({
+      body: {
+        source: {
+          index: 'nkc',
+        },
+        dest: {
+          index: indexName,
+          version_type: 'internal',
+        },
+      },
+    });
   }
 };
 

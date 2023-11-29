@@ -137,17 +137,25 @@ router.get('/', async (ctx, next) => {
     data.total = results.hits.total;
     results = results.hits.hits.map((r) => {
       const resource = r._source;
-      resource.highlight = r.highlight;
       // 在内容中匹配到含有关键词的内容
       const highlightKeys = Object.keys(r.highlight);
       for (const key of highlightKeys) {
-        const textContent = String(resource[key]);
-        const highlightContent = textContent.replace(
-          new RegExp(`${keyWordString}`, 'ig'),
-          (match) => `<span style="color: #e85a71;">${match}</span>`,
-        );
-        resource.highlight[key] = highlightContent;
+        const textContentArray = [];
+        for (let textContent of r.highlight[key]) {
+          textContent = elasticSearch.replaceSearchResultHTMLLink(
+            textContent + '',
+          );
+          textContent = nkcModules.apiFunction.obtainPureText(textContent);
+          textContent = textContent.replace(
+            new RegExp(`${keyWordString}`, 'ig'),
+            (match) => `<span style="color: #e85a71;">${match}</span>`,
+          );
+          textContentArray.push(textContent);
+        }
+
+        r.highlight[key] = textContentArray;
       }
+      resource.highlight = r.highlight;
       return resource;
     });
     // 根据分页设置，计算分页
