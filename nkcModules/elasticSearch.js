@@ -83,178 +83,80 @@ func.init = async () => {
         },
         mappings: {
           documents: {
-            // properties: {
-            //   docType: {
-            //     // 文档类型：thread， user， post，document_article， document_comment
-            //     type: 'keyword',
-            //   },
-            //   uid: {
-            //     type: 'keyword',
-            //   },
-            //   username: {
-            //     type: 'text',
-            //     analyzer: analyzer,
-            //     search_analyzer: analyzer,
-            //   },
-            //   description: {
-            //     type: 'text',
-            //     analyzer: analyzer,
-            //     search_analyzer: searchAnalyzer,
-            //   },
-            //   pid: {
-            //     type: 'keyword',
-            //   },
-            //   toc: {
-            //     type: 'date',
-            //   },
-            //   title: {
-            //     type: 'text',
-            //     analyzer: analyzer,
-            //     search_analyzer: searchAnalyzer,
-            //   },
-            //   abstractCN: {
-            //     type: 'text',
-            //     analyzer: analyzer,
-            //     search_analyzer: searchAnalyzer,
-            //   },
-            //   abstractEN: {
-            //     type: 'text',
-            //     analyzer: analyzer,
-            //     search_analyzer: searchAnalyzer,
-            //   },
-            //   content: {
-            //     type: 'text',
-            //     analyzer: analyzer,
-            //     search_analyzer: searchAnalyzer,
-            //   },
-            //   mainForumsId: {
-            //     type: 'keyword',
-            //   },
-            //   tcId: {
-            //     type: 'keyword',
-            //   },
-            //   digest: {
-            //     type: 'boolean',
-            //   },
-            //   tid: {
-            //     type: 'keyword',
-            //   },
-            //   aid: {
-            //     type: 'keyword',
-            //   },
-            //   keywordsCN: {
-            //     type: 'keyword',
-            //   },
-            //   keywordsEN: {
-            //     type: 'keyword',
-            //   },
-            //   authors: {
-            //     type: 'keyword',
-            //   },
-            //   voteUp: {
-            //     type: 'long',
-            //   },
-            //   voteDown: {
-            //     type: 'long',
-            //   },
-            // },
             properties: {
-              abstractCN: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              abstractEN: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              aid: {
-                type: 'text',
-                // analyzer: analyzer,
-                // search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              authors: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              content: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              description: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              digest: { type: 'boolean' },
               docType: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+                // 文档类型：thread， user， post，document_article， document_comment
+                type: 'keyword',
               },
-              keywordsCN: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              keywordsEN: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              mainForumsId: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              pid: {
-                type: 'text',
-                // 文号不使用过滤分词的方法
-                // analyzer: analyzer,
-                // search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              tcId: { type: 'long' },
-              tid: {
-                type: 'text',
-                // analyzer: analyzer,
-                // search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              title: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
-              },
-              toc: { type: 'date' },
               uid: {
-                type: 'text',
-                // analyzer: analyzer,
-                // search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+                type: 'keyword',
               },
               username: {
                 type: 'text',
                 analyzer: analyzer,
                 search_analyzer: searchAnalyzer,
-                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
-              voteDown: { type: 'long' },
-              voteUp: { type: 'long' },
+              description: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+              },
+              pid: {
+                type: 'keyword',
+              },
+              toc: {
+                type: 'date',
+              },
+              title: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+              },
+              abstractCN: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+              },
+              abstractEN: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+              },
+              content: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+              },
+              mainForumsId: {
+                type: 'keyword',
+              },
+              tcId: {
+                type: 'keyword',
+              },
+              digest: {
+                type: 'boolean',
+              },
+              tid: {
+                type: 'keyword',
+              },
+              aid: {
+                type: 'keyword',
+              },
+              keywordsCN: {
+                type: 'keyword',
+              },
+              keywordsEN: {
+                type: 'keyword',
+              },
+              authors: {
+                type: 'keyword',
+              },
+              voteUp: {
+                type: 'long',
+              },
+              voteDown: {
+                type: 'long',
+              },
             },
           },
         },
@@ -614,7 +516,10 @@ func.search = async (t, c, options) => {
                             'tid',
                             (() => {
                               let targetKeyword = c.toUpperCase();
-                              if (targetKeyword.indexOf('D') === 0) {
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
                                 targetKeyword = targetKeyword.slice(1);
                               }
                               return targetKeyword;
@@ -650,7 +555,10 @@ func.search = async (t, c, options) => {
                             'tid',
                             (() => {
                               let targetKeyword = c.toUpperCase();
-                              if (targetKeyword.indexOf('D') === 0) {
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
                                 targetKeyword = targetKeyword.slice(1);
                               }
                               return targetKeyword;
