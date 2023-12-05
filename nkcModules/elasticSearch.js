@@ -19,6 +19,68 @@ func.init = async () => {
     await client.indices.create({
       index: indexName,
       body: {
+        settings: {
+          analysis: {
+            filter: {
+              ng_filter: {
+                type: 'ngram',
+                min_gram: 1,
+                max_gram: 256,
+                // token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+                token_chars: ['letter', 'digit'],
+              },
+              eg_filter: {
+                type: 'edge_ngram',
+                min_gram: 1,
+                max_gram: 256,
+                token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+                // token_chars: ['letter', 'digit'],
+              },
+            },
+            analyzer: {
+              ng_analyzer: {
+                // tokenizer: 'ng_tokenizer',
+                // filter: ['lowercase'],
+                type: 'custom',
+                tokenizer: 'standard',
+                //char_filter: ['my_char_filter'],
+                filter: ['lowercase', 'ng_filter'],
+              },
+              eg_analyzer: {
+                // tokenizer: 'ng_tokenizer',
+                // filter: ['lowercase'],
+                type: 'custom',
+                tokenizer: 'standard',
+                char_filter: ['my_char_filter'],
+                filter: ['lowercase', 'eg_filter'],
+              },
+              search_analyzer: {
+                tokenizer: 'standard',
+                char_filter: ['my_char_filter'],
+              },
+            },
+            tokenizer: {
+              ng_tokenizer: {
+                type: 'ngram',
+                min_gram: 1,
+                max_gram: 256,
+                token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+              },
+              eg_tokenizer: {
+                type: 'edge_ngram',
+                min_gram: 1,
+                max_gram: 256,
+                token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+              },
+            },
+            char_filter: {
+              my_char_filter: {
+                type: 'mapping',
+                mappings: ['+=> 加'],
+              },
+            },
+          },
+        },
         mappings: {
           documents: {
             properties: {
@@ -100,6 +162,8 @@ func.init = async () => {
         },
       },
     });
+
+    //已有索引数据迁移
   }
 };
 
@@ -452,7 +516,10 @@ func.search = async (t, c, options) => {
                             'tid',
                             (() => {
                               let targetKeyword = c.toUpperCase();
-                              if (targetKeyword.indexOf('D') === 0) {
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
                                 targetKeyword = targetKeyword.slice(1);
                               }
                               return targetKeyword;
@@ -488,7 +555,10 @@ func.search = async (t, c, options) => {
                             'tid',
                             (() => {
                               let targetKeyword = c.toUpperCase();
-                              if (targetKeyword.indexOf('D') === 0) {
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
                                 targetKeyword = targetKeyword.slice(1);
                               }
                               return targetKeyword;
