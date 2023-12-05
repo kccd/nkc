@@ -19,87 +19,249 @@ func.init = async () => {
     await client.indices.create({
       index: indexName,
       body: {
+        settings: {
+          analysis: {
+            filter: {
+              ng_filter: {
+                type: 'ngram',
+                min_gram: 1,
+                max_gram: 256,
+                // token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+                token_chars: ['letter', 'digit'],
+              },
+              eg_filter: {
+                type: 'edge_ngram',
+                min_gram: 1,
+                max_gram: 256,
+                token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+                // token_chars: ['letter', 'digit'],
+              },
+            },
+            analyzer: {
+              ng_analyzer: {
+                // tokenizer: 'ng_tokenizer',
+                // filter: ['lowercase'],
+                type: 'custom',
+                tokenizer: 'standard',
+                //char_filter: ['my_char_filter'],
+                filter: ['lowercase', 'ng_filter'],
+              },
+              eg_analyzer: {
+                // tokenizer: 'ng_tokenizer',
+                // filter: ['lowercase'],
+                type: 'custom',
+                tokenizer: 'standard',
+                char_filter: ['my_char_filter'],
+                filter: ['lowercase', 'eg_filter'],
+              },
+              search_analyzer: {
+                tokenizer: 'standard',
+                char_filter: ['my_char_filter'],
+              },
+            },
+            tokenizer: {
+              ng_tokenizer: {
+                type: 'ngram',
+                min_gram: 1,
+                max_gram: 256,
+                token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+              },
+              eg_tokenizer: {
+                type: 'edge_ngram',
+                min_gram: 1,
+                max_gram: 256,
+                token_chars: ['letter', 'digit', 'punctuation', 'symbol'],
+              },
+            },
+            char_filter: {
+              my_char_filter: {
+                type: 'mapping',
+                mappings: ['+=> 加'],
+              },
+            },
+          },
+        },
         mappings: {
           documents: {
+            // properties: {
+            //   docType: {
+            //     // 文档类型：thread， user， post，document_article， document_comment
+            //     type: 'keyword',
+            //   },
+            //   uid: {
+            //     type: 'keyword',
+            //   },
+            //   username: {
+            //     type: 'text',
+            //     analyzer: analyzer,
+            //     search_analyzer: analyzer,
+            //   },
+            //   description: {
+            //     type: 'text',
+            //     analyzer: analyzer,
+            //     search_analyzer: searchAnalyzer,
+            //   },
+            //   pid: {
+            //     type: 'keyword',
+            //   },
+            //   toc: {
+            //     type: 'date',
+            //   },
+            //   title: {
+            //     type: 'text',
+            //     analyzer: analyzer,
+            //     search_analyzer: searchAnalyzer,
+            //   },
+            //   abstractCN: {
+            //     type: 'text',
+            //     analyzer: analyzer,
+            //     search_analyzer: searchAnalyzer,
+            //   },
+            //   abstractEN: {
+            //     type: 'text',
+            //     analyzer: analyzer,
+            //     search_analyzer: searchAnalyzer,
+            //   },
+            //   content: {
+            //     type: 'text',
+            //     analyzer: analyzer,
+            //     search_analyzer: searchAnalyzer,
+            //   },
+            //   mainForumsId: {
+            //     type: 'keyword',
+            //   },
+            //   tcId: {
+            //     type: 'keyword',
+            //   },
+            //   digest: {
+            //     type: 'boolean',
+            //   },
+            //   tid: {
+            //     type: 'keyword',
+            //   },
+            //   aid: {
+            //     type: 'keyword',
+            //   },
+            //   keywordsCN: {
+            //     type: 'keyword',
+            //   },
+            //   keywordsEN: {
+            //     type: 'keyword',
+            //   },
+            //   authors: {
+            //     type: 'keyword',
+            //   },
+            //   voteUp: {
+            //     type: 'long',
+            //   },
+            //   voteDown: {
+            //     type: 'long',
+            //   },
+            // },
             properties: {
-              docType: {
-                // 文档类型：thread， user， post，document_article， document_comment
-                type: 'keyword',
-              },
-              uid: {
-                type: 'keyword',
-              },
-              username: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-              },
-              description: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-              },
-              pid: {
-                type: 'keyword',
-              },
-              toc: {
-                type: 'date',
-              },
-              title: {
-                type: 'text',
-                analyzer: analyzer,
-                search_analyzer: searchAnalyzer,
-              },
               abstractCN: {
                 type: 'text',
                 analyzer: analyzer,
                 search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
               abstractEN: {
                 type: 'text',
                 analyzer: analyzer,
                 search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+              },
+              aid: {
+                type: 'text',
+                // analyzer: analyzer,
+                // search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+              },
+              authors: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
               content: {
                 type: 'text',
                 analyzer: analyzer,
                 search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
-              mainForumsId: {
-                type: 'keyword',
+              description: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
-              tcId: {
-                type: 'keyword',
-              },
-              digest: {
-                type: 'boolean',
-              },
-              tid: {
-                type: 'keyword',
-              },
-              aid: {
-                type: 'keyword',
+              digest: { type: 'boolean' },
+              docType: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
               keywordsCN: {
-                type: 'keyword',
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
               keywordsEN: {
-                type: 'keyword',
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
-              authors: {
-                type: 'keyword',
+              mainForumsId: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
-              voteUp: {
-                type: 'long',
+              pid: {
+                type: 'text',
+                // 文号不使用过滤分词的方法
+                // analyzer: analyzer,
+                // search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
-              voteDown: {
-                type: 'long',
+              tcId: { type: 'long' },
+              tid: {
+                type: 'text',
+                // analyzer: analyzer,
+                // search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
               },
+              title: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+              },
+              toc: { type: 'date' },
+              uid: {
+                type: 'text',
+                // analyzer: analyzer,
+                // search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+              },
+              username: {
+                type: 'text',
+                analyzer: analyzer,
+                search_analyzer: searchAnalyzer,
+                fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+              },
+              voteDown: { type: 'long' },
+              voteUp: { type: 'long' },
             },
           },
         },
       },
     });
+
+    //已有索引数据迁移
   }
 };
 

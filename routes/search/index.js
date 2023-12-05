@@ -127,10 +127,34 @@ router.get('/', async (ctx, next) => {
   if (c) {
     // 搜索结果
     results = await nkcModules.elasticSearch.search(t, c, options);
+    // 首先需要对关键词进行格式化处理，处理中间的空格,去重(一次性匹配的话可以不用),转义特殊字符
+    let keyWordArray = c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    keyWordArray = keyWordArray
+      .split(/\s+/)
+      .filter((item, index, self) => self.indexOf(item) === index && item);
+    const keyWordString = keyWordArray.join('|');
     // 总匹配数
     data.total = results.hits.total;
     results = results.hits.hits.map((r) => {
       const resource = r._source;
+      // 在内容中匹配到含有关键词的内容
+      const highlightKeys = Object.keys(r.highlight);
+      for (const key of highlightKeys) {
+        const textContentArray = [];
+        for (let textContent of r.highlight[key]) {
+          textContent = elasticSearch.replaceSearchResultHTMLLink(
+            textContent + '',
+          );
+          textContent = nkcModules.apiFunction.obtainPureText(textContent);
+          textContent = textContent.replace(
+            new RegExp(`${keyWordString}`, 'ig'),
+            (match) => `<span style="color: #e85a71;">${match}</span>`,
+          );
+          textContentArray.push(textContent);
+        }
+
+        r.highlight[key] = textContentArray;
+      }
       resource.highlight = r.highlight;
       return resource;
     });
@@ -159,7 +183,7 @@ router.get('/', async (ctx, next) => {
         targetUser = await db.UserModel.findOne({
           usernameLowerCase: c.toLowerCase(),
         });
-        uidToUser = await db.UserModel.findOne({ uid: parseInt(c) });
+        uidToUser = await db.UserModel.findOne({ uid: c });
       }
     }
     data.paging = nkcModules.apiFunction.paging(page, data.total, perpage);
