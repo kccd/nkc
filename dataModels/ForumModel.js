@@ -747,9 +747,144 @@ forumSchema.statics.updateForumsMessage = async() => {
             parents[fid].push(forum);
         }
     }
-    const children = forums.filter((forum) => !forum.childForums.length);
-    // 先更新最底层的专业，作为上层专业的信息来源，无需再查数据库
-    for (const c of children) {
+    // const children = forums.filter((forum) => !forum.childForums.length);
+    // // 先更新最底层的专业，作为上层专业的信息来源，无需再查数据库
+    // for (const c of children) {
+    //     const { fid } = c;
+    //     const countPosts = await PostModel.countDocuments({
+    //         type: 'post',
+    //         mainForumsId: fid,
+    //         parentPostId: '',
+    //     });
+    //     const countThreads = await PostModel.countDocuments({
+    //         type: 'thread',
+    //         mainForumsId: fid,
+    //     });
+    //     const digest = await ThreadModel.countDocuments({
+    //         mainForumsId: fid,
+    //         digest: true,
+    //     });
+    //     const tCount = {
+    //         digest,
+    //         normal: countThreads - digest,
+    //     };
+    //     const today = apiFunction.today();
+    //     const countPostsToday = await PostModel.countDocuments({
+    //         mainForumsId: fid,
+    //         toc: { $gte: today },
+    //         parentPostId: '',
+    //     });
+    //     await ForumModel.updateOne({ fid }, {
+    //         $set: {
+    //             tCount,
+    //             countPosts,
+    //             countThreads,
+    //             countPostsToday,
+    //         },
+    //     }, );
+    //     c.tCount = tCount;
+    //     c.countPosts = countPosts;
+    //     c.countThreads = countThreads;
+    //     c.countPostsToday = countPostsToday;
+    // }
+    // const _updatedForums = [];
+    // // 更新上层专业
+    // const func = async(parentsId = []) => {
+    //     for (const fid of parentsId) {
+    //         const forum = forumsObj[fid];
+    //         if (!forum || _updatedForums.includes(forum)) {
+    //             continue;
+    //         }
+    //         const _children = forum.childForums;
+    //         let tCount = {
+    //                 digest: 0,
+    //                 normal: 0,
+    //             },
+    //             countPosts = 0,
+    //             countThreads = 0,
+    //             countPostsToday = 0;
+    //         for (const f of _children) {
+    //             tCount.digest += f.tCount.digest;
+    //             tCount.normal += f.tCount.normal;
+    //             countPosts += f.countPosts;
+    //             countThreads += f.countThreads;
+    //             countPostsToday += f.countPostsToday;
+    //         }
+    //         await ForumModel.updateOne({ fid }, {
+    //             $set: {
+    //                 tCount,
+    //                 countPosts,
+    //                 countThreads,
+    //                 countPostsToday,
+    //             },
+    //         }, );
+    //         _updatedForums.push(forum);
+    //         await func(forum.parentsId);
+    //     }
+    // };
+    // for (const c of children) {
+    //     await func(c.parentsId);
+    // }
+    // 方案二 查找每个专业及其所有子专业后更新
+    // for (const c of forums) {
+    //     const { fid } = c;
+    //     //找出该专业的所有子专业
+    //     const childFids=[];
+    //     const getChildFids = (forum)=>{
+    //         childFids.push(forum.fid)
+    //         if(forum.childForums.length){
+    //             for(const childForum of forum.childForums){
+    //                 getChildFids(childForum);
+    //             }
+    //         }
+    //     }
+    //     getChildFids(c);
+    //     const countPosts = await PostModel.countDocuments({
+    //         type: 'post',
+    //         mainForumsId: {
+    //             $in: childFids,
+    //         },
+    //         parentPostId: '',
+    //     });
+    //     const countThreads = await PostModel.countDocuments({
+    //         type: 'thread',
+    //         mainForumsId: {
+    //             $in: childFids,
+    //         },
+    //     });
+    //     const digest = await ThreadModel.countDocuments({
+    //         mainForumsId: {
+    //             $in: childFids,
+    //         },
+    //         digest: true,
+    //     });
+    //     const tCount = {
+    //         digest,
+    //         normal: countThreads - digest,
+    //     };
+    //     const today = apiFunction.today();
+    //     const countPostsToday = await PostModel.countDocuments({
+    //         mainForumsId: {
+    //             $in: childFids,
+    //         },
+    //         toc: { $gte: today },
+    //         parentPostId: '',
+    //     });
+    //     await ForumModel.updateOne({ fid }, {
+    //         $set: {
+    //             tCount,
+    //             countPosts,
+    //             countThreads,
+    //             countPostsToday,
+    //         },
+    //     }, );
+    //     // c.tCount = tCount;
+    //     // c.countPosts = countPosts;
+    //     // c.countThreads = countThreads;
+    //     // c.countPostsToday = countPostsToday;
+    // }
+    // 方案三 先找出每个专业下的文章并更新最底层专业，后根据最底层专业类似回溯过程更新其父级、祖先级专业
+    for (const c of forums) {
         const { fid } = c;
         const countPosts = await PostModel.countDocuments({
             type: 'post',
@@ -774,7 +909,8 @@ forumSchema.statics.updateForumsMessage = async() => {
             toc: { $gte: today },
             parentPostId: '',
         });
-        await ForumModel.updateOne({ fid }, {
+        if(!c.childForums.length){
+            await ForumModel.updateOne({ fid }, {
             $set: {
                 tCount,
                 countPosts,
@@ -782,48 +918,40 @@ forumSchema.statics.updateForumsMessage = async() => {
                 countPostsToday,
             },
         }, );
+        }
         c.tCount = tCount;
         c.countPosts = countPosts;
         c.countThreads = countThreads;
         c.countPostsToday = countPostsToday;
     }
-    const _updatedForums = [];
-    // 更新上层专业
-    const func = async(parentsId = []) => {
-        for (const fid of parentsId) {
-            const forum = forumsObj[fid];
-            if (!forum || _updatedForums.includes(forum)) {
-                continue;
+    async function accumulateValues(obj) {
+        if (obj.childForums.length) {
+            for(const childForum of obj.childForums){
+                await accumulateValues(childForum);
+                obj.countPosts += childForum.countPosts || 0;
+                obj.countThreads += childForum.countThreads || 0;
+                obj.countPostsToday += childForum.countPostsToday || 0;
+                if (obj.tCount && childForum.tCount) {
+                  obj.tCount.digest += childForum.tCount.digest || 0;
+                  obj.tCount.normal += childForum.tCount.normal || 0;
+                }
+                const {fid,tCount,countPosts,countThreads,countPostsToday} = obj;
+                await ForumModel.updateOne({ fid }, {
+                    $set: {
+                        tCount,
+                        countPosts,
+                        countThreads,
+                        countPostsToday,
+                    },
+                }, );
             }
-            const _children = forum.childForums;
-            let tCount = {
-                    digest: 0,
-                    normal: 0,
-                },
-                countPosts = 0,
-                countThreads = 0,
-                countPostsToday = 0;
-            for (const f of _children) {
-                tCount.digest += f.tCount.digest;
-                tCount.normal += f.tCount.normal;
-                countPosts += f.countPosts;
-                countThreads += f.countThreads;
-                countPostsToday += f.countPostsToday;
-            }
-            await ForumModel.updateOne({ fid }, {
-                $set: {
-                    tCount,
-                    countPosts,
-                    countThreads,
-                    countPostsToday,
-                },
-            }, );
-            _updatedForums.push(forum);
-            await func(forum.parentsId);
         }
-    };
-    for (const c of children) {
-        await func(c.parentsId);
+      }
+      
+    // 顶级专业从最低层专业累加
+    const tempParents = forums.filter((forum) => !forum.parentsId.length);
+    for (const c of tempParents) {
+        await accumulateValues(c);
     }
 };
 
@@ -1970,15 +2098,21 @@ forumSchema.methods.saveLatestThreadToRedisAsync = async function(count) {
 };
 forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
     const fid = this.fid;
+    const ForumModel = mongoose.model('forums');
     const ThreadModel = mongoose.model('threads');
     const nkcRender = require('../nkcModules/nkcRender');
     const PostModel = mongoose.model('posts');
     const UserModel = mongoose.model('users');
+    const childFids = await ForumModel.getAllChildrenFid(fid);
+    childFids.push(fid);
     const threads = await ThreadModel.find({
             disabled: false,
             reviewed: true,
             recycleMark: { $ne: true },
-            mainForumsId: fid,
+            // mainForumsId: fid,
+            mainForumsId: {
+                $in: childFids,
+            },
         }, {
             tid: 1,
             oc: 1,
@@ -3103,6 +3237,18 @@ forumSchema.statics.getUserCategoriesWithForums = async(props) => {
             userGrade,
             user,
         );
+        // 存在三级专业（第一级分类不算）时，查找最新文章并去除三级及其子专业数据
+        for (let categoryForum of forumsTree) {
+                if (categoryForum.childrenForums && categoryForum.childrenForums.length > 0) {
+                    for (const forum of categoryForum.childrenForums) {
+                      if (forum.childrenForums && forum.childrenForums.length > 0) {
+                        const latestThreads = await ForumModel.getLatestThreadsFromRedis(forum.fid);
+                        forum.latestThreads = latestThreads
+                        forum.childrenForums=[];
+                      }
+                    }
+                  }
+          }
     } else {
         forumsTree = await ForumModel.getForumsTree(userRoles, userGrade, user);
     }
