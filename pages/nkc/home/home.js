@@ -36,6 +36,8 @@ const app = new Vue({
     originalThreadDisplayMode: data.originalThreadDisplayMode,
     // 是否在首页显示“活动”入口
     showActivityEnter: data.showActivityEnter ? 'show' : 'hidden',
+    showHomeForums: data.showHomeForums ? 'show' : 'hidden',
+    showHomeWebApply: data.showHomeWebApply ? 'show' : 'hidden',
     updating: false,
     columnUpdating: false,
     columnListPosition: data.columnListPosition,
@@ -398,6 +400,28 @@ const app = new Vue({
       let value = this.showActivityEnter === 'show';
       nkcAPI('/nkc/home/showActivityEnter', 'PUT', {
         showActivityEnter: value,
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+    saveShowHomeForums() {
+      let value = this.showHomeForums === 'show';
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveShowHomeForums',
+        showHomeForums: value,
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+    saveShowHomeWebApply() {
+      let value = this.showHomeWebApply === 'show';
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveShowHomeWebApply',
+        showHomeWebApply: value,
       })
         .then(() => {
           sweetSuccess('保存成功');
