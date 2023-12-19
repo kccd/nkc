@@ -2839,7 +2839,7 @@ threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
       );
     }
     results = automaticallySelectedThreads.slice(0, count);
-  } else {
+  } else if (displayType === 'all') {
     // 根据比例从手动和自动推荐文章中选取
     const automaticCount = Math.round(
       (count * automaticProportion) / (automaticProportion + 1),

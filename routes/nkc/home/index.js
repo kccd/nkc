@@ -201,6 +201,8 @@ router
     data.columnCount = homeSettings.columnCount;
     data.columnListSort = homeSettings.columnListSort;
     data.columnPool = homeSettings.columnPool;
+    data.showHomeForums = homeSettings.showHomeForums;
+    data.showHomeWebApply = homeSettings.showHomeWebApply;
     ctx.template = 'nkc/home/home.pug';
     await next();
   })
@@ -262,7 +264,9 @@ router
       if (!['fixed', 'movable'].includes(type)) {
         ctx.throw(500, `数据类型错误 type: ${type}`);
       }
-      if (!['manual', 'automatic', 'all'].includes(options.displayType)) {
+      if (
+        !['manual', 'automatic', 'all', 'null'].includes(options.displayType)
+      ) {
         ctx.throw(400, '请选择显示类型');
       }
       if (!['fixed', 'random'].includes(options.order)) {
@@ -497,6 +501,26 @@ router
         {
           $set: {
             'c.originalThreadDisplayMode': originalThreadDisplayMode,
+          },
+        },
+      );
+    } else if (operation === 'saveShowHomeForums') {
+      let { showHomeForums } = body;
+      await db.SettingModel.updateOne(
+        { _id: 'home' },
+        {
+          $set: {
+            'c.showHomeForums': showHomeForums,
+          },
+        },
+      );
+    } else if (operation === 'saveShowHomeWebApply') {
+      let { showHomeWebApply } = body;
+      await db.SettingModel.updateOne(
+        { _id: 'home' },
+        {
+          $set: {
+            'c.showHomeWebApply': showHomeWebApply,
           },
         },
       );

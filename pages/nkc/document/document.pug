@@ -64,7 +64,7 @@ block nkcContent
 
               if document.source === 'moment'
                 if permission('managementMoment')
-                  if document.status === 'deleted'
+                  if document.status === 'deleted' || document.status === 'disabled'
                     button.btn-xs.btn.btn-success(onclick=`recoveryMoment('${document.momentInfo.momentId}')`) 恢复
                   else if document.status === 'normal'
                     button.btn-xs.btn.btn-danger(onclick=`deleteMoment('${document.momentInfo.momentId}')`) 删除

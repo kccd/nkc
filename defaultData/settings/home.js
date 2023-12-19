@@ -100,6 +100,8 @@ module.exports = {
     originalThreadDisplayMode: 'simple', // 首页上“最新原创”板块文章的显示方式， “simple” 简略显示， “full” 完整显示
     subscribesDisplayMode: 'row', // 首页上“关注的专业”板块的显示方式，  “row” 横排， “column” 竖排
     showActivityEnter: true, // 显示活动入口
+    showHomeForums: true, // 显示社区导航模块
+    showHomeWebApply: true, // 显示网站应用模块
     latestToppedThreadsId: [],
     communityToppedThreadsId: [],
     columnListPosition: 'side', // 专栏显示位置 main: 中间, side: 侧边, null: 不显示

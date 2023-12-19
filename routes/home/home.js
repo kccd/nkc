@@ -73,12 +73,15 @@ module.exports = async (options) => {
     }
     forumsObj[categoryId].push(f);
   });
-  data.categoryForums = await db.ForumModel.getUserCategoriesWithForums({
-    user: data.user,
-    userRoles: data.userRoles,
-    userGrade: data.userGrade,
-    limitLevel: true,
-  });
+  // 社区导航/专业列表
+  if (homeSettings.showHomeForums) {
+    data.categoryForums = await db.ForumModel.getUserCategoriesWithForums({
+      user: data.user,
+      userRoles: data.userRoles,
+      userGrade: data.userGrade,
+      limitLevel: true,
+    });
+  }
 
   // 置顶专栏
   // data.toppedColumns = await db.ColumnModel.getHomeToppedColumns();
@@ -89,6 +92,11 @@ module.exports = async (options) => {
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
   data.columnListPosition = homeSettings.columnListPosition;
+  // 推荐文章的轮播图和固定图的设置
+  data.recommendThreadsDisplay = {
+    fixedDisplay: homeSettings.recommendThreads.fixed.displayType,
+    movableDisplay: homeSettings.recommendThreads.movable.displayType,
+  };
   // 是否有权限开办专业
   data.hasPermissionOpenNewForum =
     await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
