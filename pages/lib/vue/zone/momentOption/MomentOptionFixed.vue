@@ -32,6 +32,9 @@
         .option(v-if="options.visitHistory" @click="visitHistory")
           .fa.fa-history
           span 历史
+        .option(v-if='options.ipInfo' @click='displayIpInfo')
+          .fa.fa-map-marker
+          span 查看IP
         .option(v-if='options.blacklist !== null' @click='userBlacklist')
           .fa.fa-ban
           span(v-if='options.blacklist === false') 加入黑名单

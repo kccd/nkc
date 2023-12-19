@@ -5,7 +5,7 @@ router.get('/', async (ctx, next) => {
   const { mid } = params;
   const { user } = data;
   const { uid } = state;
-  const { normal, deleted } = await db.MomentModel.getMomentStatus();
+  const { normal, deleted, disabled } = await db.MomentModel.getMomentStatus();
   const moment = await db.MomentModel.findOnly({ _id: mid });
   if (!moment) {
     ctx.throw(400, '未找到动态，请刷新');
@@ -46,12 +46,15 @@ router.get('/', async (ctx, next) => {
     visibleMoment: null,
     editorMoment: null,
     visitHistory: null,
+    ipInfo: null,
   };
   if (user) {
     //审核权限
     if (permission('review')) {
       optionStatus.reviewed = moment.status;
-      optionStatus.disable = true;
+      if (moment.status !== disabled) {
+        optionStatus.disable = true;
+      }
     }
     if (isAuthor && moment.status !== deleted) {
       optionStatus.delete = true;
@@ -90,6 +93,9 @@ router.get('/', async (ctx, next) => {
           Operations.visitOtherUserZoneMomentHistory,
         );
       }
+    }
+    if (permission('ipinfo')) {
+      optionStatus.ipInfo = true;
     }
   }
   const stableDocument = await db.DocumentModel.getStableDocumentBySource(

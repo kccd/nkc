@@ -404,7 +404,7 @@ schema.statics.getHomeBlockData = async (props) => {
     fidOfCanGetThreads = [],
     showDisabledBlock = false
   } = props;
-  let {showShopGoods} = await SettingModel.getSettings('home');
+  let {showShopGoods,showHomeWebApply} = await SettingModel.getSettings('home');
   const {movable, fixed} = await ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
   const match = {};
   if(!showDisabledBlock) {
@@ -422,11 +422,14 @@ schema.statics.getHomeBlockData = async (props) => {
     management: await SettingModel.getManagementData(user),
     goods: [],
     forums: [],
-    webApply: await SettingModel.getAppsData(),
+    webApply: [],
   };
   // 热销商品
   if(showShopGoods) {
     defaultData.goods = await ShopGoodsModel.getHomeGoods();
+  }
+  if(showHomeWebApply){
+    defaultData.webApply = await SettingModel.getAppsData();
   }
   const homeBlocksData = {
     left: [],

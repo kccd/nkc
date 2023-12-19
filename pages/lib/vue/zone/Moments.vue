@@ -9,13 +9,15 @@
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
     moment-status(ref="momentStatus" :permissions="permissions")
-    .moment-latest-container(:key="latestMoment.momentId" v-for="latestMoment in latestData")
+    // 最新电文列表
+    //.moment-latest-container(:key="latestMoment.momentId" v-for="latestMoment in latestData")
       moment(
           :data="latestMoment"
+          @complaint="complaint"
           :permissions="permissions"
         )
-    .moment-divider(v-if="latestData.length>0") 以上是新内容
-    .moment-container(:key="momentData.momentId" v-for="momentData in moments" v-if="!momentData.quoteData || momentData.quoteData.data.status!=='permission'")
+    //.moment-divider(v-if="latestData.length>0") 以上是新内容
+    .moment-container(:key="momentData.momentId" v-for="momentData in moments" v-if="!momentData.quoteData || !momentData.quoteData.data || !momentData.quoteData.data.status || momentData.quoteData.data.status!=='permission'")
       moment(
         :data="momentData"
         @complaint="complaint"

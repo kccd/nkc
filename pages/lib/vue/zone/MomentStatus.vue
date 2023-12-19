@@ -34,6 +34,9 @@
   .disabled {
     background: #8f8f8f;
   }
+  .deleted {
+    background: #e85a71;
+  }
 }
 </style>
 

@@ -26,35 +26,37 @@ mixin renderHome(homeBlock, options)
           button.btn-warning.btn.btn-xs(onclick=`disabledHomeBlock('${homeBlock._id}', ${!homeBlock.disabled})`)=homeBlock.disabled? '恢复': '屏蔽'
   if homeBlock._id === 'recommendThreadsMovable'
     //轮播图
-    .home-forums-list.m-b-1.home-covers-movable-container(id=`block_${homeBlock._id}`).p-a-0
-      .p-l-1.p-r-1
-        +homeBlockHeader(true, false)
-      .home-swiper.home-covers-md.home-covers-movable
-        .swiper-container.swiper-home
-          .swiper-wrapper
-            for thread in homeBlock.data
-              a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
-              })
-                .swiper-title= `${thread.title}`
-          .swiper-pagination
-          .swiper-button-next.swiper-button(style='background-image: none;')
-            .fa.fa-angle-right
-          .swiper-button-prev.swiper-button(style='background-image: none;')
-            .fa.fa-angle-left
+    if data.recommendThreadsDisplay.movableDisplay!=='null'
+      .home-forums-list.m-b-1.home-covers-movable-container(id=`block_${homeBlock._id}`).p-a-0
+        .p-l-1.p-r-1
+          +homeBlockHeader(true, false)
+        .home-swiper.home-covers-md.home-covers-movable
+          .swiper-container.swiper-home
+            .swiper-wrapper
+              for thread in homeBlock.data
+                a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                  'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
+                })
+                  .swiper-title= `${thread.title}`
+            .swiper-pagination
+            .swiper-button-next.swiper-button(style='background-image: none;')
+              .fa.fa-angle-right
+            .swiper-button-prev.swiper-button(style='background-image: none;')
+              .fa.fa-angle-left
   else if homeBlock._id === 'recommendThreadsFixed'
     //右侧小图
-    .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
-      .p-l-1.p-r-1
-        +homeBlockHeader(true, false)
-      .home-swiper.home-covers-sm
-        for thread, index in homeBlock.data
-          .home-cover-sm
-            a(href=`/t/${thread.tid}` target="_blank" title=thread.title
-              class=index > 2 ? 'm-b-0' : ''
-            )
-              .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
-              .home-covers-sm-title=thread.title
+    if data.recommendThreadsDisplay.fixedDisplay!=='null'
+      .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0
+        .p-l-1.p-r-1
+          +homeBlockHeader(true, false)
+        .home-swiper.home-covers-sm
+          for thread, index in homeBlock.data
+            .home-cover-sm
+              a(href=`/t/${thread.tid}` target="_blank" title=thread.title
+                class=index > 2 ? 'm-b-0' : ''
+              )
+                .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+                .home-covers-sm-title=thread.title
   else if homeBlock._id === 'toppedThreads'
     //首页顶置
     if homeBlock.data.length
@@ -117,7 +119,7 @@ mixin renderHome(homeBlock, options)
               span=f.displayName
   else if homeBlock._id === 'hotColumns'
     //热门专栏
-    if homeBlock.data.length > 0
+    if homeBlock.data.length > 0 && data.columnListPosition!=='null'
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
         +homeBlockHeader(false, false)
         .home-columns
@@ -165,31 +167,32 @@ mixin renderHome(homeBlock, options)
             -var klass = index === homeBlock.data.length - 1 ? 'm-b-0' : ''
             +columnPanel(column, klass)
   else if homeBlock._id === 'forums'
-    .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
-      +homeBlockHeader(false, false)
-      .home-forums
-        for cf in data.categoryForums
-          .m-b-1.category-forums
-            .home-forums-parent-name=cf.name
-            for f in cf.forums
-              .home-forums-brief
-                a.home-forums-parent(href=`/f/${f.fid}`
-                  data-global-mouseover="showForumPanel"
-                  data-global-mouseout="hideForumPanel"
-                  data-global-data=objToStr({fid: f.fid})
-                )=f.displayName
-                if f.childrenForums && f.childrenForums.length
-                  span ：
-                  for cf, index in f.childrenForums
-                    if index !== 0
-                      span |
-                    a.home-forums-child(href=`/f/${cf.fid}`
-                      data-global-mouseover="showForumPanel"
-                      data-global-mouseout="hideForumPanel"
-                      data-global-data=objToStr({fid: cf.fid})
-                      style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
-                      if cf.countPostsToday && cf.countPostsToday > 0
-                        sup=cf.countPostsToday
+    if data.categoryForums
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        .home-forums
+          for cf in data.categoryForums
+            .m-b-1.category-forums
+              .home-forums-parent-name=cf.name
+              for f in cf.forums
+                .home-forums-brief
+                  a.home-forums-parent(href=`/f/${f.fid}`
+                    data-global-mouseover="showForumPanel"
+                    data-global-mouseout="hideForumPanel"
+                    data-global-data=objToStr({fid: f.fid})
+                  )=f.displayName
+                  if f.childrenForums && f.childrenForums.length
+                    span ：
+                    for cf, index in f.childrenForums
+                      if index !== 0
+                        span |
+                      a.home-forums-child(href=`/f/${cf.fid}`
+                        data-global-mouseover="showForumPanel"
+                        data-global-mouseout="hideForumPanel"
+                        data-global-data=objToStr({fid: cf.fid})
+                        style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
+                        if cf.countPostsToday && cf.countPostsToday > 0
+                          sup=cf.countPostsToday
   else if homeBlock._id === 'management'
     if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
       .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
@@ -197,10 +200,11 @@ mixin renderHome(homeBlock, options)
         include ../publicModules/management/management
         +managementPanel(homeBlock.data, {hidePanelHeader: true})
   else if homeBlock._id === 'webApply'
-    .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
-      +homeBlockHeader(false, false)
-      include  ../publicModules/apps/apps
-      +appsPanel(homeBlock.data, {hidePanelHeader: true})
+    if homeBlock.data.length
+      .bg-color-ffffff.home-forums-list.m-b-1(id=`block_${homeBlock._id}`)
+        +homeBlockHeader(false, false)
+        include  ../publicModules/apps/apps
+        +appsPanel(homeBlock.data, {hidePanelHeader: true})
   else
     -var bgColor = homeBlock.blockStyle.backgroundColor || '#fff';
     .home-forums-list.m-b-1(

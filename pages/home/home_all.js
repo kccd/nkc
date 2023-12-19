@@ -21,12 +21,15 @@ $(function () {
       disableOnInteraction: false,
     },
   });
-  swiper.el.onmouseover = function () {
-    swiper.autoplay.stop();
-  };
-  swiper.el.onmouseleave = function () {
-    swiper.autoplay.start();
-  };
+  // 没有轮播图时不需要绑定方法
+  if (typeof swiper.el !== 'string') {
+    swiper.el.onmouseover = function () {
+      swiper.autoplay.stop();
+    };
+    swiper.el.onmouseleave = function () {
+      swiper.autoplay.start();
+    };
+  } 
   // 监听页面滚动 更改header样式
   $(window).scroll(function (event) {
     const scrollTop = $(window).scrollTop();

@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({toppedColumns: data.toppedColumns, poolColumns: data.poolColumns, columnPool: data.columnPool, columnListSort: data.columnListSort, columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
+  #data.hidden=objToStr({toppedColumns: data.toppedColumns, poolColumns: data.poolColumns, columnPool: data.columnPool, columnListSort: data.columnListSort, columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter, showHomeForums: data.showHomeForums, showHomeWebApply: data.showHomeWebApply})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -25,9 +25,12 @@ block nkcContent
                 label.m-r-1
                   input(type='radio' value='automatic' v-model='recommendThreads[page.id].displayType')
                   span 自动
-                label
+                label.m-r-1
                   input(type='radio' value='all' v-model='recommendThreads[page.id].displayType')
                   span 半自动
+                label
+                  input(type='radio' value='null' v-model='recommendThreads[page.id].displayType')
+                  span 不显示
           .form-group
             label.col-sm-3.control-label 显示顺序
             .col-sm-9
@@ -38,7 +41,7 @@ block nkcContent
                 label
                   input(type='radio' value='fixed' v-model='recommendThreads[page.id].order')
                   span 正序
-          span(v-if='recommendThreads[page.id].displayType !== "manual"')
+          span(v-if='recommendThreads[page.id].displayType === "automatic" || recommendThreads[page.id].displayType === "all"')
             .form-group.form-inline(v-if='recommendThreads[page.id].displayType === "all"')
               label.col-sm-3.control-label 比例（自动/手动）
               .col-sm-9
@@ -126,9 +129,9 @@ block nkcContent
                 .cover-container
                   .cover
                     img(:src="getUrl('recommendThreadCover', t.cover)")
-        div(v-if='recommendThreads[page.id].displayType !== "automatic"')
+        div(v-if='recommendThreads[page.id].displayType !== "automatic" && recommendThreads[page.id].displayType !== "null"')
           +threadList({name: '手动推荐', listName: 'manuallySelectedThreads'})
-        div(v-if='recommendThreads[page.id].displayType !== "manual"')
+        div(v-if='recommendThreads[page.id].displayType !== "manual" && recommendThreads[page.id].displayType !== "null"')
           +threadList({name: '自动推荐', listName: 'automaticallySelectedThreads'})
         .m-t-1
           button.btn.btn-primary(@click='saveRecommendThreads') 保存
@@ -351,6 +354,30 @@ block nkcContent
             span 完整显示
         .m-t-1
           button.management-button(@click="saveOriginalThreadDisplayMode") 保存
+      div.m-t-2
+        .management-header 社区导航
+        .radio
+          span 是否在首页显示：
+          label.m-r-1
+            input(type="radio" value="show" v-model="showHomeForums")
+            span 显示
+          label.m-r-1
+            input(type="radio" value="hidden" v-model="showHomeForums")
+            span 不显示
+        .m-t-1
+          button.management-button(@click="saveShowHomeForums") 保存
+      div.m-t-2
+        .management-header 网站应用
+        .radio
+          span 是否在首页显示：
+          label.m-r-1
+            input(type="radio" value="show" v-model="showHomeWebApply")
+            span 显示
+          label.m-r-1
+            input(type="radio" value="hidden" v-model="showHomeWebApply")
+            span 不显示
+        .m-t-1
+          button.management-button(@click="saveShowHomeWebApply") 保存
       div.m-t-2
         .management-header 活动
         .radio
