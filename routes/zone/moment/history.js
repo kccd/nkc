@@ -17,7 +17,7 @@ router.get('/', async (ctx, next) => {
   );
   if (
     state.uid !== moment.uid &&
-    ctx.permission(Operations.visitOtherUserZoneMomentHistory)
+    !ctx.permission(Operations.visitOtherUserZoneMomentHistory)
   ) {
     ctx.throw(403, '权限不足');
   }

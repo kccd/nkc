@@ -834,6 +834,10 @@
       //显示是否加载更多
       showLoadMore(){
         this.$nextTick(()=>{
+          if(!this.$refs.momentDetails){
+            // 详情页面没有ref('momentDetails')
+            return;
+          }
           const momentDetailsHeight = this.$refs.momentDetails.clientHeight
           const momentDetailsContentHeight = this.$refs.momentDetailsContent.getBoundingClientRect().height
           this.isFold = momentDetailsContentHeight > momentDetailsHeight;

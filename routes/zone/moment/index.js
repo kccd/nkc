@@ -5,11 +5,30 @@ const voteRouter = require('./vote');
 const historyRouter = require('./history');
 router
   .use('/:mid', async (ctx, next) => {
-    const { internalData, db, params } = ctx;
+    const { internalData, db, params, state, permission } = ctx;
     const { mid } = params;
     internalData.moment = await db.MomentModel.findOne({ _id: mid });
     if (!internalData.moment) {
       ctx.throw(404, `动态 ID 错误 momentId=${mid}`);
+    }
+    const { uid, status } = internalData.moment;
+    //正常、删除电文状态
+    const { normal: normalMomentStatus, deleted: deleteMomentStatus } =
+      await db.MomentModel.getMomentStatus();
+    if (
+      uid === state.uid &&
+      status === deleteMomentStatus &&
+      !permission('review')
+    ) {
+      // 动态主，动态已删除
+      ctx.throw(403, `动态已删除，您无权查看此动态`);
+    } else if (
+      uid !== state.uid &&
+      status !== normalMomentStatus &&
+      !permission('review')
+    ) {
+      // 查看其他人的动态，动态需为正常状态
+      ctx.throw(403, `此动态状态异常，您无权查看此动态`);
     }
     await next();
   })

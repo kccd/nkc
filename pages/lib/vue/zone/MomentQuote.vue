@@ -60,7 +60,7 @@
     from-now(:time="threadHeaderInfo.toc")
     |）
 
-  .moment-quote-permission(v-if="quoteData.data.quoteData && quoteData.data.quoteData.data.status==='permission'" ) 根据相关法律法规和政策，内容不予显示。
+  .moment-quote-permission(v-if="quoteData.data && quoteData.data.quoteData && quoteData.data.quoteData.data && quoteData.data.quoteData.data.status && quoteData.data.quoteData.data.status==='permission'" ) 根据相关法律法规和政策，内容不予显示。
   div(v-else)
     .moment-quote-lost(v-if="!quoteData.data")
       .fa.fa-exclamation-circle

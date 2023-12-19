@@ -17,7 +17,7 @@ router.get('/', async (ctx, next) => {
   if (!document) {
     return ctx.throw(404, '未找到文章，请刷新后重试');
   }
-  if (!permission('review')) {
+  if (!permission('ipinfo')) {
     ctx.throw(401, '权限不足');
   }
   let ip = document.ip;

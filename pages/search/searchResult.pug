@@ -168,7 +168,7 @@
       .search-result-time
         +fromNow(result.documentTime)
       if result.source === 'column'
-        span 发表于专栏
+        span 专栏文章
         a.clear-a-style.search-result-forum(href=result.column.homeUrl target="_blank")=result.column.name
       else if result.source === 'zone'
         span 电波长电文

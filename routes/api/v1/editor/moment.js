@@ -278,11 +278,21 @@ router
       stable: stableDocumentTypes,
       stableHistory: stableHistoryDocumentTypes,
     } = await db.DocumentModel.getDocumentTypes();
+    //正常电文状态
+    const { normal: normalMomentStatus } =
+      await db.MomentModel.getMomentStatus();
     //获取现在的moment
-    const moment = await db.MomentModel.findOnly({ _id: mid }, { did: 1 });
+    const moment = await db.MomentModel.findOnly(
+      { _id: mid },
+      { did: 1, status: 1 },
+    );
     //如何没有找到 moment--后期需要抛出错误
     if (!moment) {
-      return await next();
+      return ctx.throw(404, '未找到电文，请刷新后重试');
+    }
+    // 对于已经屏蔽、删除等不正常的电文暂不支持回滚
+    if (moment.status !== normalMomentStatus) {
+      return ctx.throw(403, '电文状态有误，请确认后重试');
     }
     //将原来的正式版本变为历史版本
     await db.DocumentModel.updateOne(
