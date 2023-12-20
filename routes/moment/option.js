@@ -94,7 +94,7 @@ router.get('/', async (ctx, next) => {
         );
       }
     }
-    if (permission('ipinfo')) {
+    if (permission(Operations.getMomentIpInfo)) {
       optionStatus.ipInfo = true;
     }
   }

@@ -782,6 +782,9 @@
       },
       //打开其他操作
       openOption(e) {
+        if(!this.logged){
+          return window.RootApp.openLoginPanel();
+        }
         const target = e.target;
         const init = $(target).attr('data-init');
         if(init === 'true') return;
