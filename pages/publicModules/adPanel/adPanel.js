@@ -20,10 +20,13 @@ window.onload = () => {
       disableOnInteraction: false,
     },
   });
-  swiper.el.onmouseover = function () {
-    swiper.autoplay.stop();
-  };
-  swiper.el.onmouseleave = function () {
-    swiper.autoplay.start();
-  };
+  // 没有首页轮播图时不需要绑定方法
+  if (typeof swiper.el !== 'string') {
+    swiper.el.onmouseover = function () {
+      swiper.autoplay.stop();
+    };
+    swiper.el.onmouseleave = function () {
+      swiper.autoplay.start();
+    };
+  }
 };
