@@ -219,8 +219,10 @@ router
       usersObj[u.uid] = u;
     }
     data.voteUpUsers = [];
-    for (const v of voteUp) {
-      data.voteUpUsers.push(usersObj[v.uid]);
+    if (state.uid) {
+      for (const v of voteUp) {
+        data.voteUpUsers.push(usersObj[v.uid]);
+      }
     }
 
     if (!data.post.anonymous) {
