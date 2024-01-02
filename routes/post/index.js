@@ -47,8 +47,48 @@ router
     const { nkcModules, data, db, query, state } = ctx;
     const { token, page = 0, highlight, redirect } = query;
     const { pid } = ctx.params;
+    const { pageSettings } = state;
     data.highlight = highlight;
     data.page = page;
+    // 访问长电文相关（D+文号）
+    if (/^D(\d+)$/.test(pid)) {
+      const Pid = pid.replace(/^D/, '');
+      const { normal } = await db.DocumentModel.getDocumentStatus();
+      const { stable } = await db.DocumentModel.getDocumentTypes();
+      const { article, comment } = await db.DocumentModel.getDocumentSources();
+      const document = await db.DocumentModel.findOnly(
+        {
+          did: Pid,
+          status: normal,
+          type: stable,
+        },
+        {
+          source: 1,
+          sid: 1,
+        },
+      );
+      // 查询是长电文还是长电文的回复
+      if (document.source === article) {
+        return ctx.redirect(`/z/a/${document.sid}`);
+      }
+      if (document.source === comment) {
+        const singleComment = await db.CommentModel.findOne({
+          _id: document.sid,
+          status: normal,
+        });
+        const page = Math.floor(
+          (singleComment.order - 1) / pageSettings.homeThreadList,
+        );
+        const { sid } = await db.ArticlePostModel.findOne({
+          _id: singleComment.sid,
+        });
+        if (sid) {
+          return ctx.redirect(
+            `/z/a/${sid}?page=${page}&highlight=${document.sid}#highlight`,
+          );
+        }
+      }
+    }
     const post = await db.PostModel.findOnly({ pid });
     if (redirect === 'true') {
       const url = await db.PostModel.getUrl(post.pid, true);
