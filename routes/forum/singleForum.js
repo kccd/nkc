@@ -716,6 +716,13 @@ router
       data.founderList = list;
     }
 
+    // 统一过滤参数信息
+    const forumRouteMessage = {
+      d: data.d,
+      s: data.s,
+      cat: data.cat,
+    };
+    data.forumRouteMessage = JSON.parse(JSON.stringify(forumRouteMessage));
     await next();
   })
   .use('/card', cardRouter.routes(), cardRouter.allowedMethods())
