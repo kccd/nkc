@@ -541,7 +541,7 @@ router
     await next();
   })
   .get(['/', '/library'], async (ctx, next) => {
-    const { data, db, query, state, params } = ctx;
+    const { data, db, query, state } = ctx;
     const { pageSettings, uid } = state;
     const { forum } = data;
     const recycleId = await db.SettingModel.getRecycleId();
@@ -716,38 +716,13 @@ router
       data.founderList = list;
     }
 
-    // 统一筛选分页信息
-    const forumRouteMessage = {};
-    // 全部、精选、我的
-    forumRouteMessage.all = `/f/${params.fid}?`;
-    forumRouteMessage.digest = `/f/${params.fid}?d=featured&`;
-    forumRouteMessage.personal = `/f/${params.fid}?d=personal&`;
-    // 复序、帖序
-    forumRouteMessage.tlm = `&s=tlm`;
-    forumRouteMessage.toc = `&s=toc`;
-    // 分页参数
-    forumRouteMessage.query = '';
-    if (data.d) {
-      forumRouteMessage.tlm += `&d=${data.d}`;
-      forumRouteMessage.toc += `&d=${data.d}`;
-      forumRouteMessage.query += `&d=${data.d}`;
-    }
-    if (data.s) {
-      forumRouteMessage.all += `s=${data.s}&`;
-      forumRouteMessage.digest += `s=${data.s}&`;
-      forumRouteMessage.personal += `s=${data.s}&`;
-      forumRouteMessage.query += `&s=${data.s}`;
-    }
-    // 分类
-    if (data.cat) {
-      forumRouteMessage.all += `cat=${data.cat}&`;
-      forumRouteMessage.digest += `cat=${data.cat}&`;
-      forumRouteMessage.personal += `cat=${data.cat}&`;
-      forumRouteMessage.tlm += `&cat=${data.cat}`;
-      forumRouteMessage.toc += `&cat=${data.cat}`;
-      forumRouteMessage.query += `&cat=${data.cat}`;
-    }
-    data.forumRouteMessage = forumRouteMessage;
+    // 统一过滤参数信息
+    const forumRouteMessage = {
+      d: data.d,
+      s: data.s,
+      cat: data.cat,
+    };
+    data.forumRouteMessage = JSON.parse(JSON.stringify(forumRouteMessage));
     await next();
   })
   .use('/card', cardRouter.routes(), cardRouter.allowedMethods())

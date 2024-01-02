@@ -1,59 +1,38 @@
--var paging = data.paging || {};
--var page = paging.page || 0;
--var pageCount = paging.pageCount || 1;
--var min, max;
--var forumRouteMessage = data.forumRouteMessage || {};
-if showPagingDigestButton
+mixin renderDigestButton(routeObject,queryKey,user,remoteUrl)
+  -var query = '';
+  each value, key in routeObject
+    if key === queryKey
+      -continue;
+    -query +=`${key}=${value}&`; 
   .paging-button
-    a.radius-left.button(href=`${forumRouteMessage.all}` class=!data.d?"active": "" data-type="reload") 全部
-    - var klass = data.d === 'featured' ? "active" : ""
-    if !data.user
-      -klass += ' radius-right'
-    a.button(href=`${forumRouteMessage.digest}` class=klass data-type="reload") 精选
-    if data.user
-      a.radius-right.button(href=`${forumRouteMessage.personal}` class=data.d === 'personal' ? "active" : "" data-type="reload") 我的
-if showPagingSortButton
+    a.radius-left.button(href=`${remoteUrl}?${query}` class=!routeObject.d?"active": "" data-type="reload") 全部
+    if user
+      a.button(href=`${remoteUrl}?${queryKey}=featured&${query}` class=routeObject.d==='featured'?"active": "" data-type="reload") 精选
+      a.radius-right.button(href=`${remoteUrl}?${queryKey}=personal&${query}` class=routeObject.d=== 'personal' ? "active" : "" data-type="reload") 我的
+    else 
+      a.radius-right.button(href=`${remoteUrl}?${queryKey}=featured&${query}` class=routeObject.d==='featured'?"active": "" data-type="reload") 精选
+
+mixin renderLatestButton(routeObject,queryKey,remoteUrl)
+  -var query = '';
+  each value, key in routeObject
+    if key === queryKey
+      -continue;
+    -query +=`${key}=${value}&`; 
   .paging-button
-    a.radius-left.button(href=`?page=${page}${forumRouteMessage.tlm }` class=data.s!=='toc'? "active": '' data-type="reload") 复序
-    a.radius-right.button(href=`?page=${page}${forumRouteMessage.toc }` class=data.s==="toc"?" active": "" data-type="reload") 帖序
-if pageCount > 1
-  -let reduce1 = page-3;
-  -let reduce2 =  page+3;
-  if(reduce1 > 0)
-    if(reduce2 > pageCount)
-      -max = pageCount;
-      if(reduce1-(reduce2 - pageCount) < 0)
-        -min = 0;
-      else
-        -min = reduce1-(reduce2 - pageCount);
-    else
-      -max = reduce2;
-      -min = reduce1;
-  else
-    -min = 0;
-    if(reduce2 < pageCount)
-      if(pageCount < reduce2 - reduce1)
-        -max = pageCount;
-      else
-        -max = reduce2-reduce1;
-    else
-      -max = pageCount - 1;
-  nav(aria-label='navigation').paging-nav
-    ul(style='margin: 0')
-      if min !== 0
-        li
-          a(href=`${remoteState.url}?page=${0}${forumRouteMessage.query}` data-type="reload") 1
-        if min > 1
-          li ...
-      -for(let i = 0; i < pageCount; i++)
-        if i >= min && i <= max
-          -let active = '';
-          if(page === i)
-            -active = 'active';
-          li(class=active)
-            a(href=`${remoteState.url}?page=${i}${forumRouteMessage.query}` data-type="reload")= i+1
-      if max < pageCount - 1
-        if max < pageCount - 2
-          li ...
-        li
-          a(href=`${remoteState.url}?page=${pageCount - 1}${forumRouteMessage.query}` data-type="reload")= pageCount
+    a.radius-left.button(href=`${remoteUrl}?${queryKey}=tlm&${query}` class=routeObject.s!=='toc'? "active": '' data-type="reload") 复序
+    a.radius-right.button(href=`${remoteUrl}?${queryKey}=toc&${query}` class=routeObject.s==='toc'?" active": "" data-type="reload") 帖序
+
+
+mixin renderPagingButton(routeObject,paging,remoteUrl)
+  -var query = '';
+  each value, key in routeObject
+    -query +=`${key}=${value}&`; 
+  if paging.pageCount>1
+    nav(aria-label='navigation').paging-nav
+      ul(style='margin: 0')
+        each item in paging.buttonValue
+          if item.type !== 'null'
+            li(class=item.type==='active'?item.type:'')
+              a(href=`${remoteUrl}?page=${item.num}&${query}` data-type="reload")= item.num+1
+          else
+            li ...

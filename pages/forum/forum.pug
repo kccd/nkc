@@ -188,8 +188,11 @@ block content
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
               span.m-r-05
-                //- include ../publicModuleshowPagingInputs/paging/paging
+                //- include ../publicModules/paging/paging
                 include ../publicModules/paging/forum-paging
+                +renderDigestButton(data.forumRouteMessage,'d',data.user,remoteState.url)
+                +renderLatestButton(data.forumRouteMessage,'s',remoteState.url)
+                +renderPagingButton(data.forumRouteMessage,data.paging,remoteState.url)
               .paging-button
                 a.radius-left.radius-right.button.button-checkbox(title='在新窗口打开文章') 新窗
                   input#threadUrlSwitch(type='checkbox' style='margin-top: 0.4rem;vertical-align: top;')
