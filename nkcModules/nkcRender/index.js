@@ -111,6 +111,7 @@ class NKCRender {
     if (type === 'article') {
       this.replaceATInfo($, body[0], atUsers);
       this.replaceLinkInfo($, body[0]);
+      this.addLinksToArticle($, body[0]);
     }
     html = body.html();
     if (type === 'article') {
@@ -535,6 +536,39 @@ class NKCRender {
         return arr.join('');
       }
     });
+  }
+  addLinksToArticle($, element) {
+    const childNodes = element.childNodes;
+    if (!childNodes || childNodes.length === 0) {
+      return;
+    }
+    for (let i = 0; i < childNodes.length; i++) {
+      const node = childNodes[i];
+
+      if (node.type === 'text') {
+        const text = node.data || '';
+        const replacedText = text.replace(/#((D|t)?\d+)/g, (match, p1) => {
+          const link = /^D(\d+)$/.test(p1)
+            ? `/document/d/${p1.replace(/^D/, '')}`
+            : `/p/${p1}`;
+          return `<a href="${link}" target="_blank">${match}</a>`;
+        });
+
+        if (replacedText !== text) {
+          // const newNode = $(`<span>${replacedText}</span>`);
+          const newNode = $(replacedText);
+          $(node).replaceWith(newNode);
+        }
+      } else if (node.type === 'tag') {
+        if (['a', 'blockquote', 'code', 'pre'].includes(node.name)) {
+          continue;
+        }
+        if (node.attribs['data-tag'] === 'nkcsource') {
+          continue;
+        }
+        this.addLinksToArticle($, node);
+      }
+    }
   }
 }
 

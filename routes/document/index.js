@@ -3,18 +3,61 @@ const nkcRender = require('../../nkcModules/nkcRender');
 const { DynamicOperations } = require('../../settings/operations');
 
 router
-  .use('/', async (ctx, next) => {
-    const { db, query, state } = ctx;
-    const { source, sid } = query;
-    const { uid: targetUserId } = await db.DocumentModel.findOne(
-      { source, sid },
-      { uid: 1 },
-    );
-    if (
-      state.uid !== targetUserId &&
-      !ctx.permission(DynamicOperations.viewUserArticle)
-    ) {
-      ctx.throw('权限不足');
+  .use(
+    ['/preview', '/history', '/history/:_id', '/history/:_id/edit'],
+    async (ctx, next) => {
+      const { db, query, state } = ctx;
+      const { source, sid } = query;
+      const { uid: targetUserId } = await db.DocumentModel.findOne(
+        { source, sid },
+        { uid: 1 },
+      );
+      if (
+        state.uid !== targetUserId &&
+        !ctx.permission(DynamicOperations.viewUserArticle)
+      ) {
+        ctx.throw('权限不足');
+      }
+      await next();
+    },
+  )
+  .get('/d/:did', async (ctx, next) => {
+    const { db, state, permission } = ctx;
+    const { did } = ctx.params;
+    const { pageSettings } = state;
+    const { normal } = await db.DocumentModel.getDocumentStatus();
+    const { stable } = await db.DocumentModel.getDocumentTypes();
+    const { article, comment } = await db.DocumentModel.getDocumentSources();
+    const match = { did, type: stable };
+    const document = await db.DocumentModel.findOne(match);
+    if (!document || ![article, comment].includes(document.source)) {
+      ctx.throw(404, '当前访问文档不存在');
+    }
+    if (document.status !== normal && !permission('review')) {
+      if (!state.uid || document.uid !== state.uid) {
+        ctx.throw(403, '权限不足');
+      }
+    }
+    // 查询是长电文还是长电文的回复
+    if (document.source === article) {
+      return ctx.redirect(`/z/a/${document.sid}`);
+    }
+    if (document.source === comment) {
+      const singleComment = await db.CommentModel.findOne({
+        _id: document.sid,
+        // status: normal,
+      });
+      const page = Math.floor(
+        (singleComment.order - 1) / pageSettings.homeThreadList,
+      );
+      const { sid } = await db.ArticlePostModel.findOne({
+        _id: singleComment.sid,
+      });
+      if (sid) {
+        return ctx.redirect(
+          `/z/a/${sid}?page=${page}&highlight=${document.sid}#highlight`,
+        );
+      }
     }
     await next();
   })

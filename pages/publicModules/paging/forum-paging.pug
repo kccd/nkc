@@ -1,0 +1,38 @@
+mixin renderDigestButton(routeObject,queryKey,user,remoteUrl)
+  -var query = '';
+  each value, key in routeObject
+    if key === queryKey
+      -continue;
+    -query +=`${key}=${value}&`; 
+  .paging-button
+    a.radius-left.button(href=`${remoteUrl}?${query}` class=!routeObject.d?"active": "" data-type="reload") 全部
+    if user
+      a.button(href=`${remoteUrl}?${queryKey}=featured&${query}` class=routeObject.d==='featured'?"active": "" data-type="reload") 精选
+      a.radius-right.button(href=`${remoteUrl}?${queryKey}=personal&${query}` class=routeObject.d=== 'personal' ? "active" : "" data-type="reload") 我的
+    else 
+      a.radius-right.button(href=`${remoteUrl}?${queryKey}=featured&${query}` class=routeObject.d==='featured'?"active": "" data-type="reload") 精选
+
+mixin renderLatestButton(routeObject,queryKey,remoteUrl)
+  -var query = '';
+  each value, key in routeObject
+    if key === queryKey
+      -continue;
+    -query +=`${key}=${value}&`; 
+  .paging-button
+    a.radius-left.button(href=`${remoteUrl}?${queryKey}=tlm&${query}` class=routeObject.s!=='toc'? "active": '' data-type="reload") 复序
+    a.radius-right.button(href=`${remoteUrl}?${queryKey}=toc&${query}` class=routeObject.s==='toc'?" active": "" data-type="reload") 帖序
+
+
+mixin renderPagingButton(routeObject,paging,remoteUrl)
+  -var query = '';
+  each value, key in routeObject
+    -query +=`${key}=${value}&`; 
+  if paging.pageCount>1
+    nav(aria-label='navigation').paging-nav
+      ul(style='margin: 0')
+        each item in paging.buttonValue
+          if item.type !== 'null'
+            li(class=item.type==='active'?item.type:'')
+              a(href=`${remoteUrl}?page=${item.num}&${query}` data-type="reload")= item.num+1
+          else
+            li ...

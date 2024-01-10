@@ -12,4 +12,9 @@ module.exports = {
       },
     },
   },
+  d: {
+    PARAMETER: {
+      GET: Operations.visitDocument,
+    },
+  },
 };
