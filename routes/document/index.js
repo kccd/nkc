@@ -31,7 +31,7 @@ router
     const match = { did, type: stable };
     const document = await db.DocumentModel.findOne(match);
     if (!document || ![article, comment].includes(document.source)) {
-      ctx.throw('当前访问文档不存在');
+      ctx.throw(404, '当前访问文档不存在');
     }
     if (document.status !== normal && !permission('review')) {
       if (!state.uid || document.uid !== state.uid) {
