@@ -548,8 +548,10 @@ class NKCRender {
       if (node.type === 'text') {
         const text = node.data || '';
         const replacedText = text.replace(/#((D|t)?\d+)/g, (match, p1) => {
-          // const link = p1 ? p1.replace(/^#(D)?/, '$1') : p2;
-          return `<a href="/p/${p1}" target="_blank">${match}</a>`;
+          const link = /^D(\d+)$/.test(p1)
+            ? `/document/d/${p1.replace(/^D/, '')}`
+            : `/p/${p1}`;
+          return `<a href="${link}" target="_blank">${match}</a>`;
         });
 
         if (replacedText !== text) {
