@@ -31,6 +31,10 @@ router
 
     data.apps = await db.SettingModel.getAppsData();
     data.management = await db.SettingModel.getManagementData(user);
+    data.home = {
+      name: '首页',
+      url: '',
+      icon: nkcModules.tools.getUrl('statics', 'apps/fund.jpg'),};
 
     await next();
   })

@@ -280,6 +280,9 @@ const app = new Vue({
         },
         {
           hideMoveType: true,
+          mode: 'selector',
+          selectForumCategory: false,
+          selectedForumsId: self.selectedRecommendForumsId,
         },
       );
     },

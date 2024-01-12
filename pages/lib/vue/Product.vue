@@ -74,7 +74,8 @@
               .product-option-content
                 span.address-text {{productAddress}}&nbsp;至&nbsp;
                 span.address-input(@click="selectAddress" placeholder="请选择收获地址")
-                  input.address-input(disabled="disabled"  v-model="userAddress")
+                  //input.address-input(disabled="disabled"  v-model="userAddress")
+                  input.address-input(readonly="readonly" placeholder="请选择收货地址"  v-model="userAddress")
           .product-group.product-shippingCost
             .product-option
               .product-option-name 运费
