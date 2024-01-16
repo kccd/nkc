@@ -118,5 +118,9 @@ module.exports = {
     },
     toppedColumnsId: [],
     latestFirst: 'reply', //首页最新点击进入的项目
+    navigationButtons: {
+      left: [],
+      right: [],
+    },
   },
 };
