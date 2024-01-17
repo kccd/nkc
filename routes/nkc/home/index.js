@@ -203,6 +203,7 @@ router
     data.columnPool = homeSettings.columnPool;
     data.showHomeForums = homeSettings.showHomeForums;
     data.showHomeWebApply = homeSettings.showHomeWebApply;
+    data.navigationButtons = homeSettings.navigationButtons;
     ctx.template = 'nkc/home/home.pug';
     await next();
   })
@@ -521,6 +522,35 @@ router
         {
           $set: {
             'c.showHomeWebApply': showHomeWebApply,
+          },
+        },
+      );
+    } else if (operation === 'saveNavigationButtons') {
+      let { navigationButtonsLeft, navigationButtonsRight } = body;
+      for (const navigation of [
+        ...navigationButtonsLeft,
+        ...navigationButtonsRight,
+      ]) {
+        const { title, url, description } = navigation;
+        if (!title) {
+          ctx.throw(400, '标题不能为空');
+        }
+        if (!description) {
+          ctx.throw(400, '描述不能为空');
+        }
+        if (!url) {
+          ctx.throw(400, '链接不能为空');
+        }
+      }
+      const obj = {
+        left: navigationButtonsLeft,
+        right: navigationButtonsRight,
+      };
+      await db.SettingModel.updateOne(
+        { _id: 'home' },
+        {
+          $set: {
+            'c.navigationButtons': obj,
           },
         },
       );

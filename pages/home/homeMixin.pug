@@ -205,6 +205,18 @@ mixin renderHome(homeBlock, options)
         +homeBlockHeader(false, false)
         include  ../publicModules/apps/apps
         +appsPanel(homeBlock.data, {hidePanelHeader: true})
+  else if homeBlock._id === 'navigationButtonsLeft' || homeBlock._id ==='navigationButtonsRight'
+    //快速导航按钮
+    if homeBlock.data.length>0
+      .home-forums-list.m-b-1(id=`block_${homeBlock._id}`).p-a-0(style="border:none")
+        .p-l-1.p-r-1
+          +homeBlockHeader(true, false)
+        .home-navigationButtons-box 
+          for navigation in homeBlock.data
+              a(href=`${navigation.url}` target='_blank')
+                button.box-button(style=`background-color:${navigation.color||'#fff'};`)
+                  span(title=`${navigation.title}`).box-title=navigation.title
+                  span(title=`${navigation.description}`).box-description=navigation.description 
   else
     -var bgColor = homeBlock.blockStyle.backgroundColor || '#fff';
     .home-forums-list.m-b-1(

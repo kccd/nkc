@@ -22,9 +22,9 @@ if !isIncluded("columnHomeList")
           a.btn.btn-sm(href=`/m?t=${pageType}&s=${sortTypes.port}` class=sortType === sortTypes.port ? "btn-primary": "btn-default") 最多文章
       button.btn.btn-sm.btn-default(href=`/column` target="_blank") 开设专栏
     .paging-button
-      a.button.radius-left(href=`/m?t=${pageType}&s=${sortTypes.new}` class=sortType === sortTypes.new ? "active" : "") 最近更新
-      a.button(href=`/m?t=${pageType}&s=${sortTypes.sub}` class=sortType === sortTypes.sub ? 'active' : "") 最多订阅
-      a.button.radius-right(href=`/m?t=${pageType}&s=${sortTypes.post}` class=sortType === sortTypes.post ? 'active' : '') 最多文章
+      a.button.radius-left(href=`/m?t=${pageType}&s=${sortTypes.new}` data-type="reload" class=sortType === sortTypes.new ? "active" : "") 最近更新
+      a.button(href=`/m?t=${pageType}&s=${sortTypes.sub}` data-type="reload" class=sortType === sortTypes.sub ? 'active' : "") 最多订阅
+      a.button.radius-right(href=`/m?t=${pageType}&s=${sortTypes.post}` data-type="reload" class=sortType === sortTypes.post ? 'active' : '') 最多文章
     if showCreateColumn
       .paging-button
         a.button.radius-right.radius-left(href=`/column` target="_blank") 开设专栏

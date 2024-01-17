@@ -62,21 +62,26 @@ block content
 
   .container-fluid.max-width
     .row
+      //.col-xs-12.col-md-12
+       .m-b-1
+          include ./communityTab
+          +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
       .col-xs-12.col-md-12
-        .row
-          //- 首页推荐
-          .col-xs-12.col-md-4.m-b-1.min-md-p-r-0.max-sm-p-a-0.min-md-p-r-0
-            +movableAD(movableThreads)
-          .col-xs-12.col-md-8.max-sm-p-a-0
-            .col-xs-12.col-md-4.m-b-1
-              .row.p-r-05.max-sm-p-a-0
-                +threadTitleList('最新发表', data.latestThreads, '/c/new?t=thread&s=toc')
-            .col-xs-12.col-md-4.m-b-1
-              .row.p-r-05.max-sm-p-a-0
-                +threadTitleList('最近回复', data.latestPostThreads, '/c/new?t=thread')
-            .col-xs-12.col-md-4.m-b-1
-              .row
-                +threadTitleList('精选', data.digestThreads, '/c/new?t=digest')
+        if !state.isApp
+          .row
+            //- 首页推荐
+            .col-xs-12.col-md-4.m-b-1.min-md-p-r-0.max-sm-p-a-0.min-md-p-r-0
+              +movableAD(movableThreads)
+            .col-xs-12.col-md-8.max-sm-p-a-0
+              .col-xs-12.col-md-4.m-b-1
+                .row.p-r-05.max-sm-p-a-0
+                  +threadTitleList('最新发表', data.latestThreads, '/c/new?t=thread&s=toc')
+              .col-xs-12.col-md-4.m-b-1
+                .row.p-r-05.max-sm-p-a-0
+                  +threadTitleList('最近回复', data.latestPostThreads, '/c/new?t=thread')
+              .col-xs-12.col-md-4.m-b-1
+                .row
+                  +threadTitleList('精选', data.digestThreads, '/c/new?t=digest')
 
       .col-xs-12.col-md-9.min-md-p-r-0
 
@@ -88,28 +93,29 @@ block content
                 include ../publicModules/thread_panel/thread_panel
         div
           .row
-            .col-xs-12(class=showVisitedForum? 'col-md-6 min-md-p-r-0': '')
-              .box-shadow.m-b-1
-                .box-shadow-header 总览
-                .community-new-container
-                  .row
-                    .col-xs-6
-                      a.community-new-title(href='/c/new')=`快捷总版`
-                      span(title='更新/文章/回复')
-                        span  (
-                        if data.communityContentCount.postCountToday > 0
-                          span.text-danger
-                            strong=data.communityContentCount.postCountToday
-                          span /
-                        span=data.communityContentCount.threadCount
-                        span /
-                        span=data.communityContentCount.postCount
-                        span )
-                      .community-new-desc 论坛最新帖子、精选帖子
-                    if data.user
+            if !state.isApp
+              .col-xs-12(class=showVisitedForum? 'col-md-6 min-md-p-r-0': '')
+                .box-shadow.m-b-1
+                  .box-shadow-header 总览
+                  .community-new-container
+                    .row
                       .col-xs-6
-                        a.community-new-title(href='/c/sub')=`我的关注`
-                        .community-new-desc 已关注专业下的最新帖子
+                        a.community-new-title(href='/c/new')=`快捷总版`
+                        span(title='更新/文章/回复')
+                          span  (
+                          if data.communityContentCount.postCountToday > 0
+                            span.text-danger
+                              strong=data.communityContentCount.postCountToday
+                            span /
+                          span=data.communityContentCount.threadCount
+                          span /
+                          span=data.communityContentCount.postCount
+                          span )
+                        .community-new-desc 论坛最新帖子、精选帖子
+                      if data.user
+                        .col-xs-6
+                          a.community-new-title(href='/c/sub')=`我的关注`
+                          .community-new-desc 已关注专业下的最新帖子
             if showVisitedForum
               .col-xs-12.col-md-6
                 .box-shadow.m-b-1
