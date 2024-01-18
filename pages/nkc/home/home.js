@@ -486,7 +486,9 @@ const app = new Vue({
         title: '',
         description: '',
         url: '',
-        color: '#ffffff',
+        urlColor: '#ffffff',
+        titleColor: '#ffffff',
+        descriptionColor: '#ffffff',
       });
     },
     linkChanged(index, position) {
@@ -498,8 +500,11 @@ const app = new Vue({
           ? this.navigationButtonsLeft[index]
           : this.navigationButtonsRight[index];
       if (tempNavigation.url) {
-        if (!/^(http|https):\/\//i.test(tempNavigation.url)) {
-          tempNavigation.url = 'http://' + tempNavigation.url;
+        if (
+          !/^(http|https):\/\//i.test(tempNavigation.url) &&
+          !/^\/.*/.test(tempNavigation.url)
+        ) {
+          tempNavigation.url = 'https://' + tempNavigation.url;
         }
       }
     },
