@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({toppedColumns: data.toppedColumns, poolColumns: data.poolColumns, columnPool: data.columnPool, columnListSort: data.columnListSort, columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter, showHomeForums: data.showHomeForums, showHomeWebApply: data.showHomeWebApply})
+  #data.hidden=objToStr({toppedColumns: data.toppedColumns, poolColumns: data.poolColumns, columnPool: data.columnPool, columnListSort: data.columnListSort, columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter, showHomeForums: data.showHomeForums, showHomeWebApply: data.showHomeWebApply,navigationButtons:data.navigationButtons})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -390,8 +390,47 @@ block nkcContent
             span 不显示
         .m-t-1
           button.management-button(@click="saveShowActivityEnter") 保存
+    div(v-else-if='page.id==="navigationButton"')
+      .form.form-horizontal.m-t-1
+        .m-b-1 
+          label.control-label 左侧
+          div(v-for="navigation, index in navigationButtonsLeft")
+            .form-inline.m-t-05
+              label 链接{{index+1}}：
+              input.form-control(style="max-width: 14rem;" type="text" v-model="navigation.title" placeholder="标题")
+              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.titleColor")
+              input.form-control(type="text" v-model="navigation.description" placeholder="描述" )
+              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.descriptionColor")
+              input.form-control(type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'left')")
+              //input.form-control(data-control="selectColor" style="max-width: 10rem;" v-model.trim="navigation.color"  :id="`left-${index}`")
+              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.urlColor")
+              button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','left')") 上移
+              button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsLeft.length" @click="moveNavigation(index, 'down','left')") 下移
+              button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'left')") 删除
+          .m-t-05
+            button.btn.btn-sm.btn-default(@click="addNavigation('left')") 添加自定义链接
+        .m-b-1 
+          label.control-label 右侧
+          div(v-for="navigation, index in navigationButtonsRight")
+            .form-inline.m-t-05.force-inline
+              label 链接{{index+1}}：
+              input.form-control(style="max-width: 14rem;" type="text" v-model="navigation.title" placeholder="标题")
+              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.titleColor")
+              input.form-control(type="text" v-model="navigation.description" placeholder="描述" )
+              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.descriptionColor")
+              input.form-control(type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'right')")
+              //- input.form-control(data-control="selectColor" style="max-width: 10rem;" v-model.trim="navigation.color" :id="`right-${index}`")
+              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.urlColor")
+              button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','right')") 上移
+              button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsRight.length" @click="moveNavigation(index, 'down','right')") 下移
+              button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'right')") 删除
+          .m-t-05
+            button.btn.btn-sm.btn-default(@click="addNavigation('right')") 添加自定义链接
+      div
+        button.btn.btn-primary(@click='saveNavigationButtons') 保存
 
 block nkcScripts
   include ../../publicModules/crop/crop_new
   include ../../publicModules/moveThread/moveThread
+  include ../../publicModules/selectColor
   +includeJS("/nkc/home/home.js")

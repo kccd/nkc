@@ -211,6 +211,9 @@ NKC.modules.MoveThread = function() {
         }
       })
       .then(()=>{
+        if(!this_.app.$refs.moveCategoryList){
+          return;
+        }
         this_.app.$refs.moveCategoryList.open(()=>{},{source: 'thread'})
       })
       .catch(function(data) {

@@ -44,6 +44,8 @@ const app = new Vue({
     columnCount: data.columnCount,
     columnListSort: data.columnListSort,
     columnPool: data.columnPool,
+    navigationButtonsLeft: [...data.navigationButtons.left],
+    navigationButtonsRight: [...data.navigationButtons.right],
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -76,6 +78,10 @@ const app = new Vue({
         {
           id: 'toppedColumn',
           name: '置顶专栏',
+        },
+        {
+          id: 'navigationButton',
+          name: '快速导航',
         },
       ];
       arr.map((a) => {
@@ -280,6 +286,9 @@ const app = new Vue({
         },
         {
           hideMoveType: true,
+          mode: 'selector',
+          selectForumCategory: false,
+          selectedForumsId: self.selectedRecommendForumsId,
         },
       );
     },
@@ -424,6 +433,90 @@ const app = new Vue({
         showHomeWebApply: value,
       })
         .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+    moveNavigation(index, direction, position) {
+      if (
+        !['left', 'right'].includes(position) ||
+        index === undefined ||
+        !['up', 'down'].includes(direction)
+      ) {
+        return;
+      }
+
+      const moveNavigation =
+        position === 'left'
+          ? this.navigationButtonsLeft
+          : this.navigationButtonsRight;
+      if (
+        (direction === 'up' && index === 0) ||
+        (direction === 'down' && index + 1 === moveNavigation.length)
+      ) {
+        return;
+      }
+      const tempNavigation = moveNavigation[index];
+      moveNavigation.splice(index, 1);
+      moveNavigation.splice(
+        direction === 'up' ? index - 1 : index + 1,
+        0,
+        tempNavigation,
+      );
+    },
+    deleteNavigation(index, position) {
+      if (!['left', 'right'].includes(position) || index === undefined) {
+        return;
+      }
+      const tempNavigation =
+        position === 'left'
+          ? this.navigationButtonsLeft
+          : this.navigationButtonsRight;
+      tempNavigation.splice(index, 1);
+    },
+    addNavigation(position) {
+      if (!['left', 'right'].includes(position)) {
+        return;
+      }
+      const tempNavigation =
+        position === 'left'
+          ? this.navigationButtonsLeft
+          : this.navigationButtonsRight;
+      tempNavigation.push({
+        title: '',
+        description: '',
+        url: '',
+        urlColor: '#ffffff',
+        titleColor: '#ffffff',
+        descriptionColor: '#ffffff',
+      });
+    },
+    linkChanged(index, position) {
+      if (!['left', 'right'].includes(position) || index === undefined) {
+        return;
+      }
+      const tempNavigation =
+        position === 'left'
+          ? this.navigationButtonsLeft[index]
+          : this.navigationButtonsRight[index];
+      if (tempNavigation.url) {
+        if (
+          !/^(http|https):\/\//i.test(tempNavigation.url) &&
+          !/^\/.*/.test(tempNavigation.url)
+        ) {
+          tempNavigation.url = 'https://' + tempNavigation.url;
+        }
+      }
+    },
+    saveNavigationButtons() {
+      const navigationButtonsLeft = this.navigationButtonsLeft;
+      const navigationButtonsRight = this.navigationButtonsRight;
+      nkcAPI('/nkc/home', 'PUT', {
+        operation: 'saveNavigationButtons',
+        navigationButtonsLeft,
+        navigationButtonsRight,
+      })
+        .then(function () {
           sweetSuccess('保存成功');
         })
         .catch(sweetError);

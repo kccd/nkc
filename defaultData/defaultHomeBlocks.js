@@ -9,4 +9,6 @@ module.exports = [
   ['webApply', 'right', 7, '网站应用'],
   ['forums', 'right', 8, '社区导航'],
   ['hotColumns', 'right', 9, '热门专栏'],
+  ['navigationButtonsLeft', 'left', 10, '快速导航'],
+  ['navigationButtonsRight', 'right', 11, '快速导航'],
 ];

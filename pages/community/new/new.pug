@@ -18,10 +18,13 @@ block content
       .col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
           .m-b-1
-            include ../communityNav
-            - 
-              let navArr=data.user?[{name: '快捷总版', url: '/c/new'},{isEqual:true,name: '我的关注', url: '/c/sub'}]:[{name: '快捷总版', url: '/c/new'}];
-            +communityNav(navArr)
+            //include ../communityTab
+            //+renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
+            if !state.isApp
+              include ../communityNav
+              - 
+                let navArr=data.user?[{name: '快捷总版', url: '/c/new'},{isEqual:true,name: '我的关注', url: '/c/sub'}]:[{name: '快捷总版', url: '/c/new'}];
+              +communityNav(navArr)
           .m-b-1
           if data.communityTypes.post === data.t
             include ./communityTypes
@@ -48,10 +51,12 @@ block content
             .paging-button
               a.button.radius-left(
                 href=`/c/new?t=${data.t}&s=tlm`
+                data-type="reload"
                 class=data.s !== 'toc'? 'active': ''
                 ) 复序
               a.button.radius-right(
                 href=`/c/new?t=${data.t}&s=toc`
+                data-type="reload"
                 class=data.s === 'toc'? 'active': ''
                 ) 贴序
 

@@ -350,6 +350,61 @@ footer.footer{
 
 
 
+// 导航按钮
+.home-navigationButtons-box {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  a {
+    display: inline-block;
+    width: 50%;
+    box-sizing: border-box;
+    text-align: center;
+    // float: left;
+    padding: 0.3rem 0.3rem;
+    transition: .2s;
+    &:hover {
+      .box-button{
+        transform: scale(1.03);
+      }
+    }
+    .box-button {
+      width: 100%;
+      // background-color: #fff;
+      // border: 1px solid #ebebeb;
+      border: none;
+      border-radius: 3px;
+      transition: transform .2s;
+      padding: 1rem;
+      
+
+      span {
+        display: block;
+        text-align: left;
+        overflow: hidden;
+        text-wrap: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .box-title {
+        font-size: 1.3rem;
+        color: #3a3a3a;
+        padding-bottom: 0.7rem;
+        // transition: transform 0.2s ease;
+        // transition: text-decoration 0.5s ease;
+
+      }
+
+      .box-description {
+        font-size: 1.2rem;
+        color: #999;
+      }
+    }
+  }
+}
 
 
 
