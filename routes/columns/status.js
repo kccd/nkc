@@ -5,7 +5,7 @@ router
   .get("/", async (ctx, next) => {
     const {data, query, db, nkcModules} = ctx;
     const {user, column} = data;
-    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled') && column.users.findIndex(item=>item.uid===user.uid)===-1) ctx.throw(403, "权限不足");
     const {sort, page} = query;
     if(sort === undefined) {
       await column.updateBasicInfo();

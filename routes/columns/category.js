@@ -104,7 +104,10 @@ router
   .post("/", async (ctx, next) => {
     const {data, db, body, nkcModules} = ctx;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_category)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid&&!column.users.includes(user.uid)) ctx.throw(403, "权限不足");
     let {name, description, parentId, type, brief} = body;
     const {checkString} = nkcModules.checkData;
     if(!['main', 'minor'].includes(type)) ctx.throw(400, `分类类型错误 type: ${type}`);
@@ -151,7 +154,10 @@ router
   .put("/", async (ctx, next) => {
     const {db, data, body} = ctx;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_category)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid&&!column.users.includes(user.uid)) ctx.throw(403, "权限不足");
     const {categoriesId} = body;
     for(let i = 0; i < categoriesId.length; i++) {
       const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoriesId[i]});
@@ -165,7 +171,10 @@ router
     const {nkcModules, data, db, body} = ctx;
     const {categoryId} = ctx.params;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_category)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid&&!column.users.includes(user.uid)) ctx.throw(403, "权限不足");
     const category = await db.ColumnPostCategoryModel.findOne({_id: categoryId});
     if(!category) ctx.throw(400, "分类不存在");
     const {checkString} = nkcModules.checkData;
@@ -200,7 +209,10 @@ router
   .del("/:categoryId", async (ctx, next) => {
     const {data, db} = ctx;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_category)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid&&!column.users.includes(user.uid)) ctx.throw(403, "权限不足");
     const {categoryId} = ctx.params;
     const category = await db.ColumnPostCategoryModel.findById(categoryId);
     if(!category) ctx.throw(400, "分类不存在");

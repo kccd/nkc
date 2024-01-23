@@ -2,6 +2,16 @@ const Router = require("koa-router");
 const router = new Router();
 const serverConfig = require("../../../config/server");
 router
+  .use('/', async (ctx, next) => {
+    const { db } = ctx;
+    const { user, column } = ctx.data;
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_page)
+    if (!isPermission && column.uid !== user.uid) {
+      ctx.throw(403, '权限不足');
+    }
+    await next();
+  })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {t, id} = query;

@@ -266,6 +266,7 @@ router
         hideDefaultCategory,
         listColor,
         toolColor,
+        users = [],
       } = fields;
       const { avatar, banner } = files;
       await columnNameCheckerService.checkColumnName(name, column._id);
@@ -374,6 +375,7 @@ router
         nameLowerCase: name.toLowerCase(),
         description,
         abbr,
+        users: JSON.parse(users),
       });
       if (avatar) {
         await db.AttachmentModel.saveColumnAvatar(column._id, avatar);

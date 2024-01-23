@@ -5,7 +5,7 @@ router
     const {query, data, db, nkcModules} = ctx;
     const {page = 0, cid, mcid} = query;
     const {column, user, isModerator} = data;
-    if(column.uid !== user.uid && !ctx.permission('column_single_disabled')) ctx.throw(403, "权限不足");
+    if(column.uid !== user.uid && !ctx.permission('column_single_disabled') && column.users.findIndex((item) => item.uid === user.uid) === -1) ctx.throw(403, "权限不足");
     const q = {
       columnId: column._id
     };
@@ -51,10 +51,39 @@ router
       childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(categoryId);
       childCategoryId.push(categoryId);
     }
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    if(column.uid !== user.uid &&column.users.findIndex((item) => item.uid === user.uid) === -1) ctx.throw(403, "权限不足");
     if(!postsId || postsId.length === 0) {
       if(!["sortByPostTimeDES", "sortByPostTimeASC"].includes(type)) {
         ctx.throw(400, "最少包含一条内容");
+      }
+    }
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    switch (type) {
+      case "removeColumnPostById": {
+        const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_post_delete);
+        if(!isPermission && column.uid !== user.uid){
+          ctx.throw(403, "权限不足");
+        }
+        break;
+      }
+      case "categoryToTop": 
+      case "categoryToBottom": 
+      case "categoryUp": 
+      case "categoryDown": 
+      case "sortByPostTimeDES": 
+      case "sortByPostTimeASC": {
+        const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_post_order);
+        if(!isPermission && column.uid !== user.uid){
+          ctx.throw(403, "权限不足");
+        }
+        break;
+      }
+      case "moveById": {
+        const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_category);
+        if(!isPermission && column.uid !== user.uid){
+          ctx.throw(403, "权限不足");
+        }
+        break;
       }
     }
     if(type === "addToColumn") { // 推送文章到专栏

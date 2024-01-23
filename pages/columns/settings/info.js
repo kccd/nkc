@@ -1,4 +1,5 @@
 window.selectImage = undefined;
+window.selectUser = undefined;
 var data = NKC.methods.getDataById("data");
 var reg = /^(http|https):\/\//i;
 for(var i = 0; i < data.column.links.length; i++) {
@@ -18,15 +19,19 @@ var app = new Vue({
     column: data.column,
 
     info: "",
-    error: ""
+    error: "",
+    users: [...data.column.users],
+    permission: [...data.usersPermission],
   },
   mounted: function() {
     window.selectImage = new NKC.methods.selectImage();
+    window.selectUser = new NKC.modules.SelectUser();
     NKC.methods.initSelectColor(function(hex, id) {
       app.column[id] = hex;
     });
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     contactAdmin: function() {
       nkcAPI("/m/" + this.column._id + "/contact", "POST", {})
         .then(function() {
@@ -121,6 +126,9 @@ var app = new Vue({
             block.show = !!block.show;
           }
           formData.append("blocks", JSON.stringify(column.blocks));
+          formData.append("users",JSON.stringify(self.users.map((item)=>{
+            return {uid:item.uid,permission:[...item.permission]}
+          })));
           return uploadFilePromise("/m/" + self.column._id, formData, function(e, a) {
             if(a === 100) {
               app.info = "处理中，请稍候";
@@ -237,6 +245,18 @@ var app = new Vue({
       perpage = parseInt(perpage);
       if(isNaN(perpage) || perpage <= 0) perpage = 1;
       this.column.perpage = perpage;
+    },
+    addUser: function(){
+      selectUser.open((data) => {
+        const { users, usersId } = data;
+        users.forEach((item) => {
+          item.permission = [];
+        });
+        app.users = app.users.concat(users.filter(item=>app.users.findIndex(user=>user.uid===item.uid)===-1));
+      });
+    },
+    deleteUser:function (index) { 
+      app.users.splice(index, 1);
     }
   }
 });
