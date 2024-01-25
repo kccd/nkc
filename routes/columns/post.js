@@ -158,12 +158,21 @@ router
         if(!columnPost) continue;
         if(['all', 'main'].includes(categoryType)) {
           const {order} = columnPost;
-          const newOrder = {};
-          for(const cid of setObj.cid) {
-            let o = order[`cid_${cid}`];
-            if(o === undefined) o = await db.SettingModel.operateSystemID("columnPostOrders", 1);
-            newOrder[`cid_${cid}`] = o
+          const newOrder = {...JSON.parse(JSON.stringify(order))};
+          const cIds = ['default', ...setObj.cid];
+          const mcIds = ['default', 'other', ...setObj.mcid];
+          for (const cid of cIds) {
+            for (const mcid of mcIds) {
+              if(order[`cid_${cid}_${mcid}`]===undefined){
+                newOrder[`cid_${cid}_${mcid}`] = await db.SettingModel.operateSystemID('columnPostOrders', 1);
+              }
+            }
           }
+          // for(const cid of setObj.cid) {
+          //   let o = order[`cid_${cid}`];
+          //   if(o === undefined) o = await db.SettingModel.operateSystemID("columnPostOrders", 1);
+          //   newOrder[`cid_${cid}`] = o
+          // }
           setObj.order = newOrder;
         }
         // 仅仅是增加分类

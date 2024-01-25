@@ -89,10 +89,14 @@ block content
                         th.order-price
                           .number ￥{{(param.price * param.count / 100).toFixed(2)}}    
                 .product-cert(v-if="product.product.uploadCert")
-                  span 上传凭证：
-                  .cert-content(:onclick="'$(\"input.hidden.input-' + product.product.productId + '\").click()'")
-                    .fa.fa-plus(v-if="!product.certId")
-                    img(v-else :src="'/shop/cert/' + product.certId" title="重新上传")  
+                  //- span(:title="product.product.uploadCertDescription" style="display:inline-block;text-wrap:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 7rem);") 上传凭证：({{product.product.uploadCertDescription}})
+                  .m-b-05(:title="product.product.uploadCertDescription" style="text-align:left;") 上传凭证：({{product.product.uploadCertDescription}})
+                  .m-r-1.cert-content(v-for="(item, index) in product.certIds||['']" :key="index" :onclick="'$(\"input.hidden.input-' + product.product.productId + '\").click()'" @click="changeCurrentIndex(index,product)")
+                    //- .fa.fa-plus(v-if="!product.certId")
+                    //- img(v-else :src="'/shop/cert/' + product.certId" title="重新上传")
+                    img(v-if="item" :src="'/shop/cert/' + item" title="重新上传")
+                    span(v-if="item" style="position: absolute;font-size:1.8rem;right: -0.9rem;top: -1.2rem;" @click.stop="deleteCertPicture(index,r,product)").fa.fa-times-circle
+                    .fa.fa-plus(v-else)
                   input.hidden(:class="'input-' + product.product.productId" type="file" accept="image/*" @change="selectedFile(r, product)")
                 .product-freight(v-if="!product.product.isFreePost && product.freight")
                   | 选择物流：
