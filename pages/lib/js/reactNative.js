@@ -359,7 +359,7 @@ export function RNSelectLocation() {
  * */
 export function RNWechatPay(data) {
   const { url, H5Url, referer } = data;
-  RNEmit('', {
+  RNEmit('weChatPay', {
     url,
     H5Url,
     referer,
