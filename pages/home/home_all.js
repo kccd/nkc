@@ -597,7 +597,8 @@ $(window).on('resize', function () {
 });
 $(function () {
   var domWidth = $('#block_navigationButtonsLeft').width();
-  if (domWidth === $(window).width()) {
+  if (domWidth === $(window).width() && !isMoved) {
+    isMoved = true;
     $('#block_navigationButtonsRight')
       .detach()
       .insertAfter('#block_navigationButtonsLeft');
