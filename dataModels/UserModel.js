@@ -1370,7 +1370,9 @@ userSchema.statics.findById = async (uid) => {
  * */
 userSchema.statics.updateUserKcb = async (uid) => {
   const UserModel = mongoose.model('users');
-  const SettingModel = mongoose.model('settings');
+  await UserModel.updateUserScores(uid);
+  return 0;
+  /*const SettingModel = mongoose.model('settings');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   // 聚合 查找出用户的科创币转账记录并将num全部相加输出为total
   // 查找出当前用户的所有科创币转账记录
@@ -1430,7 +1432,7 @@ userSchema.statics.updateUserKcb = async (uid) => {
       },
     );
   }
-  return total;
+  return total;*/
 };
 /*
  * 更新用户的kcb
@@ -1439,7 +1441,8 @@ userSchema.statics.updateUserKcb = async (uid) => {
  * */
 userSchema.methods.updateKcb = async function () {
   const UserModel = mongoose.model('users');
-  this.kcb = await UserModel.updateUserKcb(this.uid);
+  return await UserModel.updateUserScores(this.uid);
+  // this.kcb = await UserModel.updateUserKcb(this.uid);
 };
 /*
  * 验证用户是否还能关注相应的内容
