@@ -208,7 +208,8 @@ mixin renderHome(homeBlock, options)
   else if homeBlock._id === 'navigationButtonsLeft'
     //快速导航按钮
     if homeBlock.data.left.length>0 || homeBlock.data.right.length>0
-      .home-forums-list(id=`block_${homeBlock._id}` style="border:none;").p-a-0
+      - var className =  homeBlock.data.left.length===0?'':'m-b-1';
+      .home-forums-list(id=`block_${homeBlock._id}` style="border:none;" class=`${className}`).p-a-0
         .p-l-1.p-r-1
           +homeBlockHeader(true, false)
         .home-navigationButtons-box 
@@ -228,7 +229,7 @@ mixin renderHome(homeBlock, options)
   else if homeBlock._id ==='navigationButtonsRight'
     //快速导航按钮
     if homeBlock.data.length>0
-      .home-forums-list(id=`block_${homeBlock._id}` style="border:none;").p-a-0
+      .home-forums-list.m-b-1(id=`block_${homeBlock._id}` style="border:none;").p-a-0
         .p-l-1.p-r-1
           +homeBlockHeader(true, false)
         .home-navigationButtons-box 
