@@ -574,6 +574,36 @@ function refresh(homeBlockId) {
     })
     .catch(sweetError);
 }
+const originalParent = $('#block_navigationButtonsRight').parent();
+const originalIndex = $('#block_navigationButtonsRight').index();
+let isMoved = false;
+$(window).on('resize', function () {
+  var domWidth = $('#block_navigationButtonsLeft').width();
+  if(!originalParent){
+    return;
+  }
+  if (domWidth === $(window).width() && !isMoved) {
+    isMoved = true;
+    $('#block_navigationButtonsRight')
+      .detach()
+      .insertAfter('#block_navigationButtonsLeft');
+  } else if (domWidth !== $(window).width() && isMoved) {
+    isMoved = false;
+    originalParent
+      .children()
+      .eq(originalIndex - 1)
+      .after($('#block_navigationButtonsRight'));
+  }
+});
+$(function () {
+  var domWidth = $('#block_navigationButtonsLeft').width();
+  if (domWidth === $(window).width() && !isMoved) {
+    isMoved = true;
+    $('#block_navigationButtonsRight')
+      .detach()
+      .insertAfter('#block_navigationButtonsLeft');
+  }
+});
 
 Object.assign(window, {
   changeOrder,

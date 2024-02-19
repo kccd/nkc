@@ -137,7 +137,7 @@ router
       for(const productObj of products) {
         const {
           productId, productParams,
-          certId, freightTotal, priceTotal, freightName
+          certIds=[], freightTotal, priceTotal, freightName
         } = productObj;
         freightName_ = freightName
         const product = await db.ShopGoodsModel.findOne({productId});
@@ -146,10 +146,13 @@ router
           ctx.throw(400, `提交的订单中存在停售的商品，请刷新`);
         }
         if(product.uploadCert) {
-          if(!certId) ctx.throw(400, "请上传凭证");
-          const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
-          if(!cert) ctx.throw(400, "凭证ID错误，请重新上传");
-          certArr.push(cert);
+          if(certIds.length===0) ctx.throw(400, "请上传凭证");
+          // if(!certId) ctx.throw(400, "请上传凭证");
+          for(const certId of certIds){
+            const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
+            if(!cert) ctx.throw(400, "凭证ID错误，请重新上传");
+            certArr.push(cert);
+          }
         }
         let countTotal_ = 0, priceTotal_ = 0;
         // 同一商品不同规格 统一计算邮费

@@ -9,6 +9,7 @@ var app = new Vue({
   },
   data: {
     column: data.column,
+    user: data.user,
     mainCategories: [],
     minorCategories: [],
     columnPosts: [],

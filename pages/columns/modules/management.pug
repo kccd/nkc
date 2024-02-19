@@ -2,6 +2,7 @@
   @param data.contributeCount 待处理的投稿数
 
 -var canManagement = data.permissions && data.permissions.column_single_disabled;
+-var haveUserPermission =  (data.user && data.column.users.findIndex(item=>item.uid===data.user.uid)!==-1)||(data.user && data.user.uid === data.column.uid); 
 
 .m-b-1.column-tool-container(style=columnToolStyle)
   include ../../publicModules/accountRegisterInfo
@@ -59,7 +60,7 @@ if canManagement
         a(onclick=`managementColumn(${data.column._id}, 'abbr', true)`).col-xs-4
           .fa.fa-align-center
           .name 删除简介
-if data.user && data.user.uid === data.column.uid
+if haveUserPermission
   .m-b-1.column-tool-container(style=columnToolStyle)
     .column-management
       a(

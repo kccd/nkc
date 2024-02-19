@@ -25,6 +25,7 @@ const app = new Vue({
     results: data.results, // 商品规格数据
     freightTotal: 0, // 运费总计
     priceTotal: 0, // 商品总计
+    CurrentIndex: undefined,
 
     showAddressForm: false,
     addressForm: {
@@ -169,16 +170,41 @@ const app = new Vue({
       let dom = $(`input.hidden.input-${product.productId}`);
       dom = dom[0];
       const file = dom.files[0];
+      if(!file){
+        return;
+      }
       const formData = new FormData();
       formData.append("type", "shopping");
       formData.append("file", file);
-      nkcUploadFile("/shop/cert", "POST", formData)
+      const self = this;
+      if(this.CurrentIndex||this.CurrentIndex===0){
+        nkcUploadFile("/shop/cert", "POST", formData)
         .then(data => {
-          p.certId = data.cert._id;
+          p.certIds[self.CurrentIndex] = data.cert._id;
+          Vue.set(r.products, r.products.indexOf(p), p);
+        })
+        .catch(sweetError);
+      }
+      else{
+        nkcUploadFile("/shop/cert", "POST", formData)
+        .then(data => {
+          if(p.certIds){
+            p.certIds = p.certIds.filter(item=>!!item);
+          }else{
+            p.certIds = [];
+          }
+          if(p.certIds.length>=4){
+            p.certIds = [...p.certIds,data.cert._id];
+          }else{
+            p.certIds = [...p.certIds,data.cert._id,''];
+          }
+          // p.certId = data.cert._id;
           Vue.set(r.products, r.products.indexOf(p), p);
           sweetSuccess("上传成功");
         })
         .catch(sweetError);
+      }
+      
     },
     // 查看凭证
     getCert(certId) {
@@ -202,14 +228,16 @@ const app = new Vue({
               products: []
             }
             products.map(productObj => {
-              const {product, params, priceTotal, freightTotal, certId, freightName} = productObj;
-              if(product.uploadCert && !certId) throw "请上传凭证";
+              const {product, params, priceTotal, freightTotal, certIds=[], freightName} = productObj;
+              const tempCertIds = certIds.filter(item=>!!item);
+              if(product.uploadCert && tempCertIds.length===0) throw "请上传凭证";
+              // if(product.uploadCert && !certId) throw "请上传凭证";
               if(!product.isFreePost && !freightName) throw "请选择物流";
               const p = {
                 productId: product.productId,
                 priceTotal,
                 freightTotal,
-                certId,
+                certIds:tempCertIds,
                 freightName,
                 productParams: []
               };
@@ -233,6 +261,25 @@ const app = new Vue({
           sweetSuccess("提交成功，正在前往付款页面");
         })
         .catch(sweetError);
+    },
+    changeCurrentIndex($index, p) {
+      if(!p.certIds||!p.certIds[$index]){
+        this.CurrentIndex = undefined;
+      }else{
+        this.CurrentIndex = $index;
+      }
+      
+    },
+    deleteCertPicture($index,r,p){
+      if(!p.certIds[$index]){
+        return;
+      }
+      p.certIds.splice($index, 1);
+      p.certIds = p.certIds.filter(item=>!!item);
+      if(p.certIds.length<5){
+        p.certIds.push('');
+      }
+      Vue.set(r.products, r.products.indexOf(p), p);
     }
   }
 })
