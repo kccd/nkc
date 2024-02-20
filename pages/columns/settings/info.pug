@@ -2,7 +2,7 @@ extends ./settings
 block settingsTitle
   title 专栏设置
 block settingsContent
-  .hidden#data=objToStr({column: data.column})
+  .hidden#data=objToStr({column: data.column,usersPermission:data.usersPermission})
   #app(v-cloak)
     .row
       .col-xs-12.col-md-12
@@ -151,6 +151,21 @@ block settingsContent
             .col-sm-8
               .form-inline.display-i-b
                 input.form-control(type="text" v-model.number="column.perpage" @change="replacePerpage")
+          .form-group 
+            label.col-sm-2.control-label 指定管理员
+            .col-sm-8
+              .m-b-1(v-for="(user, index) in users" :key="index" ) 
+                span(style="text-decoration:none; margin-right:0.5rem;line-height:2.5rem;display: inline-block;background-color: #dcdcdc;border-radius: 1.5rem;font-size: 0;white-space: nowrap;height:2.5rem;")
+                  a(:href="`/u/${user.uid}`" target="_blank" )
+                    img(:src="getUrl('userAvatar', user.avatar, 'sm')", alt="",style="vertical-align:top;width:2.5rem;height:2.5rem;border-radius:50%;margin-right:0.5rem;" )
+                  span(style="margin-right:0.5rem;font-size:1.25rem;color:#606266;") {{user.username}}
+                    span.fa.fa-times-circle(@click="deleteUser(index)" style="font-size:1.8rem;color: #fff;cursor:pointer;margin-left:0.5rem;vertical-align:middle;")
+                //.m-t-05(style="font-weight:bold;text-indent:0.5rem;") 权限
+                .checkbox 
+                  label.m-r-1(v-for="item in permission" :key="item.id")
+                    input(type='checkbox' :value="item.id" v-model="user.permission")
+                    span {{item.title}}
+              button.m-t-05.btn.btn-sm.btn-default(@click="addUser") 添加
 
           .form-group
             label.col-sm-2.control-label
@@ -165,4 +180,5 @@ block settingsContent
 block settingsScripts
   include ../../publicModules/crop/crop_new
   include ../../publicModules/selectColor
+  include ../../publicModules/selectUser/selectUser
   +includeJS("/columns/settings/info.js")

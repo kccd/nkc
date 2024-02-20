@@ -1,6 +1,16 @@
 const { subscribeSources } = require('../../../settings/subscribe');
 const router = require('koa-router')();
 router
+  .use('/', async (ctx, next) => {
+    const { db } = ctx;
+    const { user, column } = ctx.data;
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_fans)
+    if (!isPermission && column.uid !== user.uid) {
+      ctx.throw(403, '权限不足');
+    }
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const { db, data, query, nkcModules } = ctx;
     const { column } = data;
@@ -54,10 +64,10 @@ router
     const { uid } = query;
     const { column } = data;
     const subscribe = await db.SubscribeModel.findOne({
-      type: 'column',
+      source: 'column',
       uid,
       cancel: false,
-      columnId: column._id,
+      sid: column._id,
     });
     if (subscribe) {
       await subscribe.cancelSubscribe();

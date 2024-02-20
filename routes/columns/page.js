@@ -4,7 +4,10 @@ router
   .post("/", async (ctx, next) => {
     const {data, db, body} = ctx;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_page)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const pageCount = await db.ColumnPageModel.countDocuments({columnId: column._id});
     const columnSettings = await db.SettingModel.getSettings("column");
     if(pageCount >= columnSettings.pageCount) ctx.throw(400, `最多允许创建${columnSettings.pageCount}个自定义页面`);
@@ -26,7 +29,10 @@ router
     const {column, user} = data;
     const {pageId} = params;
     const {type} = body;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_page)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(400, `未找到ID为${pageId}的自定义页面`);
     if(type === "modifyContent") {
@@ -87,7 +93,10 @@ router
     const {data, db, params} = ctx;
     const {column, user} = data;
     const {pageId} = params;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_page)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
+    // if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(400, `未找到ID为${pageId}的自定义页面`);
     await page.deleteOne();

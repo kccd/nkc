@@ -3053,8 +3053,9 @@ threadSchema.statics.extendShopInfo = async function (props) {
   // 获取用户地址信息
   if (uid) {
     try {
-      const ipInfo = await IPModel.getIPInfoByIP(address);
-      userAddress = ipInfo.location;
+      // const ipInfo = await IPModel.getIPInfoByIP(address);
+      const city = await IPModel.getIpCity(address);
+      userAddress = city.replace(',', '/');
     } catch (err) {
       //
     }

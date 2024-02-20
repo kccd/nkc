@@ -3,6 +3,15 @@ const { ThrowServerInternalError } = require('../nkcModules/error');
 const moment = require('moment');
 const Schema = mongoose.Schema;
 const { subscribeSources } = require('../settings/subscribe');
+const columnUserPermission = {
+  column_post_order: '文章调序',
+  column_post_add: '添加文章',
+  column_post_delete: '撤稿文章',
+  column_settings_contribute: '投稿处理',
+  column_settings_category: '分类管理',
+  column_settings_page: '自定义页',
+  column_settings_fans: '粉丝管理',
+};
 const schema = new Schema(
   {
     _id: Number,
@@ -169,6 +178,11 @@ const schema = new Schema(
     refreshTime: {
       type: Date,
       default: null,
+    },
+    // 指定专栏管理员uids
+    users: {
+      type: Schema.Types.Mixed,
+      default: [],
     },
   },
   {
@@ -1030,4 +1044,33 @@ schema.statics.clearColumAbbr = async (columnId) => {
   await ColumnModel.updateOne({ _id: columnId }, { $set: { abbr: '' } });
 };
 
+/*
+ * 获取 指定管理员的permission
+ * */
+schema.statics.getUsersPermission = async () => {
+  return columnUserPermission;
+};
+/*
+ * 获取 指定管理员的permission
+ * */
+schema.statics.getUsersPermissionKeyObject = async () => {
+  const newObj = {};
+  Object.keys({ ...columnUserPermission }).forEach((key) => {
+    newObj[key] = key;
+  });
+  return newObj;
+};
+/*
+ * 检查 指定管理员的permission
+ * */
+schema.statics.checkUsersPermission = async (users = [], uid, operation) => {
+  const index = users.findIndex((item) => item.uid === uid);
+  if (index === -1) {
+    return false;
+  }
+  if (!users[index].permission.includes(operation)) {
+    return false;
+  }
+  return true;
+};
 module.exports = mongoose.model('columns', schema);

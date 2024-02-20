@@ -390,9 +390,10 @@ footer.footer{
       }
 
       .box-title {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
         color: #3a3a3a;
         padding-bottom: 0.7rem;
+        font-weight: 520;
         // transition: transform 0.2s ease;
         // transition: text-decoration 0.5s ease;
 
@@ -913,7 +914,19 @@ footer.footer{
 .app-top{
   display: none;
 }
+.navigation-right-data{
+  display: none;
+}
 @media (max-width: 991px) {
+  #block_navigationButtonsRight {
+    display: none;
+  }
+  #block_navigationButtonsLeft{
+    margin-bottom: 1rem;
+  }
+  .navigation-right-data {
+    display: inline;
+  }
   .app-top {
     display: inline-block;
     width: 100%;

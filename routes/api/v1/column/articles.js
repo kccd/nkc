@@ -8,7 +8,9 @@ router
       threadsId, articlesId, mainCategoriesId, minorCategoriesId,
     } = body;
     const {column, user} = data;
-    if(column.uid !== user.uid) ctx.throw(403, "权限不足");
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_post_add)
+    if(column.uid !== user.uid && !isPermission) ctx.throw(403, "权限不足");
     if(threadsId.length === 0 && articlesId.length === 0) ctx.throw(400, "请选择文章");
 
     if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "文章分类不能为空");

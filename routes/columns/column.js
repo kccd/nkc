@@ -24,10 +24,6 @@ router
     const { _id } = params;
     const { user } = data;
     const column = await db.ColumnModel.findById(_id);
-    //获取当前用户是否能查看所有状态的文章
-    data.isModerator =
-      ctx.permissionsOr(['review', 'movePostsToDraft', 'movePostsToRecycle']) ||
-      (user && user.uid === column.uid);
     if (!column) {
       const u = await db.UserModel.findOne({ uid: _id });
       if (u) {
@@ -35,6 +31,10 @@ router
       }
       ctx.throw(404, `未找到ID为${_id}的专栏`);
     }
+    //获取当前用户是否能查看所有状态的文章
+    data.isModerator =
+      ctx.permissionsOr(['review', 'movePostsToDraft', 'movePostsToRecycle']) ||
+      (user && user.uid === column.uid);
     if (!ctx.permission('column_single_disabled')) {
       if (column.disabled) {
         nkcModules.throwError(403, '专栏已屏蔽', 'columnHasBeenBanned');
@@ -215,17 +215,19 @@ router
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(
       column._id,
     );
-    
-    if(data.categories.length>0){
-      data.categories.forEach(async item=>{
-        const childId = await db.ColumnPostCategoryModel.getChildCategoryId(item._id);
+
+    if (data.categories.length > 0) {
+      data.categories.forEach(async (item) => {
+        const childId = await db.ColumnPostCategoryModel.getChildCategoryId(
+          item._id,
+        );
         childId.push(item._id);
         item.count = await db.ColumnPostModel.countDocuments({
           columnId: column._id,
           cid: { $in: childId },
         });
-      })
-    } 
+      });
+    }
     data.timeline = await db.ColumnModel.getTimeline(column._id);
     const homeSettings = await db.SettingModel.getSettings('home');
     if (ctx.permission('homeHotColumn')) {
@@ -266,6 +268,7 @@ router
         hideDefaultCategory,
         listColor,
         toolColor,
+        users = [],
       } = fields;
       const { avatar, banner } = files;
       await columnNameCheckerService.checkColumnName(name, column._id);
@@ -374,6 +377,7 @@ router
         nameLowerCase: name.toLowerCase(),
         description,
         abbr,
+        users: JSON.parse(users),
       });
       if (avatar) {
         await db.AttachmentModel.saveColumnAvatar(column._id, avatar);

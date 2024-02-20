@@ -423,7 +423,7 @@ schema.statics.getHomeBlockData = async (props) => {
     goods: [],
     forums: [],
     webApply: [],
-    navigationButtonsLeft: [...navigationButtons.left],
+    navigationButtonsLeft: { left:[...navigationButtons.left], right:[...navigationButtons.right]},
     navigationButtonsRight: [...navigationButtons.right],
   };
   // 热销商品
