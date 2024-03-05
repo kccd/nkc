@@ -94,6 +94,21 @@ NKC.modules.MoveThread = function() {
           if(fid === canSelectForums[i].fid) return canSelectForums[i];
         }
       },
+      getForumsByIdV1: function(fid) {
+        var forums = JSON.parse(JSON.stringify(this.forums));
+        for(var i = 0; i < forums.length; i++) {
+          var forum = forums[i];
+          forum.allChildForums = this_.app.getAllChildForumsV1(forum, []);
+        }
+        var arr = [];
+        for(var i = 0; i < forums.length; i++) {
+          arr = arr.concat(forums[i].allChildForums || []);
+        }
+        var canSelectForums = arr;
+        for(var i = 0; i < canSelectForums.length; i++) {
+          if(fid === canSelectForums[i].fid) return canSelectForums[i];
+        }
+      },
       getAllChildForums: function(forum, arr) {
         if(forum.childrenForums && forum.childrenForums.length > 0) {
           for(var i = 0; i < forum.childrenForums.length; i++) {
@@ -105,6 +120,21 @@ NKC.modules.MoveThread = function() {
               }
             }
             this.getAllChildForums(f, arr);
+          }
+        }
+        return arr;
+      },
+      getAllChildForumsV1: function(forum, arr) {
+        if(forum.childrenForums && forum.childrenForums.length > 0) {
+          for(var i = 0; i < forum.childrenForums.length; i++) {
+            var f = forum.childrenForums[i];
+            if(this.showRecycle || f.fid !== this.recycleId) {
+              f.selectedThreadType = "";
+              arr.push(f);
+            }
+            if(f.childrenForums &&f.childrenForums.length){
+              this.getAllChildForumsV1(f, arr);
+            }
           }
         }
         return arr;
@@ -192,7 +222,7 @@ NKC.modules.MoveThread = function() {
             var selectedForums = [];
             var forumsId = options.selectedForumsId;
             for(var i = 0; i < forumsId.length; i++) {
-              var f = this_.app.getForumsById(forumsId[i]);
+              var f = this_.app.getForumsByIdV1(forumsId[i]);
               if(f) {
                 if(options.selectedCategoriesId) {
                   f.selectedThreadType = this_.app.getCategory(f, options.selectedCategoriesId);
