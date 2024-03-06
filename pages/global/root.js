@@ -111,7 +111,7 @@ window.RootApp = new Vue({
             .catch((err) => {
               sweetError(err);
             });
-        }, {});
+        }, {selectTypesWhenSubscribe:false});
       } else {
         subUsers(uid, sub)
           .then(() => {
