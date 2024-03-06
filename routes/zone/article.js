@@ -24,6 +24,13 @@ router
     data.categoryList = categoriesObj.categoryList;
     data.categoriesTree = categoriesObj.categoriesTree;
     data.targetUser = await article.extendUser();
+    if (user) {
+      let userSubscribeUsersId = [];
+      userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(
+      user.uid,
+    );
+    data.subscribeAuthor = !!(userSubscribeUsersId.includes(data.targetUser.uid));
+    }
     data.targetUser.description = renderMarkdown(
       nkcModules.nkcRender.replaceLink(data.targetUser.description),
     );
