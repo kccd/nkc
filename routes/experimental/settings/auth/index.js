@@ -63,6 +63,9 @@ router
       minLength: 1,
       maxLength: 1000
     });
+    if (!['null','city','province','country'].includes(verifyPhoneNumber.address)) {
+      ctx.throw(400, `登录间隔地址上限类型错误`);
+    }
     await db.SettingModel.updateOne({
       _id: "auth"
     }, {
@@ -79,7 +82,8 @@ router
           maxInterval: verifyPhoneNumber.maxInterval,
           type: verifyPhoneNumber.type,
           reviewPostContent: verifyPhoneNumber.reviewPostContent,
-          disablePublishContent: verifyPhoneNumber.disablePublishContent
+          disablePublishContent: verifyPhoneNumber.disablePublishContent,
+          address: verifyPhoneNumber.address
         }
       }
     });
