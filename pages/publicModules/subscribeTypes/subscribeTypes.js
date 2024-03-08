@@ -307,7 +307,7 @@ NKC.modules.SubscribeTypes = function() {
           .catch(function(data) {
             sweetError(data);
           })
-      });
+      },{selectTypesWhenSubscribe:false});
     } else {
       this_.subscribeUserPromise(id, sub)
         .then(function() {

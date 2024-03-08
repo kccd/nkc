@@ -193,6 +193,9 @@ loginRouter
     const userPersonalById = await db.UsersPersonalModel.findOne({
       uid: user.uid,
     });
+    // 检查IP地址是否突变
+    await db.UsersPersonalModel.shouldVerifyPhoneNumberOfIP(address, user.uid);
+    // await db.UsersPersonalModel.shouldVerifyPhoneNumberOfIP('171.95.255.27', user.uid);
     let secretList = userPersonalById.secret;
     const loginRecordDoc = await db.LoginRecordModel.createLoginRecord({
       uid: user.uid,

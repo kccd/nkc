@@ -1,3 +1,5 @@
+const { collectionService } = require('../../services/subscribe/collection.service');
+
 const router = require('koa-router')();
 
 router.get('/:aid', async (ctx, next)=>{
@@ -96,10 +98,11 @@ router.get('/:aid', async (ctx, next)=>{
         // ];
       }
       //是否收藏文章
-      const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
-      if(collection) {
-        data.columnPost.collected = true;
-      }
+      // const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: article._id, type: "article"});
+      // if(collection) {
+      //   data.columnPost.collected = true;
+      // }
+      data.columnPost.collected = await collectionService.isCollectedArticle(user.uid, article._id);
       //禁用和退修权限
       if(permission('movePostsToRecycle') || permission('movePostsToDraft')) {
         permissions.disabled = true
@@ -166,10 +169,11 @@ router.get('/:aid', async (ctx, next)=>{
     data.columnPost.collectedCount = await db.ThreadModel.getCollectedCountByTid(thread.tid);
     //获取用户是否收藏文章
     if(user) {
-      const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: thread.tid, type: "collection"});
-      if(collection) {
-        data.columnPost.collected = true;
-      }
+      // const collection = await db.SubscribeModel.findOne({cancel: false, uid: data.user.uid, tid: thread.tid, type: "collection"});
+      // if(collection) {
+      //   data.columnPost.collected = true;
+      // }
+      data.columnPost.collected = await collectionService.isCollectedThread(user.uid, thread.tid);
     }
     // 文章处于待审核的状态
     // 若当前用户不是专家、不是作者，则在此抛出403

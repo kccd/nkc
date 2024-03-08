@@ -655,6 +655,74 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function (uid) {
   }
 };
 
+/**
+ * 根据传入ip地址与上一次登录的ip地址判断是否需要验证手机号即是否更新上一次验证时间为null
+ * @param {string} ip 用户本次登录ip
+ * @param {string} uid 用户id
+ */
+usersPersonalSchema.statics.shouldVerifyPhoneNumberOfIP = async function (
+  ip,
+  uid,
+) {
+  const SettingModel = mongoose.model('settings');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const LoginRecordModel = mongoose.model('loginRecords');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const userPersonal = await UsersPersonalModel.findOne({ uid });
+  const authSettings = await SettingModel.getSettings('auth');
+  // 超过最大地址限制
+  let overAddressLimit = false;
+  if (userPersonal && authSettings.verifyPhoneNumber.enabled) {
+    const address = authSettings.verifyPhoneNumber.address;
+    // 获取上一次的IP地址
+    const loginRecords = await LoginRecordModel.findOne({ uid })
+      .sort({ toc: -1 })
+      .limit(1);
+    if (loginRecords) {
+      const latestIpAddress = await apiFunction.getIpInfoFromLocalModule(ip);
+      const beforeIpAddress = await apiFunction.getIpInfoFromLocalModule(
+        loginRecords.ip,
+      );
+      // const beforeIpAddress = await apiFunction.getIpInfoFromLocalModule(
+      //   '110.184.0.1',
+      // );
+      // console.log('====================================');
+      // console.log(latestIpAddress,beforeIpAddress);
+      // console.log('====================================');
+      if (latestIpAddress && beforeIpAddress) {
+        switch (address) {
+          case 'null':
+            break;
+          case 'city':
+            overAddressLimit =
+              latestIpAddress.country !== beforeIpAddress.country ||
+              latestIpAddress.province !== beforeIpAddress.province ||
+              latestIpAddress.city !== beforeIpAddress.city;
+            break;
+          case 'province':
+            overAddressLimit =
+              latestIpAddress.country !== beforeIpAddress.country ||
+              latestIpAddress.province !== beforeIpAddress.province;
+            break;
+          case 'country':
+            overAddressLimit =
+              latestIpAddress.country !== beforeIpAddress.country;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    if (overAddressLimit) {
+      // 更新上一次验证时间为null
+      await userPersonal.updateOne({
+        $set: {
+          lastVerifyPhoneNumberTime: null,
+        },
+      });
+    }
+  }
+};
 /*
  * 获取用户的邮箱地址
  * @param {String} uid 用户ID
