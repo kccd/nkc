@@ -182,6 +182,10 @@
     padding-left: @avatarWidth + 1rem;
     min-height: @avatarWidth;
 
+    @media(max-width: 768px) {
+           padding-left: 4rem;
+            min-height: 3.5rem;
+        }
     .single-moment-left{
       position: absolute;
       top: 0;
@@ -190,6 +194,10 @@
       .single-moment-avatar{
         height: @avatarWidth;
         width: @avatarWidth;
+        @media(max-width: 768px) {
+          height: 3.5rem;
+          width: 3.5rem;
+        }
         border-radius: 50%;
         overflow: hidden;
         img{

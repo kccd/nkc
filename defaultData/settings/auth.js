@@ -14,6 +14,7 @@ module.exports = {
       reviewPostContent:
         '请参与定期验证手机号，验证前你所发表的内容需通过审核后才能显示。',
       disablePublishContent: '请参与定期验证手机号，验证前你无权发表内容。',
+      address: 'null',
     },
   },
 };

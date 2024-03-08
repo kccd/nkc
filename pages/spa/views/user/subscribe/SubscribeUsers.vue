@@ -308,6 +308,7 @@ export default {
                 sweetError(err);
               })
         }, {
+          selectTypesWhenSubscribe:false
         })
       }else{
         subUsers(uid,sub)
