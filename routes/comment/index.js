@@ -166,7 +166,8 @@ router
           //发布评论
           data.renderedComment = await comment.publishComment(
             article,
-            toColumn,
+            // toColumn,
+            null,
             {
               ip: ctx.address,
               port: ctx.port,

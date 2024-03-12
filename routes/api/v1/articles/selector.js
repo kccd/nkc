@@ -102,6 +102,9 @@ router.get('/', permissions.OnlyUser(), async (ctx, next) => {
           item.columnId,
           item.article,
         );
+        if (!item.columnId) {
+          url = `/article/${item._id}`;
+        }
       }
       return {
         tid: item._id,

@@ -2,9 +2,11 @@
   .column-creation.standard-fluid-max-container
     //.m-b-1
       bread-crumb(:list="navList")
-    template(v-if="column.userColumn")
+    template
       article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
-    template(v-else)
+    //template(v-if="column.userColumn")
+      article-editor(ref="articleEditor" :configs="formConfigs" time="60000" source="column")
+    //template(v-else)
       .no-column
         span 您还未开通专栏，点击&nbsp;
         a(href="/column") 这里

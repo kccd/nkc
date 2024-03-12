@@ -777,5 +777,6 @@
   "visitZoneMomentHistory": "查看电文修改历史",
   "rollbackZoneMomentHistory": "回滚电文历史",
   "visitOtherUserZoneMomentHistory": "查看其他人的电文修改历史",
-  "visitDocument":"访问文章信息"
+  "visitDocument": "访问文章信息",
+  "previewArticle": "预览独立文章"
 }

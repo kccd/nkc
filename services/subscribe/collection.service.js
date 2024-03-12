@@ -19,6 +19,13 @@ class CollectionService {
       sid: aid,
     });
   }
+  async isCollectedPost(uid, pid) {
+    return await subscribeService.isSubscribed({
+      uid,
+      source: subscribeSources.collectionPost,
+      sid: pid,
+    });
+  }
 
   async checkWhenCollectThread(uid, tid) {
     const isCollected = await this.isCollectedThread(uid, tid);
@@ -31,6 +38,15 @@ class CollectionService {
 
   async checkWhenCollectArticle(uid, aid) {
     const isCollected = await this.isCollectedArticle(uid, aid);
+    if (isCollected) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
+      );
+    }
+  }
+
+  async checkWhenCollectPost(uid, pid) {
+    const isCollected = await this.isCollectedPost(uid, pid);
     if (isCollected) {
       ThrowBadRequestResponseTypeError(
         ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
@@ -56,6 +72,15 @@ class CollectionService {
     });
   }
 
+  async collectPost(uid, pid, cid = []) {
+    return await subscribeService.createSubscribe({
+      source: subscribeSources.collectionPost,
+      sid: pid,
+      uid,
+      cid,
+    });
+  }
+
   async unCollectThread(uid, tid) {
     await subscribeService.cancelSubscribe({
       uid,
@@ -68,6 +93,13 @@ class CollectionService {
     await subscribeService.cancelSubscribe({
       uid,
       source: subscribeSources.collectionArticle,
+      sid: aid,
+    });
+  }
+  async unCollectPost(uid, aid) {
+    await subscribeService.cancelSubscribe({
+      uid,
+      source: subscribeSources.collectionPost,
       sid: aid,
     });
   }
@@ -91,6 +123,18 @@ class CollectionService {
       uid,
       source: subscribeSources.collectionArticle,
       sid: aid,
+    });
+    if (subscribe) {
+      cid = subscribe.cid;
+    }
+    return cid;
+  }
+  async getCollectedPostCategoriesId(uid, pid) {
+    let cid = [];
+    const subscribe = await subscribeService.getUserSubscribeBySource({
+      uid,
+      source: subscribeSources.collectionPost,
+      sid: pid,
     });
     if (subscribe) {
       cid = subscribe.cid;

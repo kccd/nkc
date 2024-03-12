@@ -464,7 +464,18 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   const articlesUrl = {};
   const articles = Object.values(articlesObject);
   for(const a of articles) {
-    articlesUrl[a._id] = (await ArticleModel.getArticleUrlBySource(a._id, a.source, a.sid)).articleUrl;
+    let articleUrl = '';
+    if (a.source === 'column') {
+      if (!a.sid) {
+        articleUrl = `/article/${a._id}`;
+      } else {
+        articleUrl = (await ArticleModel.getArticleUrlBySource(a._id, a.source, a.sid.split('-')[0])).articleUrl;
+      }
+    } else {
+      articleUrl = (await ArticleModel.getArticleUrlBySource(a._id, a.source, a.sid)).articleUrl;
+    }
+    // articlesUrl[a._id] = (await ArticleModel.getArticleUrlBySource(a._id, a.source, a.sid)).articleUrl;
+    articlesUrl[a._id] = articleUrl;
   }
   for(const t of types) {
     typesObj[t._id] = t;

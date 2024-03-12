@@ -127,6 +127,21 @@ router
         const columnPost = await db.ColumnPostModel.findOne({_id, columnId: column._id});
         if(columnPost) {
           await columnPost.deleteOne();
+          if (columnPost.type === 'article') {
+            // 撤稿时清除文章sid中专栏ID片段
+            let sidArray = [];
+            // let sid = '';
+            const columnPostArray = await db.ColumnPostModel.find({
+              pid: columnPost.pid,
+              type: 'article',
+            });
+            for (const columnPostItem of columnPostArray) {
+              sidArray.push(columnPostItem.columnId);
+            }
+            sidArray = [...new Set(sidArray)];
+            const article = await db.ArticleModel.findOne({_id: columnPost.pid});
+            await article.updateOne({ $set: { sid: sidArray.join('-') } });
+          }
         }
         await db.ColumnModel.updateOne({_id: column._id}, {$pull: {topped: _id}});
       }

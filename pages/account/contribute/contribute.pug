@@ -1,20 +1,21 @@
 extends ../../bootstrap_base
 block title
-  title 投稿记录
+  title 投稿/撤稿记录
 block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
-        h4 投稿记录
+        h4 投稿/撤稿 记录
       .col-xs-12.col-md-12
         include ../../publicModules/paging/paging
         .table-responsive
           table.table
             thead
               tr
-                th 投稿时间
+                th 申请时间
                 th 专栏
                 th 文章
+                th 类型
                 th 附加说明
                 th 状态
             tbody
@@ -24,15 +25,27 @@ block content
                   th
                     a(href=`/m/${c.columnId}` target="_blank")=c.column.name
                   th
-                    a(href=`/t/${c.tid}` target="_blank")=c.thread.firstPost.t
+                    if c.source==='article'
+                      a(href=`/article/${c.tid}` target="_blank")=c.article.title
+                    else 
+                      a(href=`/t/${c.tid}` target="_blank")=c.thread.firstPost.t
+                  th
+                    if c.type==='submit'
+                      span 投稿文章
+                    else 
+                      span(style="color:rgb(232, 90, 113)") 撤稿文章
                   th=c.description
                   th
-                    if c.passed === null
+                    if c.passed === 'pending'
                       span 待处理
-                    else if c.passed === true
+                    else if c.passed === 'resolve'
                       span.text-success 已同意
-                    else
+                    else if c.passed === 'unknown'
+                      spans 审核中
+                    else if c.passed === 'reject'
                       span.text-danger=`已拒绝(理由：${c.reason||"无"})`
+                    else 
+                      span.text-info 已取消
         include ../../publicModules/paging/paging_input
 block scripts
   +includeJS("/account/contribute/contribute.js")

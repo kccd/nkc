@@ -70,6 +70,31 @@ router
     };
     await next();
   })
+  .get('/getColumn', async (ctx, next) => {
+    const { db, data, query } = ctx;
+    const { columnId, columnName } = query;
+    const targetColumns = [];
+    if (columnName) {
+      const column = await db.ColumnModel.findOne({
+        nameLowerCase: columnName.toLowerCase(),
+        closed: false,
+      });
+      if (column) {
+        targetColumns.push(column);
+      }
+    }
+    if (columnId) {
+      const column = await db.ColumnModel.findOne({
+        _id: columnId,
+        closed: false,
+      });
+      if (column) {
+        targetColumns.push(column);
+      }
+    }
+    data.targetColumns = targetColumns;
+    await next();
+  })
   .post('/', async (ctx, next) => {
     const { data, db, body, state } = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(

@@ -413,8 +413,26 @@ module.exports = {
       ]
     },
     {
+      content: "您的专栏 [url=columnURL(columnName)] 有新的撤稿，[url=columnContributeURL(立即查看)]",
+      type: "newColumnDisContribute",
+      parameters: [
+        "columnContributeURL",
+        "columnURL",
+        "columnName"
+      ]
+    },
+    {
       content: "您在专栏 [url=columnURL(columnName)] 的投稿状态已更新，[url=userContributeURL(立即查看)]",
       type: "columnContributeChange",
+      parameters: [
+        "userContributeURL",
+        "columnURL",
+        "columnName"
+      ]
+    },
+    {
+      content: "您在专栏 [url=columnURL(columnName)] 的撤稿状态已更新，[url=userContributeURL(立即查看)]",
+      type: "columnDisContributeChange",
       parameters: [
         "userContributeURL",
         "columnURL",

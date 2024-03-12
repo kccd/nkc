@@ -15,7 +15,7 @@
     .m-b-05#container
       editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" )
     .m-b-05
-      column(
+      //column(
         ref="column"
         :data="{addedToColumn: added}"
         :state="columnInfo"
@@ -179,10 +179,10 @@
           commentId: self.commentId,
           toColumn: null,
         };
-        const toColumn = self.$refs.column.getStatus();
-        if(toColumn.checkbox) {
-          data.toColumn = toColumn;
-        }
+        // const toColumn = self.$refs.column.getStatus();
+        // if(toColumn.checkbox) {
+        //   data.toColumn = toColumn;
+        // }
         return nkcAPI('/comment', 'POST', data)
         .then(res => {
           self.commentId = res.commentId;

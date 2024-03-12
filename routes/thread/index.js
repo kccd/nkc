@@ -57,7 +57,8 @@ threadRouter
         data.threads = [];
         const threadsId = threads.map((t) => t.oc);
         const contributes = await db.ColumnContributeModel.find(
-          { columnId, pid: { $in: threadsId }, passed: null },
+          // { columnId, pid: { $in: threadsId }, passed: null },
+          { columnId, pid: { $in: threadsId }, passed: 'pending' },
           { pid: 1 },
         );
         let columnPosts = await db.ColumnPostModel.find(

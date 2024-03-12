@@ -14,7 +14,7 @@ router
   .post("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {user, column} = data;
-    if(user.uid === column.uid) ctx.throw(400, "自己的专栏无需投稿，可在文章页直接将文章推送到专栏");
+    // if(user.uid === column.uid) ctx.throw(400, "自己的专栏无需投稿，可在文章页直接将文章推送到专栏");
     let {threadsId, articlesId, description, mainCategoriesId, minorCategoriesId} = body;
     if(threadsId.length === 0 && articlesId.length === 0) ctx.throw(400, "请选择需要投稿的文章");
     if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "请选择文章分类");
@@ -54,7 +54,8 @@ router
           columnId: column._id,
           pid: {$in: ocs},
           source: columnPostTypes.thread,
-          passed: null
+          // passed: null
+          passed: 'pending',
         });
         if(contributes && contributes.length > 0){
           const contributesPids = contributes.map(item => {
@@ -98,11 +99,12 @@ router
       }
       if(ids && ids.length > 0){
         let contributes = await db.ColumnContributeModel.find({
-          columnId: column._id, pid: {$in: ids}, source: 'thread',passed: null
+          // columnId: column._id, pid: {$in: ids}, source: 'thread',passed: null
+          columnId: column._id, tid: {$in: ids}, source: 'article',passed: 'pending'
         });
         if(contributes && contributes.length > 0){
           const contributesPids = contributes.map(item => {
-            return item.pid
+            return item.tid
           })
           ids = ids.filter(item=>{
             return !contributesPids.includes(item)
@@ -127,12 +129,58 @@ router
         mcid: minorCategoriesId,
         description,
         columnId: column._id,
-        source: columnPostTypes.thread
+        source: columnPostTypes.thread,
+        passed: 'pending',
+        type: 'submit',
       });
       await contribute.save();
       threadCount++;
     }
     for(const _article of articles) {
+      const userPermissionObject =
+        await db.ColumnModel.getUsersPermissionKeyObject();
+      const isPermission = await db.ColumnModel.checkUsersPermission(
+        column.users,
+        user.uid,
+        userPermissionObject.column_post_add,
+      );
+      let passed = 'pending';
+      if(isPermission || column.uid === user.uid){
+        passed = 'resolve';
+        const article = await db.ArticleModel.findOne({_id:_article._id});
+        let columnPost = await db.ColumnPostModel.findOne({
+          pid: _article._id,
+          columnId: column._id,
+          type: 'article',
+        });
+        if (!columnPost) {
+          await db.ColumnPostModel({
+            _id: await db.SettingModel.operateSystemID("columnPosts", 1),
+            tid: '',
+            from: "contribute",
+            pid: article._id,
+            columnId: column._id,
+            type: 'article',
+            order: await db.ColumnPostModel.getColumnPostOrder(mainCategoriesId,minorCategoriesId),
+            top: article.toc,
+            cid: mainCategoriesId,
+            mcid: minorCategoriesId,
+          }).save();
+        }
+        if (article.source === 'column') {
+          // 需要进行更新article中sid
+          let sidArray = [];
+          const columnPostArray = await db.ColumnPostModel.find({
+            pid: article._id,
+            type: 'article',
+          });
+          for (const columnPostItem of columnPostArray) {
+            sidArray.push(columnPostItem.columnId);
+          }
+          sidArray = [...new Set(sidArray)];
+          await article.updateOne({ $set: { sid: sidArray.join('-')}});
+        }
+      }
       const contribute = db.ColumnContributeModel({
         _id: await db.SettingModel.operateSystemID("columnContributes", 1),
         uid: user.uid,
@@ -142,7 +190,9 @@ router
         mcid: minorCategoriesId,
         description,
         columnId: column._id,
-        source: columnPostTypes.article
+        source: columnPostTypes.article,
+        passed,
+        type: 'submit',
       });
       await contribute.save();
       threadCount++;

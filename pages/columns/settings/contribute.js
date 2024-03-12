@@ -65,10 +65,10 @@ var app = new Vue({
       if(!agree){
         type = "disagree"
       } else {
-        if(cid.length === 0) return screenTopWarning("请选择文章分类");
+        if(cid.length === 0 && c.type==='submit') return screenTopWarning("请选择文章分类");
       }
       nkcAPI("/m/" + this.column._id + "/settings/contribute", "POST", {
-        contributes: [{_id: c._id, source: c.source}],
+        contributes: [{_id: c._id, source: c.source, type: c.type}],
         reason: reason,
         mainCategoriesId: cid,
         minorCategoriesId: mcid,

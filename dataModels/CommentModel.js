@@ -1214,6 +1214,19 @@ schema.statics.getCommentsInfo = async function (comments) {
     const columnPost = columnPostsObj[articlePost.sid];
     if (articlePost.source === columnSource) {
       if (!columnPost) {
+        // 对于已经撤稿的文章下的评论暂时跳转文章预览页面
+        results.push({
+          ...comment.toObject(),
+          article: articleObj[articlePost.sid],
+          commentDocument,
+          articleDocument,
+          user: userObj[comment.uid],
+          url: `article/${articleObj[articlePost.sid]._id}`,
+          isAuthor: commentDocument.uid === articleDocument.uid,
+          commentUrl: `article/${articleObj[articlePost.sid]._id}`,
+          content: nkcRender.htmlToPlain(commentDocument.content),
+          // credits,
+        });
         continue;
       }
     }

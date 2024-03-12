@@ -61,10 +61,18 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  // passed: {
+  //   type: Boolean,
+  //   default: null,
+  //   index: 1
+  // }
   passed: {
-    type: Boolean,
-    default: null,
-    index: 1
+    type: String,
+    default: ""
+  },
+  type: {
+    type: String,
+    default: ""
   }
 }, {
   collection: "columnContributes"
@@ -73,33 +81,57 @@ const schema = new Schema({
 schema.statics.extendContributes = async (contributes) => {
   const UserModel = mongoose.model("users");
   const ThreadModel = mongoose.model("threads");
-  const uid = new Set(), tid = new Set();
+  const ArticleModel = mongoose.model("articles");
+  const ColumnModel = mongoose.model('columns');
+  const uid = new Set(), tid = new Set(), articlesId = new Set(), columnsId = new Set();
   contributes.map(c => {
     uid.add(c.uid);
-    tid.add(c.tid);
+    columnsId.add(c.columnId);
+    if (c.source === 'article') {
+      articlesId.add(c.tid);
+    } else if (c.source === 'thread') {
+      tid.add(c.tid);
+    }
   });
   const users = await UserModel.find({uid: {$in: [...uid]}});
   let threads = await ThreadModel.find({tid: {$in: [...tid]}});
+  let articles = await ArticleModel.find({_id: {$in: [...articlesId]}});
+  let columns = await ColumnModel.find({_id: {$in: [...columnsId]}});
   threads = await ThreadModel.extendThreads(threads);
-  const usersObj = {}, threadsObj = {};
+  articles = await ArticleModel.extendArticles(articles);
+  const usersObj = {}, threadsObj = {}, articleObj = {}, columnObj = {};
   users.map(user => {
     usersObj[user.uid] = user;
   });
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
+  articles.forEach(item=>{
+    articleObj[item._id] = item;
+  });
+  columns.forEach(item=>{
+    columnObj[item._id] = item;
+  })
   const results = [];
   for(let c of contributes) {
     c = c.toObject();
-    c.thread = threadsObj[c.tid];
-    if(c.thread.firstPost.anonymous) {
-      c.thread.uid = "";
-      c.thread.firstPost.uid = "";
-      c.thread.firstPost.user = "";
-    } else {
-      c.user = c.thread.firstPost.user;
+    if(columnObj[c.columnId]){
+      c.column = {name: columnObj[c.columnId].name};
     }
-    results.push(c);
+    if (c.source === 'article' && articleObj[c.tid]){
+      c.article = articleObj[c.tid];
+      results.push(c);
+    } else if (c.source === 'thread'){
+      c.thread = threadsObj[c.tid];
+      if(c.thread.firstPost.anonymous) {
+        c.thread.uid = "";
+        c.thread.firstPost.uid = "";
+        c.thread.firstPost.user = "";
+      } else {
+        c.user = c.thread.firstPost.user;
+      }
+      results.push(c);
+    }
   }
   return results;
 };
@@ -243,6 +275,9 @@ schema.statics.extendColumnContributes = async (contributes) => {
         url = tools.getUrl('zoneArticle', article._id)
       }else {
         url = tools.getUrl('columnArticle', article.columnId, article.article)
+        if(!article.columnId){
+          url = `/article/${article._id}`;
+        }
       }
       articlesObj[article._id] = {
         tid: article._id,

@@ -24,7 +24,7 @@ router
       .skip(paging.start)
       .limit(paging.perpage);
     data.paging = paging;
-    data.articlesList = await db.ArticleModel.extendArticlesList(articles);
+    data.articlesList = await db.ArticleModel.extendArticlesListWithColumn(articles);
     await next();
   });
 module.exports = router;

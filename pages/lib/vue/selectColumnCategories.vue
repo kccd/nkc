@@ -106,6 +106,9 @@ export default {
     },
     selectedMinorCategoriesId() {
       this.$emit('change');
+    },
+    columnId(){
+    this.getCategories();
     }
   },
   methods: {
