@@ -1541,7 +1541,7 @@ schema.statics.extendArticlesDraftList = async (articles) => {
     const { _id: articleId, status, source, sid } = article;
     let articleUrl = '',
       editorUrl = '';
-    if (source === 'columnSource') {
+    if (source === columnSource) {
       articleUrl = `/article/${articleId}`;
       editorUrl = `/creation/editor/column?source=column&aid=${articleId}`;
     } else {
