@@ -292,6 +292,12 @@ import { routesName } from "../routes/creation"
               url: '/creation/collections',
               icon: 'fa fa-folder-open-o'
             },
+            // {
+            //   type: routesName.creationCollectionPosts,
+            //   title: '回复收藏',
+            //   url: '/creation/collectionPosts',
+            //   icon: 'fa fa-heart'
+            // },
             {
               type: routesName.creationBlackLists,
               title: '黑名单',

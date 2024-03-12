@@ -418,6 +418,62 @@ router
         let passType;
         if (document.source === 'article') {
           passType = 'documentPassReview';
+          const contribute = await db.ColumnContributeModel.findOne({ tid: document.sid,type:'submit'}).sort({toc:-1});
+          if(contribute&&contribute.passed==='unknown'){
+            // 是否具有专栏管理员添加文章权限或者专栏主
+            // 获取专栏的基本信息。。与用户的信息进行对比
+            const column = await db.ColumnModel.findOnly({ _id: contribute.columnId });
+            const userPermissionObject =
+              await db.ColumnModel.getUsersPermissionKeyObject();
+            const isPermission = await db.ColumnModel.checkUsersPermission(
+              column.users,
+              document.uid,
+              userPermissionObject.column_post_add,
+            );
+            if(isPermission || column.uid === document.uid){
+              const article = await db.ArticleModel.findOne({_id:document.sid})
+              let columnPost = await db.ColumnPostModel.findOne({
+                pid: document.sid,
+                type: 'article',
+                columnId: column._id,
+              });
+              if (!columnPost) {
+                await db.ColumnPostModel({
+                  _id: await db.SettingModel.operateSystemID("columnPosts", 1),
+                  tid: '',
+                  from: "contribute",
+                  pid: article._id,
+                  columnId: column._id,
+                  type: contribute.source,
+                  order: await db.ColumnPostModel.getColumnPostOrder(contribute.cid,contribute.mcid),
+                  top: article.toc,
+                  cid: contribute.cid,
+                  mcid: contribute.mcid,
+                }).save();
+              }
+              // 需要进行更新article中sid
+              let sidArray = [];
+              const columnPostArray = await db.ColumnPostModel.find({
+                pid: article._id,
+                type: 'article',
+              });
+              for (const columnPostItem of columnPostArray) {
+                sidArray.push(columnPostItem.columnId);
+              }
+              sidArray = [...new Set(sidArray)];
+              await article.updateOne({ $set: { sid:sidArray.join('-')}});
+              await contribute.updateOne({
+                tlm: Date.now(),
+                description: '具有专栏添加文章权限',
+                passed: 'resolve',
+              });
+            } else {
+              await contribute.updateOne({
+                tlm: Date.now(),
+                passed: 'pending',
+              });
+            }
+          }
         } else if (document.source === 'comment') {
           passType = 'commentPassReview';
           //如果审核的内容是comment,并且是第一次审核，即判断document的状态是否为unknown,就通知文章作者文章被评论

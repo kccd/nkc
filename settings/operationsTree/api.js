@@ -37,6 +37,9 @@ module.exports = {
       selector: {
         GET: Operations.getUserArticles,
       },
+      contribute: {
+        POST: Operations.column_single_contribute,
+      },
     },
     column: {
       PARAMETER: {

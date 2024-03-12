@@ -157,8 +157,25 @@ xsfsRecordSchema.statics.extendXsfsRecords = async (records) => {
       url = getUrl('post', pid);
     } else if(type === xsfsRecordTypes.article) {
       const article = await ArticleModel.findOnly({_id: pid});
-      const {articleUrl} = await ArticleModel.getArticleUrlBySource(article._id, article.source, article.sid);
-      url = articleUrl;
+      if (article.source === 'column') {
+        if (!article.sid) {
+          url = `/article/${article._id}`;
+        } else {
+          const { articleUrl } = await ArticleModel.getArticleUrlBySource(
+            article._id,
+            article.source,
+            article.sid.split('-')[0],
+          );
+          url = articleUrl;
+        }
+      } else {
+        const { articleUrl } = await ArticleModel.getArticleUrlBySource(
+          article._id,
+          article.source,
+          article.sid,
+        );
+        url = articleUrl;
+      }
     } else if(type === xsfsRecordTypes.comment) {
       url = getUrl('comment', pid);
     }

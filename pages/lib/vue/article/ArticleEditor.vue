@@ -30,7 +30,18 @@
             ref="editorCategoriesRef"
           )
       //只有article的状态为default或者不存在article时才会显示专栏文章分类
-      .form-group(v-if="(articleStatus === 'default' || !articleStatus) && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
+      div(v-if="configs.selectCategory")
+        .selected-column(v-if="column")
+          .selected-column-avatar
+            img(:src="column.avatar")
+          .selected-column-name {{column.name}}
+            .fa.fa-remove(@click="removeColumn")
+        button.btn.btn-default.btn-sm( @click="selectColumn" ) 选择投稿专栏
+      .form-group(v-if="column && configs.selectCategory")
+        .m-b-2
+          .editor-header 专栏文章分类
+          select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
+      //.form-group(v-if="(articleStatus === 'default' || !articleStatus) && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
@@ -42,6 +53,7 @@
       .checkbox
         .editor-auto-save(v-if="autoSaveInfo")
           .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
+    select-column(ref="selectColumn")
 </template>
 
 <style lang="less">
@@ -126,6 +138,35 @@
       color: #428bca;
       font-style: italic;
     }
+    .selected-column{
+    font-size: 0;
+    display: inline-block;
+    margin: 0 0.5rem 0.5rem 0;
+    vertical-align: top;
+  }
+  .selected-column-avatar img{
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 3px 0 0 3px;
+  }
+  .selected-column-avatar{
+    display: inline-block;
+    vertical-align: top;
+  }
+  .selected-column-name{
+    vertical-align: top;
+    display: inline-block;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    padding: 0 0.5rem;
+    border-radius: 0 3px 3px 0;
+    font-size: 1.2rem;
+    background-color: #999;
+    color: #fff;
+  }
+  .selected-column-name .fa{
+    cursor: pointer;
+  }
   }
   .editor-header{
     font-size: 1.25rem;
@@ -148,6 +189,7 @@ import { getUrl } from '../../js/tools'
 import {visitUrl} from "../../js/pageSwitch";
 import {immediateDebounce} from "../../js/execution";
 import EditorCategories from "../publicVue/moveThreadOrArticle/EditorCategories";
+import SelectColumn from "../../../editor/vueComponents/SelectColumn"
 
 
 export default {
@@ -193,7 +235,8 @@ export default {
   components: {
     "document-editor": DocumentEditor,
     'select-column-categories': selectColumnCategories,
-    'editor-categories': EditorCategories
+    'editor-categories': EditorCategories,
+    'select-column': SelectColumn,
   },
   computed: {
     type() {
@@ -212,7 +255,7 @@ export default {
     },
   },
   mounted() {
-    this.getColumn();
+    // this.getColumn();
     this.initAutoSaveToDraft();
   },
   destroyed() {
@@ -283,17 +326,20 @@ export default {
       if(self.source === 'column') {
         mid = this.getRequest().mid;
         aid = this.getRequest().aid;
-        if(!mid) {
-          if(self.columnId) {
-            mid = self.columnId;
-            self.addUrlParam('mid', mid);
-          } else {
-            return;
-          }
+        // if(!mid) {
+        //   if(self.columnId) {
+        //     mid = self.columnId;
+        //     self.addUrlParam('mid', mid);
+        //   } else {
+        //     return;
+        //   }
+        // }
+        // query = query + `&mid=${mid}`;
+        if(mid){
+          query = query + `&mid=${mid}`;
         }
-        query = query + `&mid=${mid}`;
         if(aid) {
-          query = query + `&mid=${mid}&aid=${aid}`;
+          query = query + `&aid=${aid}`;
         }
       } else if(self.source === 'zone') {
         aid = this.getRequest().aid;
@@ -341,6 +387,11 @@ export default {
           } else if(data.editorInfo.articles) {
             //存在正在编辑中的专栏文章
             self.articles = data.editorInfo.articles;
+          }
+          if(data.targetColumn){
+            self.columnId = data.targetColumn._id;
+            self.column = data.targetColumn;
+            self.column.avatar = getUrl('userAvatar', data.targetColumn.avatar);
           }
         })
         .catch(err => {
@@ -668,9 +719,9 @@ export default {
       }
       //检测是否勾选文章专栏分类
       if(!this.article.title) return sweetWarning('请输入文章标题');
-      if(this.articleStatus === 'default' && this.source === 'column' && !this.selectCategory
-        || (this.selectCategory && this.selectCategory.selectedMainCategoriesId
-          && this.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
+      // if(this.articleStatus === 'default' && this.source === 'column' && !this.selectCategory
+      //   || (this.selectCategory && this.selectCategory.selectedMainCategoriesId
+      //     && this.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
       this.post(this.types.publish);
     },
     //保存文章 有提示保存成功
@@ -722,6 +773,23 @@ export default {
       if(this.type.create === this.types.create){
         this.post(this.types.autoSave)
       }
+    },
+    selectColumn(){
+      const self =this;
+      this.$refs.selectColumn.open(
+        function(data) {
+          self.columnId = data.columns[0]._id;
+          self.column = data.columns[0];
+          self.column.avatar = getUrl('userAvatar', data.columns[0].avatar);
+        },
+        {
+          showColumnCategories:false,
+        }
+      );
+    },
+    removeColumn(){
+      this.column=null;
+      this.columnId=null;
     }
   }
 }

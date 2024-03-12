@@ -9,3 +9,13 @@ export function getColumnInfo() {
       sweetError(err);
     });
 };
+//根据专栏名获取专栏信息;
+export function getColumnMessage(columnName) {
+  return nkcAPI(`/column/getColumn?columnName=${columnName}`, 'GET')
+    .then((res) => {
+      return res.targetColumns;
+    })
+    .catch((err) => {
+      sweetError(err);
+    });
+}

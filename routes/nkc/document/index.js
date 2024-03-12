@@ -139,12 +139,25 @@ router.get('/', async (ctx, next) => {
         if (!article) {
           break;
         }
-        const { articleUrl } = await db.ArticleModel.getArticleUrlBySource(
-          article._id,
-          article.source,
-          article.sid,
-        );
-        url = articleUrl;
+        if (article.source === 'column') {
+          if (!article.sid) {
+            url = `/article/${article._id}`;
+          } else {
+            const { articleUrl } = await db.ArticleModel.getArticleUrlBySource(
+              article._id,
+              article.source,
+              article.sid.split('-')[0],
+            );
+            url = articleUrl;
+          }
+        } else {
+          const { articleUrl } = await db.ArticleModel.getArticleUrlBySource(
+            article._id,
+            article.source,
+            article.sid,
+          );
+          url = articleUrl;
+        }
         switch (article.source) {
           case articleSourcesObj.column: {
             from = '专栏文章';

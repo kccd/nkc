@@ -86,5 +86,8 @@ module.exports = {
     /*delete: {
 			GET: "deletePost"
 		}*/
+    // collection: {
+    //   POST: Operations.collectionPost,
+    // },
   },
 };

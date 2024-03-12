@@ -8,9 +8,16 @@
         .article-time {{article.time}}
         .article-from 发表
         .article-count 点赞 {{article.voteUp}} 阅读 {{article.hits}} 评论 {{article.comment}}
-      .article-options
+      .article-options(v-if=" article.articleSource === 'column' ")
+        .article-option(v-if=" article.status==='normal' " @click="contribute") 投稿
+        .article-option(v-if="article.articleSourceId" @click="disContribute") 撤稿
+        .article-option(v-if="!article.articleSourceId" @click="navToEditor(article)") 修改
+        .article-option(v-if="!article.articleSourceId&&article.status!=='disabled' " @click="deleteArticle(article)") 删除
+        .article-option(v-if=" article.status==='normal' " @click="navToContribute(article)") 投撤记录
+      .article-options(v-else)
         .article-option(@click="navToEditor(article)") 修改
         .article-option(@click="deleteArticle(article)") 删除
+      submit-column(ref="submitColumn" @change-column="changeColumn")
 </template>
 
 <style lang="less">
@@ -71,6 +78,8 @@
 </style>
 
 <script>
+  import SubmitColumn from "../../editor/vueComponents/SubmitColumn";
+  import { nkcAPI } from "../../lib/js/netAPI";
   import {visitUrl} from "../../lib/js/pageSwitch";
   import {sweetQuestion} from "../../lib/js/sweetAlert";
 
@@ -79,9 +88,15 @@
     data: () => ({
 
     }),
+    components:{
+    'submit-column': SubmitColumn,
+    },
     methods: {
       navToEditor(article) {
         visitUrl(article.articleEditorUrl, false);
+      },
+      navToContribute(article){
+        visitUrl(`/account/contribute?articleId=${article.articleId}`, true);
       },
       deleteArticle(article) {
         const self = this;
@@ -94,7 +109,74 @@
             sweetSuccess('操作成功');
           })
           .catch(sweetError);
-      }
+      },
+      contribute(){
+      //console.log(this.article);
+      const self =this;
+      this.$refs.submitColumn.close();
+      this.$refs.submitColumn.open(
+        function(data) {
+          // self.columnId = data.columns[0]._id;
+          // self.column = data.columns[0];
+          // self.categoryChange();
+          // self.submit(data.mainCategoriesId,data.minorCategoriesId,data.columns[0]);
+          const mainCategoriesId = data.mainCategoriesId;
+          const minorCategoriesId = data.minorCategoriesId;
+          const column = data.columns[0];
+          if(!mainCategoriesId || mainCategoriesId.length === 0){
+            return sweetError("未选择分类");
+          } 
+          nkcAPI("/m/" + column._id + "/contribute", "POST", {
+            articlesId: [self.article.articleId],
+            mainCategoriesId: [...mainCategoriesId],
+            minorCategoriesId: [...minorCategoriesId],
+            threadsId:[],
+            description:''
+          })
+            .then(function() {
+              sweetSuccess('发送投稿申请成功');
+            })
+            .catch(err=>{
+              sweetError(err);
+            });
+        },
+        {
+          retreatArticle:self.article,
+          articleId:self.article.articleId,
+          currentTab:{name:'contribute',title:'投稿'},
+        }
+      );
+      },
+      disContribute(){
+      // console.log(this.article);
+      const self = this;
+      this.$refs.submitColumn.close();
+      this.$refs.submitColumn.open(
+        function(data) {
+        },
+        {
+          retreatArticle:self.article,
+          articleId:self.article.articleId,
+          currentTab:{name:'contributed',title:'已投稿'},
+        }
+      );
+      },
+      changeColumn(data){
+        const { column, contributeColumns} = data;
+        let tempArticle = this.article;
+        // if(column.length>0){
+          if(column){
+            tempArticle.column = [...column];
+          }
+          if(contributeColumns){
+            tempArticle.contributeColumns = [...contributeColumns];
+          }
+          if(tempArticle.column.length===0){
+            tempArticle.articleSourceId='';
+          }
+          this.article = tempArticle;
+        // }
+      },
     }
   }
 </script>

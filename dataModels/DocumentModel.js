@@ -1694,12 +1694,25 @@ schema.statics.getDocumentsUrlByDocumentsId = async (documentsId) => {
     if (source === documentSources.article) {
       const article = articlesObj[sid];
       if (article) {
-        const { articleUrl } = await ArticleModel.getArticleUrlBySource(
-          article._id,
-          article.source,
-          article.sid,
-        );
-        url = articleUrl;
+        if (article.column === 'column') {
+          if (!article.sid) {
+            url = `/article/${article._id}`;
+          } else {
+            const { articleUrl } = await ArticleModel.getArticleUrlBySource(
+              article._id,
+              article.source,
+              article.sid.split('-')[0],
+            );
+            url = articleUrl;
+          }
+        } else {
+          const { articleUrl } = await ArticleModel.getArticleUrlBySource(
+            article._id,
+            article.source,
+            article.sid,
+          );
+          url = articleUrl;
+        }
       }
     } else if (source === documentSources.moment) {
       url = getUrl('zoneMoment', sid);

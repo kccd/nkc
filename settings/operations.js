@@ -44,6 +44,7 @@ const FixedOperations = {
   checkAccountPermission: 'checkAccountPermission',
   getThreadOrder: 'getThreadOrder',
   visitDocument: 'visitDocument',
+  previewArticle: 'previewArticle',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -790,6 +791,7 @@ const DynamicOperations = {
   visitZoneMomentHistory: 'visitZoneMomentHistory',
   rollbackZoneMomentHistory: 'rollbackZoneMomentHistory',
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
+  // collectionPost: 'collectionPost',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

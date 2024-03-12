@@ -243,11 +243,25 @@ router
         _id: data.document.sid,
       });
       //  选择此版本进行编辑的url
-      editorUrl = await db.ArticleModel.getArticleUrlBySource(
-        article._id,
-        article.source,
-        article.sid,
-      );
+      if (article.source === 'column') {
+        if (!article.sid) {
+          editorUrl = {
+            editorUrl: `/creation/editor/column?source=column&aid=${article._id}`,
+          };
+        } else {
+          editorUrl = await db.ArticleModel.getArticleUrlBySource(
+            article._id,
+            article.source,
+            article.sid.split('-')[0],
+          );
+        }
+      } else {
+        editorUrl = await db.ArticleModel.getArticleUrlBySource(
+          article._id,
+          article.source,
+          article.sid,
+        );
+      }
     }
     if (source === 'draft') {
       editorUrl = await db.ArticleModel.getArticleUrlBySource(
