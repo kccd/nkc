@@ -36,7 +36,7 @@
             img(:src="column.avatar")
           .selected-column-name {{column.name}}
             .fa.fa-remove(@click="removeColumn")
-        button.btn.btn-default.btn-sm( @click="selectColumn" ) 选择投稿专栏
+        button.btn.btn-default.btn-sm( @click="selectColumn" ) {{column? "重新选择专栏": "选择投稿专栏"}}
       .form-group(v-if="column && configs.selectCategory")
         .m-b-2
           .editor-header 专栏文章分类
@@ -139,34 +139,42 @@
       font-style: italic;
     }
     .selected-column{
-    font-size: 0;
-    display: inline-block;
-    margin: 0 0.5rem 0.5rem 0;
-    vertical-align: top;
-  }
-  .selected-column-avatar img{
-    height: 2.5rem;
-    width: 2.5rem;
-    border-radius: 3px 0 0 3px;
-  }
-  .selected-column-avatar{
-    display: inline-block;
-    vertical-align: top;
-  }
-  .selected-column-name{
-    vertical-align: top;
-    display: inline-block;
-    height: 2.5rem;
-    line-height: 2.5rem;
-    padding: 0 0.5rem;
-    border-radius: 0 3px 3px 0;
-    font-size: 1.2rem;
-    background-color: #999;
-    color: #fff;
-  }
-  .selected-column-name .fa{
-    cursor: pointer;
-  }
+      font-size: 0;
+      display: inline-block;
+      margin: 0 0.5rem 0.5rem 0;
+      vertical-align: top;
+    }
+    .selected-column-avatar img{
+      height: 2.5rem;
+      width: 2.5rem;
+      border-radius: 3px 0 0 3px;
+    }
+    .selected-column-avatar{
+      display: inline-block;
+      vertical-align: top;
+    }
+    .selected-column-name{
+      vertical-align: top;
+      display: inline-block;
+      height: 2.5rem;
+      line-height: 2.5rem;
+      padding: 0 2.5rem 0 0.5rem;
+      border-radius: 0 3px 3px 0;
+      font-size: 1.2rem;
+      background-color: #999;
+      color: #fff;
+      position: relative;
+    }
+    .selected-column-name .fa{
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 2.5rem;
+      line-height: 2.5rem;
+      text-align: center;
+    }
   }
   .editor-header{
     font-size: 1.25rem;

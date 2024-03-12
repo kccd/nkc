@@ -32,7 +32,7 @@
             .search-user-name {{column.name}}
             .search-user-description {{ column.abbr }}
       .contributed-results(v-if= "currentTab.name==='contributed' ")
-        h5.text-info(v-if="!submittedColumn||submittedColumn.length===0") 暂无已投稿的专栏
+        h5.p-t-2.text-center(v-if="!submittedColumn||submittedColumn.length===0") 空空如也~
         .search-column(v-for="column,index in submittedColumn||[]" :key="index")
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
@@ -47,7 +47,7 @@
           .search-column-status(v-if=" column.type==='retreat'&&column.passed==='reject' " :style="'border-left-color: rgba(253, 226, 226,0.85);'") 
             span(:style="'color: #f56c6c;'") 撤稿失败
       .contributing-results(v-if= "currentTab.name==='contributing' ")
-        h5.text-info(v-if="!submittingColumn||submittingColumn.length===0") 暂无投稿中的专栏
+        h5.p-t-2.text-center(v-if="!submittingColumn||submittingColumn.length===0") 空空如也~
         .search-column(v-for="column,index in submittingColumn||[]" :key="index")
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
@@ -218,7 +218,7 @@ export default {
         const articlesId = this.articleId;
         const column = this.submittedColumn[index];
         const self = this;
-        sweetConfirm('是否向此专栏发送该文章的撤稿申请？').then(function() {
+        sweetQuestion('确定要从当前专栏撤稿吗？此操作需要经专栏管理员同意后才可生效。').then(function() {
           nkcAPI("/api/v1/articles/contribute", "POST", {
                       articlesId,
                       columns:[column._id],
@@ -237,7 +237,7 @@ export default {
                             sweetSuccess('发送撤稿申请成功');
                           }else if(passed==='resolve'){
                             self.deleteOneColumn(index);
-                            sweetSuccess('撤稿文章成功');
+                            sweetSuccess('撤稿成功');
                           }
                         }
                       })
@@ -250,7 +250,7 @@ export default {
         const articlesId = this.articleId;
         const column = this.submittedColumn[index];
         const self = this;
-        sweetConfirm('是否取消撤稿申请？').then(function() {
+        sweetConfirm('确定要取消撤稿申请吗？').then(function() {
           nkcAPI("/api/v1/articles/contribute", "POST", {
                       articlesId,
                       columns:[column._id],
@@ -264,7 +264,7 @@ export default {
                         if(passed&&passed==='cancel'){
                           column.passed = passed;
                           self.$emit('change-column',[...self.submittedColumn]);
-                          sweetSuccess('取消撤稿申请成功');
+                          sweetSuccess('取消成功');
                         }
                       })
                       .catch(err=>{
@@ -277,7 +277,7 @@ export default {
         const column = this.submittingColumn[index];
         const temColumns = [...this.submittingColumn];
         const self = this;
-        sweetConfirm('是否取消投稿申请？').then(function() {
+        sweetConfirm('确定要取消投稿申请吗？').then(function() {
           nkcAPI("/api/v1/articles/contribute", "POST", {
                       articlesId,
                       columns:[column._id],
@@ -292,7 +292,7 @@ export default {
                           temColumns.splice(index,1);
                           self.submittingColumn = temColumns;
                           self.$emit('change-column',{contributeColumns:temColumns});
-                          sweetSuccess('取消投稿申请成功');
+                          sweetSuccess('取消成功');
                         }
                       })
                       .catch(err=>{
@@ -319,7 +319,7 @@ export default {
 }
 }
 .modal-title{
-  padding-left: 5px;
+  padding-left: 1rem;
   height: 3rem;
   line-height: 3rem;
 }
@@ -357,10 +357,10 @@ export default {
   border-bottom: none;
 }
 .modal-body{
-  padding-top: 0;
+  padding-top: 1rem;
   padding-bottom: 0;
   max-height: 60vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .modal-footer{
   border-top: none;
@@ -428,35 +428,21 @@ export default {
   right: 0.5rem;
   top: 2rem;
   button{
-  //   &:focus{
-  //     outline: none;
-  //   }
     height: 2rem;
     width: 4rem;
     border-radius: 2px;
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
     font-size: 1rem;
-    &:hover{
-      // .confirm{
-        text-decoration: underline;
-      // }
-    }
   }
   .confirm{
     background-color: #fff;
     border: 1px solid #ccc;
     color: #282c37;
-    // &:hover{
-    //     background-color: #eee;
-    // }
   }
   .cancel{
     background-color: #e85a71;
     border: 1px solid #e85a71;
     color: #fff;
-    // &:hover{
-    //     background-color: #cb4c61;
-    // }
   }
 }
 .search-user-name{
@@ -489,7 +475,7 @@ export default {
   overflow: hidden;
 }
 .selected-users{
-  padding: 0.5rem 0;
+  padding-top: 0.5rem;
 }
 .selected-column{
   font-size: 0;
