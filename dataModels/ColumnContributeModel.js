@@ -274,10 +274,12 @@ schema.statics.extendColumnContributes = async (contributes) => {
       if(article.source === 'zone'){
         url = tools.getUrl('zoneArticle', article._id)
       }else {
-        url = tools.getUrl('columnArticle', article.columnId, article.article)
-        if(!article.columnId){
-          url = `/article/${article._id}`;
-        }
+        // 投稿处理统一跳转到独立文章页
+        url = `/article/${article._id}`;
+        // url = tools.getUrl('columnArticle', article.columnId, article.article)
+        // if(!article.columnId){
+        //   url = `/article/${article._id}`;
+        // }
       }
       articlesObj[article._id] = {
         tid: article._id,

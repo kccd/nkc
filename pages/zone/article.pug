@@ -91,6 +91,15 @@ block content
             //- .panel-header 作者
             -const author = data.targetUser;
             include ../thread/authorInfo
+        if data.columns
+          .box-shadow.m-b-1
+            .box-shadow-header 所在专栏
+            div
+              include ../columns/home/columnList
+              for column in data.columns
+                +columnListForArticle({
+                  column
+                })
         //- 滚动到页头页脚
         include ../module_scrollTo.pug
   include ../publicModules/floatForumNav

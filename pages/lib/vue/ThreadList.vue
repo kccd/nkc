@@ -19,8 +19,10 @@
           .account-thread-info
             .thread-time
               span {{fromNow(subscribe.article.toc)}}
-            a.thread-forum-link(:href="subscribe.article.column.homeUrl" target="_blank" v-if="subscribe.article.source === 'column'") {{subscribe.article.column.name}}
-            span.thread-forum-link(v-else) 空间文章
+            //a.thread-forum-link(:href="subscribe.article.column.homeUrl" target="_blank" v-if="subscribe.article.source === 'column'") {{subscribe.article.column.name}}
+            a.thread-forum-link(:href="subscribe.article.column.homeUrl" target="_blank" v-if="subscribe.article.source === 'column' && subscribe.article.column ") {{subscribe.article.column.name}}
+            //span.thread-forum-link(v-else) 空间文章
+            span.thread-forum-link(v-else) 独立文章
             span(v-if="subscribe.article.anonymous") 匿名
             a.thread-user(:href="`/u/${subscribe.article.uid}`" target="_blank" v-else)
               img(:src="getUrl('userAvatar', subscribe.article.user.avatar)"

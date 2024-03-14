@@ -33,29 +33,33 @@
             .search-user-description {{ column.abbr }}
       .contributed-results(v-if= "currentTab.name==='contributed' ")
         h5.p-t-2.text-center(v-if="!submittedColumn||submittedColumn.length===0") 空空如也~
-        .search-column(v-for="column,index in submittedColumn||[]" :key="index")
+        .search-column(v-for="column,index in submittedColumn||[]" :key="index" style="height:7rem")
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
           .search-user-info
-            .search-user-name {{column.name}}
+            a.search-user-name( :href="`/m/${column._id}`"  target='_blank') {{column.name}}
             .search-user-description {{ column.abbr }}
-          .search-colum-button
+          //.search-colum-button
               button.cancel(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消
               button.confirm(v-else @click="retreatContribute(index)") 撤稿
           .search-column-status(v-if=" column.type==='retreat'&&column.passed==='pending' " :style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
-          .search-column-status(v-if=" column.type==='retreat'&&column.passed==='reject' " :style="'border-left-color: rgba(253, 226, 226,0.85);'") 
+          //.search-column-status(v-if=" column.type==='retreat'&&column.passed==='reject' " :style="'border-left-color: rgba(253, 226, 226,0.85);'") 
             span(:style="'color: #f56c6c;'") 撤稿失败
+          .search-colum-button.m-t-05
+            a.m-r-05( :href="column.inColumnUrl"  target='_blank') 在专栏中查看
+            button.cancel(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消专栏撤稿
+            button.confirm(v-else @click="retreatContribute(index)") 从专栏中撤稿
       .contributing-results(v-if= "currentTab.name==='contributing' ")
         h5.p-t-2.text-center(v-if="!submittingColumn||submittingColumn.length===0") 空空如也~
-        .search-column(v-for="column,index in submittingColumn||[]" :key="index")
+        .search-column(v-for="column,index in submittingColumn||[]" :key="index" style="height:7rem")
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
           .search-user-info
-            .search-user-name {{column.name}}
+            a.search-user-name(:href="`/m/${column._id}`"  target='_blank') {{column.name}}
             .search-user-description {{ column.abbr }}
-          .search-colum-button
-              button.cancel(@click="cancelSubmit(index)") 取消
+          .search-colum-button.m-t-05
+              button.cancel(@click="cancelSubmit(index)") 取消专栏投稿
           .search-column-status(:style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
       .row(v-if="selectedColumn.length>0&&currentTab.name==='contribute' ")
@@ -132,6 +136,15 @@ export default {
         
       },
       clickColumn(column) {
+        const { inColumn,inContribute} =column;
+        if(inColumn){
+          sweetError('该专栏已投稿');
+          return;
+        }
+        if(inContribute) {
+          sweetError('该专栏已发送投稿申请');
+          return;
+        }
         this.selectedColumn=[{...column}];
       },
       search() {
@@ -143,7 +156,7 @@ export default {
           minLength: 1
         });
         const self = this;
-      getColumnMessage(this.keyword).then(res=>{
+      getColumnMessage(this.keyword,this.articleId).then(res=>{
           self.searchColumns = [...res];
         })
       },
@@ -421,15 +434,16 @@ export default {
   display: table-cell;
   vertical-align: top;
   padding-left: 1rem;
-  max-width: 19rem;
+  // max-width: 19rem;
 }
 .search-colum-button{
-  position: absolute;
-  right: 0.5rem;
-  top: 2rem;
+  // position: absolute;
+  // right: 0.5rem;
+  // top: 2rem;
+  float: right;
   button{
     height: 2rem;
-    width: 4rem;
+    width: 8rem;
     border-radius: 2px;
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
     font-size: 1rem;

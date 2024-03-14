@@ -127,11 +127,13 @@ router
       selectCategory,
       authorInfos,
     } = JSON.parse(fields.article);
-    //内容校验
-    if (title && title.length > 100) {
-      ctx.throw(400, `标题不能超过100个字`);
-    } else if (title && title.length < 3) {
-      ctx.throw(400, `标题不能小于3个字`);
+    if (type === 'publish') {
+      //内容校验
+      if (title && title.length > 100) {
+        ctx.throw(400, `标题不能超过100个字`);
+      } else if (title && title.length < 3) {
+        ctx.throw(400, `标题不能小于3个字`);
+      }
     }
     const _content = customCheerio.load(content).text();
     if (_content && _content.length > 100000) {
@@ -174,7 +176,7 @@ router
       }
       // 对于已经在专栏的文章暂时无法修改和发布
       if (!permission('review') && article.sid) {
-        ctx.throw(400, "该文章已经在专栏中，请撤稿后重试");
+        ctx.throw(400, '该文章已经在专栏中，请撤稿后重试');
       }
       await article.modifyArticle({
         title,

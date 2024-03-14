@@ -72,7 +72,7 @@ router
   })
   .get('/getColumn', async (ctx, next) => {
     const { db, data, query } = ctx;
-    const { columnId, columnName } = query;
+    const { columnId, columnName, articleId } = query;
     const targetColumns = [];
     if (columnName) {
       const column = await db.ColumnModel.findOne({
@@ -80,7 +80,36 @@ router
         closed: false,
       });
       if (column) {
-        targetColumns.push(column);
+        let inColumn = null;
+        let inContribute = false;
+        if (articleId) {
+          // 文章是否在搜索专栏中
+          inColumn = await db.ColumnPostModel.checkColumnPost(
+            column._id,
+            articleId,
+          );
+          // 是否有投稿申请
+          const contribute = await db.ColumnContributeModel.findOne({
+            tid: articleId,
+            source: 'article',
+            columnId: column._id,
+          }).sort({ toc: -1 });
+          if (
+            contribute &&
+            contribute.passed === 'pending' &&
+            contribute.type === 'submit'
+          ) {
+            inContribute = true;
+          }
+        }
+        targetColumns.push({
+          _id: column._id,
+          avatar: column.avatar,
+          name: column.name,
+          abbr: column.abbr,
+          inColumn,
+          inContribute,
+        });
       }
     }
     if (columnId) {
