@@ -12,7 +12,7 @@ router
     const { aid } = params;
     // const { pageSettings, uid } = state;
     // const { user } = data;
-    // const { page = 0, last_pages, highlight, t, did, redirect, token } = query;
+    const { page = 0, last_pages, highlight, t, did, redirect, token } = query;
     // const { normal: commentStatus, default: defaultComment } =
     //   await db.CommentModel.getCommentStatus();
     // let article = await db.ArticleModel.findOnly({ _id: aid });
@@ -203,7 +203,11 @@ router
     // });
     // //文章浏览数加一
     // await article.addArticleHits();
-    return ctx.redirect(`/article/${aid}`);
+    if(highlight){
+      return ctx.redirect(`/article/${aid}?page=${page}&highlight=${highlight}`);
+    }else{
+      return ctx.redirect(`/article/${aid}`);
+    }
     // await next();
   })
   .put('/:aid/category', async (ctx, next) => {
