@@ -120,6 +120,7 @@ router.get('/', OnlyUser(), async (ctx, next) => {
   }
   data.paging = paging;
   data.activity = activity;
+  data.activeTab = data.communityTab.subscribe;
   ctx.template = 'community/sub/sub.pug';
   await next();
 });

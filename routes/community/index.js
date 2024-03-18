@@ -10,6 +10,7 @@ const { userForumService } = require('../../services/user/userForum.service');
 const newRouter = require('./new');
 const subRouter = require('./sub');
 const { forumListService } = require('../../services/forum/forumList.service');
+const communityTab = { new: 'new', subscribe: 'subscribe', home: 'home' };
 router
   // 访问控制，判断后台是否禁用了社区的访问
   .use('/', async (ctx, next) => {
@@ -90,6 +91,7 @@ router
     }
     internalData.fidOfCanGetThreads = fidOfCanGetThreads;
     data.enableFund = enableFund;
+    data.communityTab = communityTab;
     await next();
   })
   // 论坛首页
@@ -161,6 +163,7 @@ router
       false,
     );
 
+    data.activeTab = communityTab.home;
     ctx.template = 'community/community.pug';
     await next();
   })
