@@ -75,11 +75,9 @@ router
       await db.MomentModel.getMomentVisibleType();
     const match = {
       parent: '',
-      // quoteType: {
-      //   $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
-      // },
-      quoteType: '',
-      quoteId: '',
+      quoteType: {
+        $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
+      },
       $or: [],
     };
     //判断是否当前用有相应证书可以查看所有内容,或设置电文可见状态
