@@ -206,7 +206,7 @@ router
     if(highlight){
       return ctx.redirect(`/article/${aid}?page=${page}&highlight=${highlight}`);
     }else{
-      return ctx.redirect(`/article/${aid}`);
+      return ctx.redirect(`/article/${aid}?page=${page}`);
     }
     // await next();
   })
