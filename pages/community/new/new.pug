@@ -18,9 +18,9 @@ block content
       .col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
           .m-b-1
-            //include ../communityTab
-            //+renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
-            if !state.isApp
+            include ../communityTab
+            +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
+            //if !state.isApp
               include ../communityNav
               - 
                 let navArr=data.user?[{name: '快捷总版', url: '/c/new'},{isEqual:true,name: '我的关注', url: '/c/sub'}]:[{name: '快捷总版', url: '/c/new'}];

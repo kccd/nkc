@@ -2,7 +2,7 @@
   .column-article
     paging(:pages="pages" @click-button="selectPageCount")
     blank(v-if="articlesList.length === 0" :height="'20rem'")
-    articles-list(:articles="articlesList" @delete="deleteItem")
+    articles-list(:articles="articlesList" @delete="deleteItem" @refresh="initData")
     paging(:pages="pages" @click-button="selectPageCount")
 </template>
 

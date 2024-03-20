@@ -38,7 +38,8 @@ router
 
     data.communityTypes = communityTypes;
     data.t = t;
-    data.pageTitle = `快捷总版 - 论坛 - ${data.pageTitle}`;
+    data.pageTitle = `最新文章 - 论坛 - ${data.pageTitle}`;
+    data.activeTab = data.communityTab.new;
     ctx.template = 'community/new/new.pug';
     await next();
   })

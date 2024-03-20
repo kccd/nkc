@@ -1,0 +1,24 @@
+if !isIncluded('community/communityTab')
+  mixin renderCommunityTab(isApp,activeTab,communityTab,user)
+    .btn-group.btn-group-justified.m-b-1
+      .btn-group(role="group")
+          a.btn.btn-default(
+            class=activeTab === communityTab.home ? 'btn-primary': ''
+            href=`/c`
+          ) 专业列表
+      .btn-group(role="group")
+        a.btn.btn-default(
+          class=activeTab === communityTab.new ? 'btn-primary': ''
+          href=`/c/new`
+          onclick=`RootApp.keepZoneRoute('a')`
+        ) 最新
+      .btn-group(role="group")
+        if user
+          a.btn.btn-default(
+            class=activeTab === communityTab.subscribe ? 'btn-primary': ''
+            href=`/c/sub`
+          ) 我的关注
+        else
+          button.btn.btn-default(
+          onclick="RootApp.openLoginPanel('login')"
+          ) 我的关注

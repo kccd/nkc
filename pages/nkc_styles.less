@@ -4416,8 +4416,13 @@ span[data-tag="nkcsource"][data-type="xsf"]>span:last-child{
     background: none !important;
     font-size: 5rem !important;
     content: "\f137" !important;
-    color: white !important;
+    color: rgba(255,255,255,0.5) !important;
     height: fit-content !important;
+    transition: color 0.15s;
+
+  }
+  &:hover::before{
+    color: white !important;
   }
 }
 .picture-ban-before-right{
@@ -4426,7 +4431,12 @@ span[data-tag="nkcsource"][data-type="xsf"]>span:last-child{
     background: none !important;
     font-size: 5rem !important;
     content: "\f138" !important;
-    color: white !important;
+    color: rgba(255,255,255,0.5) !important;
     height: fit-content !important;
+    transition: color 0.15s;
+
+  }
+  &:hover::before{
+    color: white !important;
   }
 }

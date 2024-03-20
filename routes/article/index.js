@@ -9,87 +9,141 @@ const creditRouter = require('./credit');
 const voteRouter = require('./vote');
 const nkcRender = require('../../nkcModules/nkcRender');
 const { OnlyUser } = require('../../middlewares/permission');
+const { renderMarkdown } = require('../../nkcModules/markdown');
+const { collectionService } = require('../../services/subscribe/collection.service');
 router
-  .get('/:aid', OnlyUser(), async (ctx, next) => {
-    const { params, db, state, permission, data, query, nkcModules } = ctx;
-    const { aid: sid } = params;
-    const { page = 0 } = query;
-    const { uid, pageSettings } = state; //登录用户uid
-    // 查看 文章的内容信息
-    // 文章权限：status:normal
-    //获取文档预览信息
-    // const { sid, source } = query;
-    const documentTypes = await db.DocumentModel.getDocumentTypes();
-    const documentSources = await db.DocumentModel.getDocumentSources();
-    const { normal: normalStatus } = await db.DocumentModel.getDocumentStatus();
-    // 需要返回 分类信息
-    const document = await db.DocumentModel.findOne({
-      sid,
-      source: documentSources.article,
-      type: documentTypes.stable,
-    }).sort({ tlm: -1 });
-    const article = await db.ArticleModel.findOne({_id:sid });
-    if (!document || !article) {
-      ctx.throw(400, '没有可以查看的内容');
-    }
-    if (article.status !== normalStatus && !permission('review') && article.uid !== uid) {
-      ctx.throw(403, '根据相关法律法规和政策，内容不予显示。');
-    }
-    let columnIds = article.sid.split('-').filter(item=>!!item&&item!=='null').map(item=>Number(item));
-    const contributes = await db.ColumnContributeModel.find({tid:sid,source:'article'});
-    for(const contribute of contributes){
-      columnIds.push(contribute.columnId);
-    }
-    columnIds = [...new Set([...columnIds])];
-    const columns =  await db.ColumnModel.find({_id:{$in:columnIds}});
-    let  permissionUIds = [];
-    for(const column of columns){
-      permissionUIds.push(column.uid)
-      for(const user of column.users){
-        if(user.permission.includes('column_settings_contribute')){
-          permissionUIds.push(user.uid);
-        }
-      }
-    }
-    permissionUIds = [...new Set([...permissionUIds])];
-    // 用户权限：文章主、管理员（具有审核权限）、具有投稿记录文章的专栏管理员具有投稿处理权限、专栏主
-    if(uid !== document.uid && !permission('review') && !permissionUIds.includes(uid)){
-      return ctx.throw(403, '权限不足');
-    }
-    // 用于pug渲染判断当前是什么类型页面
-    data.type = documentSources.article;
-    data.document = document;
-    const documentResourceId = await data.document.getResourceReferenceId();
-    let resources = await db.ResourceModel.getResourcesByReference(
-      documentResourceId,
+  .get('/:aid', async (ctx, next) => {
+    //获取文章信息
+    ctx.remoteTemplate = 'zone/article.pug';
+    const { db, data, params, query, state, permission, nkcModules } = ctx;
+    const { aid } = params;
+    const { pageSettings, uid } = state;
+    const { user } = data;
+    const { page = 0, highlight, t, token } = query;
+    const { normal: commentStatus, default: defaultComment } =
+      await db.CommentModel.getCommentStatus();
+    let article = await db.ArticleModel.findOnly({ _id: aid });
+    const categoriesObj = await db.ThreadCategoryModel.getCategories(
+      article.tcId,
+      'article',
     );
-    data.document.content = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: data.document.content,
-        resources,
-      },
-    });
-    // 查询文章作者
-    const user = await db.UserModel.findOnly({ uid: data.document.uid });
-    const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
-    data.user = { ...user.toObject(), avatarUrl };
-    if (data.document.origin !== 0) {
-      const originDesc = await nkcModules.apiFunction.getOriginLevel(
-        data.document.origin,
-      );
-      data.document = { ...data.document.toObject(), originDesc };
-    } else {
-      data.document = data.document.toObject();
+    data.allCategories = categoriesObj.allCategories;
+    data.categoryList = categoriesObj.categoryList;
+    data.categoriesTree = categoriesObj.categoriesTree;
+    data.targetUser = await article.extendUser();
+    if (user) {
+      let userSubscribeUsersId = [];
+      userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(
+      user.uid,
+    );
+    data.subscribeAuthor = !!(userSubscribeUsersId.includes(data.targetUser.uid));
+    }
+    data.targetUser.description = renderMarkdown(
+      nkcModules.nkcRender.replaceLink(data.targetUser.description),
+    );
+    data.targetUser.avatar = nkcModules.tools.getUrl(
+      'userAvatar',
+      data.targetUser.avatar,
+    );
+    await data.targetUser.extendGrade();
+    await db.UserModel.extendUserInfo(data.targetUser);
+    if (data.targetUser && typeof data.targetUser.toObject === 'function') {
+      data.targetUser = data.targetUser.toObject();
+    }
+    const userColumn = await db.UserModel.getUserColumn(state.uid);
+    if (userColumn) {
+      data.addedToColumn =
+        (await db.ColumnPostModel.countDocuments({
+          columnId: userColumn._id,
+          type: 'article',
+          pid: aid,
+        })) > 0;
+    }
+
+    const columnPermission = await db.UserModel.ensureApplyColumnPermission(
+      data.user,
+    );
+
+    data.columnInfo = {
+      userColumn: userColumn,
+      columnPermission: columnPermission,
+      column: userColumn,
+    };
+    if (token) {
+      //如果存在token就验证token是否合法
+      await db.ShareModel.hasPermission(token, article._id);
     }
     //查找文章的评论盒子
     const articlePost = await db.ArticlePostModel.findOne({
       sid: article._id,
       source: article.source,
     });
+    // 获取空间文章需要显示的数据
+    const articleRelatedContent = await db.ArticleModel.getZoneArticle(
+      article._id,
+    );
+    const homeSettings = await db.SettingModel.getSettings('home');
+    //点击楼层高亮需要url和highlight值
+    data.originUrl = state.url;
+    data.highlight = highlight;
+    data.columnPost = articleRelatedContent;
+    data.columnPost.article.vote = await db.PostsVoteModel.getVoteByUid({
+      uid: state.uid,
+      id: data.columnPost.article._id,
+      type: 'article',
+    });
+    data.homeTopped = await db.SettingModel.isEqualOfArr(
+      homeSettings.toppedThreadsId,
+      { id: article._id, type: 'article' },
+    );
+    const isModerator = await article.isModerator(state.uid);
+    const { normal: normalStatus } = await db.ArticleModel.getArticleStatus();
+    const _article = (await db.ArticleModel.getArticlesInfo([article]))[0];
+    if (_article.document.status !== normalStatus && !isModerator) {
+      if (!permission('review')) {
+        return ctx.throw(403, '权限不足');
+      }
+    }
+
     let match = {};
     if (articlePost) {
       match.sid = articlePost._id;
+    }
+    //只看作者
+    if (t === 'author') {
+      data.t = t;
+      match.uid = _article.uid;
+    }
+    const permissions = {
+      cancelXsf: ctx.permission('cancelXsf'),
+      modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
+      manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
+      review: ctx.permission('review'),
+      creditKcb: ctx.permission('creditKcb'),
+      movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr([
+        'movePostsToRecycle',
+        'movePostsToDraft',
+      ]),
+      unblockPosts: ctx.permission('unblockPosts'),
+    };
+    //获取文章收藏数
+    data.columnPost.collectedCount =
+      await db.ArticleModel.getCollectedCountByAid(article._id);
+    if (user) {
+      if (permission('review')) {
+        permissions.reviewed = true;
+      } else {
+        match.$or = [{ status: commentStatus }, { uid }];
+      }
+      //禁用和退修权限
+      if (permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true;
+      }
+      //是否收藏该文章
+      data.columnPost.collected = await collectionService.isCollectedArticle(
+        data.user.uid,
+        article._id,
+      );
     }
     let count = 0;
     //获取评论分页
@@ -102,23 +156,80 @@ router
       pageSettings.homeThreadList,
     );
     data.paging = paging;
+    let comment = null;
     let comments = [];
+    //获取该文章下当前用户编辑了未发布的评论内容
     if (articlePost) {
+      const m = {
+        uid: state.uid,
+        status: defaultComment,
+        sid: articlePost._id,
+      };
+      comment = await db.CommentModel.getCommentsByArticleId({ match: m });
       //获取该文章下的评论
       comments = await db.CommentModel.getCommentsByArticleId({
         match,
         paging,
       });
-      if (comments && comments.length !== 0) {
-        comments = await db.CommentModel.extendPostComments({
-          comments,
-          uid: state.uid,
-          authorUid: article.uid,
-        });
+    }
+    if (comments && comments.length !== 0) {
+      comments = await db.CommentModel.extendPostComments({
+        comments,
+        uid: state.uid,
+        isModerator,
+        permissions,
+        authorUid: article.uid,
+      });
+    }
+    if (comment && comment.length !== 0) {
+      //拓展单个评论内容
+      comment = await comment[0].extendEditorComment();
+      if (comment.type === 'beta') {
+        data.comment = comment || '';
       }
     }
+    data.articleStatus = _article.document.status;
+    const hidePostSettings = await db.SettingModel.getSettings('hidePost');
+    data.postHeight = hidePostSettings.postHeight;
+    data.permissions = permissions;
+    data.isModerator = isModerator;
     data.comments = comments || [];
-    ctx.template = 'document/preview/article.pug';
+    data.article = _article;
+    data.authorRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: data.article.uid,
+      ipId: data.article.document.ip,
+    });
+    if (article.source === 'column') {
+      // 查询文章所在专栏
+      const columnPosts = await db.ColumnPostModel.find({
+        pid: article._id,
+        type: 'article',
+      });
+      const columnIds = [];
+      const columnPostsObject = {};
+      for (const item of columnPosts) {
+        columnIds.push(item.columnId);
+        columnPostsObject[item.columnId] = item;
+      }
+      const columns = await db.ColumnModel.find({ _id: { $in: columnIds } });
+      const tempColumns = [];
+      for (const item of columns) {
+        tempColumns.push({
+          _id: item._id,
+          homeUrl: nkcModules.tools.getUrl('columnHome', item._id),
+          avatarUrl: nkcModules.tools.getUrl('userAvatar', item.avatar),
+          name: item.name,
+          subCount: item.subCount,
+          postCount: item.postCount,
+          articleUrl: `/m/${item._id}/a/${columnPostsObject[item._id]._id}`,
+        });
+      }
+      if (tempColumns.length > 0) {
+        data.columns = tempColumns;
+      }
+    }
+    //文章浏览数加一
+    await article.addArticleHits();
     await next();
   })
   .del('/:aid', async (ctx, next) => {

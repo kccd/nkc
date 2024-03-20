@@ -30,7 +30,7 @@
             ref="editorCategoriesRef"
           )
       //只有article的状态为default或者不存在article时才会显示专栏文章分类
-      div(v-if="configs.selectCategory")
+      div(v-if="configs.selectCategory && (articleStatus === 'default' || !articleStatus)")
         .selected-column(v-if="column")
           .selected-column-avatar
             img(:src="column.avatar")
@@ -45,6 +45,7 @@
         .m-b-2
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
+    .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05 提示：文章发布后所有人可见。
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId || lockPost") 保存

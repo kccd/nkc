@@ -135,6 +135,7 @@
           })
             .then(function() {
               sweetSuccess('发送投稿申请成功');
+              self.initData();
             })
             .catch(err=>{
               sweetError(err);
@@ -153,6 +154,26 @@
       this.$refs.submitColumn.close();
       this.$refs.submitColumn.open(
         function(data) {
+          const mainCategoriesId = data.mainCategoriesId;
+          const minorCategoriesId = data.minorCategoriesId;
+          const column = data.columns[0];
+          if(!mainCategoriesId || mainCategoriesId.length === 0){
+            return sweetError("未选择分类");
+          } 
+          nkcAPI("/m/" + column._id + "/contribute", "POST", {
+            articlesId: [self.article.articleId],
+            mainCategoriesId: [...mainCategoriesId],
+            minorCategoriesId: [...minorCategoriesId],
+            threadsId:[],
+            description:''
+          })
+            .then(function() {
+              sweetSuccess('发送投稿申请成功');
+              self.initData();
+            })
+            .catch(err=>{
+              sweetError(err);
+            });
         },
         {
           retreatArticle:self.article,
@@ -176,6 +197,9 @@
           }
           this.article = tempArticle;
         // }
+      },
+      initData(){
+        this.$emit('refresh');
       },
     }
   }

@@ -569,8 +569,11 @@ schema.methods.deleteColumnContribute = async function () {
       $replaceRoot: { newRoot: '$latestContributions' }, // 将每个分组中的记录作为新的根文档
     },
   ]);
-  for(const contribute of latestContributeInColumn){
-    if (contribute.passed === 'pending' && contribute.type === 'submit') {
+  for (const contribute of latestContributeInColumn) {
+    if (
+      (contribute.passed === 'pending' || contribute.passed === 'unknown') &&
+      contribute.type === 'submit'
+    ) {
       // 最新的一条申请是审核中的投稿则改变此条申请状态
       await ColumnContributeModel.updateOne(
         { _id: contribute._id },
@@ -585,6 +588,7 @@ schema.methods.deleteColumnContribute = async function () {
 schema.methods.deleteArticle = async function () {
   const ArticleModel = mongoose.model('articles');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const DocumentModel = mongoose.model('documents');
   const { normal: normalStatus, deleted: deletedStatus } =
     await ArticleModel.getArticleStatus();
   const { column: columnSource, zone: zoneSource } =
@@ -599,6 +603,22 @@ schema.methods.deleteArticle = async function () {
   if (source === columnSource) {
     await this.deleteColumnContribute();
     await ColumnPostModel.deleteColumnPost(_id);
+  }
+  //暂时对document禁封处理
+  const { article: articleSource } = await DocumentModel.getDocumentSources();
+  const { disabled: disabledStatus } = await DocumentModel.getDocumentStatus();
+  const { stable: stableType } = await DocumentModel.getDocumentTypes();
+  const document = await DocumentModel.findOne({
+    sid: _id,
+    source: articleSource,
+    type: stableType,
+  });
+  if (document) {
+    await document.updateOne({
+      $set: {
+        status: disabledStatus,
+      },
+    });
   }
   // 删除文章
   this.status = deletedStatus;
@@ -760,7 +780,7 @@ schema.methods.submitArticle = async function (options) {
   const SettingModel = mongoose.model('settings');
   const { article: articleQuoteType } = await MomentModel.getMomentQuoteTypes();
   const { article: articleType } = await ColumnPostModel.getColumnPostTypes();
-  const { sid, selectCategory, reviewPermission} = options;
+  const { sid, selectCategory, reviewPermission } = options;
   const DocumentModel = mongoose.model('documents');
   const { did, uid, _id: articleId } = this;
   const documentSources = await DocumentModel.getDocumentSources();
@@ -835,7 +855,7 @@ schema.methods.submitArticle = async function (options) {
         source: 'article',
         type: 'submit',
         passed: {
-          $in: ['pending', 'resolve'],
+          $in: ['unknown', 'pending', 'resolve'],
         },
       });
       if (!contribute) {
@@ -923,7 +943,10 @@ schema.methods.submitArticle = async function (options) {
         sidArray = [...new Set(sidArray)];
         // const sidArray = this.sid.split('-').filter(item=>!!item&&item!==String(sid));
         // sidArray.push(sid);
-        await ArticleModel.updateOne({ _id: this._id }, { $set: { sid: sidArray.join('-')}});
+        await ArticleModel.updateOne(
+          { _id: this._id },
+          { $set: { sid: sidArray.join('-') } },
+        );
         await documentsObj.beta.sendMessageToAtUsers('article');
         articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
       } else {
@@ -1342,6 +1365,7 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
   const ArticleModel = mongoose.model('articles');
   const ColumnModel = mongoose.model('columns');
   const ColumnContributeModel = mongoose.model('columnContributes');
+  const ColumnPostModel = mongoose.model('columnPosts');
   const nkcRender = require('../nkcModules/nkcRender');
   const tools = require('../nkcModules/tools');
   const { column: columnSource } = await ArticleModel.getArticleSources();
@@ -1351,8 +1375,10 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
     const { _id, source, sid } = article;
     articlesId.push(_id);
     if (source === columnSource && sid) {
-      const sidArray = String(sid).split('-').filter(sid=>!!sid&&sid!=='null');
-      for(const sidItem of sidArray){
+      const sidArray = String(sid)
+        .split('-')
+        .filter((sid) => !!sid && sid !== 'null');
+      for (const sidItem of sidArray) {
         columnsId.push(sidItem);
       }
     }
@@ -1389,21 +1415,39 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
     //   sid,
     //   status,
     // );
-    const sidArray = String(sid).split('-').filter(sid=>!!sid);
-    for(const sidItem of sidArray){
+    const sidArray = String(sid)
+      .split('-')
+      .filter((sid) => !!sid);
+    for (const sidItem of sidArray) {
       if (source === columnSource) {
         const targetColumn = columnsObj[sidItem];
         if (targetColumn) {
           let passed = '';
           let type = '';
+          let inColumnUrl = '';
           const contribute = await ColumnContributeModel.findOne({
             columnId: targetColumn._id,
             tid: articleId,
             source: 'article',
           }).sort({ toc: -1 });
-          if(contribute&&contribute.type==='retreat'){
+          if (contribute && contribute.type === 'retreat') {
             passed = contribute.passed;
             type = contribute.type;
+          }
+          const columnPost = await ColumnPostModel.findOne(
+            {
+              type: 'article',
+              pid: articleId,
+              columnId: targetColumn._id,
+            },
+            { _id: 1 },
+          );
+          if (columnPost) {
+            inColumnUrl = tools.getUrl(
+              'columnArticle',
+              targetColumn._id,
+              columnPost._id,
+            );
           }
           column.push({
             _id: targetColumn._id,
@@ -1412,6 +1456,7 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
             homeUrl: tools.getUrl('columnHome', targetColumn._id),
             avatar: targetColumn.avatar,
             abbr: targetColumn.abbr,
+            inColumnUrl,
             passed,
             type,
           });
@@ -1443,15 +1488,17 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
       }
     }
     if (contributeColumns.length > 0) {
-      contributeColumns = await ColumnModel.find({_id:{$in:[...contributeColumns]}});
-      contributeColumns = [...contributeColumns].map(item=>({
-            _id: item._id,
-            name: item.name,
-            description: item.description,
-            homeUrl: tools.getUrl('columnHome', item._id),
-            avatar: item.avatar,
-            abbr: item.abbr,
-          }))
+      contributeColumns = await ColumnModel.find({
+        _id: { $in: [...contributeColumns] },
+      });
+      contributeColumns = [...contributeColumns].map((item) => ({
+        _id: item._id,
+        name: item.name,
+        description: item.description,
+        homeUrl: tools.getUrl('columnHome', item._id),
+        avatar: item.avatar,
+        abbr: item.abbr,
+      }));
     }
     articlesList.push({
       status,
@@ -1545,7 +1592,11 @@ schema.statics.extendArticlesDraftList = async (articles) => {
       articleUrl = `/article/${articleId}`;
       editorUrl = `/creation/editor/column?source=column&aid=${articleId}`;
     } else {
-      const Url = await ArticleModel.getArticleUrlBySource(articleId, source, sid);
+      const Url = await ArticleModel.getArticleUrlBySource(
+        articleId,
+        source,
+        sid,
+      );
       articleUrl = Url.articleUrl;
       editorUrl = Url.editorUrl;
     }
@@ -1837,11 +1888,19 @@ schema.statics.getArticlesInfo = async function (articles) {
     }
     const columnPost = columnPostsObj[article._id];
     if (article.source === columnSource) {
-      if (!columnPost) {
-        continue;
+      // 以前：对于没有专栏的文章会跳过拓展文章的相关信息
+      // if (!columnPost) {
+      //   continue;
+      // }
+      // editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+      // url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+      if (columnPost) {
+        editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+        url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+      } else {
+        editorUrl = `/column/editor?source=column&aid=${article._id}`;
+        url = `/article/${article._id}`;
       }
-      editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
-      url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if (article.source === zoneSource) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/z/a/${article._id}`;
@@ -1879,7 +1938,7 @@ schema.statics.getArticlesInfo = async function (articles) {
         : 0,
       url,
     };
-    if (article.source === 'column') {
+    if (article.source === 'column' && columnPost) {
       info.column = columnObj[columnPost.columnId];
     }
     if (documentResourceId) {
