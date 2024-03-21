@@ -16,7 +16,7 @@ const resourcesRouter = require('./resources');
 const optionRouter = require('./option');
 const commentsRouter = require('./comments');
 const commentRouter = require('./comment');
-// const collectionRouter = require('./collection');
+const collectionRouter = require('./collection');
 const router = new Router();
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { ObjectId } = require('mongodb');
@@ -733,11 +733,11 @@ router
     resourcesRouter.routes(),
     resourcesRouter.allowedMethods(),
   )
-  // .use(
-  //   '/:pid/collection',
-  //   collectionRouter.routes(),
-  //   collectionRouter.allowedMethods(),
-  // )
+  .use(
+    '/:pid/collection',
+    collectionRouter.routes(),
+    collectionRouter.allowedMethods(),
+  )
   .use('/:pid/post', postRouter.routes(), postRouter.allowedMethods())
   .use('/:pid/option', optionRouter.routes(), optionRouter.allowedMethods())
   .use(

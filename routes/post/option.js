@@ -58,10 +58,10 @@ router.get('/', async (ctx, next) => {
     }
     if (isPost) {
       // 收藏 回复
-      // optionStatus.collection = await collectionService.isCollectedPost(
-      //   user.uid,
-      //   post.pid,
-      // );
+      optionStatus.collection = await collectionService.isCollectedPost(
+        user.uid,
+        post.pid,
+      );
       // 回复置顶
       if (
         !isComment &&

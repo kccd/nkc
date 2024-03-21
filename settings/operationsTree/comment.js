@@ -50,5 +50,8 @@ module.exports = {
         POST: 'post-vote-down',
       },
     },
+    collection: {
+      POST: Operations.collectionPost,
+    },
   },
 };

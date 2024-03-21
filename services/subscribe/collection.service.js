@@ -26,6 +26,13 @@ class CollectionService {
       sid: pid,
     });
   }
+  async isCollectedComment(uid, cid) {
+    return await subscribeService.isSubscribed({
+      uid,
+      source: subscribeSources.collectionComment,
+      sid: cid,
+    });
+  }
 
   async checkWhenCollectThread(uid, tid) {
     const isCollected = await this.isCollectedThread(uid, tid);
@@ -47,6 +54,15 @@ class CollectionService {
 
   async checkWhenCollectPost(uid, pid) {
     const isCollected = await this.isCollectedPost(uid, pid);
+    if (isCollected) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
+      );
+    }
+  }
+
+  async checkWhenCollectComment(uid, cid) {
+    const isCollected = await this.isCollectedComment(uid, cid);
     if (isCollected) {
       ThrowBadRequestResponseTypeError(
         ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
@@ -81,6 +97,14 @@ class CollectionService {
     });
   }
 
+  async collectComment(uid, id, cid = []) {
+    return await subscribeService.createSubscribe({
+      source: subscribeSources.collectionComment,
+      sid: id,
+      uid,
+      cid,
+    });
+  }
   async unCollectThread(uid, tid) {
     await subscribeService.cancelSubscribe({
       uid,
@@ -101,6 +125,13 @@ class CollectionService {
       uid,
       source: subscribeSources.collectionPost,
       sid: aid,
+    });
+  }
+  async unCollectComment(uid, cid) {
+    await subscribeService.cancelSubscribe({
+      uid,
+      source: subscribeSources.collectionComment,
+      sid: cid,
     });
   }
 
@@ -135,6 +166,18 @@ class CollectionService {
       uid,
       source: subscribeSources.collectionPost,
       sid: pid,
+    });
+    if (subscribe) {
+      cid = subscribe.cid;
+    }
+    return cid;
+  }
+  async getCollectedCommentCategoriesId(uid, id) {
+    let cid = [];
+    const subscribe = await subscribeService.getUserSubscribeBySource({
+      uid,
+      source: subscribeSources.collectionComment,
+      sid: id,
     });
     if (subscribe) {
       cid = subscribe.cid;

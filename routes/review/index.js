@@ -381,13 +381,13 @@ router
       if (!document) {
         ctx.throw(404, `未找到_ID为 ${docId}的文档`);
       }
-      if (document.status !== unknownStatus) {
-        ctx.throw(400, '内容状态错误或已经审核, 请刷新后重试');
-      }
       const targetUser = await db.UserModel.findOne({ uid: document.uid });
       if (pass) {
         if (document.status === normalStatus) {
           ctx.throw(400, '内容已经审核, 请刷新后重试');
+        }
+        if (document.status !== unknownStatus) {
+          ctx.throw(400, '内容状态错误或已经审核, 请刷新后重试');
         }
         //将document状态改为已审核状态
         await document.setStatus(normalStatus);

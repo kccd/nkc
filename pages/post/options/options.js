@@ -218,23 +218,33 @@ window.PostOption = new Vue({
         })
         .catch(sweetError);
     },
-    // collectionPost() {
-    //   const { pid, collection } = this;
-    //   const self = this;
-    //   nkcAPI('/p/' + pid + '/collection', 'POST', {
-    //     type: !collection,
-    //     cid: [],
-    //   })
-    //     .then(() => {
-    //       self.collection = !collection;
-    //       if (collection) {
-    //         sweetSuccess(`已取消收藏`);
-    //       } else {
-    //         sweetSuccess(`已加入收藏`);
-    //       }
-    //     })
-    //     .catch(sweetError);
-    // },
+    collectionPost() {
+      const { pid, collection } = this;
+      const self = this;
+      if (!collection) {
+        SubscribeTypes.open(function (cid) {
+          SubscribeTypes.collectionReplyPromise(pid, !collection, cid, 'post')
+            .then(function () {
+              SubscribeTypes.close();
+              self.collection = !collection;
+              sweetSuccess('收藏成功');
+            })
+            .catch(function (data) {
+              sweetError(data);
+            });
+        });
+      } else {
+        SubscribeTypes.collectionReplyPromise(pid, !collection, [], 'post')
+          .then(function () {
+            SubscribeTypes.close();
+            self.collection = !collection;
+            sweetSuccess('收藏已取消');
+          })
+          .catch(function (data) {
+            sweetError(data);
+          });
+      }
+    },
     subscribeThread() {
       const { tid, subscribe } = this;
       SubscribeTypes.subscribeThread(tid, !subscribe);

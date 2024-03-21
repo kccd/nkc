@@ -1,3 +1,5 @@
+const { collectionService } = require("../../services/subscribe/collection.service");
+
 module.exports = async (ctx, next) => {
   const {db, data, state, params, query, permission, permissionsOr} = ctx;
   const {_id} = params;
@@ -22,6 +24,7 @@ module.exports = async (ctx, next) => {
     blacklist: null,
     digest: null,
     xsf: null,
+    collection: null,
   };
   if(user) {
     data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
@@ -63,6 +66,11 @@ module.exports = async (ctx, next) => {
         optionStatus.violation = ctx.permission('violationRecord')? true: null;
         data.commentUserId = comment.uid;
       }
+      //收藏回复
+      optionStatus.collection = await collectionService.isCollectedComment(
+        user.uid,
+        comment._id,
+      );
     }
   }
   data.options = optionStatus;

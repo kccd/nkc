@@ -73,6 +73,20 @@ export function unSubscribeThread(id) {
 export function collectionArticle(id, collection, cid) {
   return nkcAPI(`/article/${id}/collection`, "POST", {type: !!collection, cid: cid || []});
 }
+//收/取藏回复
+export function collectionReply(id, collection, cid, source) {
+  if (source === 'comment') {
+    return nkcAPI(`/comment/${id}/collection`, 'POST', {
+      type: !!collection,
+      cid: cid || [],
+    });
+  } else if (source === 'post') {
+    return nkcAPI(`/p/${id}/collection`, 'POST', {
+      type: !!collection,
+      cid: cid || [],
+    });
+  }
+}
 
 /*
 * 将用户从黑名单中移除

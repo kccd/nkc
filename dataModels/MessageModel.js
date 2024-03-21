@@ -1273,7 +1273,7 @@ messageSchema.statics.getParametersData = async (message) => {
         if (!document) {
           return null;
         }
-        url = `article/${sid}`;
+        url = `/article/${sid}`;
         title = document.title;
       } else {
         url = article.url;

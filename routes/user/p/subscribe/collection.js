@@ -13,6 +13,8 @@ module.exports = async (ctx, next) => {
     $in: [
       subscribeSources.collectionArticle,
       subscribeSources.collectionThread,
+      subscribeSources.collectionPost,
+      subscribeSources.collectionComment,
     ],
   };
   match.cancel = false;

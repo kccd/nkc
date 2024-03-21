@@ -4,7 +4,7 @@
     nav-types(ref="navTypes")
     .account-thread(v-for="subscribe in subscribes")
       .account-thread(:class="subscribe.article.status" v-if="subscribe.source === 'collectionArticle'")
-        .account-reason(v-if="subscribe.article.statue === 'disabled'") 已屏蔽，仅自己可见。
+        .account-reason(v-if="subscribe.article.status === 'disabled'") 已屏蔽，仅自己可见。
         .account-reason(v-else-if="subscribe.article.status === 'faulty'") 退修中，仅自己可见，修改后对所有人可见。
         .account-reason(v-else-if="subscribe.article.status === 'default'") 审核中，仅自己可见，通过后对所有人可见。
         .account-thread-avatar
@@ -40,7 +40,7 @@
             .thread-comment(v-if="subscribe.article.count")
               .fa.fa-comment
               span {{subscribe.article.count}}
-      .account-thread(:class="threadType(subscribe.thread)" v-else)
+      .account-thread(:class="threadType(subscribe.thread)" v-if="subscribe.source === 'collectionThread'")
         .account-reason(v-if="subscribe.thread.disabled") 已屏蔽，仅自己可见。
         .account-reason(v-else-if="subscribe.thread.recycleMark") 退修中，仅自己可见，修改后对所有人可见。
         .account-reason(v-else-if="!subscribe.thread.reviewed") 审核中，仅自己可见，通过后对所有人可见。
@@ -74,6 +74,76 @@
             .thread-comment(v-if="subscribe.thread.count")
               .fa.fa-comment
               span {{subscribe.thread.count}}
+      .account-thread(:class="threadType(subscribe.post)" v-if="subscribe.source === 'collectionPost'")
+        .account-reason(v-if="subscribe.post.disabled") 回复已屏蔽。
+        .account-reason(v-else-if="subscribe.post.recycleMark") 退修中，修改后对所有人可见。
+        .account-reason(v-else-if="!subscribe.post.reviewed") 审核中，通过后对所有人可见。
+        .account-thread-avatar(v-if="!subscribe.post.disabled")
+          div(:style="`background-image: url(${getUrl('postCover', subscribe.post.cover)})`" v-if="subscribe.post.cover")
+        .account-thread-content(:style="!subscribe.post.cover?'display: block':''")
+          .account-thread-title(:class="subscribe.post.digest?'digest':''")
+            .account-follower-buttons(:data-thread="subscribe.sid" :class="threadsId.includes(subscribe.sid) ? 'active' : ''")
+              button.category.collection-button.m-r-05(@click="moveSub([subscribe.sid])") 分类
+              button.subscribe(@click="subPost(subscribe.sid)" :class="{'collection-button': type === 'collection'}")
+            a(:href="`/p/${subscribe.post.pid}`" :title="subscribe.post.t" target="_blank") {{subscribe.post.t}}
+          .account-thread-abstract(v-if="!subscribe.post.disabled") {{subscribe.post.abstractCN || subscribe.post.c}}
+          .account-thread-info
+            .thread-time
+              span {{fromNow(subscribe.post.toc)}}
+            span 发表于
+              a.thread-forum-link(:href="`${subscribe.post.postUrl}`" target="_blank") 《{{ subscribe.post.thread.firstPost.t }}》
+            span(v-if="subscribe.post.anonymous") 匿名
+            a.thread-user(:href="`/u/${subscribe.post.uid}`" v-else)
+              img(:src="getUrl('userAvatar', subscribe.post.user.avatar)"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: subscribe.post.uid})"
+              )
+              span {{subscribe.post.user.username}}
+            .thread-thumbup(v-if="subscribe.post.voteUp")
+              .fa.fa-thumbs-up
+              span {{subscribe.post.voteUp}}
+            //.thread-hits(v-if="subscribe.thread.hits")
+              .fa.fa-eye
+              span {{subscribe.thread.hits}}
+            .thread-comment(v-if="subscribe.post.postCount")
+              .fa.fa-comment
+              span {{subscribe.post.postCount}}
+      .account-thread(:class="subscribe.comment.status" v-if="subscribe.source === 'collectionComment'")
+        .account-reason(v-if="subscribe.comment.status === 'disabled'") 内容已屏蔽。
+        .account-reason(v-else-if="subscribe.comment.status === 'faulty'") 退修中，内容已屏蔽，修改后对所有人可见。
+        .account-reason(v-else-if="subscribe.comment.status === 'default'") 审核中，内容已屏蔽，通过后对所有人可见。
+        .account-thread-avatar
+          div(:style="`background-image: url(${getUrl('postCover', subscribe.comment.cover)})`" v-if="subscribe.comment.cover")
+        .account-thread-content(:style="!subscribe.comment.cover?'display: block':''")
+          .account-thread-title(:class="subscribe.comment.digest?'digest':''")
+            .account-follower-buttons(:data-thread="subscribe.tid" :class="threadsId.includes(subscribe.sid) ? 'active' : ''")
+              button.category.collection-button.m-r-05(@click="moveSub([subscribe.sid])") 分类
+              button.subscribe(@click="subComment(subscribe.sid, 'article')" :class="{'collection-button': type === 'collection'}")
+            //a(:href="subscribe.article.url" :title="subscribe.article.title" target="_blank") {{subscribe.article.title}}
+          .account-thread-abstract(v-if="subscribe.comment.status === 'normal'") {{subscribe.comment.content}}
+          .account-thread-info
+            .thread-time
+              span {{fromNow(subscribe.comment.toc)}}
+            span 发表于
+              a.thread-forum-link(:href="`${subscribe.comment.commentUrl}`" target="_blank") 《{{ subscribe.comment.articleDocument.title }}》
+            span(v-if="subscribe.comment.anonymous") 匿名
+            a.thread-user(:href="`/u/${subscribe.comment.uid}`" target="_blank" v-else)
+              img(:src="getUrl('userAvatar', subscribe.comment.user.avatar)"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: subscribe.comment.uid})"
+              )
+              span {{subscribe.comment.user.username}}
+            .thread-thumbup(v-if="subscribe.comment.voteUp && subscribe.comment.voteUp > 0")
+              .fa.fa-thumbs-up
+              span {{subscribe.comment.voteUp}}
+            .thread-hits(v-if="subscribe.comment.hits")
+              .fa.fa-eye
+              span {{subscribe.comment.hits}}
+            .thread-comment(v-if="subscribe.comment.count")
+              .fa.fa-comment
+              span {{subscribe.comment.count}}
 
 </template>
 <style lang="less" scoped>
@@ -246,6 +316,16 @@
         //background-color: @warningColor;
       }
     }
+    &.faulty{
+        @disabledColor: rgba(0, 0, 0, 0.07);
+        background-color: @disabledColor;
+        .account-reason{
+          text-align: center;
+          color: @accent;
+          padding: 0.5rem;
+          font-weight: 700;
+        }
+      }
     &.review{
       @disabledColor: rgba(255, 0, 0, 0.07);
       background-color: @disabledColor;
@@ -371,7 +451,7 @@
 import SubscribeTypes from "./SubscribeTypes";
 import NavTypes from "../../spa/views/user/subscribe/NavTypes";
 import {fromNow, getUrl, objToStr} from "../js/tools";
-import {collectionArticle, collectionThread, subscribeThread, unSubscribeThread} from "../js/subscribe";
+import {collectionArticle, collectionReply, collectionThread, subscribeThread, unSubscribeThread} from "../js/subscribe";
 import {nkcAPI} from "../js/netAPI";
 export default {
   props: ['subscribes', 'threads-id', 'type'],
@@ -525,6 +605,64 @@ export default {
           })
       }
     },
+    subComment(id){
+      const self = this;
+      const sub = !self.threadsId.includes(id);
+      if(sub) {
+        self.$refs.subscribeTypes.open((cid) => {
+          collectionReply(id, sub, cid,'comment')
+            .then(() => {
+              const index = self.threadsId.indexOf(id);
+              if(index === -1) self.threadsId.push(id);
+              sweetSuccess('收藏成功');
+              self.$refs.subscribeTypes.close();
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        }, {
+        })
+      } else {
+        collectionReply(id, sub,[],'comment')
+          .then(() => {
+            const index = self.threadsId.indexOf(id);
+            if(index !== -1) self.threadsId.splice(index, 1);
+            sweetSuccess('收藏已取消');
+          })
+          .catch(err => {
+            sweetError(err);
+          })
+      }
+    },
+    subPost(id){
+      const self = this;
+      const sub = !self.threadsId.includes(id);
+      if(sub) {
+        self.$refs.subscribeTypes.open((cid) => {
+          collectionReply(id, sub, cid,'post')
+            .then(() => {
+              const index = self.threadsId.indexOf(id);
+              if(index === -1) self.threadsId.push(id);
+              sweetSuccess('收藏成功');
+              self.$refs.subscribeTypes.close();
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        }, {
+        })
+      } else {
+        collectionReply(id, sub,[],'post')
+          .then(() => {
+            const index = self.threadsId.indexOf(id);
+            if(index !== -1) self.threadsId.splice(index, 1);
+            sweetSuccess('收藏已取消');
+          })
+          .catch(err => {
+            sweetError(err);
+          })
+      }
+    }
   }
 }
 </script>

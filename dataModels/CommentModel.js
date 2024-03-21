@@ -1235,7 +1235,7 @@ schema.statics.getCommentsInfo = async function (comments) {
       if (columnPost) {
         url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
       } else {
-        url = `article/${articleObj[articlePost.sid]._id}`;
+        url = `/article/${articleObj[articlePost.sid]._id}`;
       }
     } else if (articlePost.source === zoneSource) {
       url = `/z/a/${articlePost.sid}`;
