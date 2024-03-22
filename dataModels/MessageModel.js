@@ -1136,7 +1136,9 @@ messageSchema.statics.getParametersData = async (message) => {
   } else if (
     [
       'newColumnContribute',
+      'newColumnDisContribute',
       'columnContributeChange',
+      'columnDisContributeChange',
       'disabledColumn',
       'disabledColumnInfo',
       'columnContactAdmin',
@@ -1147,13 +1149,16 @@ messageSchema.statics.getParametersData = async (message) => {
     if (!column) {
       return null;
     }
-    if (type === 'newColumnContribute') {
+    if (type === 'newColumnContribute' || type === 'newColumnDisContribute') {
       parameters = {
         columnContributeURL: `/m/${column._id}/settings/contribute`,
         columnURL: `/m/${column._id}`,
         columnName: column.name,
       };
-    } else if (type === 'columnContributeChange') {
+    } else if (
+      type === 'columnContributeChange' ||
+      type === 'columnDisContributeChange'
+    ) {
       parameters = {
         userContributeURL: `/account/contribute`,
         columnURL: `/m/${column._id}`,
@@ -1256,8 +1261,26 @@ messageSchema.statics.getParametersData = async (message) => {
         return null;
       }
       article = (await ArticleModel.getArticlesInfo([article]))[0];
-      url = article.url;
-      title = `文章《${article.document.title}》`;
+      if (!article) {
+        const { stable: stableType } = await DocumentModel.getDocumentTypes();
+        const { normal: normalStatus } = await DocumentModel.getDocumentStatus();
+        const document = await DocumentModel.findOne({
+          sid: sid,
+          type: stableType,
+          status: normalStatus,
+          source: 'article',
+        });
+        if (!document) {
+          return null;
+        }
+        url = `/article/${sid}`;
+        title = document.title;
+      } else {
+        url = article.url;
+        title = `文章《${article.document.title}》`;
+      }
+      // url = article.url;
+      // title = `文章《${article.document.title}》`;
     } else if (source === voteSources.comment) {
       let comment = await CommentModel.findOne({ _id: sid });
       if (!comment) {

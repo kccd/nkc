@@ -546,11 +546,49 @@ schema.methods.deleteDraft = async function () {
 };
 
 /*
+ * 删除文章的投稿申请
+ * */
+schema.methods.deleteColumnContribute = async function () {
+  const ColumnContributeModel = mongoose.model('columnContributes');
+  const { _id: articleId } = this;
+  // 以文章id为条件在columnContribute中查找在各个column中最新的一条申请
+  const latestContributeInColumn = await ColumnContributeModel.aggregate([
+    {
+      $match: { tid: articleId, source: 'article' }, // 匹配条件，根据 tid 进行筛选
+    },
+    {
+      $sort: { toc: -1 }, // 根据 toc 字段降序排序
+    },
+    {
+      $group: {
+        _id: '$columnId', // 按 columnId 分组
+        latestContributions: { $first: '$$ROOT' }, // 获取每个分组中的第一条记录，即最新的一条申请
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$latestContributions' }, // 将每个分组中的记录作为新的根文档
+    },
+  ]);
+  for (const contribute of latestContributeInColumn) {
+    if (
+      (contribute.passed === 'pending' || contribute.passed === 'unknown') &&
+      contribute.type === 'submit'
+    ) {
+      // 最新的一条申请是审核中的投稿则改变此条申请状态
+      await ColumnContributeModel.updateOne(
+        { _id: contribute._id },
+        { $set: { passed: 'cancel' } },
+      );
+    }
+  }
+};
+/*
  * 刪除文章
  * */
 schema.methods.deleteArticle = async function () {
   const ArticleModel = mongoose.model('articles');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const DocumentModel = mongoose.model('documents');
   const { normal: normalStatus, deleted: deletedStatus } =
     await ArticleModel.getArticleStatus();
   const { column: columnSource, zone: zoneSource } =
@@ -563,7 +601,24 @@ schema.methods.deleteArticle = async function () {
   await this.deleteDraft();
   //根据文章id删除引用
   if (source === columnSource) {
+    await this.deleteColumnContribute();
     await ColumnPostModel.deleteColumnPost(_id);
+  }
+  //暂时对document禁封处理
+  const { article: articleSource } = await DocumentModel.getDocumentSources();
+  const { disabled: disabledStatus } = await DocumentModel.getDocumentStatus();
+  const { stable: stableType } = await DocumentModel.getDocumentTypes();
+  const document = await DocumentModel.findOne({
+    sid: _id,
+    source: articleSource,
+    type: stableType,
+  });
+  if (document) {
+    await document.updateOne({
+      $set: {
+        status: disabledStatus,
+      },
+    });
   }
   // 删除文章
   this.status = deletedStatus;
@@ -713,6 +768,236 @@ schema.methods.publishArticle = async function (options) {
 
   return articleUrl;
 };
+/*
+ * 发布 article 为独立文章可以不选择专栏信息
+ * */
+schema.methods.submitArticle = async function (options) {
+  const ArticleModel = mongoose.model('articles');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const ColumnModel = mongoose.model('columns');
+  const MomentModel = mongoose.model('moments');
+  const ColumnContributeModel = mongoose.model('columnContributes');
+  const SettingModel = mongoose.model('settings');
+  const { article: articleQuoteType } = await MomentModel.getMomentQuoteTypes();
+  const { article: articleType } = await ColumnPostModel.getColumnPostTypes();
+  const { sid, selectCategory, reviewPermission } = options;
+  const DocumentModel = mongoose.model('documents');
+  const { did, uid, _id: articleId } = this;
+  const documentSources = await DocumentModel.getDocumentSources();
+  const articleSources = await ArticleModel.getArticleSources();
+  //检测当前用户的发表权限
+  await DocumentModel.checkGlobalPostPermission(
+    this.uid,
+    documentSources.article,
+  );
+  let articleUrl;
+  const { article: documentSource } = await DocumentModel.getDocumentSources();
+  const { normal: normalStatus } = await ArticleModel.getArticleStatus();
+  const stableDocument = await DocumentModel.getStableDocumentBySource(
+    documentSource,
+    articleId,
+  );
+  const isModify = !!stableDocument;
+  //更新文章的最后修改时间
+  await this.updateOne({
+    $set: {
+      tlm: new Date(),
+    },
+  });
+  const { checkString } = require('../nkcModules/checkData');
+  const { stable, beta } = await DocumentModel.getDocumentTypes();
+  const type = [stable, beta];
+  const documentsObj = {};
+  const documents = await DocumentModel.find({
+    did,
+    type: { $in: type },
+  });
+  for (const d of documents) {
+    documentsObj[d.type] = d;
+  }
+  if (!documentsObj.beta) {
+    ThrowCommonError(400, `不存在编辑版`);
+  }
+  //判断专栏文章编辑版是否填写标题
+  if (documentsObj.beta.source === 'column') {
+    checkString(documentsObj.beta.source, {
+      name: '文章标题',
+      minTextLength: 1,
+      maxLength: 500,
+    });
+  }
+  //如果存在正式版就将正式版变为正式历史版，更新修改时间
+  if (documentsObj.stable) {
+    await documentsObj.stable.setAsHistoryDocument();
+  }
+  await documentsObj.beta.updateOne({
+    $set: {
+      type: type[0],
+      tlm: documentsObj.stable ? new Date() : null,
+    },
+  });
+  //是否需要审核
+  let needReview = await documentsObj.beta.getReviewStatusAndCreateReviewLog();
+  if (reviewPermission) {
+    needReview = false;
+  }
+  if (needReview) {
+    await documentsObj.beta.setStatus(
+      (
+        await DocumentModel.getDocumentStatus()
+      ).unknown,
+    );
+    if (sid && selectCategory) {
+      // 有选择专栏==》创建一条投稿记录
+      let contribute = await ColumnContributeModel.findOne({
+        columnId: sid,
+        tid: this._id,
+        source: 'article',
+        type: 'submit',
+        passed: {
+          $in: ['unknown', 'pending', 'resolve'],
+        },
+      });
+      if (!contribute) {
+        contribute = ColumnContributeModel({
+          _id: await SettingModel.operateSystemID('columnContributes', 1),
+          uid: this.uid,
+          tid: this._id,
+          pid: '',
+          cid: selectCategory.selectedMainCategoriesId,
+          mcid: selectCategory.selectedMinorCategoriesId,
+          description: '',
+          columnId: sid,
+          source: 'article',
+          passed: 'unknown',
+          type: 'submit',
+        });
+        await contribute.save();
+      }
+    }
+  } else {
+    //不需要审核
+    await documentsObj.beta.setStatus(
+      (
+        await DocumentModel.getDocumentStatus()
+      ).normal,
+    );
+    if (sid && selectCategory) {
+      // 有选择专栏
+      // 是否具有专栏管理员添加文章权限或者专栏主
+      // 获取专栏的基本信息。。与用户的信息进行对比
+      const column = await ColumnModel.findOnly({ _id: sid });
+      const userPermissionObject =
+        await ColumnModel.getUsersPermissionKeyObject();
+      const isPermission = await ColumnModel.checkUsersPermission(
+        column.users,
+        this.uid,
+        userPermissionObject.column_post_add,
+      );
+      if (isPermission || column.uid === this.uid) {
+        let contribute = await ColumnContributeModel.findOne({
+          columnId: column._id,
+          tid: this._id,
+          source: 'article',
+          type: 'submit',
+          passed: {
+            $in: ['pending', 'resolve'],
+          },
+        });
+        if (!contribute) {
+          contribute = ColumnContributeModel({
+            _id: await SettingModel.operateSystemID('columnContributes', 1),
+            uid: this.uid,
+            tid: this._id,
+            pid: '',
+            cid: selectCategory.selectedMainCategoriesId,
+            mcid: selectCategory.selectedMinorCategoriesId,
+            description: '具有专栏添加文章权限',
+            columnId: column._id,
+            source: 'article',
+            passed: 'resolve',
+            type: 'submit',
+          });
+          await contribute.save();
+        }
+        let columnPost = await ColumnPostModel.findOne({
+          pid: this._id,
+          type: articleType,
+          columnId: column._id,
+        });
+        if (!columnPost) {
+          columnPost = await ColumnPostModel.createColumnPost(
+            this,
+            selectCategory,
+          );
+        }
+        // 需要进行更新article中sid
+        let sidArray = [];
+        const columnPostArray = await ColumnPostModel.find({
+          pid: this._id,
+          type: 'article',
+        });
+        for (const columnPostItem of columnPostArray) {
+          sidArray.push(columnPostItem.columnId);
+        }
+        sidArray = [...new Set(sidArray)];
+        // const sidArray = this.sid.split('-').filter(item=>!!item&&item!==String(sid));
+        // sidArray.push(sid);
+        await ArticleModel.updateOne(
+          { _id: this._id },
+          { $set: { sid: sidArray.join('-') } },
+        );
+        await documentsObj.beta.sendMessageToAtUsers('article');
+        articleUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+      } else {
+        let contribute = await ColumnContributeModel.findOne({
+          columnId: column._id,
+          tid: this._id,
+          source: 'article',
+          type: 'submit',
+          passed: {
+            $in: ['pending', 'resolve'],
+          },
+        });
+        if (!contribute) {
+          contribute = ColumnContributeModel({
+            _id: await SettingModel.operateSystemID('columnContributes', 1),
+            uid: this.uid,
+            tid: this._id,
+            pid: '',
+            cid: selectCategory.selectedMainCategoriesId,
+            mcid: selectCategory.selectedMinorCategoriesId,
+            description: '',
+            columnId: column._id,
+            source: 'article',
+            passed: 'pending',
+            type: 'submit',
+          });
+          await contribute.save();
+        }
+      }
+    }
+    // await documentsObj.beta.sendMessageToAtUsers('article');
+  }
+  //同步到search数据库
+  await documentsObj.beta.pushToSearchDB();
+  const newArticle = await ArticleModel.findOnly({ _id: this._id });
+  // 如果发布的article不需要审核，并且不存在该文章的动态时就为该文章创建一条新的动态
+  // 不需要审核的文章状态不为默认状态
+  if (!isModify && newArticle.status === normalStatus) {
+    // 获取IP
+    const { ip, port } = await this.getIpAndPort();
+    MomentModel.createQuoteMomentAndPublish({
+      ip,
+      port,
+      uid,
+      quoteType: articleQuoteType,
+      quoteId: articleId,
+    }).catch(console.error);
+  }
+
+  return articleUrl || `/creation/column/article`;
+};
 
 schema.methods.getIpAndPort = async function () {
   const DocumentModel = mongoose.model('documents');
@@ -861,6 +1146,8 @@ schema.statics.extendArticles = async function (articles) {
     if (article.source === articleSource.column) {
       if (columnPost) {
         url = `/m/${columnPostObj[_id].columnId}/a/${columnPostObj[_id]._id}`;
+      } else {
+        url = `/article/${article._id}`;
       }
     } else if (article.source === articleSource.zone) {
       url = `/z/a/${article._id}`;
@@ -1051,6 +1338,193 @@ schema.statics.extendArticlesList = async (articles) => {
 };
 
 /*
+ * 拓展独立文章列表，用于显示文章列表
+ * @param {[Article]}
+ * @return {[Object]}
+ *   @param {String} articleSource 文章来源
+ *   @param {String} articleSourceId 来源 ID
+ *   @param {String} articleId 文章 ID
+ *   @param {String} articleUrl 文章链接
+ *   @param {String} articleEditorUrl 文章编辑器链接
+ *   @param {Number} hits 阅读量
+ *   @param {Number} voteUp 点赞数
+ *   @param {Number} comment 评论数
+ *   @param {String} title 文章标题
+ *   @param {String} content 文章摘要
+ *   @param {String} coverUrl 封面图链接
+ *   @param {String} time 格式化之后的文章内容创建时间
+ *   @param {String} mTime 格式化之后的文章内容最后修改时间
+ *   @param {Object} column
+ *     @param {Number} _id 专栏 ID
+ *     @param {String} name 专栏名称
+ *     @param {String} description 专栏介绍
+ *     @param {String} homeUrl 专栏首页链接
+ * */
+schema.statics.extendArticlesListWithColumn = async (articles) => {
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const ColumnModel = mongoose.model('columns');
+  const ColumnContributeModel = mongoose.model('columnContributes');
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const nkcRender = require('../nkcModules/nkcRender');
+  const tools = require('../nkcModules/tools');
+  const { column: columnSource } = await ArticleModel.getArticleSources();
+  const articlesId = [];
+  let columnsId = [];
+  for (const article of articles) {
+    const { _id, source, sid } = article;
+    articlesId.push(_id);
+    if (source === columnSource && sid) {
+      const sidArray = String(sid)
+        .split('-')
+        .filter((sid) => !!sid && sid !== 'null');
+      for (const sidItem of sidArray) {
+        columnsId.push(sidItem);
+      }
+    }
+  }
+  columnsId = [...new Set(columnsId)];
+  const { article: articleSource } = await DocumentModel.getDocumentSources();
+  const stableDocumentsObj = await DocumentModel.getStableDocumentsBySource(
+    articleSource,
+    articlesId,
+    'object',
+  );
+  const columnsObj = await ColumnModel.getColumnsById(columnsId, 'object');
+
+  const articlesList = [];
+  for (const article of articles) {
+    const {
+      _id: articleId,
+      source,
+      sid,
+      voteUp,
+      hits,
+      comment,
+      status,
+    } = article;
+    const stableDocument = stableDocumentsObj[articleId];
+    if (!stableDocument) {
+      continue;
+    }
+    let column = [];
+    let contributeColumns = [];
+    // const { articleUrl, editorUrl } = await ArticleModel.getArticleUrlBySource(
+    //   articleId,
+    //   source,
+    //   sid,
+    //   status,
+    // );
+    const sidArray = String(sid)
+      .split('-')
+      .filter((sid) => !!sid);
+    for (const sidItem of sidArray) {
+      if (source === columnSource) {
+        const targetColumn = columnsObj[sidItem];
+        if (targetColumn) {
+          let passed = '';
+          let type = '';
+          let inColumnUrl = '';
+          const contribute = await ColumnContributeModel.findOne({
+            columnId: targetColumn._id,
+            tid: articleId,
+            source: 'article',
+          }).sort({ toc: -1 });
+          if (contribute && contribute.type === 'retreat') {
+            passed = contribute.passed;
+            type = contribute.type;
+          }
+          const columnPost = await ColumnPostModel.findOne(
+            {
+              type: 'article',
+              pid: articleId,
+              columnId: targetColumn._id,
+            },
+            { _id: 1 },
+          );
+          if (columnPost) {
+            inColumnUrl = tools.getUrl(
+              'columnArticle',
+              targetColumn._id,
+              columnPost._id,
+            );
+          }
+          column.push({
+            _id: targetColumn._id,
+            name: targetColumn.name,
+            description: targetColumn.description,
+            homeUrl: tools.getUrl('columnHome', targetColumn._id),
+            avatar: targetColumn.avatar,
+            abbr: targetColumn.abbr,
+            inColumnUrl,
+            passed,
+            type,
+          });
+        }
+      }
+    }
+    // 以文章id为条件在columnContribute中查找在各个column中最新的一条申请
+    const latestContributeInColumn = await ColumnContributeModel.aggregate([
+      {
+        $match: { tid: articleId, source: 'article' }, // 匹配条件，根据 tid 进行筛选
+      },
+      {
+        $sort: { toc: -1 }, // 根据 toc 字段降序排序
+      },
+      {
+        $group: {
+          _id: '$columnId', // 按 columnId 分组
+          latestContributions: { $first: '$$ROOT' }, // 获取每个分组中的第一条记录，即最新的一条申请
+        },
+      },
+      {
+        $replaceRoot: { newRoot: '$latestContributions' }, // 将每个分组中的记录作为新的根文档
+      },
+    ]);
+    for (const contribute of latestContributeInColumn) {
+      if (contribute.passed === 'pending' && contribute.type === 'submit') {
+        // 最新的一条申请是审核中的投稿
+        contributeColumns.push(contribute.columnId);
+      }
+    }
+    if (contributeColumns.length > 0) {
+      contributeColumns = await ColumnModel.find({
+        _id: { $in: [...contributeColumns] },
+      });
+      contributeColumns = [...contributeColumns].map((item) => ({
+        _id: item._id,
+        name: item.name,
+        description: item.description,
+        homeUrl: tools.getUrl('columnHome', item._id),
+        avatar: item.avatar,
+        abbr: item.abbr,
+      }));
+    }
+    articlesList.push({
+      status,
+      articleSource: source,
+      articleSourceId: sid,
+      articleId,
+      articleUrl: `/article/${articleId}`,
+      articleEditorUrl: `/creation/editor/column?source=column&aid=${articleId}`,
+      voteUp,
+      hits,
+      comment,
+      title: stableDocument.title,
+      content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      coverUrl: stableDocument.cover
+        ? tools.getUrl('documentCover', stableDocument.cover)
+        : '',
+      time: moment(stableDocument.toc).format(`YYYY/MM/DD`),
+      mTime: tools.fromNow(stableDocument.tlm),
+      column,
+      contributeColumns,
+    });
+  }
+  return articlesList;
+};
+
+/*
  * 拓展独立文章草稿页列表，用于显示文章草稿列表
  * @param {[Article]}
  * @return {[Object]}
@@ -1080,8 +1554,9 @@ schema.statics.extendArticlesDraftList = async (articles) => {
   const articlesId = [];
   const columnsId = [];
   for (const article of articles) {
-    if (article.source === columnSource) {
-      columnsId.push(article.sid);
+    if (article.source === columnSource && article.sid) {
+      // columnsId.push(article.sid);
+      columnsId.concat([...article.sid.split('-')]);
     }
     articlesId.push(article._id);
   }
@@ -1098,8 +1573,8 @@ schema.statics.extendArticlesDraftList = async (articles) => {
       continue;
     }
     let column;
-    if (article.source === columnSource) {
-      const targetColumn = columnsObj[article.sid];
+    if (article.source === columnSource && article.sid) {
+      const targetColumn = columnsObj[article.sid.split('-')[0]];
       if (targetColumn) {
         column = {
           _id: targetColumn._id,
@@ -1111,11 +1586,20 @@ schema.statics.extendArticlesDraftList = async (articles) => {
     }
     const { title, content, toc, tlm, cover } = betaDocument;
     const { _id: articleId, status, source, sid } = article;
-    const { articleUrl, editorUrl } = await ArticleModel.getArticleUrlBySource(
-      articleId,
-      source,
-      sid,
-    );
+    let articleUrl = '',
+      editorUrl = '';
+    if (source === columnSource) {
+      articleUrl = `/article/${articleId}`;
+      editorUrl = `/creation/editor/column?source=column&aid=${articleId}`;
+    } else {
+      const Url = await ArticleModel.getArticleUrlBySource(
+        articleId,
+        source,
+        sid,
+      );
+      articleUrl = Url.articleUrl;
+      editorUrl = Url.editorUrl;
+    }
     results.push({
       type: status === 'default' ? 'create' : 'modify',
       articleId,
@@ -1404,11 +1888,19 @@ schema.statics.getArticlesInfo = async function (articles) {
     }
     const columnPost = columnPostsObj[article._id];
     if (article.source === columnSource) {
-      if (!columnPost) {
-        continue;
+      // 以前：对于没有专栏的文章会跳过拓展文章的相关信息
+      // if (!columnPost) {
+      //   continue;
+      // }
+      // editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+      // url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+      if (columnPost) {
+        editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+        url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+      } else {
+        editorUrl = `/column/editor?source=column&aid=${article._id}`;
+        url = `/article/${article._id}`;
       }
-      editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
-      url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
     } else if (article.source === zoneSource) {
       editorUrl = `/creation/editor/zone/article?source=zone&aid=${article._id}`;
       url = `/z/a/${article._id}`;
@@ -1446,7 +1938,7 @@ schema.statics.getArticlesInfo = async function (articles) {
         : 0,
       url,
     };
-    if (article.source === 'column') {
+    if (article.source === 'column' && columnPost) {
       info.column = columnObj[columnPost.columnId];
     }
     if (documentResourceId) {
@@ -1510,11 +2002,25 @@ schema.statics.getArticlesDataByArticlesId = async function (
   const articleStatus = await ArticleModel.getArticleStatus();
   const obj = {};
   for (const article of articles) {
-    const articleUrl = await ArticleModel.getArticleUrlBySource(
-      article._id,
-      article.source,
-      article.sid,
-    );
+    let articleUrl = { articleUrl: '' };
+    // 没有专栏信息的独立文章暂时跳转到文章预览链接
+    if (article.source === 'column') {
+      if (!article.sid) {
+        articleUrl.articleUrl = `/article/${article._id}`;
+      } else {
+        articleUrl = await ArticleModel.getArticleUrlBySource(
+          article._id,
+          article.source,
+          article.sid.split('-')[0],
+        );
+      }
+    } else {
+      articleUrl = await ArticleModel.getArticleUrlBySource(
+        article._id,
+        article.source,
+        article.sid,
+      );
+    }
     const stableDocument = stableDocuments[article._id];
     if (!stableDocument) {
       continue;
@@ -1526,9 +2032,9 @@ schema.statics.getArticlesDataByArticlesId = async function (
     const { title, content, cover } = stableDocument;
     let articleData;
     // 暂时屏蔽被撤稿的文章，待专栏改进时一同调整
-    if (!articleUrl.articleUrl) {
-      article.status = articleStatus.deleted;
-    }
+    // if (!articleUrl.articleUrl) {
+    //   article.status = articleStatus.deleted;
+    // }
     if (article.status === articleStatus.normal) {
       articleData = {
         status: articleStatus.normal,

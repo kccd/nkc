@@ -293,10 +293,10 @@ schema.statics.getArticleDataById = async function (columnId, _id) {
   const ArticleModel = mongoose.model('articles');
   //获取文章专栏引用
   let columnPost = await ColumnPostsModel.findOne({ _id, columnId });
-  columnPost = columnPost.toObject();
   if (!columnPost) {
     throwErr(400, '未找到文章引用');
   }
+  columnPost = columnPost.toObject();
   switch (columnPost.type) {
     case 'thread':
       //拓展thread文章信息

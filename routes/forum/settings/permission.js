@@ -79,7 +79,7 @@ permissionRouter
       }
     }
     if (!['free', 'force', 'unSub'].includes(subType)) {
-      ctx.throw(400, '请选择关注类型');
+      ctx.throw(400, '请选择订阅类型');
     }
     if (!['tlm', 'toc'].includes(orderBy)) {
       ctx.throw(400, '请选择文章排序方式');

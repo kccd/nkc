@@ -11,7 +11,7 @@ block settingsContent
       .col-xs-12.col-md-12
         h3 文章管理
         hr
-        a.btn.btn-primary.btn-sm.m-b-05(v-if="user&&user.uid===column.uid" href='/creation/editor/column' target="_blank") 发表文章
+        a.btn.btn-primary.btn-sm.m-b-05(href='/creation/editor/column' target="_blank") 发表文章
         button.btn.btn-default.btn-sm.m-b-05(@click="openSelector()") 添加已有文章
       .col-xs-12.col-md-3.m-b-2
         ul.nav.nav-tabs

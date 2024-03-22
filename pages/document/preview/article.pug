@@ -1,0 +1,107 @@
+extends ../../bootstrap_base
+block title
+  title=data.document.title || "未填写标题"
+  style.
+    body{
+      display: none;
+    }
+  +includeCSS('/document/preview/preview.css')
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel
+        //.m-b-1.book-content-container
+        .m-b-1
+          include ../../columns/article/nav
+          +nav({docNumber: `D${data.document.did}`})
+          -var {uid, origin: originState, originDesc, dt, title, type, authorInfos} = data.document
+          -var {user} = data;
+          include ../../columns/article/title
+          +title({
+            uid, originState, originDesc, toc: format('YYYY-MM-DD', new Date(dt)), allToc: tools.timeFormat(new Date(dt)),
+            title, authorInfos, username: user.username, avatarUrl: user.avatarUrl
+          })
+          if data.type !== "draft"
+            if (data.document.abstract.length || data.document.abstractEN.length)
+              .abstract(style="margin-top:1rem; word-break: break-all;")
+                if data.document.abstract.length
+                  .panel.panel-default(style="border:0;margin-bottom:0")
+                    .panel-heading.paperHeader 中文摘要
+                    .panel-body!=LineFeedConversion(data.document.abstract)
+                if data.document.abstractEN.length
+                  .panel.panel-default(style="border:0;margin-bottom:0")
+                    .panel-heading.paperHeader Abstract
+                    .panel-body!=LineFeedConversion(data.document.abstractEN)
+            if (data.document.keywords.length || data.document.keywordsEN.length)
+              .keyWords(style="margin-top:1rem;")
+                .panel.panel-default(style="border:0;margin-bottom:0")
+                  .panel-heading.paperHeader 关键词
+                  .panel-body(style="padding:5px")
+                    if data.document.keywords.length
+                      div
+                        for keyCn in data.document.keywords
+                          span.keyWordstagCn(style="cursor:pointer")!=keyCn
+                    if data.document.keywordsEN.length
+                      div(style="margin-top:5px")
+                        for keyEn in data.document.keywordsEN
+                          span.keyWordstagEn(style="cursor:pointer")!=keyEn
+          .book-content-content!=data.document.content
+        .m-b-1
+          include ../../publicModules/paging/paging
+          .p-a-0.comment-container.m-b-1
+            .comment-list.m-t-1
+              for comment in data.comments
+                - var {uid,isAuthor,digest,toc,tlm,addr,docNumber,order,title,content} = comment;
+                - var {avatar,userHome,username,gradeId,gradeName,gradeIconUrl,} = comment.user;
+                .single-post-container
+                  .single-post-top
+                    .single-post-avatar(
+                      data-global-mouseover="showUserPanel"
+                      data-global-mouseout="hideUserPanel"
+                      data-global-data=objToStr({uid})
+                      )
+                      img(src=avatar class='user-banned-avatar')
+                    .single-post-user
+                      .single-post-username
+                        a(
+                          data-anonymous=!uid
+                          href=userHome
+                          target='_blank'
+                          data-global-mouseover="showUserPanel"
+                          data-global-mouseout="hideUserPanel"
+                          data-global-data=objToStr({uid})
+                        )=username
+                        include ../../user/grade
+                        +userGrade(gradeId, gradeName, gradeIconUrl)
+                        if isAuthor
+                          span 作者
+                        if digest
+                          span.post-digest.fa.fa-star(title='精选内容')
+                      .single-post-toc
+                        +fromNow(toc)
+                        if tlm
+                          | &nbsp;修改于&nbsp;
+                          +fromNow(tlm)
+                        span=` IP:${addr}`
+                    .single-post-floor
+                      .doc-number=docNumber
+                      .doc-order
+                        span=`${order}楼`
+                        //.single-post-checkbox
+                          label
+                            input(type='checkbox' data-docId=docId)
+                  .single-post-title=title||''
+                  .single-post-content!=content
+            if !data.comments || data.comments.length === 0
+              .null.p-t-1#nullComments 还没有人评论哦~~  
+          include ../../publicModules/paging/paging
+      .col-xs-12.col-md-3.box-shadow-panel
+        if data.comments && data.comments.length>5
+          include ../../module_scrollTo.pug
+        //include ../../columns/article/authorInfo.pug
+        //+authorInfo()
+        //include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+
+block scripts
+  include ../../publicModules/nkcSource
+  +includeJS('/document/preview/preview.js')

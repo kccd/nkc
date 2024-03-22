@@ -29,10 +29,15 @@ if !isIncluded('options')
         a.option(v-if='postType === "thread"' :href="'/t/' + tid + '?t=author'")
           .fa.fa-filter
           span 只看作者
-        .option(v-if='collection !== null' @click='collectionThread')
+        .option(v-if='collection !== null && postType === "thread"' @click='collectionThread')
           .fa.fa-folder-o
           span(v-if='collection === false') 加入收藏
           span(v-else) 取消收藏
+        .option(v-if='collection !== null && postType === "post"' @click='collectionPost')
+          .fa.fa-heart-o(v-if='!collection')
+          span(v-if='!collection') 收藏
+          .fa.fa-heart(v-if='collection')
+          span(v-if='collection') 取消收藏
         .option(v-if='hidePost !== null' @click='hidePostContent')
           .fa.fa-compress
           span 折叠回复

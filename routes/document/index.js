@@ -40,6 +40,16 @@ router
     }
     // 查询是长电文还是长电文的回复
     if (document.source === article) {
+      // 查询独立文章是否在唯一专栏中
+      const columnPosts = await db.ColumnPostModel.find({
+        pid: document.sid,
+        type: 'article',
+      });
+      if (columnPosts.length === 1) {
+        return ctx.redirect(
+          `/m/${columnPosts[0].columnId}/a/${columnPosts[0]._id}`,
+        );
+      }
       return ctx.redirect(`/z/a/${document.sid}`);
     }
     if (document.source === comment) {
@@ -54,6 +64,16 @@ router
         _id: singleComment.sid,
       });
       if (sid) {
+        // 查询文章是否在唯一专栏中
+        const columnPosts = await db.ColumnPostModel.find({
+          pid: sid,
+          type: 'article',
+        });
+        if (columnPosts.length === 1) {
+          return ctx.redirect(
+            `/m/${columnPosts[0].columnId}/a/${columnPosts[0]._id}?page=${page}&highlight=${document.sid}#highlight`,
+          );
+        }
         return ctx.redirect(
           `/z/a/${sid}?page=${page}&highlight=${document.sid}#highlight`,
         );
@@ -243,11 +263,25 @@ router
         _id: data.document.sid,
       });
       //  选择此版本进行编辑的url
-      editorUrl = await db.ArticleModel.getArticleUrlBySource(
-        article._id,
-        article.source,
-        article.sid,
-      );
+      if (article.source === 'column') {
+        if (!article.sid) {
+          editorUrl = {
+            editorUrl: `/creation/editor/column?source=column&aid=${article._id}`,
+          };
+        } else {
+          editorUrl = await db.ArticleModel.getArticleUrlBySource(
+            article._id,
+            article.source,
+            article.sid.split('-')[0],
+          );
+        }
+      } else {
+        editorUrl = await db.ArticleModel.getArticleUrlBySource(
+          article._id,
+          article.source,
+          article.sid,
+        );
+      }
     }
     if (source === 'draft') {
       editorUrl = await db.ArticleModel.getArticleUrlBySource(

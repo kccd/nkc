@@ -47,7 +47,8 @@ router
     if (user && user.uid === data.column.uid) {
       data.contributeCount = await db.ColumnContributeModel.countDocuments({
         columnId: column._id,
-        passed: null,
+        // passed: null,
+        passed: 'pending',
       });
     }
     const timeout = 24 * 60 * 60 * 1000;
@@ -270,6 +271,9 @@ router
         toolColor,
         users = [],
       } = fields;
+      if([...JSON.parse(users)].some(item=>item.uid===user.uid)){
+        ctx.throw(400, '请不要选择自己作为专栏管理员');
+      }
       const { avatar, banner } = files;
       await columnNameCheckerService.checkColumnName(name, column._id);
       await columnAbbrCheckerService.checkColumnAbbr(abbr);

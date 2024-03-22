@@ -4,7 +4,7 @@
       .row
         .article-item-status.col-md-6(:class="articleStatus(article.status)")
           .article-status-content(v-if="articleStatusContent(article.status)" ) {{articleStatusContent(article.status)}}
-      article-item(:article="article" @delete="deleteItem(index)")
+      article-item(:article="article" @delete="deleteItem(index)" @refresh="initData")
 </template>
 
 <style lang="less">
@@ -53,6 +53,9 @@
     methods: {
       deleteItem(index) {
         this.$emit('delete', index);
+      },
+      initData(){
+        this.$emit('refresh');
       },
       articleStatusContent(status){
         let showContent='';

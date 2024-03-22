@@ -17,7 +17,7 @@ subscribeRouter
     const childrenForums = await forum.extendChildrenForums();
 
     if (childrenForums.length !== 0) {
-      ctx.throw(400, '该专业下存在其他专业，无法关注。');
+      ctx.throw(400, '该专业下存在其他专业，无法订阅。');
     }
 
     await user.ensureSubLimit(subscribeSources.forum);
@@ -25,7 +25,7 @@ subscribeRouter
     const { subType } = forum;
 
     if (subType === 'unSub') {
-      ctx.throw(400, '该专业不可关注');
+      ctx.throw(400, '该专业不可订阅');
     }
 
     await subscribeForumService.checkSubscribeForum(user.uid, fid);
@@ -36,7 +36,7 @@ subscribeRouter
         uid: user.uid,
       });
       if (!type) {
-        ctx.throw(400, `未找到ID为${typeId}的关注分类`);
+        ctx.throw(400, `未找到ID为${typeId}的订阅分类`);
       }
     }
 
@@ -55,7 +55,7 @@ subscribeRouter
     const forum = await db.ForumModel.findOnly({ fid }, { subType: 1 });
     const { subType } = forum;
     if (subType === 'force') {
-      ctx.throw(400, '关注该专业后不可取消');
+      ctx.throw(400, '订阅该专业后不可取消');
     }
     await subscribeForumService.unsubscribeForum(user.uid, fid);
     const cid = await subscribeForumService.getSubscribeForumCategoriesId(

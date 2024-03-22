@@ -1,6 +1,7 @@
 const { Operations } = require('../operations.js');
 module.exports = {
   PARAMETER: {
+    GET: Operations.visitArticle,
     DELETE: Operations.deleteArticle,
     options: {
       GET: Operations.getArticleOptions,

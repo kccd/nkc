@@ -4,6 +4,8 @@ const subscribeSources = {
   column: 'column',
   collectionArticle: 'collectionArticle',
   collectionThread: 'collectionThread',
+  collectionPost: 'collectionPost',
+  collectionComment: 'collectionComment',
 };
 
 module.exports = {

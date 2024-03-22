@@ -62,10 +62,9 @@ block content
 
   .container-fluid.max-width
     .row
-      //.col-xs-12.col-md-12
-       .m-b-1
-          include ./communityTab
-          +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
+      .col-xs-12.col-md-12
+        include ./communityTab
+        +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
       .col-xs-12.col-md-12
         if !state.isApp
           .row
@@ -114,8 +113,8 @@ block content
                         .community-new-desc 论坛最新帖子、精选帖子
                       if data.user
                         .col-xs-6
-                          a.community-new-title(href='/c/sub')=`我的关注`
-                          .community-new-desc 已关注专业下的最新帖子
+                          a.community-new-title(href='/c/sub')=`我的订阅`
+                          .community-new-desc 已订阅专业下的最新帖子
             if showVisitedForum
               .col-xs-12.col-md-6
                 .box-shadow.m-b-1

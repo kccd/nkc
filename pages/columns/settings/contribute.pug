@@ -30,14 +30,17 @@ block settingsContent
         div(v-else)
           .contribute-list-li(v-for="c in contributes")
             a(:href="c.user && c.user.url" target="_blank") {{c.user && c.user.username}}
-            span &nbsp;&nbsp;{{fromNow(c.toc)}}&nbsp;&nbsp;投稿文章&nbsp;&nbsp;
+            span &nbsp;&nbsp;{{fromNow(c.toc)}}&nbsp;&nbsp;
+            span(v-if="c.type==='retreat'" :style="{color:'#e85a71'}") 撤稿文章&nbsp;&nbsp;
+            span(v-else) 投稿文章&nbsp;&nbsp;
             a(:href="c.thread && c.thread.url" target="_blank") {{c.thread && c.thread.t}}
             .m-t-05(v-if="c.description")
               p 补充说明：{{c.description}}
             .m-t-05(v-if="c.reason")
               p 拒绝理由：{{c.reason}}
             .m-t-05
-              div(v-if="c.passed === null")
+              //- div(v-if="c.passed === null")
+              div(v-if="c.passed === 'pending'")
                 .radio
                   label
                     input(type="radio" :value="true" v-model="c.agree")
@@ -45,7 +48,7 @@ block settingsContent
                   label
                     input(type="radio" :value="false" v-model="c.agree")
                     | 拒绝
-                div(v-if="c.agree")
+                div(v-if="c.agree&&c.type!=='retreat'")
                   .row
                     .col-xs-12.col-md-6
                       strong 主分类
@@ -65,7 +68,8 @@ block settingsContent
                   h5 拒绝理由（选填）
                   textarea.form-control(rows=3 style="max-width:30rem" v-model="c.reason")
                 button.btn.btn-success.btn-sm(v-if="c.agree !== ''" @click="submit(c)") 提交
-              div(v-else-if="c.passed")
+              //- div(v-else-if="c.passed")
+              div(v-else-if="c.passed === 'resolve'")
                 h5.text-success 已同意
               div(v-else)
                 h5.text-danger 已拒绝

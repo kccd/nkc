@@ -19,6 +19,20 @@ class CollectionService {
       sid: aid,
     });
   }
+  async isCollectedPost(uid, pid) {
+    return await subscribeService.isSubscribed({
+      uid,
+      source: subscribeSources.collectionPost,
+      sid: pid,
+    });
+  }
+  async isCollectedComment(uid, cid) {
+    return await subscribeService.isSubscribed({
+      uid,
+      source: subscribeSources.collectionComment,
+      sid: cid,
+    });
+  }
 
   async checkWhenCollectThread(uid, tid) {
     const isCollected = await this.isCollectedThread(uid, tid);
@@ -31,6 +45,24 @@ class CollectionService {
 
   async checkWhenCollectArticle(uid, aid) {
     const isCollected = await this.isCollectedArticle(uid, aid);
+    if (isCollected) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
+      );
+    }
+  }
+
+  async checkWhenCollectPost(uid, pid) {
+    const isCollected = await this.isCollectedPost(uid, pid);
+    if (isCollected) {
+      ThrowBadRequestResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
+      );
+    }
+  }
+
+  async checkWhenCollectComment(uid, cid) {
+    const isCollected = await this.isCollectedComment(uid, cid);
     if (isCollected) {
       ThrowBadRequestResponseTypeError(
         ResponseTypes.FORBIDDEN_BECAUSE_COLLECTED_THREAD,
@@ -56,6 +88,23 @@ class CollectionService {
     });
   }
 
+  async collectPost(uid, pid, cid = []) {
+    return await subscribeService.createSubscribe({
+      source: subscribeSources.collectionPost,
+      sid: pid,
+      uid,
+      cid,
+    });
+  }
+
+  async collectComment(uid, id, cid = []) {
+    return await subscribeService.createSubscribe({
+      source: subscribeSources.collectionComment,
+      sid: id,
+      uid,
+      cid,
+    });
+  }
   async unCollectThread(uid, tid) {
     await subscribeService.cancelSubscribe({
       uid,
@@ -69,6 +118,20 @@ class CollectionService {
       uid,
       source: subscribeSources.collectionArticle,
       sid: aid,
+    });
+  }
+  async unCollectPost(uid, aid) {
+    await subscribeService.cancelSubscribe({
+      uid,
+      source: subscribeSources.collectionPost,
+      sid: aid,
+    });
+  }
+  async unCollectComment(uid, cid) {
+    await subscribeService.cancelSubscribe({
+      uid,
+      source: subscribeSources.collectionComment,
+      sid: cid,
     });
   }
 
@@ -91,6 +154,30 @@ class CollectionService {
       uid,
       source: subscribeSources.collectionArticle,
       sid: aid,
+    });
+    if (subscribe) {
+      cid = subscribe.cid;
+    }
+    return cid;
+  }
+  async getCollectedPostCategoriesId(uid, pid) {
+    let cid = [];
+    const subscribe = await subscribeService.getUserSubscribeBySource({
+      uid,
+      source: subscribeSources.collectionPost,
+      sid: pid,
+    });
+    if (subscribe) {
+      cid = subscribe.cid;
+    }
+    return cid;
+  }
+  async getCollectedCommentCategoriesId(uid, id) {
+    let cid = [];
+    const subscribe = await subscribeService.getUserSubscribeBySource({
+      uid,
+      source: subscribeSources.collectionComment,
+      sid: id,
     });
     if (subscribe) {
       cid = subscribe.cid;

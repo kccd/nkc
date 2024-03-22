@@ -34,6 +34,7 @@ import DraftEditor from '../views/creation/editor/DraftEditor';
 import Collections from '../views/creation/collections/Collections';
 
 import BlackLists from '../views/creation/collections/BlackLists';
+// import CollectionPosts from '../views/creation/collections/CollectionPosts.vue';
 
 export const routesName = {
   creation: 'creation',
@@ -68,6 +69,7 @@ export const routesName = {
   creationZoneArticle: 'creationZoneArticle',
   creationZoneDraft: 'creationZoneDraft',
   creationCollections: 'creationCollections',
+  // creationCollectionPosts: 'creationCollectionPosts',
   creationBlackLists: 'creationBlackLists',
 };
 
@@ -78,6 +80,11 @@ export default [
     component: Creation,
     children: [
       // {name: 'home', path: '/creation', component: Home},
+      // {
+      //   name: routesName.creationCollectionPosts,
+      //   path: '/creation/collectionPosts',
+      //   component: CollectionPosts,
+      // },
       {
         name: routesName.creationCollections,
         path: '/creation/collections',

@@ -18,9 +18,9 @@
                 input(type="checkbox" :value="c._id" v-model="selectedMinorCategoriesId")
                 span {{c.name}}
           .m-t-05
-            button.btn.btn-default.btn-sm.fa.fa-plus-circle(@click="addCategory" v-if="!createCategory") &nbsp;
+            button.btn.btn-default.btn-sm.fa.fa-plus-circle(@click="addCategory" v-if="!createCategory && categoryPermission") &nbsp;
               |添加分类
-            .form(v-if="createCategory").m-t-1
+            .form(v-if="createCategory && categoryPermission").m-t-1
               .form-group
                 label 分类类型
                 .radio
@@ -62,7 +62,7 @@
 <script>
 import {getRequest} from "../js/tools";
 export default {
-  props: ['column-id'],
+  props: ['column-id','categoryPermission'],
   data: () => ({
     loaded: false,
     mainCategories: [],
@@ -106,6 +106,9 @@ export default {
     },
     selectedMinorCategoriesId() {
       this.$emit('change');
+    },
+    columnId(){
+    this.getCategories();
     }
   },
   methods: {

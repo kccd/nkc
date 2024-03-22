@@ -209,9 +209,9 @@ NKC.modules.SubscribeTypes = function() {
       .then(function() {
         this_.close();
         if(!!sub) {
-          sweetSuccess("关注成功");
+          sweetSuccess("订阅成功");
         } else {
-          sweetSuccess("关注已取消");
+          sweetSuccess("订阅已取消");
         }
       })
       .catch(sweetError);
@@ -372,6 +372,20 @@ NKC.modules.SubscribeTypes = function() {
     return nkcAPI(`/article/${id}/collection`, "POST", {type: !!collection, cid: cid || []});
   }
 
+// 收藏回复
+  this_.collectionReplyPromise = function(id, collection, cid, source) {
+    if (source === 'post') {
+      return nkcAPI('/p/' + id + '/collection', 'POST', {
+        type: !!collection,
+        cid: cid || [],
+      });
+    } else if (source === 'comment') {
+      return nkcAPI('/comment/' + id + '/collection', 'POST', {
+        type: !!collection,
+        cid: cid || [],
+      });
+    }
+  };
   //收藏独立文章
   this_.collectionArticle = function (id, collection) {
     if(collection) {

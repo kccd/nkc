@@ -70,6 +70,120 @@ router
     };
     await next();
   })
+  .get('/getColumn', async (ctx, next) => {
+    const { db, data, query } = ctx;
+    const { columnId, columnName, articleId } = query;
+    const targetColumns = [];
+    if (columnName) {
+      const column = await db.ColumnModel.findOne({
+        nameLowerCase: columnName.toLowerCase(),
+        closed: false,
+      });
+      if (column) {
+        let inColumn = null;
+        let inContribute = false;
+        let inColumnUrl = '';
+        // 检查是否具有添加专栏文章分类的权限
+        const userPermissionObject =
+          await db.ColumnModel.getUsersPermissionKeyObject();
+        const categoryPermission =
+          column.uid === data.user.uid ||
+          (await db.ColumnModel.checkUsersPermission(
+            column.users,
+            data.user.uid,
+            userPermissionObject.column_settings_category,
+          ));
+        if (articleId) {
+          // 文章是否在搜索专栏中
+          const columnPost = await db.ColumnPostModel.findOne({
+            columnId: column._id,
+            pid: articleId,
+          });
+          if (columnPost) {
+            inColumn = true;
+            inColumnUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+          }
+
+          // 是否有投稿申请
+          const contribute = await db.ColumnContributeModel.findOne({
+            tid: articleId,
+            source: 'article',
+            columnId: column._id,
+          }).sort({ toc: -1 });
+          if (contribute && contribute.passed === 'pending') {
+            inContribute = true;
+          }
+        }
+        targetColumns.push({
+          _id: column._id,
+          avatar: column.avatar,
+          name: column.name,
+          abbr: column.abbr,
+          inColumn,
+          inContribute,
+          categoryPermission,
+          inColumnUrl,
+        });
+      }
+    }
+    if (columnId) {
+      if (isNaN(Number(columnId))) {
+        return ctx.throw(400, '专栏ID格式有误');
+      }
+      const column = await db.ColumnModel.findOne({
+        _id: columnId,
+        closed: false,
+      });
+      if (column) {
+        let inColumn = null;
+        let inContribute = false;
+        let inColumnUrl = '';
+        // 检查是否具有添加专栏文章分类的权限
+        const userPermissionObject =
+          await db.ColumnModel.getUsersPermissionKeyObject();
+        const categoryPermission =
+          column.uid === data.user.uid ||
+          (await db.ColumnModel.checkUsersPermission(
+            column.users,
+            data.user.uid,
+            userPermissionObject.column_settings_category,
+          ));
+        if (articleId) {
+          // 文章是否在搜索专栏中
+          const columnPost = await db.ColumnPostModel.findOne({
+            columnId: column._id,
+            pid: articleId,
+          });
+          if (columnPost) {
+            inColumn = true;
+            inColumnUrl = `/m/${columnPost.columnId}/a/${columnPost._id}`;
+          }
+
+          // 是否有投稿申请
+          const contribute = await db.ColumnContributeModel.findOne({
+            tid: articleId,
+            source: 'article',
+            columnId: column._id,
+          }).sort({ toc: -1 });
+          if (contribute && contribute.passed === 'pending') {
+            inContribute = true;
+          }
+        }
+        targetColumns.push({
+          _id: column._id,
+          avatar: column.avatar,
+          name: column.name,
+          abbr: column.abbr,
+          inColumn,
+          inContribute,
+          categoryPermission,
+          inColumnUrl,
+        });
+      }
+    }
+    data.targetColumns = targetColumns;
+    await next();
+  })
   .post('/', async (ctx, next) => {
     const { data, db, body, state } = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(

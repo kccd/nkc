@@ -550,7 +550,7 @@ class NKCRender {
         const replacedText = text.replace(/#((D|t)?\d+)/g, (match, p1) => {
           const link = /^D(\d+)$/.test(p1)
             ? `/document/d/${p1.replace(/^D/, '')}`
-            : `/p/${p1}`;
+            : `/p/${p1}?redirect=true`;
           return `<a href="${link}" target="_blank">${match}</a>`;
         });
 

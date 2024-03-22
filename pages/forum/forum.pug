@@ -102,11 +102,11 @@ block content
                   if data.subscribed
                     button.btn-sm.forum-sub-btn.btn(
                       onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", false)`
-                    ) 取关
+                    ) 退订
                   else
                     button.btn-sm.forum-sub-btn.btn.success(
                       onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
-                    ) 关注
+                    ) 订阅
 
           .forum-nav
             .thread-nav

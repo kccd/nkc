@@ -60,7 +60,8 @@ router
         'default'
       ];
       const m = {
-        sid: mid ? mid : '',
+        // sid拼接多个专栏ID 后暂不支持
+        // sid: mid ? mid : '',
         uid: state.uid,
         status: articleStatus,
         source: articleSource,
@@ -85,11 +86,21 @@ router
     data.articleCategoryTree = await db.ThreadCategoryModel.getCategoryTree({
       source: 'article',
     });
+    if (mid) {
+      const column = await db.ColumnModel.findOne({ _id: mid });
+      if (column) {
+        data.targetColumn = {
+          _id: column._id,
+          avatar: column.avatar,
+          name: column.name,
+        };
+      }
+    }
     await next();
   })
   .post('/editor', async (ctx, next) => {
     //创建，修改，编辑文章
-    const { db, data, state, body, nkcModules } = ctx;
+    const { db, data, state, body, nkcModules, permission } = ctx;
     const { files, fields } = body;
     const { coverFile } = files;
     const { type, articleId, source, sid, _tcId } = fields;
@@ -116,11 +127,13 @@ router
       selectCategory,
       authorInfos,
     } = JSON.parse(fields.article);
-    //内容校验
-    if (title && title.length > 100) {
-      ctx.throw(400, `标题不能超过100个字`);
-    } else if (title && title.length < 3) {
-      ctx.throw(400, `标题不能小于3个字`);
+    if (type === 'publish') {
+      //内容校验
+      if (title && title.length > 100) {
+        ctx.throw(400, `标题不能超过100个字`);
+      } else if (title && title.length < 3) {
+        ctx.throw(400, `标题不能小于3个字`);
+      }
     }
     const _content = customCheerio.load(content).text();
     if (_content && _content.length > 100000) {
@@ -161,6 +174,10 @@ router
       if (!article) {
         ctx.throw(400, '未找到文章');
       }
+      // 对于已经在专栏的文章暂时无法修改和发布
+      if (!permission('review') && article.sid) {
+        ctx.throw(400, '该文章已经在专栏中，请撤稿后重试');
+      }
       await article.modifyArticle({
         title,
         content,
@@ -175,23 +192,34 @@ router
       });
       await db.ArticleModel.updateOne({ _id: articleId }, { $set: { tcId } });
       if (type === 'publish') {
-        //判断用户是否选择文章专栏分类
-        if (
-          source === columnSource &&
-          article.status === defaultStatus &&
-          (!selectCategory.selectedMainCategoriesId ||
-            selectCategory.selectedMainCategoriesId.length === 0)
-        ) {
-          ctx.throw(401, '未选择文章专栏分类');
+        if (source === columnSource) {
+          if (selectCategory) {
+            //判断用户是否选择文章专栏分类
+            if (
+              article.status === defaultStatus &&
+              (!selectCategory.selectedMainCategoriesId ||
+                selectCategory.selectedMainCategoriesId.length === 0)
+            ) {
+              ctx.throw(401, '未选择文章专栏分类');
+            }
+            //检测文章专栏分类是否有效
+            if (article.status === defaultStatus) {
+              await db.ColumnPostCategoryModel.checkColumnCategory(
+                selectCategory,
+              );
+            }
+          }
+          data.articleUrl = await article.submitArticle({
+            sid,
+            selectCategory,
+            reviewPermission: permission('review'),
+          });
+        } else {
+          data.articleUrl = await article.publishArticle({
+            source,
+            selectCategory,
+          });
         }
-        //检测文章专栏分类是否有效
-        if (source === columnSource && article.status === defaultStatus) {
-          await db.ColumnPostCategoryModel.checkColumnCategory(selectCategory);
-        }
-        data.articleUrl = await article.publishArticle({
-          source,
-          selectCategory,
-        });
       } else if (type === 'save') {
         await article.saveArticle();
       } else if (type === 'autoSave') {

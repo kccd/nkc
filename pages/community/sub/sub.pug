@@ -1,9 +1,12 @@
 extends ../../bootstrap_base
 block title
-  title=`我的关注 - 论坛 - ${remoteState.serverSettings.websiteName}`
+  title=`我的订阅 - 论坛 - ${remoteState.serverSettings.websiteName}`
 block content
   .container-fluid.max-width
     .row
+      .col-xs-12.col-md-12
+        include ../communityTab
+        +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
       .col-xs-12.col-md-1.min-md-p-r-0.hidden-xs.hidden-sm
         //- 游客显示推荐关注
         include ../communityLeftNav
@@ -16,19 +19,27 @@ block content
         +communityLeftNav(communityLeftNavProps)
       .col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
-          .m-b-1
-            //include ../communityTab
-            //+renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
-            if !state.isApp
+          //.m-b-1
+            include ../communityTab
+            +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
+            //if !state.isApp
               include ../communityNav
               +communityNav([{name: '我的关注', url: '/c/sub'},{isEqual:true,name: '快捷总版', url: '/c/new'}])
           .m-b-1
             -showPagingSortButton = false;
             include ../../publicModules/paging/paging
-              include ../../subscribe/postActivity
+              //include ../../subscribe/postActivity
                 for a in data.activity
                   +postActivity(a)
-              include ../../publicModules/paging/paging_input
+              if data.articlesPanelData && data.articlesPanelData.length > 0
+                include ../../publicModules/articlePanel/articlePanel
+                +ArticlesPanel(data.articlesPanelData, data.articlePanelStyle)
+              else
+                .p-t-5.p-b-5.text-center 空空如也~
+              if data.paging && data.paging.buttonValue.length > 0
+                .m-t-1
+                  include ../../publicModules/paging/paging_input
+              //- include ../../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         include ../communitySide
         -

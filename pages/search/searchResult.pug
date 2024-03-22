@@ -168,8 +168,11 @@
       .search-result-time
         +fromNow(result.documentTime)
       if result.source === 'column'
-        span 专栏文章
-        a.clear-a-style.search-result-forum(href=result.column.homeUrl target="_blank")=result.column.name
+        if result.column
+          span 专栏文章
+          a.clear-a-style.search-result-forum(href=result.column.homeUrl target="_blank")=result.column.name
+        else
+          span 独立文章
       else if result.source === 'zone'
         span 电波长电文
     .search-result-abstract!= result.abstract

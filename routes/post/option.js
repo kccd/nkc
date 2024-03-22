@@ -1,5 +1,8 @@
 const { Operations } = require('../../settings/operations');
 const router = require('koa-router')();
+const {
+  collectionService,
+} = require('../../services/subscribe/collection.service');
 router.get('/', async (ctx, next) => {
   const { state, data, db, params } = ctx;
   const { user } = data;
@@ -54,6 +57,11 @@ router.get('/', async (ctx, next) => {
       );
     }
     if (isPost) {
+      // 收藏 回复
+      optionStatus.collection = await collectionService.isCollectedPost(
+        user.uid,
+        post.pid,
+      );
       // 回复置顶
       if (
         !isComment &&
