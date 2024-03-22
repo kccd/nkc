@@ -85,12 +85,13 @@
             .account-follower-buttons(:data-thread="subscribe.sid" :class="threadsId.includes(subscribe.sid) ? 'active' : ''")
               button.category.collection-button.m-r-05(@click="moveSub([subscribe.sid])") 分类
               button.subscribe(@click="subPost(subscribe.sid)" :class="{'collection-button': type === 'collection'}")
-            a(:href="`/p/${subscribe.post.pid}`" :title="subscribe.post.t" target="_blank") {{subscribe.post.t}}
-          .account-thread-abstract(v-if="!subscribe.post.disabled") {{subscribe.post.abstractCN || subscribe.post.c}}
+            a(:href="`/p/${subscribe.post.pid}`" :title="subscribe.post.t" target="_blank" v-if="!subscribe.post.disabled && subscribe.post.t") {{subscribe.post.t}}
+            a(:href="`/p/${subscribe.post.pid}`" :title="subscribe.post.c" target="_blank" v-if="!subscribe.post.disabled && !subscribe.post.t") {{subscribe.post.c}}
+          .account-thread-abstract(v-if="!subscribe.post.disabled && subscribe.post.t") {{subscribe.post.abstractCN || subscribe.post.c}}
           .account-thread-info
             .thread-time
               span {{fromNow(subscribe.post.toc)}}
-            span 发表于
+            span 回复于
               a.thread-forum-link(:href="`${subscribe.post.postUrl}`" target="_blank") 《{{ subscribe.post.thread.firstPost.t }}》
             span(v-if="subscribe.post.anonymous") 匿名
             a.thread-user(:href="`/u/${subscribe.post.uid}`" v-else)
@@ -100,13 +101,13 @@
                 :data-global-data="objToStr({uid: subscribe.post.uid})"
               )
               span {{subscribe.post.user.username}}
-            .thread-thumbup(v-if="subscribe.post.voteUp")
+            //-.thread-thumbup(v-if="subscribe.post.voteUp")
               .fa.fa-thumbs-up
               span {{subscribe.post.voteUp}}
-            //.thread-hits(v-if="subscribe.thread.hits")
+            //-.thread-hits(v-if="subscribe.thread.hits")
               .fa.fa-eye
               span {{subscribe.thread.hits}}
-            .thread-comment(v-if="subscribe.post.postCount")
+            //-.thread-comment(v-if="subscribe.post.postCount")
               .fa.fa-comment
               span {{subscribe.post.postCount}}
       .account-thread(:class="subscribe.comment.status" v-if="subscribe.source === 'collectionComment'")
@@ -116,16 +117,17 @@
         .account-thread-avatar
           div(:style="`background-image: url(${getUrl('postCover', subscribe.comment.cover)})`" v-if="subscribe.comment.cover")
         .account-thread-content(:style="!subscribe.comment.cover?'display: block':''")
-          .account-thread-title(:class="subscribe.comment.digest?'digest':''")
+          .account-thread-title.m-b-05(:class="subscribe.comment.digest?'digest':''")
             .account-follower-buttons(:data-thread="subscribe.tid" :class="threadsId.includes(subscribe.sid) ? 'active' : ''")
               button.category.collection-button.m-r-05(@click="moveSub([subscribe.sid])") 分类
               button.subscribe(@click="subComment(subscribe.sid, 'article')" :class="{'collection-button': type === 'collection'}")
-            //a(:href="subscribe.article.url" :title="subscribe.article.title" target="_blank") {{subscribe.article.title}}
-          .account-thread-abstract(v-if="subscribe.comment.status === 'normal'") {{subscribe.comment.content}}
+            //-a(:href="subscribe.article.url" :title="subscribe.article.title" target="_blank") {{subscribe.article.title}}
+            span(v-if="subscribe.comment.status === 'normal'") {{subscribe.comment.content}}
+          //-.account-thread-abstract(v-if="subscribe.comment.status === 'normal'") {{subscribe.comment.content}}
           .account-thread-info
             .thread-time
               span {{fromNow(subscribe.comment.toc)}}
-            span 发表于
+            span 回复于
               a.thread-forum-link(:href="`${subscribe.comment.commentUrl}`" target="_blank") 《{{ subscribe.comment.articleDocument.title }}》
             span(v-if="subscribe.comment.anonymous") 匿名
             a.thread-user(:href="`/u/${subscribe.comment.uid}`" target="_blank" v-else)
@@ -135,13 +137,13 @@
                 :data-global-data="objToStr({uid: subscribe.comment.uid})"
               )
               span {{subscribe.comment.user.username}}
-            .thread-thumbup(v-if="subscribe.comment.voteUp && subscribe.comment.voteUp > 0")
+            //-.thread-thumbup(v-if="subscribe.comment.voteUp && subscribe.comment.voteUp > 0")
               .fa.fa-thumbs-up
               span {{subscribe.comment.voteUp}}
-            .thread-hits(v-if="subscribe.comment.hits")
+            //-.thread-hits(v-if="subscribe.comment.hits")
               .fa.fa-eye
               span {{subscribe.comment.hits}}
-            .thread-comment(v-if="subscribe.comment.count")
+            //-.thread-comment(v-if="subscribe.comment.count")
               .fa.fa-comment
               span {{subscribe.comment.count}}
 

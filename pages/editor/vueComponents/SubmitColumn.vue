@@ -10,7 +10,7 @@
           li(v-for="tab,index in tabItems" :class="{'active': tab.name === currentTab.name}" :key="index" @click="currentTab=tab;" style='cursor:pointer;')
             a {{tab.title}}
       //.selected-users(v-if=" currentTab.name==='contribute' ")
-      .input-group(v-if="currentTab.name==='contribute' ")
+      .input-group.m-t-05(v-if="currentTab.name==='contribute' ")
         .input-group-btn
           button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
             | {{getTypeName(type)}}&nbsp;
@@ -34,12 +34,11 @@
           .search-column-status(v-if=" column.inContribute" :style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
           .search-colum-button.m-t-05
-            button.btn.btn-default.m-r-05(v-if="column.inColumn")
-              a( :href="column.inColumnUrl"  target='_blank' :style="'color:black;'") 在专栏中查看
-            button.btn.btn-primary(v-if="!column.inContribute && !column.inColumn"  @click="clickColumn(column)") 选择
-            button.btn.btn-primary(v-if="column.inContribute && column.inColumn" @click="cancelRetreat(-1,column)") 取消专栏撤稿
-            button.btn.btn-danger(v-if="!column.inContribute && column.inColumn" @click="retreatContribute(-1,column)") 从专栏中撤稿
-            button.btn.btn-primary( v-if="column.inContribute && !column.inColumn" @click="cancelSubmit(-1,column)") 取消专栏投稿
+            a.button.btn.btn-xs.btn-default.m-r-05(v-if="column.inColumn" :href="column.inColumnUrl"  target='_blank' :style="'color:black;'") 在专栏中查看
+            button.btn.btn-xs.btn-primary(v-if="!column.inContribute && !column.inColumn"  @click="clickColumn(column)") 选择
+            button.btn.btn-xs.btn-primary(v-if="column.inContribute && column.inColumn" @click="cancelRetreat(-1,column)") 取消专栏撤稿
+            button.btn.btn-xs.btn-danger(v-if="!column.inContribute && column.inColumn" @click="retreatContribute(-1,column)") 从专栏中撤稿
+            button.btn.btn-xs.btn-primary( v-if="column.inContribute && !column.inColumn" @click="cancelSubmit(-1,column)") 取消专栏投稿
       .contributed-results(v-if= "currentTab.name==='contributed' ")
         h5.p-t-2.text-center(v-if="!submittedColumn||submittedColumn.length===0") 空空如也~
         .search-column(v-for="column,index in submittedColumn||[]" :key="index" style="height:7rem")
@@ -51,10 +50,9 @@
           .search-column-status(v-if=" column.type==='retreat'&&column.passed==='pending' " :style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
           .search-colum-button.m-t-05
-            button.btn.btn-default.m-r-05
-              a( :href="column.inColumnUrl"  target='_blank' :style="'color:black;'") 在专栏中查看
-            button.btn.btn-primary(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消专栏撤稿
-            button.btn.btn-danger(v-else @click="retreatContribute(index)") 从专栏中撤稿
+            a.button.btn.btn-xs.btn-default.m-r-05(:href="column.inColumnUrl"  target='_blank' :style="'color:black;'") 在专栏中查看
+            button.btn.btn-xs.btn-primary(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消专栏撤稿
+            button.btn.btn-xs.btn-danger(v-else @click="retreatContribute(index)") 从专栏中撤稿
       .contributing-results(v-if= "currentTab.name==='contributing' ")
         h5.p-t-2.text-center(v-if="!submittingColumn||submittingColumn.length===0") 空空如也~
         .search-column(v-for="column,index in submittingColumn||[]" :key="index" style="height:7rem")
@@ -64,7 +62,7 @@
             a.search-user-name(:href="`/m/${column._id}`"  target='_blank' :style="'color:black;'") {{column.name}}
             .search-user-description {{ column.abbr }}
           .search-colum-button.m-t-05
-            button.btn.btn-primary(@click="cancelSubmit(index)") 取消专栏投稿
+            button.btn.btn-xs.btn-primary(@click="cancelSubmit(index)") 取消专栏投稿
           .search-column-status(:style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
       .row(v-if="selectedColumn.length>0&&currentTab.name==='contribute' ")
@@ -486,14 +484,17 @@ export default {
   // top: 2rem;
   float: right;
   button{
-    padding: 0;
-    height: 2rem;
-    width: 8rem;
-    border-radius: 2px;
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
-    font-size: 1rem;
+    // padding: 0;
+    // height: 2rem;
+    // width: 8rem;
+    // border-radius: 2px;
+    // box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+    // font-size: 1rem;
     a{
       &:hover{
+        text-decoration: none;
+      }
+      &:active{
         text-decoration: none;
       }
     }
