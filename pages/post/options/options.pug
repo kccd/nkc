@@ -35,7 +35,7 @@ if !isIncluded('options')
           span(v-else) 取消收藏
         .option(v-if='collection !== null && postType === "post"' @click='collectionPost')
           .fa.fa-heart-o(v-if='!collection')
-          span(v-if='!collection') 加入收藏
+          span(v-if='!collection') 收藏
           .fa.fa-heart(v-if='collection')
           span(v-if='collection') 取消收藏
         .option(v-if='hidePost !== null' @click='hidePostContent')

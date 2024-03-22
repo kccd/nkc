@@ -9,8 +9,8 @@
             .float-forum-icon(v-else :style="'background-color: ' + forum.color + ';'")
           .float-forum-info
             a(:href="'/f/' + forum.fid" target="_blank" :style="uid?'padding-right: 3.5rem;':''").float-forum-name {{forum.displayName}}
-            button(v-if="uid && subscribed" @click="subscribe") 取关
-            button.active(v-if="uid && !subscribed" @click="subscribe") 关注
+            button(v-if="uid && subscribed" @click="subscribe") 退订
+            button.active(v-if="uid && !subscribed" @click="subscribe") 订阅
             .float-forum-count
               .number {{forum.countThreads}}
               | 篇文章，
@@ -284,9 +284,9 @@ export default {
       subForum(fid, sub)
       .then(res => {
         if(sub) {
-          sweetSuccess('关注成功');
+          sweetSuccess('订阅成功');
         } else {
-          sweetSuccess('取关成功');
+          sweetSuccess('退订成功');
         }
         self.subscribed = sub;
       })
