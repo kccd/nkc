@@ -33,7 +33,7 @@ if !isIncluded('options')
           .fa.fa-folder-o
           span(v-if='collection === false') 加入收藏
           span(v-else) 取消收藏
-        //.option(v-if='collection !== null && postType === "post"' @click='collectionPost')
+        .option(v-if='collection !== null && postType === "post"' @click='collectionPost')
           .fa.fa-heart-o(v-if='!collection')
           span(v-if='!collection') 加入收藏
           .fa.fa-heart(v-if='collection')

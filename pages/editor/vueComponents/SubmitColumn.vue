@@ -9,57 +9,60 @@
         ul.nav.nav-tabs
           li(v-for="tab,index in tabItems" :class="{'active': tab.name === currentTab.name}" :key="index" @click="currentTab=tab;" style='cursor:pointer;')
             a {{tab.title}}
-      .selected-users(v-if=" currentTab.name==='contribute' ")
-      .input-group(v-if="currentTab.name==='contribute' ")
+      //.selected-users(v-if=" currentTab.name==='contribute' ")
+      .input-group.m-t-05(v-if="currentTab.name==='contribute' ")
         .input-group-btn
-          button.btn.btn-default.dropdown-toggle(aria-expanded=false)
-            | {{getTypeName('columnName')}}&nbsp;
+          button.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+            | {{getTypeName(type)}}&nbsp;
             span.caret
           ul.dropdown-menu
             li.pointer
               a(@click="selectType('columnName')") {{getTypeName("columnName")}}
-            //li.pointer
+            li.pointer
               a(@click="selectType('columnId')") {{getTypeName("columnId")}}
         input.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search")
         button.search-button(@click="search")
           .fa.fa-search
       .search-results(v-if= "currentTab.name==='contribute' ")
         h5.text-danger(v-if="searchColumns&&searchColumns.length===0") 未找到相关专栏
-        .search-column(v-for="column,index in searchColumns||[]" :key="index" :style=" 'cursor:pointer;' " @click="clickColumn(column)")
+        .search-column(v-for="column,index in searchColumns||[]" :key="index"  style="height:7rem" )
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
           .search-user-info
-            .search-user-name {{column.name}}
+            a.search-user-name( :href="`/m/${column._id}`"  target='_blank' :style="'color:black;'") {{column.name}}
             .search-user-description {{ column.abbr }}
+          .search-column-status(v-if=" column.inContribute" :style="'border-left-color: rgba(217, 236, 255,0.85);'") 
+            span(:style="'color: #409eff;'") 审核中
+          .search-colum-button.m-t-05
+            a.button.btn.btn-xs.btn-default.m-r-05(v-if="column.inColumn" :href="column.inColumnUrl"  target='_blank' :style="'color:black;'") 在专栏中查看
+            button.btn.btn-xs.btn-primary(v-if="!column.inContribute && !column.inColumn"  @click="clickColumn(column)") 选择
+            button.btn.btn-xs.btn-primary(v-if="column.inContribute && column.inColumn" @click="cancelRetreat(-1,column)") 取消专栏撤稿
+            button.btn.btn-xs.btn-danger(v-if="!column.inContribute && column.inColumn" @click="retreatContribute(-1,column)") 从专栏中撤稿
+            button.btn.btn-xs.btn-primary( v-if="column.inContribute && !column.inColumn" @click="cancelSubmit(-1,column)") 取消专栏投稿
       .contributed-results(v-if= "currentTab.name==='contributed' ")
         h5.p-t-2.text-center(v-if="!submittedColumn||submittedColumn.length===0") 空空如也~
         .search-column(v-for="column,index in submittedColumn||[]" :key="index" style="height:7rem")
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
           .search-user-info
-            a.search-user-name( :href="`/m/${column._id}`"  target='_blank') {{column.name}}
+            a.search-user-name( :href="`/m/${column._id}`"  target='_blank' :style="'color:black;'") {{column.name}}
             .search-user-description {{ column.abbr }}
-          //.search-colum-button
-              button.cancel(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消
-              button.confirm(v-else @click="retreatContribute(index)") 撤稿
           .search-column-status(v-if=" column.type==='retreat'&&column.passed==='pending' " :style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
-          //.search-column-status(v-if=" column.type==='retreat'&&column.passed==='reject' " :style="'border-left-color: rgba(253, 226, 226,0.85);'") 
-            span(:style="'color: #f56c6c;'") 撤稿失败
           .search-colum-button.m-t-05
-            a.m-r-05( :href="column.inColumnUrl"  target='_blank') 在专栏中查看
-            button.cancel(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消专栏撤稿
-            button.confirm(v-else @click="retreatContribute(index)") 从专栏中撤稿
+            a.button.btn.btn-xs.btn-default.m-r-05(:href="column.inColumnUrl"  target='_blank' :style="'color:black;'") 在专栏中查看
+            button.btn.btn-xs.btn-primary(v-if=" column.type==='retreat'&&column.passed==='pending' " @click="cancelRetreat(index)") 取消专栏撤稿
+            button.btn.btn-xs.btn-danger(v-else @click="retreatContribute(index)") 从专栏中撤稿
       .contributing-results(v-if= "currentTab.name==='contributing' ")
         h5.p-t-2.text-center(v-if="!submittingColumn||submittingColumn.length===0") 空空如也~
         .search-column(v-for="column,index in submittingColumn||[]" :key="index" style="height:7rem")
           .search-user-avatar
             img(:src="getUrl('userAvatar', column.avatar)")
           .search-user-info
-            a.search-user-name(:href="`/m/${column._id}`"  target='_blank') {{column.name}}
+            a.search-user-name(:href="`/m/${column._id}`"  target='_blank' :style="'color:black;'") {{column.name}}
             .search-user-description {{ column.abbr }}
           .search-colum-button.m-t-05
-              button.cancel(@click="cancelSubmit(index)") 取消专栏投稿
+            button.btn.btn-xs.btn-primary(@click="cancelSubmit(index)") 取消专栏投稿
           .search-column-status(:style="'border-left-color: rgba(217, 236, 255,0.85);'") 
             span(:style="'color: #409eff;'") 审核中
       .row(v-if="selectedColumn.length>0&&currentTab.name==='contribute' ")
@@ -156,9 +159,17 @@ export default {
           minLength: 1
         });
         const self = this;
-      getColumnMessage(this.keyword,this.articleId).then(res=>{
+        if(this.type==='columnId'){
+          getColumnMessage('',this.articleId,this.keyword).then(res=>{
           self.searchColumns = [...res];
-        })
+        });
+        }
+        else{
+          getColumnMessage(this.keyword,this.articleId).then(res=>{
+          self.searchColumns = [...res];
+        });
+        }
+      
       },
       getCategories() {
         const self = this;
@@ -227,9 +238,15 @@ export default {
         });
         this.close();
       },
-      retreatContribute: function(index){
+      retreatContribute: function(index,$column){
+        let $index = 0;
         const articlesId = this.articleId;
-        const column = this.submittedColumn[index];
+        if(index==-1){
+          $index = this.submittedColumn.findIndex(item=>item._id===$column._id);
+        }else{
+          $index = index;
+        }
+        const column = this.submittedColumn[$index];
         const self = this;
         sweetQuestion('确定要从当前专栏撤稿吗？此操作需要经专栏管理员同意后才可生效。').then(function() {
           nkcAPI("/api/v1/articles/contribute", "POST", {
@@ -247,9 +264,15 @@ export default {
                           if(passed==='pending'){
                             column.passed = 'pending';
                             column.type = 'retreat';
+                            if(index==-1){
+                            self.searchColumns[0].inContribute = true;
+                            }
                             sweetSuccess('发送撤稿申请成功');
                           }else if(passed==='resolve'){
                             self.deleteOneColumn(index);
+                            if(index==-1){
+                            self.searchColumns[0].inColumn = null;
+                            }
                             sweetSuccess('撤稿成功');
                           }
                         }
@@ -259,9 +282,15 @@ export default {
                       });
         });
       },
-      cancelRetreat: function(index){
+      cancelRetreat: function(index,$column){
+        let $index = 0;
         const articlesId = this.articleId;
-        const column = this.submittedColumn[index];
+        if(index==-1){
+          $index = this.submittedColumn.findIndex(item=>item._id===$column._id);
+        }else{
+          $index = index;
+        }
+        const column = this.submittedColumn[$index];
         const self = this;
         sweetConfirm('确定要取消撤稿申请吗？').then(function() {
           nkcAPI("/api/v1/articles/contribute", "POST", {
@@ -277,6 +306,9 @@ export default {
                         if(passed&&passed==='cancel'){
                           column.passed = passed;
                           self.$emit('change-column',[...self.submittedColumn]);
+                          if(index==-1){
+                            self.searchColumns[0].inContribute = false;
+                          }
                           sweetSuccess('取消成功');
                         }
                       })
@@ -285,9 +317,15 @@ export default {
                       });
         });
       },
-      cancelSubmit: function(index){
+      cancelSubmit: function(index,$column){
+        let $index = 0;
         const articlesId = this.articleId;
-        const column = this.submittingColumn[index];
+        if(index==-1){
+          $index = this.submittingColumn.findIndex(item=>item._id===$column._id);
+        }else{
+          $index = index;
+        }
+        const column = this.submittingColumn[$index];
         const temColumns = [...this.submittingColumn];
         const self = this;
         sweetConfirm('确定要取消投稿申请吗？').then(function() {
@@ -305,6 +343,9 @@ export default {
                           temColumns.splice(index,1);
                           self.submittingColumn = temColumns;
                           self.$emit('change-column',{contributeColumns:temColumns});
+                          if(index==-1){
+                            self.searchColumns[0].inContribute = false;
+                          }
                           sweetSuccess('取消成功');
                         }
                       })
@@ -373,6 +414,7 @@ export default {
   padding-top: 1rem;
   padding-bottom: 0;
   max-height: 60vh;
+  min-height: 20vh;
   overflow-y: auto;
 }
 .modal-footer{
@@ -442,11 +484,20 @@ export default {
   // top: 2rem;
   float: right;
   button{
-    height: 2rem;
-    width: 8rem;
-    border-radius: 2px;
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
-    font-size: 1rem;
+    // padding: 0;
+    // height: 2rem;
+    // width: 8rem;
+    // border-radius: 2px;
+    // box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+    // font-size: 1rem;
+    a{
+      &:hover{
+        text-decoration: none;
+      }
+      &:active{
+        text-decoration: none;
+      }
+    }
   }
   .confirm{
     background-color: #fff;

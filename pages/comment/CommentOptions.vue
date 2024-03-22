@@ -6,6 +6,11 @@
       a.option(v-if="options.editor" @click="editor()")
         .fa.fa-edit
         span 编辑
+      .option(v-if='options.collection !== null' @click='collectionComment')
+        .fa.fa-heart-o(v-if='options.collection === false')
+        .fa.fa-heart(v-else)
+        span(v-if='options.collection === false') 收藏评论
+        span(v-else) 取消收藏
       .option(v-if='options.digest !== null' @click='commentDigest')
         .fa.fa-star-o(v-if='options.digest === false')
         .fa.fa-star(v-else)
@@ -375,6 +380,36 @@ export default {
     creditKcbPanel() {
       const {_id} = this.comment;
       window.RootApp.openCredit(creditTypes.kcb, contentTypes.comment, _id);
+    },
+    collectionComment(){
+      // const { pid, collection } = this;
+      const {collection} = this.options;
+      const {_id} = this.comment;
+      const self = this;
+      if (!collection) {
+        SubscribeTypes.open(function (cid) {
+          SubscribeTypes.collectionReplyPromise(_id, !collection, cid, 'comment')
+            .then(function () {
+              SubscribeTypes.close();
+              self.options.collection = !collection;
+              sweetSuccess('收藏成功');
+            })
+            .catch(function (data) {
+              sweetError(data);
+            });
+        });
+      } else {
+        SubscribeTypes.collectionReplyPromise(_id, !collection, [], 'comment')
+          .then(function () {
+            SubscribeTypes.close();
+            self.options.collection = !collection;
+            sweetSuccess('收藏已取消');
+          })
+          .catch(function (data) {
+            sweetError(data);
+          });
+      }
+      
     }
   }
 }

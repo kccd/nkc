@@ -418,6 +418,7 @@ schema.statics.getUserCollectionThreadsId = async (uid) => {
 };
 
 //保存用户收藏的社区文章和专栏文章
+//添加保存用户收藏的社区文章回复和独立文章评论
 schema.statics.saveUserCollectionThreadsId = async (uid) => {
   const subs = await mongoose
     .model('subscribes')
@@ -427,6 +428,8 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
           $in: [
             subscribeSources.collectionThread,
             subscribeSources.collectionArticle,
+            subscribeSources.collectionComment,
+            subscribeSources.collectionPost,
           ],
         },
         cancel: false,
@@ -720,11 +723,17 @@ schema.statics.extendSubscribes = async (subscribes) => {
   const ColumnModel = mongoose.model('columns');
   const ThreadModel = mongoose.model('threads');
   const ArticleModel = mongoose.model('articles');
+  const PostModel = mongoose.model('posts');
+  const CommentModel = mongoose.model('comments');
   const uid = new Set(),
     fid = new Set(),
     columnId = new Set(),
     tid = new Set(),
-    aid = new Set();
+    aid = new Set(),
+    // 回复
+    pid = new Set(),
+    // 评论
+    cid = new Set();
   subscribes.map((s) => {
     const { source } = s;
     if (source === subscribeSources.user) {
@@ -738,6 +747,10 @@ schema.statics.extendSubscribes = async (subscribes) => {
       tid.add(s.sid);
     } else if (source === subscribeSources.collectionArticle) {
       aid.add(s.sid);
+    } else if (source === subscribeSources.collectionPost) {
+      pid.add(s.sid);
+    } else if (source === subscribeSources.collectionComment) {
+      cid.add(s.sid);
     }
   });
   let users = await UserModel.find({ uid: { $in: [...uid] } });
@@ -751,6 +764,19 @@ schema.statics.extendSubscribes = async (subscribes) => {
   const articleObj = {};
   articles.map((a) => {
     articleObj[a._id] = a;
+  });
+  let posts = await PostModel.find({ pid: { $in: [...pid] } });
+  posts = await PostModel.extendPosts(posts);
+  const postObj = {};
+  posts.map((p) => {
+    postObj[p.pid] = p;
+    tid.add(p.tid);
+  });
+  let comments = await CommentModel.find({ _id: { $in: [...cid] } });
+  comments = await CommentModel.getCommentsInfo(comments);
+  const commentObj = {};
+  comments.map((c) => {
+    commentObj[c._id] = c;
   });
   let threads = await ThreadModel.find({ tid: { $in: [...tid] } });
   threads = await ThreadModel.extendThreads(threads, {
@@ -834,6 +860,23 @@ schema.statics.extendSubscribes = async (subscribes) => {
       };
       if (articleSource === 'column') {
         subscribe.article.column = articleObj[sid].column;
+      }
+    } else if (source === subscribeSources.collectionPost) {
+      subscribe.post = postObj[sid];
+      if (!subscribe.post) {
+        continue;
+      }
+      subscribe.post.thread = {
+        firstPost: {
+          t: threadsObj[subscribe.post.tid].firstPost.t,
+        },
+      };
+      subscribe.post.postUrl = await PostModel.getUrl(subscribe.post);
+      subscribe.post.c = await obtainPureText(subscribe.post.c, true, 100);
+    } else if (source === subscribeSources.collectionComment) {
+      subscribe.comment = commentObj[sid];
+      if (!subscribe.comment) {
+        continue;
       }
     }
     results.push(subscribe);

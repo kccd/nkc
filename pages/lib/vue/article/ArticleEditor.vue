@@ -40,14 +40,24 @@
       .form-group(v-if="column && configs.selectCategory")
         .m-b-2
           .editor-header 专栏文章分类
-          select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
+          select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId" :categoryPermission="categoryPermission")
       //.form-group(v-if="(articleStatus === 'default' || !articleStatus) && column && configs.selectCategory && column.userColumn && !column.addedToColumn")
         .m-b-2
           .editor-header 专栏文章分类
           select-column-categories(ref="selectColumnCategories" @change="categoryChange" :column-id="columnId")
-    .editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05 提示：文章发布后所有人可见。
+    //.editor-thread-category-warning.bg-warning.text-warning.p-a-05.bg-border.m-b-05 提示：文章发布后所有人可见。
+    .m-b-05
+      .checkbox
+        label
+          input(type="checkbox" value="true" v-model="checkProtocol")
+          span 我已阅读并同意遵守与本次发表相关的全部协议。
+          a(href="/protocol" target="_blank") 查看协议
+    .m-b-05
+      .checkbox 
+        .editor-auto-save
+          .fa.fa-exclamation-circle &nbsp; 文章发布后对所有人可见。
     .m-b-1
-      button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId") 发布
+      button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId || !checkProtocol") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId || lockPost") 保存
       button.btn.btn-default.m-r-05(@click="preview" :disabled="!articleId") 预览
       button.btn.btn-default.m-r-05(@click="history" :disabled="!articleId") 历史
@@ -216,6 +226,7 @@ export default {
     articleStatus: null, //文章当前状态
     autoSaveInfo: '',//草稿保存信息
     selectCategory: '', //文章专栏分类
+    checkProtocol:false,
     article: {
       title: '',
       content: '',
@@ -228,6 +239,8 @@ export default {
       authorInfos: [],
     },
     lockPost: false,
+    // 是否具有添加专栏文章分类的权限
+    categoryPermission:false,
     // 是否允许触发contentChange
     contentChangeEventFlag: false,
     articles: [], //当前专栏正在编辑的文章
@@ -790,6 +803,7 @@ export default {
           self.columnId = data.columns[0]._id;
           self.column = data.columns[0];
           self.column.avatar = getUrl('userAvatar', data.columns[0].avatar);
+          self.categoryPermission = data.columns[0].categoryPermission;
         },
         {
           showColumnCategories:false,

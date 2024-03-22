@@ -791,7 +791,7 @@ const DynamicOperations = {
   visitZoneMomentHistory: 'visitZoneMomentHistory',
   rollbackZoneMomentHistory: 'rollbackZoneMomentHistory',
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
-  // collectionPost: 'collectionPost',
+  collectionPost: 'collectionPost',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };
