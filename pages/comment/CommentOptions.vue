@@ -9,7 +9,7 @@
       .option(v-if='options.collection !== null' @click='collectionComment')
         .fa.fa-heart-o(v-if='options.collection === false')
         .fa.fa-heart(v-else)
-        span(v-if='options.collection === false') 收藏评论
+        span(v-if='options.collection === false') 收藏
         span(v-else) 取消收藏
       .option(v-if='options.digest !== null' @click='commentDigest')
         .fa.fa-star-o(v-if='options.digest === false')

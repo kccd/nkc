@@ -209,9 +209,9 @@ NKC.modules.SubscribeTypes = function() {
       .then(function() {
         this_.close();
         if(!!sub) {
-          sweetSuccess("关注成功");
+          sweetSuccess("订阅成功");
         } else {
-          sweetSuccess("关注已取消");
+          sweetSuccess("订阅已取消");
         }
       })
       .catch(sweetError);
