@@ -10,15 +10,28 @@ export function getColumnInfo() {
     });
 }
 //根据专栏名获取专栏信息;
-export function getColumnMessage(columnName, articleId) {
-  return nkcAPI(
-    `/column/getColumn?columnName=${columnName}&articleId=${articleId || ''}`,
-    'GET',
-  )
-    .then((res) => {
-      return res.targetColumns;
-    })
-    .catch((err) => {
-      sweetError(err);
-    });
+export function getColumnMessage(columnName, articleId, columnId) {
+  if (columnName && !columnId) {
+    return nkcAPI(
+      `/column/getColumn?columnName=${columnName}&articleId=${articleId || ''}`,
+      'GET',
+    )
+      .then((res) => {
+        return res.targetColumns;
+      })
+      .catch((err) => {
+        sweetError(err);
+      });
+  } else if (!columnName && columnId) {
+    return nkcAPI(
+      `/column/getColumn?columnId=${columnId}&articleId=${articleId || ''}`,
+      'GET',
+    )
+      .then((res) => {
+        return res.targetColumns;
+      })
+      .catch((err) => {
+        sweetError(err);
+      });
+  }
 }

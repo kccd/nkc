@@ -63,9 +63,8 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
-       .m-b-1
-          include ./communityTab
-          +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
+        include ./communityTab
+        +renderCommunityTab(state.isApp,data.activeTab,data.communityTab,data.user)
       .col-xs-12.col-md-12
         if !state.isApp
           .row

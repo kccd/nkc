@@ -1,6 +1,6 @@
 if !isIncluded('community/communityTab')
   mixin renderCommunityTab(isApp,activeTab,communityTab,user)
-    .btn-group.btn-group-justified.m-b-1
+    .btn-group.btn-group-justified.m-b-05
       .btn-group(role="group")
           a.btn.btn-default(
             class=activeTab === communityTab.home ? 'btn-primary': ''
@@ -17,8 +17,8 @@ if !isIncluded('community/communityTab')
           a.btn.btn-default(
             class=activeTab === communityTab.subscribe ? 'btn-primary': ''
             href=`/c/sub`
-          ) 我的关注
+          ) 我的订阅
         else
           button.btn.btn-default(
           onclick="RootApp.openLoginPanel('login')"
-          ) 我的关注
+          ) 我的订阅
