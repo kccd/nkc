@@ -63,7 +63,7 @@ router
     } else if (registerExamination && examSource.length === 0) {
       ctx.throw(400, '若选择开启考试，试卷不能为空');
     } else if (registerExamination && examSource.length > 1) {
-      ctx.throw(400, '若选择开启考试，只能选择一份试卷');
+      // ctx.throw(400, '若选择开启考试，只能选择一份试卷');
     }
 
     await Promise.all(

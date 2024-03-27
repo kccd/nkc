@@ -187,7 +187,26 @@ registerRouter
     if (examSource.length === 0) {
       ctx.throw('并未添加考卷，请前往注册页设置添加');
     }
+    const _ids = [];
+    for (const item of examSource) {
+      _ids.push(item._id);
+    }
+    const examsCategories = await db.ExamsCategoryModel.find(
+      {
+        _id: { $in: [..._ids] },
+      },
+      {
+        _id: 1,
+        name: 1,
+        description: 1,
+      },
+    );
+    for (const item of examsCategories) {
+      examSource.find((exam) => exam._id == item._id).description =
+        item.description;
+    }
     data.cid = examSource[0]._id;
+    data.examSource = examSource;
     data.examNotice = examNotice;
     ctx.template = 'exam/public.pug';
     await next();

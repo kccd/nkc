@@ -57,7 +57,7 @@ if !isIncluded("columnHomeList")
                   .column-abbr
                     -var subscribed = subColumnsId.includes(column._id);
                     -var klass = subscribed ? 'btn-default' : 'btn-default';
-                    -var text = subscribed ? '已关注' : '关注'
+                    -var text = subscribed ? '退订' : '订阅'
                     button.m-r-05.column-subscription.btn.btn-xs(
                       data-subscribed=subscribed ? 'true' : 'false'
                       class=klass
@@ -65,7 +65,7 @@ if !isIncluded("columnHomeList")
                     )=`${text}`
                     span.text-danger=pre
                     span.accent=column.subCount
-                    span &nbsp;人关注&nbsp;
+                    span &nbsp;人订阅&nbsp;
                     span.accent=column.postCount
                     span &nbsp;篇文章
                     //-span
