@@ -1,6 +1,6 @@
 <template lang="pug">
   .sub-forums.m-b-1
-    .panel-header 关注的领域
+    .panel-header 订阅的领域
     .m-b-2
       .user-card-sub-div
         .home-topic-item-div

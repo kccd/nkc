@@ -404,7 +404,7 @@ module.exports = {
       content: "用户[url=userURL(username)]在您的回复/评论下发表了评论，[url=postURL(立即查看)]（可能因为审核等原因延期显示）。\n以下是评论内容：[text=postContent]"
     },
     {
-      content: "您的专栏 [url=columnURL(columnName)] 有新的投稿，[url=columnContributeURL(立即查看)]",
+      content: "您的专栏 [url=columnURL(columnName)] 有新的投稿申请，[url=columnContributeURL(立即查看)]",
       type: "newColumnContribute",
       parameters: [
         "columnContributeURL",
@@ -413,7 +413,7 @@ module.exports = {
       ]
     },
     {
-      content: "您的专栏 [url=columnURL(columnName)] 有新的撤稿，[url=columnContributeURL(立即查看)]",
+      content: "您的专栏 [url=columnURL(columnName)] 有新的撤稿申请，[url=columnContributeURL(立即查看)]",
       type: "newColumnDisContribute",
       parameters: [
         "columnContributeURL",

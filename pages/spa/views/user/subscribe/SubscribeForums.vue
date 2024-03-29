@@ -159,7 +159,7 @@
       border: 1px solid @primary;
       color: #fff;
       &:after{
-        content: "关注";
+        content: "订阅";
       }
       &.collection-button:after{
         content: "收藏";
@@ -176,7 +176,7 @@
           background-color: #cb4c61;
         }
         &:after{
-          content: "取关";
+          content: "退订";
         }
         &.collection-button:after{
           content: "取藏"
@@ -268,11 +268,11 @@ export default {
       .then(() => {
         const index = self.subForumsId.indexOf(fid);
         if(sub) {
-          sweetSuccess('关注成功');
+          sweetSuccess('订阅成功');
           //将关注的id添加到关注的专业id数组中
           if(index === -1) self.subForumsId.push(fid);
         } else {
-          sweetSuccess('关注已取消');
+          sweetSuccess('退订成功');
           //将关注的id从关注专业中去除
           if(index !== -1) self.subForumsId.splice(index, 1);
         }

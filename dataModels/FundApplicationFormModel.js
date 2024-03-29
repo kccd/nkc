@@ -971,6 +971,7 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
+  const HistoriesModel = mongoose.model('histories');
   const FundApplicationFormHistoryModel = mongoose.model(
     'fundApplicationHistories',
   );
@@ -1084,6 +1085,9 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (
   } else {
     await formThread.updateOne({ mainForumsId: fundForumsId });
     const formPost = await PostModel.findOnly({ pid: formThread.oc });
+    //  添加基金内容的历史记录
+    const tempPost = formPost.toObject();
+    await HistoriesModel.createHistory(tempPost);
     formPost.c = form.project.c;
     formPost.t = form.project.t;
     formPost.abstractEn = form.project.abstractEn;
@@ -1093,6 +1097,7 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (
     formPost.l = 'html';
     formPost.mainForumsId = fundForumsId;
     formPost.uid = form.uid;
+    formPost.tlm = form.tlm;
     await formPost.save();
   }
   await form.save();
