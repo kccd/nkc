@@ -46,11 +46,11 @@ var app = new Vue({
         _id: event.target.id,
         name: event.target.name,
       };
-      if (this.regSettings.examSource.length === 0) {
+      // if (this.regSettings.examSource.length === 0) {
         this.regSettings.examSource.push(newData);
-      } else {
-        sweetError('注册考试只能选择一份试卷');
-      }
+      // } else {
+      //   sweetError('注册考试只能选择一份试卷');
+      // }
     },
     deleteExam(event) {
       const idToRemove = event.target.id;

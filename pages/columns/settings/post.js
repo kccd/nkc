@@ -280,7 +280,8 @@ var app = new Vue({
       })
     },
     openSelector: function (){
-      this.$refs.articleSelectorDialog.open(this.chooseArticles, {articleSource:['zone']})
+      // this.$refs.articleSelectorDialog.open(this.chooseArticles, {articleSource:['zone']})
+      this.$refs.articleSelectorDialog.open(this.chooseArticles)
     }
   }
 });

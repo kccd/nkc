@@ -49,7 +49,7 @@ block content
                   img(src=data.column.avatarUrl)
               .column-name
                 a(href=data.column.homeUrl target="_blank")=data.column.name
-              .column-info=`${data.column.subCount} 人关注 ${data.column.postCount} 篇文章`
+              .column-info=`${data.column.subCount} 人订阅 ${data.column.postCount} 篇文章`
         if data.hotColumns && data.hotColumns.length > 0
           .box-shadow.m-b-1
             .box-shadow-header 热门专栏

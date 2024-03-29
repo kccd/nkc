@@ -14,12 +14,12 @@ if !isIncluded('columnHomeNav')
             a.btn.btn-default(
               href=`/m?t=sub`
               class=activeType === 'sub' ? 'btn-primary': 'btn-default'
-            ) 我的关注
+            ) 我的订阅
         else
           .btn-group(role="group")
             button.btn.btn-default(
               onclick="RootApp.openLoginPanel()"
-            ) 我的关注
+            ) 我的订阅
         .btn-group(role="group")
           a.btn.btn-default(
             href=`/m?t=list`

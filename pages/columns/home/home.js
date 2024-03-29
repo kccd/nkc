@@ -23,7 +23,7 @@ window.subscribeColumn = function (columnId) {
           .attr('data-subscribed', 'false')
           .removeClass('btn-default')
           .addClass('btn-default')
-          .text('关注');
+          .text('订阅');
       })
       .catch(sweetError);
   } else {
@@ -34,7 +34,7 @@ window.subscribeColumn = function (columnId) {
           .attr('data-subscribed', 'true')
           .removeClass('btn-default')
           .addClass('btn-default')
-          .text('已关注');
+          .text('退订');
       })
       .catch(sweetError);
   }

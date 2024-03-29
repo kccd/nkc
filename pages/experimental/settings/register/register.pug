@@ -66,7 +66,7 @@ block eContent
                     input(type="radio" :value="false" v-model="regSettings.registerExamination")
                     span 关闭
                   .form-group
-                    h5(style="font-weight: bold;") 已选试卷
+                    h5(style="font-weight: bold;") 已选试卷（注意：进入考试前默认选中首张试卷）
                     div(v-if='regSettings.examSource.length === 0')
                       h5.text-danger 暂未选择任何试卷
                     div(v-else)
@@ -91,7 +91,7 @@ block eContent
                           tr(v-for='categorie in categories' :key="categorie._id")
                             th {{categorie.name}}
                             th
-                              button(@click='addExam' :id=`categorie._id` :name='categorie.name') 添加
+                              button(@click='addExam' :id=`categorie._id` :name='categorie.name' :disabled="regSettings.examSource.findIndex(item=>item._id==categorie._id) !== -1") 添加
                     h5(style="font-weight: bold;") 说明（Markdown）
                     textarea.form-control(v-model="regSettings.examNotice" rows=7)
 
