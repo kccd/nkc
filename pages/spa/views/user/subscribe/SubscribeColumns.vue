@@ -9,7 +9,7 @@
         .account-follower-content
           .account-follower-name
             .account-follower-buttons
-              button.subscribe(:class="subColumnsId.indexOf(item.column._id)+1 && visitorSubColumnsId.indexOf(item.column._id)+1 ?'cancel':'focus'" @click="columnFollowType(item.column._id)") {{subColumnsId.indexOf(item.column._id)+1 && visitorSubColumnsId.indexOf(item.column._id)+1 ? '取关':'关注'}}
+              button.subscribe(:class="subColumnsId.indexOf(item.column._id)+1 && visitorSubColumnsId.indexOf(item.column._id)+1 ?'cancel':'focus'" @click="columnFollowType(item.column._id)") {{subColumnsId.indexOf(item.column._id)+1 && visitorSubColumnsId.indexOf(item.column._id)+1 ? '退订':'订阅'}}
             a(:href="getUrl('columnHome', item.column._id)") {{item.column.name}}
           .account-follower-description {{item.column.description || "暂无简介"}}
 </template>
@@ -166,10 +166,10 @@ export default {
       subColumn(uid,sub)
           .then((res)=>{
             if(sub) {
-              sweetSuccess('关注成功');
+              sweetSuccess('订阅成功');
               if(index === -1) subIdType.push(uid);
             } else {
-              sweetSuccess('取消关注');
+              sweetSuccess('退订成功');
               if(index !== -1) subIdType.splice(index, 1);
             }
           })

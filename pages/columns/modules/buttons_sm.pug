@@ -10,14 +10,14 @@
       a(href="/creation/editor/column" target="_blank") 发表
   .column-button
     if !data.user
-      a(onclick='RootApp.openLoginPanel("login")') 关注
+      a(onclick='RootApp.openLoginPanel("login")') 订阅
     else if data.subColumnsId.includes(data.column._id)
-      a.subscribed(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 取关
+      a.subscribed(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 退订
     else
-      a(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, true)`) 关注
+      a(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, true)`) 订阅
     if data.column.subCount > 0
       span.subscribe-number
         span &nbsp;&nbsp;
         span=briefNumber && briefNumber(data.column.subCount)
-        span 人关注
+        span 人订阅
 

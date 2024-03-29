@@ -162,7 +162,7 @@ function subscribeColumn(columnId) {
           .attr('data-subscribed', 'false')
           .removeClass('btn-default')
           .addClass('btn-primary')
-          .text('关注');
+          .text('订阅');
       } else {
         // 关注
         number ++;
@@ -170,7 +170,7 @@ function subscribeColumn(columnId) {
           .attr('data-subscribed', 'true')
           .removeClass('btn-primary')
           .addClass('btn-default')
-          .text('已关注');
+          .text('退订');
       }
       subscriptionNumber
         .attr('data-number', number)

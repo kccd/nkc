@@ -13,6 +13,7 @@ new Vue({
     codeId: '',
     codeValue: [],
     codeResult: '',
+    examSource: data.examSource,
   },
   mounted() {
     this.getCode();

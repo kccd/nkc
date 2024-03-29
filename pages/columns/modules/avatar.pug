@@ -16,13 +16,13 @@ mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner, columnSubscribeI
             data-subscribed=subscribed?'true':'false'
             class=subscribed? 'btn-default':'btn-primary'
             onclick=`subscribeColumn(${column._id})`
-            )=subscribed? '已关注': '关注'
+            )=subscribed? '退订': '订阅'
           .column-abbr=column.abbr
           .hidden-md.hidden-lg
             include ../modules/buttons_sm
         .column-name-numbers.hidden-sm.hidden-xs
           .column-name-number
-            h5 关注数
+            h5 订阅数
             span.subscribe-number(
               data-number=column.subCount
               data-type='subscriptionNumber'

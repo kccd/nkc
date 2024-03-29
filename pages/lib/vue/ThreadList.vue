@@ -91,10 +91,17 @@
           .account-thread-info
             .thread-time
               span {{fromNow(subscribe.post.toc)}}
-            span 回复于
-              a.thread-forum-link(:href="`${subscribe.post.postUrl}`" target="_blank") 《{{ subscribe.post.thread.firstPost.t }}》
             span(v-if="subscribe.post.anonymous") 匿名
             a.thread-user(:href="`/u/${subscribe.post.uid}`" v-else)
+              img(:src="getUrl('userAvatar', subscribe.post.user.avatar)"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: subscribe.post.uid})"
+              )
+            span 回复于
+              a.thread-forum-link(:href="`${subscribe.post.postUrl}`" target="_blank") 《{{ subscribe.post.thread.firstPost.t }}》
+            //-span(v-if="subscribe.post.anonymous") 匿名
+            //-a.thread-user(:href="`/u/${subscribe.post.uid}`" v-else)
               img(:src="getUrl('userAvatar', subscribe.post.user.avatar)"
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
@@ -127,10 +134,18 @@
           .account-thread-info
             .thread-time
               span {{fromNow(subscribe.comment.toc)}}
-            span 回复于
-              a.thread-forum-link(:href="`${subscribe.comment.commentUrl}`" target="_blank") 《{{ subscribe.comment.articleDocument.title }}》
             span(v-if="subscribe.comment.anonymous") 匿名
             a.thread-user(:href="`/u/${subscribe.comment.uid}`" target="_blank" v-else)
+              img(:src="getUrl('userAvatar', subscribe.comment.user.avatar)"
+                data-global-mouseover="showUserPanel"
+                data-global-mouseout="hideUserPanel"
+                :data-global-data="objToStr({uid: subscribe.comment.uid})"
+              )
+              span {{subscribe.comment.user.username}}
+            span 回复于
+              a.thread-forum-link(:href="`${subscribe.comment.commentUrl}`" target="_blank") 《{{ subscribe.comment.articleDocument.title }}》
+            //-span(v-if="subscribe.comment.anonymous") 匿名
+            //-a.thread-user(:href="`/u/${subscribe.comment.uid}`" target="_blank" v-else)
               img(:src="getUrl('userAvatar', subscribe.comment.user.avatar)"
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"

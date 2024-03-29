@@ -17,7 +17,7 @@
             img(:src="getUrl('columnAvatar', targetUser.column.avatar)")
           .column-content
             a.column-title(:href="`/m/${targetUser.column._id}`") {{targetUser.column.name}}
-            .column-focus-count {{targetUser.column.subCount}}人关注
+            .column-focus-count {{targetUser.column.subCount}}人订阅
 </template>
 <style lang="less" scoped>
 @import "../../../../publicModules/base";

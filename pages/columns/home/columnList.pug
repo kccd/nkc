@@ -55,14 +55,14 @@ if !isIncluded('pages/columns/home/columnList.pug')
       .column-list-item-sm-info
         .column-list-item-sm-name
           a(href=column.homeUrl target="_blank")=column.name
-        .column-list-item-sm-number=`${column.subCount} 人关注 ${column.postCount} 篇文章`
+        .column-list-item-sm-number=`${column.subCount} 人订阅 ${column.postCount} 篇文章`
       .column-list-item-sm-sub
         if !logged
-          button.btn.btn-default.btn-xs(onclick="RootApp.openLoginPanel('login')") 关注
+          button.btn.btn-default.btn-xs(onclick="RootApp.openLoginPanel('login')") 订阅
         else
           -
             var dataSubscribed = subscribed ? 'true' : 'false';
-            var text = subscribed? '已关注': '关注';
+            var text = subscribed? '退订': '订阅';
           button.btn.btn-default.btn-xs.column-subscription(
             data-subscribed=dataSubscribed
             onclick=`subscribeColumn(${column._id})`
@@ -79,6 +79,6 @@ if !isIncluded('pages/columns/home/columnList.pug')
       .column-list-item-sm-info
         .column-list-item-sm-name
           a(href=column.homeUrl target="_blank")=column.name
-        .column-list-item-sm-number=`${column.subCount} 人关注 ${column.postCount} 篇文章`
+        .column-list-item-sm-number=`${column.subCount} 人订阅 ${column.postCount} 篇文章`
       .column-list-article-url
          a(href=column.articleUrl target="_blank") 查看文章

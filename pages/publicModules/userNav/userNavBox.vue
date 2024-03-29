@@ -39,9 +39,9 @@
         a(href="/sticker" target='_blank').col-xs-6.nav-user-link
           .fa.fa-smile-o
           | 我的表情
-        a(:href="'/u/' + user.uid + '/profile/subscribe/user'" target='_blank').col-xs-6.nav-user-link
+        a(:href="'/u/' + user.uid + '/profile/subscribe/forum'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-star
-          | 我的关注
+          | 我的订阅
         a(:href="'/u/' + user.uid + '/profile/finance?t=all'" target='_blank').col-xs-6.nav-user-link
           .fa.fa-file-text-o
           | 我的账单

@@ -59,7 +59,8 @@ router
       {
         $project: {
           toc: 1,
-          _id: 1
+          _id: 1,
+          source:1,
         }
       },
       {
@@ -138,6 +139,22 @@ router
           cid: mainCategoriesId,
           mcid: minorCategoriesId,
         }).save();
+        if (columnPost.type === 'article' && columnPost.source === 'column') {
+          // 需要进行更新article中sid
+          let sidArray = [];
+          const columnPostArray = await db.ColumnPostModel.find({
+            pid: columnPost._id,
+            type: 'article',
+          });
+          for (const columnPostItem of columnPostArray) {
+            sidArray.push(columnPostItem.columnId);
+          }
+          sidArray = [...new Set(sidArray)];
+          await db.ArticleModel.updateOne(
+            { _id: columnPost._id },
+            { $set: { sid: sidArray.join('-') } },
+          );
+        }
       }
     }
     ctx.apiData = {};
