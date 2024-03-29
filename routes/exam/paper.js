@@ -32,7 +32,7 @@ paperRouter
       } = await db.SettingModel.findOnly({ _id: 'register' }, { c: 1 });
       const cIds = examSource.map((item) => Number(item._id));
       if (!cIds.includes(cid)) {
-        ctx.throw(403, '该科目的下的考试不属于注册考卷，请刷新');
+        ctx.throw(403, '已选试卷无法用于注册考试，请更换。');
       }
     }
     // 创建开卷考试游标卡尺验证
