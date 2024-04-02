@@ -21,11 +21,16 @@
           :class="{active : selectedSource === 'choose', 'radius-left': true, 'radius-right': true}"
         ) 已选泽
           .selected-count.absolute(v-if="getSelectedArticles.length !== 0") {{getSelectedArticles.length}}
+        .selected-search.m-t-05
+          input.inline-block.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search" placeholder='文章标题、文号')
+          button.btn.btn-default.search-button(@click="search")
+            .fa.fa-search
     div
       div.selector-core-body(v-if="loading" ) 加载中...
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
-          paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
+          paging(ref="paging" :pages="pageButtons" @click-button="clickButton" v-if="!keyword.trim()")
+          .text-warning.m-b-05(v-else) 提示：搜索结果数量有限，精确匹配还请输入完整标题或文号
           label
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position 全选
@@ -72,6 +77,24 @@
         color: #fff;
       }
     }
+  }
+  .selected-search{
+    position: relative;
+    .search-button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 34px;
+    width: 34px;
+    z-index: 100;
+    border: none;
+    background-color: rgba(255, 255, 255, 0);
+    color: #282c37;
+  }
+  .search-input{
+    padding-right: 34px;
+    border-radius: 0 4px 4px 0;
+  }
   }
   .selector-core-body {
     padding-left: 1rem;
@@ -156,6 +179,7 @@ export default {
     paging: {},
     number: 0,
     loading: true,
+    keyword:'',
     source: {
       'thread': '论坛',
       'zone': '电波',
@@ -271,8 +295,33 @@ export default {
       this.articles= [];
       this.paging= {};
       this.loading = true;
+      this.keyword = '';
       this.getUserArticles(0);
 
+    },
+    search(){
+      const self= this;
+      if(!self.keyword.trim()){
+        this.getUserArticles(0);
+        return;
+      }
+      let url;
+      if(this.selectedSource === 'threads') {
+        url = `/api/v1/threads/selector/search?t=${self.keyword}`;
+      } else {
+        url = `/api/v1/articles/selector/search?t=${self.keyword}&selectedSource=${this.selectedSource}`;
+      }
+      const number = this.getNumber();
+      nkcAPI(url, "GET")
+        .then(res => {
+          if(this.number === number) {
+            this.loading = false;
+            self.articles = res.data.articles;
+          }
+        })
+        .catch(err => {
+          sweetError(err);
+        })
     }
   }
 }
