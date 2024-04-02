@@ -23,6 +23,9 @@ module.exports = {
     threads: {
       selector: {
         GET: Operations.getUserArticles,
+        search: {
+          GET: Operations.getUserArticles,
+        },
       },
     },
     thread: {
@@ -36,6 +39,9 @@ module.exports = {
     articles: {
       selector: {
         GET: Operations.getUserArticles,
+        search: {
+          GET: Operations.getUserArticles,
+        },
       },
       contribute: {
         POST: Operations.column_single_contribute,

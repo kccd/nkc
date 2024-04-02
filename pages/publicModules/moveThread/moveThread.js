@@ -136,6 +136,12 @@ NKC.modules.MoveThread = function() {
               this.getAllChildForumsV1(f, arr);
             }
           }
+        } else {
+          // 对于没有子专业的论坛
+          if (this.showRecycle || forum.fid !== this.recycleId) {
+            forum.selectedThreadType = '';
+            arr.push(forum);
+          }
         }
         return arr;
       },
