@@ -23,15 +23,15 @@
           .selected-count.absolute(v-if="getSelectedArticles.length !== 0") {{getSelectedArticles.length}}
         .selected-search.m-t-05
           input.inline-block.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search" placeholder='文章标题、文号')
-          button.btn.btn-default.search-button(@click="search")
-            .fa.fa-search
-          button.btn.btn-default.m-l-05.search-clear(@click="clear") 清空
+          button.btn.btn-default.clear-button(@click="clear" v-if="keyword")
+            .fa.fa-times-circle(title='清空')
+          button.btn.btn-default.m-l-05.search-button(@click="search") 搜索
     div
       div.selector-core-body(v-if="loading" ) 加载中...
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
           paging(ref="paging" :pages="pageButtons" @click-button="clickButton" v-if="!searchStatus")
-          .text-info.m-b-05(v-else) 通过关键词 “{{ searchKeyword}}” 共找到 {{ articles.length }} 条结果，提供更多关键词可获得更准确的搜索结果。
+          .text-warning.m-b-05(v-else) 通过关键词 “{{ searchKeyword}}” 共找到 {{ articles.length }} 条结果，提供更多关键词可获得更准确的搜索结果。
           label
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position(style="cursor:pointer;") 全选
@@ -82,7 +82,7 @@
   .selected-search{
     position: relative;
     width: 16.5rem;
-    .search-button{
+    .clear-button{
     position: absolute;
     top: 0;
     right: 0;
@@ -92,8 +92,16 @@
     border: none;
     background-color: rgba(255, 255, 255, 0);
     color: #282c37;
+    .fa-times-circle{
+      color: rgba(0, 0, 0, 0.4);
+      font-size: 1.5rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
-  .search-clear{
+  .search-button{
     position: absolute;
   }
   .search-input{
