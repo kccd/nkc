@@ -31,7 +31,7 @@
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
           paging(ref="paging" :pages="pageButtons" @click-button="clickButton" v-if="!searchStatus")
-          .text-warning.m-b-05(v-else) 根据关键词“{{ searchKeyword}}”约找到 {{ articles.length }} 条结果，未找到文章还请输入完整标题或文号
+          .text-info.m-b-05(v-else) 通过关键词 “{{ searchKeyword}}” 共找到 {{ articles.length }} 条结果，提供更多关键词可获得更准确的搜索结果。
           label
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
               div.content-position(style="cursor:pointer;") 全选
