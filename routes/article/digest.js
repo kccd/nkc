@@ -6,6 +6,7 @@ router
     const {db, data, query, params, state, permission, nkcModules, body} = ctx;
     const {aid} = params;
     const {kcb} = body;
+    let messageType = 'digestArticle';
     if(!permission('digestArticle')) return ctx.throw(401, '权限不足');
     const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const article = await db.ArticleModel.findOnly({_id: aid});
@@ -54,6 +55,7 @@ router
             articleId: article._id,
         });
         await record.save();
+        messageType = 'digestArticleWithMoney';
     }
     // await db.KcbsRecordModel.insertSystemRecord('digestArticle', targetUser, ctx);
     log.type = 'score';
@@ -65,9 +67,11 @@ router
         r: targetUser.uid,
         vd: false,
         c: {
-            type: 'digestArticle',
+            type: messageType,
             targetUid: targetUser.uid,
             aid: article.id,
+            scoreName:digestRewardScore.name,
+            scoreNumber:num ? num/100 : 0,
         },
     });
     await message.save();

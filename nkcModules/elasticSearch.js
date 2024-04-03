@@ -820,6 +820,174 @@ func.search = async (t, c, options) => {
     body,
   });
 };
+// 搜索文章
+func.searchThreadOrArticle = async (t, c, options) => {
+  const SettingModel = require('../dataModels/SettingModel');
+  let { page = 0, relation = 'or', uid, fid = [] } = options;
+  const { searchThreadList } = await SettingModel.getSettings('page');
+  let size;
+  size = searchThreadList;
+  const body = {
+    from: page * size,
+    size,
+    min_score: 1,
+    sort: [],
+    highlight: {
+      pre_tags: ['<span style="color: #e85a71;">'],
+      post_tags: ['</span>'],
+      fields: {
+        tid: {
+          pre_tags: ['<span style="color: #e85a71;">D'],
+          post_tags: ['</span>'],
+        },
+        pid: {},
+        aid: {},
+        title: {},
+        content: {},
+        username: {},
+        authors: {},
+        description: {},
+        abstractCN: {},
+        abstractEN: {},
+        keywordsCN: {},
+        keywordsEN: {},
+      },
+    },
+  };
+
+  // 只搜标题和文号
+  const threadConditions = [
+    createMatch('title', c, 5, relation),
+    createMatch('pid', c.toLowerCase(), 100, relation),
+  ];
+
+  body.query = {
+    bool: {
+      must: [
+        // 最后一个元素用于docType筛选
+        {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'thread',
+                      },
+                    },
+                    {
+                      bool: {
+                        should: threadConditions,
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'user',
+                      },
+                    },
+                    {
+                      bool: {
+                        should: [createMatch('username', c, 6, relation)],
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_article',
+                      },
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch(
+                            'tid',
+                            (() => {
+                              let targetKeyword = c.toUpperCase();
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
+                                targetKeyword = targetKeyword.slice(1);
+                              }
+                              return targetKeyword;
+                            })(),
+                            5,
+                            relation,
+                          ),
+                          createMatch('title', c, 5, relation),
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+  if (t === 'thread') {
+    body.query.bool.must.push({
+      bool: {
+        should: [
+          {
+            match: {
+              docType: 'thread',
+            },
+          },
+        ],
+      },
+    });
+  } else if (t === 'document_article') {
+    body.query.bool.must.push({
+      match: {
+        docType: 'document_article',
+      },
+    });
+  }
+
+  if (t === 'thread' && fid.length > 0) {
+    const fidMatch = {
+      bool: {
+        should: fid.map((id) => {
+          return {
+            match: {
+              mainForumsId: id,
+            },
+          };
+        }),
+      },
+    };
+    body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
+  }
+  const authorMatch = {
+    match: {
+      uid,
+    },
+  };
+  //添加只查看该用户的搜索结果
+  body.query.bool.must[0].bool.should[0].bool.must.push(authorMatch);
+  body.query.bool.must[0].bool.should[2].bool.must.push(authorMatch);
+
+  return await client.search({
+    index: indexName,
+    type: 'documents',
+    body,
+  });
+};
 
 func.delete = async (docType, id) => {
   id = docType + '_' + id;

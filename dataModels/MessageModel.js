@@ -627,6 +627,59 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       commentURL: comment.commentUrl,
     };
+  } else if (type === 'digestPostWithMoney') {
+    const { pid, scoreName, scoreNumber } = message.c;
+    const post = await PostModel.findOne({ pid });
+    if (!post) {
+      return null;
+    }
+    parameters = {
+      postURL: await PostModel.getUrl(post),
+      scoreName,
+      scoreNumber,
+    };
+  } else if (type === 'digestThreadWithMoney') {
+    const { pid, scoreName, scoreNumber } = message.c;
+    const post = await PostModel.findOne({ pid });
+    if (!post) {
+      return null;
+    }
+    const thread = await ThreadModel.findOne({ tid: post.tid });
+    if (!thread) {
+      return null;
+    }
+    const firstPost = await thread.extendFirstPost();
+    parameters = {
+      threadTitle: firstPost.t,
+      threadURL: getUrl('thread', thread.tid),
+      scoreName,
+      scoreNumber,
+    };
+  } else if (type === 'digestArticleWithMoney') {
+    const { aid, scoreName, scoreNumber } = message.c;
+    let article = await ArticleModel.findOnly({ _id: aid });
+    if (!article) {
+      return null;
+    }
+    article = (await ArticleModel.getArticlesInfo([article]))[0];
+    parameters = {
+      articleTitle: article.document.title,
+      articleURL: article.url,
+      scoreName,
+      scoreNumber,
+    };
+  } else if (type === 'digestCommentWithMoney') {
+    const { cid, scoreName, scoreNumber } = message.c;
+    let comment = await CommentModel.findOnly({ _id: cid });
+    if (!comment) {
+      return null;
+    }
+    comment = (await CommentModel.getCommentsInfo([comment]))[0];
+    parameters = {
+      commentURL: comment.commentUrl,
+      scoreName,
+      scoreNumber,
+    };
   } else if (type === 'bannedThread') {
     const { tid, rea } = message.c;
     const thread = await ThreadModel.findOne({ tid });
@@ -1263,7 +1316,8 @@ messageSchema.statics.getParametersData = async (message) => {
       article = (await ArticleModel.getArticlesInfo([article]))[0];
       if (!article) {
         const { stable: stableType } = await DocumentModel.getDocumentTypes();
-        const { normal: normalStatus } = await DocumentModel.getDocumentStatus();
+        const { normal: normalStatus } =
+          await DocumentModel.getDocumentStatus();
         const document = await DocumentModel.findOne({
           sid: sid,
           type: stableType,
