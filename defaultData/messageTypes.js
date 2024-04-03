@@ -37,6 +37,46 @@ module.exports = {
     },
     {
       parameters: [
+        "threadTitle",
+        "threadID",
+        "threadURL",
+        "scoreNumber",
+        "scoreName",
+      ],
+      content: "您发表的文章[url=threadURL(threadTitle)]已被列入精选，发放创作激励[text=scoreName][text=scoreNumber]元。",
+      type: "digestThreadWithMoney"
+    },
+    {
+      parameters: [
+        "articleTitle",
+        "articleURL",
+        "scoreNumber",
+        "scoreName",
+      ],
+      content: "您发表的文章[url=articleURL(articleTitle)]已被列入精选，发放创作激励[text=scoreName][text=scoreNumber]元。",
+      type: "digestArticleWithMoney"
+    },
+    {
+      parameters: [
+        "commentURL",
+        "scoreNumber",
+        "scoreName",
+      ],
+      content: "您发表的回复已被列入精选，发放创作激励[text=scoreName][text=scoreNumber]元，[url=commentURL(查看)]。",
+      type: "digestCommentWithMoney"
+    },
+    {
+      parameters: [
+        "postID",
+        "postURL",
+        "scoreNumber",
+        "scoreName",
+      ],
+      content: "您发表的回复已被列入精选，发放创作激励[text=scoreName][text=scoreNumber]元，[url=postURL(查看)]。",
+      type: "digestPostWithMoney"
+    },
+    {
+      parameters: [
         "threadID",
         "threadURL",
         "threadTitle",
