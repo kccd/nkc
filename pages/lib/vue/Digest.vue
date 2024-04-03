@@ -96,12 +96,19 @@ export default {
             redEnvelopeSettings: res.redEnvelopeSettings,
             digestRewardScore: res.digestRewardScore,
           };
+          self.digestCount = res.redEnvelopeSettings.draftFee.defaultCount/100;
         })
         .catch(err => {
           screenTopWarning(err.error || err);
         })
     },
-    open(callback) {
+    open(callback,options) {
+      if(options){
+        if(options.digestData.redEnvelopeSettings.draftFee.close){
+          callback(0);
+          return;
+        }
+      }
       this.callback = callback;
       this.getDigestData()
       this.draggableElement.show();

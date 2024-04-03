@@ -41,6 +41,8 @@
   "moveThread": "文章被移动",
   "digestPost": "回复被列入精选",
   "digestThread": "文章被列入精选",
+  "digestPostWithMoney": "回复被列入精选",
+  "digestThreadWithMoney": "文章被列入精选",
   "at": "at信息",
   "articleAt": "at信息",
   "commentAt": "at信息",
@@ -128,6 +130,8 @@
   "momentPass": "动态审核通过",
   "digestArticle": "文章被列入精选",
   "digestComment": "回复被列入精选",
+  "digestArticleWithMoney": "文章被列入精选",
+  "digestCommentWithMoney": "回复被列入精选",
   "momentRepost": "电文被转发",
   "momentComment": "电文被回复",
   "noteDisabled" : "笔记被屏蔽"

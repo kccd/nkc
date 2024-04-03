@@ -25,15 +25,16 @@
           input.inline-block.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search" placeholder='文章标题、文号')
           button.btn.btn-default.search-button(@click="search")
             .fa.fa-search
+          button.btn.btn-default.m-l-05.search-clear(@click="clear") 清空
     div
       div.selector-core-body(v-if="loading" ) 加载中...
       div(v-else)
         .selector-core-body(v-if="selectedSource !== 'choose'" )
-          paging(ref="paging" :pages="pageButtons" @click-button="clickButton" v-if="!keyword.trim()")
-          .text-warning.m-b-05(v-else) 提示：搜索结果数量有限，精确匹配还请输入完整标题或文号
+          paging(ref="paging" :pages="pageButtons" @click-button="clickButton" v-if="!searchStatus")
+          .text-warning.m-b-05(v-else) 根据关键词“{{ searchKeyword}}”约找到 {{ articles.length }} 条结果，未找到文章还请输入完整标题或文号
           label
               input(type='checkbox' :checked='isAllChecked' @click="selectedAllArticlesFunc()")
-              div.content-position 全选
+              div.content-position(style="cursor:pointer;") 全选
           .articles
             .text-center.p-t-3.p-b-1(v-if="articles.length === 0") 空空如也~
             label(v-for="article in articles")
@@ -80,6 +81,7 @@
   }
   .selected-search{
     position: relative;
+    width: 16.5rem;
     .search-button{
     position: absolute;
     top: 0;
@@ -91,6 +93,9 @@
     background-color: rgba(255, 255, 255, 0);
     color: #282c37;
   }
+  .search-clear{
+    position: absolute;
+  }
   .search-input{
     padding-right: 34px;
     border-radius: 0 4px 4px 0;
@@ -98,17 +103,23 @@
   }
   .selector-core-body {
     padding-left: 1rem;
+    padding-right: 1rem;
     .articles {
       height: 400px;
       overflow-y: auto;
       background-color: #eceeef;
+      label {
+      &:hover{
+        background-color: #d9dfe3;
+      }
+    }
     }
     label {
       display: block;
       position: relative;
-      &:hover{
-        background-color: #d9dfe3;
-      }
+      // &:hover{
+      //   background-color: #d9dfe3;
+      // }
       input {
         position: absolute;
       }
@@ -173,6 +184,7 @@ export default {
   },
   data: () => ({
     selectedSource: 'threads',
+    searchStatus:false,
     selectedArticles: [],
     selectedArticlesId: [],
     articles: [],
@@ -180,6 +192,7 @@ export default {
     number: 0,
     loading: true,
     keyword:'',
+    searchKeyword:'',
     source: {
       'thread': '论坛',
       'zone': '电波',
@@ -224,6 +237,15 @@ export default {
       }
       return type;
     }
+  },
+  watch:{
+    keyword: {
+      handler(newValue) {
+        if(!newValue.trim()&&this.searchStatus){
+          this.clear();
+        }
+      },
+    },
   },
   methods:{
     fromNow,
@@ -286,6 +308,7 @@ export default {
       this.selectedSource = source;
       if(source!=='choose'){
         this.getUserArticles(0);
+        this.searchStatus =false;
       }
     },
     init(){
@@ -302,9 +325,11 @@ export default {
     search(){
       const self= this;
       if(!self.keyword.trim()){
-        this.getUserArticles(0);
+        this.clear()
         return;
       }
+      this.searchStatus = true;
+      this.searchKeyword = self.keyword.trim();
       let url;
       if(this.selectedSource === 'threads') {
         url = `/api/v1/threads/selector/search?t=${self.keyword}`;
@@ -322,6 +347,14 @@ export default {
         .catch(err => {
           sweetError(err);
         })
+    },
+    clear(){
+      this.keyword= '';
+      if(!this.searchStatus){
+        return;
+      }
+      this.searchStatus = false;
+      this.getUserArticles(0);
     }
   }
 }

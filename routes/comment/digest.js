@@ -7,6 +7,7 @@ router
     const {user} = data;
     const {_id: cid} = params;
     const {kcb} = body;
+    let messageType = 'digestComment';
     if(!permission('digestComment')) ctx.throw(401, '权限不足');
     const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const comment = await db.CommentModel.findOnly({_id: cid});
@@ -52,6 +53,7 @@ router
         commentId: comment._id,
       });
       await record.save();
+      messageType = 'digestCommentWithMoney';
     }
     log.type = 'score';
     log.key = 'digestCommentCount';
@@ -62,9 +64,11 @@ router
       r: targetUser.uid,
       vd: false,
       c: {
-        type: 'digestComment',
+        type: messageType,
         targetUid: targetUser.uid,
         cid: comment.id,
+        scoreName: digestRewardScore.name,
+        scoreNumber: num ? num / 100 : 0,
       },
     });
     await message.save();

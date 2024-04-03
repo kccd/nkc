@@ -570,7 +570,7 @@ function closeThread(tid) {
 		})
 }
 // 设回复为精选
-function digestPost(pid) {
+function digestPost(pid, digestData) {
   var post = function(obj) {
     nkcAPI('/p/'+pid+'/digest', 'POST', obj)
       .then(function() {
@@ -587,7 +587,7 @@ function digestPost(pid) {
   };
   window.RootApp.openDigest((kcb) => {
     post({kcb});
-  });
+  }, {digestData:digestData});
   // if(digestDom.length === 0) {
   //   return post({});
   // }

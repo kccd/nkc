@@ -6,6 +6,8 @@ router
 		const {db, data, params, nkcModules, body} = ctx;
 		const {pid} = params;
 		let {kcb} = body;
+		let threadMessageType = 'digestThread';
+		let postMessageType = 'digestPost';
     const post = await db.PostModel.findOnly({pid});
 		const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const thread = await post.extendThread();
@@ -24,6 +26,8 @@ router
     const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     let num;
     if(!redEnvelopeSettings.c.draftFee.close) {
+			threadMessageType = 'digestThreadWithMoney';
+			postMessageType = 'digestPostWithMoney';
       if(!kcb) ctx.throw(400, '参数错误，请刷新');
       num = Number(kcb);
       if(num%1 !== 0) ctx.throw(400, `${digestRewardScore.name}仅支持到小数点后两位`);
@@ -84,9 +88,11 @@ router
 				r: post.uid,
 				vd: false,
 				c: {
-					type: 'digestThread',
+					type: threadMessageType,
 					targetUid: targetUser.uid,
-					pid
+					pid,
+					scoreName: digestRewardScore.name,
+          scoreNumber: num ? num / 100 : 0,
 				}
 			});
 			await message.save();
@@ -121,9 +127,11 @@ router
 				r: post.uid,
 				vd: false,
 				c: {
-					type: 'digestPost',
+					type: postMessageType,
 					targetUid: targetUser.uid,
-					pid
+					pid,
+					scoreName: digestRewardScore.name,
+          scoreNumber: num ? num / 100 : 0,
 				}
 			});
 			await message.save();

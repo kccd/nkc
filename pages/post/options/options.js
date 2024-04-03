@@ -57,6 +57,7 @@ window.PostOption = new Vue({
     reviewed: null,
     commentControl: null,
     editType: '',
+    digestData: null,
   },
   computed: {
     position() {
@@ -122,6 +123,8 @@ window.PostOption = new Vue({
             postType,
             postUserId,
             isComment,
+            digestRewardScore,
+            redEnvelopeSettings,
           } = data;
           if (postType === 'thread') {
             // console.log('修改文章')
@@ -163,6 +166,10 @@ window.PostOption = new Vue({
 
           self.postUserId = postUserId;
 
+          self.digestData = {
+            digestRewardScore,
+            redEnvelopeSettings,
+          };
           self.loading = false;
         })
         .catch((err) => {
@@ -288,11 +295,11 @@ window.PostOption = new Vue({
       openCreditPanel(creditTypes.xsf, contentTypes.post, pid);
     },
     postDigest() {
-      const { pid, digest } = this;
+      const { pid, digest, digestData} = this;
       if (digest) {
         unDigestPost(pid);
       } else {
-        digestPost(pid);
+        digestPost(pid,digestData);
       }
     },
     postWarning() {

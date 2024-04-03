@@ -40,6 +40,10 @@ router.get('/', async (ctx, next) => {
     commentControl: null,
   };
   if (user) {
+    data.digestRewardScore = await db.SettingModel.getScoreByOperationType(
+      'digestRewardScore',
+    );
+    data.redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');
     // 推送到专栏
     const userColumn = await db.UserModel.getUserColumn(state.uid);
     if (userColumn && isThread) {
