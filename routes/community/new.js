@@ -301,6 +301,16 @@ router
     data.toppedArticlesData = await db.ThreadModel.extendArticlesPanelData(
       latestToppedThreads,
     );
+    ctx.setCookie(
+      'recentCommunity',
+      {
+        path: `/c/new?page=${page}&t=${data.t}&s=${s ? data.s : 'tlm'}`,
+      },
+      {
+        httpOnly: false,
+        signed: false,
+      },
+    );
     // ctx.template = 'community/new/new.pug';
     await next();
   });

@@ -161,6 +161,16 @@ router.get('/', OnlyUser(), async (ctx, next) => {
   // data.activity = activity;
   data.activeTab = data.communityTab.subscribe;
   ctx.template = 'community/sub/sub.pug';
+  ctx.setCookie(
+    'recentCommunity',
+    {
+      path: `/c/sub?page=${page}`,
+    },
+    {
+      httpOnly: false,
+      signed: false,
+    },
+  );
   await next();
 });
 module.exports = router;

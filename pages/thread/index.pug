@@ -57,7 +57,7 @@ block content
                 -const showManagement = data.permissions.showManagement;
                 .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
-                    a.nav-link(href='/c') 论坛
+                    a.nav-link(href='/c' onclick="return RootApp.visitCommunity()") 论坛
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >

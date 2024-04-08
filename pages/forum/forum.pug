@@ -111,7 +111,7 @@ block content
           .forum-nav
             .thread-nav
               .thread-nav-left
-                a.nav-link(href='/c') 论坛
+                a.nav-link(href='/c' onclick="return RootApp.visitCommunity()") 论坛
                 for n in data.forumNav
                   -const {fid, name, cid} = n;
                   span.nav-delimiter >

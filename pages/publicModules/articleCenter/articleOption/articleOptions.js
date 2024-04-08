@@ -130,7 +130,7 @@ window.articleOption = new Vue({
     },
     editArticle() {
       if(this.article) {
-        visitUrl(this.article.editorUrl, true);
+        visitUrl(this.article.editorUrl.replace(/&?mid=\d+/g, ''), true);
       }
     },
     toColumn() {

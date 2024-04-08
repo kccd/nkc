@@ -8,7 +8,7 @@
           .col-xs-3
             a(href='/z' onclick="return RootApp.visitZone()" ) 电波
           .col-xs-3
-            a(href='/c') 论坛
+            a(href='/c' onclick="return RootApp.visitCommunity()") 论坛
           .col-xs-3
             a(href=`/m`) 专栏
           .col-xs-3
