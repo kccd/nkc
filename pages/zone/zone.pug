@@ -7,8 +7,9 @@ block content
     .row
       .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
-          include ./zone/zoneAppTab
-          +renderZoneAppTab(state.isApp,data.tab,data.zoneTab,data.type,data.user)
+          #zone-tab
+            include ./zone/zoneAppTab
+            +renderZoneAppTab(state.isApp,data.tab,data.zoneTab,data.type,data.user)
           #ZoneMomentEditor.m-b-05.p-t-05(v-cloak v-if='logged')
             moment-editor(@published='published')
           if data.type ===data.zoneTypes.moment
@@ -21,17 +22,21 @@ block content
               });
 
             #ZoneMoments(v-cloak)
-              include ./zone/zoneTypes
-              +renderZoneTypes(data.type, data.tab, data.zoneTypes)
+              div(v-if="showPadding")
+                include ./zone/zoneTypes
+                +renderZoneTypes(data.type, data.tab, data.zoneTypes)
 
-              include ../publicModules/paging/paging
-              bubble(@scroll='scroll' :avatars="avatars" v-if='updated' :isapp='isApp')
-              moments(:latests="latestData" :moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
-              .p-t-5.p-b-5.text-center(v-else) 空空如也~
-            if data.paging && data.paging.buttonValue.length > 0
-              .m-t-1
-                include ../publicModules/paging/paging_input
+                include ../publicModules/paging/paging
+              transition(name="fade") 
+                router-view
+                //-bubble(@scroll='scroll' :avatars="avatars" v-if='updated' :isapp='isApp')
+                //-moments(:latests="latestData" :moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')
+                //-.p-t-5.p-b-5.text-center(v-else) 空空如也~
+              if data.paging && data.paging.buttonValue.length > 0
+                .m-t-1(v-if="showPadding")
+                  include ../publicModules/paging/paging_input
             .hidden#data=dataString
+            +includeJS('/vue-router/dist/vue-router.min.js', true)
             +includeJS('/zone/zone/moment.js')
           else
             .m-b-1

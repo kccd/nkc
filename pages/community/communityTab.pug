@@ -10,7 +10,6 @@ if !isIncluded('community/communityTab')
         a.btn.btn-default(
           class=activeTab === communityTab.new ? 'btn-primary': ''
           href=`/c/new`
-          onclick=`RootApp.keepZoneRoute('a')`
         ) 最新
       .btn-group(role="group")
         if user

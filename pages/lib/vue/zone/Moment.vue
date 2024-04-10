@@ -739,7 +739,11 @@
           // 用户选中了文本，不执行后续操作
           return;
         }
+        if(this.$route&&(this.$route.name==='MomentDetail'||this.$route.name==='Zone')){
+        this.$emit('handleDetail',this.momentData.momentId);
+        }else{
         this.visitUrl(this.momentData.url, true);
+        }
       },
       initData() {
         const {data} = this;

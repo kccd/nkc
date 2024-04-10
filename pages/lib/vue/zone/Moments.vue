@@ -19,6 +19,7 @@
     //.moment-divider(v-if="latestData.length>0") 以上是新内容
     .moment-container(:key="momentData.momentId" v-for="momentData in moments" v-if="!momentData.quoteData || !momentData.quoteData.data || !momentData.quoteData.data.status || momentData.quoteData.data.status!=='permission'")
       moment(
+        @handleDetail='handleDetail'
         :data="momentData"
         @complaint="complaint"
         :permissions="permissions"
@@ -89,6 +90,9 @@
       complaint(mid) {
         this.$refs.complaint.open('moment', mid);
       },
+      handleDetail(e){
+        this.$emit('handleDetail',e)
+      }
     }
   }
 </script>
