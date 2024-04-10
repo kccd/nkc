@@ -1,6 +1,6 @@
 <template lang="pug">
   .zone-moment-container
-    .zone-back.m-b-05(title='返回' @click="backZoneList")
+    //-.zone-back.m-b-05(title='返回' @click="backZoneList")
       span.fa.fa-mail-reply
     complaint(ref="complaint")
     violation-record(ref="violationRecord")
@@ -106,6 +106,9 @@ export default {
           });
           //查看违规记录
           EventBus.$on('violation-record', function (uid) {
+            if(!self.$refs.violationRecord){
+              return;
+            }
             self.$refs.violationRecord.open({ uid });
           });
           const momentData = JSON.parse(JSON.stringify(res.momentListData));

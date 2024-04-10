@@ -19,3 +19,39 @@
   transition: opacity 0.1s;
   opacity: 0;
 }
+#bubble-back{
+  display: none;
+  cursor: pointer;
+  padding: 0 0.7rem;
+  height: 2.8rem;
+  width: 8rem;
+  background-color: white;
+  border-radius: 2.5rem;
+  border:1px solid rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.5);
+  transform: all 0.3s;
+  &:hover{
+    border:1px solid #ccc;
+    color: rgba(0, 0, 0, 0.7);
+  }
+  .back-box{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    span{
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+  .icon{
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+  .text{
+    font-size: 14px;
+    float: right;
+    line-height: 2rem;
+    margin-right: 0.3rem;
+  }
+}

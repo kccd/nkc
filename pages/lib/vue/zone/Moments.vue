@@ -70,6 +70,9 @@
     mounted() {
       const self = this;
       EventBus.$on('violation-record', function(uid) {
+        if(!self.$refs.violationRecord){
+              return;
+        }
         self.$refs.violationRecord.open({uid});
       });
     },

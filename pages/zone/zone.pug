@@ -6,6 +6,10 @@ block content
   .container-fluid.max-width
     .row
       .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
+        #bubble-back.m-b-05(onclick='history.back()')
+          .back-box
+            span.icon.fa.fa-angle-left
+            span.text 返回上级
         .box-shadow
           #zone-tab
             include ./zone/zoneAppTab

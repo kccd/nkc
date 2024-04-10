@@ -49,6 +49,7 @@ router.afterEach((to, from) => {
   let title = '电波 - 科创网';
   const $domTab = document.getElementById('zone-tab');
   const $domEditor = document.getElementById('ZoneMomentEditor');
+  const $domBack = document.getElementById('bubble-back');
   if (to.name === 'MomentDetail') {
     title = '电文详情';
     if ($domTab) {
@@ -57,6 +58,7 @@ router.afterEach((to, from) => {
     if ($domEditor) {
       $domEditor.style.display = 'none';
     }
+    $domBack.style.display = 'block';
   } else {
     if ($domTab) {
       $domTab.style.display = 'block';
@@ -64,6 +66,7 @@ router.afterEach((to, from) => {
     if ($domEditor) {
       $domEditor.style.display = 'block';
     }
+    $domBack.style.display = 'none';
   }
   document.title = title;
 });
