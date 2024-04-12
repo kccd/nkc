@@ -1,11 +1,6 @@
 const Router = require('koa-router');
+const { OnlyUser } = require('../../../../middlewares/permission');
 const router = new Router();
-const { OnlyUser } = require('../../middlewares/permission');
-const articleRouter = require('./article');
-const momentRouter = require('./moment');
-const {
-  subscribeUserService,
-} = require('../../services/subscribe/subscribeUser.service');
 const zoneTypes = {
   moment: 'm',
   article: 'a',
@@ -15,27 +10,14 @@ const zoneTab = {
   all: 'a',
   subscribe: 's',
 };
-
 const onlyUserPermission = OnlyUser();
-
 // 缓存动态总条数
 const momentsCount = {
   number: 0, // 数据数目
   timestamp: 0, // 更新时间 ms
   interval: 3 * 60 * 1000, // 有效时间 ms
 };
-
 router
-  .use('/', async (ctx, next) => {
-    const { db, state, data } = ctx;
-    await db.MomentModel.checkAccessControlPermissionWithThrowError({
-      uid: state.uid,
-      rolesId: data.userRoles.map((r) => r._id),
-      gradeId: state.uid ? data.userGrade._id : undefined,
-      isApp: state.isApp,
-    });
-    await next();
-  })
   .get('/', async (ctx, next) => {
     const { query, data, state } = ctx;
     const { t = '' } = query;
@@ -54,9 +36,6 @@ router
     data.t = t;
     data.zoneTypes = zoneTypes;
     data.zoneTab = zoneTab;
-    data.currentPage = 'Zone';
-    ctx.template = 'zone/zone.pug';
-
     if (data.tab === zoneTab.subscribe && !state.uid) {
       await onlyUserPermission(ctx, next);
     } else {
@@ -181,6 +160,16 @@ router
     );
     data.paging = paging;
     data.permissions = permissions;
+    ctx.apiData = {
+      momentsData: data.momentsData,
+      permissions: data.permissions,
+      subUid: data.subUid,
+      tab: data.tab,
+      zoneTab: data.zoneTab,
+      type: data.type,
+      paging: data.paging,
+      zoneTypes: data.zoneTypes,
+    };
     await next();
   })
   .get('/', async (ctx, next) => {
@@ -220,8 +209,55 @@ router
       articles,
     );
     data.paging = paging;
+    ctx.apiData = {
+      permissions: data.permissions,
+      subUid: data.subUid,
+      tab: data.tab,
+      zoneTab: data.zoneTab,
+      type: data.type,
+      paging: data.paging,
+      zoneTypes: data.zoneTypes,
+      articlesPanelData: data.articlesPanelData,
+      latestZoneArticlePanelStyle: data.latestZoneArticlePanelStyle,
+    };
     await next();
   })
-  .use('/m', momentRouter.routes(), momentRouter.allowedMethods())
-  .use('/a', articleRouter.routes(), articleRouter.allowedMethods());
+  .get('/m/:mid', async (ctx, next) => {
+    const { permission, data, state, db, params } = ctx;
+    const { mid } = params;
+    const moment = await db.MomentModel.findOne({ _id: mid });
+    if (!moment) {
+      ctx.throw(404, `动态 ID 错误 momentId=${mid}`);
+    }
+    let targetMoment;
+    let focusCommentId;
+    if (moment.parents.length > 0) {
+      targetMoment = await db.MomentModel.findOnly({ _id: moment.parents[0] });
+      focusCommentId = moment._id;
+    } else {
+      targetMoment = moment;
+      focusCommentId = '';
+    }
+    const [momentListData] = await db.MomentModel.extendMomentsListData(
+      [targetMoment],
+      state.uid,
+    );
+    if (!momentListData) {
+      ctx.throw(500, `动态数据错误 momentId=${moment._id}`);
+    }
+    data.permissions = {
+      reviewed:
+        state.uid &&
+        (permission('movePostsToRecycle') || permission('movePostsToDraft')),
+    };
+    data.focusCommentId = focusCommentId;
+    data.momentListData = momentListData;
+    ctx.apiData = {
+      momentListData: data.momentListData,
+      focusCommentId: data.focusCommentId,
+      permissions: data.permissions,
+    };
+    await moment.addMomentHits();
+    await next();
+  });
 module.exports = router;

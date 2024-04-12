@@ -6,3 +6,4 @@ export const getRequest = NKC.methods.tools.getRequest;
 export const addUrlParam = NKC.methods.tools.addUrlParam;
 export const delUrlParam = NKC.methods.tools.delUrlParam;
 export const objToStr = NKC.methods.tools.objToStr;
+export const briefTime = NKC.methods.tools.briefTime;
