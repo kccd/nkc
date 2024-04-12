@@ -138,5 +138,13 @@ module.exports = {
         GET: Operations.getForumsTree,
       },
     },
+    zone: {
+      GET: Operations.visitZone,
+      m: {
+        PARAMETER: {
+          GET: Operations.visitZoneSingleMoment,
+        },
+      },
+    },
   },
 };

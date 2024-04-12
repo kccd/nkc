@@ -3,7 +3,25 @@ block title
   title=`电波 - ${remoteState.serverSettings.websiteName}`
   +includeCSS('/zone/zone.css')
 block content
-  .container-fluid.max-width
+  -
+    var dataString = objToStr({
+      momentsData: data.momentsData,
+      permissions: data.permissions,
+      subUid: data.subUid,
+      tab:data.tab,
+      zoneTab:data.zoneTab,
+      type:data.type,
+      paging:data.paging,
+      zoneTypes: data.zoneTypes,
+      articlesPanelData: data.articlesPanelData,
+      latestZoneArticlePanelStyle: data.latestZoneArticlePanelStyle,
+      currentPage:data.currentPage,
+    });
+  #zoneApp
+    transition(name="fade") 
+      router-view
+  .hidden#data=dataString
+  //-.container-fluid.max-width
     .row
       .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
         #bubble-back.m-b-05(onclick='history.back()')
@@ -58,4 +76,5 @@ block content
 
 
 block scripts
-  +includeJS('/zone/zone/zone.js')
+  +includeJS('/vue-router/dist/vue-router.min.js', true)
+  +includeJS('/zone/zone/app.js')
