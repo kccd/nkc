@@ -165,6 +165,16 @@ router
 
     data.activeTab = communityTab.home;
     ctx.template = 'community/community.pug';
+    ctx.setCookie(
+      'recentCommunity',
+      {
+        path: '/c',
+      },
+      {
+        httpOnly: false,
+        signed: false,
+      },
+    );
     await next();
   })
   .use(['/new', '/sub'], async (ctx, next) => {

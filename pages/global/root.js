@@ -102,16 +102,19 @@ window.RootApp = new Vue({
       const { uid, sub } = options;
       const self = this;
       if (sub) {
-        self.$refs.subscribeTypes.open((cid) => {
-          subUsers(uid, sub, [...cid])
-            .then(() => {
-              sweetSuccess('关注成功');
-              self.$refs.subscribeTypes.close();
-            })
-            .catch((err) => {
-              sweetError(err);
-            });
-        }, {selectTypesWhenSubscribe:false});
+        self.$refs.subscribeTypes.open(
+          (cid) => {
+            subUsers(uid, sub, [...cid])
+              .then(() => {
+                sweetSuccess('关注成功');
+                self.$refs.subscribeTypes.close();
+              })
+              .catch((err) => {
+                sweetError(err);
+              });
+          },
+          { selectTypesWhenSubscribe: false },
+        );
       } else {
         subUsers(uid, sub)
           .then(() => {
@@ -135,6 +138,24 @@ window.RootApp = new Vue({
       }
       visitUrl(`/z?t=m-${zoneTab}`);
       return false;
+    },
+    visitCommunity() {
+      const cookieArray = document.cookie.split(';');
+      const cookieObj = {};
+      cookieArray.forEach((cookie) => {
+        const parts = cookie.trim().split('=');
+        const name = decodeURIComponent(parts[0]);
+        const value = decodeURIComponent(parts[1]);
+        cookieObj[name] = value;
+      });
+      if (cookieObj['recentCommunity'] && atob(cookieObj['recentCommunity'])) {
+        const cookieValue = atob(cookieObj['recentCommunity']);
+        visitUrl(JSON.parse(cookieValue).path);
+        return false;
+      } else {
+        visitUrl(`/c`);
+        return false;
+      }
     },
   },
 });

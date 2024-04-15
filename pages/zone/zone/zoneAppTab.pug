@@ -12,7 +12,7 @@ if !isIncluded('zone/zone/zoneAppTab')
           if user
             a.btn.btn-default(
               class=tab === zoneTab.subscribe? 'btn-primary': ''
-              href=`z?t=${type}-s`
+              href=`/z?t=${type}-s`
               onclick=`RootApp.keepZoneRoute('s')`
             ) 我的关注
           else

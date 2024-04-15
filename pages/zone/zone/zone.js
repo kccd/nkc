@@ -12,7 +12,7 @@ const app = new Vue({
       // visitUrl(`/z`);
       // 刷新
       visitUrl(
-        `${window.location.pathname}?t=m-${
+        `/z?t=m-${
           localStorage.getItem('zoneTab') || 'a'
         }`,
       );

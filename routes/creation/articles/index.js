@@ -162,7 +162,7 @@ router
         abstractEN,
         origin,
         source,
-        sid,
+        // sid,
         authorInfos,
         tcId,
       });
@@ -174,8 +174,9 @@ router
       if (!article) {
         ctx.throw(400, '未找到文章');
       }
+      const columnPosts = await db.ColumnPostModel.find({ pid: article._id });
       // 对于已经在专栏的文章暂时无法修改和发布
-      if (!permission('review') && article.sid) {
+      if (!permission('review') && columnPosts.length > 0) {
         ctx.throw(400, '该文章已经在专栏中，请撤稿后重试');
       }
       await article.modifyArticle({

@@ -63,7 +63,10 @@ router.get('/', async (ctx, next) => {
     if (uid === article.uid || ctx.permission('viewUserArticle')) {
       optionStatus.history = true;
     }
-    if (uid === article.uid || ctx.permission('modifyOtherArticles')) {
+    // if (uid === article.uid || ctx.permission('modifyOtherArticles')) {
+    //   optionStatus.edit = true;
+    // }
+    if (ctx.permission('modifyOtherArticles')) {
       optionStatus.edit = true;
     }
     // 评学术分
