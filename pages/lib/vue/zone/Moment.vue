@@ -121,7 +121,7 @@
           )
         //- 动态内容
         .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
-        .single-moment-content.simple.pointer(v-else  ref="momentDetails" @click.prevent="handleClick")
+        .single-moment-content.simple.pointer(v-else  ref="momentDetails" @click.prevent="handleClick('')")
           span(v-html="momentData.content" ref="momentDetailsContent" )
         .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
         //- 图片视频
@@ -135,14 +135,14 @@
           .single-moment-options-left(
             title="评论"
             :class="{'active': showPanelType === panelTypes.comment}"
-            @click="showPanel(panelTypes.comment)"
+            @click.prevent="handleClick(panelTypes.comment)"
             )
             .fa.fa-comment-o
             span(v-if="momentData.commentCount > 0") {{momentData.commentCount}}
           .single-moment-options-center(
             title="转发"
             :class="{'active': showPanelType === panelTypes.repost}"
-            @click="showPanel(panelTypes.repost)"
+            @click.prevent="handleClick(panelTypes.repost)"
             )
             .fa.fa-retweet
             span(v-if="momentData.repostCount > 0") {{momentData.repostCount}}
@@ -732,7 +732,7 @@
       clearTimer() {
         clearTimeout(this.timer);
       },
-      handleClick(){
+      handleClick(showType){
         // 检查是否为选中文本
         const selectedText = window.getSelection().toString();
         if (selectedText) {
@@ -740,9 +740,9 @@
           return;
         }
         if(this.$route&&(this.$route.name==='MomentDetail'||this.$route.name==='Zone')){
-        this.$emit('handleDetail',this.momentData.momentId);
+        this.$emit('handleDetail',{mid: this.momentData.momentId, type: showType});
         }else{
-        this.visitUrl(this.momentData.url, true);
+        this.visitUrl(`${this.momentData.url}?type=${showType}`, true);
         }
       },
       initData() {
@@ -788,6 +788,9 @@
       },
       showCommentPanel() {
         this.showPanel(this.panelTypes.comment);
+      },
+      showTypePanel(type) {
+        this.showPanel(type);
       },
       onPostComment() {
         this.momentData.commentCount ++;

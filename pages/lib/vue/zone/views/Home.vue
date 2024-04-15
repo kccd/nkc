@@ -109,6 +109,19 @@ export default {
     if (element) {
       element.remove();
     }
+    const self = this;
+    const { savePosition } = self.$store.state
+    this.$nextTick(() => {
+      setTimeout(() => {
+        window.scrollTo({
+          top: savePosition.y || 0,
+          // left: this.$store.state.savePosition.x,
+          behavior: 'instant',
+        });
+      },150)
+
+    });
+
   },
   // watch: {
   //   type(newVal) {
@@ -178,18 +191,23 @@ export default {
         self.avatars = [...new Set(avatarsArray)];
       });
     },
-    handleDetail(id) {
-      // console.log('22222',id);
+    handleDetail(e) {
+      const { mid, type } = e;
+      // console.log('22222',e);
+      // return
       const { isApp } = getState();
-      if(isApp){
-        visitUrl(`/z/m/${id}`);
-      }else{
+      if (isApp) {
+        visitUrl(`/z/m/${mid}?type=${type}`);
+      } else {
         this.$router.push({
-        name: 'MomentDetail',
-        params: {
-          mid: id,
-        }
-      });
+          name: 'MomentDetail',
+          params: {
+            mid,
+          },
+          query: {
+            type
+          }
+        });
       }
     },
     getList(type, tab, page = 0) {
@@ -250,9 +268,9 @@ export default {
         });
     },
     getListV2() {
-      const type = this.$route.query?this.$route.query.t.split('-')[0]:'m';
-      const tab =this.$route.query?this.$route.query.t.split('-')[1]:'a';
-      const page = this.$route.query?this.$route.query.page:0;
+      const type = this.$route.query ? this.$route.query.t.split('-')[0] : 'm';
+      const tab = this.$route.query ? this.$route.query.t.split('-')[1] : 'a';
+      const page = this.$route.query ? this.$route.query.page : 0;
       if (tab === 's' && !uid) {
         return window.RootApp.openLoginPanel('login')
       }

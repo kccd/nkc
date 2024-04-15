@@ -142,13 +142,13 @@ export default {
     fromZone: false,
     showBack: true,
   }),
-  created(){
-    const {currentPage} = this.$store.state;
-    if(currentPage==='Zone'){
-      this.fromZone =true;
+  created() {
+    const { currentPage } = this.$store.state;
+    if (currentPage === 'Zone') {
+      this.fromZone = true;
     }
     const { isApp } = getState();
-    if(isApp){
+    if (isApp) {
       this.showBack = false;
     }
   },
@@ -178,7 +178,7 @@ export default {
     //     RNSetSharePanelStatus(true, shareTypes.moment, momentData.momentId);
     //   }
     // } else {
-      this.initData();
+    this.initData();
     // }
 
   },
@@ -214,7 +214,12 @@ export default {
         });
     },
     showCommentPanel() {
-      this.$refs.moment.showCommentPanel();
+      const queries = new URLSearchParams(window.location.search);
+      const type = queries.get('type')||'comment';
+      if (['comment','repost'].includes(type)) {
+        this.$refs.moment.showTypePanel(type);
+      }
+      // this.$refs.moment.showCommentPanel();
     },
     //投诉或举报
     complaint(mid) {
