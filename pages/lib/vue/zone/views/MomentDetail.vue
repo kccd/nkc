@@ -153,34 +153,7 @@ export default {
     }
   },
   mounted() {
-    const element = document.querySelector('.float-user');
-    if (element) {
-      element.remove();
-    }
-    // if (momentListData) {
-    //   this.momentListData = momentListData;
-    //   this.focusCommentId = focusCommentId;
-    //   this.permissions = permissions;
-    //   self.loading = false;
-    //   self.fromZone = false;
-    //   self.$nextTick(() => {
-    //     self.showCommentPanel();
-    //   });
-    //   //查看违规记录
-    //   EventBus.$on('violation-record', function (uid) {
-    //     if (!self.$refs.violationRecord) {
-    //       return;
-    //     }
-    //     self.$refs.violationRecord.open({ uid });
-    //   });
-    //   const momentData = JSON.parse(JSON.stringify(momentListData));
-    //   if (NKC.configs.isApp) {
-    //     RNSetSharePanelStatus(true, shareTypes.moment, momentData.momentId);
-    //   }
-    // } else {
     this.initData();
-    // }
-
   },
   computed: {},
   destroyed() { },
@@ -196,6 +169,10 @@ export default {
           self.loading = false;
           self.$nextTick(() => {
             self.showCommentPanel();
+            const element = document.querySelector('.float-user');
+            if (element) {
+              element.remove();
+            }
           });
           //查看违规记录
           EventBus.$on('violation-record', function (uid) {
@@ -215,8 +192,20 @@ export default {
     },
     showCommentPanel() {
       const queries = new URLSearchParams(window.location.search);
-      const type = queries.get('type')||'comment';
-      if (['comment','repost'].includes(type)) {
+      if (['comment', 'repost'].includes(queries.get('type'))) {
+        const element = document.querySelector('.single-moment-detail-options');
+          if (element) {
+            element.scrollIntoView({ behavior: 'instant', block: 'start' });
+          }
+        setTimeout(() => {
+          const textarea = this.findComponentByRef('textarea', this.$refs.moment.$children);
+          if (textarea) {
+            textarea.focus();
+          }
+        }, 150);
+      }
+      const type = queries.get('type') || 'comment';
+      if (['comment', 'repost'].includes(type)) {
         this.$refs.moment.showTypePanel(type);
       }
       // this.$refs.moment.showCommentPanel();
@@ -235,6 +224,23 @@ export default {
         );
       }
 
+    },
+    findComponentByRef(refName, components) {
+      const tempObject = {};
+      const getRef = (name, coms) => {
+        for (let i = 0; i < coms.length; i++) {
+          const com = coms[i];
+          if (com.$refs && com.$refs[name]) {
+            tempObject[name] = com;
+            return;
+          }
+          if (com.$children.length > 0) {
+            getRef(name, com.$children);
+          }
+        }
+      }
+      getRef(refName, components);
+      return tempObject[refName];
     }
   },
 };

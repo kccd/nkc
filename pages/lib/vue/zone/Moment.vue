@@ -120,10 +120,12 @@
             @selectedMomentId="handleMid"
           )
         //- 动态内容
-        .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
+        .single-moment-content(v-if="expandContent" v-html="momentData.content")
         .single-moment-content.simple.pointer(v-else  ref="momentDetails" @click.prevent="handleClick('')")
           span(v-html="momentData.content" ref="momentDetailsContent" )
-        .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
+        //-.singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
+        .singe-moment-details(v-if="isFold && !expandContent"    @click.self="expandContent=true") 显示更多
+        .singe-moment-details(v-if="isFold && expandContent"    @click.self="expandContent=false") 收起
         //- 图片视频
         .single-moment-files
           moment-files(:data="momentData.files")
@@ -713,7 +715,8 @@
         attention:'关注可见',
         everyone:'完全公开'
       },
-      isShowPublicTag:false
+      isShowPublicTag:false,
+      expandContent:false
     }),
     mounted() {
       this.initData();

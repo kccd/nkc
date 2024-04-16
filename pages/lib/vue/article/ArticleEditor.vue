@@ -749,8 +749,13 @@ export default {
     //保存文章 有提示保存成功
     saveArticle() {
       this.post(this.types.save)
-      .then(() => {
-        sweetSuccess('保存成功');
+      .then((res) => {
+        if(res&&res.error){
+          sweetError(err);
+        }else{
+          sweetSuccess('保存成功');
+        }
+        
       });
     },
     //修改文章内容，在没有内容变化两秒后再提交内容
