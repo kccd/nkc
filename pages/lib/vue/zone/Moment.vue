@@ -861,7 +861,8 @@
           }
           const momentDetailsHeight = this.$refs.momentDetails.clientHeight
           const momentDetailsContentHeight = this.$refs.momentDetailsContent.getBoundingClientRect().height
-          this.isFold = momentDetailsContentHeight > momentDetailsHeight;
+          const overFold = momentDetailsContentHeight > momentDetailsHeight;
+          this.isFold = this.$refs.momentDetailsContent.innerHTML ? overFold : false ;
         })
       },
       onPublished(data) {
