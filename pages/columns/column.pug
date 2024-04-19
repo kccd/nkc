@@ -23,13 +23,17 @@ block content
           href=`/m/${column._id}?c=${c._id}`
           data-type='reload'
           title=c.brief
+          style=`${index===categoriesNav.length-1 && state.uid === column.uid ?'margin-right:4.8rem;':''}`
         )= c.name
+        if state.uid === column.uid && index===categoriesNav.length-1
+          button.btn.btn-primary.btn-xs( style='position:absolute;right:1rem;' onclick=`openNewWindow('/m/${column._id}/settings/category#${categoriesNav[categoriesNav.length-1]._id}')`) 编辑分类
     if childCategories && childCategories.length > 0
       .column-child-categories
         span 子分类：
         for c in childCategories
           a.column-child-category(href=`/m/${column._id}?c=${c._id}`)=c.name
   .hidden#data=objToStr({columnId: data.column._id, color: data.column.color, listColor: data.column.listColor, toolColor: data.column.toolColor, user: data.user})
+  .hidden#columnAppData=objToStr({toppedId:data.toppedId,column: data.column,columnPosts: data.columnPosts,category: data.category,topped: data.topped,paging: data.paging,user: data.user})
   .container-fluid.max-width
     .column
       .row
@@ -64,31 +68,59 @@ block content
                       ).column-minor-category=`${c.name}(${c.count})`
               if data.minorCategory
                 .column-category-abbr!=data.minorCategory.description
-            if data.paging.page === 0 && data.topped.length > 0
-              .m-t-05
-              for columnPost in data.topped
-                include ./singleColumnPost
-              if data.category
-                .column-posts-body-info — 以上为分类置顶 —
-              else
-                .column-posts-body-info — 以上为专栏置顶 —
-            div(style="margin-bottom: -0.6rem;")
-              include ../publicModules/paging/paging
-            .column-posts-body
-              if data.columnPosts.length === 0 && data.topped.length === 0
-                .text-center.p-t-5.p-b-5
+            if state.uid === data.column.uid && (data.columnPosts.length !== 0 || data.topped.length !== 0)
+              #columnButtons.m-b-1(style='text-align: right') 
+                button.btn.btn-info.btn-xs( onclick='editColumnPosts(true)') 文章管理
+                button.btn.btn-default.btn-xs(style='display:none;' onclick='editColumnPosts(false)') 退出管理
+            #columnApp(v-cloak style='display:none;')
+              - var showPagingInput = true;
+              .m-t-05(v-if="paging.page === 0 && topped.length > 0")
+                column-posts(@refresh="getPostList" :articles="topped" :topped="true" :column="column" :category="category" :tid="toppedId" :show="showSettingButton")
+                .column-posts-body-info(v-if="category") — 以上为分类置顶 —
+                .column-posts-body-info(v-else) — 以上为专栏置顶 —
+              div(style="margin-bottom: -0.6rem;")
+                include ../publicModules/paging/paging
+              .column-posts-body
+                .text-center.p-t-5.p-b-5(v-if="columnPosts.length === 0 && topped.length === 0")
                   h4 空空如也~
-                  if data.user && data.user.uid === data.column.uid
-                    .m-t-1
-                      | 点击
-                      a(href=`/m/${data.column._id}/settings/post` target="_blank")
-                        b 添加文章
-                      | ，可批量将文章推送到专栏。
-              else
-                for columnPost in data.columnPosts
-                  if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
-                    include ./singleColumnPost
-            include ../publicModules/paging/paging_input
+                  .m-t-1(v-if="user && user.uid === column.uid")
+                    | 点击
+                    a( :href="`/m/${column._id}/settings/post`" target='_blank')
+                      b 添加文章
+                    | ，可批量将文章推送到专栏。
+                column-posts(v-else @refresh="getPostList" :articles="columnPosts" :topped="false" :column="column" :category="category" :tid="toppedId" :show="showSettingButton")
+                //-else
+                  for columnPost in data.columnPosts
+                    if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
+                      //- 需要添加文章调序
+                      include ./singleColumnPost
+              include ../publicModules/paging/paging_input
+            #columnPug
+              if data.paging.page === 0 && data.topped.length > 0
+                .m-t-05
+                for columnPost in data.topped
+                  include ./singleColumnPost
+                if data.category
+                  .column-posts-body-info — 以上为分类置顶 —
+                else
+                  .column-posts-body-info — 以上为专栏置顶 —
+              div(style="margin-bottom: -0.6rem;")
+                include ../publicModules/paging/paging
+              .column-posts-body
+                if data.columnPosts.length === 0 && data.topped.length === 0
+                  .text-center.p-t-5.p-b-5
+                    h4 空空如也~
+                    if data.user && data.user.uid === data.column.uid
+                      .m-t-1
+                        | 点击
+                        a(href=`/m/${data.column._id}/settings/post` target="_blank")
+                          b 添加文章
+                        | ，可批量将文章推送到专栏。
+                else
+                  for columnPost in data.columnPosts
+                    if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
+                      include ./singleColumnPost
+              include ../publicModules/paging/paging_input
         .col-xs-12.col-md-3.box-shadow-panel.m-t-1
           -var columnToolStyle = `background-color: ${data.column.toolColor};`;
           //--发表独立文章按钮
@@ -103,6 +135,8 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/nkcSource
+  -const column = data.column;
+  include ../publicModules/toColumn/toColumn
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
   +mixinColumnNavLinkScript()

@@ -50,6 +50,7 @@ if !isIncluded('floatForumNav')
         .float-forum-container
           for f , index in arr
             -var {fid, displayName, cid, url = ''} = f;
+            - url=url?url:`/f/${fid}`;
             a.float-forum-item(href=url
               data-global-mouseover="showForumPanel"
               data-global-mouseout="hideForumPanel"

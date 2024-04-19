@@ -209,6 +209,7 @@ import {visitUrl} from "../../js/pageSwitch";
 import {immediateDebounce} from "../../js/execution";
 import EditorCategories from "../publicVue/moveThreadOrArticle/EditorCategories";
 import SelectColumn from "../../../editor/vueComponents/SelectColumn"
+import { sweetError } from "../../js/sweetAlert";
 
 
 export default {
@@ -477,7 +478,7 @@ export default {
             return self.post(self.types.autoSave)
               .then(() => {
                 self.saveToDraftSuccess();
-              })
+              }).catch(sweetError)
           }
         })
     },
@@ -625,8 +626,10 @@ export default {
           if(type === self.types.save || type === self.types.autoSave) {
             info = '草稿保存失败： ';
           }
-          sweetError(info + (err.error || err));
-          return err;
+          err.error = info + err.error;
+          // sweetError(info + (err.error || err));
+          throw(err);
+          // return err;
         })
     },
     //重置封面图
@@ -744,23 +747,19 @@ export default {
       // if(this.articleStatus === 'default' && this.source === 'column' && !this.selectCategory
       //   || (this.selectCategory && this.selectCategory.selectedMainCategoriesId
       //     && this.selectCategory.selectedMainCategoriesId.length === 0)) return sweetWarning('请选择文章专栏分类');
-      this.post(this.types.publish);
+      this.post(this.types.publish).catch(sweetError);
     },
     //保存文章 有提示保存成功
     saveArticle() {
       this.post(this.types.save)
-      .then((res) => {
-        if(res&&res.error){
-          sweetError(err);
-        }else{
-          sweetSuccess('保存成功');
-        }
+      .then(() => {
+        sweetSuccess('保存成功');
         
-      });
+      }).catch(sweetError);
     },
     //修改文章内容，在没有内容变化两秒后再提交内容
     modifyArticle: immediateDebounce(function () {
-      this.post(this.type);
+      this.post(this.type).catch(sweetError);
     }, 2000),
     //当编辑器中的内容发生变化时
     watchContentChange(data) {
@@ -798,7 +797,7 @@ export default {
     outSelectedCategoriesId(data){
       this.tcId = data;
       if(this.type.create === this.types.create){
-        this.post(this.types.autoSave)
+        this.post(this.types.autoSave).catch(sweetError)
       }
     },
     selectColumn(){
