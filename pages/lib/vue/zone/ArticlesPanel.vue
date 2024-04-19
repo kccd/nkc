@@ -31,7 +31,8 @@
                 :data-global-data="objToStr({uid: article.user.uid})"
               )
                 a(:href="article.user.homeUrl" target='_blank') {{article.user.username}}
-              .article-panel-time {{ fromNow(article.content.time)}}
+              .article-panel-time 
+                from-now(:time="article.content.time")
               .article-panel-category(
                 v-for="(c, $index) in article.categories" :key="$index"
                 v-if="c.type === ArticlePanelCategoryType.forum"
@@ -49,7 +50,8 @@
                 .fa.fa-commenting-o
                 a(:href="article.reply.user.homeUrl" target='_blank') {{article.reply.user.username}}
               .article-panel-reply-time(v-if="article.reply")
-                a(:href="article.reply.content.url" target='_blank') {{ fromNow(article.reply.content.time) }}
+                a(:href="article.reply.content.url" target='_blank') 
+                  from-now(:time="article.reply.content.time")
               .pull-right
                 .article-panel-count(v-if="article.content.voteUpCount >0 ")
                   .fa.fa-thumbs-up
@@ -88,7 +90,8 @@
                 :data-global-data="objToStr({uid: article.user.uid})"
                 )
                 a(:href="article.user.homeUrl" target='_blank') {{article.user.username}}
-              .article-panel-time {{ fromNow(article.content.time)}}
+              .article-panel-time
+                from-now(:time="article.content.time")
               .pull-right
                 .article-panel-category(
                   v-for="(c, $index) in article.categories" :key="$index"
@@ -125,7 +128,8 @@
                 :data-global-data="objToStr({fid: c.id})"
               )
                 a(:href="c.url" target='_blank') {{c.name}}
-              .article-panel-time {{ fromNow(article.content.time)}}
+              .article-panel-time 
+                from-now(:time="article.content.time")
               .pull-right
                 .article-panel-count(v-if="article.content.voteUpCount >0 ")
                   .fa.fa-thumbs-up
@@ -148,7 +152,8 @@
                   a(:href="article.content.url" target='_blank') {{article.content.abstract}}
                 .article-panel-reply(v-if="article.reply")
                   .article-panel-reply-time
-                    a(:href="article.content.url" target='_blank') {{fromNow(article.reply.content.time)}}
+                    a(:href="article.content.url" target='_blank')
+                      from-now(:time="article.reply.content.time")
                   .article-panel-reply-content
                     a(:href="article.reply.content.url" target='_blank') {{article.reply.content.abstract}}
                   .article-panel-reply-user(
@@ -695,10 +700,12 @@ a.article-panel-title-page{
 }</style>
 
 <script>
-import { fromNow, objToStr, timeFormat,briefTime } from '../../js/tools';
+import {  objToStr, timeFormat,briefTime } from '../../js/tools';
+import FromNow from '../FromNow.vue';
 
 export default {
   components: {
+    'from-now': FromNow,
   },
   props: ['articles', 'panelStyle'],
   data: () => ({
@@ -744,7 +751,7 @@ export default {
     objToStr: objToStr,
     timeFormat:timeFormat,
     briefTime:briefTime,
-    fromNow:fromNow
+    // fromNow:fromNow
   },
 };
 </script>

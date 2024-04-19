@@ -120,6 +120,7 @@ import {EventBus} from "../../../../spa/eventBus";
 import {visitUrl} from "../../../js/pageSwitch";
 import {getUrl} from "../../../js/tools";
 import MomentVisible from "../MomentVisible.vue";
+import { getState } from "../../../js/state";
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -158,7 +159,18 @@ export default {
     },
     //评论详情
     toMoment(url){
-      visitUrl(url,true)
+      const self = this;
+      const { isApp } = getState();
+      if (this.$route && (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') && !isApp) {
+        this.$router.push({
+          name: 'MomentDetail',
+          params: {
+            mid: self.moment.momentCommentId ? self.moment.momentCommentId : self.moment.momentId,
+          },
+        });
+      } else {
+        visitUrl(url, true)
+      }
     },
     open(props) {
       if(!this.isAddEvent){

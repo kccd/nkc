@@ -105,13 +105,14 @@ export default {
     if (uid) {
       this.connectZoneHomeRoom();
     }
-    const element = document.querySelector('.float-user');
-    if (element) {
-      element.remove();
-    }
+
     const self = this;
     const { savePosition } = self.$store.state
     this.$nextTick(() => {
+      const element = document.querySelector('.float-user');
+      if (element) {
+        element.remove();
+      }
       setTimeout(() => {
         window.scrollTo({
           top: savePosition.y || 0,
@@ -197,7 +198,7 @@ export default {
       // return
       const { isApp } = getState();
       if (isApp) {
-        visitUrl(`/z/m/${mid}?type=${type}`);
+        visitUrl(`/z/m/${mid}?type=${type}`,true);
       } else {
         this.$router.push({
           name: 'MomentDetail',

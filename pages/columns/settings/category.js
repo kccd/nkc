@@ -345,7 +345,8 @@ window.categoryForm = new Vue({
           this.disableCategoryType = true;
           this.setDescription();
           this.showForm = true;
-          window.location.href = window.location.pathname + '#categoryForm';
+          window.location.href = window.location.pathname + `#${_id}`;
+          // window.location.href = window.location.pathname + `?cid=${_id}`;
         })
         .catch(sweetError);
     },
@@ -420,4 +421,15 @@ Object.assign(window, {
   minorCategoryOnEnd,
   getChildren,
   CommonModel
+})
+
+$(function () {
+  const cid = window.location.hash.substring(1);
+  if (cid && !isNaN(Number(cid))) {
+    window.categoryForm.$nextTick().then((app) => {
+      app.categoryEditor.ready(() => {
+        app.editCategory(cid);
+      });
+    });
+  }
 })
