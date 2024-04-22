@@ -134,6 +134,7 @@
 
 <script>
 import { nkcAPI } from '../../js/netAPI';
+import { sweetConfirm, sweetSuccess } from '../../js/sweetAlert';
 import { objToStr } from '../../js/tools';
 import { screenTopWarning } from '../../js/topAlert';
 import FromNow from '../FromNow.vue';
@@ -205,12 +206,12 @@ export default {
         })
     },
     remove(_id) {
-      if (!confirm("确认要从专栏删除该文章？")) return;
+      const self =  this;
       if(!this.column){
         return;
       }
-      const self =  this;
-      nkcAPI("/m/" + this.column._id + "/post", "POST", {
+      sweetConfirm('确认要从专栏删除该文章？').then(function() {
+        nkcAPI("/m/" + self.column._id + "/post", "POST", {
         type: "removeColumnPostById",
         postsId: _id
       })
@@ -220,6 +221,7 @@ export default {
         .catch(function(err) {
           screenTopWarning(err);
         })
+      });
     },
     move(_id, selectedMainCategoriesId, selectedMinorCategoriesId){
       if(!this.column){
@@ -242,6 +244,7 @@ export default {
           .then(function() {
             self.getPostList();
             moduleToColumn.hide();
+            sweetSuccess('文章移动成功');
           })
           .catch(function(err) {
             screenTopWarning(err);

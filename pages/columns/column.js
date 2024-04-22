@@ -24,7 +24,7 @@ $(function () {
       },
       data: {
         column,
-        columnPosts: [...columnPosts].filter(item => !toppedId.includes(item._id)),
+        columnPosts,
         category,
         topped,
         paging,
@@ -59,7 +59,7 @@ $(function () {
                 toppedId,
               } = data.data;
               self.column = column;
-              self.columnPosts = [...columnPosts].filter(item => !toppedId.includes(item._id));
+              self.columnPosts = [...columnPosts];
               self.category = category;
               self.topped = topped;
               self.paging = paging;
