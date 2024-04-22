@@ -23,10 +23,10 @@ block content
           href=`/m/${column._id}?c=${c._id}`
           data-type='reload'
           title=c.brief
-          style=`${index===categoriesNav.length-1 && state.uid === column.uid ?'margin-right:4.8rem;':''}`
+          style=`${index===categoriesNav.length-1 && state.uid === column.uid ?'margin-right:5.8rem;':''}`
         )= c.name
         if state.uid === column.uid && index===categoriesNav.length-1
-          button.btn.btn-default.btn-xs( style='position:absolute;right:1rem;' onclick=`openNewWindow('/m/${column._id}/settings/category#${categoriesNav[categoriesNav.length-1]._id}')`) 编辑分类
+          button.btn.btn-default.btn-xs( style='position:absolute;right:1rem;' onclick=`openNewWindow('/m/${column._id}/settings/category#${categoriesNav[categoriesNav.length-1]._id}')`) 编辑主分类
     if childCategories && childCategories.length > 0
       .column-child-categories
         span 子分类：
@@ -65,7 +65,10 @@ block content
                       class=data.minorCategory && data.minorCategory._id === c._id? 'active':''
                       title=c.brief
                       data-type='reload'
+                      style=`${index===data.minorCategories.length-1 && state.uid === data.column.uid ?'margin-right:5.8rem;':''}`
                       ).column-minor-category=`${c.name}(${c.count})`
+                    if state.uid === data.column.uid && index===data.minorCategories.length-1 && data.minorCategory
+                      button.btn.btn-default.btn-xs( style='position:absolute;right:2rem;' onclick=`openNewWindow('/m/${data.column._id}/settings/category#${data.minorCategory._id}')`) 编辑辅分类
               if data.minorCategory
                 .column-category-abbr!=data.minorCategory.description
             #columnApp(v-cloak style='display:none;')
