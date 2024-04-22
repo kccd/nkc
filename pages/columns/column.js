@@ -2,11 +2,77 @@ import {toLogin} from "../lib/js/account";
 import {getState} from "../lib/js/state";
 import {RNSetSharePanelStatus} from "../lib/js/reactNative";
 import {shareTypes} from "../lib/js/shareTypes";
-
+import ColumnPosts from '../lib/vue/column/ColumnPosts.vue';
+import { nkcAPI } from "../lib/js/netAPI";
+import { sweetError } from "../lib/js/sweetAlert";
 const state = getState();
 const logged = !!state.uid;
 
 var data = NKC.methods.getDataById("data");
+// 挂载所需要的vue实例对象
+let app = null;
+$(function () {
+  const $element = document.getElementById('columnApp');
+  if ($element) {
+    moduleToColumn.init();
+    const { column, columnPosts, category, topped, paging, user, toppedId } =
+      NKC.methods.getDataById('columnAppData');
+     app = new Vue({
+      el: '#columnApp',
+      components: {
+        'column-posts': ColumnPosts,
+      },
+      data: {
+        column,
+        columnPosts,
+        category,
+        topped,
+        paging,
+        user,
+        toppedId,
+        showSettingButton: false,
+      },
+      methods: {
+        getPostList() {
+          if (!this.column) {
+            return;
+          }
+          const self = this;
+          let query = `?page=${this.paging.page}`;
+          if (this.category) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const c = urlParams.get('c') || '';
+            query += `&c=${this.category._id}`;
+            if (c.split('-').length === 2 && !isNaN(Number(c.split('-')[1]))) {
+              query += `-${c.split('-')[1]}`;
+            }
+          }
+          //请求服务器数据
+          nkcAPI('/api/v1/column/' + this.column._id + query, 'GET')
+            .then(function (data) {
+              const {
+                column,
+                columnPosts,
+                category,
+                topped,
+                paging,
+                toppedId,
+              } = data.data;
+              self.column = column;
+              self.columnPosts = [...columnPosts];
+              self.category = category;
+              self.topped = topped;
+              self.paging = paging;
+              self.toppedId = toppedId;
+            })
+            .catch(function (err) {
+              sweetError(err);
+            });
+        },
+      },
+    });
+  }
+});
 var SubscribeTypes = window.SubscribeTypes;
 $(function() {
   if(data.columnId){
@@ -179,6 +245,22 @@ function subscribeColumn(columnId) {
     .catch(sweetError);
 }
 
+function editColumnPosts(isEdit) {
+  if(isEdit){
+    $('#columnPug').hide();
+    $('#columnApp').show();
+    if(app){
+      app.showSettingButton = true;
+    }
+    
+  }else{
+    if(app){
+      app.showSettingButton = false;
+    }
+    
+  }
+  
+}
 Object.assign(window, {
   bodyBackgroundColor,
   CommonModal,
@@ -189,5 +271,6 @@ Object.assign(window, {
   openNewWindow,
   pushToHome,
   subscribeColumn,
-  toppedColumn
+  toppedColumn,
+  editColumnPosts
 });

@@ -174,10 +174,8 @@ router
       if (!article) {
         ctx.throw(400, '未找到文章');
       }
-      const columnPosts = await db.ColumnPostModel.find({ pid: article._id });
-      // 对于已经在专栏的文章暂时无法修改和发布
-      if (!permission('review') && columnPosts.length > 0) {
-        ctx.throw(400, '该文章已经在专栏中，请撤稿后重试');
+      if (!permission('review') && state.uid !== article.uid) {
+        ctx.throw(400, '您没有权限修改别人的文章');
       }
       await article.modifyArticle({
         title,

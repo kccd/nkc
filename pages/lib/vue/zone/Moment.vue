@@ -120,10 +120,11 @@
             @selectedMomentId="handleMid"
           )
         //- 动态内容
-        .single-moment-content(v-if="type === 'details'" v-html="momentData.content")
-        .single-moment-content.simple.pointer(v-else  ref="momentDetails" @click.prevent="handleClick('')")
+        .single-moment-content.pointer(:class="{'simple': !expandContent}" ref="momentDetails" @click.stop="handleClick('',$event)")
           span(v-html="momentData.content" ref="momentDetailsContent" )
-        .singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
+        //-.singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
+        .singe-moment-details.m-b-1(v-if="isFold && !expandContent"    @click.self="expandContent=true") 显示更多
+        .singe-moment-details.m-b-1(v-if="isFold && expandContent"    @click.self="expandContent=false") 收起
         //- 图片视频
         .single-moment-files
           moment-files(:data="momentData.files")
@@ -631,7 +632,7 @@
     cursor: pointer;
   }
   .singe-moment-details:hover{
-    text-decoration: underline;
+    // text-decoration: underline;
   }
   .moment-editor-header{
     @momentEditorHeader: 2.5rem;
@@ -713,7 +714,8 @@
         attention:'关注可见',
         everyone:'完全公开'
       },
-      isShowPublicTag:false
+      isShowPublicTag:false,
+      expandContent:false
     }),
     mounted() {
       this.initData();
@@ -732,7 +734,13 @@
       clearTimer() {
         clearTimeout(this.timer);
       },
-      handleClick(showType){
+      handleClick(showType,e){
+        if(e){
+          // 处理未阻止捕获的事件
+          if(e.target.tagName==='A'){
+            return;
+          }
+        }
         // 检查是否为选中文本
         const selectedText = window.getSelection().toString();
         if (selectedText) {
@@ -858,7 +866,8 @@
           }
           const momentDetailsHeight = this.$refs.momentDetails.clientHeight
           const momentDetailsContentHeight = this.$refs.momentDetailsContent.getBoundingClientRect().height
-          this.isFold = momentDetailsContentHeight > momentDetailsHeight;
+          const overFold = momentDetailsContentHeight > momentDetailsHeight;
+          this.isFold = this.$refs.momentDetailsContent.innerHTML ? overFold : false ;
         })
       },
       onPublished(data) {

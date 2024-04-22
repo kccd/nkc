@@ -49,6 +49,7 @@ module.exports = {
     },
     column: {
       PARAMETER: {
+        GET: Operations.column_single_get,
         articles: {
           POST: Operations.columnManage,
         },
