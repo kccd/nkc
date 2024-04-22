@@ -123,8 +123,8 @@ block content
                         | ，可批量将文章推送到专栏。
                 else
                   for columnPost in data.columnPosts
-                    if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
-                      include ./singleColumnPost
+                    //- if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
+                    include ./singleColumnPost
               include ../publicModules/paging/paging_input
         .col-xs-12.col-md-3.box-shadow-panel.m-t-1
           -var columnToolStyle = `background-color: ${data.column.toolColor};`;
