@@ -23,10 +23,10 @@ block content
           href=`/m/${column._id}?c=${c._id}`
           data-type='reload'
           title=c.brief
-          style=`${index===categoriesNav.length-1 && state.uid === column.uid ?'margin-right:4.8rem;':''}`
+          style=`${index===categoriesNav.length-1 && state.uid === column.uid ?'margin-right:5.8rem;':''}`
         )= c.name
         if state.uid === column.uid && index===categoriesNav.length-1
-          button.btn.btn-default.btn-xs( style='position:absolute;right:1rem;' onclick=`openNewWindow('/m/${column._id}/settings/category#${categoriesNav[categoriesNav.length-1]._id}')`) 编辑分类
+          button.btn.btn-default.btn-xs( style='position:absolute;right:1rem;' onclick=`openNewWindow('/m/${column._id}/settings/category#${categoriesNav[categoriesNav.length-1]._id}')`) 编辑主分类
     if childCategories && childCategories.length > 0
       .column-child-categories
         span 子分类：
@@ -65,13 +65,12 @@ block content
                       class=data.minorCategory && data.minorCategory._id === c._id? 'active':''
                       title=c.brief
                       data-type='reload'
+                      style=`${index===data.minorCategories.length-1 && state.uid === data.column.uid ?'margin-right:5.8rem;':''}`
                       ).column-minor-category=`${c.name}(${c.count})`
+                    if state.uid === data.column.uid && index===data.minorCategories.length-1 && data.minorCategory
+                      button.btn.btn-default.btn-xs( style='position:absolute;right:2rem;' onclick=`openNewWindow('/m/${data.column._id}/settings/category#${data.minorCategory._id}')`) 编辑辅分类
               if data.minorCategory
                 .column-category-abbr!=data.minorCategory.description
-            if state.uid === data.column.uid && (data.columnPosts.length !== 0 || data.topped.length !== 0)
-              #columnButtons.m-b-1(style='text-align: right') 
-                button.btn.btn-info.btn-xs( onclick='editColumnPosts(true)') 文章管理
-                button.btn.btn-default.btn-xs(style='display:none;' onclick='editColumnPosts(false)') 退出管理
             #columnApp(v-cloak style='display:none;')
               - var showPagingInput = true;
               .m-t-05(v-if="paging.page === 0 && topped.length > 0")
@@ -79,6 +78,9 @@ block content
                 .column-posts-body-info(v-if="category") — 以上为分类置顶 —
                 .column-posts-body-info(v-else) — 以上为专栏置顶 —
               div(style="margin-bottom: -0.6rem;")
+                .paging-button(v-if="user&&user.uid === column.uid && (columnPosts.length !== 0 || topped.length !== 0)")
+                  a.button.radius-left.radius-right(v-if="!showSettingButton" onclick='editColumnPosts(true)') 文章管理
+                  a.button.radius-left.radius-right(v-else onclick='editColumnPosts(false)') 退出管理
                 include ../publicModules/paging/paging
               .column-posts-body
                 .text-center.p-t-5.p-b-5(v-if="columnPosts.length === 0 && topped.length === 0")
@@ -105,6 +107,9 @@ block content
                 else
                   .column-posts-body-info — 以上为专栏置顶 —
               div(style="margin-bottom: -0.6rem;")
+                if state.uid === data.column.uid && (data.columnPosts.length !== 0 || data.topped.length !== 0)
+                  .paging-button
+                    a.button.radius-left.radius-right(onclick='editColumnPosts(true)') 文章管理
                 include ../publicModules/paging/paging
               .column-posts-body
                 if data.columnPosts.length === 0 && data.topped.length === 0

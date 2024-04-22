@@ -44,7 +44,7 @@ $(function () {
             const c = urlParams.get('c') || '';
             query += `&c=${this.category._id}`;
             if (c.split('-').length === 2 && !isNaN(Number(c.split('-')[1]))) {
-              query += `-c.split('-')[1]`;
+              query += `-${c.split('-')[1]}`;
             }
           }
           //请求服务器数据
@@ -249,15 +249,11 @@ function editColumnPosts(isEdit) {
   if(isEdit){
     $('#columnPug').hide();
     $('#columnApp').show();
-    $('#columnButtons button:first').hide();
-    $('#columnButtons button:last').show();
     if(app){
       app.showSettingButton = true;
     }
     
   }else{
-    $('#columnButtons button:first').show();
-    $('#columnButtons button:last').hide();
     if(app){
       app.showSettingButton = false;
     }

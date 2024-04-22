@@ -126,7 +126,7 @@
   // }
   // }
   button {
-    margin: 0.2rem 1rem;
+    margin: 0.2rem 0.2rem;
   }
 
 }

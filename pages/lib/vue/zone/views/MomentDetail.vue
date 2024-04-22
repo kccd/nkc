@@ -169,10 +169,6 @@ export default {
           self.loading = false;
           self.$nextTick(() => {
             self.showCommentPanel();
-            const element = document.querySelector('.float-user');
-            if (element) {
-              element.remove();
-            }
           });
           //查看违规记录
           EventBus.$on('violation-record', function (uid) {
@@ -193,10 +189,11 @@ export default {
     showCommentPanel() {
       const queries = new URLSearchParams(window.location.search);
       if (['comment', 'repost'].includes(queries.get('type'))) {
-        const element = document.querySelector('.single-moment-detail-options');
-          if (element) {
-            element.scrollIntoView({ behavior: 'instant', block: 'start' });
-          }
+        // const element = document.querySelector('.single-moment-detail-options');
+        //   if (element) {
+        //     element.scrollIntoView({ behavior: 'instant', block: 'start' });
+        //   }
+        // this.$store.commit('setDetailPageScroll', true)
         setTimeout(() => {
           const textarea = this.findComponentByRef('textarea', this.$refs.moment.$children);
           if (textarea) {

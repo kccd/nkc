@@ -200,6 +200,7 @@
             self.commentsData = res.commentsData;
             self.paging = res.paging;
             self.loading = false;
+            self.scrollElementForZoneDetail();
             self.loadFocusComment = true;
           })
           .catch(sweetError)
@@ -215,6 +216,7 @@
             self.repostData = res.repostData;
             self.paging = res.paging;
             self.loading = false;
+            self.scrollElementForZoneDetail();
           })
           .catch(sweetError)
       },
@@ -286,6 +288,19 @@
       },
       refresh(){
         visitUrl(`${window.location.pathname}${window.location.search}`);
+      },
+      scrollElementForZoneDetail(){
+        const queries = new URLSearchParams(window.location.search);
+        if(this.$route&&this.$route.name==='MomentDetail'&&['comment', 'repost'].includes(queries.get('type'))){
+          this.$nextTick(()=>{
+            // setTimeout(()=>{
+            const element = document.querySelector('.single-moment-detail-options');
+          if (element) {
+            element.scrollIntoView({ behavior: 'instant', block: 'start' });
+          }
+          // },150);
+          });
+        }
       }
     },
   }

@@ -109,10 +109,6 @@ export default {
     const self = this;
     const { savePosition } = self.$store.state
     this.$nextTick(() => {
-      const element = document.querySelector('.float-user');
-      if (element) {
-        element.remove();
-      }
       setTimeout(() => {
         window.scrollTo({
           top: savePosition.y || 0,
@@ -269,8 +265,9 @@ export default {
         });
     },
     getListV2() {
-      const type = this.$route.query ? this.$route.query.t.split('-')[0] : 'm';
-      const tab = this.$route.query ? this.$route.query.t.split('-')[1] : 'a';
+      const {t} = this.$route.query;
+      const type = t ? this.$route.query.t.split('-')[0] : 'm';
+      const tab = t ? this.$route.query.t.split('-')[1] : 'a';
       const page = this.$route.query ? this.$route.query.page : 0;
       if (tab === 's' && !uid) {
         return window.RootApp.openLoginPanel('login')
