@@ -193,10 +193,11 @@ export default {
     showCommentPanel() {
       const queries = new URLSearchParams(window.location.search);
       if (['comment', 'repost'].includes(queries.get('type'))) {
-        const element = document.querySelector('.single-moment-detail-options');
-          if (element) {
-            element.scrollIntoView({ behavior: 'instant', block: 'start' });
-          }
+        // const element = document.querySelector('.single-moment-detail-options');
+        //   if (element) {
+        //     element.scrollIntoView({ behavior: 'instant', block: 'start' });
+        //   }
+        // this.$store.commit('setDetailPageScroll', true)
         setTimeout(() => {
           const textarea = this.findComponentByRef('textarea', this.$refs.moment.$children);
           if (textarea) {

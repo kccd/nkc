@@ -68,10 +68,6 @@ block content
                       ).column-minor-category=`${c.name}(${c.count})`
               if data.minorCategory
                 .column-category-abbr!=data.minorCategory.description
-            if state.uid === data.column.uid && (data.columnPosts.length !== 0 || data.topped.length !== 0)
-              #columnButtons.m-b-1(style='text-align: right') 
-                button.btn.btn-info.btn-xs( onclick='editColumnPosts(true)') 文章管理
-                button.btn.btn-default.btn-xs(style='display:none;' onclick='editColumnPosts(false)') 退出管理
             #columnApp(v-cloak style='display:none;')
               - var showPagingInput = true;
               .m-t-05(v-if="paging.page === 0 && topped.length > 0")
@@ -79,6 +75,9 @@ block content
                 .column-posts-body-info(v-if="category") — 以上为分类置顶 —
                 .column-posts-body-info(v-else) — 以上为专栏置顶 —
               div(style="margin-bottom: -0.6rem;")
+                .paging-button(v-if="user&&user.uid === column.uid && (columnPosts.length !== 0 || topped.length !== 0)")
+                  a.button.radius-left.radius-right(v-if="!showSettingButton" onclick='editColumnPosts(true)') 文章管理
+                  a.button.radius-left.radius-right(v-else onclick='editColumnPosts(false)') 退出管理
                 include ../publicModules/paging/paging
               .column-posts-body
                 .text-center.p-t-5.p-b-5(v-if="columnPosts.length === 0 && topped.length === 0")
@@ -105,6 +104,9 @@ block content
                 else
                   .column-posts-body-info — 以上为专栏置顶 —
               div(style="margin-bottom: -0.6rem;")
+                if state.uid === data.column.uid && (data.columnPosts.length !== 0 || data.topped.length !== 0)
+                  .paging-button
+                    a.button.radius-left.radius-right(onclick='editColumnPosts(true)') 文章管理
                 include ../publicModules/paging/paging
               .column-posts-body
                 if data.columnPosts.length === 0 && data.topped.length === 0

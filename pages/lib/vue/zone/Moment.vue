@@ -633,7 +633,7 @@
     cursor: pointer;
   }
   .singe-moment-details:hover{
-    text-decoration: underline;
+    // text-decoration: underline;
   }
   .moment-editor-header{
     @momentEditorHeader: 2.5rem;
