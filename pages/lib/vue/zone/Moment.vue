@@ -120,7 +120,7 @@
             @selectedMomentId="handleMid"
           )
         //- 动态内容
-        .single-moment-content.pointer(:class="{'simple': !expandContent}" ref="momentDetails" @click.stop="handleClick('')")
+        .single-moment-content.pointer(:class="{'simple': !expandContent}" ref="momentDetails" @click.stop="handleClick('',$event)")
           span(v-html="momentData.content" ref="momentDetailsContent" )
         //-.singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
         .singe-moment-details.m-b-1(v-if="isFold && !expandContent"    @click.self="expandContent=true") 显示更多
@@ -734,7 +734,13 @@
       clearTimer() {
         clearTimeout(this.timer);
       },
-      handleClick(showType){
+      handleClick(showType,e){
+        if(e){
+          // 处理未阻止捕获的事件
+          if(e.target.tagName==='A'){
+            return;
+          }
+        }
         // 检查是否为选中文本
         const selectedText = window.getSelection().toString();
         if (selectedText) {

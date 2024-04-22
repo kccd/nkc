@@ -333,6 +333,9 @@ export default {
           top = dom.offset().top;
           width = dom.width();
           height = dom.height();
+          if(dom['0']&&!document.contains(dom['0'])){
+            return false
+          }
           return self.getUserById(targetUid);
         })
         .then((userObj) => {

@@ -109,10 +109,6 @@ export default {
     const self = this;
     const { savePosition } = self.$store.state
     this.$nextTick(() => {
-      const element = document.querySelector('.float-user');
-      if (element) {
-        element.remove();
-      }
       setTimeout(() => {
         window.scrollTo({
           top: savePosition.y || 0,

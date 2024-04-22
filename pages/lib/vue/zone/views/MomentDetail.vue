@@ -169,10 +169,6 @@ export default {
           self.loading = false;
           self.$nextTick(() => {
             self.showCommentPanel();
-            const element = document.querySelector('.float-user');
-            if (element) {
-              element.remove();
-            }
           });
           //查看违规记录
           EventBus.$on('violation-record', function (uid) {
