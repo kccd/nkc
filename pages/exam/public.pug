@@ -15,18 +15,18 @@ block content
           //- verifications(ref='verifications')
           hr(v-if="codeId")
           .exam-form(v-if="codeId")
-            label.control-label.text-left.select-test-header 请选择考卷
+            label.control-label.text-left.select-test-header(v-translate="{ zh: '请选择考卷', en: 'Please select the exam paper' }") 请选择考卷
             .radio.test-item(v-for='item in examSource' :key="item._id")
               label
-                input(type='radio' name="examOption" :value="item._id" :checked="cid === item._id"  v-model="cid")
+                input(type='radio' name="examOption" :value="item._id" :checked="cid === item._id"  v-model="cid" @change="handleSelection")
                 strong {{item.name}}
                 p {{item.description}}
           .code-form.m-r-05(v-if="codeId")
-            span.m-r-05 验证码
+            span.m-r-05(v-translate="{ zh: '验证码', en: 'Captcha' }") 验证码
             span.border-radius-3px(style="") {{codeValue[0]}} ＋ {{codeValue[1]}} =
             input(v-model='codeResult' style='width: 3rem;')
-          .btn.btn-primary.fund-terms-button(v-if="!codeResult" :disabled="true" title='请填写计算结果') 参加考试
-          .btn.btn-primary.fund-terms-button(v-else @click=`visitPublicExam()`) 参加考试
+          .btn.btn-primary.fund-terms-button(v-translate="{ zh: '参加考试', en: 'Take the exam' }" v-if="!codeResult" :disabled="true" title='请填写计算结果') 参加考试
+          .btn.btn-primary.fund-terms-button(v-translate="{ zh: '参加考试', en: 'Take the exam' }" v-else @click=`visitPublicExam()`) 参加考试
 block scripts
   +includeJS('/exam/public.js')
   script.
