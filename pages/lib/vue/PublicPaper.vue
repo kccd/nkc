@@ -4,7 +4,7 @@
       img(:src="getUrl('siteFile', 'holy_exam.gif')")
       .exam-header-info
         .h3 科创会员开卷考试
-          span(style="font-size:1.4rem;vertical-align:middle;") （Open-book examination for science and technology members）
+          span(style="font-size:1.4rem;vertical-align:middle;") （Open-book exam）
         .h5 考试科目（Exam subjec）：{{paperName}}
         .h5 开考时间（Exam start time）：{{detailedTime(paperTime)}}
         .h5 试题总数（Total number of questions）：{{paperQuestionCount}}
