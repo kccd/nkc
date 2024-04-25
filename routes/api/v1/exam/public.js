@@ -76,6 +76,8 @@ router
       paperName: `${category.name} ${
         category.volume === 'A' ? '基础级' : '专业级'
       }`,
+      paperTitle: category.name,
+      paperCategory: category.volume,
       paperTime: paper.toc,
       paperQuestionCount: `${paper.record.length}`,
     };

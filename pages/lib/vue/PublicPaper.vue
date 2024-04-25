@@ -4,9 +4,10 @@
       img(:src="getUrl('siteFile', 'holy_exam.gif')")
       .exam-header-info
         .h3 科创会员开卷考试
-        .h5 考试科目：{{paperName}}
-        .h5 开考时间：{{detailedTime(paperTime)}}
-        .h5 试题总数：{{paperQuestionCount}}
+          span(style="font-size:1.4rem;vertical-align:middle;") （Open-book exam）
+        .h5 考试科目（Exam subjec）：{{paperName}}
+        .h5 开考时间（Exam start time）：{{detailedTime(paperTime)}}
+        .h5 试题总数（Total number of questions）：{{paperQuestionCount}}
     hr
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
@@ -16,21 +17,29 @@
             span(v-if="question.isIndefinite" ) 不定项
             span(v-if="question.type === 'ch4' && !question.isIndefinite" ) {{question.isMultiple? '多选题': '单选题'}}
             | ）
+            span(style="font-size:1.2rem;") Question {{index + 1}}（
+            span(v-if="question.type === 'ans'" style="font-size:1.2rem;") Blank
+            span(v-if="question.isIndefinite" style="font-size:1.2rem;") Uncertainty
+            span(style="font-size:1.2rem;" v-if="question.type === 'ch4' && !question.isIndefinite" ) {{question.isMultiple? 'Multiple Choice': 'Single Choice'}}
+            span(style="font-size:1.2rem;") ）
           question-text-content(:text="`${question.content}`")
           .question-desc(v-if="question.contentDesc")
             .text-info(v-if="isShowReminder || isCorrect === false " ).m-t-1.m-b-05
               .answer-desc-icon.fa.fa-lightbulb-o
               span {{this.question.contentDesc}}
-            button.btn.btn-default.btn-xs(@click="showReminder") 查看提示
+            button.btn.btn-default.btn-xs(@click="showReminder") 查看提示（Check out the tips）
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-status
-        h4.question-intro.text-danger(v-if="isCorrect === false" ) 回答错误，请阅读所有提示，理解其内容，再重新作答
-        h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确
+        h4.question-intro.text-danger(v-if="isCorrect === false" ) 
+          span 回答错误，请阅读所有提示，理解其内容，再重新作答
+          br
+          span Wrong answer! Please read all prompts, understand their content, and answer again.
+        h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确 (Answer correctly)
       .question-content
         .question-answer.m-b-2
           form(v-if='question.type === "ans"')
             .answer-form-group
-              span 答案：
+              span 答案：（Answer）
               textarea(:disabled = "isCorrect"  v-model.trim='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
@@ -53,20 +62,24 @@
 
         footer.clearfix
           .button-group
-            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题
-            button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选
-            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " ) 下一题
-            button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空':''") 提交
-            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' ) 完成
+            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题（Previous question）
+            button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选（Reselect）
+            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " ) 下一题（Next question）
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空（Answer cannot be empty）':''") 提交（Submit）
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' ) 完成（Finish）
 
     div.clearfix(v-else id="finished-box" )
       .notice-content
         .glyphicon.glyphicon-ok.icon-success.m-b-1
-        .notice-text.m-b-1 考试通过
+        .notice-text.m-b-1 考试通过（Passing the exam）
         div(v-if="from === 'register'")
           span 恭喜您通过了 {{paperName}} 考试，请点击&nbsp;
           button.btn.btn-xs.btn-default(@click="redirectToPage") 这里
           span &nbsp;继续注册。
+          br
+          span Congratulations on passing the {{paperName}} exam, please click&nbsp;
+          button.btn.btn-xs.btn-default(@click="redirectToPage") here
+          span &nbsp;continue to register.
         div(v-else)
           .m-b-1 恭喜您通过了 {{paperName}} 考试。
           a(:href="redirectUrl") 返回到考试主页

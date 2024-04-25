@@ -1246,23 +1246,36 @@ export default {
     },
     uploadFileSeries() {
       const self = this;
-      var file;
-      for(var i = 0; i < self.files.length; i++) {
-        var f = self.files[i];
-        if(f.status !== 'unUpload' || f.error) continue;
-        file = f;
-        break;
-      }
-      // var file = self.files[0];
-      if(!file) return Promise.resolve();
-      return self.startUpload(file)
-        .then(new Promise(function(resolve, _) {
-          console.log("【上传成功】", file.name);
-          setTimeout(resolve, 1000);
-        }))
-        .then(function() {
+      // var file;
+      // for(var i = 0; i < self.files.length; i++) {
+      //   var f = self.files[i];
+      //   if(f.status !== 'unUpload' || f.error) continue;
+      //   file = f;
+      //   break;
+      // }
+      // // var file = self.files[0];
+      // if(!file) return Promise.resolve();
+      const readyFiles = [...self.files].filter(file => file.status === "unUpload" && !file.error);
+      if (readyFiles.length === 0) return Promise.resolve();
+      const filePromises = readyFiles.map(file => {
+        return self.startUpload(file)
+          .then(new Promise(function (resolve, _) {
+            console.log("【上传成功】", file.name);
+            setTimeout(resolve, 1000);
+          }));
+      });
+      // return self.startUpload(file)
+      //   .then(new Promise(function(resolve, _) {
+      //     console.log("【上传成功】", file.name);
+      //     setTimeout(resolve, 1000);
+      //   }))
+      //   .then(function() {
+      //     return self.uploadFileSeries();
+      //   })
+      return Promise.allSettled(filePromises)
+        .then(() => {
           return self.uploadFileSeries();
-        })
+        });
     },
     // 用户已选择待上传的文件
     selectedFiles: function() {
