@@ -6,20 +6,20 @@ const data = getDataById('data');
 import { sweetError } from '../lib/js/sweetAlert';
 import { nkcAPI, HttpMethods } from '../lib/js/netAPI';
 
-Vue.directive('translate', {
-  update(el, binding, vnode) {
-    const { value } = binding;
+// Vue.directive('translate', {
+//   update(el, binding, vnode) {
+//     const { value } = binding;
 
-    if (value && typeof value === 'object') {
-      const language = vnode.context.$data.currentLanguage;
-      const translation = value[language];
+//     if (value && typeof value === 'object') {
+//       const language = vnode.context.$data.currentLanguage;
+//       const translation = value[language];
 
-      if (translation) {
-        el.textContent = translation;
-      }
-    }
-  },
-});
+//       if (translation) {
+//         el.textContent = translation;
+//       }
+//     }
+//   },
+// });
 new Vue({
   el: '#app',
   data: {
@@ -28,13 +28,13 @@ new Vue({
     codeValue: [],
     codeResult: '',
     examSource: data.examSource,
-    currentLanguage: 'zh',
+    // currentLanguage: 'zh',
   },
   mounted() {
     this.getCode();
-    setTimeout(() => {
-      this.handleSelection();
-    }, 150);
+    // setTimeout(() => {
+    //   this.handleSelection();
+    // }, 150);
   },
   methods: {
     changeCode() {
@@ -62,18 +62,18 @@ new Vue({
           sweetError(err);
         });
     },
-    handleSelection() {
-      const examSource = this.examSource;
-      this.$nextTick(() => {
-        const isChinese = /^[\u4e00-\u9fff]+$/.test(
-          [...examSource].find((item) => item._id === this.cid).name,
-        );
-        if (!isChinese) {
-          this.$data.currentLanguage = 'en';
-        } else {
-          this.$data.currentLanguage = 'zh';
-        }
-      });
-    },
+    // handleSelection() {
+    //   const examSource = this.examSource;
+    //   this.$nextTick(() => {
+    //     const isChinese = /^[\u4e00-\u9fff]+$/.test(
+    //       [...examSource].find((item) => item._id === this.cid).name,
+    //     );
+    //     if (!isChinese) {
+    //       this.$data.currentLanguage = 'en';
+    //     } else {
+    //       this.$data.currentLanguage = 'zh';
+    //     }
+    //   });
+    // },
   },
 });

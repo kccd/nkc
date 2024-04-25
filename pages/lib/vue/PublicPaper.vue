@@ -3,34 +3,43 @@
     .exam-header-container
       img(:src="getUrl('siteFile', 'holy_exam.gif')")
       .exam-header-info
-        .h3(v-translate="{ zh: '科创会员开卷考试', en: 'Open-book examination for science and technology members' }") 科创会员开卷考试
-        .h5(v-translate="{ zh: `考试科目：${paperName}`, en: `Exam subject: ${paperName}` }") 考试科目：{{paperName}}
-        .h5(v-translate="{ zh: `开考时间：${detailedTime(paperTime)}`, en: `Exam start time: ${detailedTime(paperTime)}` }") 开考时间：{{detailedTime(paperTime)}}
-        .h5(v-translate="{ zh: `试题总数：${paperQuestionCount}`, en: `Total number of questions: ${paperQuestionCount}` }") 试题总数：{{paperQuestionCount}}
+        .h3 科创会员开卷考试
+          span(style="font-size:1.4rem;vertical-align:middle;") （Open-book examination for science and technology members）
+        .h5 考试科目（Exam subjec）：{{paperName}}
+        .h5 开考时间（Exam start time）：{{detailedTime(paperTime)}}
+        .h5 试题总数（Total number of questions）：{{paperQuestionCount}}
     hr
     div.clearfix.question-box(v-if="!isFinished")
       .question-title
         .question-text
-          .h4.text-info {{ currentLanguage=== 'zh' ? `第 ${index + 1} 题（`: `Question ${index+1} (` }}
-            span(v-if="question.type === 'ans'" v-translate="{ zh: '填空题', en: 'Blank' }") 填空题
-            span(v-if="question.isIndefinite" v-translate="{ zh: '不定项', en: 'Uncertainty' }") 不定项
-            span(v-if="question.type === 'ch4' && !question.isIndefinite" v-translate="question.isMultiple ?{ zh: '多选题', en: 'Multiple Choice' } : { zh: '单选题', en: 'Single Choice' } ") {{question.isMultiple? '多选题': '单选题'}}
-            | {{ currentLanguage === 'zh'?'）' : ')'}}            
+          .h4.text-info 第 {{index + 1}} 题（
+            span(v-if="question.type === 'ans'") 填空题
+            span(v-if="question.isIndefinite" ) 不定项
+            span(v-if="question.type === 'ch4' && !question.isIndefinite" ) {{question.isMultiple? '多选题': '单选题'}}
+            | ）
+            span(style="font-size:1.2rem;") Question {{index + 1}}（
+            span(v-if="question.type === 'ans'" style="font-size:1.2rem;") Blank
+            span(v-if="question.isIndefinite" style="font-size:1.2rem;") Uncertainty
+            span(style="font-size:1.2rem;" v-if="question.type === 'ch4' && !question.isIndefinite" ) {{question.isMultiple? 'Multiple Choice': 'Single Choice'}}
+            span(style="font-size:1.2rem;") ）
           question-text-content(:text="`${question.content}`")
           .question-desc(v-if="question.contentDesc")
             .text-info(v-if="isShowReminder || isCorrect === false " ).m-t-1.m-b-05
               .answer-desc-icon.fa.fa-lightbulb-o
               span {{this.question.contentDesc}}
-            button.btn.btn-default.btn-xs(@click="showReminder" v-translate="{ zh: '查看提示', en: 'Check out the tips' }") 查看提示
+            button.btn.btn-default.btn-xs(@click="showReminder") 查看提示（Check out the tips）
         img(v-if='question.hasImage' :src='"/exam/question/" + question.qid + "/image"')
       .question-status
-        h4.question-intro.text-danger(v-show="isCorrect === false" v-translate="{ zh: '回答错误，请阅读所有提示，理解其内容，再重新作答', en: 'Wrong answer? Please read all prompts, understand their content, and answer again.' }") 回答错误，请阅读所有提示，理解其内容，再重新作答
-        h4.question-intro.text-success(v-show="isCorrect === true" v-translate="{ zh: '回答正确', en: 'Answer correctly' }") 回答正确
+        h4.question-intro.text-danger(v-if="isCorrect === false" ) 
+          span 回答错误，请阅读所有提示，理解其内容，再重新作答
+          br
+          span Wrong answer! Please read all prompts, understand their content, and answer again.
+        h4.question-intro.text-success(v-if="isCorrect === true" ) 回答正确 (Answer correctly)
       .question-content
         .question-answer.m-b-2
           form(v-if='question.type === "ans"')
             .answer-form-group
-              span(v-translate="{ zh: '答案：', en: 'Answer:' }") 答案：
+              span 答案：（Answer）
               textarea(:disabled = "isCorrect"  v-model.trim='fill' )
               span(v-if="answerDesc.desc") {{answerDesc.desc}}
           form(v-else)
@@ -53,20 +62,24 @@
 
         footer.clearfix
           .button-group
-            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" v-translate="{ zh: '上一题', en: 'Previous question' }") 上一题
-            button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected' v-translate="{ zh: '重选', en: 'Reselect' }") 重选
-            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " v-translate="{ zh: '下一题', en: 'Next question' }") 下一题
-            button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title=" isDisabled ? currentLanguage=== 'zh' ? '答案不能为空': 'Answer cannot be empty' : '' " v-translate="{ zh: '提交', en: 'Submit' }") 提交
-            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' v-translate="{ zh: '完成', en: 'Finish' }") 完成
+            button.btn.btn-default.btn-editor-block.m-r-1(@click='pre' v-if="index - 1 >= 0" ) 上一题（Previous question）
+            button.btn.btn-default.btn-editor-block.btn-info(v-if="isReselected && type === 'ch4'" @click='reselected') 重选（Reselect）
+            button.btn.btn-default.btn-editor-block.btn-primary(@click='next' v-if="isCorrect === true && this.index < this.questionTotal -1 " ) 下一题（Next question）
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="!isReselected && isCorrect !== true" @click='submit' :disabled="isDisabled" :title="isDisabled?'答案不能为空（Answer cannot be empty）':''") 提交（Submit）
+            button.btn.btn-default.btn-editor-block.btn-primary(v-if="this.index >= this.questionTotal - 1 && isCorrect === true" @click='finish' ) 完成（Finish）
 
     div.clearfix(v-else id="finished-box" )
       .notice-content
         .glyphicon.glyphicon-ok.icon-success.m-b-1
-        .notice-text.m-b-1 {{currentLanguage=== 'zh'? '考试通过': 'Passing the exam' }}
+        .notice-text.m-b-1 考试通过（Passing the exam）
         div(v-if="from === 'register'")
-          span {{ currentLanguage=== 'zh' ? `恭喜您通过了 ${paperName} 考试，请点击` : `Congratulations on passing the ${paperName} exam, please click` }} &nbsp;
-          button.btn.btn-xs.btn-default(@click="redirectToPage" v-translate="{ zh: '这里', en: 'here' }") {{ currentLanguage=== 'zh'? '这里':'here' }}
-          span &nbsp;{{currentLanguage=== 'zh'?'继续注册。': 'continue to register.'}}
+          span 恭喜您通过了 {{paperName}} 考试，请点击&nbsp;
+          button.btn.btn-xs.btn-default(@click="redirectToPage") 这里
+          span &nbsp;继续注册。
+          br
+          span Congratulations on passing the {{paperName}} exam, please click&nbsp;
+          button.btn.btn-xs.btn-default(@click="redirectToPage") here
+          span &nbsp;continue to register.
         div(v-else)
           .m-b-1 恭喜您通过了 {{paperName}} 考试。
           a(:href="redirectUrl") 返回到考试主页
@@ -298,12 +311,9 @@ export default Vue.extend({
       paperTime: '',
       paperQuestionCount: "",
       paperName: '',
-      paperCategory: '',
-      paperTitle: '',
       isCorrect:null,
       isShowReminder:false,
-      url: window.location.href,
-      currentLanguage: 'zh',
+      url: window.location.href
     };
   },
   props:['pid'],
@@ -355,7 +365,7 @@ export default Vue.extend({
       nkcAPI(`/api/v1/exam/public/paper/${this.pid}?index=${index}&&type=${type}`, 'GET')
         .then((res) => {
           if (res) {
-            const { paperCategory,paperTitle,question, questionTotal, index, paperName, paperTime, paperQuestionCount } =
+            const { question, questionTotal, index, paperName, paperTime, paperQuestionCount } =
               res.data;
             const {correct ,answer, type, ...params } = question;
             const oldAnswer = JSON.parse(JSON.stringify(answer));
@@ -399,11 +409,8 @@ export default Vue.extend({
             this.index = Number(index) ;
             this.type = type;
             this.paperName = paperName;
-            this.paperTitle = paperTitle;
-            this.paperCategory = paperCategory;
             this.paperTime = paperTime;
             this.paperQuestionCount = paperQuestionCount;
-            this.changeLanguage(paperTitle);
             setTimeout(() => {
               renderFormula()
             }, 500)
@@ -585,27 +592,7 @@ export default Vue.extend({
       const confirmationMessage = '确定要离开页面吗？';
       event.returnValue = confirmationMessage;
       return confirmationMessage;
-    },
-    changeLanguage(paperTitle) {
-      // console.log(this.from);
-      
-      const self = this;
-      this.$nextTick(()=>{
-        const isChinese = /[\u4e00-\u9fa5]/.test(paperTitle);
-      if (!isChinese) {
-        self.$data.currentLanguage = 'en';
-        let name = self.paperTitle;
-        if(self.paperCategory === 'A'){
-          name+=` Basic level`;
-        }else{
-          name+=` Professional grade`;
-        }
-        self.paperName = name;
-      } else {
-        self.$data.currentLanguage = 'zh';
-      }
-      });
-    },
+    }
   },
 })
 </script>
