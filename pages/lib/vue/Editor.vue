@@ -71,7 +71,7 @@
   import DraftsSelector from "./DraftsSelector";
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
-  import { isFileDomain } from "../js/url";
+  import { isFileDomain, isFileDomainV2 } from "../js/url";
   import {screenTopWarning} from "../js/topAlert";
   import {
     replaceTwemojiCharWithImage,
@@ -395,11 +395,11 @@
             continue;
           // 属性正确的文章图片
           if(imageNode.getAttribute('data-tag') === 'nkcsource'
-            &&imageNode.getAttribute('data-type') === 'picture'
+            &&imageNode.getAttribute('data-type')
             &&imageNode.getAttribute('data-id')) 
             continue;
           // if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
-          // if(isFileDomain(src)) continue;
+          if(isFileDomainV2(src)) continue;
           // 外链图片
           if(isBase64.test(src)){
             this.editorPasteBase64ToImageEventHandle(imageNode)
