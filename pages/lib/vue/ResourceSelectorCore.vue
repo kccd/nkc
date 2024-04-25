@@ -1272,7 +1272,7 @@ export default {
       //   .then(function() {
       //     return self.uploadFileSeries();
       //   })
-      return Promise.all(filePromises)
+      return Promise.allSettled(filePromises)
         .then(() => {
           return self.uploadFileSeries();
         });
