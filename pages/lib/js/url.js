@@ -38,3 +38,13 @@ export function isFileDomain(url) {
   }
 }
 
+export function isFileDomainV2(url) {
+  const { fileDomain } = getState();
+  if (fileDomain) {
+    return (
+      url.indexOf(fileDomain) === 0 || url.indexOf(window.location.origin) === 0
+    );
+  } else {
+    return url.indexOf(window.location.origin) === 0;
+  }
+}

@@ -139,6 +139,9 @@ router
     if (_content && _content.length > 100000) {
       ctx.throw(400, `内容不能超过10万字`);
     }
+    if (_content && _content.length < 500 && origin !== 0) {
+      ctx.throw(400, `字数小于500的文章不允许声明原创`);
+    }
     nkcModules.checkData.checkString(content, {
       name: '内容',
       minLength: 0,

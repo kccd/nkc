@@ -62,7 +62,7 @@
   import {getUrl} from "../js/tools";
   import {nkcAPI} from "../js/netAPI";
   import {initDblclick} from "../js/dblclick";
-  import {resourceToHtml} from "../js/dataConversion";
+  import {fixImageWithNoData, resourceToHtml} from "../js/dataConversion";
   import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
   import StickerSelector from './StickerSelector';
@@ -71,7 +71,7 @@
   import DraftsSelector from "./DraftsSelector";
   import {getSocket} from "../js/socket";
   import {getState} from "../js/state";
-  import { isFileDomain } from "../js/url";
+  import { isFileDomain, isFileDomainV2 } from "../js/url";
   import {screenTopWarning} from "../js/topAlert";
   import {
     replaceTwemojiCharWithImage,
@@ -372,6 +372,8 @@
         for(let i = 0; i < images.length; i++) {
           const imageNode = images[i];
           const TestSrc = imageNode.getAttribute('src');
+          const TestTag = imageNode.getAttribute('data-tag');
+          const TestType = imageNode.getAttribute('data-type');
           // 修复文章中带http的(/r)图片添加属性信息
           if(this.isNotFormatLink(TestSrc)){
             const { fileDomain }=getState();
@@ -389,17 +391,25 @@
             imageNode.setAttribute("data-type","picture");
             imageNode.setAttribute("data-id",dataId);
           }
+          // 修复粘贴表情包没有id和char
+          if (TestTag === 'nkcsource') {
+            if(TestType === 'twemoji' && (!imageNode.getAttribute('data-id') || !imageNode.getAttribute('data-char')) ){
+              fixImageWithNoData(imageNode,'twemoji');
+            }else if(TestType === 'sticker' && !imageNode.getAttribute('data-id')){
+              fixImageWithNoData(imageNode,'sticker');
+            }
+          }
           const src = imageNode.getAttribute('src');
           // 本地资源图片
           if(this.isLocalPictureLink(src))
             continue;
           // 属性正确的文章图片
           if(imageNode.getAttribute('data-tag') === 'nkcsource'
-            &&imageNode.getAttribute('data-type') === 'picture'
+            &&imageNode.getAttribute('data-type')
             &&imageNode.getAttribute('data-id')) 
             continue;
           // if(imageNode.getAttribute('data-tag') === 'nkcsource') continue;
-          // if(isFileDomain(src)) continue;
+          // if(isFileDomainV2(src)) continue;
           // 外链图片
           if(isBase64.test(src)){
             this.editorPasteBase64ToImageEventHandle(imageNode)
@@ -577,10 +587,12 @@
         event.dataTransfer.setData('text/plain', this.dragEventInnerContentMark)
       },
       initEditorDropImageEvent() {
-        this.editor.document.addEventListener('drop', this.editorDropImageEventHandle);
+        this.editor.document.body.addEventListener('drop', this.editorDropImageEventHandle);
+        // this.editor.document.addEventListener('drop', this.editorDropImageEventHandle);
       },
       removeEditorDropImageEvent() {
-        this.editor.document.removeEventListener('drop', this.editorDropImageEventHandle);
+        this.editor.document.body.removeEventListener('drop', this.editorDropImageEventHandle);
+        // this.editor.document.removeEventListener('drop', this.editorDropImageEventHandle);
       },
       editorBeforePasteEventHandler(type, data) {
         const pastedContent = data.html;

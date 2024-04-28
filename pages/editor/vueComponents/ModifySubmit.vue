@@ -255,6 +255,7 @@ export default {
         });
     },
     saveToDraftBase(saveType = "manual") {
+      if(this.disabledSubmit) return;
       this.readyDataForSave();
       const { saveData } = this;
       if (!saveData.c){
