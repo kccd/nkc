@@ -61,7 +61,7 @@ router
       ctx.throw(400, `内容不能超过10万字`);
     }
     if (content && content.length < 500 && originState !== 0) {
-      ctx.throw(400, `字数小于500的文章无法声明原创`);
+      ctx.throw(400, `字数小于500的文章不允许声明原创`);
     }
     await db.ThreadCategoryModel.checkCategoriesId(tcId);
     nkcModules.checkData.checkString(c, {

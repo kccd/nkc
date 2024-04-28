@@ -178,7 +178,7 @@ draftsRouter
       ctx.throw(400, `内容不能超过10万字`);
     }
     if (_content && _content.length < 500 && originState !== 0) {
-      ctx.throw(400, `字数小于500的文章无法声明原创`);
+      ctx.throw(400, `字数小于500的文章不允许声明原创`);
     }
     nkcModules.checkData.checkString(c, {
       name: '内容',
@@ -201,7 +201,7 @@ draftsRouter
         type: draftTypes.beta,
       }).sort({ tlm: -1 });
       if (!draft) {
-        ctx.throw(400, `文章已经发布或已经为历史版`);
+        ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
       }
     }
     const draftObj = {
