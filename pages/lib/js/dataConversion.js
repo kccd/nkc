@@ -6,6 +6,7 @@
  * */
 import { marked } from 'marked';
 import createDOMPurify from 'dompurify';
+import { getState } from './state';
 
 export function strToObj(str) {
   return JSON.parse(decodeURIComponent(str));
@@ -160,6 +161,41 @@ export function replaceTwemojiCharWithImage(content) {
   });
 }
 
+export function fixImageWithNoData(node, type) {
+  const srcValue = node.getAttribute('src');
+  const { fileDomain } = getState();
+  let fileLink = '';
+  if (srcValue.indexOf(`${fileDomain}/`) === 0) {
+    fileLink = fileDomain;
+  } else if (srcValue.indexOf(`${window.location.origin}/`) === 0) {
+    fileLink = window.location.origin;
+  }
+  if (type === 'twemoji') {
+    const regex = /\/(\w+)\.svg$/;
+    const match = regex.exec(srcValue);
+    const dataId = match ? match[1] : null;
+    if (dataId) {
+      const emojiChar = twemoji.convert.fromCodePoint(dataId);
+      const imageSrc = srcValue.replace(`${fileLink}`, '');
+      node.setAttribute('data-id', dataId);
+      node.setAttribute('data-char', emojiChar);
+      node.setAttribute('src', imageSrc);
+      node.setAttribute('_src', imageSrc);
+    }
+  } else if (type === 'sticker') {
+    const regex = /sticker\/(\d+)/;
+    const match = regex.exec(srcValue);
+    const dataId = match ? match[1] : null;
+
+    if (dataId) {
+      const imageSrc = srcValue.replace(`${fileLink}`, '');
+      node.setAttribute('src', imageSrc);
+      node.setAttribute('_src', imageSrc);
+      node.setAttribute('data-id', dataId);
+    }
+  }
+  // return node;
+}
 /*
  * 修改富文本中「学术分隐藏」 结构
  * */

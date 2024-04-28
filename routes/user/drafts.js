@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const draftsRouter = new Router();
 draftsRouter
   .get('/', async (ctx, next) => {
@@ -117,9 +118,10 @@ draftsRouter
   })
   // 保存草稿
   .post('/', async (ctx, next) => {
-    const { data, db } = ctx;
+    const { data, db, nkcModules } = ctx;
     const { user } = data;
     const draftCount = await db.DraftModel.countDocuments({ uid: user.uid });
+    // 后期需要完善
     if (draftCount >= 5000) {
       ctx.throw(400, '草稿箱已满');
     }
@@ -170,6 +172,19 @@ draftsRouter
       noticeContent,
       checkNewNotice,
     } = post;
+    // 检查草稿
+    const _content = customCheerio.load(c).text();
+    if (_content && _content.length > 100000) {
+      ctx.throw(400, `内容不能超过10万字`);
+    }
+    if (_content && _content.length < 500 && originState !== 0) {
+      ctx.throw(400, `字数小于500的文章无法声明原创`);
+    }
+    nkcModules.checkData.checkString(c, {
+      name: '内容',
+      minLength: 0,
+      maxLength: 2000000,
+    });
     let draft;
     let contentLength;
     if (parentPostId) {
@@ -185,6 +200,9 @@ draftsRouter
         uid: user.uid,
         type: draftTypes.beta,
       }).sort({ tlm: -1 });
+      if (!draft) {
+        ctx.throw(400, `文章已经发布或已经为历史版`);
+      }
     }
     const draftObj = {
       t,
