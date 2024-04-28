@@ -35,6 +35,9 @@ export default {
   },
   computed: {
     allowedOriginal() {
+      if(this.contentLength < this.original?.wordLimit){
+        this.originState = 0;
+      }
       return this.contentLength >= this.original?.wordLimit;
       // if(!allowed) this.originState = 0;
     },

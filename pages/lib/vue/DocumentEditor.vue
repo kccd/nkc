@@ -528,6 +528,9 @@ export default {
     updateContentLength() {
       const content = this.$refs.editor.getContentTxt();
       this.contentLength = content.length;
+      if(content.length < this.originalWordLimit){
+        this.originState = 0;
+      }
     },
     getDocumentForm() {
       const {
