@@ -180,10 +180,20 @@ draftsRouter
     if (_content && _content.length < 500 && originState !== 0) {
       ctx.throw(400, `字数小于500的文章无法声明原创`);
     }
-    nkcModules.checkData.checkString(c, {
-      name: '内容',
+    nkcModules.checkData.checkString(JSON.stringify(post), {
+      name: '草稿内容',
       minLength: 0,
       maxLength: 2000000,
+    });
+    nkcModules.checkData.checkString(abstractEn, {
+      name: '英文摘要',
+      minLength: 0,
+      maxLength: 1000,
+    });
+    nkcModules.checkData.checkString(abstractCn, {
+      name: '中文摘要',
+      minLength: 0,
+      maxLength: 1000,
     });
     let draft;
     let contentLength;

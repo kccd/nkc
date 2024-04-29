@@ -142,10 +142,34 @@ router
     if (_content && _content.length < 500 && origin !== 0) {
       ctx.throw(400, `字数小于500的文章无法声明原创`);
     }
-    nkcModules.checkData.checkString(content, {
-      name: '内容',
+    nkcModules.checkData.checkString(
+      JSON.stringify({
+        title,
+        content,
+        cover,
+        keywords,
+        keywordsEN,
+        abstract,
+        abstractEN,
+        origin,
+        selectCategory,
+        authorInfos,
+      }),
+      {
+        name: '内容',
+        minLength: 0,
+        maxLength: 2000000,
+      },
+    );
+    nkcModules.checkData.checkString(abstractEN, {
+      name: '英文摘要',
       minLength: 0,
-      maxLength: 2000000,
+      maxLength: 1000,
+    });
+    nkcModules.checkData.checkString(abstract, {
+      name: '中文摘要',
+      minLength: 0,
+      maxLength: 1000,
     });
     let article;
     if (articleId) {

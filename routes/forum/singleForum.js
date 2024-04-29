@@ -46,6 +46,8 @@ router
       tcId = [],
       _id,
       originState,
+      abstractEn = '',
+      abstractCn = '',
     } = post;
     if (t.length < 3) {
       ctx.throw(400, `标题不能少于3个字`);
@@ -64,10 +66,20 @@ router
       ctx.throw(400, `字数小于500的文章无法声明原创`);
     }
     await db.ThreadCategoryModel.checkCategoriesId(tcId);
-    nkcModules.checkData.checkString(c, {
+    nkcModules.checkData.checkString(JSON.stringify(post), {
       name: '内容',
       minLength: 1,
       maxLength: 2000000,
+    });
+    nkcModules.checkData.checkString(abstractEn, {
+      name: '英文摘要',
+      minLength: 0,
+      maxLength: 1000,
+    });
+    nkcModules.checkData.checkString(abstractCn, {
+      name: '中文摘要',
+      minLength: 0,
+      maxLength: 1000,
     });
     /*if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
 		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");*/

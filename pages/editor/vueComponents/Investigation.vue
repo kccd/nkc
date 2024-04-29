@@ -27,7 +27,7 @@
         .form-group(v-if="survey.type !== 'vote'")
           label.col-sm-2.control-label 调查说明
           .col-sm-9
-            textarea.form-control(v-model="survey.description" rows=4 placeholder="请输入调查说明")
+            textarea.form-control(v-model="survey.description" maxlength="1000" rows=4 placeholder="请输入调查说明")
         .form-group
           label.col-sm-2.control-label 问题
           .col-sm-9
@@ -39,7 +39,7 @@
                       .fa.fa-chevron-circle-up(title="上移" @click="moveOption('up', o)")
                       .fa.fa-chevron-circle-down(title="下移" @click="moveOption('down', o)")
                     .fa.fa-trash(title="移除" @click="removeOption(index)")
-                textarea.form-control(v-model="o.content" placeholder="请输入问题内容")
+                textarea.form-control(v-model="o.content" maxlength="1000" placeholder="请输入问题内容")
                 .row.option-links.m-t-05(v-if="o.links_ && o.links_.length")
                   .option-link.m-b-05(v-for="link, index in o.links_")
                     .col-xs-12.col-md-8
@@ -63,7 +63,7 @@
                         .fa.fa-chevron-circle-down(title="下移" @click="moveOption('down', o, a)")
                         .fa.fa-trash(title="移除" @click="removeAnswer(o, index)")
 
-                    textarea.form-control.m-b-05(placeholder="请输入选项内容" v-model="a.content")
+                    textarea.form-control.m-b-05(placeholder="请输入选项内容" maxlength="1000" v-model="a.content")
                     .row.option-links.m-t-05(v-if="a.links_ && a.links_.length")
                       .option-link.m-b-05(v-for="link, index in a.links_")
                         .col-xs-12.col-md-8

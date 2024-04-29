@@ -236,6 +236,9 @@
           font-size: 1.2rem;
           color: #9baec8;
         }
+        .warning {
+          color: #ff6262;
+        }
       }
     }
   }

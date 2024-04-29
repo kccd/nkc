@@ -371,6 +371,7 @@ export default {
         })
     },
     checkAuthorInfos(arr) {
+      if (arr.length > 50) throw "作者信息数量超出限制";
       for (let i = 0; i < arr.length; i++) {
         let info = arr[i];
         this.checkString(info.name, {
@@ -475,6 +476,7 @@ export default {
     // 检测关键词
     checkKeywords(cn, en) {
       if (cn.length + en.length > 50) throw "关键词数量超出限制";
+      if(cn.some(item=>item.length>50)||en.some(item=>item.length>50)) throw "关键词字数超出限制";
     },
     //拿取其他组件数据
     readyData() {
@@ -506,6 +508,8 @@ export default {
             this.checkTitle(submitData.t);
             this.checkContent(submitData.c);
             this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
+            this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
+            this.checkAuthorInfos(submitData.authorInfos);
             this.checkForums(submitData.fids);
             this.checkThreadCategory(this.data.threadCategories);
             let formData = new FormData();
