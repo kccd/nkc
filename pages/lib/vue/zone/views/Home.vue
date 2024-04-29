@@ -190,8 +190,6 @@ export default {
     },
     handleDetail(e) {
       const { mid, type } = e;
-      // console.log('22222',e);
-      // return
       const { isApp } = getState();
       if (isApp) {
         visitUrl(`/z/m/${mid}?type=${type}`,true);
@@ -201,9 +199,7 @@ export default {
           params: {
             mid,
           },
-          query: {
-            type
-          }
+          query: type ? { type } : {}
         });
       }
     },
