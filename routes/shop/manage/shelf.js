@@ -143,7 +143,7 @@ shelfRouter
         price,
         useDiscount,
         isEnable,
-        stocksTotal,
+        stocksSurplus,
       } = param;
       const p = {
         isEnable: !!isEnable,
@@ -159,11 +159,11 @@ shelfRouter
         maxLength: 100,
       });
       p.name = name;
-      checkNumber(stocksTotal, {
+      checkNumber(stocksSurplus, {
         name: '规格库存',
         min: 0,
       });
-      p.stocksTotal = stocksTotal;
+      p.stocksSurplus = stocksSurplus;
       checkNumber(originPrice, {
         name: '规格价格',
         min: 0.01,
@@ -349,7 +349,7 @@ shelfRouter
         param.uid = user.uid; // 商品拥有者
         param.isEnable = true;
         param.order = i;
-        param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
+        param.stocksTotal = param.stocksSurplus; // 剩余库存=总库存
         param._id = await db.SettingModel.operateSystemID(
           'shopProductsParams',
           1,
@@ -384,7 +384,7 @@ shelfRouter
           price,
           isEnable,
           useDiscount,
-          stocksTotal,
+          stocksSurplus,
         } = param;
         if (_id) {
           // 修改已有规格
@@ -398,14 +398,15 @@ shelfRouter
                 price,
                 isEnable: !!isEnable,
                 useDiscount: !!useDiscount,
-                stocksTotal,
+                // stocksTotal,
+                stocksSurplus,
               },
             },
           );
         } else {
           param.productId = product.productId; // 规格所属商品的ID
           param.uid = user.uid; // 商品拥有者
-          param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
+          param.stocksTotal = param.stocksSurplus; // 剩余库存=总库存
           param.isEnable = true;
           param.order = i;
           param._id = await db.SettingModel.operateSystemID(

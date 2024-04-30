@@ -231,14 +231,14 @@ window.app = new Vue({
             const {
               name, originPrice,
               price, useDiscount,
-              stocksTotal
+              stocksSurplus
             } = param;
             checkString(name, {
               name: "规格名称",
               minLength: 1,
               maxLength: 100
             });
-            checkNumber(stocksTotal, {
+            checkNumber(stocksSurplus, {
               name: "规格库存",
               min: 0
             }),
@@ -503,7 +503,7 @@ window.app = new Vue({
         price: "",
         isEnable: true,
         useDiscount: false,
-        stocksTotal: ""
+        stocksSurplus: ""
       }
     },
     addParams() {
