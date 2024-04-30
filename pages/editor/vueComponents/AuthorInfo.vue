@@ -46,7 +46,7 @@
                 .display-i-b.m-b-05
                   span &nbsp;邮政编码
                   input.author-name(type="text" v-model.trim="a.contractObj.contractCode" placeholder="选填")
-      button.btn.btn-default.btn-sm(@click.stop="addAuthor") 添加
+      button.btn.btn-default.btn-sm(:disabled="authorInfos&&authorInfos.length>50" @click.stop="addAuthor") 添加
 </template>
 
 <script>

@@ -75,6 +75,7 @@
           padding: 0;
           display: block;
           width: 100%;
+          // max-height: 200rem;
 
           img {
             position: relative;
@@ -171,7 +172,18 @@
             filesData.push(fileData);
           }
         }
+        if(filesData.length===1){
+          filesData.forEach(item=>{
+           if(item?.type === types.picture && !this.isZoneDetail){
+            let tempStyle = item.pictureContainerStyle;
+            item.pictureContainerStyle =  'max-height: 36rem;background-size: contain;background-position: left;background-color:transparent;background-repeat: no-repeat;' + tempStyle;
+           }
+          });
+        }
         return filesData
+      },
+      isZoneDetail(){
+        return this.$route&&this.$route.name==='MomentDetail';
       }
     },
     methods: {

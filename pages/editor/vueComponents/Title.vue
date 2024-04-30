@@ -35,7 +35,7 @@
             a.detail(@click="openOnEditNotes = !openOnEditNotes") {{openOnEditNotes ?  "收起":"展开"}}
           .on-edit-note-content(v-if="openOnEditNotes") {{notice}}
         //- .on-edit-note-content(v-if="openOnEditNotes")!=nkcRender.plainEscape(state.editorSettings.onEditNotes)
-    input.editor-title(placeholder="请输入标题..." v-model="titleValue" )
+    input.editor-title(placeholder="请输入标题..." v-model="titleValue" maxlength="100" )
 </template>
 <script>
 import { immediateDebounce ,debounce } from '../../lib/js/execution';
