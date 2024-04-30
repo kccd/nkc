@@ -75,7 +75,7 @@
           padding: 0;
           display: block;
           width: 100%;
-          max-height: 200rem;
+          // max-height: 200rem;
 
           img {
             position: relative;
@@ -176,7 +176,7 @@
           filesData.forEach(item=>{
            if(item?.type === types.picture && !this.isZoneDetail){
             let tempStyle = item.pictureContainerStyle;
-            item.pictureContainerStyle =  'max-height: 22rem;background-size: contain;background-position: left;background-color:transparent;background-repeat: no-repeat;' + tempStyle;
+            item.pictureContainerStyle =  'max-height: 36rem;background-size: contain;background-position: left;background-color:transparent;background-repeat: no-repeat;' + tempStyle;
            }
           });
         }
