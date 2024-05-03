@@ -180,11 +180,32 @@ draftsRouter
     if (_content && _content.length < 500 && originState !== 0) {
       ctx.throw(400, `字数小于500的文章不允许声明原创`);
     }
-    nkcModules.checkData.checkString(JSON.stringify(post), {
-      name: '草稿内容',
-      minLength: 0,
-      maxLength: 2000000,
-    });
+    nkcModules.checkData.checkString(
+      JSON.stringify({
+        t,
+        c,
+        l,
+        abstractCn,
+        abstractEn,
+        keyWordsCn,
+        keyWordsEn,
+        fids,
+        cids,
+        authorInfos,
+        originState,
+        anonymous,
+        survey,
+        parentPostId,
+        tcId,
+        noticeContent,
+        checkNewNotice,
+      }),
+      {
+        name: '草稿内容',
+        minLength: 0,
+        maxLength: 2000000,
+      },
+    );
     nkcModules.checkData.checkString(abstractEn, {
       name: '英文摘要',
       minLength: 0,
