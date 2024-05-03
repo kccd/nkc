@@ -146,7 +146,6 @@ router
       JSON.stringify({
         title,
         content,
-        cover,
         keywords,
         keywordsEN,
         abstract,
