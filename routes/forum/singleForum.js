@@ -66,11 +66,25 @@ router
       ctx.throw(400, `字数小于500的文章不允许声明原创`);
     }
     await db.ThreadCategoryModel.checkCategoriesId(tcId);
-    nkcModules.checkData.checkString(JSON.stringify(post), {
-      name: '内容',
-      minLength: 1,
-      maxLength: 2000000,
-    });
+    nkcModules.checkData.checkString(
+      JSON.stringify({
+        c,
+        t,
+        fids,
+        columnMainCategoriesId,
+        columnMinorCategoriesId,
+        anonymous,
+        tcId,
+        originState,
+        abstractEn,
+        abstractCn,
+      }),
+      {
+        name: '内容',
+        minLength: 1,
+        maxLength: 2000000,
+      },
+    );
     nkcModules.checkData.checkString(abstractEn, {
       name: '英文摘要',
       minLength: 0,
