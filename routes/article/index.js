@@ -81,6 +81,7 @@ router
     // 获取空间文章需要显示的数据
     const articleRelatedContent = await db.ArticleModel.getZoneArticle(
       article._id,
+      data.user,
     );
     const homeSettings = await db.SettingModel.getSettings('home');
     //点击楼层高亮需要url和highlight值
@@ -179,6 +180,7 @@ router
         isModerator,
         permissions,
         authorUid: article.uid,
+        targetUser: data.user,
       });
     }
     if (comment && comment.length !== 0) {

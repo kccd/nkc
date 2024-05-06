@@ -375,6 +375,7 @@ schema.statics.extendPostComments = async (props) => {
     isModerator = '',
     permissions = {},
     authorUid,
+    targetUser,
   } = props;
   const DocumentModel = mongoose.model('documents');
   const UserModel = mongoose.model('users');
@@ -551,7 +552,10 @@ schema.statics.extendPostComments = async (props) => {
     const result = {
       ...m,
       docNumber: `D${c.did}`,
-      content: await CommentModel.renderComment(documentObj[c.did]._id),
+      content: await CommentModel.renderComment(
+        documentObj[c.did]._id,
+        targetUser,
+      ),
       docId: documentObj[c.did]._id,
       status: documentObj[c.did].status,
       type: documentObj[c.did].type,
@@ -988,7 +992,7 @@ schema.statics.extendComments = async function (comments) {
 /*
  * 渲染图书评论
  * */
-schema.statics.renderComment = async function (_id) {
+schema.statics.renderComment = async function (_id, targetUser) {
   const nkcRender = require('../nkcModules/nkcRender');
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
@@ -1006,6 +1010,7 @@ schema.statics.renderComment = async function (_id) {
     },
     source: 'document',
     sid: _id,
+    user: targetUser,
   });
   return c;
 };

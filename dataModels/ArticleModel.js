@@ -279,7 +279,7 @@ schema.statics.filterData = (filterData, allowKey) => {
  * 获取空间文章显示的内容
  * @param {String} id 文章article id
  */
-schema.statics.getZoneArticle = async (id) => {
+schema.statics.getZoneArticle = async (id, targetUser) => {
   const nkcRender = require('../nkcModules/nkcRender');
   const UserModel = mongoose.model('users');
   const ArticleModel = mongoose.model('articles');
@@ -324,6 +324,7 @@ schema.statics.getZoneArticle = async (id) => {
       resources,
       atUsers: document.atUsers,
     },
+    user: targetUser,
   });
   return {
     docNumber: `D${document.did}`,
