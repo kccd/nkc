@@ -137,7 +137,14 @@ router.get('/:aid', async (ctx, next)=>{
       comments = await db.CommentModel.getCommentsByArticleId({match, paging});
     }
     if(comments && comments.length !== 0) {
-      comments = await db.CommentModel.extendPostComments({comments, uid: state.uid, isModerator, permissions, authorUid:article.uid});
+      comments = await db.CommentModel.extendPostComments({
+        comments,
+        uid: state.uid,
+        isModerator,
+        permissions,
+        authorUid: article.uid,
+        targetUser: data.user,
+      });
     }
     if(comment && comment.length !== 0) {
       //拓展单个评论内容
