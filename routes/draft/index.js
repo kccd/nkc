@@ -60,6 +60,10 @@ router
   }else if(source === newPost){
     queryCriteria.did = draftId;
   }
+  // 后期完善：draftId应该先查一下
+  if(draftId && ['modifyThread','modifyPost'].includes(source)){
+    queryCriteria.did = draftId;
+  }
   //  获取列表
   // 返回分页信息
   const count =  await db.DraftModel.countDocuments(queryCriteria);
@@ -85,7 +89,7 @@ router
       },
     });
     // 包含了将此版本改为编辑版的url 组成
-    data.urlComponent = {_id: data.document._id, did: data.document.did, source, page, desTypeId};
+    data.urlComponent = {_id: data.document._id, did: data.document.did, source, page, desTypeId, draftId};
     // 查询文章作者
     const user = await db.UserModel.findOnly({uid: data.document.uid});
     const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
