@@ -25,9 +25,19 @@ block content
             .paging
               .post-list-paging
                 for page, i in data.paging.buttonValue
-                  a(
+                  if (data.urlComponent.source!=='newThread')
+                    if (data.urlComponent.draftId)
+                      a(
+                      href=`/draft/history?source=${data.urlComponent.source}&desTypeId=${data.urlComponent.desTypeId}&draftId=${data.urlComponent.draftId}&page=${i}`
+                      )=`${page.type === 'null' ? '...' : page.num+1}`
+                    else 
+                      a(
+                      href=`/draft/history?source=${data.urlComponent.source}&desTypeId=${data.urlComponent.desTypeId}&page=${i}`
+                      )=`${page.type === 'null' ? '...' : page.num+1}`
+                  else 
+                    a(
                     href=`/draft/history?source=${data.urlComponent.source}&desTypeId=${data.urlComponent.did}&page=${i}`
-                  )=`${page.type === 'null' ? '...' : page.num+1}`
+                    )=`${page.type === 'null' ? '...' : page.num+1}`
         //- 内容
         .col-xs-12.col-md-9.book-content-container.m-b-1
           if data.history.length
