@@ -423,8 +423,15 @@ schema.statics.getHomeBlockData = async (props) => {
     goods: [],
     forums: [],
     webApply: [],
-    navigationButtonsLeft: { left:[...navigationButtons.left], right:[...navigationButtons.right]},
-    navigationButtonsRight: [...navigationButtons.right],
+    navigationButtonsLeft: {
+      left: [...navigationButtons.left],
+      right: [...navigationButtons.right],
+      target: navigationButtons?.target || '_self',
+    },
+    navigationButtonsRight: {
+      right: [...navigationButtons.right],
+      target: navigationButtons?.target || '_self',
+    },
   };
   // 热销商品
   if(showShopGoods) {

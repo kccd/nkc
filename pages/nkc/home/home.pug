@@ -426,6 +426,11 @@ block nkcContent
               button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'right')") 删除
           .m-t-05
             button.btn.btn-sm.btn-default(@click="addNavigation('right')") 添加自定义链接
+        .m-b-1 
+          label.control-label 打开方式
+          select.m-l-05.form-control(v-model="navigationButtonsTarget" style='max-width: 14rem; display:inline-block')
+            option(value="_self") 原窗口
+            option(value="_blank") 新窗口
       div
         button.btn.btn-primary(@click='saveNavigationButtons') 保存
 
