@@ -781,6 +781,7 @@ export default {
         authorInfos,
       } = data;
       this.coverFile = coverFile;
+      this.cover = cover;
       this.article = {
         title,
         content,

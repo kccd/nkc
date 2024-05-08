@@ -56,6 +56,7 @@
             v-model="d.value",
             :placeholder="d.placeholder || ''",
             :rows="d.rows || 4",
+            @input="handleChange($event,index)"
             @keyup.enter="!d.disabledKeyup ? submit : ';'"
           )
           //- 单选
@@ -156,18 +157,22 @@ export default {
     },
     open() {
       this.showModel = true;
+      this.$set(this.data[0], "value",this.keyWordsCn.join(","));
+      this.$set(this.data[1], "value", this.keyWordsEn.join(","));
     },
     submit() {
       let keywordCn = this.data[0].value;
+      let keyWordsCnArray = [];
+      let keyWordsEnArray = [];
       if (keywordCn) {
-        this.keyWordsCn = [];
+        // this.keyWordsCn = [];
         keywordCn = keywordCn.replace(/，/gi, ",");
         let cnArr = keywordCn.split(",");
         for (let i = 0; i < cnArr.length; i++) {
           let cn = cnArr[i];
           cn = cn.trim();
-          if (cn && this.keyWordsCn.indexOf(cn) === -1) {
-            this.keyWordsCn.push(cn);
+          if (cn && keyWordsCnArray.indexOf(cn) === -1) {
+            keyWordsCnArray.push(cn);
           }
         }
         if (!cnArr.length) return sweetError("请输入关键词");
@@ -175,19 +180,36 @@ export default {
 
       let keywordEn = this.data[1].value;
       if (keywordEn) {
-        this.keyWordsEn = [];
+        // this.keyWordsEn = [];
         keywordEn = keywordEn.replace(/，/gi, ",");
         let enArr = keywordEn.split(",");
         for (let i = 0; i < enArr.length; i++) {
           let en = enArr[i];
           en = en.trim();
-          if (en && this.keyWordsEn.indexOf(en) === -1) {
-            this.keyWordsEn.push(en);
+          if (en && keyWordsEnArray.indexOf(en) === -1) {
+            keyWordsEnArray.push(en);
           }
         }
         if (!enArr.length) return sweetError("请输入关键词");
       }
 
+      if ((keyWordsCnArray.length + keyWordsEnArray.length) > 50) return sweetError("关键词数量超出限制");
+      keyWordsCnArray = [...keyWordsCnArray].map(item => {
+        if (item.length > 50) {
+          return item.substring(0, 50);
+        }else{
+          return item;
+        }
+      });
+      keyWordsEnArray = [...keyWordsEnArray].map(item => {
+        if (item.length > 50) {
+          return item.substring(0, 50);
+        }else{
+          return item;
+        }
+      });
+      this.keyWordsCn = keyWordsCnArray;
+      this.keyWordsEn = keyWordsEnArray;
       this.close();
     },
     pickedFile: function (index) {
@@ -197,10 +219,44 @@ export default {
     removeKeyword(index, arr) {
       arr.splice(index, 1);
       // 添加对话框中内容删除
-      this.$set(this.data[index], "value", "");
+      // this.$set(this.data[index], "value", "");
+      this.$set(this.data[0], "value",this.keyWordsCn.join(","));
+      this.$set(this.data[1], "value", this.keyWordsEn.join(","));
     },
     addKeyword() {
       this.open();
+    },
+    handleChange(event,index) {
+      const self = this;
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+
+      this.timer = setTimeout(() => {
+        let keyWordsArray = [];
+        let keyword =  event.target.value;
+        let lastChar =  '';
+        if (keyword) {
+          keyword = keyword.replace(/，/gi, ",");
+          lastChar =  keyword.charAt(keyword.length - 1)
+          let cnArr = keyword.split(",");
+          for (let i = 0; i < cnArr.length; i++) {
+            let cn = cnArr[i];
+            cn = cn.trim();
+            if (cn && keyWordsArray.indexOf(cn) === -1) {
+              keyWordsArray.push(cn);
+            }
+          }
+          keyWordsArray = keyWordsArray.map(item => {
+            if (item.length > 50) {
+              return item.substring(0, 50);
+            } else {
+              return item;
+            }
+          });
+        }
+        self.$set(self.data[index], "value", lastChar===',' ? keyWordsArray.join(",")+',':keyWordsArray.join(","));
+      }, 500);
     },
     update() {},
     getData() {
@@ -394,6 +450,14 @@ h5:nth-child(1) {
   color: #fff;
   margin: 0 0.8rem 0.8rem 0;
   line-height: 2.4rem;
+  span{
+    vertical-align: middle;
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 .editor-keyword .fa {
   cursor: pointer;

@@ -87,6 +87,10 @@ export default {
               url
             })
             .then(res => {
+              if((res.size/(1024*1024)) > 8){
+                this.$refs.imageSelector.close();
+                throw '封面图片大小不得超过8MB';
+              } 
               this.coverData = res;
               fileToBase64(res)
                 .then(res => {
@@ -126,7 +130,7 @@ export default {
       return {
         cover: this.cover,
         coverData: this.coverData,
-        coverUrl: this.coverUrl
+        // coverUrl: this.coverUrl
       };
     }
   }

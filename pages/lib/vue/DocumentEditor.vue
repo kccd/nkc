@@ -3,7 +3,7 @@
     common-modal(ref="commonModal")
     .form
       .form-group(v-if="formConfigs.title")
-        input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题")
+        input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题" maxlength='100')
       .form-group
 
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady")
@@ -28,11 +28,15 @@
             small （选填）
           .row.editor-abstract
             .col-xs-12.col-md-6(v-if="formConfigs.abstract")
-              textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstract")
-              .editor-abstract-info(:class="{'warning': abstractCnLength > 1000}") {{abstractCnLength}} / 1000
+              textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstract" @input="handleChange($event,'cn')")
+              .editor-abstract-info(:class="{'warning': abstractCnLength > 1000}") 
+                span(class="warning"  v-if="abstractCnLength > 1000 || cnOverLength") 中文摘要不能超过1000字符：
+                span {{abstractCnLength}} / 1000
             .col-xs-12.col-md-6(v-if="formConfigs.abstractEN")
-              textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEN")
-              .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}") {{abstractEnLength}} / 1000
+              textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEN" @input="handleChange($event,'en')")
+              .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}")
+                span(class="warning" v-if="abstractEnLength > 1000 || enOverLength") 英文摘要不能超过1000字符： 
+                span {{abstractEnLength}} / 1000
       .form-group(v-if="formConfigs.keywords || formConfigs.keywordsEN")
         .m-b-2
           .editor-header 关键词
@@ -190,6 +194,14 @@
           color: #fff;
           margin: 0 0.5rem 0.5rem 0;
           line-height: 2.4rem;
+          span{
+            vertical-align: middle;
+            display: inline-block;
+            white-space: nowrap;
+            max-width: 25rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
         .editor-keyword {
           .fa {
@@ -299,6 +311,9 @@ export default {
     },
     // 是否允许触发contentChange
     contentChangeEventFlag: false,
+    cnOverLength: false,
+    enOverLength: false,
+    timer: null,
   }),
   watch: {
     title() {
@@ -307,12 +322,12 @@ export default {
     coverFile() {
       this.watchContentChange();
     },
-    abstract() {
-      this.watchContentChange();
-    },
-    abstractEN() {
-      this.watchContentChange();
-    },
+    // abstract() {
+    //   this.watchContentChange();
+    // },
+    // abstractEN() {
+    //   this.watchContentChange();
+    // },
     keywords() {
       this.watchContentChange();
     },
@@ -374,6 +389,51 @@ export default {
     getState: getState,
     getLength: getLength,
     getUrl: getUrl,
+    triggerTips(key) {
+      const self = this;
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      if(key==='cn'){
+        this.cnOverLength = true;
+        this.enOverLength = false;
+      } 
+      if(key==='en'){
+        this.enOverLength = true;
+        this.cnOverLength = false;
+      } 
+      this.timer = setTimeout(() => {
+        if(key==='cn') self.cnOverLength = false;
+        if(key==='en') self.enOverLength = false;
+        self.timer = null;
+      }, 2000);
+    },
+    handleChange(event,key) {
+      let stringValue = event.target.value.trim();
+      if (this.getLength(stringValue) > 1000) {
+        this.triggerTips(key);
+        let truncatedString = '';
+        let byteLength = 0;
+        for (let i = 0; i < stringValue.length; i++) {
+          const charCode = stringValue.charCodeAt(i);
+          if (charCode <= 0x007f) {
+            byteLength += 1;
+          } else {
+            byteLength += 2;
+          }
+
+          if (byteLength <= 1000) {
+            truncatedString += stringValue.charAt(i);
+          } else {
+            break;
+          }
+        }
+        stringValue = truncatedString;
+      }
+      if(key==='cn') this.abstract = stringValue;
+      if(key==='en') this.abstractEN = stringValue;
+      this.watchContentChange();
+    },
     setSavedStatus(type) {
       this.$refs.editor.changeSaveInfo(type);
     },
@@ -496,6 +556,10 @@ export default {
         }
         self.$refs.image.open({aspectRatio: 3/2, url: url})
           .then(res => {
+            if((res.size/(1024*1024)) > 8){
+                self.$refs.image.close();
+                throw '封面图片大小不得超过8MB';
+              } 
             const file = blobToFile(res, 'cover.png');
             return fileToBase64(file)
               .then(base64 => {
