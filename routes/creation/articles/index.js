@@ -170,8 +170,8 @@ router
       minLength: 0,
       maxLength: 1000,
     });
-    if (coverFile && (coverFile.size / (1024 * 1024)) > 8) {
-      ctx.throw(400, '封面图片大小不得超过8MB');
+    if (coverFile && (coverFile.size / (1024 * 1024)) > 30) {
+      ctx.throw(400, '封面图片大小不得超过30MB');
     }
     let article;
     if (articleId) {

@@ -30,12 +30,12 @@
             .col-xs-12.col-md-6(v-if="formConfigs.abstract")
               textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstract" @input="handleChange($event,'cn')")
               .editor-abstract-info(:class="{'warning': abstractCnLength > 1000}") 
-                span(class="warning"  v-if="abstractCnLength > 1000 || cnOverLength") 中文摘要不能超过1000字符：
+                span(class="warning" style="float:left;" v-if="abstractCnLength > 1000 || cnOverLength") 中文摘要不能超过1000字符
                 span {{abstractCnLength}} / 1000
             .col-xs-12.col-md-6(v-if="formConfigs.abstractEN")
               textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEN" @input="handleChange($event,'en')")
               .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}")
-                span(class="warning" v-if="abstractEnLength > 1000 || enOverLength") 英文摘要不能超过1000字符： 
+                span(class="warning" style="float:left;" v-if="abstractEnLength > 1000 || enOverLength") 英文摘要不能超过1000字符
                 span {{abstractEnLength}} / 1000
       .form-group(v-if="formConfigs.keywords || formConfigs.keywordsEN")
         .m-b-2
@@ -554,12 +554,8 @@ export default {
         } else {
           url = "/r/" + r.rid;
         }
-        self.$refs.image.open({aspectRatio: 3/2, url: url})
+        self.$refs.image.open({aspectRatio: 3/2, url: url, maxSize: 30})
           .then(res => {
-            if((res.size/(1024*1024)) > 8){
-                self.$refs.image.close();
-                throw '封面图片大小不得超过8MB';
-              } 
             const file = blobToFile(res, 'cover.png');
             return fileToBase64(file)
               .then(base64 => {

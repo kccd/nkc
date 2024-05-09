@@ -84,13 +84,10 @@ export default {
           this.$refs.imageSelector
             .open({
               aspectRatio: 3 / 2,
-              url
+              url,
+              maxSize: 30
             })
             .then(res => {
-              if((res.size/(1024*1024)) > 8){
-                this.$refs.imageSelector.close();
-                throw '封面图片大小不得超过8MB';
-              } 
               this.coverData = res;
               fileToBase64(res)
                 .then(res => {
