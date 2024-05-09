@@ -8,15 +8,21 @@
         placeholder="中文摘要，最多可输入1000字符",
         rows=7,
         v-model="cn"
+        @input="handleChange($event,'cn')"
       )
-      .editor-abstract-info(:class="{ warning: abstractCnLength > 1000 }") {{ abstractCnLength }} / 1000
+      .editor-abstract-info(:class="{ warning: abstractCnLength > 1000 }") 
+        span(class="warning"  v-if="abstractCnLength > 1000 || cnOverLength") 中文摘要不能超过1000字符：
+        span {{ abstractCnLength }} / 1000
     .col-xs-12.col-md-6
       textarea.abstract-en(
         placeholder="英文摘要，最多可输入1000字符",
         rows=7,
         v-model="en"
+        @input="handleChange($event,'en')"
       )
-      .editor-abstract-info(:class="{ warning: abstractEnLength > 1000 }") {{ abstractEnLength }} / 1000
+      .editor-abstract-info(:class="{ warning: abstractEnLength > 1000 }") 
+        span(class="warning" v-if="abstractEnLength > 1000 || enOverLength") 英文摘要不能超过1000字符：
+        span {{ abstractEnLength }} / 1000
 </template>
 
 <script>
@@ -26,7 +32,10 @@ export default {
   data: () => ({
     cn: "", // 中文摘要
     en: "", // 英文摘要
-    changeContentDebounce: ''
+    changeContentDebounce: '',
+    cnOverLength: false,
+    enOverLength: false,
+    timer: null,
   }),
   props: {
     abstract: {
@@ -58,12 +67,12 @@ export default {
         this.en = n.en || "";
       },
     },
-    en() {
-      this.changeContentDebounce()
-    },
-    cn() {
-      this.changeContentDebounce()
-    }
+    // en() {
+    //   this.changeContentDebounce()
+    // },
+    // cn() {
+    //   this.changeContentDebounce()
+    // }
   },
   methods: {
     changeContent() {
@@ -76,6 +85,52 @@ export default {
         abstractEn: this.en,
       };
     },
+    triggerTips(key) {
+      const self = this;
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      if(key==='cn'){
+        this.cnOverLength = true;
+        this.enOverLength = false;
+      } 
+      if(key==='en'){
+        this.enOverLength = true;
+        this.cnOverLength = false;
+      } 
+      this.timer = setTimeout(() => {
+        if(key==='cn') self.cnOverLength = false;
+        if(key==='en') self.enOverLength = false;
+        self.timer = null;
+      }, 2000);
+    },
+    handleChange(event,key) {
+      // console.log(event.target.value);
+      let stringValue = event.target.value;
+      if (NKC.methods.checkData.getLength(stringValue) > 1000) {
+        this.triggerTips(key);
+        let truncatedString = '';
+        let byteLength = 0;
+        for (let i = 0; i < stringValue.length; i++) {
+          const charCode = stringValue.charCodeAt(i);
+          if (charCode <= 0x007f) {
+            byteLength += 1;
+          } else {
+            byteLength += 2;
+          }
+
+          if (byteLength <= 1000) {
+            truncatedString += stringValue.charAt(i);
+          } else {
+            break;
+          }
+        }
+        stringValue = truncatedString;
+      }
+      if(key==='cn') this.cn = stringValue;
+      if(key==='en') this.en = stringValue;
+      this.changeContentDebounce();
+    }
   },
 };
 </script>

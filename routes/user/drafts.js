@@ -178,7 +178,7 @@ draftsRouter
       ctx.throw(400, `内容不能超过10万字`);
     }
     if (_content && _content.length < 500 && Number(originState) !== 0) {
-      ctx.throw(400, `字数小于500的文章不允许声明原创`);
+      originState = '0';
     }
     nkcModules.checkData.checkString(
       JSON.stringify({
@@ -216,6 +216,9 @@ draftsRouter
       minLength: 0,
       maxLength: 1000,
     });
+    if (files && files.postCover && (files.postCover.size / (1024 * 1024)) > 8) {
+      ctx.throw(400, '封面图片大小不得超过8MB');
+    }
     let draft;
     let contentLength;
     if (parentPostId) {

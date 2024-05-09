@@ -46,6 +46,7 @@ const app = new Vue({
     columnPool: data.columnPool,
     navigationButtonsLeft: [...data.navigationButtons.left],
     navigationButtonsRight: [...data.navigationButtons.right],
+    navigationButtonsTarget: data.navigationButtons?.target || '_self',
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -511,10 +512,15 @@ const app = new Vue({
     saveNavigationButtons() {
       const navigationButtonsLeft = this.navigationButtonsLeft;
       const navigationButtonsRight = this.navigationButtonsRight;
+      let navigationButtonsTarget = this.navigationButtonsTarget;
+      if (!['_self', '_blank'].includes(navigationButtonsTarget)) {
+        navigationButtonsTarget = '_self';
+      }
       nkcAPI('/nkc/home', 'PUT', {
         operation: 'saveNavigationButtons',
         navigationButtonsLeft,
         navigationButtonsRight,
+        navigationButtonsTarget,
       })
         .then(function () {
           sweetSuccess('保存成功');

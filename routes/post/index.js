@@ -473,6 +473,26 @@ router
       maxLength: 2000000,
     });
 
+    nkcModules.checkData.checkString(
+      JSON.stringify({
+        columnMainCategoriesId,
+        columnMinorCategoriesId,
+        anonymous,
+        t,
+        c,
+        abstractCn,
+        abstractEn,
+        keyWordsCn,
+        keyWordsEn,
+        authorInfos,
+        originState,
+      }),
+      {
+        name: '内容',
+        minLength: 1,
+        maxLength: 2000000,
+      },
+    );
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
     for (let targetForum of targetForums) {

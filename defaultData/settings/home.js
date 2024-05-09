@@ -121,6 +121,7 @@ module.exports = {
     navigationButtons: {
       left: [],
       right: [],
+      target: '_self',
     },
   },
 };
