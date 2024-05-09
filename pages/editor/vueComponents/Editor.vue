@@ -253,6 +253,7 @@ export default {
         history.replaceState({}, '', self.delUrlParam('aid'));
       }
       self.addUrlParam('aid', aid);
+      this.pageData.draftId = this.pageData?.draftId ?? self.drafts.find(item=>item._id===aid).did;
       this.getData().
         then(() => {
           this.$refs.submit.setSubmitStatus(false);

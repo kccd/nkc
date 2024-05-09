@@ -110,6 +110,7 @@
   import 'cropperjs/dist/cropper.css';
   import {DraggableElement} from "../js/draggable";
   import Cropper from 'cropperjs';
+import { sweetError } from "../js/sweetAlert";
   export default {
     data: () => ({
       draggableElement: null,
@@ -124,7 +125,8 @@
       progress: false,
       imgInfo:{},
       reduction:[0,180,-180],
-      minContainerHeight:400
+      minContainerHeight:400,
+      maxSize:30,
     }),
     mounted() {
       this.initDraggableElement();
@@ -200,11 +202,13 @@
           self.initModal();
           const {
             aspectRatio = 1,
-            url = ''
+            url = '',
+            maxSize = 30,
           } = options;
           if(url) {
             self.resetCropperImage(url);
           }
+          self.maxSize = maxSize;
           self.cropper.setAspectRatio(aspectRatio);
           self.resolve = resolve;
           self.reject = reject;
@@ -274,6 +278,11 @@
         this.progress = true;
         try{
           this.cropper.getCroppedCanvas().toBlob(blob => {
+            if( blob && (blob.size/(1024*1024)) > this.maxSize){
+              this.progress = false;
+              sweetError(`封面图片大小不得超过${this.maxSize}MB`);
+              return;
+            }
             this.resolve(blob);
             this.progress = false;
           });

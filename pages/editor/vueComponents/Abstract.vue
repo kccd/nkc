@@ -11,7 +11,7 @@
         @input="handleChange($event,'cn')"
       )
       .editor-abstract-info(:class="{ warning: abstractCnLength > 1000 }") 
-        span(class="warning"  v-if="abstractCnLength > 1000 || cnOverLength") 中文摘要不能超过1000字符：
+        span(class="warning" style="float:left;" v-if="abstractCnLength > 1000 || cnOverLength") 中文摘要不能超过1000字符
         span {{ abstractCnLength }} / 1000
     .col-xs-12.col-md-6
       textarea.abstract-en(
@@ -21,7 +21,7 @@
         @input="handleChange($event,'en')"
       )
       .editor-abstract-info(:class="{ warning: abstractEnLength > 1000 }") 
-        span(class="warning" v-if="abstractEnLength > 1000 || enOverLength") 英文摘要不能超过1000字符：
+        span(class="warning" style="float:left;" v-if="abstractEnLength > 1000 || enOverLength") 英文摘要不能超过1000字符
         span {{ abstractEnLength }} / 1000
 </template>
 
