@@ -424,13 +424,22 @@ schema.statics.getHomeBlockData = async (props) => {
     forums: [],
     webApply: [],
     navigationButtonsLeft: {
-      left: [...navigationButtons.left],
-      right: [...navigationButtons.right],
-      target: navigationButtons?.target || '_self',
+      left: [...navigationButtons.left].map((item) => {
+        item.target = item?.target || '_self';
+        return item;
+      }),
+      right: [...navigationButtons.right].map((item) => {
+        item.target = item?.target || '_self';
+        return item;
+      }),
+      // target: navigationButtons?.target || '_self',
     },
     navigationButtonsRight: {
-      right: [...navigationButtons.right],
-      target: navigationButtons?.target || '_self',
+      right: [...navigationButtons.right].map((item) => {
+        item.target = item?.target || '_self';
+        return item;
+      }),
+      // target: navigationButtons?.target || '_self',
     },
   };
   // 热销商品
