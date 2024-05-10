@@ -215,14 +215,14 @@ mixin renderHome(homeBlock, options)
         .home-navigationButtons-box 
           if(homeBlock.data.left.length>0)
             for navigation in homeBlock.data.left
-                a(href=`${navigation.url}` target=`${homeBlock.data.target}`)
+                a(href=`${navigation.url}` target=`${navigation.target}`)
                   button.box-button(style=`background-color:${navigation.urlColor||'#fff'};`)
                     span(title=`${navigation.title}` style=`color:${navigation.titleColor||'#3a3a3a'};`).box-title=navigation.title
                     span(title=`${navigation.description}` style=`color:${navigation.descriptionColor||'#fff'};`).box-description=navigation.description
           if(homeBlock.data.right.length>0)
             for navigation in homeBlock.data.right
                 span(class="navigation-right-data")
-                  a(href=`${navigation.url}` target=`${homeBlock.data.target}`)
+                  a(href=`${navigation.url}` target=`${navigation.target}`)
                     button.box-button(style=`background-color:${navigation.urlColor||'#fff'};`)
                       span(title=`${navigation.title}` style=`color:${navigation.titleColor||'#3a3a3a'};`).box-title=navigation.title
                       span(title=`${navigation.description}` style=`color:${navigation.descriptionColor||'#fff'};`).box-description=navigation.description 
@@ -234,7 +234,7 @@ mixin renderHome(homeBlock, options)
           +homeBlockHeader(true, false)
         .home-navigationButtons-box 
           for navigation in homeBlock.data.right
-              a(href=`${navigation.url}` target=`${homeBlock.data.target}`)
+              a(href=`${navigation.url}` target=`${navigation.target}`)
                 button.box-button(style=`background-color:${navigation.urlColor||'#fff'};`)
                   span(title=`${navigation.title}` style=`color:${navigation.titleColor||'#3a3a3a'};`).box-title=navigation.title
                   span(title=`${navigation.description}` style=`color:${navigation.descriptionColor||'#fff'};`).box-description=navigation.description 

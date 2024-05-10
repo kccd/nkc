@@ -526,16 +526,12 @@ router
         },
       );
     } else if (operation === 'saveNavigationButtons') {
-      let {
-        navigationButtonsLeft,
-        navigationButtonsRight,
-        navigationButtonsTarget,
-      } = body;
+      let { navigationButtonsLeft, navigationButtonsRight } = body;
       for (const navigation of [
         ...navigationButtonsLeft,
         ...navigationButtonsRight,
       ]) {
-        const { title, url, description } = navigation;
+        const { title, url, description, target } = navigation;
         if (!title) {
           ctx.throw(400, '标题不能为空');
         }
@@ -545,14 +541,13 @@ router
         if (!url) {
           ctx.throw(400, '链接不能为空');
         }
-      }
-      if (!['_self', '_blank'].includes(navigationButtonsTarget)) {
-        navigationButtonsTarget = '_self';
+        if (!target) {
+          navigation.target = '_self';
+        }
       }
       const obj = {
         left: navigationButtonsLeft,
         right: navigationButtonsRight,
-        target: navigationButtonsTarget,
       };
       await db.SettingModel.updateOne(
         { _id: 'home' },
