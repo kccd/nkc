@@ -119,7 +119,13 @@ export default {
     keywords: {
       immediate: true,
       handler(n) {
-        if (typeof n !== "undefined") {
+        // if (typeof n !== "undefined") {
+        //   this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+        //   this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
+        //   this.keyWordsCn = n.cn || []
+        //   this.keyWordsEn = n.en || []
+        // }
+        if (n && n.cn!==undefined && n.en!= undefined) {
           this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
           this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
           this.keyWordsCn = n.cn || []

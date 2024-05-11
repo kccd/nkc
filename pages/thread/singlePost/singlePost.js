@@ -518,6 +518,7 @@ class SinglePostModule {
   // 点击回复按钮
   postData(pid) {
     const content = this.getEditorContent(pid);
+    const editorApp = this.getEditorApp(pid);
     const self = this;
     return Promise.resolve()
       .then(() => {
@@ -535,7 +536,7 @@ class SinglePostModule {
             l: 'html',
             anonymous: isAnonymous,
             parentPostId: pid,
-            _id,
+            _id: editorApp._id || '',
           },
         });
       })
@@ -543,6 +544,8 @@ class SinglePostModule {
         screenTopAlert('发表成功');
         const renderedComment = data.renderedPost;
         self.clearEditorContent(pid);
+        editorApp.draftId = '';
+        editorApp._id = '';
         self.changeEditorButtonStatus(pid, false);
         self.switchCommentForm(pid);
         if (renderedComment) {
@@ -581,6 +584,8 @@ class SinglePostModule {
             c: content,
             l: 'html',
             parentPostId: pid,
+            did: editorApp?.draftId || '',
+            _id: editorApp?._id || '',
           },
           draftId: editorApp.draftId,
           // desType: "thread",
@@ -593,6 +598,7 @@ class SinglePostModule {
           return { saved: false, error: '草稿内容不能为空' };
         }
         editorApp.draftId = data.draft.did;
+        editorApp._id = data.draft._id;
         // 草稿唯一ID
         _id = data.draft._id;
         return { saved: true };

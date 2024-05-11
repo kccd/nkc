@@ -303,6 +303,7 @@ export default {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
             sweetError("您提交的内容已过期，请检查文章状态。");
+            throw {error:"您提交的内容已过期，请检查文章状态。"};
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
@@ -318,7 +319,7 @@ export default {
           }
         })
         .catch((err) => {
-          if(err.error && !err.error.status){
+          if(err.error && !err.status){
             this.err = err.error;
             this.$emit('noPermission', err);
           } else {

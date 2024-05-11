@@ -57,22 +57,35 @@ export default {
     },
   },
   watch: {
+    // abstract: {
+    //   immediate: true,
+    //   handler(n) {
+    //     // console.log(n.cn)
+    //     // console.log(n.en)
+    //     // if (this.cn === n.cn && this.en === n.en) return
+    //     this.cn = n.cn || "";
+    //     this.en = n.en || "";
+    //   },
+    // },
     abstract: {
       immediate: true,
-      handler(n) {
-        // console.log(n.cn)
-        // console.log(n.en)
-        // if (this.cn === n.cn && this.en === n.en) return
-        this.cn = n.cn || "";
-        this.en = n.en || "";
+      handler(newValue,oldValue) {
+        if(newValue && newValue.cn !==undefined && newValue.en !==undefined){
+          if(oldValue && oldValue.cn !==undefined && oldValue.en !==undefined){
+            if(newValue.cn == oldValue.cn && newValue.en == oldValue.en) return;
+          }
+          this.cn = newValue.cn || "";
+          this.en = newValue.en || "";
+        }
+        
       },
     },
-    // en() {
-    //   this.changeContentDebounce()
-    // },
-    // cn() {
-    //   this.changeContentDebounce()
-    // }
+    en() {
+      this.changeContentDebounce()
+    },
+    cn() {
+      this.changeContentDebounce()
+    }
   },
   methods: {
     changeContent() {
@@ -129,7 +142,7 @@ export default {
       }
       if(key==='cn') this.cn = stringValue;
       if(key==='en') this.en = stringValue;
-      this.changeContentDebounce();
+      // this.changeContentDebounce();
     }
   },
 };
