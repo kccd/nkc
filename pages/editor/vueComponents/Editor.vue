@@ -385,7 +385,7 @@ export default {
       }
     },
     infoSubmit(){
-      this.$refs.submit.saveToDraftBase("automatic");
+      this.$refs?.submit?.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
     // saveDraftSuccess() {
@@ -400,6 +400,8 @@ export default {
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
+      // 编辑器是否准备完成
+      if(!this.$refs?.content?.$refs?.threadEditor?.ready) return;
       if (!submitFn)
         throw("callback is is undefined");
       // 每个组件下都有一个getData返回数据
