@@ -234,7 +234,8 @@ draftsRouter
         uid: user.uid,
         type: draftTypes.beta,
       }).sort({ tlm: -1 });
-      if (!draft) {
+      // 保存回复 没有post._id
+      if (!draft || (post._id && draft._id != post._id)) {
         ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
       }
     }

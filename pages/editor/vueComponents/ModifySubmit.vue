@@ -272,8 +272,11 @@ export default {
             saveData.cids?.length ||
             saveData.fids?.length ||
             saveData.cover ||
+            saveData.coverData ||
             saveData.keyWordsCn?.length ||
             saveData.keyWordsEn?.length  ||
+            saveData.abstractCn?.length ||
+            saveData.abstractCn?.length  ||
             saveData.authorInfos?.length ||
             saveData.survey||
             saveData.checkNewNotice||

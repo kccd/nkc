@@ -41,11 +41,18 @@ export default {
     abstract: {
       require: true,
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        cn:"",
+        en:"",
+      }),
     },
   },
   created() {
     this.changeContentDebounce = immediateDebounce(this.changeContent, 2000);
+  },
+  mounted() {
+    this.cn = this.abstract?.cn || "";
+    this.en = this.abstract?.en || "";
   },
   computed: {
     abstractCnLength() {
@@ -57,16 +64,29 @@ export default {
     },
   },
   watch: {
-    abstract: {
-      immediate: true,
-      handler(n) {
-        // console.log(n.cn)
-        // console.log(n.en)
-        // if (this.cn === n.cn && this.en === n.en) return
-        this.cn = n.cn || "";
-        this.en = n.en || "";
-      },
-    },
+    // abstract: {
+    //   immediate: true,
+    //   handler(n) {
+    //     // console.log(n.cn)
+    //     // console.log(n.en)
+    //     // if (this.cn === n.cn && this.en === n.en) return
+    //     this.cn = n.cn || "";
+    //     this.en = n.en || "";
+    //   },
+    // },
+    // abstract: {
+    //   immediate: true,
+    //   handler(newValue,oldValue) {
+    //     if(newValue && newValue.cn !==undefined && newValue.en !==undefined){
+    //       if(oldValue && oldValue.cn !==undefined && oldValue.en !==undefined){
+    //         if(newValue.cn == oldValue.cn && newValue.en == oldValue.en) return;
+    //       }
+    //       this.cn = newValue.cn || "";
+    //       this.en = newValue.en || "";
+    //     }
+        
+    //   },
+    // },
     // en() {
     //   this.changeContentDebounce()
     // },
@@ -78,6 +98,10 @@ export default {
     changeContent() {
       // 统一发送一个事件
       this.$emit('info-change');
+    },
+    setData(abstractCn,abstractEn){
+       this.cn = abstractCn || '';
+       this.en = abstractEn || '';
     },
     getData() {
       return {
