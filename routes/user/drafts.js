@@ -178,7 +178,7 @@ draftsRouter
       ctx.throw(400, `内容不能超过10万字`);
     }
     if (_content && _content.length < 500 && Number(originState) !== 0) {
-      ctx.throw(400, `字数小于500的文章不允许声明原创`);
+      originState = '0';
     }
     nkcModules.checkData.checkString(
       JSON.stringify({
@@ -216,6 +216,9 @@ draftsRouter
       minLength: 0,
       maxLength: 1000,
     });
+    if (files && files.postCover && (files.postCover.size / (1024 * 1024)) > 30) {
+      ctx.throw(400, '封面图片大小不得超过30MB');
+    }
     let draft;
     let contentLength;
     if (parentPostId) {
@@ -231,7 +234,8 @@ draftsRouter
         uid: user.uid,
         type: draftTypes.beta,
       }).sort({ tlm: -1 });
-      if (!draft) {
+      // 保存回复 没有post._id
+      if (!draft || (post._id && draft._id != post._id)) {
         ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
       }
     }

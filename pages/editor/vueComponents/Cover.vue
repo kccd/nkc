@@ -84,7 +84,8 @@ export default {
           this.$refs.imageSelector
             .open({
               aspectRatio: 3 / 2,
-              url
+              url,
+              maxSize: 30
             })
             .then(res => {
               this.coverData = res;
@@ -126,7 +127,7 @@ export default {
       return {
         cover: this.cover,
         coverData: this.coverData,
-        coverUrl: this.coverUrl
+        // coverUrl: this.coverUrl
       };
     }
   }

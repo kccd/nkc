@@ -468,6 +468,12 @@ function autoSaveDraft() {
     Promise.resolve()
       .then(function () {
         var post = getPost();
+        if (draftId) {
+          post.did = draftId;
+        }
+        if (_id) {
+          post._id = _id;
+        }
         post.t = '';
         var method = 'POST';
         var url = '/u/' + NKC.configs.uid + '/drafts';
@@ -497,6 +503,12 @@ function saveDraft(threadId, userId) {
       modifyMathJax();
       // 获取回复的内容
       var post = getPost();
+      if (draftId) {
+        post.did = draftId;
+      }
+      if (_id) {
+        post._id = _id;
+      }
       post.t = '';
       var method = 'POST';
       var url = '/u/' + userId + '/drafts';
@@ -730,6 +742,8 @@ function submit(tid) {
     })
     .then(function (data) {
       ue.setContent('');
+      draftId = '';
+      _id = '';
       setSubmitButton(false);
       if (window.quotePostApp) {
         window.quotePostApp.clear();

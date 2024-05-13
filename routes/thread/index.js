@@ -13,6 +13,7 @@ const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
 const { Operations } = require('../../settings/operations');
+const { ObjectId } = require('mongodb');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -1323,6 +1324,25 @@ threadRouter
       minLength: 1,
       maxLength: 2000000,
     });
+    // 检查提交的内容在草稿中的状态
+    if (post._id) {
+      const draftDid =
+        did ||
+        (await db.DraftModel.findOnly({ _id: ObjectId(post._id) }, { did: 1 }))
+          .did;
+      if (draftDid) {
+        const beta = (await db.DraftModel.getType()).beta;
+        const betaDaft = await db.DraftModel.findOne({
+          did: draftDid,
+          type: beta,
+          uid: state.uid,
+        }).sort({ tlm: -1 });
+        if (!betaDaft || betaDaft._id != post._id) {
+          ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+        }
+      }
+    }
+
     // 判断前台有没有提交匿名标志，未提交则默认false
     if (
       anonymous &&

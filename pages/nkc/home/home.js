@@ -44,8 +44,14 @@ const app = new Vue({
     columnCount: data.columnCount,
     columnListSort: data.columnListSort,
     columnPool: data.columnPool,
-    navigationButtonsLeft: [...data.navigationButtons.left],
-    navigationButtonsRight: [...data.navigationButtons.right],
+    navigationButtonsLeft: [...data.navigationButtons.left].map((item) => {
+      item.target = item?.target || '_self';
+      return item;
+    }),
+    navigationButtonsRight: [...data.navigationButtons.right].map((item) => {
+      item.target = item?.target || '_self';
+      return item;
+    }),
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -489,6 +495,7 @@ const app = new Vue({
         urlColor: '#ffffff',
         titleColor: '#ffffff',
         descriptionColor: '#ffffff',
+        target: '_self',
       });
     },
     linkChanged(index, position) {

@@ -392,40 +392,88 @@ block nkcContent
           button.management-button(@click="saveShowActivityEnter") 保存
     div(v-else-if='page.id==="navigationButton"')
       .form.form-horizontal.m-t-1
+        .m-b-1
+          h5(style='font-weight: bold;') 左侧
+          div(style='padding-left: 1.5rem;')
+            div(v-for="navigation, index in navigationButtonsLeft" style='padding-left: inherit;' :key="index")
+              .form-inline.m-t-05
+                .form-link-title
+                  label 链接{{index+1}}：
+                .form-link-item
+                  label 标题
+                  input.form-control(style='margin:0 0.5rem;' type="text" v-model="navigation.title" placeholder="标题")
+                  label 标题字体颜色
+                  input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;margin:0 0.5rem;" v-model.trim="navigation.titleColor")
+                .form-link-item
+                  label 描述
+                  input.form-control(style='margin:0 0.5rem;' type="text" v-model="navigation.description" placeholder="描述" )
+                  label 描述字体颜色
+                  input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0; margin:0 0.5rem;" v-model.trim="navigation.descriptionColor")
+                .form-link-item
+                  label 链接
+                  input.form-control(style='margin:0 0.5rem;' type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'left')")
+                  label 链接背景颜色
+                  input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0; margin:0 0.5rem;" v-model.trim="navigation.urlColor")
+                .form-link-item(style='font-weight: bold;') 打开方式
+                  label.p-r-05.p-l-05(style='cursor: pointer;')
+                    input(style='cursor: pointer;' type='radio' :name="`target-left-${index}`" value="_self" v-model="navigation.target")
+                    span.p-l-05 原窗口
+                  label(style='cursor: pointer;')
+                    input(style='cursor: pointer;' type='radio' :name="`target-left-${index}`" value="_blank" v-model="navigation.target")
+                    span.p-l-05 新窗口
+                  span.form-link-action
+                    button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','left')") 上移
+                    button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsLeft.length" @click="moveNavigation(index, 'down','left')") 下移
+                    button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'left')") 删除
+            .m-t-05
+              button.btn.btn-sm.btn-default(@click="addNavigation('left')") 添加自定义链接
         .m-b-1 
-          label.control-label 左侧
-          div(v-for="navigation, index in navigationButtonsLeft")
-            .form-inline.m-t-05
-              label 链接{{index+1}}：
-              input.form-control(style="max-width: 14rem;" type="text" v-model="navigation.title" placeholder="标题")
-              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.titleColor")
-              input.form-control(type="text" v-model="navigation.description" placeholder="描述" )
-              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.descriptionColor")
-              input.form-control(type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'left')")
-              //input.form-control(data-control="selectColor" style="max-width: 10rem;" v-model.trim="navigation.color"  :id="`left-${index}`")
-              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.urlColor")
-              button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','left')") 上移
-              button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsLeft.length" @click="moveNavigation(index, 'down','left')") 下移
-              button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'left')") 删除
-          .m-t-05
-            button.btn.btn-sm.btn-default(@click="addNavigation('left')") 添加自定义链接
-        .m-b-1 
-          label.control-label 右侧
-          div(v-for="navigation, index in navigationButtonsRight")
-            .form-inline.m-t-05.force-inline
-              label 链接{{index+1}}：
-              input.form-control(style="max-width: 14rem;" type="text" v-model="navigation.title" placeholder="标题")
-              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.titleColor")
-              input.form-control(type="text" v-model="navigation.description" placeholder="描述" )
-              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.descriptionColor")
-              input.form-control(type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'right')")
-              //- input.form-control(data-control="selectColor" style="max-width: 10rem;" v-model.trim="navigation.color" :id="`right-${index}`")
-              input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.urlColor")
-              button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','right')") 上移
-              button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsRight.length" @click="moveNavigation(index, 'down','right')") 下移
-              button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'right')") 删除
-          .m-t-05
-            button.btn.btn-sm.btn-default(@click="addNavigation('right')") 添加自定义链接
+          h5(style='font-weight: bold;') 右侧
+          div(style='padding-left: 1.5rem;')
+            div(v-for="navigation, index in navigationButtonsRight")
+              //-.form-inline.m-t-05.force-inline
+                label 链接{{index+1}}：
+                input.form-control(style="max-width: 14rem;" type="text" v-model="navigation.title" placeholder="标题")
+                input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.titleColor")
+                input.form-control(type="text" v-model="navigation.description" placeholder="描述" )
+                input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.descriptionColor")
+                input.form-control(type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'right')")
+                //- input.form-control(data-control="selectColor" style="max-width: 10rem;" v-model.trim="navigation.color" :id="`right-${index}`")
+                input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;" v-model.trim="navigation.urlColor")
+                button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','right')") 上移
+                button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsRight.length" @click="moveNavigation(index, 'down','right')") 下移
+                button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'right')") 删除
+              .form-inline.m-t-05
+                .form-link-title
+                  label 链接{{index+1}}：
+                .form-link-item
+                  label 标题
+                  input.form-control(style='margin:0 0.5rem;' type="text" v-model="navigation.title" placeholder="标题")
+                  label 标题字体颜色
+                  input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0;margin:0 0.5rem;" v-model.trim="navigation.titleColor")
+                .form-link-item
+                  label 描述
+                  input.form-control(style='margin:0 0.5rem;' type="text" v-model="navigation.description" placeholder="描述" )
+                  label 描述字体颜色
+                  input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0; margin:0 0.5rem;" v-model.trim="navigation.descriptionColor")
+                .form-link-item
+                  label 链接
+                  input.form-control(style='margin:0 0.5rem;' type="text" v-model="navigation.url" placeholder="链接" @change="linkChanged(index,'right')")
+                  label 链接背景颜色
+                  input.form-control(type="color" style="min-width: 6rem;max-width: 14rem;padding:0; margin:0 0.5rem;" v-model.trim="navigation.urlColor")
+                .form-link-item(style='font-weight: bold;') 打开方式
+                  label.p-r-05.p-l-05(style='cursor: pointer;')
+                    input(style='cursor: pointer;' type='radio' :name="`target-right-${index}`" value="_self"  v-model="navigation.target")
+                    span.p-l-05 原窗口
+                  label(style='cursor: pointer;')
+                    input(style='cursor: pointer;' type='radio' :name="`target-right-${index}`" value="_blank"  v-model="navigation.target")
+                    span.p-l-05 新窗口
+                  span.form-link-action
+                    button.btn.btn-sm.btn-default(:disabled="index===0" @click="moveNavigation(index, 'up','right')") 上移
+                    button.btn.btn-sm.btn-default(:disabled="index+1===navigationButtonsRight.length" @click="moveNavigation(index, 'down','right')") 下移
+                    button.btn.btn-sm.btn-danger(@click="deleteNavigation(index,'right')") 删除
+            .m-t-05
+              button.btn.btn-sm.btn-default(@click="addNavigation('right')") 添加自定义链接
       div
         button.btn.btn-primary(@click='saveNavigationButtons') 保存
 

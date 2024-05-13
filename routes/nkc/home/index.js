@@ -531,7 +531,7 @@ router
         ...navigationButtonsLeft,
         ...navigationButtonsRight,
       ]) {
-        const { title, url, description } = navigation;
+        const { title, url, description, target } = navigation;
         if (!title) {
           ctx.throw(400, '标题不能为空');
         }
@@ -540,6 +540,9 @@ router
         }
         if (!url) {
           ctx.throw(400, '链接不能为空');
+        }
+        if (!target) {
+          navigation.target = '_self';
         }
       }
       const obj = {

@@ -63,7 +63,7 @@ router
       ctx.throw(400, `内容不能超过10万字`);
     }
     if (content && content.length < 500 && Number(originState) !== 0) {
-      ctx.throw(400, `字数小于500的文章不允许声明原创`);
+      post.originState = '0';
     }
     await db.ThreadCategoryModel.checkCategoriesId(tcId);
     nkcModules.checkData.checkString(
@@ -95,6 +95,23 @@ router
       minLength: 0,
       maxLength: 1000,
     });
+    if (_id) {
+      const did =
+        post?.did ||
+        (await db.DraftModel.findOnly({ _id: ObjectId(_id) }, { did: 1 })).did;
+      if (did) {
+        const beta = (await db.DraftModel.getType()).beta;
+        const betaDaft = await db.DraftModel.findOne({
+          did,
+          type: beta,
+          uid: state.uid,
+        }).sort({ tlm: -1 });
+        if (!betaDaft || betaDaft._id != _id) {
+          ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+        }
+      }
+    }
+
     /*if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
 		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");*/
     data.forum = await ForumModel.findOnly({ fid });

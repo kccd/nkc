@@ -473,6 +473,43 @@ router
       maxLength: 2000000,
     });
 
+    nkcModules.checkData.checkString(
+      JSON.stringify({
+        columnMainCategoriesId,
+        columnMinorCategoriesId,
+        anonymous,
+        t,
+        c,
+        abstractCn,
+        abstractEn,
+        keyWordsCn,
+        keyWordsEn,
+        authorInfos,
+        originState,
+      }),
+      {
+        name: '内容',
+        minLength: 1,
+        maxLength: 2000000,
+      },
+    );
+    if (_id) {
+      const draftDid =
+        did ||
+        (await db.DraftModel.findOnly({ _id: ObjectId(_id) }, { did: 1 })).did;
+      if (draftDid) {
+        const beta = (await db.DraftModel.getType()).beta;
+        const betaDaft = await db.DraftModel.findOne({
+          did: draftDid,
+          type: beta,
+          uid: state.uid,
+        }).sort({ tlm: -1 });
+        if (!betaDaft || betaDaft._id != _id) {
+          ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+        }
+      }
+    }
+
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
     for (let targetForum of targetForums) {

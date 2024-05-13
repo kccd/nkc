@@ -253,6 +253,7 @@ export default {
         history.replaceState({}, '', self.delUrlParam('aid'));
       }
       self.addUrlParam('aid', aid);
+      this.pageData.draftId = this.pageData?.draftId ?? self.drafts.find(item=>item._id===aid).did;
       this.getData().
         then(() => {
           this.$refs.submit.setSubmitStatus(false);
@@ -301,7 +302,7 @@ export default {
         .then((resData) => {
           // 如果文章已经变为历史版
           if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
-            sweetError("您提交的内容已过期，请检查文章状态。");
+            throw new Error('您提交的内容已过期，请检查文章状态。');
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
           if (resData.type ==='newThread' &&  resData.mainForums.length) {
@@ -309,6 +310,10 @@ export default {
           }
           resData.mainForums = this.mainForums;
           this.pageData = resData;
+          if(JSON.stringify(resData.post) !== '{}'){
+            this.$refs?.abstract?.setData(resData.post.abstractCn,resData.post.abstractEn);
+            this.$refs?.keyWord?.setData(resData.post.keyWordsCn,resData.post.keyWordsEn);
+          }
           this.pageState = resData.state;
           this.show = true;
           this.getUserDraft();
@@ -317,11 +322,11 @@ export default {
           }
         })
         .catch((err) => {
-          if(err.error && !err.error.status){
+          if(err.error && !err.status){
             this.err = err.error;
             this.$emit('noPermission', err);
           } else {
-            return sweetError(err.error);
+            return sweetError(err?.error||err?.message);
           }
         });
     },
@@ -380,7 +385,7 @@ export default {
       }
     },
     infoSubmit(){
-      this.$refs.submit.saveToDraftBase("automatic");
+      this.$refs?.submit?.saveToDraftBase("automatic");
     },
     // 保存草稿成功后执行
     // saveDraftSuccess() {
@@ -395,6 +400,8 @@ export default {
     },
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
+      // 编辑器是否准备完成
+      if(!this.$refs?.content?.$refs?.threadEditor?.ready) return;
       if (!submitFn)
         throw("callback is is undefined");
       // 每个组件下都有一个getData返回数据
