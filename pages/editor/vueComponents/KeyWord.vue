@@ -113,26 +113,30 @@ export default {
     keywords: {
       type: Object,
       require: true,
+      default: () => ({
+        cn: [],
+        en: [],
+      }),
     },
   },
   watch: {
-    keywords: {
-      immediate: true,
-      handler(n) {
-        // if (typeof n !== "undefined") {
-        //   this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
-        //   this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
-        //   this.keyWordsCn = n.cn || []
-        //   this.keyWordsEn = n.en || []
-        // }
-        if (n && n.cn!==undefined && n.en!= undefined) {
-          this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
-          this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
-          this.keyWordsCn = n.cn || []
-          this.keyWordsEn = n.en || []
-        }
-      },
-    },
+    // keywords: {
+    //   immediate: true,
+    //   handler(n) {
+    //     // if (typeof n !== "undefined") {
+    //     //   this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+    //     //   this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
+    //     //   this.keyWordsCn = n.cn || []
+    //     //   this.keyWordsEn = n.en || []
+    //     // }
+    //     if (n && n.cn!==undefined && n.en!= undefined) {
+    //       this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+    //       this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
+    //       this.keyWordsCn = n.cn || []
+    //       this.keyWordsEn = n.en || []
+    //     }
+    //   },
+    // },
     keyWordsWatch: {
       deep: true,
       handler() {
@@ -149,6 +153,11 @@ export default {
       this.$refs.addKeyword
     );
     this.draggableElement.setPositionCenter()
+    const n = this.keywords;
+    this.$set(this.data[0], "value", (n.cn && n.cn.join(",")) || "");
+    this.$set(this.data[1], "value", (n.en && n.en.join(",")) || "");
+    this.keyWordsCn = n.cn || [];
+    this.keyWordsEn = n.en || [];
 
   },
   destroyed(){
@@ -270,6 +279,12 @@ export default {
         keyWordsEn: this.keyWordsEn,
         keyWordsCn: this.keyWordsCn,
       };
+    },
+    setData(keyWordsCn,keyWordsEn){
+    this.$set(this.data[0], "value", (keyWordsCn && keyWordsCn.join(",")) || "");
+    this.$set(this.data[1], "value", (keyWordsEn && keyWordsEn.join(",")) || "");
+    this.keyWordsCn = keyWordsCn || [];
+    this.keyWordsEn = keyWordsEn || [];
     },
   },
   computed: {
