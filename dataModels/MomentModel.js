@@ -477,17 +477,24 @@ schema.statics.replaceMomentResourcesId = async function (resourcesId) {
     if (!resource) {
       continue;
     }
-    if (!type) {
-      type = resource.mediaType;
-    }
-    if (type !== resource.mediaType) {
-      continue;
-    }
     newResourcesId.push(resource.rid);
   }
-  if (type === 'mediaVideo' && newResourcesId.length > 1) {
-    newResourcesId = [newResourcesId[0]];
-  }
+  // for (const rid of resourcesId) {
+  //   const resource = resourcesObj[rid];
+  //   if (!resource) {
+  //     continue;
+  //   }
+  //   if (!type) {
+  //     type = resource.mediaType;
+  //   }
+  //   if (type !== resource.mediaType) {
+  //     continue;
+  //   }
+  //   newResourcesId.push(resource.rid);
+  // }
+  // if (type === 'mediaVideo' && newResourcesId.length > 1) {
+  //   newResourcesId = [newResourcesId[0]];
+  // }
   return newResourcesId;
 };
 
@@ -696,6 +703,7 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
   if (moment) {
     let picturesId = [];
     let videosId = [];
+    let medias = [];
     const DocumentModel = mongoose.model('documents');
     const { moment: momentSource } = await DocumentModel.getDocumentSources();
     const betaDocument = await DocumentModel.getBetaDocumentBySource(
@@ -715,13 +723,29 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
           mediaType: 1,
         },
       );
-      const resourcesId = resources.map((r) => r.rid);
-      if (resources.length > 0) {
-        if (resources[0].mediaType === 'mediaPicture') {
-          picturesId = resourcesId;
-        } else {
-          videosId = resourcesId;
+      // const resourcesId = resources.map((r) => r.rid);
+      // if (resources.length > 0) {
+      //   if (resources[0].mediaType === 'mediaPicture') {
+      //     picturesId = resourcesId;
+      //   } else {
+      //     videosId = resourcesId;
+      //   }
+      // }
+      for (const ridItem of oldResourcesId) {
+        const file = resources.find((item) => item.rid === ridItem);
+        let type = '';
+        if (!file || !['mediaPicture', 'mediaVideo'].includes(file.mediaType)) {
+          continue;
         }
+        if (file.mediaType === 'mediaPicture') {
+          type = 'picture';
+        } else {
+          type = 'video';
+        }
+        medias.push({
+          rid: file.rid,
+          type,
+        });
       }
     }
     return {
@@ -732,6 +756,7 @@ schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
       content: betaDocument.content,
       picturesId,
       videosId,
+      medias,
     };
   } else {
     return null;
@@ -768,6 +793,7 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
     let picturesId = [];
     let videosId = [];
     let resources = [];
+    const medias = [];
     // const oldResourcesId = moment.files;
     // if (oldResourcesId.length > 0) {
     //   resources = await ResourceModel.find(
@@ -809,6 +835,25 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
           mediaType: 1,
         },
       );
+      for (const ridItem of oldResourcesId) {
+        const fileItem = resources.find((item) => item.rid === ridItem);
+        let type = '';
+        if (
+          !fileItem ||
+          !['mediaPicture', 'mediaVideo'].includes(fileItem.mediaType)
+        ) {
+          continue;
+        }
+        if (fileItem.mediaType === 'mediaPicture') {
+          type = 'picture';
+        } else {
+          type = 'video';
+        }
+        medias.push({
+          rid: fileItem.rid,
+          type,
+        });
+      }
       const resourcesId = resources.map((r) => r.rid);
       if (resources.length > 0) {
         if (resources[0].mediaType === 'mediaPicture') {
@@ -829,6 +874,7 @@ schema.statics.getEditorMomentDataByMid = async (mid) => {
       momentStatus: moment.status,
       files,
       mediaType: resources[0] ? resources[0].mediaType : '',
+      medias,
     };
   }
 };
@@ -889,13 +935,18 @@ schema.methods.checkBeforePublishing = async function () {
     if (resources.length !== this.files.length) {
       throwErr(500, `媒体文件类型错误`);
     }
+    // for (const resource of resources) {
+    //   if (!mediaType) {
+    //     mediaType = resource.mediaType;
+    //   } else {
+    //     if (mediaType !== resource.mediaType) {
+    //       throwErr(500, `媒体文件类型错误`);
+    //     }
+    //   }
+    // }
     for (const resource of resources) {
-      if (!mediaType) {
-        mediaType = resource.mediaType;
-      } else {
-        if (mediaType !== resource.mediaType) {
-          throwErr(500, `媒体文件类型错误`);
-        }
+      if (!['mediaPicture', 'mediaVideo'].includes(resource.mediaType)) {
+        throwErr(500, `媒体文件类型错误`);
       }
     }
   }

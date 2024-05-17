@@ -6,19 +6,25 @@
       .textarea-editor-container
         textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange" @click-ctrl-enter="onClickEnter")
       .files-container
-        .pictures(v-if="picturesUrl.length > 0")
+        .medias(v-if="mediasUrl.length > 0")
+          .media-item(v-for="(media, index) in mediasUrl" :style=" media.type==='picture'? `background-image: url(${media.url})` :`background-image: url(${media.cover})` ")
+            .icon-remove(@click="removeFromArr(medias, index)" title="取消选择")
+              .fa.fa-trash-o
+            .fa.fa-play-circle-o(v-if=" media.type==='video' " class='play-icon')
+            //-video(v-if=" media.type==='video' " :src="media.url" :poster="media.cover" controls="controls")
+        //-.pictures(v-if="picturesUrl.length > 0")
           .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
             .icon-remove(@click="removeFromArr(picturesId, index)" title="取消选择")
               .fa.fa-trash-o
-        .videos(v-if="videosUrl.length > 0")
+        //-.videos(v-if="videosUrl.length > 0")
           .video-item(v-for="(videoUrl, index) in videosUrl")
             .icon-remove(@click="removeFromArr(videosId, index)" title="取消选择")
               .fa.fa-trash-o
             video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
     .buttons-container.m-b-1
       .button-icon(
-        @click="selectPicture"
-        :class="{'disabled': !allowedToSelectPicture}"
+        @click="selectMedia('picture')"
+        :class="{'disabled': !allowedToSelectMedia}"
         @mouseover="iconMouseOver(icons.image)"
         @mouseleave="iconMouseLeave(icons.image)"
         title="图片"
@@ -29,8 +35,8 @@
           :fill="icons.image.fill"
           )
       .button-icon(
-        @click="selectVideo"
-        :class="{'disabled': !allowedToSelectVideo}"
+        @click="selectMedia('video')"
+        :class="{'disabled': !allowedToSelectMedia}"
         @mouseover="iconMouseOver(icons.video)"
         @mouseleave="iconMouseLeave(icons.video)"
         title="视频"
@@ -142,6 +148,49 @@
             &:hover{
               background-color: rgba(0, 0, 0, 0.5);
             }
+          }
+        }
+      }
+      .medias{
+        margin-bottom: 1rem;
+        .media-item{
+          @pictureHeight: 8rem;
+          position: relative;
+          display: inline-block;
+          height: @pictureHeight;
+          width: @pictureHeight;
+          background-color: #000;
+          overflow: hidden;
+          margin-right: 0.5rem;
+          border-radius: 10px;
+          background-size: cover;
+          background-position: center;
+          .icon-remove{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2rem;
+            line-height: 2rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 100ms;
+            &:hover{
+              background-color: rgba(0, 0, 0, 0.5);
+            }
+          }
+          .play-icon{
+            font-size: 3rem;
+            color:rgba(0, 179, 255, 0.8);
+            position: absolute;
+            top: 10rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: color 0.2s;
+            display: inline-block;
           }
         }
       }
@@ -272,11 +321,13 @@
       maxContentLength: 1000,
       maxPictureCount: 9,
       maxVideoCount: 1,
+      maxMediaCount: 9,
       momentId: '',
       content: '',
       momentStatus:'',
       picturesId: [],
       videosId: [],
+      medias: [],
       files:[],
       icons: {
         image: {
@@ -313,6 +364,10 @@
         const {picturesId, videosId, maxVideoCount} = this;
         return picturesId.length === 0 && videosId.length < maxVideoCount;
       },
+      allowedToSelectMedia() {
+        const { medias,maxMediaCount} = this;
+        return medias.length < maxMediaCount;
+      },
       contentLength() {
         const {content} = this;
         return getLength(content);
@@ -344,14 +399,29 @@
         }
         return filesUrl;
       },
+      mediasUrl() {
+        const { medias } = this;
+        const filesUrl = [];
+        for (const item of medias) {
+          const url = getUrl('resource', item.rid);
+          if (item.type === 'video') {
+            const cover = getUrl('resource', item.rid, 'cover')
+            filesUrl.push({ url, cover, type: item.type });
+          } else {
+            filesUrl.push({url, type:item.type});
+          }
+        }
+        return filesUrl;
+      },
       disablePublish() {
-        const {submitting, momentId, content,picturesUrl,videosUrl} = this;
-        return submitting || !momentId || (content.length === 0 && picturesUrl.length === 0 && videosUrl.length === 0)
+        const {submitting, momentId, content,picturesUrl,videosUrl,medias} = this;
+        return submitting || !momentId || (content.length === 0 && medias.length === 0 )
       }
     },
     watch: {
       'picturesId.length': 'onContentChange',
       'videosId.length': 'onContentChange',
+      'medias.length': 'onContentChange',
       'content': 'onContentChange'
     },
     methods: {
@@ -369,41 +439,44 @@
         this.setTextareaEditorContent('');
         this.picturesId = [];
         this.videosId = [];
+        this.medias = [];
       },
       initData() {
         const self = this;
         if(!this.mid){
           nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
             .then(res => {
-              const {momentId, content, picturesId, videosId} = res;
+              const {momentId, content, picturesId, videosId, medias} = res;
               if(!momentId) return;
               self.momentId = momentId;
               self.content = content;
               self.syncTextareaEditorContent();
-              self.picturesId = picturesId;
-              self.videosId = videosId;
+              // self.picturesId = picturesId;
+              // self.videosId = videosId;
+              self.medias = medias;
             })
             .catch(err => {
               sweetError(err);
             });
         }else {
           nkcAPI(`/api/v1/editor/moment/${this.mid}`,'GET').then((res)=>{
-            const {momentId, content, picturesId, videosId,momentStatus,files,mediaType} = res.data;
+            const {momentId, content, picturesId, videosId,momentStatus,files,mediaType,medias} = res.data;
             if(!momentId) return;
             self.momentId = momentId;
             self.content = content;
             self.syncTextareaEditorContent();
             self.momentStatus = momentStatus
-            if(files.length>0){
-              if(mediaType === 'mediaPicture'){
-                self.picturesId = files
-              }else {
-                self.videosId =  files
-              }
-            }else {
-              self.picturesId = picturesId;
-              self.videosId = videosId;
-            }
+            self.medias = medias;
+            // if(files.length>0){
+            //   if(mediaType === 'mediaPicture'){
+            //     self.picturesId = files
+            //   }else {
+            //     self.videosId =  files
+            //   }
+            // }else {
+            //   self.picturesId = picturesId;
+            //   self.videosId = videosId;
+            // }
 
           }).catch(err=>{
             sweetError(err,'err')
@@ -418,13 +491,25 @@
       },
       addResourcesId(type, resourcesId) {
         const {maxPictureCount, maxVideoCount} = this;
-        if(type === 'picture') {
-          const picturesId = [...new Set(this.picturesId.concat(resourcesId))];
-          this.picturesId = picturesId.slice(0, maxPictureCount);
-        } else {
-          const videosId = [...new Set(this.videosId.concat(resourcesId))];
-          this.videosId = videosId.slice(0, maxVideoCount);
+        // if(type === 'picture') {
+        //   const picturesId = [...new Set(this.picturesId.concat(resourcesId))];
+        //   this.picturesId = picturesId.slice(0, maxPictureCount);
+        // } else {
+        //   const videosId = [...new Set(this.videosId.concat(resourcesId))];
+        //   this.videosId = videosId.slice(0, maxVideoCount);
+        // }
+        const temMedia = [...this.medias];
+        const readyMedia = []
+        for(const rid of resourcesId){
+          if(temMedia.findIndex(item=>item.rid===rid)===-1){
+            readyMedia.push({
+              rid,
+              type
+            })
+          }
         }
+        temMedia.push(...readyMedia);
+        this.medias= temMedia.slice(0, this.maxMediaCount);
       },
       selectPicture() {
         const self = this;
@@ -450,6 +535,18 @@
           countLimit: self.maxVideoCount - self.videosId.length
         });
       },
+      selectMedia(type) {
+        const self = this;
+        if(!this.allowedToSelectMedia) return;
+        this.$refs.resourceSelector.open(res => {
+          // 后期可以利用回传的对象数据获取type
+          self.addResourcesId(type, res.resourcesId);
+          self.$refs.resourceSelector.close();
+        }, {
+          allowedExt: [type],
+          countLimit: self.maxMediaCount - self.medias.length
+        });
+      },
       insertContent(text) {
         return this.$refs.textareaEditor.insertContent(text);
       },
@@ -465,8 +562,9 @@
       },
       publishContent() {
         const self = this;
-        const {content, picturesId, videosId, momentId,momentStatus} = this;
-        const resourcesId = picturesId.length > 0? picturesId: videosId;
+        const {content, picturesId, videosId, momentId,momentStatus,medias} = this;
+        // const resourcesId = picturesId.length > 0? picturesId: videosId;
+        const resourcesId = medias.map(item=>item.rid);
         if(momentStatus === 'normal'){
           nkcAPI(`/api/v1/editor/moment/${this.mid}`,'POST',{
             content,
@@ -518,8 +616,9 @@
       saveContent() {
         const self = this;
         //暂存的
-        const {content, picturesId, videosId, momentId,momentStatus } = this;
-        const resourcesId = picturesId.length > 0? picturesId: videosId;
+        const {content, picturesId, videosId, momentId,momentStatus ,medias} = this;
+        // const resourcesId = picturesId.length > 0? picturesId: videosId;
+        const resourcesId =  medias.map(item=>item.rid);
         //判断是否是已发表的电文的编辑
         if(momentStatus === 'normal'){
           nkcAPI(`/api/v1/editor/moment/${this.mid}`,'PUT',{

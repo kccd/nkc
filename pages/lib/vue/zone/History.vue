@@ -16,19 +16,41 @@
           .moment-file-container
             .moment-file-picture(
               v-for="file, number in history.filesData"
-              v-if="file.type === 'picture'"
-              data-global-click="viewImages"
-              :data-global-data="renderObjToStr(index,number)"
+              :key="number"
+              @click="viewMedias(history.filesData,number)"
               )
-              img(:src="file.url")
-            .moment-file-video(
+              img(:src=" file.type === 'picture' ? file.url : file.coverUrl"
+                :alt="file.filename"
+                :title="file.filename")
+              .fa.fa-play-circle-o(v-if=" file.type==='video' " class='play-icon')
+            //-.moment-file-video(
               v-for="file, order in history.filesData"
               v-if="file.type !== 'picture'"
               )
               video(:src="file.sources[file.sources.length - 1].url" :poster="file.coverUrl" controls='controls')
+      preview-model(ref="preview")
 </template>
 
 <style lang="less" scoped>
+.moment-file-picture{
+  .play-icon{
+  font-size: 3rem;
+  color:rgba(0, 179, 255, 0.8);
+  position: absolute;
+  top: 10rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: color 0.2s;
+  display: inline-block;
+  }
+  &:hover{
+      .play-icon{
+        color: #00b3ff;
+        font-size: 3.5rem;
+      }
+    }
+}
 </style>
 
 <script>
@@ -36,12 +58,16 @@ import {objToStr } from '../../js/dataConversion';
 import { nkcAPI } from '../../js/netAPI';
 import { visitUrl } from '../../js/pageSwitch';
 import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
+import PreviewModel from './PreviewModel';
   export default {
     props: ['histories','mid'],
     components: {
     },
     data: () => ({
     }),
+    components: {
+      'preview-model': PreviewModel,
+    },
     mounted() {
     },
     methods: {
@@ -72,6 +98,19 @@ import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
         return objToStr({images: self.histories[index].filesData.map(file=>{
           return {url: file.url,  name: file.filename};
         }),index: number});
+      },
+      viewMedias(filesData=[],index){
+        const readyFiles = [];
+        for(const fileData of filesData) {
+          if(fileData.type === 'video'){
+            readyFiles.push({...fileData,});
+          }else if(fileData.type === 'picture'){
+            readyFiles.push({...fileData,url:fileData.urlLG || fileData.url});
+          }
+        }
+        if(readyFiles.length === 0) return;
+        this.$refs.preview.setData(true,index,readyFiles);
+        this.$refs.preview.init(index);
       }
     }
   }

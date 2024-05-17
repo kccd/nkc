@@ -222,7 +222,7 @@
 
 <script>
   import {objToStr} from "../../js/tools";
-  import MomentFiles from './MomentFiles';
+  import MomentFiles from './MomentFilesNew';
   import FromNow from '../FromNow';
   import {visitUrl} from "../../js/pageSwitch";
 
