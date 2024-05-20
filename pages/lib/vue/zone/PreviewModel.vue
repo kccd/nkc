@@ -90,7 +90,7 @@ transition(name='main')
 }
 #ImgPreview .titleBar .closeBtn {
   position: absolute;
-  left: 1rem;
+  left: 1.1rem;
   bottom: 0rem;
   color: white;
   font-size: 2.5rem;
@@ -101,12 +101,12 @@ transition(name='main')
 #ImgPreview .pre {
   position: absolute;
   left: 5%;
-  top: calc(50% - 3rem);
+  top: calc(50% - 1.5rem);
   cursor: pointer;
   z-index: 2019;
   span {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 4.5rem;
+    font-size: 3.2rem;
     transition: color 0.15s;
     &:hover {
       color: white;
@@ -116,12 +116,12 @@ transition(name='main')
 #ImgPreview .next {
   position: absolute;
   right: 5%;
-  top: calc(50% - 3rem);
+  top: calc(50% - 1.5rem);
   cursor: pointer;
   z-index: 2019;
   span {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 4.5rem;
+    font-size: 3.2rem;
     transition: color 0.15s;
     &:hover {
       color: white;
@@ -370,8 +370,11 @@ export default {
         this.locationData.startX = e.clientX;
         this.locationData.startY = e.clientY;
         e.preventDefault();
-        this.$refs?.titleBar.addEventListener('mouseup', this.moveupError);
-        this.$refs?.toolBar.addEventListener('mouseup', this.moveupError);
+        if(this.$refs && this.$refs.titleBar && this.$refs.toolBar){
+          this.$refs.titleBar.addEventListener('mouseup', this.moveupError);
+          this.$refs.toolBar.addEventListener('mouseup', this.moveupError);
+        }
+        
 
         window.addEventListener('mousemove', this.throttle(this.mousemove, 10));
         window.addEventListener('mouseup', this.mouseup);
@@ -379,8 +382,10 @@ export default {
       }
     },
     removeEvent() {
-      this.$refs?.titleBar.removeEventListener('mouseup', this.moveupError);
-      this.$refs?.toolBar.removeEventListener('mouseup', this.moveupError);
+      if(this.$refs && this.$refs.titleBar && this.$refs.toolBar){
+        this.$refs.titleBar.removeEventListener('mouseup', this.moveupError);
+        this.$refs.toolBar.removeEventListener('mouseup', this.moveupError);
+      }
     },
     mouseup(e) {
       if (e.which !== 1) {

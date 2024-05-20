@@ -55,10 +55,13 @@
 
 <script>
 import {objToStr } from '../../js/dataConversion';
+import { openImageViewer } from '../../js/imageViewer';
 import { nkcAPI } from '../../js/netAPI';
 import { visitUrl } from '../../js/pageSwitch';
+import { getState } from '../../js/state';
 import { sweetError, sweetQuestion,} from '../../js/sweetAlert';
 import PreviewModel from './PreviewModel';
+const { isApp } = getState();
   export default {
     props: ['histories','mid'],
     components: {
@@ -99,18 +102,47 @@ import PreviewModel from './PreviewModel';
           return {url: file.url,  name: file.filename};
         }),index: number});
       },
-      viewMedias(filesData=[],index){
-        const readyFiles = [];
-        for(const fileData of filesData) {
-          if(fileData.type === 'video'){
-            readyFiles.push({...fileData,});
-          }else if(fileData.type === 'picture'){
-            readyFiles.push({...fileData,url:fileData.urlLG || fileData.url});
+      viewMedias(filesData = [], index) {
+        let readyFiles = [];
+        if (isApp) {
+          // 判断点击的类型是视频还是还是图片，暂时处理==》视频：过滤所有的图片；图片：过滤掉所有的视频
+          const clickType = filesData[index]?.type;
+          const clickRid = filesData[index]?.rid;
+          let tempArray = [];
+          if (clickType === 'video') {
+            readyFiles = filesData.filter((item) => item.type === 'video');
+            if (readyFiles.length === 0) return;
+            const $index = readyFiles.findIndex((item) => item.rid === clickRid);
+            this.$refs.preview.setData(true, $index, readyFiles);
+            this.$refs.preview.init($index);
+          } else if (clickType === 'picture') {
+            tempArray = filesData.filter((item) => item.type === 'picture');
+            for (const fileItem of tempArray) {
+              readyFiles.push({
+                ...fileItem,
+                url: fileItem.urlLG || fileItem.url,
+                name: fileItem.filename,
+              });
+            }
+            if (readyFiles.length === 0) return;
+            openImageViewer(
+              readyFiles,
+              readyFiles.findIndex((item) => item.rid === clickRid),
+            );
           }
+        } else {
+          for (const fileData of filesData) {
+            if (fileData.type === 'video') {
+              readyFiles.push({ ...fileData, });
+            } else if (fileData.type === 'picture') {
+              readyFiles.push({ ...fileData, url: fileData.urlLG || fileData.url });
+            }
+          }
+          if (readyFiles.length === 0) return;
+          this.$refs.preview.setData(true, index, readyFiles);
+          this.$refs.preview.init(index);
         }
-        if(readyFiles.length === 0) return;
-        this.$refs.preview.setData(true,index,readyFiles);
-        this.$refs.preview.init(index);
+
       }
     }
   }

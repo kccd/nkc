@@ -22,7 +22,7 @@
               .fa.fa-trash-o
             video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
     .buttons-container.m-b-1
-      .button-icon(
+      //-.button-icon(
         @click="selectMedia('picture')"
         :class="{'disabled': !allowedToSelectMedia}"
         @mouseover="iconMouseOver(icons.image)"
@@ -34,7 +34,7 @@
           :size="icons.image.size"
           :fill="icons.image.fill"
           )
-      .button-icon(
+      //-.button-icon(
         @click="selectMedia('video')"
         :class="{'disabled': !allowedToSelectMedia}"
         @mouseover="iconMouseOver(icons.video)"
@@ -46,6 +46,18 @@
           :theme="icons.video.theme"
           :size="icons.video.size"
           :fill="icons.video.fill"
+          )
+      .button-icon(
+        @click="selectMedia"
+        :class="{'disabled': !allowedToSelectMedia}"
+        @mouseover="iconMouseOver(icons.media)"
+        @mouseleave="iconMouseLeave(icons.media)"
+        title="媒体资源"
+        )
+        add-picture(
+          :theme="icons.media.theme"
+          :size="icons.media.size"
+          :fill="icons.media.fill"
           )
       .button-icon(
         @click="selectEmoji"
@@ -340,6 +352,11 @@
           size: 22,
           theme: 'outline'
         },
+        media: {
+          fill: iconFill.normal,
+          size: 22,
+          theme: 'outline'
+        },
         face: {
           fill: iconFill.normal,
           size: 22,
@@ -511,6 +528,26 @@
         temMedia.push(...readyMedia);
         this.medias= temMedia.slice(0, this.maxMediaCount);
       },
+      addResources(resources) {
+        const temMedia = [...this.medias];
+        const readyMedia = []
+        for(const rItem of resources){
+          let type = '';
+          if(rItem.mediaType === 'mediaVideo'){
+            type = 'video';
+          } else if(rItem.mediaType === 'mediaPicture'){
+            type = 'picture';
+          }
+          if(temMedia.findIndex(item=>item.rid=== rItem.rid)===-1){
+            readyMedia.push({
+              rid: rItem.rid,
+              type,
+            })
+          }
+        }
+        temMedia.push(...readyMedia);
+        this.medias= temMedia.slice(0, this.maxMediaCount);
+      },
       selectPicture() {
         const self = this;
         if(!this.allowedToSelectPicture) return;
@@ -535,15 +572,15 @@
           countLimit: self.maxVideoCount - self.videosId.length
         });
       },
-      selectMedia(type) {
+      selectMedia() {
         const self = this;
         if(!this.allowedToSelectMedia) return;
         this.$refs.resourceSelector.open(res => {
           // 后期可以利用回传的对象数据获取type
-          self.addResourcesId(type, res.resourcesId);
+          self.addResources(res.resources);
           self.$refs.resourceSelector.close();
         }, {
-          allowedExt: [type],
+          allowedExt: ['picture','video'],
           countLimit: self.maxMediaCount - self.medias.length
         });
       },
