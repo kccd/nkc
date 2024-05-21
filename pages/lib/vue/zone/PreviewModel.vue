@@ -35,9 +35,11 @@ transition(name='main')
     .toolBar(ref='toolBar' v-show=" imgType === 'picture' ")
       .btnGroup
         div
-          img(src='/statics/preview-model/rotate.png', @click='rotateImg')
+          //-img(src='/statics/preview-model/rotate.png', @click='rotateImg')
+          span.fa.fa-rotate-right(style="font-size:2rem;color:white" @click='rotateImg')
         div
-          img(src='/statics/preview-model/reset.png', @click='reset')
+          //-img(src='/statics/preview-model/reset.png', @click='reset')
+          span.fa.fa-refresh(style="font-size:2rem;color:white" @click='reset')
 </template>
 <style>
 .model-open{
@@ -188,7 +190,7 @@ transition(name='main')
 }
 #ImgPreview .toolBar .btnGroup div {
   cursor: pointer;
-  margin: 0 10px 0 10px;
+  margin: 0 22px 0 22px;
 }
 </style>
 
