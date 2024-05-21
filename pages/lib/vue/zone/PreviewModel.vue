@@ -7,10 +7,11 @@ transition(name='main')
     @wheel='stopEvent'
   )
     .titleBar(ref='titleBar', @click='visible')
+      .pagIndex {{ `${imgI+1} / ${imgData.length}`}}
       span.closeBtn
-    .pre(ref='preCover')
+    .pre(ref='preCover' v-show=" imgI !== 0")
       span.fa.fa-chevron-circle-left(ref='preBtn', @click='prevImg')
-    .next(ref='nextCover')
+    .next(ref='nextCover' v-show=" imgI+1 < imgData.length")
       span.fa.fa-chevron-circle-right(ref='nextBtn', @click='nextImg')
     #imgPreview(ref='imgPreview')
       //- 加载动画
@@ -19,7 +20,7 @@ transition(name='main')
         span.loading-text 加载中...
       .videoContainer(v-show=" imgType === 'video'"  ref='videoContainer')
         .video-player(ref='video')
-          video-player(v-if="imgType === 'video'" :file="videoFile")
+          video-player(v-if="imgType === 'video'" :file="videoFile" :ratio="videoRatio")
       .imgContainer( v-show=" imgType === 'picture'" ref='imgContainer')
         img(
           ref='img',
@@ -47,7 +48,7 @@ transition(name='main')
 .video-player{
   width: 100vh;
 @media (max-width: 991px) {
-  width: 80vw;
+  width: 100vw;
 }
 
 }
@@ -86,7 +87,14 @@ transition(name='main')
   }
   cursor: pointer;
 }
-#ImgPreview .titleBar .imgName {
+#ImgPreview .titleBar .pagIndex {
+  cursor: default;
+  color: white;
+  font-size: 1.2rem;
+  position: fixed;
+  top: 5vh;
+  left:calc( 50% - 0.5rem );
+  transform: translate(-50%, -50%);
 }
 #ImgPreview .titleBar .closeBtn {
   position: absolute;
@@ -220,6 +228,7 @@ export default {
     error: false, // 错误图片的加载状态
     snapImgIndex: 0, // 在调用Retry的临时数据
     preloadImgData: [],//预加载后图片的数据
+    videoRatio:'4:3'
   }),
   components: {
       'video-player': VideoPlayerVue,
@@ -259,11 +268,14 @@ export default {
         if (newValue) {
           document.addEventListener('keydown', this.handleKeyDown);
           window.addEventListener('resize', this.reloadLocation);
+          // window.history.pushState(null, '', '#');
+          // window.addEventListener('popstate', this.historyForBack);
           document.body.style.paddingRight =`${window.innerWidth - document.body.clientWidth}px`;
           document.body.className = 'model-open';
         } else {
           document.removeEventListener('keydown', this.handleKeyDown);
           window.removeEventListener('resize', this.reloadLocation);
+          // window.removeEventListener('popstate', this.historyForBack);
           document.body.className = '';
           document.body.style.paddingRight =`0px`
         }
@@ -271,6 +283,11 @@ export default {
     }
   },
   methods: {
+    historyForBack(event){
+      // event.preventDefault();
+      // window.history.replaceState(event.state,'',window.location.origin + window.location.pathname + window.location.search);
+      this.visible();
+    },
     reloadLocation(){
       if(this.imgType==='picture'){
         this.initImgMsg(this.imgI);
@@ -308,6 +325,7 @@ export default {
       this.rotateDeg = 0; // 旋转角度
       // this.preImgData= '';//预加载后图片的数组
       // this.imgSrc = ''; // 预览图片的src
+      this.videoRatio = '4:3';
       this.videoFile = {}
       this.imgType = '';
       this.scaleSize = 0;//缩放系数
@@ -646,9 +664,6 @@ export default {
       // console.log(this.videoElement.offsetHeight ,this.videoElement.clientHeight, this.videoElement.getBoundingClientRect().height);
       // console.log('====================================');
       this.videoContainer.style.cssText = 'top:calc(50% - ' + ctop + 'px);left:calc(50% - ' + cleft + 'px)';
-      // this.videoFile = this.preloadImgData[index];
-      // this.imgw = this.imgWidth;
-      // this.imgh = this.imgHeight;
       this.snapImgIndex = index;
 
     },
@@ -665,10 +680,28 @@ export default {
     changeLoading(status) {
       this.loading = status;
     },
+    getScreenAspectRatio() {
+      const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      const screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      if( screenWidth > 991 ){
+        this.videoRatio = '4:3';
+        return;
+      }
+      // 计算宽高比
+      const gcd = function(a, b) {
+        return b ? gcd(b, a % b) : a;
+      };
+      const divisor = gcd(screenWidth, screenHeight);
+      const widthRatio = screenWidth / divisor;
+      const heightRatio = screenHeight / divisor;
+      // 返回宽高比字符串
+      this.videoRatio = `${widthRatio}:${heightRatio}`;
+    },
     setPreviewImg(index) {
       this.imgType = this.imgData[index].type;
       if (this.imgData[index].type === 'video') {
         this.videoFile = this.imgData[index];
+        this.getScreenAspectRatio();
         this.preloadVideo(index).then(() => {
           this.initVideoMsg(index);
           // this.reset();

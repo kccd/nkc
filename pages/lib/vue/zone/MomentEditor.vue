@@ -7,11 +7,15 @@
         textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange" @click-ctrl-enter="onClickEnter")
       .files-container
         .medias(v-if="mediasUrl.length > 0")
-          .media-item(v-for="(media, index) in mediasUrl" :style=" media.type==='picture'? `background-image: url(${media.url})` :`background-image: url(${media.cover})` ")
+          //-.media-item(v-for="(media, index) in mediasUrl" :style=" media.type==='picture'? `background-image: url(${media.url})` :`background-image: url(${media.cover})` ")
             .icon-remove(@click="removeFromArr(medias, index)" title="取消选择")
               .fa.fa-trash-o
             .fa.fa-play-circle-o(v-if=" media.type==='video' " class='play-icon')
-            //-video(v-if=" media.type==='video' " :src="media.url" :poster="media.cover" controls="controls")
+          .media-item(v-for="(media, index) in mediasUrl" :style=" media.type==='picture'? `background-image: url(${media.url})` : '' ")
+            .icon-remove(@click="removeFromArr(medias, index)" title="取消选择")
+              .fa.fa-trash-o
+            //-.fa.fa-play-circle-o(v-if=" media.type==='video' " class='play-icon')
+            video(v-if=" media.type==='video' " :src="media.url" :poster="media.cover" controls="controls")
         //-.pictures(v-if="picturesUrl.length > 0")
           .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
             .icon-remove(@click="removeFromArr(picturesId, index)" title="取消选择")
@@ -177,21 +181,47 @@
           border-radius: 10px;
           background-size: cover;
           background-position: center;
+          // .icon-remove{
+          //   position: absolute;
+          //   bottom: 0;
+          //   left: 0;
+          //   width: 100%;
+          //   height: 2rem;
+          //   line-height: 2rem;
+          //   text-align: center;
+          //   background-color: rgba(0, 0, 0, 0.3);
+          //   color: #fff;
+          //   cursor: pointer;
+          //   transition: background-color 100ms;
+          //   &:hover{
+          //     background-color: rgba(0, 0, 0, 0.5);
+          //   }
+          // }
           .icon-remove{
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2rem;
-            line-height: 2rem;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.3);
-            color: #fff;
             cursor: pointer;
-            transition: background-color 100ms;
-            &:hover{
-              background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 2.5rem;
+            z-index: 10;
+            width: 2.5rem;
+            font-size: 1.4rem;
+            padding: 0 0.7rem;
+            .fa{
+              margin-right: 0.2rem;
             }
+            line-height: 2.5rem;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            transition: background-color 100ms;
+            color: #fff;
+            &:hover{
+              background-color: rgba(0, 0, 0, 1);
+            }
+          }
+          video{
+            width: 100%;
+            height: 100%;
           }
           .play-icon{
             font-size: 3rem;

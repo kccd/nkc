@@ -105,7 +105,7 @@
     *     @param {String} height 视频分辨率 480p、720p、1080p
     *     @param {Number} dataSize 视频大小
     * */
-    props: ['file'],
+    props: ['file','ratio'],
     components: {
       'download-panel': DownloadPanel,
     },
@@ -144,7 +144,7 @@
     methods: {
       initPlayer() {
         this.player = new Plyr(this.$refs.videoDom, {
-          ratio: '4:3',
+          ratio: this.ratio ? this.ratio : '4:3',
           controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
           settings: ['quality', 'speed'],
           quality: {default: 480, options: [1080, 720, 480]},
