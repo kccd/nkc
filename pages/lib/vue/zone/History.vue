@@ -35,7 +35,7 @@
 .moment-file-picture{
   .play-icon{
   font-size: 3rem;
-  color:rgba(0, 179, 255, 0.8);
+  color:rgba(255, 255, 255, 0.8);
   position: absolute;
   top: 10rem;
   top: 50%;

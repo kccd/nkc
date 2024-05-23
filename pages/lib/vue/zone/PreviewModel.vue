@@ -81,9 +81,11 @@ transition(name='main')
   top: 0;
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
-  border-bottom-left-radius: 3rem;
-  width: 3.5rem;
-  height: 3.5rem;
+  //border-bottom-left-radius: 3rem;
+  width: 4rem;
+  height: 4rem;
+  text-align: center;
+  line-height: 4rem;
   &:hover {
     background: rgba(0, 0, 0, 0.65);
   }
@@ -99,9 +101,7 @@ transition(name='main')
   transform: translate(-50%, -50%);
 }
 #ImgPreview .titleBar .closeBtn {
-  position: absolute;
-  left: 1.1rem;
-  bottom: -0.5rem;
+  //position: absolute;
   color: white;
   font-size: 3.5rem;
   &::before {
