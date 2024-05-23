@@ -6,7 +6,7 @@ transition(name='main')
     @click='clickPreview',
     @wheel='stopEvent'
   )
-    .titleBar(ref='titleBar', @click='visible')
+    .titleBar(ref='titleBar', @click='modelClose')
       .pagIndex {{ `${imgI+1} / ${imgData.length}`}}
       span.closeBtn
     .pre(ref='preCover' v-show=" imgI !== 0")
@@ -19,7 +19,7 @@ transition(name='main')
         span.fa.fa-spinner.fa-spin.fa-fw
         span.loading-text 加载中...
       .videoContainer(v-show=" imgType === 'video'"  ref='videoContainer')
-        .video-player(ref='video')
+        .video-player-container(ref='video' :style="videoWidthStyle" ) 
           video-player(v-if="imgType === 'video'" :file="videoFile" :ratio="videoRatio")
       .imgContainer( v-show=" imgType === 'picture'" ref='imgContainer')
         img(
@@ -47,7 +47,7 @@ transition(name='main')
 }
 </style>
 <style lang="less" scoped>
-.video-player{
+.video-player-container{
   width: 100vh;
 @media (max-width: 991px) {
   width: 100vw;
@@ -82,15 +82,15 @@ transition(name='main')
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
   border-bottom-left-radius: 3rem;
-  width: 3rem;
-  height: 3rem;
+  width: 3.5rem;
+  height: 3.5rem;
   &:hover {
     background: rgba(0, 0, 0, 0.65);
   }
   cursor: pointer;
 }
 #ImgPreview .titleBar .pagIndex {
-  cursor: default;
+  pointer-events: none;
   color: white;
   font-size: 1.2rem;
   position: fixed;
@@ -101,9 +101,9 @@ transition(name='main')
 #ImgPreview .titleBar .closeBtn {
   position: absolute;
   left: 1.1rem;
-  bottom: 0rem;
+  bottom: -0.5rem;
   color: white;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   &::before {
     content: '×';
   }
@@ -141,21 +141,26 @@ transition(name='main')
 #ImgPreview #imgPreview {
   width: 100%;
   height: 100%;
+  -webkit-user-select: none; /* Chrome, Safari, Opera */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  user-select: none; /* Standard syntax */
 }
 #ImgPreview #imgPreview .loading {
   width: 100%;
   height: 100%;
+  pointer-events: none;
   display: flex;
   justify-content: center;
   align-items: center;
   span {
+    -webkit-user-select: none; /* Chrome, Safari, Opera */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
+    user-select: none; /* Standard syntax */
     font-size: 1.2rem;
     color: white;
   }
-}
-#ImgPreview #imgPreview .loading svg path,
-#ImgPreview #imgPreview .loading svg rect {
-  fill: grey;
 }
 #ImgPreview #imgPreview .imgContainer {
   position: absolute;
@@ -195,6 +200,7 @@ transition(name='main')
 </style>
 
 <script>
+import { getState } from '../../js/state';
 import VideoPlayerVue from '../VideoPlayer';
 export default {
   data: () => ({
@@ -230,7 +236,8 @@ export default {
     error: false, // 错误图片的加载状态
     snapImgIndex: 0, // 在调用Retry的临时数据
     preloadImgData: [],//预加载后图片的数据
-    videoRatio:'4:3'
+    videoRatio:'4:3',
+    videoWidthStyle:'',
   }),
   components: {
       'video-player': VideoPlayerVue,
@@ -261,6 +268,11 @@ export default {
     videoStyle() {
       return this.imgElement.style;
     },
+    isMobile() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const {isApp} = getState();
+      return /mobile|android|iphone|ipad|phone/.test(userAgent) || isApp;
+    },
 
   },
   watch: {
@@ -270,14 +282,18 @@ export default {
         if (newValue) {
           document.addEventListener('keydown', this.handleKeyDown);
           window.addEventListener('resize', this.reloadLocation);
-          // window.history.pushState(null, '', '#');
-          // window.addEventListener('popstate', this.historyForBack);
+          if(this.isMobile){
+            window.history.pushState(null, '', '#');
+            window.addEventListener('popstate', this.historyForBack);
+          }
           document.body.style.paddingRight =`${window.innerWidth - document.body.clientWidth}px`;
           document.body.className = 'model-open';
         } else {
           document.removeEventListener('keydown', this.handleKeyDown);
           window.removeEventListener('resize', this.reloadLocation);
-          // window.removeEventListener('popstate', this.historyForBack);
+          if(this.isMobile){
+            window.removeEventListener('popstate', this.historyForBack);
+          }
           document.body.className = '';
           document.body.style.paddingRight =`0px`
         }
@@ -290,11 +306,26 @@ export default {
       // window.history.replaceState(event.state,'',window.location.origin + window.location.pathname + window.location.search);
       this.visible();
     },
-    reloadLocation(){
+    initVideoWidthStyle() {
+      const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      const screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      if(screenWidth>  991 ){
+          if(screenHeight *4/3 > screenWidth){
+            this.videoWidthStyle = 'width:90vw;';
+          }else{
+            this.videoWidthStyle = 'width:100vh;';
+          }
+        }else{
+            this.videoWidthStyle = 'width:100vw;';
+        }
+    },
+    reloadLocation(e){
+      // console.log(e.target.innerWidth >  991 && (e.target.innerHeight*4) / 3 > e.target.innerWidth);
       if(this.imgType==='picture'){
         this.initImgMsg(this.imgI);
         this.reset();
       }else{
+        this.initVideoWidthStyle();
         this.initVideoMsg(this.imgI);
       }
     },
@@ -302,7 +333,7 @@ export default {
       // 检查按下的键是否是 Esc 键
       if (event.key === "Escape") {
         // 关闭弹窗的逻辑
-        this.visible();
+        this.modelClose();
       }
       else if (event.key === 'ArrowUp') {
         // console.log('向上键被按下');
@@ -317,11 +348,16 @@ export default {
     },
     clickPreview(e) {
       // console.log(e.target instanceof HTMLImageElement);
-      if (e.target === this.$refs.toolBar || e.target === this.$refs.imgPreview) this.visible();
+      if (e.target === this.$refs.toolBar || e.target === this.$refs.imgPreview) this.modelClose();
       // if (!(e.target instanceof HTMLImageElement)) {
       //   console.log('点击无内容区域');
       //   // this.visible();
       // }
+    },
+    modelClose(){
+      this.visible();
+      if(this.isMobile) window.history.go(-1);
+      
     },
     cleanData() {
       this.rotateDeg = 0; // 旋转角度
@@ -338,6 +374,7 @@ export default {
       this.imgh = 0;//图片的clientHeight
       this.imgContainerWidth = 0;//图片容器的clientHeight
       this.imgContainerHeight = 0;//图片容器的clientHeight
+      this.videoWidthStyle = '';
       // this.imgDataListLength= 0; // 数组的长度
       // this.snapImgIndex= 0;
     },
@@ -437,10 +474,6 @@ export default {
       }
     },
     doubleClick(e){
-      e.preventDefault();
-      // console.log('====================================');
-      // console.log(e);
-      // console.log('====================================');
     },
     mousewheel(e) {
       // console.log('滚动')
@@ -460,9 +493,9 @@ export default {
         snapScaleSize =
           snapScaleSize < 0.2 ?
             0.2 :
-            snapScaleSize > 5 ?
-              5 :
-              snapScaleSize //可以缩小到0.2,放大到5倍
+            snapScaleSize > 10 ?
+              10 :
+              snapScaleSize //可以缩小到0.2,放大到10倍
         //计算位置，以鼠标所在位置为中心
         //以每个点的x、y位置，计算其相对于图片的位置，再计算其相对放大后的图片的位置
         this.locationData.distanceX =
@@ -702,6 +735,7 @@ export default {
     setPreviewImg(index) {
       this.imgType = this.imgData[index].type;
       if (this.imgData[index].type === 'video') {
+        this.initVideoWidthStyle();
         this.videoFile = this.imgData[index];
         this.getScreenAspectRatio();
         this.preloadVideo(index).then(() => {
