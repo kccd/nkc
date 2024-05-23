@@ -20,13 +20,20 @@ router
         moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
       }
       if (moment) {
-        const { momentId, videosId, picturesId, content, momentCommentId } =
-          moment;
+        const {
+          momentId,
+          videosId,
+          picturesId,
+          content,
+          momentCommentId,
+          medias,
+        } = moment;
         data.momentCommentId = momentCommentId;
         data.momentId = momentId;
         data.videosId = videosId;
         data.picturesId = picturesId;
         data.content = content;
+        data.medias = medias;
       }
       return await next();
     }

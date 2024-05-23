@@ -670,7 +670,8 @@
   import {sweetError} from "../../js/sweetAlert";
   import {objToStr} from "../../js/tools";
   import FromNow from '../../../lib/vue/FromNow';
-  import MomentFiles from './MomentFiles';
+  // import MomentFiles from './MomentFiles';
+  import MomentFiles from './MomentFilesNew';
   import MomentComments from './MomentComments';
   import MomentQuote from './MomentQuote';
   import MomentStatus from "./MomentStatus";

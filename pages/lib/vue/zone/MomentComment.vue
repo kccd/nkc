@@ -116,7 +116,7 @@ import TextareaEditor from '../../vue/TextareaEditor';
 import {nkcAPI} from "../../js/netAPI";
 import { WinkingFace } from "@icon-park/vue";
 import EmojiSelector from "../EmojiSelector.vue";
-import MomentFiles from './MomentFiles';
+import MomentFiles from './MomentFilesNew';
 import ResourceSelector from '../ResourceSelector';
 import { getUrl } from '../../js/tools';
 const state = getState();
