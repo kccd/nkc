@@ -7,7 +7,11 @@ transition(name='main')
     @wheel='stopEvent'
   )
     .titleBar(ref='titleBar', @click='modelClose')
-      .pagIndex {{ `${imgI+1} / ${imgData.length}`}}
+      .pagIndex {{ `${imgI+1} / ${imgData.length}`}} 
+        //- p(style="font-size:1.2rem;color:white") {{ `start:${parseInt(touchData.startX[0])}：${parseInt(touchData.startY[0])}、${parseInt(touchData.startX[1])}：${parseInt(touchData.startY[1])}` }}   
+        //- p(style="font-size:1.2rem;color:white") {{ `end ${parseInt(touchData.endX[0])}： ${parseInt(touchData.endY[0])}、${parseInt(touchData.endX[1])} ：${parseInt(touchData.endY[1])}` }}
+        //- p(style="font-size:1.2rem;color:white") {{ `${parseInt(Math.sqrt( (touchData.startX[0]-touchData.startX[1]) *(touchData.startX[0]-touchData.startX[1]) +   (touchData.startY[0]-touchData.startY[1]) *(touchData.startY[0]-touchData.startY[1])  ))} `}}
+        //- p(style="font-size:1.2rem;color:white") {{ `${parseInt(Math.sqrt( (touchData.endX[0]-touchData.endX[1]) *(touchData.endX[0]-touchData.endX[1]) +   (touchData.endY[0]-touchData.endY[1]) *(touchData.endY[0]-touchData.endY[1])  ))} `}}
       span.closeBtn
     .pre(ref='preCover' v-show=" imgI !== 0")
       span.fa.fa-chevron-circle-left(ref='preBtn', @click='prevImg')
@@ -27,9 +31,13 @@ transition(name='main')
           :src='imgSrc',
           :style='{ width: imgWidth + "px", height: imgHeight + "px" }',
           @mousedown.capture.self='mousedown',
+          @mousemove.capture.self='mousemove'
           @mouseup='mouseup',
           @wheel='mousewheel',
-          @dblclick="doubleClick"
+          @dblclick="doubleClick",
+          @touchstart="touchStart",
+          @touchmove="touchMove",
+          @touchend="touchEnd"
         )
     //- 预览窗的功能区
     .toolBar(ref='toolBar' v-show=" imgType === 'picture' ")
@@ -218,6 +226,13 @@ export default {
       imgTop: '', //鼠标点距离窗口的top
       distanceX: 0, //鼠标点距离窗口的X距离
       distanceY: 0, //鼠标点距离窗口的Y距离
+      isDoubleClick: false,//是否双击
+    },
+    touchData:{
+      startX: [0,0], //鼠标按下时距离窗口的X轴距离
+      startY: [0,0], //鼠标按下时距离窗口的Y轴距离
+      endX: [0,0], //move停下时距离窗口的X轴距离
+      endY: [0,0], //move停下时距离窗口的Y轴距离
     },
     imgType: '',
     rotateDeg: 0, // 旋转角度
@@ -238,6 +253,9 @@ export default {
     preloadImgData: [],//预加载后图片的数据
     videoRatio:'4:3',
     videoWidthStyle:'',
+    startDrag : false,
+    touchTime: 0,
+    touchDouble : false,
   }),
   components: {
       'video-player': VideoPlayerVue,
@@ -265,9 +283,9 @@ export default {
     imgStyle() {
       return this.imgElement.style;
     },
-    videoStyle() {
-      return this.imgElement.style;
-    },
+    // videoStyle() {
+    //   return this.imgElement.style;
+    // },
     isMobile() {
       const userAgent = navigator.userAgent.toLowerCase();
       const {isApp} = getState();
@@ -296,6 +314,7 @@ export default {
           }
           document.body.className = '';
           document.body.style.paddingRight =`0px`
+          this.locationData.isMove = false;
         }
       },
     }
@@ -375,6 +394,9 @@ export default {
       this.imgContainerWidth = 0;//图片容器的clientHeight
       this.imgContainerHeight = 0;//图片容器的clientHeight
       this.videoWidthStyle = '';
+      this.startDrag = false;
+      this.touchTime = 0;
+      this.touchDouble = false;
       // this.imgDataListLength= 0; // 数组的长度
       // this.snapImgIndex= 0;
     },
@@ -417,9 +439,12 @@ export default {
       }
     },
     moveupError() {
+      this.locationData.isMove = false;
       this.visible();
     },
     mousedown(e) {
+      // const timerDown = new Date().getTime();
+      // console.log('mousedown',timerDown);
       if (e.which === 1 && e.target && e.target === this.imgElement) {
         this.locationData.isMove = true;
         // console.log('down')
@@ -433,8 +458,8 @@ export default {
         }
         
 
-        window.addEventListener('mousemove', this.throttle(this.mousemove, 10));
-        window.addEventListener('mouseup', this.mouseup);
+        // window.addEventListener('mousemove', this.throttle(this.mousemove, 10));
+        // window.addEventListener('mouseup', this.mouseup);
 
       }
     },
@@ -445,23 +470,34 @@ export default {
       }
     },
     mouseup(e) {
+      // const timerUp = new Date().getTime();
+      // console.log('mouseup',timerUp);
       if (e.which !== 1) {
         return
       }
+      this.removeEvent();
+      e.preventDefault();
+      if(!this.startDrag){
+        this.locationData.isMove = false;
+        return;
+      }
       // this.imgStyle.cursor = 'default'
       this.locationData.isMove = false
-      if (typeof this.locationData.imgLeft !== 'undefined') {
+      if (typeof this.locationData.imgLeft !== 'undefined' && this.startDrag) {
+        // console.log('关键就爱乃案件i安吉');
+        this.startDrag = false;
         this.locationData.distanceX = this.locationData.imgLeft
         this.locationData.distanceY = this.locationData.imgTop
       }
-      this.removeEvent();
-      e.preventDefault();
     },
     mousemove(e) {
       if (e.which !== 1) {
         return
       }
       if (this.locationData.isMove && !this.error) {
+        // console.log('mousemove');
+        // 触发此事件才开始拖拽图片流程
+        this.startDrag = true;
         // console.log('d');
         e.preventDefault()
         // this.imgStyle.cursor = 'move';
@@ -474,6 +510,191 @@ export default {
       }
     },
     doubleClick(e){
+      if (e.which !== 1) {
+        return
+      }
+      if(this.touchDouble) return;
+      // console.log('doubleClick');
+      let x = e.clientX
+      let y = e.clientY
+      e.preventDefault();
+      if (e.target && this.error === false && e.target === this.imgElement) {
+        let l = this.getOffset(this.imgContainer)
+        x = x - l.left
+        y = y - l.top
+
+        let scaleNum = this.locationData.isDoubleClick ? -0.5 : 0.5;
+        let snapScaleSize = this.scaleSize //暂存缩放系数
+        snapScaleSize += scaleNum
+        snapScaleSize =
+          snapScaleSize < 0.2 ?
+            0.2 :
+            snapScaleSize > 10 ?
+              10 :
+              snapScaleSize //可以缩小到0.2,放大到10倍
+        //计算位置，以鼠标所在位置为中心
+        //以每个点的x、y位置，计算其相对于图片的位置，再计算其相对放大后的图片的位置
+        this.locationData.distanceX =
+          this.locationData.distanceX -
+          ((x - this.locationData.distanceX) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+        this.locationData.distanceY =
+          this.locationData.distanceY -
+          ((y - this.locationData.distanceY) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+        this.scaleSize = snapScaleSize //更新倍率
+        //改变位置和大小
+        // this.imgStyle.transition='all 0.2s ease'
+
+        this.imgStyle.width = this.imgw * snapScaleSize + 'px'
+        this.imgStyle.height = this.imgh * snapScaleSize + 'px'
+        this.imgStyle.top = this.locationData.distanceY + 'px'
+        this.imgStyle.left = this.locationData.distanceX + 'px'
+        this.locationData.isDoubleClick = !this.locationData.isDoubleClick;
+
+      }
+    },
+    touchStart(event) {
+      // console.log(event);
+      if(event.which !== 0) return;
+      event.preventDefault()
+      if(event.touches.length>=2){
+        // 双指缩放
+        const point1 = event.touches[0];
+        const point2 = event.touches[1];
+        this.touchData.startX = [point1.clientX,point2.clientX];
+        this.touchData.startY = [point1.clientY,point2.clientY];
+      } else {
+        let time = this.touchTime;
+        // if (this.touchTime === 0) {
+        //   delta = 0;
+        // } else {
+        //   delta = Date.now() - this.touchTime;
+        // }
+        const delta = Date.now() - time;
+        this.touchTime = Date.now();
+        if (delta > 0 && delta <= 250) {
+          // 双击
+          // console.log('doubleStat');
+          this.touchDouble = true;
+        } else {
+          this.touchDouble = false;
+          // 单指拖动
+          if (event.target && event.target === this.imgElement) {
+            this.locationData.isMove = true;
+            this.locationData.startX = event.touches[0].clientX;
+            this.locationData.startY = event.touches[0].clientY;
+          }
+        }
+
+      }
+    },
+    touchMove(event) {
+      // console.log(event);
+      if(event.which !== 0) return;
+      event.preventDefault()
+      if(event.touches.length>=2){
+        const point1 = event.touches[0];
+        const point2 = event.touches[1];
+        let x = (point1.clientX + point2.clientX)/2
+        let y = (point1.clientY + point2.clientY)/2
+        let l = this.getOffset(this.imgContainer)
+        this.touchData.endX = [point1.clientX , point2.clientX]
+        this.touchData.endY = [point1.clientY , point2.clientY]
+        const distanceStart = Math.sqrt( (this.touchData.startX[0]-this.touchData.startX[1]) *(this.touchData.startX[0]-this.touchData.startX[1]) +   (this.touchData.startY[0]-this.touchData.startY[1]) *(this.touchData.startY[0]-this.touchData.startY[1])  )
+        const distanceEnd = Math.sqrt( (point1.clientX-point2.clientX) *(point1.clientX-point2.clientX) +   (point1.clientY-point2.clientY) *(point1.clientY-point2.clientY)  )
+        let scaleNum = (distanceStart-distanceEnd)>0 ? -0.1 : 0.1
+        x = x - l.left
+        y = y - l.top 
+        let snapScaleSize = this.scaleSize //暂存缩放系数
+        snapScaleSize += scaleNum
+        snapScaleSize =
+          snapScaleSize < 0.5 ?
+            0.5 :
+            snapScaleSize > 10 ?
+              10 :
+              snapScaleSize //可以缩小到0.5,放大到10倍
+        this.locationData.distanceX =
+          this.locationData.distanceX -
+          ((x - this.locationData.distanceX) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+        this.locationData.distanceY =
+          this.locationData.distanceY -
+          ((y - this.locationData.distanceY) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+        this.scaleSize = snapScaleSize //更新倍率
+        //改变位置和大小
+        // this.imgStyle.transition='all 0.2s ease'
+        this.imgStyle.width = this.imgw * snapScaleSize + 'px'
+        this.imgStyle.height = this.imgh * snapScaleSize + 'px'
+        this.imgStyle.top = this.locationData.distanceY + 'px'
+        this.imgStyle.left = this.locationData.distanceX + 'px'
+        this.locationData.isDoubleClick = false;
+      }else{
+        if (this.locationData.isMove && !this.error) {
+        // 触发此事件才开始拖拽图片流程
+        this.startDrag = true;
+        this.locationData.endX = event.touches[0].clientX;
+        this.locationData.endY = event.touches[0].clientY;
+        this.locationData.imgLeft = this.locationData.distanceX + this.locationData.endX - this.locationData.startX;
+        this.locationData.imgTop = this.locationData.distanceY + this.locationData.endY - this.locationData.startY;
+        this.imgStyle.left = this.locationData.imgLeft + 'px';
+        this.imgStyle.top = this.locationData.imgTop + 'px';
+      }
+      }
+    },
+    touchEnd(event) {
+      if (event.which !== 0) return;
+      event.preventDefault();
+      // console.log('=============touchEnd=======================');
+      // console.log(event);
+      // console.log('====================================');
+      if (this.touchDouble) {
+        // console.log('touchDouble');
+        let x = event.changedTouches[0].clientX
+        let y = event.changedTouches[0].clientY
+        if (event.target && this.error === false && event.target === this.imgElement) {
+          let l = this.getOffset(this.imgContainer)
+          x = x - l.left
+          y = y - l.top
+
+          let scaleNum = this.locationData.isDoubleClick ? -0.5 : 0.5;
+          let snapScaleSize = this.scaleSize //暂存缩放系数
+          snapScaleSize += scaleNum
+          snapScaleSize =
+            snapScaleSize < 0.2 ?
+              0.2 :
+              snapScaleSize > 10 ?
+                10 :
+                snapScaleSize //可以缩小到0.2,放大到10倍
+          //计算位置，以鼠标所在位置为中心
+          //以每个点的x、y位置，计算其相对于图片的位置，再计算其相对放大后的图片的位置
+          this.locationData.distanceX =
+            this.locationData.distanceX -
+            ((x - this.locationData.distanceX) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+          this.locationData.distanceY =
+            this.locationData.distanceY -
+            ((y - this.locationData.distanceY) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+          this.scaleSize = snapScaleSize //更新倍率
+          //改变位置和大小
+          // this.imgStyle.transition='all 0.2s ease'
+
+          this.imgStyle.width = this.imgw * snapScaleSize + 'px'
+          this.imgStyle.height = this.imgh * snapScaleSize + 'px'
+          this.imgStyle.top = this.locationData.distanceY + 'px'
+          this.imgStyle.left = this.locationData.distanceX + 'px'
+          this.locationData.isDoubleClick = !this.locationData.isDoubleClick;
+
+        }
+      } else {
+        if (!this.startDrag) {
+          this.locationData.isMove = false;
+          return;
+        }
+        this.locationData.isMove = false
+        if (typeof this.locationData.imgLeft !== 'undefined' && this.startDrag) {
+          // console.log('手机收手机');
+          this.startDrag = false;
+          this.locationData.distanceX = this.locationData.imgLeft
+          this.locationData.distanceY = this.locationData.imgTop
+        }
+      }
     },
     mousewheel(e) {
       // console.log('滚动')
@@ -481,7 +702,7 @@ export default {
       // let deltaY = 0
       let x = e.clientX
       let y = e.clientY
-      e.preventDefault();
+      // e.preventDefault();
       if (e.target && this.error === false && e.target === this.imgElement) {
         let l = this.getOffset(this.imgContainer)
         x = x - l.left
@@ -507,10 +728,13 @@ export default {
         this.scaleSize = snapScaleSize //更新倍率
         //改变位置和大小
         // this.imgStyle.transition='all 0.2s ease'
+
         this.imgStyle.width = this.imgw * snapScaleSize + 'px'
         this.imgStyle.height = this.imgh * snapScaleSize + 'px'
         this.imgStyle.top = this.locationData.distanceY + 'px'
         this.imgStyle.left = this.locationData.distanceX + 'px'
+        this.locationData.isDoubleClick = false;
+
       }
     },
     stopEvent(e) {
@@ -530,9 +754,11 @@ export default {
     },
     reset() {
       if(this.imgType!=='picture') return;
+
       var pW, pH;//imgContainer的宽高暂存值
       // 以完全显示图片为基准,如果改为>，则为以铺满屏幕为基准
       // 我设置的默认为<即img宽度填充imgContainer
+      this.locationData.isDoubleClick = false;
       if (this.imgContainerWidth / this.imgContainerHeight < this.imgw / this.imgh) {
         pW = this.imgContainerWidth
         pH = (this.imgh * this.imgContainerWidth) / this.imgw
