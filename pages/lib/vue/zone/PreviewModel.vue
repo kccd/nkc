@@ -236,6 +236,10 @@ export default {
       imgMoveWidth: 0,
       imgMoveHeight: 0,
     },
+    wheelData:{
+      imgWheelWidth: 0,
+      imgWheelHeight: 0,
+    },
     imgType: '',
     rotateDeg: 0, // 旋转角度
     preImgData: '',//预加载后图片的数组
@@ -707,7 +711,9 @@ export default {
       }
     },
     mousewheel(e) {
-      // console.log('滚动')
+      // console.log('滚动',e.wheelDelta)
+      this.wheelData.imgWheelWidth = this.scaleSize * this.imgw;
+      this.wheelData.imgWheelHeight = this.scaleSize * this.imgh;
       //以鼠标为中心缩放，同时进行位置调整
       // let deltaY = 0
       let x = e.clientX
@@ -718,29 +724,53 @@ export default {
         x = x - l.left
         y = y - l.top
 
+        // let scaleNum = e.wheelDelta / 1200
+        // let snapScaleSize = this.scaleSize //暂存缩放系数
+        // snapScaleSize += scaleNum
+        // snapScaleSize =
+        //   snapScaleSize < 0.2 ?
+        //     0.2 :
+        //     snapScaleSize > 10 ?
+        //       10 :
+        //       snapScaleSize //可以缩小到0.2,放大到10倍
+        // //计算位置，以鼠标所在位置为中心
+        // //以每个点的x、y位置，计算其相对于图片的位置，再计算其相对放大后的图片的位置
+        // this.locationData.distanceX =
+        //   this.locationData.distanceX -
+        //   ((x - this.locationData.distanceX) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+        // this.locationData.distanceY =
+        //   this.locationData.distanceY -
+        //   ((y - this.locationData.distanceY) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+        // this.scaleSize = snapScaleSize //更新倍率
+        // //改变位置和大小
+        // // this.imgStyle.transition='all 0.2s ease'
+
+        // this.imgStyle.width = this.imgw * snapScaleSize + 'px'
+        // this.imgStyle.height = this.imgh * snapScaleSize + 'px'
+        // this.imgStyle.top = this.locationData.distanceY + 'px'
+        // this.imgStyle.left = this.locationData.distanceX + 'px'
+        // this.locationData.isDoubleClick = false;
         let scaleNum = e.wheelDelta / 1200
-        let snapScaleSize = this.scaleSize //暂存缩放系数
-        snapScaleSize += scaleNum
-        snapScaleSize =
-          snapScaleSize < 0.2 ?
-            0.2 :
-            snapScaleSize > 10 ?
-              10 :
-              snapScaleSize //可以缩小到0.2,放大到10倍
+        let snapScaleSize = 1 + scaleNum//暂存缩放系数
+        let snapScaleSizeT = this.wheelData.imgWheelWidth * snapScaleSize/this.imgw
+        // snapScaleSize += scaleNum
+        // snapScaleSize =
+        //   snapScaleSize < 0.2 ?
+        //     0.2 :
+        //     snapScaleSize > 10 ?
+        //       10 :
+        //       snapScaleSize //可以缩小到0.2,放大到10倍
         //计算位置，以鼠标所在位置为中心
         //以每个点的x、y位置，计算其相对于图片的位置，再计算其相对放大后的图片的位置
         this.locationData.distanceX =
           this.locationData.distanceX -
-          ((x - this.locationData.distanceX) * (snapScaleSize - this.scaleSize)) / this.scaleSize
+          ((x - this.locationData.distanceX) * (snapScaleSizeT - this.scaleSize)) / this.scaleSize
         this.locationData.distanceY =
           this.locationData.distanceY -
-          ((y - this.locationData.distanceY) * (snapScaleSize - this.scaleSize)) / this.scaleSize
-        this.scaleSize = snapScaleSize //更新倍率
-        //改变位置和大小
-        // this.imgStyle.transition='all 0.2s ease'
-
-        this.imgStyle.width = this.imgw * snapScaleSize + 'px'
-        this.imgStyle.height = this.imgh * snapScaleSize + 'px'
+          ((y - this.locationData.distanceY) * (snapScaleSizeT - this.scaleSize)) / this.scaleSize
+        this.scaleSize = snapScaleSizeT //更新倍率
+        this.imgStyle.width = this.wheelData.imgWheelWidth * snapScaleSize + 'px'
+        this.imgStyle.height = this.wheelData.imgWheelHeight * snapScaleSize + 'px'
         this.imgStyle.top = this.locationData.distanceY + 'px'
         this.imgStyle.left = this.locationData.distanceX + 'px'
         this.locationData.isDoubleClick = false;
