@@ -574,7 +574,7 @@ export default {
       // console.log(event);
       if(event.which !== 0) return;
       event.preventDefault()
-      if(event.touches.length>=2){
+      if(event.touches.length===2){
         // 双指缩放
         const point1 = event.touches[0];
         const point2 = event.touches[1];
@@ -611,7 +611,7 @@ export default {
       // console.log(event);
       if(event.which !== 0) return;
       event.preventDefault()
-      if(event.touches.length>=2){
+      if(event.touches.length===2){
         const point1 = event.touches[0];
         const point2 = event.touches[1];
         // 按照开始的中心进行计算
@@ -639,6 +639,8 @@ export default {
         this.imgStyle.height = this.touchData.imgMoveHeight * snapScaleSize + 'px'
         this.imgStyle.top = this.locationData.distanceY + 'px'
         this.imgStyle.left = this.locationData.distanceX + 'px'
+        this.locationData.imgLeft = this.locationData.distanceX;
+        this.locationData.imgTop = this.locationData.distanceY;
         this.locationData.isDoubleClick = false;
       }else{
         if (this.locationData.isMove && !this.error) {
@@ -711,7 +713,9 @@ export default {
       }
     },
     mousewheel(e) {
-      // console.log('滚动',e.wheelDelta)
+      // console.log('滚动',this.scaleSize)
+      if(this.scaleSize>1000 && e.wheelDelta>0) return;
+      if(this.scaleSize<0.1 && e.wheelDelta<0) return;
       this.wheelData.imgWheelWidth = this.scaleSize * this.imgw;
       this.wheelData.imgWheelHeight = this.scaleSize * this.imgh;
       //以鼠标为中心缩放，同时进行位置调整
