@@ -11,7 +11,7 @@ transition(name='main')
         //- p(style="font-size:1.2rem;color:white") {{ `start:${parseInt(touchData.startX[0])}：${parseInt(touchData.startY[0])}、${parseInt(touchData.startX[1])}：${parseInt(touchData.startY[1])}` }}   
         //- p(style="font-size:1.2rem;color:white") {{ `end ${parseInt(touchData.endX[0])}： ${parseInt(touchData.endY[0])}、${parseInt(touchData.endX[1])} ：${parseInt(touchData.endY[1])}` }}
         //- p(style="font-size:1.2rem;color:white") {{ `${parseInt(Math.sqrt( (touchData.startX[0]-touchData.startX[1]) *(touchData.startX[0]-touchData.startX[1]) +   (touchData.startY[0]-touchData.startY[1]) *(touchData.startY[0]-touchData.startY[1])  ))} `}}
-        //- p(style="font-size:1.2rem;color:white") {{ `${parseInt(Math.sqrt( (touchData.endX[0]-touchData.endX[1]) *(touchData.endX[0]-touchData.endX[1]) +   (touchData.endY[0]-touchData.endY[1]) *(touchData.endY[0]-touchData.endY[1])  ))} `}}
+        //- p(style="font-size:1.2rem;color:white") {{locationData.distanceX}}{{locationData.distanceY   }} {{ scaleSize }}
       span.closeBtn
     .pre(ref='preCover' v-show=" imgI !== 0")
       span.fa.fa-chevron-circle-left(ref='preBtn', @click='prevImg')
@@ -233,6 +233,8 @@ export default {
       startY: [0,0], //鼠标按下时距离窗口的Y轴距离
       endX: [0,0], //move停下时距离窗口的X轴距离
       endY: [0,0], //move停下时距离窗口的Y轴距离
+      imgMoveWidth: 0,
+      imgMoveHeight: 0,
     },
     imgType: '',
     rotateDeg: 0, // 旋转角度
@@ -442,6 +444,10 @@ export default {
       this.locationData.isMove = false;
       this.visible();
     },
+    moveUpOthers(e) {
+      this.locationData.isMove = false;
+      this.mouseup(e);
+    },
     mousedown(e) {
       // const timerDown = new Date().getTime();
       // console.log('mousedown',timerDown);
@@ -454,7 +460,11 @@ export default {
         e.preventDefault();
         if(this.$refs && this.$refs.titleBar && this.$refs.toolBar){
           this.$refs.titleBar.addEventListener('mouseup', this.moveupError);
-          this.$refs.toolBar.addEventListener('mouseup', this.moveupError);
+          this.$refs.toolBar.addEventListener('mouseup', this.moveUpOthers);
+        }
+        if(this.$refs && this.$refs.preCover && this.$refs.nextCover){
+          this.$refs.preCover.addEventListener('mouseup', this.moveUpOthers);
+          this.$refs.nextCover.addEventListener('mouseup', this.moveUpOthers);
         }
         
 
@@ -466,8 +476,12 @@ export default {
     removeEvent() {
       if(this.$refs && this.$refs.titleBar && this.$refs.toolBar){
         this.$refs.titleBar.removeEventListener('mouseup', this.moveupError);
-        this.$refs.toolBar.removeEventListener('mouseup', this.moveupError);
+        this.$refs.toolBar.removeEventListener('mouseup', this.moveUpOthers);
       }
+      if(this.$refs && this.$refs.preCover && this.$refs.nextCover){
+          this.$refs.preCover.removeEventListener('mouseup', this.moveUpOthers);
+          this.$refs.nextCover.removeEventListener('mouseup', this.moveUpOthers);
+        }
     },
     mouseup(e) {
       // const timerUp = new Date().getTime();
@@ -560,8 +574,10 @@ export default {
         // 双指缩放
         const point1 = event.touches[0];
         const point2 = event.touches[1];
-        this.touchData.startX = [point1.clientX,point2.clientX];
-        this.touchData.startY = [point1.clientY,point2.clientY];
+        this.touchData.startX = [point1.pageX,point2.pageX,point1.clientX,point2.clientX];
+        this.touchData.startY = [point1.pageY,point2.pageY,point1.clientY,point2.clientY];
+        this.touchData.imgMoveWidth = this.scaleSize * this.imgw;
+        this.touchData.imgMoveHeight = this.scaleSize * this.imgh;
       } else {
         let time = this.touchTime;
         // if (this.touchTime === 0) {
@@ -594,35 +610,29 @@ export default {
       if(event.touches.length>=2){
         const point1 = event.touches[0];
         const point2 = event.touches[1];
-        let x = (point1.clientX + point2.clientX)/2
-        let y = (point1.clientY + point2.clientY)/2
+        // 按照开始的中心进行计算
+        let x = (this.touchData.startX[2] + this.touchData.startX[3])/2
+        let y = (this.touchData.startY[2] + this.touchData.startY[3])/2
         let l = this.getOffset(this.imgContainer)
-        this.touchData.endX = [point1.clientX , point2.clientX]
-        this.touchData.endY = [point1.clientY , point2.clientY]
-        const distanceStart = Math.sqrt( (this.touchData.startX[0]-this.touchData.startX[1]) *(this.touchData.startX[0]-this.touchData.startX[1]) +   (this.touchData.startY[0]-this.touchData.startY[1]) *(this.touchData.startY[0]-this.touchData.startY[1])  )
-        const distanceEnd = Math.sqrt( (point1.clientX-point2.clientX) *(point1.clientX-point2.clientX) +   (point1.clientY-point2.clientY) *(point1.clientY-point2.clientY)  )
-        let scaleNum = (distanceStart-distanceEnd)>0 ? -0.1 : 0.1
+        const x1 = this.touchData.startX[0];
+        const x2 = this.touchData.startX[1];
+        const y1 = this.touchData.startY[0];
+        const y2 = this.touchData.startY[1];
+        const x3 = point1.pageX;
+        const x4 = point2.pageX;
+        const y3 = point1.pageY;
+        const y4 = point2.pageY;
+        const distanceStart = Math.sqrt( (x1-x2) *(x1-x2) +   (y1-y2) *(y1-y2)  )
+        const distanceEnd = Math.sqrt( (x3-x4) *(x3-x4) +   (y3-y4) *(y3-y4)  )
         x = x - l.left
         y = y - l.top 
-        let snapScaleSize = this.scaleSize //暂存缩放系数
-        snapScaleSize += scaleNum
-        snapScaleSize =
-          snapScaleSize < 0.5 ?
-            0.5 :
-            snapScaleSize > 10 ?
-              10 :
-              snapScaleSize //可以缩小到0.5,放大到10倍
-        this.locationData.distanceX =
-          this.locationData.distanceX -
-          ((x - this.locationData.distanceX) * (snapScaleSize - this.scaleSize)) / this.scaleSize
-        this.locationData.distanceY =
-          this.locationData.distanceY -
-          ((y - this.locationData.distanceY) * (snapScaleSize - this.scaleSize)) / this.scaleSize
-        this.scaleSize = snapScaleSize //更新倍率
-        //改变位置和大小
-        // this.imgStyle.transition='all 0.2s ease'
-        this.imgStyle.width = this.imgw * snapScaleSize + 'px'
-        this.imgStyle.height = this.imgh * snapScaleSize + 'px'
+       let snapScaleSize = distanceEnd/distanceStart
+        const snapScaleSizeT = (snapScaleSize * this.touchData.imgMoveWidth) / this.imgw;
+        this.locationData.distanceX = this.locationData.distanceX - ((x - this.locationData.distanceX) * (snapScaleSizeT - this.scaleSize)) / this.scaleSize
+        this.locationData.distanceY = this.locationData.distanceY - ((y - this.locationData.distanceY) * (snapScaleSizeT - this.scaleSize)) / this.scaleSize
+        this.scaleSize = (this.touchData.imgMoveWidth * snapScaleSize) / this.imgw //更新倍率
+        this.imgStyle.width = this.touchData.imgMoveWidth * snapScaleSize + 'px'
+        this.imgStyle.height = this.touchData.imgMoveHeight * snapScaleSize + 'px'
         this.imgStyle.top = this.locationData.distanceY + 'px'
         this.imgStyle.left = this.locationData.distanceX + 'px'
         this.locationData.isDoubleClick = false;
