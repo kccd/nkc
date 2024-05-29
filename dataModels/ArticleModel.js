@@ -997,7 +997,7 @@ schema.methods.submitArticle = async function (options) {
     }).catch(console.error);
   }
 
-  return articleUrl || `/creation/column/article`;
+  return articleUrl || `/z/a/${articleId}`;
 };
 
 schema.methods.getIpAndPort = async function () {
