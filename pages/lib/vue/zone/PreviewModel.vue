@@ -31,7 +31,6 @@ transition(name='main')
           :src='imgSrc',
           :style='{ width: imgWidth + "px", height: imgHeight + "px" }',
           @mousedown.capture.self='mousedown',
-          @mousemove.capture.self='mousemove'
           @mouseup='mouseup',
           @wheel='mousewheel',
           @dblclick="doubleClick",
@@ -473,7 +472,7 @@ export default {
         }
         
 
-        // window.addEventListener('mousemove', this.throttle(this.mousemove, 10));
+        window.addEventListener('mousemove', this.mousemove);
         window.addEventListener('mouseup', this.mouseup);
 
       }
@@ -488,6 +487,7 @@ export default {
           this.$refs.nextCover.removeEventListener('mouseup', this.moveUpOthers);
         }
         window.removeEventListener('mouseup', this.mouseup);
+        window.removeEventListener('mousemove', this.mousemove);
     },
     mouseup(e) {
       // const timerUp = new Date().getTime();
