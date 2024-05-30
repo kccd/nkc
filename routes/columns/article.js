@@ -73,6 +73,7 @@ router.get('/:aid', async (ctx, next)=>{
       data.t = t;
       match.uid = _article.uid;
     }
+    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
@@ -84,6 +85,7 @@ router.get('/:aid', async (ctx, next)=>{
       homeHotColumn: ctx.permission('homeHotColumn'),
       homeToppedColumn: ctx.permission('homeToppedColumn'),
       column_single_disabled: ctx.permission('column_single_disabled'),
+      column_settings_category: user && ( await db.ColumnModel.checkUsersPermission(columnPostData.column.users,user.uid,userPermissionObject.column_settings_category)  || user.uid === columnPostData.column.uid),
     };
     //文章收藏数
     data.columnPost.collectedCount = await db.ArticleModel.getCollectedCountByAid(article._id);

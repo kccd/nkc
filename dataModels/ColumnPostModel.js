@@ -144,6 +144,8 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
       mainCategory,
       auxiliaryCategory,
       type,
+      cid,
+      mcid,
     } = articleData;
     const {
       uid,
@@ -194,6 +196,8 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
           atUsers,
         ),
       },
+      cid,
+      mcid,
     };
   } else if (articleData.type === threadType) {
     const {
@@ -207,6 +211,8 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
       auxiliaryCategory,
       type,
       url,
+      cid,
+      mcid,
     } = articleData;
     const {
       uid,
@@ -248,6 +254,8 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
         keyWordsEn,
         c: await ColumnPostModel.getRenderHTML(c, resources, xsf, atUsers),
       },
+      cid,
+      mcid,
     };
   } else {
     return;

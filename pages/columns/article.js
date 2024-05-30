@@ -70,10 +70,50 @@ function hideArticleKcbRecordReason(aid, recordId, hide) {
     })
 }
 
+function moveColumnArticle() {
+  const columnPostId = data.columnPostId;
+  const columnId = data.columnId;
+  const selectedMainCategoriesId = data.cid;
+  const selectedMinorCategoriesId = data.mcid;
+  moduleToColumn.show(function (res) {
+    const minorCategoriesId = res.minorCategoriesId;
+    const mainCategoriesId = res.mainCategoriesId;
+    const operationType = res.operationType;
+    const categoryType = res.categoryType;
+    nkcAPI("/m/" + columnId + "/post", "POST", {
+        type: "moveById",
+        postsId: [columnPostId],
+        operationType,
+        categoryType,
+        mainCategoriesId: mainCategoriesId,
+        minorCategoriesId: minorCategoriesId,
+      })
+      .then(function () {
+        // self.getPostList();
+        moduleToColumn.hide();
+        sweetSuccess('文章移动成功');
+      })
+      .catch(function (err) {
+        screenTopWarning(err);
+      })
+  }, {
+    selectMul: true,
+    showOperationType: true,
+    showCategoryType: true,
+    selectedMainCategoriesId: selectedMainCategoriesId,
+    selectedMinorCategoriesId: selectedMinorCategoriesId
+  });
+}
+$(function () {
+  if(window.moduleToColumn && window.moduleToColumn.init){
+    window.moduleToColumn.init();
+  }
+} )
 Object.assign(window, {
   cancelArticleXsf,
   hideArticleKcbRecordReason,
-  openMoveArticleCategory
+  openMoveArticleCategory,
+  moveColumnArticle,
 })
 
 

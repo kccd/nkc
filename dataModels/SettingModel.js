@@ -1077,6 +1077,7 @@ settingSchema.statics.getManagementData = async (user) => {
     return [];
   }
   const SettingModel = mongoose.model('settings');
+  const SecurityApplicationModel = mongoose.model('securityApplications');
   const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
@@ -1194,6 +1195,17 @@ settingSchema.statics.getManagementData = async (user) => {
       icon: 'i-library',
       webIcon: 'fa-book',
       count: 0,
+    });
+  }
+  if (await user.hasPermission('nkcManagementSecurityApplication')) {
+    results.push({
+      name: '手机号申诉',
+      url: '/nkc/securityApplication',
+      icon: 'ft-phone',
+      webIcon: 'fa-phone-square',
+      count: await SecurityApplicationModel.countDocuments({
+        status: 'pending',
+      }),
     });
   }
   return results;
