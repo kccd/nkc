@@ -2,7 +2,7 @@ if !isIncluded('columns/article/articleOptions')
   -var types = {article: 'article', thread: 'thread'};
   +includeCSS('/columns/article/articleOptions.css')
   mixin articleOptions(props)
-    -var {logged, type, _id, threadUrl, tid, collected, digest, voteUp, voteDown, replyCount, vote, permissions} = props;
+    -var {logged, type, _id, threadUrl, tid, collected, digest, voteUp, voteDown, replyCount, vote, permissions,columnId} = props;
     .article-options
 
       mixin replyItem
@@ -61,6 +61,7 @@ if !isIncluded('columns/article/articleOptions')
         .article-options-item.other-options(
           data-type="articleOption"
           data-aid=_id
+          data-column-id=columnId
           title="其他操作"
           data-direction="down"
         )

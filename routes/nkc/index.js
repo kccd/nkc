@@ -11,6 +11,16 @@ const securityApplication = require('./securityApplication');
 const moment = require('moment');
 const documentRouter = require('./document');
 router
+  .use('/', async (ctx, next) => {
+    const { db, data, permission } = ctx;
+    //获取手机号申诉待审核数量
+    if (permission('nkcManagementSecurityApplication')) {
+      data.mobileApplyCount = await db.SecurityApplicationModel.countDocuments({
+        status: 'pending',
+      });
+    }
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const { db, query, data, nkcModules } = ctx;
     data.type = 'status';

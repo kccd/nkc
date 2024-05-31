@@ -13,6 +13,10 @@ mixin setUp()
           button.btn.btn-default.btn-sm(onclick=`homeTop('')`) 首页置顶
         if data.permissions && data.permissions.manageZoneArticleCategory
           button.btn.btn-default.btn-sm(onclick="moveArticle()") 修改多维分类
+        if data.permissions && data.permissions.column_settings_category
+          -const column = data.columnPost.column
+          include ../../publicModules/toColumn/toColumn
+          button.btn.btn-default.btn-sm(onclick="moveColumnArticle()")  移动文章
         button.btn-sm.btn.btn-danger(onclick="deleteArticle()") 退修/删除
       else if data.columnPost.type === 'thread'
         button.btn-sm.btn.btn-default(onclick=`toUrl('${url}')`) 去论坛文章

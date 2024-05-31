@@ -251,6 +251,12 @@ router
         (permission('movePostsToRecycle') || permission('movePostsToDraft')),
     };
     data.focusCommentId = focusCommentId;
+    if (state.uid) {
+      const subscribeUsersId = await db.SubscribeModel.getUserSubUsersId(
+        state.uid,
+      );
+      momentListData.subscribed = subscribeUsersId.includes(moment.uid);
+    }
     data.momentListData = momentListData;
     ctx.apiData = {
       momentListData: data.momentListData,

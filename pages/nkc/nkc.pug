@@ -61,6 +61,9 @@ block content
                 | 手机号申诉
                 if !permission("nkcManagementSecurityApplication")
                   | （无权）
+                else
+                  if data.mobileApplyCount 
+                    span.number=data.mobileApplyCount
             li(class=data.nav === 'os' ? 'active' : '')
               a(href=`/nkc/os`)
                 .fa.fa-list-alt
