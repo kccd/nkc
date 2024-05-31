@@ -22,7 +22,10 @@
             span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于&nbsp;
             from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
           //- 其他操作
-          .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'||(momentData.visibleType==='everyone'&&isShowPublicTag)") {{visitType[momentData.visibleType]}}
+          .single-moment-detail-tips
+            button.btn-xs.btn.btn-danger(v-if="logged && momentData.subscribed" @click.stop="userFollow(false)") 取关
+            button.btn-xs.btn.btn-primary(v-if="!logged || (!momentData.subscribed && uid!==momentData.uid)" @click.stop="userFollow(true)") 关注
+            .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'||(momentData.visibleType==='everyone'&&isShowPublicTag)") {{visitType[momentData.visibleType]}}
           .single-moment-detail-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
           moment-option(
             ref="momentOption"
@@ -307,7 +310,7 @@
       }
       .single-moment-detail-header{
         min-height: @avatarWidth;
-        padding-right: 8rem;
+        padding-right: 11rem;
         padding-left: @avatarWidth + 1rem;
         //margin-bottom: 0.5rem;
         @optionHeight: 2rem;
@@ -326,39 +329,46 @@
           font-size: 9pt;
           color: #555;
         }
-        .single-moment-tag{
+        .single-moment-detail-tips{
           display:inline-block;
           position:absolute;
-          right: 2.2rem;
+          right: @optionHeight;
           top: 0;
-          cursor: default;
-          border-width: 1px;
-          border-style: solid;
-          font-size: 1rem;
-          display: inline-flex;
-          justify-content: center;
-          align-items: center;
-          vertical-align: middle;
-          border-radius: 4px;
-          padding: 0 9px;
-          height: 2rem;
-          line-height: 2rem;
-        }
-        .own{
-          border-color:#d9ecff;
-          border-radius: 4px;
-          background-color: #ecf5ff;
-          color: #409eff;
-        }
-        .attention{
-          border-color:#faecd8;
-          background-color: #fdf6ec;
-          color: #e6a23c;
-        }
-        .everyone{
-          border-color:#e1f3d8;
-          background-color: #f0f9eb;
-          color: #67c23a;
+          button{
+            margin-right: 0.2rem;
+          }
+          .single-moment-tag{
+            margin-right: 0.2rem;
+            display:inline-block;
+            cursor: default;
+            border-width: 1px;
+            border-style: solid;
+            font-size: 1rem;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            vertical-align: middle;
+            border-radius: 4px;
+            padding: 0 9px;
+            height: 2rem;
+            line-height: 2rem;
+          }
+          .own{
+            border-color:#d9ecff;
+            border-radius: 4px;
+            background-color: #ecf5ff;
+            color: #409eff;
+          }
+          .attention{
+            border-color:#faecd8;
+            background-color: #fdf6ec;
+            color: #e6a23c;
+          }
+          .everyone{
+            border-color:#e1f3d8;
+            background-color: #f0f9eb;
+            color: #67c23a;
+          }
         }
         .single-moment-detail-header-options{
           height: @optionHeight;
@@ -667,7 +677,7 @@
 
 <script>
   import {momentVote} from "../../js/zone/vote";
-  import {sweetError} from "../../js/sweetAlert";
+  import {sweetError,sweetSuccess} from "../../js/sweetAlert";
   import {objToStr} from "../../js/tools";
   import FromNow from '../../../lib/vue/FromNow';
   // import MomentFiles from './MomentFiles';
@@ -680,6 +690,7 @@
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
   import MomentEditor from "./MomentEditor.vue";
+  import {subUsers} from "../../../lib/js/subscribe";
 
   const state = getState();
   export default {
@@ -700,6 +711,7 @@
     props: ['data', 'focus', 'permissions', 'mode', 'type'],
     data: () => ({
       logged: !!state.uid,
+      uid: state.uid,
       momentData: null,
       showPanelType: '', // comment, repost
       panelTypes: {
@@ -732,6 +744,25 @@
     methods: {
       objToStr: objToStr,
       visitUrl,
+      //取消关注和关注
+      userFollow(status) {
+        const self = this;
+        if(!this.logged){
+          return window.RootApp.openLoginPanel('login');
+        }
+        subUsers(this.momentData.uid,status)
+            .then(()=>{
+              if(status){
+              sweetSuccess('关注成功');
+              }else{
+              sweetSuccess('取消关注');
+              }
+              self.momentData.subscribed = status;
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+      },
       clearTimer() {
         clearTimeout(this.timer);
       },
