@@ -752,7 +752,7 @@
               if(status){
               sweetSuccess('关注成功');
               }else{
-              sweetSuccess('取消关注');
+              sweetSuccess('关注已取消');
               }
               self.momentData.subscribed = status;
             })
