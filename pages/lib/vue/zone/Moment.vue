@@ -23,7 +23,7 @@
             from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
           //- 其他操作
           .single-moment-detail-tips
-            button.btn-xs.btn.btn-danger(v-if="logged && momentData.subscribed" @click.stop="userFollow(false)") 取关
+            button.btn-xs.btn.btn-default(v-if="logged && momentData.subscribed" @click.stop="userFollow(false)") 取关
             button.btn-xs.btn.btn-primary(v-if="!logged || (!momentData.subscribed && uid!==momentData.uid)" @click.stop="userFollow(true)") 关注
             .single-moment-tag(:class="momentData.visibleType" v-if="momentData.visibleType!=='everyone'||(momentData.visibleType==='everyone'&&isShowPublicTag)") {{visitType[momentData.visibleType]}}
           .single-moment-detail-header-options.fa.fa-ellipsis-h(@click="openOption($event)" data-direction="down")
@@ -310,7 +310,7 @@
       }
       .single-moment-detail-header{
         min-height: @avatarWidth;
-        padding-right: 11rem;
+        padding-right: 11.5rem;
         padding-left: @avatarWidth + 1rem;
         //margin-bottom: 0.5rem;
         @optionHeight: 2rem;
@@ -332,13 +332,10 @@
         .single-moment-detail-tips{
           display:inline-block;
           position:absolute;
-          right: @optionHeight;
+          right: 2.3rem;
           top: 0;
-          button{
-            margin-right: 0.2rem;
-          }
           .single-moment-tag{
-            margin-right: 0.2rem;
+            margin-left: 0.5rem;
             display:inline-block;
             cursor: default;
             border-width: 1px;

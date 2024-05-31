@@ -8,6 +8,7 @@ window.articleOption = new Vue({
   el: '#moduleArticleOptions',
   data: {
     show: false,
+    columnId: '',
 
     loading: true,
 
@@ -93,9 +94,10 @@ window.articleOption = new Vue({
       visitUrl(url, true);
     },
     open(props) {
-      const {aid, direction, jqDOM, tid = '', collected = '',} = props;
+      const {aid, direction, jqDOM, tid = '', collected = '', columnId = ''} = props;
       this.jqDOM = jqDOM;
       this.direction = direction;
+      this.columnId = columnId;
       const self = this;
       self.loading = true;
       //获取当前用户对文章的操作权限
@@ -112,7 +114,7 @@ window.articleOption = new Vue({
     //获取当前操作权限
     getPermissions(aid) {
       const self = this;
-      nkcAPI(`/article/${aid}/options`, 'GET')
+      nkcAPI(`/article/${aid}/options?columnId=${this.columnId}`, 'GET')
         .then(data => {
           if(data.optionStatus) self.optionStatus = data.optionStatus;
           self.article = data.article;
@@ -448,6 +450,7 @@ NKC.methods.initArticleOption = () => {
     dom.on('click', (e) => {
       const aid = dom.attr('data-aid');
       const tid = dom.attr('data-tid');
+      const columnId = dom.attr('data-column-id');
       const collected = dom.attr('data-collected');
       const direction = dom.attr('data-direction') || 'up';
       articleOption.open({
@@ -456,6 +459,7 @@ NKC.methods.initArticleOption = () => {
         collected,
         direction,
         jqDOM: dom,
+        columnId,
       });
       //阻止浏览器默认行为
       e.stopPropagation();

@@ -14,6 +14,9 @@ block baseColumnContent
     +hidePostContentSettings(data.postHeight)
   mixin thread
     .m-b-1
+      if data.permissions.column_settings_category
+            -const column = data.columnPost.column
+            include ../publicModules/toColumn/toColumn
       include ./article/nav
       +nav({_id, name, hits, count, docNumber, oc, mainCategory, auxiliaryCategory, collectedCount, collected, type, url, showManagement, user: data.user})
       include ./article/setUp
@@ -53,6 +56,7 @@ block baseColumnContent
         replyCount: type === 'article' ? article.count : count,
         vote: article.vote,
         permissions: data.permissions,
+        columnId: _id
       })
   .hidden#data=objToStr({cid: data.columnPost.cid,mcid: data.columnPost.mcid ,columnId: data.columnPost.column._id,columnPostId: data.columnPost._id, allCategories: data.allCategories, type, comments: data.comments, comment: data.comment, article, collectedCount, type, collected, columnInfo: data.columnInfo, addedToColumn: data.addedToColumn, isLastPage: (data.paging.page + 1) === data.paging.pageCount})
   span.move-article-category#moveCategoryBoxAppInColumns(v-cloak)
