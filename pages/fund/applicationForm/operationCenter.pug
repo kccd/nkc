@@ -64,6 +64,8 @@ if !isIncluded('operationCenter')
               button.btn.btn-default.btn-block(onclick=`removeUserFromFundBlacklist("${form.uid}")`) 移出黑名单
             else
               button.btn.btn-default.btn-block(onclick=`addUserToFundBlacklist("${form.uid}", ${form._id})`) 加入黑名单
+        if userFundRoles.includes('visitPostHistory') && form.pid
+          a.btn.btn-default.btn-block(target='_blank' href=`/p/${form.pid}/history`) 查看历史
 
 
   +includeJS('/fund/blacklist/blacklist.js')

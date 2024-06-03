@@ -1896,7 +1896,7 @@ schema.statics.getArticlesInfo = async function (articles) {
       // editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
       // url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
       if (columnPost) {
-        editorUrl = `/column/editor?source=column&mid=${columnPost.columnId}&aid=${columnPost.pid}`;
+        editorUrl = `/column/editor?source=column&aid=${columnPost.pid}`;
         url = `/m/${columnPost.columnId}/a/${columnPost._id}`;
       } else {
         editorUrl = `/column/editor?source=column&aid=${article._id}`;
@@ -2157,6 +2157,8 @@ schema.statics.getArticleInfoByColumn = async function (columnPost) {
     mainCategory,
     auxiliaryCategory,
     type: columnPost.type,
+    mcid,
+    cid,
   };
 };
 

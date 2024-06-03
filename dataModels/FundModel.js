@@ -653,7 +653,7 @@ fundSchema.statics.modifyTimeoutApplicationForm = async () => {
 
   const applicationForms = await FundApplicationFormModel.find(match);
   for (const form of applicationForms) {
-    await form.setUselessAsTimeout();
+    await form.setUselessAsTimeout(form.uid);
   }
 };
 

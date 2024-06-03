@@ -14,7 +14,7 @@
             input(type="checkbox" checked="checked" data-type="protocol" v-model="protocol")
             span 我已阅读并同意遵守与本次发表相关的全部协议。
             a(href="/protocol" target="_blank") 查看协议
-        .btn.btn-primary.btn-sm.m-r-05(@click="publishComment" :disabled="lockPost") 提交
+        .btn.btn-primary.btn-sm.m-r-05(@click="publishComment" :disabled="lockPost || !protocol") 提交
         .btn.btn-default.btn-sm.m-r-05(@click="saveComment" :disabled="lockPost") 存草稿
         .btn.btn-default.btn-sm(@click="close") 取消
 </template>
@@ -156,9 +156,10 @@ export default {
       this.lockPost = true;
       const self = this;
       self.setSavedStatus('saving');
-      return Promise.resolve().then(()=>{
+      // return Promise.resolve().then(()=>{
        return  nkcAPI('/comment', 'POST', {
           content: self.commentContent,
+          content: self.$refs[`commentEditor_${self.comment._id}`].getContent(),
           type,
           source: self.comment.source,
           aid: self.aid,
@@ -177,19 +178,24 @@ export default {
               self.close();
             }
             return self.setSavedStatus('succeeded');
-          })
-      }).catch(err => {
+          }).catch(err => {
         self.lockPost = false;
         self.setSavedStatus('failed');
         sweetError(err);
       })
+      // }).catch(err => {
+      //   self.lockPost = false;
+      //   self.setSavedStatus('failed');
+      //   sweetError(err);
+      // })
     },
     //提交正式版评论
     publishComment() {
-      this.post('save',true).then(()=>{
-          this.post('publish').then(()=>{
-        })
-      });
+      this.post('publish')
+      // this.post('save',true).then(()=>{
+      //     this.post('publish').then(()=>{
+      //   })
+      // });
     },
     //暂存评论
     saveComment() {

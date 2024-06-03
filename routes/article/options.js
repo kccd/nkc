@@ -3,10 +3,11 @@ const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
 router.get('/', async (ctx, next) => {
-  const { db, data, params, state, permission, permissionsOr } = ctx;
+  const { db, data, params, state, permission, permissionsOr, query } = ctx;
   const { aid } = params;
   const { user } = data;
   const { uid } = state;
+  const { columnId } = query;
   const { normal: articleStatus } = await db.ArticleModel.getArticleStatus();
   let article = await db.ArticleModel.findOnly({ _id: aid });
   if (!article) {
@@ -46,6 +47,7 @@ router.get('/', async (ctx, next) => {
     source: document.source,
     digest: null,
     xsf: null,
+    move: null,
   };
   if (user) {
     data.digestRewardScore = await db.SettingModel.getScoreByOperationType(
@@ -95,6 +97,19 @@ router.get('/', async (ctx, next) => {
       // 违规记录
       optionStatus.violation = ctx.permission('violationRecord') ? true : null;
       optionStatus.articleUserId = article.uid;
+    }
+    if (columnId) {
+      const userPermissionObject =
+        await db.ColumnModel.getUsersPermissionKeyObject();
+      const column = await db.ColumnModel.findOne({ _id: columnId });
+      if (column) {
+        optionStatus.move =
+          (await db.ColumnModel.checkUsersPermission(
+            column.users,
+            user.uid,
+            userPermissionObject.column_settings_category,
+          )) || user.uid === column.uid;
+      }
     }
   }
   data.optionStatus = optionStatus;

@@ -72,7 +72,7 @@ router
     }
     if(type === "destroy") {
       if(mobileCodeObj) await mobileCodeObj.updateOne({used: true});
-      if(emailCodeObj) await mobileCodeObj.updateOne({used: true});
+      if(emailCodeObj) await emailCodeObj.updateOne({used: true});
       await db.UserModel.destroyAccount({
         uid: user.uid,
         ip: ctx.address,

@@ -3001,6 +3001,8 @@ threadSchema.statics.getThreadInfoByColumn = async function (columnPost) {
     auxiliaryCategory,
     type: columnPost.type,
     url,
+    cid,
+    mcid,
   };
 };
 

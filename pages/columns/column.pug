@@ -5,6 +5,7 @@ block content
   include ./modules/columnHeader
   include ./modules/contribute
   include ./modules/articleContribute
+  - const editCategoryPermission = state.uid === data.column.uid || data.column.users.some(item=>item.uid===state.uid&&item.permission.includes('column_settings_category'));
   +mixinColumnHeader({
     user: data.user,
     column: data.column,
@@ -23,9 +24,9 @@ block content
           href=`/m/${column._id}?c=${c._id}`
           data-type='reload'
           title=c.brief
-          style=`${index===categoriesNav.length-1 && state.uid === column.uid ?'margin-right:5.8rem;':''}`
+          style=`${index===categoriesNav.length-1 && editCategoryPermission ?'margin-right:5.8rem;':''}`
         )= c.name
-        if state.uid === column.uid && index===categoriesNav.length-1
+        if editCategoryPermission && index===categoriesNav.length-1
           button.btn.btn-default.btn-xs( style='position:absolute;right:1rem;' onclick=`openNewWindow('/m/${column._id}/settings/category#${categoriesNav[categoriesNav.length-1]._id}')`) 编辑主分类
     if childCategories && childCategories.length > 0
       .column-child-categories
@@ -65,9 +66,9 @@ block content
                       class=data.minorCategory && data.minorCategory._id === c._id? 'active':''
                       title=c.brief
                       data-type='reload'
-                      style=`${index===data.minorCategories.length-1 && state.uid === data.column.uid ?'margin-right:5.8rem;':''}`
+                      style=`${index===data.minorCategories.length-1 && editCategoryPermission ?'margin-right:5.8rem;':''}`
                       ).column-minor-category=`${c.name}(${c.count})`
-                    if state.uid === data.column.uid && index===data.minorCategories.length-1 && data.minorCategory
+                    if editCategoryPermission && index===data.minorCategories.length-1 && data.minorCategory
                       button.btn.btn-default.btn-xs( style='position:absolute;right:2rem;' onclick=`openNewWindow('/m/${data.column._id}/settings/category#${data.minorCategory._id}')`) 编辑辅分类
               if data.minorCategory
                 .column-category-abbr!=data.minorCategory.description
@@ -78,7 +79,7 @@ block content
                 .column-posts-body-info(v-if="category") — 以上为分类置顶 —
                 .column-posts-body-info(v-else) — 以上为专栏置顶 —
               div(style="margin-bottom: -0.6rem;")
-                .paging-button(v-if="user&&user.uid === column.uid && (columnPosts.length !== 0 || topped.length !== 0)")
+                .paging-button(v-if="user&&(user.uid === column.uid || column.users.some(item=>item.uid===user.uid)) && (columnPosts.length !== 0 || topped.length !== 0)")
                   a.button.radius-left.radius-right(v-if="!showSettingButton" onclick='editColumnPosts(true)') 文章管理
                   a.button.radius-left.radius-right(v-else onclick='editColumnPosts(false)') 退出管理
                 include ../publicModules/paging/paging
@@ -107,7 +108,7 @@ block content
                 else
                   .column-posts-body-info — 以上为专栏置顶 —
               div(style="margin-bottom: -0.6rem;")
-                if state.uid === data.column.uid && (data.columnPosts.length !== 0 || data.topped.length !== 0)
+                if (state.uid === data.column.uid || data.column.users.some(item=>item.uid===state.uid)) && (data.columnPosts.length !== 0 || data.topped.length !== 0)
                   .paging-button
                     a.button.radius-left.radius-right(onclick='editColumnPosts(true)') 文章管理
                 include ../publicModules/paging/paging

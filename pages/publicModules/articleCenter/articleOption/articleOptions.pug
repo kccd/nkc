@@ -40,6 +40,9 @@ if !isIncluded('articleOptions')
         .option(v-if="optionStatus.reviewed === 'unknown'" @click='reviewArticle')
           .fa.fa-check-circle-o
           span 通过审核
+        .option(v-if="optionStatus.move" onclick="moveColumnArticle()")
+          .fa.fa-newspaper-o
+          span 移动文章
         .option(v-if='optionStatus.collection !== null' @click='collectionThread')
           .fa.fa-folder-o
           span(v-if='optionStatus.collection === false') 加入收藏

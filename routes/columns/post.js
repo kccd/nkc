@@ -85,6 +85,16 @@ router
         }
         break;
       }
+      case "columnTop":
+      case "unColumnTop":
+      case "categoryTop":
+      case "unCategoryTop": {
+        const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_post_order);
+        if(!isPermission && column.uid !== user.uid){
+          ctx.throw(403, "权限不足");
+        }
+        break;
+      }
     }
     if(type === "addToColumn") { // 推送文章到专栏
       if(!mainCategoriesId || mainCategoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
