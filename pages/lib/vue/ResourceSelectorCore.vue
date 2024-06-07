@@ -701,6 +701,7 @@ import SelectCategory from "./SelectCategory";
 import {openImageViewer} from "../js/imageViewer";
 
 const {isApp, fileDomain} = getState();
+const isReactNative = isApp && getState().platform === 'reactNative';
 import {
   RNTakePictureAndUpload,
   RNTakeAudioAndUpload,
@@ -1378,7 +1379,16 @@ export default {
         if(r.rid === rid) index = images.length - 1;
       }
       if(images.length === 0) return;
-      openImageViewer(images, index);
+      if (isReactNative) {
+        openImageViewer(images, index);
+      } else {
+        const readyFiles = images.map((item) => {
+          return { ...item, type: 'picture' };
+        });
+        window.RootApp.$refs.preview.setData(true, index, readyFiles);
+        window.RootApp.$refs.preview.init(index);
+      }
+      // openImageViewer(images, index);
     },
     selectResourceType: function(t) {
       this.resourceType = t;

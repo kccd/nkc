@@ -28,7 +28,6 @@
               v-if="file.type !== 'picture'"
               )
               video(:src="file.sources[file.sources.length - 1].url" :poster="file.coverUrl" controls='controls')
-      preview-model(ref="preview")
 </template>
 
 <style lang="less" scoped>
@@ -113,8 +112,8 @@ const { isApp } = getState();
             readyFiles = filesData.filter((item) => item.type === 'video');
             if (readyFiles.length === 0) return;
             const $index = readyFiles.findIndex((item) => item.rid === clickRid);
-            this.$refs.preview.setData(true, $index, readyFiles);
-            this.$refs.preview.init($index);
+            window.RootApp.$refs.preview.setData(true, $index, readyFiles);
+            window.RootApp.$refs.preview.init($index);
           } else if (clickType === 'picture') {
             tempArray = filesData.filter((item) => item.type === 'picture');
             for (const fileItem of tempArray) {
@@ -139,8 +138,8 @@ const { isApp } = getState();
             }
           }
           if (readyFiles.length === 0) return;
-          this.$refs.preview.setData(true, index, readyFiles);
-          this.$refs.preview.init(index);
+          window.RootApp.$refs.preview.setData(true, index, readyFiles);
+          window.RootApp.$refs.preview.init(index);
         }
 
       }

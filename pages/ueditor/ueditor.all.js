@@ -14879,7 +14879,7 @@
         var currentScene = this.getScene(notSetCursor),
           lastScene = this.list[this.index];
 
-        if (lastScene && lastScene.content != currentScene.content) {
+        if ((lastScene && lastScene.content != currentScene.content)||(this.index===0&&this.list.length===0)) {
           me.trigger('contentchange')
         }
         //内容相同位置相同不存
@@ -15022,7 +15022,25 @@
         if (!isCollapsed) {
           this.undoManger.save(false, true);
           isCollapsed = true;
+          return;
         }
+        clearTimeout(saveSceneTimer);
+        function save(cont) {
+          cont.fireEvent('selectionchange');
+          cont.undoManger.save(false, true);
+        }
+        saveSceneTimer = setTimeout(function () {
+          if (inputType) {
+            var interalTimer = setInterval(function () {
+              if (!inputType) {
+                save(me);
+                clearInterval(interalTimer)
+              }
+            }, 300)
+            return;
+          }
+          save(me);
+        }, 200);
       }
     });
     //扩展实例，添加关闭和开启命令undo

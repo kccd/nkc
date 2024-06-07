@@ -35,16 +35,20 @@ router.get('/', async (ctx, next) => {
   data.form = form;
   let options;
 
+  const readableForumsId = await db.ForumModel.getReadableForumsIdByUid(
+    user ? user.uid : null,
+  );
+
   // 高级搜索参数
   if (d) {
     try {
       options = JSON.parse(
         decodeURIComponent(Buffer.from(d, 'base64').toString()),
       );
-      const { fid, excludedFid } = options;
-      if (fid && fid.length > 0) {
+      if (options.fid && options.fid.length > 0) {
+        options.fid = options.fid.filter((id) => readableForumsId.includes(id));
         data.selectedForums = await db.ForumModel.find(
-          { fid: { $in: fid } },
+          { fid: { $in: options.fid } },
           {
             fid: 1,
             displayName: 1,
@@ -53,9 +57,12 @@ router.get('/', async (ctx, next) => {
           },
         ).sort({ order: 1 });
       }
-      if (excludedFid && excludedFid.length > 0) {
+      if (options.excludedFid && options.excludedFid.length > 0) {
+        options.excludedFid = options.excludedFid.filter((id) =>
+          readableForumsId.includes(id),
+        );
         data.excludedForums = await db.ForumModel.find(
-          { fid: { $in: excludedFid } },
+          { fid: { $in: options.excludedFid } },
           {
             fid: 1,
             displayName: 1,
@@ -81,9 +88,6 @@ router.get('/', async (ctx, next) => {
   let results = [];
   data.results = [];
 
-  const readableForumsId = await db.ForumModel.getReadableForumsIdByUid(
-    user ? user.uid : null,
-  );
   const displayOnSearchForumsId =
     await db.ForumModel.getDisplayOnSearchForumsIdFromRedis();
   const fidOfCanGetThreads = readableForumsId.filter((id) =>

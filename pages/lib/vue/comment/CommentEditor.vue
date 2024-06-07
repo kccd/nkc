@@ -27,8 +27,8 @@
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
     .m-b-05
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentId || lockPost || !checkProtocol" v-if="!publishing") 发布
-      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="!commentId || lockPost || !checkProtocol" v-if="publishing") 发布中...
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="disabledPublish" v-if="!publishing") 发布
+      button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="disabledPublish" v-if="publishing") 发布中...
         span.fa.fa-spinner.fa-spin
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="!saving") 暂存
       button.m-r-05.btn.btn-default.btn-sm(@click="saveComment" :disabled="!commentContent || lockPost" v-if="saving") 暂存中...
@@ -97,6 +97,13 @@
       'column': Column
     },
     computed: {
+      disabledPublish(){
+        let count = 0;
+        if( this.$refs.editor){
+          count = this.$refs.editor.getContentTxt().length;
+        }
+        return !this.commentId || this.lockPost || !this.checkProtocol || !this.commentContent || count>commentEditorConfigs.maximumWords;
+      }
     },
     mounted() {
     },
@@ -140,7 +147,7 @@
         // } else {
           self.setTimeout = setTimeout(function () {
             self.post(self.type);
-          }, 1500);
+          }, 800);
         // }
       },
       //点击引用获取该楼层的引用信息
@@ -170,7 +177,7 @@
         if(type === 'publish') {
           if(!this.commentId) return;
           this.publishing = true;
-          // clearTimeout(this.setTimeout);
+          clearTimeout(this.setTimeout);
         } else if(type === 'save') {
           this.saving = true;
         }
@@ -214,6 +221,7 @@
             self.quote = null;
             self.publishing = false;
             self.commentId = null;
+            clearTimeout(this.setTimeout);
           }
           self.lockPost = false;
           self.setSavedStatus('succeeded');
