@@ -126,6 +126,7 @@ const {uid} = getState();
 import {toLogin} from '../js/account.js';
 const logged = !!uid;
 
+const isReactNative = getState().isApp && getState().platform === 'reactNative';
 import Vue from 'vue';
 export default Vue.extend({
   props: ['store'],
@@ -366,7 +367,16 @@ export default Vue.extend({
           name: `商品图 ${i + 1}`,
         });
       }
-      openImageViewer(images, index);
+      if (isReactNative) {
+        openImageViewer(images, index);
+      } else {
+        const readyFiles = images.map((item) => {
+          return { ...item, type: 'picture' };
+        });
+        window.RootApp.$refs.preview.setData(true, index, readyFiles);
+        window.RootApp.$refs.preview.init(index);
+      }
+      // openImageViewer(images, index);
     },
   },
 })

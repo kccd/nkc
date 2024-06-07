@@ -1057,14 +1057,14 @@ export default {
       img.src = imgData[index].url;
       return new Promise((resolve, reject) => {
         img.onload = (data) => {
-          snapData = { type: 'picture', filename: imgData[index].filename, url: imgData[index].url, rid: imgData[index].rid, width: imgData[index].width, height: imgData[index].height, error: false };
+          snapData = { type: 'picture', filename: imgData[index].filename || imgData[index].name || '', url: imgData[index].url, rid: imgData[index].rid||'', width: imgData[index].width||img.width, height: imgData[index].height || img.height, error: false };
           this.preloadImgData[index] = snapData;
 
           resolve(true);
         };
 
         img.onerror = () => {
-          snapData = { type: 'picture', filename: 'loading error', url: '/statics/preview-model/error.png', rid: imgData[index].rid, width: 128, height: 128, error: true };
+          snapData = { type: 'picture', filename: 'loading error', url: '/statics/preview-model/error.png', rid: imgData[index].rid||'', width: 128, height: 128, error: true };
           this.preloadImgData[index] = snapData;
 
           reject(false);

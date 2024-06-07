@@ -11,6 +11,7 @@ import Sticker from '../lib/vue/Sticker';
 import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
+import PreviewModel from '../lib/vue/zone/PreviewModel';
 import Lottery from '../lib/vue/lottery.vue';
 import { toChat } from '../lib/js/chat';
 import { sweetSuccess, sweetError } from '../lib/js/sweetAlert';
@@ -45,6 +46,7 @@ window.RootApp = new Vue({
     digest: Digest,
     credit: Credit,
     'share-float-panel': ShareFloatPanel,
+    'preview-model': PreviewModel,
   },
   computed: {
     hasLogged() {

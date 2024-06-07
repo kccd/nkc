@@ -35,7 +35,15 @@ function viewImage(data) {
     name,
     url
   }];
-  openImageViewer(images, 0);
+  if (isReactNative) {
+    openImageViewer(images, 0);
+  } else {
+    const readyFiles = images.map((item) => {
+      return { ...item, type: 'picture' };
+    });
+    window.RootApp.$refs.preview.setData(true, 0, readyFiles);
+    window.RootApp.$refs.preview.init(0);
+  }
 }
 /*
 * 查看多张图片
@@ -46,8 +54,16 @@ function viewImage(data) {
 *   @param {Number} index 默认打开的图片索引
 * */
 function viewImages(data) {
-  const {images, index} = data;
-  openImageViewer(images, index);
+  const { images, index } = data;
+  if (isReactNative) {
+    openImageViewer(images, index);
+  } else {
+    const readyFiles = images.map((item) => {
+      return { ...item, type: 'picture' };
+    });
+    window.RootApp.$refs.preview.setData(true, index, readyFiles);
+    window.RootApp.$refs.preview.init(index);
+  }
 }
 
 /*
