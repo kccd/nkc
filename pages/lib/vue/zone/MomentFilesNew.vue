@@ -23,7 +23,6 @@
           :title="fileData.filename"
           )
         span.fa.fa-play-circle-o(v-if="fileData.type === types.video " class='play-icon')
-    preview-model(ref="preview")
 </template>
 
 <style lang="less" scoped>
@@ -166,7 +165,6 @@
 import { openImageViewer } from '../../js/imageViewer';
 import { getState } from '../../js/state';
 import VideoPlayer from '../VideoPlayer';
-import PreviewModel from './PreviewModel';
 const { isApp } = getState();
 export default {
   /*
@@ -192,7 +190,6 @@ export default {
   props: ['data'],
   components: {
     'video-player': VideoPlayer,
-    'preview-model': PreviewModel,
   },
   data: () => ({
     types: {
@@ -273,8 +270,8 @@ export default {
           readyFiles = filesData.filter((item) => item.type === 'video');
           if (readyFiles.length === 0) return;
           const $index = readyFiles.findIndex((item) => item.rid === clickRid);
-          this.$refs.preview.setData(true, $index , readyFiles);
-          this.$refs.preview.init($index);
+          window.RootApp.$refs.preview.setData(true, $index , readyFiles);
+          window.RootApp.$refs.preview.init($index);
         } else if (clickType === 'picture') {
           tempArray = filesData.filter((item) => item.type === 'picture');
           for (const fileItem of tempArray) {
@@ -302,8 +299,8 @@ export default {
           }
         }
         if (readyFiles.length === 0) return;
-        this.$refs.preview.setData(true, index, readyFiles);
-        this.$refs.preview.init(index);
+        window.RootApp.$refs.preview.setData(true, index, readyFiles);
+        window.RootApp.$refs.preview.init(index);
       }
     },
   },

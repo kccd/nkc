@@ -15,6 +15,8 @@ export function initNKCRenderImagesView() {
       if(!data.url || !data.name) continue;
       image.url = data.url;
       image.name = data.name;
+      image.width = data.width;
+      image.height = data.height;
     }
     images.push(image);
   }
