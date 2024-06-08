@@ -6,7 +6,6 @@ router
     const { db, data, params, body, redis } = ctx;
     const { pid } = params;
     const { user } = data;
-    console.log(pid, 'pid');
     let { num, description } = body;
     num = Number(num);
     if (num % 1 !== 0) {
@@ -140,91 +139,89 @@ router
     await next();
   })
   .post('/kcb', async (ctx, next) => {
-    const { data, db, body, params, redis } = ctx;
-    const { user } = data;
-    const { pid } = params;
-    let { num, description } = body;
-    const creditScore = await db.SettingModel.getScoreByOperationType(
-      'creditScore',
-    );
-    num = Number(num);
-    if (num % 1 !== 0) {
-      ctx.throw(400, `${creditScore.name}仅支持到小数点后两位`);
-    }
-    const fromUser = user;
-    const post = await db.PostModel.findOnly({ pid });
-    if (post.anonymous) {
-      ctx.throw(400, '无法鼓励匿名用户');
-    }
-    const toUser = await db.UserModel.findOnly({ uid: post.uid });
-    if (fromUser.uid === toUser.uid) {
-      ctx.throw(400, '无法给自己鼓励');
-    }
-    const thread = await db.ThreadModel.findOnly({ tid: post.tid });
-    if (thread.disabled) {
-      ctx.throw(403, '文章已被封禁');
-    }
-    if (post.disabled) {
-      ctx.throw(403, '回复已被封禁');
-    }
-    const creditSettings = await db.SettingModel.getCreditSettings();
-    await db.UserModel.updateUserScores(user.uid);
-    const userScore = await db.UserModel.getUserScore(
-      user.uid,
-      creditScore.type,
-    );
-    if (num < creditSettings.min) {
-      ctx.throw(400, `${creditScore.name}最少为${creditSettings.min / 100}`);
-    }
-    if (num > creditSettings.max) {
-      ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max / 100}`);
-    }
-    // fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
-    if (userScore < num) {
-      ctx.throw(400, `你的${creditScore.name}不足`);
-    }
-    if (description.length < 2) {
-      ctx.throw(400, '理由写的太少了');
-    }
-    if (description.length > 500) {
-      ctx.throw(400, '理由不能超过500个字');
-    }
-    const record = await db.KcbsRecordModel.insertUsersRecord({
-      fromUser,
-      toUser,
-      post,
-      description,
-      num,
-      ip: ctx.address,
-      port: ctx.port,
-    });
-    await fromUser.calculateScore();
-    await toUser.calculateScore();
+    const { data, db, body, params, redis, nkcModules} = ctx;
+    const lock = await nkcModules.redLock.redLock.lock("creditKCB", 6000);
+    try{
+      const { user } = data;
+      const { pid } = params;
+      let { num, description } = body;
+      const creditScore = await db.SettingModel.getScoreByOperationType(
+        'creditScore',
+      );
+      num = Number(num);
+      if (num % 1 !== 0) {
+        ctx.throw(400, `${creditScore.name}仅支持到小数点后两位`);
+      }
+      const fromUser = user;
+      const post = await db.PostModel.findOnly({ pid });
+      if (post.anonymous) {
+        ctx.throw(400, '无法鼓励匿名用户');
+      }
+      const toUser = await db.UserModel.findOnly({ uid: post.uid });
+      if (fromUser.uid === toUser.uid) {
+        ctx.throw(400, '无法给自己鼓励');
+      }
+      const thread = await db.ThreadModel.findOnly({ tid: post.tid });
+      if (thread.disabled) {
+        ctx.throw(403, '文章已被封禁');
+      }
+      if (post.disabled) {
+        ctx.throw(403, '回复已被封禁');
+      }
+      const creditSettings = await db.SettingModel.getCreditSettings();
+      await db.UserModel.updateUserScores(user.uid);
+      const userScore = await db.UserModel.getUserScore(
+        user.uid,
+        creditScore.type,
+      );
+      if (num < creditSettings.min) {
+        ctx.throw(400, `${creditScore.name}最少为${creditSettings.min / 100}`);
+      }
+      if (num > creditSettings.max) {
+        ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max / 100}`);
+      }
+      // fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
+      if (userScore < num) {
+        ctx.throw(400, `你的${creditScore.name}不足`);
+      }
+      if (description.length < 2) {
+        ctx.throw(400, '理由写的太少了');
+      }
+      if (description.length > 500) {
+        ctx.throw(400, '理由不能超过500个字');
+      }
+      const record = await db.KcbsRecordModel.insertUsersRecord({
+        fromUser,
+        toUser,
+        post,
+        description,
+        num,
+        ip: ctx.address,
+        port: ctx.port,
+      });
+      await fromUser.calculateScore();
+      await toUser.calculateScore();
 
-    await thread.updateThreadEncourage();
-    // 发消息
-    const message = db.MessageModel({
-      _id: await db.SettingModel.operateSystemID('messages', 1),
-      r: toUser.uid,
-      ty: 'STU',
-      port: ctx.port,
-      ip: ctx.address,
-      c: {
-        type: 'scoreTransfer',
-        // pid: post.pid,
-        // // userName: user.username,
-        // uid: user.uid,
-        // // kcb: num,
-        // number: num,
-        // // scoreName: creditScore.name,
-        // scoreType: creditScore.type,
-        // // threadTitle: post.t,
-        // description,
-        recordId: record._id,
-      },
-    });
-    await message.save();
-    await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      await thread.updateThreadEncourage();
+      // 发消息
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID('messages', 1),
+        r: toUser.uid,
+        ty: 'STU',
+        port: ctx.port,
+        ip: ctx.address,
+        c: {
+          type: 'scoreTransfer',
+          recordId: record._id,
+        },
+      });
+      await message.save();
+      await ctx.nkcModules.socket.sendMessageToUser(message._id);
+      await lock.unlock();
+    } catch(err) {
+      await lock.unlock();
+      throw err;
+    }
     await next();
   })
   .put('/kcb/:recordId', async (ctx, next) => {
