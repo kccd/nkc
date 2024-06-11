@@ -48,6 +48,8 @@ router
   })
   .post("/", async (ctx, next) => {
     const {db, body, nkcModules, data} = ctx;
+    const lock = await nkcModules.redLock.redLock.lock("creditKCB", 6000);
+    try{
     const {checkNumber} = nkcModules.checkData;
     const {password, number} = body;
     const {user, kcbOnce, targetUser, shopScore} =  data;
@@ -82,6 +84,12 @@ router
 
     await db.UserModel.updateUserScores(user.uid);
     await db.UserModel.updateUserScores(targetUser.uid);
+    
+      await lock.unlock();
+    } catch(err) {
+      await lock.unlock();
+      throw err;
+    }
     // await db.UserModel.updateUserKcb(user.uid);
     // await db.UserModel.updateUserKcb(targetUser.uid);
     await next();
