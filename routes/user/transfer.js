@@ -48,40 +48,48 @@ router
   })
   .post("/", async (ctx, next) => {
     const {db, body, nkcModules, data} = ctx;
-    const {checkNumber} = nkcModules.checkData;
-    const {password, number} = body;
-    const {user, kcbOnce, targetUser, shopScore} =  data;
-    checkNumber(number, {
-      name: "转账金额",
-      min: 1
-    });
-    if(!password) ctx.throw(400, "密码不能为空");
-    if(number > kcbOnce) ctx.throw(400, `转账金额不能超过${kcbOnce/100}${shopScore.unit}${shopScore.name}`);
-    const usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    await usersPersonal.ensurePassword(password);
+    const lock = await nkcModules.redLock.redLock.lock("creditKCB", 6000);
+    try {
+      const {checkNumber} = nkcModules.checkData;
+      const {password, number} = body;
+      const {user, kcbOnce, targetUser, shopScore} =  data;
+      checkNumber(number, {
+        name: "转账金额",
+        min: 1
+      });
+      if(!password) ctx.throw(400, "密码不能为空");
+      if(number > kcbOnce) ctx.throw(400, `转账金额不能超过${kcbOnce/100}${shopScore.unit}${shopScore.name}`);
+      const usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+      await usersPersonal.ensurePassword(password);
 
-    await db.UserModel.updateUserScores(user.uid);
-    // await db.UserModel.updateUserKcb(user.uid);
+      await db.UserModel.updateUserScores(user.uid);
+      // await db.UserModel.updateUserKcb(user.uid);
 
-    const userScore = await db.UserModel.getUserScore(user.uid, shopScore.type);
+      const userScore = await db.UserModel.getUserScore(user.uid, shopScore.type);
 
-    if(userScore < number) ctx.throw(400, `你的${shopScore.name}不足`);
+      if(userScore < number) ctx.throw(400, `你的${shopScore.name}不足`);
 
-    const record = db.KcbsRecordModel({
-      _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
-      scoreType: shopScore.type,
-      from: user.uid,
-      to: targetUser.uid,
-      type: "transferToUser",
-      num: number,
-      ip: ctx.address,
-      port: ctx.port
-    });
+      const record = db.KcbsRecordModel({
+        _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
+        scoreType: shopScore.type,
+        from: user.uid,
+        to: targetUser.uid,
+        type: "transferToUser",
+        num: number,
+        ip: ctx.address,
+        port: ctx.port
+      });
 
-    await record.save();
+      await record.save();
 
-    await db.UserModel.updateUserScores(user.uid);
-    await db.UserModel.updateUserScores(targetUser.uid);
+      await db.UserModel.updateUserScores(user.uid);
+      await db.UserModel.updateUserScores(targetUser.uid);
+    
+      await lock.unlock();
+    } catch(err) {
+      await lock.unlock();
+      throw err;
+    }
     // await db.UserModel.updateUserKcb(user.uid);
     // await db.UserModel.updateUserKcb(targetUser.uid);
     await next();

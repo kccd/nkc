@@ -40,7 +40,9 @@ block eContent
               a.btn.btn-default(type='submit' href='/e/log/kcb') 全部
             .text-danger= data.info
         .col-xs-12.col-md-12.table-responsive
-          include ../../publicModules/paging/paging
+          //-include ../../publicModules/paging/paging
+          include ../../publicModules/paging/forum-paging
+          +renderPagingButton({t: data.t || 'username',content: data.content || '',operationId: data.operationId || '',scoreType:data.scoreType || ''},data.paging,remoteState.url)
           table.table.table-bordered(style='font-size:1rem;')
             thead
               tr
