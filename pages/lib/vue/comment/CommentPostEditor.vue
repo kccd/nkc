@@ -121,8 +121,8 @@ export default {
     //关闭评论编辑器
     close() {
       this.show = false;
-      window.location.reload();
-      // this.$emit('close-editor', this.comment._id);
+      // window.location.reload();
+      this.$emit('close-editor', this.comment._id);
     },
     //当编辑器中的内容变化时
     editorContentChange: debounce(function() {
@@ -175,7 +175,9 @@ export default {
               self.lockPost = false;
               sweetSuccess('提交成功');
               //提交成功后关闭评论编辑器
-              self.close();
+              self.show = false;
+              window.location.reload();
+              // self.close();
             }
             return self.setSavedStatus('succeeded');
           }).catch(err => {
