@@ -43,7 +43,7 @@ imgCodeSchema.statics.ensureCode = async (_id, token) => {
 
 	const {effectiveTime} = require('../settings/imgCode');
 	const ImgCodeModel = mongoose.model('imgCodes');
-	const imgCode = await ImgCodeModel.findOne({_id: mongoose.Types.ObjectId(_id)});
+	const imgCode = await ImgCodeModel.findOne({_id: new mongoose.Types.ObjectId(_id)});
 	if(!imgCode) {
 		const error = new Error('图形验证码无效。');
 		error.status = 400;

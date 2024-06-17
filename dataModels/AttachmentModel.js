@@ -100,7 +100,7 @@ const schema = new Schema({
 * @author pengxiguaa 2020/6/12
 * */
 schema.statics.getNewId = () => {
-  return mongoose.Types.ObjectId().toString();
+  return new mongoose.Types.ObjectId().toString();
 };
 
 
