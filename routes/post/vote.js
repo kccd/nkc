@@ -27,7 +27,9 @@ voteRouter
     await thread.updateThreadVote();
   })
   .post('/up', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, nkcModules} = ctx;
+    const lock = await nkcModules.redLock.redLock.lock("postVote", 6000);
+    try {
     const {user, post, isModerator} = data;
     const {post: postSource} = await db.PostsVoteModel.getVoteSources();
     let vote = await db.PostsVoteModel.findOne({source: postSource, uid: user.uid, sid: post.pid});
@@ -76,10 +78,17 @@ voteRouter
     };
     await post.updatePostsVote();
     data.post = post;
+    await lock.unlock();
+    } catch (err) {
+      await lock.unlock();
+      throw err;
+    }
     await next();
   })
   .post('/down', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, nkcModules} = ctx;
+    const lock = await nkcModules.redLock.redLock.lock("postVote", 6000);
+    try {
     const {user, post, isModerator} = data;
     const {post: postSource} = await db.PostsVoteModel.getVoteSources();
     let vote = await db.PostsVoteModel.findOne({source: postSource, uid: user.uid, sid: post.pid});
@@ -109,6 +118,11 @@ voteRouter
     }
     await post.updatePostsVote();
     data.post = post;
+    await lock.unlock();
+    } catch (err) {
+      await lock.unlock();
+      throw err;
+    }
     await next();
   });
 module.exports = voteRouter;

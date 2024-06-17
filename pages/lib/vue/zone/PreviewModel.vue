@@ -40,6 +40,8 @@ transition(name='main')
         )
     //- 预览窗的功能区
     .toolBar(ref='toolBar' v-show=" imgType === 'picture' ")
+      transition(name='main')
+        .scaleTips(v-if="scaleShow") {{`${Math.round(scaleSize * 100)}%`}}
       .btnGroup
         div
           //-img(src='/statics/preview-model/rotate.png', @click='rotateImg')
@@ -200,6 +202,18 @@ transition(name='main')
   margin: 0 auto;
   border-radius: 7px 7px 0 0;
 }
+#ImgPreview .toolBar .scaleTips {
+  color: white;
+  position:absolute;
+  left:50%;
+  top:calc(50% - 45px);
+  transform:translate(-50%,-50%);
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.65);
+  background-image: none;
+  padding: 0.1rem 0.6rem;
+  border-radius: 4rem;
+}
 #ImgPreview .toolBar .btnGroup div {
   cursor: pointer;
   margin: 0 22px 0 22px;
@@ -262,6 +276,8 @@ export default {
     startDrag : false,
     touchTime: 0,
     touchDouble : false,
+    scaleShow: false,
+    scaleShowTimer: null
   }),
   components: {
       'video-player': VideoPlayerVue,
@@ -403,6 +419,7 @@ export default {
       this.startDrag = false;
       this.touchTime = 0;
       this.touchDouble = false;
+      this.scaleShow = false;
       // this.imgDataListLength= 0; // 数组的长度
       // this.snapImgIndex= 0;
     },
@@ -443,6 +460,17 @@ export default {
         }
 
       }
+    },
+    triggerScaleTips(){
+      if(!this.viewerVisibleShow) return;
+        const self = this;
+        this.scaleShow  = true;
+        if(this.scaleShowTimer){
+          clearTimeout(this.scaleShowTimer);
+        }
+        this.scaleShowTimer = setTimeout(()=>{
+          self.scaleShow = false;
+        },600);
     },
     moveupError() {
       this.locationData.isMove = false;
@@ -530,6 +558,7 @@ export default {
       }
     },
     doubleClick(e){
+      this.triggerScaleTips();
       if (e.which !== 1) {
         return
       }
@@ -653,6 +682,7 @@ export default {
         this.locationData.imgLeft = this.locationData.distanceX;
         this.locationData.imgTop = this.locationData.distanceY;
         this.locationData.isDoubleClick = false;
+        this.triggerScaleTips();
       }else if(event.touches.length===1){
         if (this.locationData.isMove && !this.error) {
         // 触发此事件才开始拖拽图片流程
@@ -673,6 +703,7 @@ export default {
       // console.log(event);
       // console.log('====================================');
       if (this.touchDouble) {
+        this.triggerScaleTips();
         // console.log('touchDouble');
         let x = event.changedTouches[0].clientX
         let y = event.changedTouches[0].clientY
@@ -725,6 +756,7 @@ export default {
       }
     },
     mousewheel(e) {
+      this.triggerScaleTips();
       // console.log('滚动',e)
       if(this.scaleSize>1000 && e.wheelDelta>0) return;
       if(this.scaleSize<0.1 && e.wheelDelta<0) return;
@@ -912,12 +944,13 @@ export default {
       const aspectRatio = this.preloadImgData[index].width / this.preloadImgData[index].height;
 
       // 计算容器的最大宽度和高度
-      const maxContainerWidth = screenWidth * 0.8; // 80% 的屏幕宽度
-      const maxContainerHeight = screenHeight * 0.8; // 80% 的屏幕高度
+      const maxContainerWidth = screenWidth * 0.85; // 85% 的屏幕宽度
+      const maxContainerHeight = screenHeight * 0.85; // 85% 的屏幕高度
 
+      
       // 计算容器的实际宽度和高度
-      this.imgContainerWidth = Math.min(this.preloadImgData[index].width / 2, maxContainerWidth);
-      this.imgContainerHeight = Math.min(this.preloadImgData[index].height / 2, maxContainerHeight);
+      this.imgContainerWidth = Math.min(this.preloadImgData[index].width , maxContainerWidth);
+      this.imgContainerHeight = Math.min(this.preloadImgData[index].height , maxContainerHeight);
 
       // 按原始比例减小图片的宽度和高度
       if (this.imgContainerWidth / this.imgContainerHeight > aspectRatio) {

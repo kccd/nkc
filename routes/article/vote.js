@@ -11,7 +11,9 @@ router
   })
   .post('/up', async (ctx, next) => {
     //独立文章点赞
-    const {db, data, params} = ctx;
+    const {db, data, params,nkcModules} = ctx;
+    const lock = await nkcModules.redLock.redLock.lock("articleVote", 6000);
+    try {
     const {aid} = params;
     const {article, user} = data;
     const {article: articleSource} = await db.PostsVoteModel.getVoteSources();
@@ -59,11 +61,18 @@ router
 
     await article.updateArticlesVote();
     data.article = article;
+      await lock.unlock();
+    } catch (err) {
+      await lock.unlock();
+      throw err;
+    }
     await next();
   })
   .post('/down', async (ctx, next) => {
     //独立文章点踩
-    const {db, data} = ctx;
+    const {db, data, nkcModules} = ctx;
+    const lock = await nkcModules.redLock.redLock.lock("articleVote", 6000);
+    try {
     const {article, user} = data;
     const {article: articleSource} = await db.PostsVoteModel.getVoteSources();
     let vote = await db.PostsVoteModel.findOne({source: articleSource, uid: user.uid, sid: article._id});
@@ -89,6 +98,12 @@ router
     }
     await article.updateArticlesVote();
     data.article = article;
+ 
+      await lock.unlock();
+    } catch (err) {
+      await lock.unlock();
+      throw err;
+    }
     await next();
   })
 

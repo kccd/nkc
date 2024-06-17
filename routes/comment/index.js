@@ -115,7 +115,7 @@ router
     if (commentId) {
       comment = await db.CommentModel.findOne({
         _id: commentId,
-        uid: state.uid,
+        // uid: state.uid,
       });
     }
     if (type === 'create' && !comment) {
@@ -162,6 +162,12 @@ router
           if (!isExistStableV) {
             order = await db.CommentModel.getCommentOrder(article._id);
             await comment.updateOrder(order);
+            // 更新评论的创建时间为发布时间
+            await comment.updateOne({
+              $set: {
+                toc: new Date(),
+              },
+            });
           }
 
           //发布评论
