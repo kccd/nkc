@@ -1328,7 +1328,7 @@ threadRouter
     if (post._id) {
       const draftDid =
         did ||
-        (await db.DraftModel.findOnly({ _id: ObjectId(post._id) }, { did: 1 }))
+        (await db.DraftModel.findOnly({ _id: new ObjectId(post._id) }, { did: 1 }))
           .did;
       if (draftDid) {
         const beta = (await db.DraftModel.getType()).beta;
