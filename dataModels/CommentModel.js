@@ -488,7 +488,7 @@ schema.statics.extendPostComments = async (props) => {
     if (d.quoteDid) {
       quoteIdArr.push(d.quoteDid);
     }
-    const { content, _id, type, status, addr } = d;
+    const { content, _id, type, status, addr, tlm } = d;
     documentObj[d.did] = {
       content,
       _id,
@@ -496,6 +496,7 @@ schema.statics.extendPostComments = async (props) => {
       status,
       addr,
       reason: reason ? reason : '',
+      tlm,
     };
   }
   //获取引用评论
@@ -1082,6 +1083,7 @@ schema.statics.getCommentsByArticleId = async function (props) {
   if (paging) {
     comments = await CommentModel.find({ ...match })
       .skip(paging.start)
+      .sort({ order: 1 })
       .limit(paging.perpage);
   } else {
     comments = await CommentModel.find({ ...match })
