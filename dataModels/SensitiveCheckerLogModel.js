@@ -94,7 +94,7 @@ schema.methods.updateLogProgress = async function (
 
 schema.statics.getLogById = async (logId) => {
   return await SensitiveCheckerLogModel.findOnly({
-    _id: mongoose.Types.ObjectId(logId),
+    _id: new mongoose.Types.ObjectId(logId),
   });
 };
 

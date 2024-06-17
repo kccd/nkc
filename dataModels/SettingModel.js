@@ -64,11 +64,11 @@ async function operateSystemID(type, op) {
 settingSchema.statics.operateSystemID = operateSystemID;
 
 settingSchema.statics.newObjectId = () => {
-  return mongoose.Types.ObjectId();
+  return new mongoose.Types.ObjectId();
 };
 
 settingSchema.statics.getNewId = () => {
-  return mongoose.Types.ObjectId().toString();
+  return new mongoose.Types.ObjectId().toString();
 };
 
 settingSchema.methods.extend = async function () {

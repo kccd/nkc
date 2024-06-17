@@ -73,7 +73,7 @@ reportRouter
 
     await db.FundOperationModel.updateOne(
       {
-        _id: mongoose.Types.ObjectId(reportId),
+        _id: new mongoose.Types.ObjectId(reportId),
       },
       {
         $set: {
