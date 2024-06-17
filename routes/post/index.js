@@ -496,7 +496,7 @@ router
     if (_id) {
       const draftDid =
         did ||
-        (await db.DraftModel.findOnly({ _id: ObjectId(_id) }, { did: 1 })).did;
+        (await db.DraftModel.findOnly({ _id: new ObjectId(_id) }, { did: 1 })).did;
       if (draftDid) {
         const beta = (await db.DraftModel.getType()).beta;
         const betaDaft = await db.DraftModel.findOne({
@@ -735,7 +735,7 @@ router
       const beta = (await db.DraftModel.getType()).beta;
       const stableHistory = (await db.DraftModel.getType()).stableHistory;
       const res = await db.DraftModel.updateOne(
-        { _id: ObjectId(_id), uid: data.user.uid, type: beta },
+        { _id: new ObjectId(_id), uid: data.user.uid, type: beta },
         {
           $set: {
             type: stableHistory,

@@ -190,7 +190,7 @@ draftSchema.statics.updateToStableHistoryById = async (_id, uid) => {
   const beta = (await DraftModel.getType()).beta;
   const stableHistory = (await DraftModel.getType()).stableHistory;
   await DraftModel.updateOne(
-    { _id: ObjectId(_id), uid, type: beta },
+    { _id: new ObjectId(_id), uid, type: beta },
     {
       $set: {
         type: stableHistory,
@@ -440,7 +440,7 @@ draftSchema.statics.updateToBetaHistory = async (_id, desType, uid) => {
   const DraftModel = mongoose.model('drafts');
   const betaHistory = (await DraftModel.getType()).betaHistory;
   return await DraftModel.updateOne(
-    { _id: ObjectId(_id), desType, uid },
+    { _id: new ObjectId(_id), desType, uid },
     {
       $set: {
         type: betaHistory,
@@ -456,7 +456,7 @@ draftSchema.methods.updateToBetaHistory = async function () {
   const DraftModel = mongoose.model('drafts');
   const betaHistory = (await DraftModel.getType()).betaHistory;
   return await DraftModel.updateOne(
-    { _id: ObjectId(this._id), desType: this.desType, uid: this.uid },
+    { _id: new ObjectId(this._id), desType: this.desType, uid: this.uid },
     {
       $set: {
         type: betaHistory,
@@ -479,7 +479,7 @@ draftSchema.statics.updateToBeta = async (_id, desType, uid) => {
   const DraftModel = mongoose.model('drafts');
   const beta = (await DraftModel.getType()).beta;
   return await DraftModel.updateOne(
-    { _id: ObjectId(_id), desType, uid },
+    { _id: new ObjectId(_id), desType, uid },
     {
       $set: {
         type: beta,
