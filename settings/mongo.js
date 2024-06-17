@@ -8,18 +8,19 @@ if (username && password) {
   account = `${username}:${password}@`;
 }
 const options = {
-  promiseLibrary: Promise,
+  // promiseLibrary: Promise,
   autoIndex: true,
-  poolSize,
-  keepAlive,
+  maxPoolSize: poolSize,
+  // poolSize,
+  // keepAlive,
 
   // 新属性
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  // useNewUrlParser: true,
+  // useUnifiedTopology: true,
 };
 
-mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify', false);
+// mongoose.set('useCreateIndex', true);
+// mongoose.set('useFindAndModify', false);
 
 function encodeMongoURI(urlString) {
   if (urlString) {

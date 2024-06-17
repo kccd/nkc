@@ -84,6 +84,7 @@ module.exports = {
     libraryTarget: 'umd',
     globalObject: 'this',
     publicPath: '/',
+    chunkFormat: 'commonjs',
   },
   module: {
     rules: [

@@ -12,7 +12,8 @@ const {
 } = config;
 
 const account = username && password ? `${username}:${password}@` : "";
-const client = new MongoClient(encodeMongoURI(`mongodb://${account}${address}:${port}/${database}`), { useUnifiedTopology: true });
+// const client = new MongoClient(encodeMongoURI(`mongodb://${account}${address}:${port}/${database}`), { useUnifiedTopology: true });
+const client = new MongoClient(encodeMongoURI(`mongodb://${account}${address}:${port}/${database}`));
 
 onExit(() => {
   client.close();
