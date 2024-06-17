@@ -1247,7 +1247,7 @@ messageSchema.statics.getParametersData = async (message) => {
   } else if (type === 'latestVotes') {
     let { votesId } = message.c;
     votesId = votesId.map((v) => {
-      return mongoose.Types.ObjectId(v);
+      return new mongoose.Types.ObjectId(v);
     });
     const voteSources = await PostsVoteModel.getVoteSources();
     const votes = await PostsVoteModel.find(
