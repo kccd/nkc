@@ -159,10 +159,11 @@ function checkMongodb(data) {
       return new Promise((resolve, reject) => {
         mongoose.connect(url, {
           autoIndex: true,
-          poolSize: 50,
-          keepAlive: 120,
-          useNewUrlParser: true,
-          useUnifiedTopology: true
+          // poolSize: 50,
+          maxPoolSize: 50,
+          // keepAlive: 120,
+          // useNewUrlParser: true,
+          // useUnifiedTopology: true
         }, async (err) => {
           if(err) return reject(err);
           const collections = await mongoose.connections[0].db.collections();
