@@ -93,7 +93,7 @@ router
   })
   .post('/kcb', async (ctx, next) => {
     //鼓励评论用户
-    const {db, data, params, permission, body} = ctx;
+    const {db, data, params, permission, body,nkcModules} = ctx;
     const lock = await nkcModules.redLock.redLock.lock("creditKCB", 6000);
     try{
       const {user} = data;
