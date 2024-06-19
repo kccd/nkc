@@ -100,13 +100,13 @@ router
       return ctx.throw(403, '文章状态异常,暂不可评论');
     }
     const _content = customCheerio.load(content).text();
-    if (_content.length > 1000) {
-      ctx.throw(400, '内容不能超过1000字');
+    if (_content.length > 100000) {
+      ctx.throw(400, '内容不能超过100000字');
     }
     nkcModules.checkData.checkString(content, {
       name: '内容',
       minLength: 0,
-      maxLength: 2000,
+      maxLength: 2000000,
     });
     if (!['modify', 'publish', 'create', 'save'].includes(type)) {
       ctx.throw(400, `未知的提交类型 type: ${type}`);
@@ -140,7 +140,7 @@ router
         nkcModules.checkData.checkString(content, {
           name: '内容',
           minLength: 1,
-          maxLength: 2000,
+          maxLength: 2000000,
         });
         //获取推送到专栏信息
         if (toColumn) {
