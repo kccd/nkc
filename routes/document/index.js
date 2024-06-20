@@ -14,9 +14,10 @@ router
       );
       if (
         state.uid !== targetUserId &&
-        !ctx.permission(DynamicOperations.viewUserArticle)
+        !ctx.permission(DynamicOperations.viewUserArticle) &&
+        !ctx.permission('review')
       ) {
-        ctx.throw('权限不足');
+        ctx.throw(403, '权限不足');
       }
       await next();
     },

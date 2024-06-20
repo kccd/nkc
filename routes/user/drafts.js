@@ -120,7 +120,11 @@ draftsRouter
   .post('/', async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
-    const draftCount = await db.DraftModel.countDocuments({ uid: user.uid });
+    const draftTypes = await db.DraftModel.getType();
+    const draftCount = await db.DraftModel.countDocuments({
+      uid: user.uid,
+      type: draftTypes.beta,
+    });
     // 后期需要完善
     if (draftCount >= 5000) {
       ctx.throw(400, '草稿箱已满');
@@ -227,7 +231,6 @@ draftsRouter
         ctx.throw(400, 'parentPostId不存在');
       }
     }
-    const draftTypes = await db.DraftModel.getType();
     if (draftId) {
       draft = await db.DraftModel.findOne({
         did: draftId,
