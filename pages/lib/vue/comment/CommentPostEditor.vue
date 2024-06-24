@@ -5,7 +5,7 @@
         .fa.fa-spinner.fa-spin
         span 加载中...
     .single-comment-editor-container(v-else)
-      .single-comment-prompt 200字以内，请确保您输入的内容合法。
+      .single-comment-prompt 请避免因为你的修改而导致他人的发言文不对题，请确保输入内容合法、友善。
       .single-comment-editor
         editor(:configs="editorConfigs" :ref="`commentEditor_${cid}`" @ready="removeEvent" :plugs="editorPlugs" @content-change="editorContentChange")
       .single-comment-button(:data-tyep="this.cid")
