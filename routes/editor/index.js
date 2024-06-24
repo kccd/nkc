@@ -6,7 +6,7 @@ router
   .get('/', async (ctx, next) => {
     const { db, data, query } = ctx;
     const { user } = data;
-    await db.UserModel.checkUserBaseInfo(user);
+    await db.UserModel.checkUserBaseInfo(user, true);
     ctx.template = 'editor/editor.pug';
     const { id, type, o } = query;
     const typeMap = {
@@ -44,7 +44,7 @@ router
     );
     data.userColumn = await db.UserModel.getUserColumn(state.uid);
     const draftDesType = await db.DraftModel.getDesType();
-    await db.UserModel.checkUserBaseInfo(user);
+    await db.UserModel.checkUserBaseInfo(user, true);
     data.notice = '';
     // 需要预制的专业和文章分类
     let selectedForumsId = [];

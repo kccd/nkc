@@ -281,6 +281,15 @@ threadRouter
     const { thread } = internalData;
 
     const tid = thread.tid;
+    if (isEditMode) {
+      //判断是否拥有进入编辑模式的权限
+      await db.ForumModel.checkEditPostPositionInRoute({
+        uid: state.uid,
+        fid: [thread.mainForumsId],
+        tid,
+        isAdmin: ctx.permission('modifyAllPostOrder'),
+      });
+    }
     const source = await db.ReviewModel.getDocumentSources();
     // 拓展文章属性
     await thread.extendThreadCategories();
@@ -393,7 +402,7 @@ threadRouter
       },
     };
     // 只看作者的回复
-    if (t === 'author') {
+    if (t === 'author' && !isEditMode) {
       match.anonymous = !!anonymous;
       match.uid = thread.uid;
     }
@@ -460,39 +469,67 @@ threadRouter
     if (last_page) {
       _page = pageCount - 1;
     }
-    const paging = nkcModules.apiFunction.paging(
-      _page,
-      count,
-      pageSettings.threadPostList,
-    );
+    // const paging = nkcModules.apiFunction.paging(
+    //   _page,
+    //   count,
+    //   pageSettings.threadPostList,
+    // );
+    const paging = isEditMode
+      ? nkcModules.apiFunction.paging(0, count, count)
+      : nkcModules.apiFunction.paging(
+          _page,
+          count,
+          pageSettings.threadPostList,
+        );
 
     let posts = [];
     // 获取回复列表
     //判断是否进入编辑模式
-    if (!isEditMode) {
-      //没有进入编辑模式
-      if (thread) {
-        const { postIds } = thread;
-        const topPostsId = postIds.slice(
-          paging.start,
-          paging.start + paging.perpage,
-        );
-        match.pid = { $in: topPostsId }; // 添加的条件
-      }
-    } else {
-      //进入了编辑模式
-      //判断是否拥有进入编辑模式的权限
-      await db.ForumModel.checkEditPostPositionInRoute({
-        uid: state.uid,
-        fid: [thread.mainForumsId],
-        tid,
-        isAdmin: ctx.permission('modifyAllPostOrder'),
-      });
-    }
-    posts = await db.PostModel.find(match);
+    // if (!isEditMode) {
+    //   //没有进入编辑模式
+    //   if (thread) {
+    //     const { postIds } = thread;
+    //     const topPostsId = postIds.slice(
+    //       paging.start,
+    //       paging.start + paging.perpage,
+    //     );
+    //     match.pid = { $in: topPostsId }; // 添加的条件
+    //   }
+    // } else {
+    //   //进入了编辑模式
+    //   //判断是否拥有进入编辑模式的权限
+    //   await db.ForumModel.checkEditPostPositionInRoute({
+    //     uid: state.uid,
+    //     fid: [thread.mainForumsId],
+    //     tid,
+    //     isAdmin: ctx.permission('modifyAllPostOrder'),
+    //   });
+    // }
+    // posts = await db.PostModel.find(match);
+    posts = await db.PostModel.aggregate([
+      {
+        $match: match,
+      },
+      {
+        $addFields: {
+          order: { $indexOfArray: [thread.postIds, '$pid'] },
+        },
+      },
+      {
+        $sort: {
+          order: 1,
+        },
+      },
+      {
+        $skip: paging.start,
+      },
+      {
+        $limit: paging.perpage,
+      },
+    ]);
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     posts = await db.PostModel.filterPostsInfo(posts);
-    posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
+    // posts = await db.PostModel.reorderByThreadModelPostsIds(tid, posts);
     // 拓展待审回复的理由
     const _postsId = [];
     for (let i = 0; i < posts.length; i++) {
