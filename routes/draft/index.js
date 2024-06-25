@@ -57,11 +57,9 @@ router
   if (source === newThread) {
     queryCriteria.did = desTypeId;
     delete queryCriteria.desTypeId;
-  }else if(source === newPost){
-    queryCriteria.did = draftId;
   }
   // 后期完善：draftId应该先查一下
-  if(draftId && ['modifyThread','modifyPost'].includes(source)){
+  if(draftId && ['modifyThread','modifyPost','newPost'].includes(source)){
     queryCriteria.did = draftId;
   }
   //  获取列表
@@ -108,7 +106,7 @@ router
 .get('/history/:_id',async (ctx, next)=>{
   ctx.template = 'draft/history/document.pug'
   const {db, data, params, state, query, permission, nkcModules} = ctx;
-  const { desTypeId, source, page=0 } = query;
+  const { desTypeId, source, page=0 ,draftId} = query;
   // _id 被选中文章
   const { _id } = params;
   // if (!allowedDesTypes.includes(source)) ctx.throw(400, "source参数不正确")
@@ -122,6 +120,9 @@ router
   if (source === newThread) {
     queryCriteria.did = desTypeId;
     delete queryCriteria.desTypeId
+  }
+  if(draftId && ['modifyThread','modifyPost','newPost'].includes(source)){
+    queryCriteria.did = draftId;
   }
   const count =  await db.DraftModel.countDocuments(queryCriteria);
   const paging = nkcModules.apiFunction.paging(page, count, 10);
@@ -164,7 +165,7 @@ router
     },
   });
   // let editorUrl = {_id: data.document._id}
-  data.urlComponent = {_id: data.document._id, source, did: data.document.did, page, desTypeId};
+  data.urlComponent = {_id: data.document._id, source, did: data.document.did, page, desTypeId, draftId};
   // 查询文章作者
   const user = await db.UserModel.findOnly({uid: data.document.uid});
   const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
