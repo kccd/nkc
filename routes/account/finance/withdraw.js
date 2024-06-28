@@ -157,6 +157,7 @@ router
       } else {
         ctx.throw(400, "未知的账户类型")
       }
+      await lock.unlock();
     } catch(err) {
       await lock.unlock();
       ctx.throw(err);
