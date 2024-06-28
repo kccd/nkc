@@ -17,7 +17,10 @@ block content
             for list in data.history
               p.title-list()
                 //- page 代表当前是第几页
-                a.book-list-item(href=`/draft/history/${list._id}?source=${list.desType}&page=${data.urlComponent.page}&desTypeId=${data.urlComponent.desTypeId}` )=`${list.t || "未填写标题"}`
+                if (data.urlComponent.draftId)
+                  a.book-list-item(href=`/draft/history/${list._id}?source=${list.desType}&page=${data.urlComponent.page}&desTypeId=${data.urlComponent.desTypeId}&draftId=${data.urlComponent.draftId}` )=`${list.t || "未填写标题"}`
+                else 
+                  a.book-list-item(href=`/draft/history/${list._id}?source=${list.desType}&page=${data.urlComponent.page}&desTypeId=${data.urlComponent.desTypeId}` )=`${list.t || "未填写标题"}`
                 span.history=`${list.type==='stableHistory'? '已发布' : '未发布' } `
                 span.time=`编辑于 ${format(`YYYY-MM-DD HH:mm:ss`, list.tlm)}`
           //- 分页
