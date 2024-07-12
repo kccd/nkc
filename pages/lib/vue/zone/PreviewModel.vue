@@ -41,7 +41,9 @@ transition(name='main')
     //- 预览窗的功能区
     .toolBar(ref='toolBar' v-show=" imgType === 'picture' ")
       transition(name='main')
-        .scaleTips(v-if="scaleShow") {{`${Math.round(scaleSize * 100)}%`}}
+        .scaleTips(v-if="scaleShow") {{`${Math.round((scaleSize*imgw/imgOriginW) * 100)}%`}}
+      transition(name='main')
+        .originSize ( {{ imgOriginW }} × {{ imgOriginH }} )
       .btnGroup
         div
           //-img(src='/statics/preview-model/rotate.png', @click='rotateImg')
@@ -204,15 +206,25 @@ transition(name='main')
 }
 #ImgPreview .toolBar .scaleTips {
   color: white;
-  position:absolute;
+  position:fixed;
   left:50%;
-  top:calc(50% - 45px);
+  top:calc(50% + 45px);
   transform:translate(-50%,-50%);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0.65);
   background-image: none;
   padding: 0.1rem 0.6rem;
   border-radius: 4rem;
+}
+#ImgPreview .toolBar .originSize {
+  color: #ccc;
+  position:absolute;
+  left:50%;
+  top:calc(50% - 45px);
+  transform:translate(-50%,-50%);
+  pointer-events: none;
+  background-image: none;
+  padding: 0.1rem 0.6rem;
 }
 #ImgPreview .toolBar .btnGroup div {
   cursor: pointer;
@@ -261,6 +273,8 @@ export default {
     scaleSize: 0,//缩放系数
     imgName: 'loading error',//图片名
     imgWidth: 0,//图片的宽度
+    imgOriginW: 0,//图片原始宽度
+    imgOriginH: 0,//图片原始高度
     imgHeight: 0,//图片的高度
     imgw: 0,//图片的clientWidth
     imgh: 0,//图片的clientHeight
@@ -1092,7 +1106,8 @@ export default {
         img.onload = (data) => {
           snapData = { type: 'picture', filename: imgData[index].filename || imgData[index].name || '', url: imgData[index].url, rid: imgData[index].rid||'', width: imgData[index].width||img.width, height: imgData[index].height || img.height, error: false };
           this.preloadImgData[index] = snapData;
-
+          this.imgOriginW = img.width || imgData[index].width;
+          this.imgOriginH = img.height || imgData[index].height;
           resolve(true);
         };
 
