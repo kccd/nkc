@@ -83,7 +83,8 @@ router
     const {cid} = query;
     const category = await db.FriendsCategoryModel.findOne({uid: user.uid, _id: cid});
     if(category) {
-      await category.remove();
+      await category.deleteOne();
+      // await db.FriendsCategoryModel.deleteOne()
       await nkcModules.socket.sendEventRemoveCategory(user.uid, category._id);
     }
     await next();
