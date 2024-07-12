@@ -56,7 +56,8 @@ router
     const match = {
       parent: '',
       quoteType: {
-        $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
+        $in: ['', momentQuoteTypes.moment],
+        // $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
       },
       $or: [],
     };

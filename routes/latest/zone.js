@@ -60,7 +60,8 @@ router
       parent: '',
       $or,
       quoteType: {
-        $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
+        $in: ['', momentQuoteTypes.moment],
+        // $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
       },
     };
     //获取当前用户对动态的审核权限
