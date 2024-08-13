@@ -767,6 +767,8 @@
         if(e){
           // 处理未阻止捕获的事件
           if(e.target.tagName==='A'){
+            e.preventDefault();
+            this.visitUrl(e.target.href,true);
             return;
           }
         }
