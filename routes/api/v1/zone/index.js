@@ -264,7 +264,7 @@ router
       const subscribeUsersId = await db.SubscribeModel.getUserSubUsersId(
         state.uid,
       );
-      momentListData.subscribed = subscribeUsersId.includes(moment.uid);
+      momentListData.subscribed = subscribeUsersId.includes(targetMoment.uid);
     }
     data.momentListData = momentListData;
     ctx.apiData = {
