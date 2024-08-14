@@ -1184,6 +1184,7 @@ export default {
             var formData = new FormData();
             formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
             formData.append('cid', self.resourceCategories);
+            formData.append('toc', f.toc);
             let url = '/r';
             /*if(fileDomain) {
               url = fileDomain + url;
@@ -1206,6 +1207,11 @@ export default {
         })
     },
     newFile: function(file) {
+      let toc = Date.now();
+      if(this.tempToc && this.tempToc >= toc){
+        toc = this.tempToc + 1;
+      }
+      this.tempToc = toc;
       return {
         name: file.name,
         ext: file.type.slice(0, 5) === "image"?"picture": "file",
@@ -1213,7 +1219,8 @@ export default {
         data: file,
         error: /*file.size >  200*1024*1024?"文件大小不能超过200MB":*/ "",
         progress: 0,
-        status: "unUpload"
+        status: "unUpload",
+        toc: toc
       }
     },
     uploadSelectFile: function(f) {

@@ -227,6 +227,8 @@ resourceRouter
     const rid = await db.SettingModel.operateSystemID('resources', 1);
 
     const mediaType = db.ResourceModel.getMediaTypeByExtension(extension);
+    const currentTime = Date.now();
+    const oneHourInMs = 60 * 60 * 1000; // 一小时的毫秒数
 
     const resourceType =
       mediaType === 'mediaPicture' && type === 'sticker'
@@ -241,7 +243,13 @@ resourceRouter
       size,
       hash,
       uid: state.uid,
-      toc: Date.now(),
+      // toc: fields.toc || Date.now(),
+      toc:
+        fields.toc &&
+        Number(fields.toc) >= currentTime - oneHourInMs &&
+        Number(fields.toc) <= currentTime + oneHourInMs
+          ? fields.toc
+          : currentTime,
       mediaType,
       state: 'inProcess',
     };

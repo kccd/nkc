@@ -1,5 +1,8 @@
 const Router = require('koa-router');
 const { OnlyUser } = require('../../../../middlewares/permission');
+const {
+  momentCheckerService,
+} = require('../../../../services/moment/momentChecker.service');
 const router = new Router();
 const zoneTypes = {
   moment: 'm',
@@ -230,6 +233,11 @@ router
     if (!moment) {
       ctx.throw(404, `动态 ID 错误 momentId=${mid}`);
     }
+    await momentCheckerService.checkMomentPermission(
+      state.uid,
+      moment,
+      permission('review'),
+    );
     let targetMoment;
     let focusCommentId;
     if (moment.parents.length > 0) {
@@ -256,7 +264,7 @@ router
       const subscribeUsersId = await db.SubscribeModel.getUserSubUsersId(
         state.uid,
       );
-      momentListData.subscribed = subscribeUsersId.includes(moment.uid);
+      momentListData.subscribed = subscribeUsersId.includes(targetMoment.uid);
     }
     data.momentListData = momentListData;
     ctx.apiData = {

@@ -14,7 +14,8 @@ for(let d of domainWhitelist) {
   regString.push(d);
 }
 
-const domainWhitelistReg = new RegExp(`^(https?:\/\/)?(${regString.join('|')})`, 'i');
+// const domainWhitelistReg = new RegExp(`^(https?:\/\/)?(${regString.join('|')})`, 'i');
+const domainWhitelistReg = new RegExp(`^(https?:\/\/)?(${regString.join('|')})?(\/.*$)`, 'i');
 const urlReg = new RegExp(`(https?:\\/\\/)?([-0-9a-zA-Z]{1,256}\\.)+(${topLevelDomain.join('|')})`, 'ig');
 // const urlReg = new RegExp(`(https?:\\/\\/)?([-0-9a-zA-Z]{1,256}\\.)+(${topLevelDomain.join('|')})((\\/[^?#<>\\/\\\\*":]*)+(\\?[^#]*)?(#.*)?)?$`, 'ig');
 const isBase64 = new RegExp(/^data:image\/(jpeg|png|gif);base64,/);
