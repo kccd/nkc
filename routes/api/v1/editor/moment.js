@@ -132,6 +132,9 @@ router
       momentSource,
       mid,
     );
+    if (document === null) {
+      ctx.throw(403, '权限不足');
+    }
     const tlm = new Date();
     //将原来的正式版本变为历史版本
     await db.DocumentModel.updateOne(
