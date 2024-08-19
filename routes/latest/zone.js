@@ -42,17 +42,18 @@ router
     const { page = 0 } = query;
     const momentStatus = await db.MomentModel.getMomentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
-    const $or = [
-      {
-        status: momentStatus.normal,
-      },
-    ];
+    const { own, everyone, attention } =
+      await db.MomentModel.getMomentVisibleType();
+    const $or = [];
     // 当前人物自己的动态
     if (state.uid) {
       $or.push({
         uid: state.uid,
         status: {
           $in: [momentStatus.normal, momentStatus.faulty, momentStatus.unknown],
+        },
+        visibleType: {
+          $in: [own, everyone, attention],
         },
       });
     }
@@ -64,6 +65,45 @@ router
         // $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
       },
     };
+    //判断是否当前用有相应证书可以查看所有内容,或设置电文可见状态
+    const hasPermission =
+      ctx.permission('setMomentVisibleOther') ||
+      ctx.permission('viewOtherUserAbnormalMoment');
+    if (hasPermission) {
+      match.$or.push({
+        status: {
+          $in: [momentStatus.normal],
+        },
+        visibleType: {
+          $in: [own, everyone, attention],
+        },
+      });
+    }
+    //获取当前用户的关注列表
+    const subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
+    const condition = {
+      uid: {
+        $in: subUid,
+      },
+      status: momentStatus.normal,
+    };
+    //查看全部
+    match.$or.push(
+      //所有人可见
+      {
+        status: momentStatus.normal,
+        visibleType: {
+          $in: [everyone],
+        },
+      },
+      //仅关注可见
+      {
+        ...condition,
+        visibleType: {
+          $in: [attention],
+        },
+      },
+    );
     //获取当前用户对动态的审核权限
     const permissions = {
       reviewed: null,
