@@ -3,7 +3,7 @@
     .row
       .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
         .box-shadow
-          .btn-group.btn-group-justified.m-b-1
+          .btn-group.btn-group-justified.m-b-1(v-if='!isApp')
             .btn-group(role="group")
               button.btn.btn-default(:class="{'btn-primary': tab === zoneTab.all }" @click="getList(type,'a')") 全部
             .btn-group(role="group")

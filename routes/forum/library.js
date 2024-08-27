@@ -29,6 +29,9 @@ router
         data.libraryClosed = true;
       }
     }
+    const uploadSettings = await db.SettingModel.getSettings('upload');
+    const { sizeLimit } = uploadSettings;
+    data.sizeLimit = sizeLimit;
     await next();
   })
   .post('/', async (ctx, next) => {

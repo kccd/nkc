@@ -31,7 +31,18 @@ checkRouter.get('/', async (ctx, next) => {
         '?t=' +
         Date.now();
       if (version && version !== newVersion.appVersion) {
-        data.newVersion = newVersion;
+        const parts1 = newVersion.appVersion.split('.').map(Number);
+        const parts2 = version.split('.').map(Number);
+        let isNewVersion = false;
+        for (let i = 0; i < 3; i++) {
+          if (parts1[i] > parts2[i]) {
+            isNewVersion = true;
+            break;
+          } else if (parts1[i] < parts2[i]) {
+            break;
+          }
+        }
+        data.newVersion = isNewVersion ? newVersion : null;
       }
       data.latestVer = newVersion; // 兼容旧版APP的下载链接 2020-1-18，APP更新多个版本后可移除
     }

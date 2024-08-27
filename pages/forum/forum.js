@@ -5,7 +5,7 @@ import { shareTypes } from '../lib/js/shareTypes';
 const socket = getSocket();
 const { isApp } = getState();
 const forumInfo = NKC.methods.getDataById('forumInfo');
-const { fid, page, digest, sort } = forumInfo;
+const { fid, page, digest, sort, sizeLimit } = forumInfo;
 
 $(function () {
   RNSetSharePanelStatus(true, shareTypes.forum, fid);
@@ -24,6 +24,7 @@ $(function () {
       uploadResourcesId: NKC.configs.uploadResourcesId
         ? NKC.configs.uploadResourcesId.split('-')
         : [],
+      sizeLimit,
     });
   }
   const threadUrlSwitch = $('#threadUrlSwitch');
