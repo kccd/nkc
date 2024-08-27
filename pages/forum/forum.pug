@@ -35,7 +35,7 @@ block content
       .forum-user-panel-body
         for targetUser in users
           include ../publicModules/user_panel/user_panel
-  .hidden#forumInfo=objToStr({fid: data.forum.fid, page: data.paging?data.paging.page:{}, digest: !!data.d, sort: data.s === 'toc'? 'toc': 'tlm'})
+  .hidden#forumInfo=objToStr({fid: data.forum.fid, page: data.paging?data.paging.page:{}, digest: !!data.d, sort: data.s === 'toc'? 'toc': 'tlm', sizeLimit: data.sizeLimit})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-1.min-md-p-r-0.hidden-xs.hidden-sm

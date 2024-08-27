@@ -2,7 +2,7 @@ import {getFileMD5} from "../../lib/js/file";
 
 NKC.modules.Library = class {
   constructor(options) {
-    const {lid, folderId, tLid, uploadResourcesId} = options;
+    const {lid, folderId, tLid, uploadResourcesId, sizeLimit} = options;
     const self = this;
     self.app = new Vue({
       el: "#moduleLibrary",
@@ -51,6 +51,7 @@ NKC.modules.Library = class {
           }
         ],
         protocol: true, // 是否同意协议
+        sizeLimit: sizeLimit,
       },
       watch:{
         listCategories() {
@@ -321,14 +322,34 @@ NKC.modules.Library = class {
               file.ext = "mediaAttachment";
             }
           }
+          if (this.sizeLimit) {
+            // 添加附件上传的尺寸限制大小
+            let settingSize;
+            const ext = (file.data.name || '').split('.').at(-1);
+            const itemIndex = this.sizeLimit.others.findIndex(
+              (item) => item.ext === ext,
+            );
+            if (itemIndex === -1) {
+              settingSize = this.sizeLimit.default;
+            } else {
+              settingSize = this.sizeLimit.others[itemIndex].size;
+            }
+            if (size > settingSize * 1024) {
+              file.error = `${ext}文件大小不能超过${this.getSize(
+                settingSize * 1024,
+              )}`;
+              file.disabled = true;
+            }
+          }
 
           if(file.ext === "mediaPicture") {
             file.error = "暂不允许上传图片到文库";
             file.disabled = true;
-          } else if(file.size > 200 * 1024 * 1024) {
-            file.error = "文件大小不能超过200MB";
-            file.disabled = true;
-          }
+          } 
+          // else if(file.size > 200 * 1024 * 1024) {
+          //   file.error = "文件大小不能超过200MB";
+          //   file.disabled = true;
+          // }
 
           return file;
         },
