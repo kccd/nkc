@@ -1,4 +1,4 @@
-if !isIncluded('singlePostWarningInfo')
+if !isIncluded('singleCommentWarningInfo')
   mixin singleCommentWarningInfo(props)
     -var {status, docId, cid, reason, permissions} = props;
     if status === 'faulty'
@@ -21,6 +21,7 @@ if !isIncluded('singlePostWarningInfo')
             | 通过请点击
             button.btn.btn-xs.btn-default(onclick=`window.singleCommentBottom['${cid}'].passReview('${docId}')`) 通过
             | &nbsp;  按钮，不通过请点击
-            button.btn.btn-xs.btn-default(onclick=`window.singleCommentBottom['${cid}'].disableComment('${cid}')`) 退修或删除
+            //- button.btn.btn-xs.btn-default(onclick=`window.singleCommentBottom['${cid}'].disableComment('${cid}')`) 退修或删除
+            button.btn.btn-xs.btn-default(onclick=`window.singleCommentBottom['${cid}'].disableComment('${docId}')`) 退修或删除
             | 按钮。
             a(href=`/review` target="_blank") 待审核列表

@@ -424,9 +424,9 @@
               formData.append("share", "true");
             }
             let url = '/r';
-            if(fileDomain) {
-              url = fileDomain + url;
-            }
+            // if(fileDomain) {
+            //   url = fileDomain + url;
+            // }
             return nkcUploadFile(url, "POST", formData, function(e, progress) {
               sticker.progress = progress;
             });
