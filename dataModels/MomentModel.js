@@ -508,6 +508,44 @@ schema.methods.deleteMoment = async function () {
   const { did } = this;
   const document = await DocumentModel.findOnly({ did, type: stable });
   await document.setStatus(this.status);
+  await this.updateParentCommentCountWhileDeleted();
+};
+
+schema.methods.updateParentCommentCountWhileDeleted = async function () {
+  const MomentModel = mongoose.model('moments');
+  if (!this.parent) {
+    // 如果是一条电文非电文回复则跳过
+    return;
+  }
+  // 运行到这里，表示当前moment为电文回复
+  // 更新上一层 moment 的评论数
+  await MomentModel.updateOne(
+    {
+      _id: this.parent,
+    },
+    {
+      $inc: {
+        comment: -1,
+        commentAll: -1,
+      },
+    },
+  );
+  if (this.parents.length > 1) {
+    // 如果当前moment处于第三层或更底层，则还需要更新除父层以外的其它层的评论数
+    const grandParents = this.parents.filter((id) => id !== this.parent);
+    await MomentModel.updateMany(
+      {
+        _id: {
+          $in: grandParents,
+        },
+      },
+      {
+        $inc: {
+          commentAll: -1,
+        },
+      },
+    );
+  }
 };
 /*
  * 标记当前动态为已屏蔽
