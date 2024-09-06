@@ -4,6 +4,7 @@
 <script lang="ts">
 import { getSocket } from '../../js/socket.js'
 import { initEventToGetUnreadMessageCount } from '../../js/socket.js'
+import { getState } from '../../js/state.js';
 import { screenTopWarning } from "../../js/topAlert.js";
 export default {
   data: () =>({
@@ -23,9 +24,10 @@ export default {
   methods:{
     // 初始化 数据来源于本地或默认数据
     initSocket(){
+      const {isApp} = getState();
       // 接受到新消息
       this.socket.on('receiveMessage', (data) => {
-        if (data.beep) {
+        if (data.beep && !isApp) {
           this.playAudio(data.beep); // 播放音频
         }
       });
