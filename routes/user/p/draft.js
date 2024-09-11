@@ -66,6 +66,23 @@ module.exports = async (ctx, next) => {
       .limit(perpage);
     drafts = draftData;
 
+  } else if (type === 'newComment') {
+    // 查询需要parentPostId
+    const { desTypeId, parentPostId } = query;
+    if (!desTypeId || !parentPostId) ctx.throw(400, '参数有误');
+    if (perpage > 1) perpage = 1;
+    const newComment = (await db.DraftModel.getDesType()).newComment;
+    const draftData = await db.DraftModel.find({
+      uid: targetUser.uid,
+      desType: newComment,
+      type: beta,
+      desTypeId,
+      parentPostId,
+    })
+      .sort({ tlm: -1 })
+      .skip(page)
+      .limit(perpage);
+    drafts = draftData;
   } else {
     count = await db.DraftModel.countDocuments({uid: targetUser.uid});
     paging = nkcModules.apiFunction.paging(page, count, perpage);

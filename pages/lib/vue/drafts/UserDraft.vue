@@ -49,7 +49,8 @@
               a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
                 .fa.fa-refresh
                 span &nbsp;更新已发布的文章
-        a(:href="`/editor?type=${draft.desType}&aid=${draft._id}`" target='_blank' v-else) 继续创作
+        a(v-if="draft.desType === 'newThread'" :href="`/editor?type=${draft.desType}&draftDid=${draft.did}`" target='_blank') 继续创作
+        a(v-else-if="draft.desType !== 'modifyThread'" :href="`/editor?type=${draft.desType}&id=${draft.desTypeId}&draftDid=${draft.did}`" target='_blank') 继续创作
     paging(:pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
