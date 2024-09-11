@@ -1362,23 +1362,23 @@ threadRouter
       maxLength: 2000000,
     });
     // 检查提交的内容在草稿中的状态
-    if (post._id) {
-      const draftDid =
-        did ||
-        (await db.DraftModel.findOnly({ _id: new ObjectId(post._id) }, { did: 1 }))
-          .did;
-      if (draftDid) {
-        const beta = (await db.DraftModel.getType()).beta;
-        const betaDaft = await db.DraftModel.findOne({
-          did: draftDid,
-          type: beta,
-          uid: state.uid,
-        }).sort({ tlm: -1 });
-        if (!betaDaft || betaDaft._id != post._id) {
-          ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
-        }
-      }
-    }
+    // if (post._id) {
+    //   const draftDid =
+    //     did ||
+    //     (await db.DraftModel.findOnly({ _id: new ObjectId(post._id) }, { did: 1 }))
+    //       .did;
+    //   if (draftDid) {
+    //     const beta = (await db.DraftModel.getType()).beta;
+    //     const betaDaft = await db.DraftModel.findOne({
+    //       did: draftDid,
+    //       type: beta,
+    //       uid: state.uid,
+    //     }).sort({ tlm: -1 });
+    //     if (!betaDaft || betaDaft._id != post._id) {
+    //       ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+    //     }
+    //   }
+    // }
 
     // 判断前台有没有提交匿名标志，未提交则默认false
     if (
@@ -1545,8 +1545,35 @@ threadRouter
     //   await db.DraftModel.removeDraftById(did, data.user.uid);
     // }
     // 发布后编辑版改为发布历史版
-    if (post._id) {
-      db.DraftModel.updateToStableHistoryById(post._id, state.uid);
+    // if (post._id) {
+    //   db.DraftModel.updateToStableHistoryById(post._id, state.uid);
+    // }
+    if (post._id || did) {
+      const draftDid =
+        did ||
+        (
+          await db.DraftModel.findOnly(
+            { _id: new ObjectId(post._id) },
+            { did: 1 },
+          )
+        ).did;
+      if (draftDid) {
+        const beta = (await db.DraftModel.getType()).beta;
+        const betaDaft = await db.DraftModel.findOne({
+          did: draftDid,
+          type: beta,
+          uid: state.uid,
+        }).sort({ tlm: -1 });
+        if (betaDaft) {
+          const stableHistory = (await db.DraftModel.getType()).stableHistory;
+          await betaDaft.updateOne({
+            $set: {
+              type: stableHistory,
+              tlm: Date.now(),
+            },
+          });
+        }
+      }
     }
     // 推送回复、评论 仅推送无需审核的post
     if (_post.reviewed) {

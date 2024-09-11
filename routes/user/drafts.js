@@ -117,6 +117,7 @@ draftsRouter
     await next();
   })
   // 保存草稿
+  // 注意草稿的查询由did最新的修改的beta版本为基准。
   .post('/', async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
@@ -220,7 +221,7 @@ draftsRouter
       minLength: 0,
       maxLength: 1000,
     });
-    if (files && files.postCover && (files.postCover.size / (1024 * 1024)) > 30) {
+    if (files && files.postCover && files.postCover.size / (1024 * 1024) > 30) {
       ctx.throw(400, '封面图片大小不得超过30MB');
     }
     let draft;
@@ -231,16 +232,49 @@ draftsRouter
         ctx.throw(400, 'parentPostId不存在');
       }
     }
-    if (draftId) {
-      draft = await db.DraftModel.findOne({
-        did: draftId,
-        uid: user.uid,
-        type: draftTypes.beta,
-      }).sort({ tlm: -1 });
-      // 保存回复 没有post._id
-      if (!draft || (post._id && draft._id != post._id)) {
-        ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
-      }
+    // newThread==>通过draftId查草稿
+    // newPost，newComment，modify...==》（理想下只有一个系列did草稿）通过desType和desTypeId 查草稿
+
+    switch (desType) {
+      case 'newThread':
+        if (draftId) {
+          draft = await db.DraftModel.findOne({
+            did: draftId,
+            uid: user.uid,
+            type: draftTypes.beta,
+          }).sort({ tlm: -1 });
+          // 保存回复 没有post._id
+          // if (!draft || (post._id && draft._id != post._id)) {
+          //   ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+          // }
+        }
+        break;
+      case 'newPost':
+      case 'modifyThread':
+      case 'modifyPost':
+        if (desTypeId) {
+          draft = await db.DraftModel.findOne({
+            desType,
+            desTypeId,
+            uid: user.uid,
+            type: draftTypes.beta,
+          }).sort({ tlm: -1 });
+        }
+        break;
+      case 'newComment':
+      case 'modifyComment':
+        if (desTypeId) {
+          draft = await db.DraftModel.findOne({
+            desType,
+            desTypeId,
+            parentPostId,
+            uid: user.uid,
+            type: draftTypes.beta,
+          }).sort({ tlm: -1 });
+        }
+        break;
+      default:
+        break;
     }
     const draftObj = {
       t,
@@ -258,6 +292,8 @@ draftsRouter
       originState,
       anonymous,
       parentPostId,
+      desTypeId,
+      desType,
       noticeContent,
       checkNewNotice,
       tlm: Date.now(),
@@ -266,11 +302,11 @@ draftsRouter
       // 存在草稿
       // 更新草稿
       await draft.updateOne(draftObj);
-      draft = await db.DraftModel.findOne({
-        did: draftId,
-        uid: user.uid,
-        type: draftTypes.beta,
-      }).sort({ tlm: -1 });
+      // draft = await db.DraftModel.findOne({
+      //   did: draftId,
+      //   uid: user.uid,
+      //   type: draftTypes.beta,
+      // }).sort({ tlm: -1 });
       if (saveType === 'timing') {
         // 定时保存
         await draft.checkContentAndCopyToBetaHistory();

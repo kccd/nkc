@@ -344,6 +344,7 @@ class SinglePostModule {
 
   // 获取编辑器dom
   getEditorApp(pid, parentDom, props = {}) {
+    const self = this;
     props.keepOpened = props.keepOpened || false;
     const { cancelEvent = 'switchCommentForm', position = 'top' } = props;
     const editorApp = this.editors[pid];
@@ -436,10 +437,42 @@ class SinglePostModule {
           },
           methods: {
             removeEvent() {
+              // 目前此函数用户编辑器准备完成执行的操作
+              this.initEditorContent();
               this.$refs[`singleEditor_${pid}`].removeNoticeEvent();
             },
             getRef() {
               return this.$refs[`singleEditor_${pid}`];
+            },
+            initEditorContent() {
+              if (NKC.configs.uid && self.tid) {
+                nkcAPI(
+                  `/u/${
+                    NKC.configs.uid
+                  }/profile/draftData?page=${0}&perpage=1&type=newComment&desTypeId=${
+                    self.tid
+                  }&parentPostId=${pid}`,
+                  'GET',
+                )
+                  .then((res) => {
+                    if (
+                      res.drafts.length &&
+                      this.$refs[`singleEditor_${pid}`].ready &&
+                      !this.$refs[`singleEditor_${pid}`].getContent()
+                    ) {
+                      this.$refs[`singleEditor_${pid}`].setContent(
+                        res.drafts[0].content,
+                      );
+                      if (self.editors[pid]) {
+                        self.editors[pid].draftId = res.drafts[0].did;
+                        self.editors[pid]._id = res.drafts[0]._id;
+                      }
+                    }
+                  })
+                  .catch((err) => {
+                    sweetError(err);
+                  });
+              }
             },
           },
         });
@@ -537,6 +570,7 @@ class SinglePostModule {
             anonymous: isAnonymous,
             parentPostId: pid,
             _id: editorApp._id || '',
+            did: editorApp.draftId || '',
           },
         });
       })

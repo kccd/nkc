@@ -95,22 +95,22 @@ router
       minLength: 0,
       maxLength: 1000,
     });
-    if (_id) {
-      const did =
-        post?.did ||
-        (await db.DraftModel.findOnly({ _id: new ObjectId(_id) }, { did: 1 })).did;
-      if (did) {
-        const beta = (await db.DraftModel.getType()).beta;
-        const betaDaft = await db.DraftModel.findOne({
-          did,
-          type: beta,
-          uid: state.uid,
-        }).sort({ tlm: -1 });
-        if (!betaDaft || betaDaft._id != _id) {
-          ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
-        }
-      }
-    }
+    // if (_id) {
+    //   const did =
+    //     post?.did ||
+    //     (await db.DraftModel.findOnly({ _id: new ObjectId(_id) }, { did: 1 })).did;
+    //   if (did) {
+    //     const beta = (await db.DraftModel.getType()).beta;
+    //     const betaDaft = await db.DraftModel.findOne({
+    //       did,
+    //       type: beta,
+    //       uid: state.uid,
+    //     }).sort({ tlm: -1 });
+    //     if (!betaDaft || betaDaft._id != _id) {
+    //       ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+    //     }
+    //   }
+    // }
 
     /*if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
 		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");*/
@@ -213,18 +213,41 @@ router
         console.error(err);
       });
     }
-    if (_id) {
-      const beta = (await db.DraftModel.getType()).beta;
-      const stableHistory = (await db.DraftModel.getType()).stableHistory;
-      await db.DraftModel.updateOne(
-        { _id: new ObjectId(_id), uid: state.uid, type: beta },
-        {
-          $set: {
-            type: stableHistory,
-            tlm: Date.now(),
-          },
-        },
-      );
+    // if (_id) {
+    //   const beta = (await db.DraftModel.getType()).beta;
+    //   const stableHistory = (await db.DraftModel.getType()).stableHistory;
+    //   await db.DraftModel.updateOne(
+    //     { _id: new ObjectId(_id), uid: state.uid, type: beta },
+    //     {
+    //       $set: {
+    //         type: stableHistory,
+    //         tlm: Date.now(),
+    //       },
+    //     },
+    //   );
+    // }
+    if (_id || post.did) {
+      const did =
+        post.did ||
+        (await db.DraftModel.findOnly({ _id: new ObjectId(_id) }, { did: 1 }))
+          .did;
+      if (did) {
+        const beta = (await db.DraftModel.getType()).beta;
+        const betaDaft = await db.DraftModel.findOne({
+          did,
+          type: beta,
+          uid: state.uid,
+        }).sort({ tlm: -1 });
+        if (betaDaft) {
+          const stableHistory = (await db.DraftModel.getType()).stableHistory;
+          await betaDaft.updateOne({
+            $set: {
+              type: stableHistory,
+              tlm: Date.now(),
+            },
+          });
+        }
+      }
     }
     // 发表文章后进行跳转
     const type = ctx.request.accepts('json', 'html');

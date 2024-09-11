@@ -1,7 +1,8 @@
-import {getPostEditorConfigs} from '../lib/js/editor'
-import Editor from '../lib/vue/Editor'
+import { getPostEditorConfigs } from '../lib/js/editor';
+import { sweetError } from '../lib/js/sweetAlert';
+import Editor from '../lib/vue/Editor';
 const container = $('#editorContainer');
-if(container.length > 0) {
+if (container.length > 0) {
   const postEditor = new Vue({
     el: '#editorContainer',
     data: {
@@ -11,25 +12,52 @@ if(container.length > 0) {
         stickerSelector: true,
         xsfSelector: true,
         mathJaxSelector: true,
-      }
+      },
+      uid: NKC.configs.uid,
+      desTypeId: document.getElementById('threadId').innerText,
     },
-    mounted() {
-    },
+    mounted() {},
     computed: {
       editorConfigs() {
         return getPostEditorConfigs();
       },
     },
     components: {
-      'editor': Editor,
+      editor: Editor,
     },
     methods: {
       removeEvent() {
+        // 目前此函数用户编辑器准备完成执行的操作
+        this.initEditorContent();
         this.$refs.postEditor.removeNoticeEvent();
       },
       getRef() {
         return this.$refs.postEditor;
-      }
+      },
+      initEditorContent() {
+        if (this.uid && this.desTypeId) {
+          nkcAPI(
+            `/u/${
+              this.uid
+            }/profile/draftData?page=${0}&perpage=1&type=newPost&desTypeId=${
+              this.desTypeId
+            }`,
+            'GET',
+          )
+            .then((res) => {
+              if (
+                res.drafts.length &&
+                this.$refs.postEditor.ready &&
+                !this.$refs.postEditor.getContent()
+              ) {
+                this.$refs.postEditor.setContent(res.drafts[0].content);
+              }
+            })
+            .catch((err) => {
+              sweetError(err);
+            });
+        }
+      },
     },
   });
   window.ue = postEditor.getRef();
