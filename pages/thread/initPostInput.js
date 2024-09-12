@@ -36,6 +36,7 @@ if (container.length > 0) {
       },
       initEditorContent() {
         if (this.uid && this.desTypeId) {
+          this.$refs.postEditor.loading = true;
           nkcAPI(
             `/u/${
               this.uid
@@ -51,12 +52,24 @@ if (container.length > 0) {
                 !this.$refs.postEditor.getContent()
               ) {
                 this.$refs.postEditor.setContent(res.drafts[0].content);
+                if (window.initDraft) {
+                  window.initDraft(res.drafts[0].did, res.drafts[0]._id);
+                }
+                if (window.quotePost && res.drafts[0].quotePostId) {
+                  window.quotePost(res.drafts[0].quotePostId);
+                }
               }
             })
             .catch((err) => {
               sweetError(err);
+            })
+            .finally(() => {
+              this.$refs.postEditor.loading = false;
             });
         }
+      },
+      autoSaveDraft() {
+        window.autoSaveDraft();
       },
     },
   });

@@ -176,6 +176,7 @@ draftsRouter
       tcId = [],
       noticeContent,
       checkNewNotice,
+      quote = '',
     } = post;
     // 检查草稿
     const _content = customCheerio.load(c).text();
@@ -231,6 +232,24 @@ draftsRouter
       if (!parentPost) {
         ctx.throw(400, 'parentPostId不存在');
       }
+    }
+    if (quote) {
+      const targetPost = await db.PostModel.findOnly({ pid: quote });
+      if (!targetPost) {
+        ctx.throw(400, 'parentPostId不存在');
+      }
+      // await targetPost.extendUser();
+      const targetThread = await db.ThreadModel.findOnly({
+        tid: targetPost.tid,
+      });
+      // await targetThread.extendForums(['mainForums', 'minorForums']);
+      await targetThread.ensurePermission(
+        data.userRoles,
+        data.userGrade,
+        data.user,
+      );
+      if (targetPost.disabled) ctx.throw(403, '无法引用已经被禁用的回复');
+      if (!targetPost.reviewed) ctx.throw(403, '回复未通过审核，暂无法引用');
     }
     // newThread==>通过draftId查草稿
     // newPost，newComment，modify...==》（理想下只有一个系列did草稿）通过desType和desTypeId 查草稿
@@ -296,6 +315,7 @@ draftsRouter
       desType,
       noticeContent,
       checkNewNotice,
+      quotePostId: quote,
       tlm: Date.now(),
     };
     if (draft) {

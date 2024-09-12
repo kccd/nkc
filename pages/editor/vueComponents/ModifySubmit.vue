@@ -119,6 +119,7 @@ export default {
         if (n?.forum) this.forum = n.forum;
         if (n?.thread) this.thread = n.thread;
         if (n?.post?.pid) this.pid = n.post.pid;
+        if (n?.post?.quotePostId) this.quotePostId = n.post.quotePostId;
       }
     },
     o: {
@@ -297,6 +298,9 @@ export default {
           } else if (type === "newPost") {
             // desType = "thread";
             desTypeId = this.thread?.tid;
+            if(this.quotePostId || this.draft.quotePostId){
+            saveData.quotePostId = this.draft.quotePostId || this.quotePostId;
+            }
           } else if (type === "modifyPost") {
             // desType = "post";
             desTypeId = this.pid;
@@ -505,6 +509,9 @@ export default {
       if(this.checkNewNotice){
         submitData.noticeContent = this.noticeContent;
         submitData.type = this.type
+      }
+      if(this.type === "newPost" && (this.quotePostId || this.draft.quotePostId)){
+        submitData.quote = this.draft.quotePostId || this.quotePostId;
       }
       let type;
       Promise.resolve()
