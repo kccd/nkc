@@ -227,13 +227,14 @@ NKC.methods.getDataById = getDataById;
  * @param {Dom} dom jquery dom
  * @author pengxiguaa 2019-7-31
  * */
-NKC.methods.scrollToDom = function (dom) {
+NKC.methods.scrollToDom = function (dom, offset) {
   if (!dom.length) {
     return;
   }
   var top = dom.offset().top;
+  offset = offset === undefined ? 300 : offset;
   setTimeout(function () {
-    $('html,body').animate({ scrollTop: top - 300 }, 500);
+    $('html,body').animate({ scrollTop: top - offset }, 500);
   });
 };
 /*
