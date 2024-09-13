@@ -1,4 +1,5 @@
 import { ToTop, ToBottom, Up, Down } from '@icon-park/vue';
+import Vue from 'vue';
 
 window.onload = function () {
   const app = new Vue({
