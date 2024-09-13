@@ -139,6 +139,11 @@ const draftSchema = new Schema(
       type: String,
       default: '',
     },
+    // 针对新建回复的引用postId
+    quotePostId: {
+      type: String,
+      default: '',
+    },
     // 多维分类Id
     tcId: {
       type: [Number],

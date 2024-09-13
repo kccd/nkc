@@ -242,7 +242,7 @@ class SinglePostModule {
           NKC.methods.scrollToDom(targetComment);
           NKC.methods.markDom(targetComment);
         }
-        self.autoSaveDraft(pid);
+        // self.autoSaveDraft(pid);
       })
       .then(() => {
         self.initNKCSource();
@@ -359,7 +359,7 @@ class SinglePostModule {
       let editorDom, app;
       if (this.postPermission.permit) {
         editorDom = $(
-          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" :plugs="editorPlugs" /></div>`,
+          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="true" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
           `<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
@@ -446,6 +446,7 @@ class SinglePostModule {
             },
             initEditorContent() {
               if (NKC.configs.uid && self.tid) {
+                this.$refs[`singleEditor_${pid}`].loading = true;
                 nkcAPI(
                   `/u/${
                     NKC.configs.uid
@@ -471,8 +472,14 @@ class SinglePostModule {
                   })
                   .catch((err) => {
                     sweetError(err);
+                  })
+                  .finally(() => {
+                    this.$refs[`singleEditor_${pid}`].loading = false;
                   });
               }
+            },
+            autoSave() {
+              self.autoSaveDraft(pid);
             },
           },
         });
@@ -490,6 +497,8 @@ class SinglePostModule {
         pid: pid,
         show: false,
         timeoutId: null,
+        mTimeoutId: null,
+        manualSave: false,
         prevDraft: '',
       };
     }
@@ -524,7 +533,7 @@ class SinglePostModule {
     } else {
       editorApp.show = true;
       editorApp.container.show();
-      this.autoSaveDraft(pid);
+      // this.autoSaveDraft(pid);
     }
   }
   // 获取指定编辑器的内容
@@ -640,6 +649,15 @@ class SinglePostModule {
   }
   // 手动点击保存草稿
   saveDraft(pid) {
+    const editorApp = this.getEditorApp(pid);
+    if (editorApp) {
+      clearTimeout(editorApp.timeoutId);
+      if (editorApp.mTimeoutId) {
+        clearTimeout(editorApp.mTimeoutId);
+        editorApp.mTimeoutId = null;
+      }
+      editorApp.manualSave = true;
+    }
     this.saveDraftData(pid)
       .then(({ saved, error }) => {
         if (saved) {
@@ -648,7 +666,13 @@ class SinglePostModule {
           sweetError(error);
         }
       })
-      .catch(sweetError);
+      .catch(sweetError)
+      .finally(() => {
+        editorApp.mTimeoutId = setTimeout(() => {
+          editorApp.manualSave = false;
+          editorApp.mTimeoutId = null;
+        }, 2000);
+      });
   }
   // 自动保存草稿
   autoSaveDraft(pid) {
@@ -658,17 +682,18 @@ class SinglePostModule {
       return;
     }
     clearTimeout(editorApp.timeoutId);
+    if (editorApp.manualSave) return;
     editorApp.timeoutId = setTimeout(() => {
       self
         .saveDraftData(pid)
         .then(() => {
-          self.autoSaveDraft(pid);
+          // self.autoSaveDraft(pid);
         })
         .catch((err) => {
           screenTopWarning(err);
-          self.autoSaveDraft(pid);
+          // self.autoSaveDraft(pid);
         });
-    }, 10000);
+    }, 2000);
   }
   /*
    * 插入一条评论
