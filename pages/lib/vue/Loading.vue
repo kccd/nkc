@@ -1,20 +1,23 @@
 <template>
   <div class="loading">
-    <div class="loading-title">
-      <i class="fa fa-spinner loading-icon" aria-hidden="true"></i>
-      <p>拼命加载中...</p>
-    </div>
+    <div class="fa fa-spinner fa-spin m-r-05" />
+    <p>拼命加载中...</p>
   </div>
 </template>
 <script>
-export default {
 
+export default {
 }
 </script>
 <style scoped>
 .loading {
+  user-select: none;
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555;
 }
 @keyframes rotate{
   0% {
@@ -32,7 +35,6 @@ export default {
   font-weight: 600;
 }
 .loading-icon {
-  font-size: 24px;
   animation: rotate 2.3s linear infinite;
 }
 </style>

@@ -2,7 +2,7 @@
   .editor
     .bg-danger.text-danger.p-a-1.text-center(v-if="errorInfo") 编辑器初始化失败： {{errorInfo}}
     div(v-else)
-      div(v-show="!loading")
+      div()
         resource-selector(ref="resourceSelector")
         draft-selector(ref="draftSelector")
         sticker-selector(ref="stickerSelector")
@@ -18,14 +18,27 @@
               .fa.fa-remove.m-r-05
               span 内容保存失败
             .save-saving(v-if="savingInfo === 'saving'") 内容保存中...
-      .skeleton.m-b-1(v-show="loading" style='padding:1rem 0rem;')
-       .skeleton-container
-          loading
+      .mask.m-b-1(v-show="loading")
+        loading
 </template>
 
 <style lang="less" scoped>
   .editor{
     background-color: #f4f4f4;
+    position: relative;
+    min-height: 10rem;
+    .mask{
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255,255,255,0.7);
+    }
     .editor-container {
       position: relative;
     }
