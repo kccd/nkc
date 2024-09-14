@@ -338,8 +338,10 @@ draftsRouter
         // 调查表数据
         if (draft.surveyId) {
           // 若草稿上已有调查表ID，则只需更新调查表数据。
-          survey._id = draft.surveyId;
-          await db.SurveyModel.modifySurvey(survey, false);
+          if (survey._id) {
+            survey._id = draft.surveyId;
+            await db.SurveyModel.modifySurvey(survey, false);
+          }
         } else {
           // 若草稿上没有调查表数据，则创建调查表。
           survey.uid = user.uid;
@@ -368,10 +370,22 @@ draftsRouter
       // else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
       //   await db.ForumModel.findOnly({fid: desTypeId});
       // }
+      if (['modifyThread', 'modifyPost', 'modifyComment'].includes(desType)) {
+        draft = await db.DraftModel.findOne({
+          desType,
+          desTypeId,
+          uid: user.uid,
+          type: draftTypes.stableHistory,
+        }).sort({ tlm: -1 });
+      }
       draftObj.desTypeId = desTypeId;
       draftObj.desType = desType;
       draftObj.uid = user.uid;
-      draftObj.did = await db.SettingModel.operateSystemID('drafts', 1);
+      if (draft) {
+        draftObj.did = draft.did;
+      } else {
+        draftObj.did = await db.SettingModel.operateSystemID('drafts', 1);
+      }
       draft = db.DraftModel(draftObj);
       await draft.save();
       if (survey) {
