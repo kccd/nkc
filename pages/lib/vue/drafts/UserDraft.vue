@@ -37,20 +37,20 @@
       a.account-post-content {{draft.c || "未填写内容"}}
       .text-right.m-t-05.draft-button
         button(@click="removeDraftSingle(draft.did)") 删除
-        span.dropdown(v-if="draft.desType === 'modifyThread'")
-          button.p-a-0.m-a-0(style='color: #2b90d9' :id="`dLabel_${draft.did}`" type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') 继续创作
-            span.caret
-          ul.dropdown-menu.dropdown-menu-right(:aria-labelledby="`dLabel_${draft.did}`")
-            li
-              a(:href="`/editor?type=redit&id=${draft.did}&o=copy`" target='_blank')
-                .fa.fa-clone
-                span &nbsp;复制为新文章
-            li
-              a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
-                .fa.fa-refresh
-                span &nbsp;更新已发布的文章
+        //span.dropdown(v-if="draft.desType === 'modifyThread'")
+        //  button.p-a-0.m-a-0(style='color: #2b90d9' :id="`dLabel_${draft.did}`" type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') 继续创作
+        //    span.caret
+        //  ul.dropdown-menu.dropdown-menu-right(:aria-labelledby="`dLabel_${draft.did}`")
+        //    li
+        //      a(:href="`/editor?type=redit&id=${draft.did}&o=copy`" target='_blank')
+        //        .fa.fa-clone
+        //        span &nbsp;复制为新文章
+        //    li
+        //      a(:href="`/editor?type=redit&id=${draft.did}&o=update`" target='_blank')
+        //        .fa.fa-refresh
+        //        span &nbsp;更新已发布的文章
         a(v-if="draft.desType === 'newThread'" :href="`/editor?type=${draft.desType}&draftDid=${draft.did}`" target='_blank') 继续创作
-        a(v-else-if="draft.desType !== 'modifyThread'" :href="`/editor?type=${draft.desType}&id=${draft.desTypeId}&draftDid=${draft.did}`" target='_blank') 继续创作
+        a(v-else :href="`/editor?type=${draft.desType}&id=${draft.desTypeId}&draftDid=${draft.did}`" target='_blank') 继续创作
     paging(:pages="pageButtons" @click-button="clickBtn")
 </template>
 <style lang="less" scoped>
