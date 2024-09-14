@@ -538,6 +538,7 @@ function saveDraft(threadId, userId) {
         // desType: "thread",
         desType: 'newPost',
         desTypeId: threadId,
+        saveType: 'manual',
       };
       return nkcAPI(url, method, data);
     })

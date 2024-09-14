@@ -605,7 +605,7 @@ class SinglePostModule {
       });
   }
   // 保存草稿
-  saveDraftData(pid) {
+  saveDraftData(pid, saveType = '') {
     const editorApp = this.getEditorApp(pid);
     const { prevDraft } = editorApp;
     const content = this.getEditorContent(pid);
@@ -634,6 +634,7 @@ class SinglePostModule {
           // desType: "thread",
           desType: 'newComment',
           desTypeId: self.tid,
+          saveType,
         });
       })
       .then((data) => {
@@ -658,7 +659,7 @@ class SinglePostModule {
       }
       editorApp.manualSave = true;
     }
-    this.saveDraftData(pid)
+    this.saveDraftData(pid, 'manual')
       .then(({ saved, error }) => {
         if (saved) {
           sweetSuccess('草稿已保存');

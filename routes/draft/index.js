@@ -59,7 +59,7 @@ router
     delete queryCriteria.desTypeId;
   }
   // 后期完善：draftId应该先查一下
-  if(draftId && ['modifyThread','modifyPost','newPost'].includes(source)){
+  if(draftId && ['modifyThread','modifyPost','newPost','newComment','modifyComment'].includes(source)){
     queryCriteria.did = draftId;
   }
   //  获取列表
@@ -121,7 +121,7 @@ router
     queryCriteria.did = desTypeId;
     delete queryCriteria.desTypeId
   }
-  if(draftId && ['modifyThread','modifyPost','newPost'].includes(source)){
+  if(draftId && ['modifyThread','modifyPost','newPost','newComment','modifyComment'].includes(source)){
     queryCriteria.did = draftId;
   }
   const count =  await db.DraftModel.countDocuments(queryCriteria);

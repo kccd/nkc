@@ -311,7 +311,7 @@ export default {
       return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版
-          if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
+          if(resData.post && ['newThread','newPost','newComment'].includes(resData.post.desType) && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
             throw new Error('您提交的内容已过期，请检查文章状态。');
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并

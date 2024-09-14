@@ -178,6 +178,7 @@ router
       // 从草稿箱来
       // let { id, o, _id } = query;
       let { id, o, draftDid } = query;
+      if (!draftDid) ctx.throw(400, '参数异常');
       // 社区的草稿只能使用_id 才能具体查找到一篇文章
       let draft;
       // if (_id) {
@@ -193,12 +194,24 @@ router
       // 找到最新修改的一篇
       const draftTypes = await db.DraftModel.getType();
       draft = await db.DraftModel.findOne({
-        did: draftDid || id,
+        did: draftDid,
         uid: user.uid,
-        type: draftTypes.beta,
+        // type: draftTypes.beta,
       }).sort({ tlm: -1 });
       if (!draft) {
         ctx.throw(400, '草稿不存在或已被删除');
+      }
+      if (
+        !['modifyThread', 'modifyPost', 'modifyComment'].includes(draft.desType)
+      ) {
+        draft = await db.DraftModel.findOne({
+          did: draftDid,
+          uid: user.uid,
+          type: draftTypes.beta,
+        }).sort({ tlm: -1 });
+        if (!draft) {
+          ctx.throw(400, '草稿不存在或状态已过期');
+        }
       }
       draft = draft.toObject();
       if (!['copy', 'update'].includes(o)) {
