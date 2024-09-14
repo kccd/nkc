@@ -22,7 +22,9 @@
           :alt="fileData.filename"
           :title="fileData.filename"
           )
-        span.fa.fa-play-circle-o(v-if="fileData.type === types.video " class='play-icon')
+        .play-icon(v-if="fileData.type === types.video")
+          play-one(size="24" theme="filled")
+        //span.fa.fa-play-circle-o(v-if="fileData.type === types.video " class='play-icon')
 </template>
 
 <style lang="less" scoped>
@@ -66,20 +68,23 @@
         z-index: 10;
       }
       .play-icon {
-        font-size: 3rem;
-        color: rgba(0, 179, 255, 0.8);
+        color: #ffffff;
         position: absolute;
-        top: 10rem;
+        height: 3.2rem;
+        width: 3.2rem;
+        background-color: rgba(0, 179, 255, 0.9);;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         transition: color 0.2s;
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
       }
       &:hover {
         .play-icon {
-          color: #00b3ff;
-          font-size: 3.5rem;
+          background-color: rgba(0, 179, 255, 1);;
         }
       }
     }
@@ -165,6 +170,7 @@
 import { openImageViewer } from '../../js/imageViewer';
 import { getState } from '../../js/state';
 import VideoPlayer from '../VideoPlayer';
+import {PlayOne} from '@icon-park/vue'
 const { isApp } = getState();
 export default {
   /*
@@ -190,6 +196,7 @@ export default {
   props: ['data'],
   components: {
     'video-player': VideoPlayer,
+    'play-one': PlayOne,
   },
   data: () => ({
     types: {
