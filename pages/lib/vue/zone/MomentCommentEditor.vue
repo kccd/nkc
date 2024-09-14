@@ -330,6 +330,7 @@
             self.$emit('published', {
               momentCommentId: res.momentCommentId,
               momentCommentPage: res.momentCommentPage,
+              repostMomentId: res.repostMomentId,
             });
             self.reset();
           })

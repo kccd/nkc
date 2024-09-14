@@ -1238,6 +1238,9 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
       momentId: repostMomentId,
     });
   }
+  return {
+    repostMomentId,
+  };
 };
 
 /*
