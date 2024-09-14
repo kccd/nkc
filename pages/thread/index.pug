@@ -492,7 +492,7 @@ block content
                 //- 编辑器的编辑框
                 .m-b-1#editorContainer(style="background-color:#fff;")
                   if data.user
-                    editor#container(:configs="editorConfigs" ref="postEditor" @ready="removeEvent" :plugs="editorPlugs")
+                    editor#container(:configs="editorConfigs" ref="postEditor" @ready="removeEvent" :plugs="editorPlugs" @content-change="autoSaveDraft" :loading="true")
                   //script#container(name='content', type='text/plain')
 
                 div
@@ -581,7 +581,8 @@ block content
           .hidden-sm.hidden-xs.box-shadow
             include ../publicModules/footer/footer_sm
 
-          include ../module_scrollTo
+          include ../publicModules/articleScroll/articleScroll
+          +articleScroll('single-post-container')
 
     //- 作者信息
 

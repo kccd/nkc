@@ -493,22 +493,22 @@ router
         maxLength: 2000000,
       },
     );
-    if (_id) {
-      const draftDid =
-        did ||
-        (await db.DraftModel.findOnly({ _id: new ObjectId(_id) }, { did: 1 })).did;
-      if (draftDid) {
-        const beta = (await db.DraftModel.getType()).beta;
-        const betaDaft = await db.DraftModel.findOne({
-          did: draftDid,
-          type: beta,
-          uid: state.uid,
-        }).sort({ tlm: -1 });
-        if (!betaDaft || betaDaft._id != _id) {
-          ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
-        }
-      }
-    }
+    // if (_id) {
+    //   const draftDid =
+    //     did ||
+    //     (await db.DraftModel.findOnly({ _id: new ObjectId(_id) }, { did: 1 })).did;
+    //   if (draftDid) {
+    //     const beta = (await db.DraftModel.getType()).beta;
+    //     const betaDaft = await db.DraftModel.findOne({
+    //       did: draftDid,
+    //       type: beta,
+    //       uid: state.uid,
+    //     }).sort({ tlm: -1 });
+    //     if (!betaDaft || betaDaft._id != _id) {
+    //       ctx.throw(400, `您提交的内容已过期，请检查文章状态。`);
+    //     }
+    //   }
+    // }
 
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
@@ -731,18 +731,35 @@ router
     // if(did) {
     //   await db.DraftModel.removeDraftById(did, data.user.uid);
     // }
-    if (_id) {
+    // if (_id) {
+    //   const beta = (await db.DraftModel.getType()).beta;
+    //   const stableHistory = (await db.DraftModel.getType()).stableHistory;
+    //   const res = await db.DraftModel.updateOne(
+    //     { _id: new ObjectId(_id), uid: data.user.uid, type: beta },
+    //     {
+    //       $set: {
+    //         type: stableHistory,
+    //         tlm: Date.now(),
+    //       },
+    //     },
+    //   );
+    // }
+    if (did) {
       const beta = (await db.DraftModel.getType()).beta;
-      const stableHistory = (await db.DraftModel.getType()).stableHistory;
-      const res = await db.DraftModel.updateOne(
-        { _id: new ObjectId(_id), uid: data.user.uid, type: beta },
-        {
+      const betaDaft = await db.DraftModel.findOne({
+        did,
+        type: beta,
+        uid: state.uid,
+      }).sort({ tlm: -1 });
+      if (betaDaft) {
+        const stableHistory = (await db.DraftModel.getType()).stableHistory;
+        await betaDaft.updateOne({
           $set: {
             type: stableHistory,
             tlm: Date.now(),
           },
-        },
-      );
+        });
+      }
     }
     await targetUser.updateUserMessage();
     // if(!postReviewed) {

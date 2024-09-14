@@ -35,6 +35,7 @@ router
     await next();
   })
   // 获取不同编辑器基本内容
+  // 注意查询草稿以did的最新修改编辑版为准
   .get('/data', async (ctx, next) => {
     const { db, data, query, state } = ctx;
     const { type, id } = query;
@@ -64,7 +65,9 @@ router
       data.type = 'newThread';
       // 判断用户是否用有指定专业的发表权限
       try {
-        await db.ForumModel.checkGlobalPostAndForumWritePermission(state.uid, [id]);
+        await db.ForumModel.checkGlobalPostAndForumWritePermission(state.uid, [
+          id,
+        ]);
         selectedForumsId = [id];
       } catch (err) {
         data.permissionInfo = err.message;
@@ -173,21 +176,42 @@ router
       data.type = 'modifyComment';
     } else if (type === 'redit') {
       // 从草稿箱来
-      let { id, o, _id } = query;
+      // let { id, o, _id } = query;
+      let { id, o, draftDid } = query;
+      if (!draftDid) ctx.throw(400, '参数异常');
       // 社区的草稿只能使用_id 才能具体查找到一篇文章
       let draft;
-      if (_id) {
-        draft = await db.DraftModel.findOne({ _id, uid: user.uid });
-      } else {
-        const draftTypes = await db.DraftModel.getType();
-        draft = await db.DraftModel.findOne({
-          did: id,
-          uid: user.uid,
-          type: draftTypes.beta,
-        });
-      }
+      // if (_id) {
+      //   draft = await db.DraftModel.findOne({ _id, uid: user.uid });
+      // } else {
+      //   const draftTypes = await db.DraftModel.getType();
+      //   draft = await db.DraftModel.findOne({
+      //     did: id,
+      //     uid: user.uid,
+      //     type: draftTypes.beta,
+      //   });
+      // }
+      // 找到最新修改的一篇
+      const draftTypes = await db.DraftModel.getType();
+      draft = await db.DraftModel.findOne({
+        did: draftDid,
+        uid: user.uid,
+        // type: draftTypes.beta,
+      }).sort({ tlm: -1 });
       if (!draft) {
         ctx.throw(400, '草稿不存在或已被删除');
+      }
+      if (
+        !['modifyThread', 'modifyPost', 'modifyComment'].includes(draft.desType)
+      ) {
+        draft = await db.DraftModel.findOne({
+          did: draftDid,
+          uid: user.uid,
+          type: draftTypes.beta,
+        }).sort({ tlm: -1 });
+        if (!draft) {
+          ctx.throw(400, '草稿不存在或状态已过期');
+        }
       }
       draft = draft.toObject();
       if (!['copy', 'update'].includes(o)) {
@@ -347,7 +371,10 @@ router
           cfObj[c.fid] = [];
         }
         cfObj[c.fid].push(c);
-        if (selectedCategoriesId.includes(c.cid)) {
+        if (
+          selectedCategoriesId.includes(c.cid) ||
+          selectedCategoriesId.includes(String(c.cid))
+        ) {
           selectedCategoriesObj[c.fid] = c;
         }
       }

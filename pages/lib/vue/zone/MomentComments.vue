@@ -232,7 +232,7 @@
         this.getList(page);
       },
       onPublished(res) {
-        const {momentCommentId} = res;
+        const {momentCommentId, repostMomentId} = res;
         const {postType} = this;
         if(postType === 'comment') {
           this.setFocusCommentId(momentCommentId);
@@ -240,9 +240,10 @@
           this.$emit('post-comment');
           this.setTimerToScrollPage();
         } else {
+          visitUrl(`/z/m/${repostMomentId}`);
           // visitUrl(`/g/moment`);
           // visitUrl(`/z`);
-          this.refresh();
+          // this.refresh();
         }
       },
       vote(commentData) {

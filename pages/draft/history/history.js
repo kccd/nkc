@@ -19,7 +19,8 @@ function post(type, obj) {
   nkcAPI(url, 'POST')
     .then(() => {
       // location.href=`/editor?type=newThread&aid=${obj._id}`;
-      location.href=`/editor?type=${obj.source}&id=${obj.desTypeId}&aid=${obj._id}`;
+      // location.href=`/editor?type=${obj.source}&id=${obj.desTypeId}&aid=${obj._id}`;
+      location.href=`/editor?type=${obj.source}&id=${obj.desTypeId}&draftDid=${obj.did}`;
     })
     .catch(err => {
       sweetError(err)

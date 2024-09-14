@@ -1,12 +1,15 @@
 <template lang="pug">
 .container-fluid.max-width
+  mixin buttonGroup
+    .bubble-back(v-if="showBack" @click="backZoneList")
+      .back-box
+        span.icon.fa.fa-angle-left
+        span.text(v-if="fromZone") 返回上级
+        span.text(v-else) 回到电波
   .row
     .col-md-offset-2.col-xs-12.col-md-8.min-md-p-r-0
-      .bubble-back.m-b-05(v-if="showBack" @click="backZoneList")
-        .back-box
-          span.icon.fa.fa-angle-left
-          span.text(v-if="fromZone") 返回上级
-          span.text(v-else) 回到电波
+      .m-b-05
+        +buttonGroup
       .box-shadow
         .zone-moment-container
           complaint(ref="complaint")
@@ -27,6 +30,8 @@
             .skeleton.m-b-1(style='min-height:10rem;padding:1rem 0rem;')
               loading
             .skeleton(style='min-height:4rem;')
+      .m-t-05
+        +buttonGroup
 </template>
 
 <style lang="less" scoped>

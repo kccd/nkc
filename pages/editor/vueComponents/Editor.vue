@@ -12,7 +12,7 @@
               .article-box-text {{draft.t  || '未填写'}} {{ setContent(draft.c) }}
               //- .article-box-text.prompt-content {{ setContent(drafts[0].c) }}
             .article-box-option
-              button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(draft._id)") 继续编辑
+              button.btn.btn-xs.btn-primary.m-r-05(@click="editArticle(draft.did)") 继续编辑
               button.btn.btn-xs.btn-default(@click="more") 查看更多
               .fa.fa-remove(@click="closeDraft")
         article-title(
@@ -237,23 +237,30 @@ export default {
 
       nkcAPI(url, 'GET')
       .then(res => {
-        self.drafts = res.drafts;
+        //除了新建文章thread之外其他的都需要默认填充唯一的did 编辑版草稿
+        if(['modifyThread','modifyPost','modifyComment','newPost','newComment'].includes(editType)&&res.drafts.length){
+          self.editArticle(res.drafts[0].did);
+        }else{
+          self.drafts = res.drafts;
+        }
       })
       .catch(err => {
         sweetError(err);
       })
     },
     //继续编辑草稿
-    editArticle(aid) {
+    editArticle(did) {
+      // 选择草稿填充==》注意 除了新建thread之外，其他的修改都无法进行选择草稿而是默认填充。
       const self = this;
-      if(!aid) {sweetError("id不存在"); return};
+      if(!did) {sweetError("did不存在"); return};
       //改变地址栏参数
-      if (new URLSearchParams(location.search).get('aid')) {
+      if (new URLSearchParams(location.search).get('draftDid')) {
         // console.log(self.delUrlParam('aid'))
-        history.replaceState({}, '', self.delUrlParam('aid'));
+        history.replaceState({}, '', self.delUrlParam('draftDid'));
       }
-      self.addUrlParam('aid', aid);
-      this.pageData.draftId = this.pageData?.draftId ?? self.drafts.find(item=>item._id===aid).did;
+      self.addUrlParam('draftDid', did);
+      // this.pageData.draftId = this.pageData?.draftId ?? self.drafts.find(item=>item._id===aid).did;
+      this.pageData.draftId = did;
       this.getData().
         then(() => {
           this.$refs.submit.setSubmitStatus(false);
@@ -265,10 +272,12 @@ export default {
       location.href = '/creation/community/draft'
     },
     getData(search) {
+      // 暂时保留==》除aid之外还有其他的参数
       if(!search) search = new URLSearchParams(location.search);
       let url = `/editor/data`;
       // 如果后台给了数据就用后台的 否则读取浏览器地址
       let type, id, o;
+      // 这里填充的未知参数过多，后期需要排查。。。
       // 链接跳转过来
       if (this.reqUrl && this.reqUrl.type && this.reqUrl.id) {
         this.allowSave = false;
@@ -293,15 +302,16 @@ export default {
           url += `&o=${this.reqUrl.o}`;
         }
       }
-      if(search.get('aid')){
+      if(search.get('draftDid')){
         this.lockRequest = true;
-        url = `/editor/data?type=redit&_id=${search.get('aid')}&o=update`;
+        // 需要把查草稿的参数换成draftDid
+        url = `/editor/data?type=redit&draftDid=${search.get('draftDid')}&o=update`;
       }
       if (url === `/editor/data`) this.allowSave = false;
       return nkcAPI(url, "get")
         .then((resData) => {
           // 如果文章已经变为历史版
-          if(resData.post && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
+          if(resData.post && ['newThread','newPost','newComment'].includes(resData.post.desType) && ['betaHistory', 'stableHistory'].includes(resData.post.type)) {
             throw new Error('您提交的内容已过期，请检查文章状态。');
           }
           // 专业进入 需要把主分类和继续编辑得到的草稿内容合并
@@ -418,9 +428,11 @@ export default {
         // 请求前一截url
       // 添加 草稿id 和 parentPostId
       submitData["did"] = this.pageData.draftId;
+      // 提交的数据的草稿_id 不再由搜索参数提供，直接由请求回的数据获取
       submitData["_id"] = new URLSearchParams(location.search).get('aid')
         || this.pageData.post?._id;
       submitData["parentPostId"] = this.pageData.post?.parentPostId;
+      submitData["desTypeId"] = this.pageData.post?.desTypeId;
       submitFn(submitData);
     },
   },

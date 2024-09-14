@@ -48,7 +48,7 @@
 <script>
 import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
-import { timeFormat, addUrlParam, getUrl } from "../../lib/js/tools";
+import { timeFormat, addUrlParam, getUrl ,delUrlParam } from "../../lib/js/tools";
 import {debounce} from '../../lib/js/execution';
 // import 'url-search-params-polyfill';
 // import { screenTopWarning } from "../../lib/js/topAlert";
@@ -119,6 +119,7 @@ export default {
         if (n?.forum) this.forum = n.forum;
         if (n?.thread) this.thread = n.thread;
         if (n?.post?.pid) this.pid = n.post.pid;
+        if (n?.post?.quotePostId) this.quotePostId = n.post.quotePostId;
       }
     },
     o: {
@@ -168,6 +169,7 @@ export default {
     clearInterval(this.setInterval)
   },
   methods: {
+    delUrlParam,
     addUrlParam,
     // boolean
     setSubmitStatus(v) {
@@ -184,14 +186,17 @@ export default {
       if (this.data.type === 'newThread') {
         // 点击继续编辑后点击历史 this.data.post.did
         // 直接输入内容点击历史只能用 this.draft.did
-        if (!this.data.post.did && !this.draft.did) return sweetError("未选择草稿");
-        url = getUrl('draftHistory', 'newThread',  this.data.post.did || this.draft.did);
+        // if (!this.data.post.did && !this.draft.did) return sweetError("未选择草稿");
+        // url = getUrl('draftHistory', 'newThread',  this.data.post.did || this.draft.did);
+        if (!new URLSearchParams(location.search).get('draftDid') && !this.draftId) return sweetError("未选择草稿");
+        url = getUrl('draftHistory', 'newThread', new URLSearchParams(location.search).get('draftDid') || this.draftId);
       } else {
         const destype = this.data.type || this.draft.desType;
         const desTypeId =  new URLSearchParams(location.search).get('id');
         if (!destype || !desTypeId) return sweetError("未选择草稿");
         url = getUrl('draftHistory', destype,  desTypeId);
-        const draftId = this.data.draftId || this.draft.did;
+        // const draftId = this.data.draftId || this.draft.did;
+        const draftId = new URLSearchParams(location.search).get('draftDid') || this.draftId;
         url = url + '&draftId=' + draftId;
       }
       window.open(url)
@@ -293,6 +298,9 @@ export default {
           } else if (type === "newPost") {
             // desType = "thread";
             desTypeId = this.thread?.tid;
+            if(this.quotePostId || this.draft.quotePostId){
+            saveData.quotePostId = this.draft.quotePostId || this.quotePostId;
+            }
           } else if (type === "modifyPost") {
             // desType = "post";
             desTypeId = this.pid;
@@ -302,7 +310,8 @@ export default {
           } else if (type === "modifyComment") {
             desTypeId = this.pid;
           } else if (type === "newComment") {
-            desTypeId = this.tid;
+            // desTypeId = this.tid;
+            desTypeId = this.thread?.tid
           }
           // else if (type === "modifyForumDeclare") {
           //   desType = "forumDeclare";
@@ -322,8 +331,8 @@ export default {
           formData.append(
             "body",
             JSON.stringify({
-              post: saveData,
-              draftId: saveData?.did || this.draftId,
+              post: {...saveData,did:new URLSearchParams(location.search).get('draftDid') || this.draftId},
+              draftId: new URLSearchParams(location.search).get('draftDid') || this.draftId,
               desType: type,
               desTypeId: desTypeId,
               saveType
@@ -359,8 +368,10 @@ export default {
           if (data.draft?.cover) {
             this.$emit('cover-change',  data.draft.cover);
           }
-          if(!new URLSearchParams(location.search).get('aid')) {
-            this.addUrlParam("aid", data.draft._id);
+          // 同步参数
+          if(new URLSearchParams(location.search).get('draftDid')!==data.draft.did) {
+            history.replaceState({}, '', this.delUrlParam('draftDid'));
+            this.addUrlParam("draftDid", data.draft.did);
           }
           this.setSubmitStatus(false);
           if (saveType === "manual") {
@@ -494,9 +505,13 @@ export default {
       });
     },
     submit(submitData) {
+      submitData.did = new URLSearchParams(location.search).get('draftDid') || this.draftId;
       if(this.checkNewNotice){
         submitData.noticeContent = this.noticeContent;
         submitData.type = this.type
+      }
+      if(this.type === "newPost" && (this.quotePostId || this.draft.quotePostId)){
+        submitData.quote = this.draft.quotePostId || this.quotePostId;
       }
       let type;
       Promise.resolve()

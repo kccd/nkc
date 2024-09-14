@@ -462,9 +462,17 @@ function getPost() {
   return post;
 }
 
+let timer = null;
+let manualSave = false;
+let mTimer = null;
 // 自动保存草稿
 function autoSaveDraft() {
-  setTimeout(function () {
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
+  }
+  if (manualSave) return;
+  timer = setTimeout(function () {
     Promise.resolve()
       .then(function () {
         var post = getPost();
@@ -488,16 +496,28 @@ function autoSaveDraft() {
       .then(function (data) {
         draftId = data.draft.did;
         _id = data.draft._id;
-        autoSaveDraft();
+        // autoSaveDraft();
       })
       .catch(function (err) {
         console.log(err);
-        autoSaveDraft();
+        // autoSaveDraft();
+      })
+      .finally(() => {
+        timer = null;
       });
-  }, 60000);
+  }, 2000);
 }
 // 保存草稿
 function saveDraft(threadId, userId) {
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
+  }
+  if (mTimer) {
+    clearTimeout(mTimer);
+    mTimer = null;
+  }
+  manualSave = true;
   Promise.resolve()
     .then(function () {
       modifyMathJax();
@@ -518,6 +538,7 @@ function saveDraft(threadId, userId) {
         // desType: "thread",
         desType: 'newPost',
         desTypeId: threadId,
+        saveType: 'manual',
       };
       return nkcAPI(url, method, data);
     })
@@ -528,7 +549,18 @@ function saveDraft(threadId, userId) {
     })
     .catch(function (data) {
       sweetError(data);
+    })
+    .finally(() => {
+      mTimer = setTimeout(() => {
+        manualSave = false;
+        mTimer = null;
+      }, 2000);
     });
+}
+// 用于初始化草稿参数
+function initDraft(draftDid, draft_id) {
+  draftId = draftDid;
+  _id = draft_id;
 }
 // 设置回复提交按钮的样式
 function setSubmitButton(submitting) {
@@ -786,6 +818,11 @@ function quotePost(pid) {
         step: '',
         c: '',
         pid: '',
+      },
+      watch: {
+        pid() {
+          autoSaveDraft();
+        },
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
@@ -1800,4 +1837,5 @@ Object.assign(window, {
   finishedEditPostOrderDebounce,
   handelInsert,
   restoreDefaultOrder,
+  initDraft,
 });

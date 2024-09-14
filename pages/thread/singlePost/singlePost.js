@@ -242,7 +242,7 @@ class SinglePostModule {
           NKC.methods.scrollToDom(targetComment);
           NKC.methods.markDom(targetComment);
         }
-        self.autoSaveDraft(pid);
+        // self.autoSaveDraft(pid);
       })
       .then(() => {
         self.initNKCSource();
@@ -344,6 +344,7 @@ class SinglePostModule {
 
   // 获取编辑器dom
   getEditorApp(pid, parentDom, props = {}) {
+    const self = this;
     props.keepOpened = props.keepOpened || false;
     const { cancelEvent = 'switchCommentForm', position = 'top' } = props;
     const editorApp = this.editors[pid];
@@ -358,7 +359,7 @@ class SinglePostModule {
       let editorDom, app;
       if (this.postPermission.permit) {
         editorDom = $(
-          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" :plugs="editorPlugs" /></div>`,
+          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="true" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
           `<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
@@ -436,10 +437,49 @@ class SinglePostModule {
           },
           methods: {
             removeEvent() {
+              // 目前此函数用户编辑器准备完成执行的操作
+              this.initEditorContent();
               this.$refs[`singleEditor_${pid}`].removeNoticeEvent();
             },
             getRef() {
               return this.$refs[`singleEditor_${pid}`];
+            },
+            initEditorContent() {
+              if (NKC.configs.uid && self.tid) {
+                this.$refs[`singleEditor_${pid}`].loading = true;
+                nkcAPI(
+                  `/u/${
+                    NKC.configs.uid
+                  }/profile/draftData?page=${0}&perpage=1&type=newComment&desTypeId=${
+                    self.tid
+                  }&parentPostId=${pid}`,
+                  'GET',
+                )
+                  .then((res) => {
+                    if (
+                      res.drafts.length &&
+                      this.$refs[`singleEditor_${pid}`].ready &&
+                      !this.$refs[`singleEditor_${pid}`].getContent()
+                    ) {
+                      this.$refs[`singleEditor_${pid}`].setContent(
+                        res.drafts[0].content,
+                      );
+                      if (self.editors[pid]) {
+                        self.editors[pid].draftId = res.drafts[0].did;
+                        self.editors[pid]._id = res.drafts[0]._id;
+                      }
+                    }
+                  })
+                  .catch((err) => {
+                    sweetError(err);
+                  })
+                  .finally(() => {
+                    this.$refs[`singleEditor_${pid}`].loading = false;
+                  });
+              }
+            },
+            autoSave() {
+              self.autoSaveDraft(pid);
             },
           },
         });
@@ -457,6 +497,8 @@ class SinglePostModule {
         pid: pid,
         show: false,
         timeoutId: null,
+        mTimeoutId: null,
+        manualSave: false,
         prevDraft: '',
       };
     }
@@ -491,7 +533,7 @@ class SinglePostModule {
     } else {
       editorApp.show = true;
       editorApp.container.show();
-      this.autoSaveDraft(pid);
+      // this.autoSaveDraft(pid);
     }
   }
   // 获取指定编辑器的内容
@@ -537,6 +579,7 @@ class SinglePostModule {
             anonymous: isAnonymous,
             parentPostId: pid,
             _id: editorApp._id || '',
+            did: editorApp.draftId || '',
           },
         });
       })
@@ -562,7 +605,7 @@ class SinglePostModule {
       });
   }
   // 保存草稿
-  saveDraftData(pid) {
+  saveDraftData(pid, saveType = '') {
     const editorApp = this.getEditorApp(pid);
     const { prevDraft } = editorApp;
     const content = this.getEditorContent(pid);
@@ -591,6 +634,7 @@ class SinglePostModule {
           // desType: "thread",
           desType: 'newComment',
           desTypeId: self.tid,
+          saveType,
         });
       })
       .then((data) => {
@@ -606,7 +650,16 @@ class SinglePostModule {
   }
   // 手动点击保存草稿
   saveDraft(pid) {
-    this.saveDraftData(pid)
+    const editorApp = this.getEditorApp(pid);
+    if (editorApp) {
+      clearTimeout(editorApp.timeoutId);
+      if (editorApp.mTimeoutId) {
+        clearTimeout(editorApp.mTimeoutId);
+        editorApp.mTimeoutId = null;
+      }
+      editorApp.manualSave = true;
+    }
+    this.saveDraftData(pid, 'manual')
       .then(({ saved, error }) => {
         if (saved) {
           sweetSuccess('草稿已保存');
@@ -614,7 +667,13 @@ class SinglePostModule {
           sweetError(error);
         }
       })
-      .catch(sweetError);
+      .catch(sweetError)
+      .finally(() => {
+        editorApp.mTimeoutId = setTimeout(() => {
+          editorApp.manualSave = false;
+          editorApp.mTimeoutId = null;
+        }, 2000);
+      });
   }
   // 自动保存草稿
   autoSaveDraft(pid) {
@@ -624,17 +683,18 @@ class SinglePostModule {
       return;
     }
     clearTimeout(editorApp.timeoutId);
+    if (editorApp.manualSave) return;
     editorApp.timeoutId = setTimeout(() => {
       self
         .saveDraftData(pid)
         .then(() => {
-          self.autoSaveDraft(pid);
+          // self.autoSaveDraft(pid);
         })
         .catch((err) => {
           screenTopWarning(err);
-          self.autoSaveDraft(pid);
+          // self.autoSaveDraft(pid);
         });
-    }, 10000);
+    }, 2000);
   }
   /*
    * 插入一条评论

@@ -245,7 +245,8 @@ export default {
             window.PostInfo.showCloseInfo = false;
           }
           // window.location.href = `/editor?type=redit&id=${d.did}`;
-          window.location.href = `/editor?type=${d.desType}&aid=${d._id}`
+          // window.location.href = `/editor?type=${d.desType}&aid=${d._id}`
+          window.location.href = `/editor?type=${d.desType}&draftDid=${d.did}`
         })
         .catch(sweetError);
     },

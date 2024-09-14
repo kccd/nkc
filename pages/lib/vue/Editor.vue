@@ -2,26 +2,43 @@
   .editor
     .bg-danger.text-danger.p-a-1.text-center(v-if="errorInfo") 编辑器初始化失败： {{errorInfo}}
     div(v-else)
-      resource-selector(ref="resourceSelector")
-      draft-selector(ref="draftSelector")
-      sticker-selector(ref="stickerSelector")
-      xsf-selector(ref="xsfSelector")
-      math-jax-selector(ref="mathJaxSelector")
-      drafts-selector(ref="draft")
-      .editor-container(:id="domId")
-        .save-info(:class="{'display': ready && savingInfo && savingInfoPanelStatus === 'show'}" ref="saveInfo")
-          .save-success(v-if="savingInfo === 'succeeded'")
-            .fa.fa-check-circle.m-r-05
-            span 内容已保存
-          .save-filed(v-if="savingInfo === 'failed'")
-            .fa.fa-remove.m-r-05
-            span 内容保存失败
-          .save-saving(v-if="savingInfo === 'saving'") 内容保存中...
+      div()
+        resource-selector(ref="resourceSelector")
+        draft-selector(ref="draftSelector")
+        sticker-selector(ref="stickerSelector")
+        xsf-selector(ref="xsfSelector")
+        math-jax-selector(ref="mathJaxSelector")
+        drafts-selector(ref="draft")
+        .editor-container(:id="domId")
+          .save-info(:class="{'display': ready && savingInfo && savingInfoPanelStatus === 'show'}" ref="saveInfo")
+            .save-success(v-if="savingInfo === 'succeeded'")
+              .fa.fa-check-circle.m-r-05
+              span 内容已保存
+            .save-filed(v-if="savingInfo === 'failed'")
+              .fa.fa-remove.m-r-05
+              span 内容保存失败
+            .save-saving(v-if="savingInfo === 'saving'") 内容保存中...
+      .mask.m-b-1(v-show="loading")
+        loading
 </template>
 
 <style lang="less" scoped>
   .editor{
     background-color: #f4f4f4;
+    position: relative;
+    min-height: 10rem;
+    .mask{
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255,255,255,0.7);
+    }
     .editor-container {
       position: relative;
     }
@@ -52,6 +69,31 @@
         color: #666;
       }
     }
+    .skeleton {
+      background-image: linear-gradient(90deg, #f2f2f2 25%, #e6e6e6 37%, #f2f2f2 63%);
+      width: 100%;
+      min-height: 15rem;
+      list-style: none;
+      background-size: 400% 100%;
+      background-position: 100% 50%;
+      animation: skeleton-loading 1s ease infinite;
+      position: relative;
+      .skeleton-container{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+  @keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
   }
 </style>
 
@@ -83,12 +125,13 @@
   import { isBase64 } from "../../../nkcModules/regExp";
   import { base64ToFile } from "../js/file";
   import { IsFirefox } from "../js/browser";
+  import Loading from '../vue/Loading.vue';
 
   const state = getState();
   const defaultUploadingOrder = Date.now() + Math.round(Math.random() * 10000);
   const filterPasteHtml = require('../../../nkcModules/xssFilters/filterPasteHtml')
   export default {
-    props: ['configs', 'plugs'],
+    props: ['configs', 'plugs', 'loading'],
     components: {
       'resource-selector': ResourceSelector,
       'draft-selector': DraftSelector,
@@ -96,6 +139,7 @@
       'math-jax-selector': MathJaxSelector,
       'xsf-selector': XsfSelector,
       'drafts-selector': DraftsSelector,
+      loading: Loading,
     },
     data: () => ({
       socketHandleResources: [

@@ -85,23 +85,25 @@ block content
           +thread
         .m-b-1
           include ../publicModules/commentCenter/comment
-      .col-xs-12.col-md-3.box-shadow-panel#rightDom
-        if data.targetUser
-          .m-b-1
-            //- .panel-header 作者
-            -const author = data.targetUser;
-            include ../thread/authorInfo
-        if data.columns
-          .box-shadow.m-b-1
-            .box-shadow-header 所在专栏
-            div
-              include ../columns/home/columnList
-              for column in data.columns
-                +columnListForArticle({
-                  column
-                })
+      .col-xs-12.col-md-3
+        .box-shadow-panel#rightDom
+          if data.targetUser
+            .m-b-1
+              //- .panel-header 作者
+              -const author = data.targetUser;
+              include ../thread/authorInfo
+          if data.columns
+            .box-shadow.m-b-1
+              .box-shadow-header 所在专栏
+              div
+                include ../columns/home/columnList
+                for column in data.columns
+                  +columnListForArticle({
+                    column
+                  })
         //- 滚动到页头页脚
-        include ../module_scrollTo.pug
+        include ../publicModules/articleScroll/articleScroll
+        +articleScroll('single-post-container')
   include ../publicModules/floatForumNav
   include ../publicModules/nkcSource
   include ../columns/article/authorInfo.pug

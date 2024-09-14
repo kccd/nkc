@@ -187,7 +187,11 @@ router
         resourcesId,
       });
       if (type === 'publish' || type === 'forward') {
-        await momentComment.publishMomentComment(postType, alsoPost);
+        const { repostMomentId } = await momentComment.publishMomentComment(
+          postType,
+          alsoPost,
+        );
+        data.repostMomentId = repostMomentId;
         // data.momentCommentPage = await db.MomentModel.getPageByOrder(momentComment.order);
       }
       data.momentCommentId = momentComment._id;
