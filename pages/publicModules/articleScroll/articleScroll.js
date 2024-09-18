@@ -1,5 +1,6 @@
 import { ToTop, ToBottom, Up, Down } from '@icon-park/vue';
 import Vue from 'vue';
+import { scrollToTop, scrollToBottom, scrollTo } from '../../lib/js/scrollPage';
 
 window.onload = function () {
   const app = new Vue({
@@ -14,6 +15,8 @@ window.onload = function () {
       offsetTop: 46,
     },
     methods: {
+      scrollToTop,
+      scrollToBottom,
       scrollPost(direction, klass) {
         let elements = document.querySelectorAll(`.${klass}`);
         elements = [...elements];
@@ -24,15 +27,15 @@ window.onload = function () {
           const element = elements[i];
           const rect = element.getBoundingClientRect();
           if (direction === 'prev') {
-            if (rect.top >= this.offsetTop) {
+            if (rect.top >= this.offsetTop - 2) {
               continue;
             }
-            NKC.methods.scrollToDom($(element), this.offsetTop);
+            scrollTo(window.scrollY - (this.offsetTop - rect.top));
           } else {
-            if (rect.top <= this.offsetTop + 1) {
+            if (rect.top <= this.offsetTop + 2) {
               continue;
             }
-            NKC.methods.scrollToDom($(element), this.offsetTop);
+            scrollTo(window.scrollY + (rect.top - this.offsetTop));
           }
           return;
         }
