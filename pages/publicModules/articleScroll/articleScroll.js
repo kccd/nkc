@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { scrollToTop, scrollToBottom, scrollTo } from '../../lib/js/scrollPage';
 
 window.onload = function () {
-  const app = new Vue({
+  new Vue({
     el: '#articleScrollContainer',
     components: {
       up: Up,

@@ -1,6 +1,6 @@
 export function scrollToTop() {
-  var htmlDom = $('html');
-  var bodyDom = $('body');
+  const htmlDom = $('html');
+  const bodyDom = $('body');
   htmlDom.css('height', 'auto');
   bodyDom.css('height', 'auto');
   $('html,body').animate({ scrollTop: 0 }, 300);
@@ -9,8 +9,8 @@ export function scrollToTop() {
 }
 
 export function scrollToBottom() {
-  var htmlDom = $('html');
-  var bodyDom = $('body');
+  const htmlDom = $('html');
+  const bodyDom = $('body');
   htmlDom.css('height', 'auto');
   bodyDom.css('height', 'auto');
   $('html,body').animate({ scrollTop: document.body.offsetHeight }, 300);
