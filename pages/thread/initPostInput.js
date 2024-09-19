@@ -15,6 +15,7 @@ if (container.length > 0) {
       },
       uid: NKC.configs.uid,
       desTypeId: document.getElementById('threadId').innerText,
+      waiting: true,
     },
     mounted() {},
     computed: {
@@ -36,7 +37,7 @@ if (container.length > 0) {
       },
       initEditorContent() {
         if (this.uid && this.desTypeId) {
-          this.$refs.postEditor.loading = true;
+          this.waiting = true;
           nkcAPI(
             `/u/${
               this.uid
@@ -64,7 +65,7 @@ if (container.length > 0) {
               sweetError(err);
             })
             .finally(() => {
-              this.$refs.postEditor.loading = false;
+              this.waiting = false;
             });
         }
       },

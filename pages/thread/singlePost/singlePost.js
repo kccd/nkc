@@ -359,7 +359,7 @@ class SinglePostModule {
       let editorDom, app;
       if (this.postPermission.permit) {
         editorDom = $(
-          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="true" :plugs="editorPlugs"/></div>`,
+          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="waiting" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
           `<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
@@ -425,6 +425,7 @@ class SinglePostModule {
               xsfSelector: true,
               mathJaxSelector: true,
             },
+            waiting: true,
           },
           mounted() {},
           computed: {
@@ -446,7 +447,7 @@ class SinglePostModule {
             },
             initEditorContent() {
               if (NKC.configs.uid && self.tid) {
-                this.$refs[`singleEditor_${pid}`].loading = true;
+                this.waiting = true;
                 nkcAPI(
                   `/u/${
                     NKC.configs.uid
@@ -474,7 +475,7 @@ class SinglePostModule {
                     sweetError(err);
                   })
                   .finally(() => {
-                    this.$refs[`singleEditor_${pid}`].loading = false;
+                    this.waiting = false;
                   });
               }
             },
@@ -619,9 +620,9 @@ class SinglePostModule {
     const self = this;
     return Promise.resolve()
       .then(() => {
-        if (!content) {
-          return;
-        }
+        // if (!content) {
+        //   return;
+        // }
         return nkcAPI(`/u/${NKC.configs.uid}/drafts`, 'POST', {
           post: {
             c: content,
@@ -638,9 +639,9 @@ class SinglePostModule {
         });
       })
       .then((data) => {
-        if (!data) {
-          return { saved: false, error: '草稿内容不能为空' };
-        }
+        // if (!data) {
+        //   return { saved: false, error: '草稿内容不能为空' };
+        // }
         editorApp.draftId = data.draft.did;
         editorApp._id = data.draft._id;
         // 草稿唯一ID

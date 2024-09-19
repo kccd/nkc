@@ -448,9 +448,9 @@ function modifyMathJax() {
 // 构建post数据
 function getPost() {
   var post = assemblePostObject();
-  if (!post || post.c.replace(/<[^>]+>/g, '') === '') {
-    throw '请填写回复内容';
-  }
+  // if (!post || post.c.replace(/<[^>]+>/g, '') === '') {
+  //   throw '请填写回复内容';
+  // }
   // 专栏文章分类
   const columnCategoriesId = getSelectedColumnCategoriesId();
   post.columnMainCategoriesId = columnCategoriesId.mainCategoriesId;

@@ -1,6 +1,10 @@
 import {generalRequest, nkcAPI, nkcUploadFile} from "./lib/js/netAPI";
 import {toLogin} from "./lib/js/account";
 import {
+  scrollToBottom as scrollToBottomOrigin,
+  scrollToTop as scrollToTopOrigin,
+} from './lib/js/scrollPage';
+import {
   sweetAlert,
   sweetWarning,
   sweetConfirm,
@@ -847,28 +851,16 @@ function closeLottery() {
 
 
 /*
-* 页面滚动到底部
-* */
+ * 页面滚动到底部
+ * */
 function scrollToBottom() {
-  var htmlDom = $("html");
-  var bodyDom = $("body");
-  htmlDom.css("height", "auto");
-  bodyDom.css("height", "auto");
-  $("html,body").animate({scrollTop: document.body.offsetHeight}, 300);
-  htmlDom.css("height", "100%");
-  bodyDom.css("height", "100%");
+  scrollToBottomOrigin();
 }
 /*
-* 页面滚动到顶部
-* */
+ * 页面滚动到顶部
+ * */
 function scrollToTop() {
-  var htmlDom = $("html");
-  var bodyDom = $("body");
-  htmlDom.css("height", "auto");
-  bodyDom.css("height", "auto");
-  $("html,body").animate({scrollTop: 0}, 300);
-  htmlDom.css("height", "100%");
-  bodyDom.css("height", "100%");
+  scrollToTopOrigin();
 }
 
 
