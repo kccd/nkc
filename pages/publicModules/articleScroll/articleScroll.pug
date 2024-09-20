@@ -1,7 +1,7 @@
 if !isIncluded('publicModule/articleScroll')
   +includeCSS('/publicModules/articleScroll/articleScroll.css')
   mixin articleScroll(listItemClass)
-    #articleScrollContainer.hidden-xs.hidden-sm(v-cloak style='margin-left: -25px; position: fixed; top: 51.5%;')
+    #articleScrollContainer.hidden-xs.hidden-sm(v-cloak style='margin-left: -25px; position: fixed; z-index: 100; top: 51.5%;')
       .article-scroll-icon-container(title='滚动到页面顶部' @click="scrollToTop")
         to-top(size="18" fill="#333")
       .article-scroll-icon-container(title='滚动到上一条' @click=`scrollPost('prev', '${listItemClass}')`)
