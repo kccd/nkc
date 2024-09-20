@@ -1,6 +1,6 @@
 if !isIncluded('singleCommentVote')
   mixin singleCommentVote(cid, vote, voteUp)
-    .posts-vote
+    .posts-vote.user-select-none
       .posts-vote-up(class=vote === 'up' ? 'active' : '' data-cid=cid onclick=`commentsVote("${cid}", "up")`)
         .fa.fa-caret-up
         .posts-vote-number(data-cid=cid)= voteUp || ''
