@@ -1,9 +1,12 @@
 const Router = require('koa-router');
 const router = new Router();
+const {
+  blacklistCheckerService,
+} = require('../../services/blacklist/blacklistChecker.service');
 
 router
   .post('/xsf', async (ctx, next) => {
-    const { db, data, params, body, redis } = ctx;
+    const { db, data, params, body } = ctx;
     const { pid } = params;
     const { user } = data;
     let { num, description } = body;
@@ -139,12 +142,14 @@ router
     await next();
   })
   .post('/kcb', async (ctx, next) => {
-    const { data, db, body, params, redis, nkcModules} = ctx;
-    const lock = await nkcModules.redLock.redLock.lock("creditKCB", 6000);
-    try{
+    const { data, db, body, params, nkcModules } = ctx;
+    const lock = await nkcModules.redLock.redLock.lock('creditKCB', 6000);
+    try {
       const { user } = data;
       const { pid } = params;
       let { num, description } = body;
+      const post = await db.PostModel.findOnly({ pid });
+      await blacklistCheckerService.checkInteractPermission(user.uid, post.uid);
       const creditScore = await db.SettingModel.getScoreByOperationType(
         'creditScore',
       );
@@ -153,7 +158,6 @@ router
         ctx.throw(400, `${creditScore.name}仅支持到小数点后两位`);
       }
       const fromUser = user;
-      const post = await db.PostModel.findOnly({ pid });
       if (post.anonymous) {
         ctx.throw(400, '无法鼓励匿名用户');
       }
@@ -178,7 +182,10 @@ router
         ctx.throw(400, `${creditScore.name}最少为${creditSettings.min / 100}`);
       }
       if (num > creditSettings.max) {
-        ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max / 100}`);
+        ctx.throw(
+          400,
+          `${creditScore.name}不能大于${creditSettings.max / 100}`,
+        );
       }
       // fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
       if (userScore < num) {
@@ -218,7 +225,7 @@ router
       await message.save();
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
       await lock.unlock();
-    } catch(err) {
+    } catch (err) {
       await lock.unlock();
       throw err;
     }
