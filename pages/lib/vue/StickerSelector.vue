@@ -29,11 +29,13 @@
       .module-ss-close(@click="close")
         .fa.fa-remove
     .module-ss-body
-      .module-ss-types
-        .module-ss-type(:class="{'active': type==='own'}" @click="selectType('own')") 我的表情
-        .module-ss-type(:class="{'active': type==='share'}" @click="selectType('share')") 共享表情
-        .module-ss-type(:class="{'active': type==='emoji'}" @click="selectType('emoji')") Emoji
-        .module-ss-type.upload(:class="{'active': type==='upload'}" @click="selectType('upload')") 上传
+      .module-types-container
+        .module-ss-types
+          .module-ss-type(:class="{'active': type==='own'}" @click="selectType('own')") 我的表情
+          .module-ss-type(:class="{'active': type==='share'}" @click="selectType('share')") 共享表情
+          .module-ss-type(:class="{'active': type==='emoji'}" @click="selectType('emoji')") Emoji
+          .module-ss-type.upload(:class="{'active': type==='upload'}" @click="selectType('upload')") 上传
+        a(href="/sticker" target="_blank").btn.btn-xs.btn-default.module-ss-button 管理
       +resourcePaging
       .module-ss-stickers
         div(v-if="type === 'emoji'")
@@ -118,16 +120,26 @@
     }
     .module-ss-body{
       padding: 0.5rem 1rem 0.5rem 1rem;
-      .module-ss-types{
-        user-select: none;
-        .module-ss-type{
-          display: inline-block;
-          color: @darkGray;
-          font-weight: 700;
-          margin-right: 0.5rem;
-          cursor: pointer;
-          &.active{
-            color: @primary;
+      .module-types-container{
+        display: flex;
+        padding-right: 0.5rem;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 2.2rem;
+        .module-ss-button{
+
+        }
+        .module-ss-types{
+          user-select: none;
+          .module-ss-type{
+            display: inline-block;
+            color: @darkGray;
+            font-weight: 700;
+            margin-right: 0.5rem;
+            cursor: pointer;
+            &.active{
+              color: @primary;
+            }
           }
         }
       }
