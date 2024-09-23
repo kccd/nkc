@@ -2147,7 +2147,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
           /\[f\/(.*?)]/g,
           function (r, v1) {
             return (
-              '<img class="message-emoji" src="/twemoji/2/svg/' + v1 + '.svg"/>'
+              '<img class="message-emoji" src="/statics/fluentui-emoji/' + v1 + '.png"/>'
             );
           },
         );

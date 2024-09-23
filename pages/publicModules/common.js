@@ -630,9 +630,9 @@ NKC.methods.replaceEmojiChar = function (content) {
       id +
       "' data-char='" +
       char +
-      '\' src="/twemoji/2/svg/' +
+      '\' src="/statics/fluentui-emoji/' +
       id +
-      '.svg">'
+      '.png">'
     );
   });
 };

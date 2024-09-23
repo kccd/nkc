@@ -114,9 +114,9 @@ export function resourceToHtml(type, rid, name) {
         rid +
         "' data-char='" +
         emojiChar +
-        '\' src="/twemoji/2/svg/' +
+        '\' src="/statics/fluentui-emoji/' +
         rid +
-        '.svg">'
+        '.png">'
       );
     },
     formula: function () {},
@@ -154,9 +154,9 @@ export function replaceTwemojiCharWithImage(content) {
       id +
       "' data-char='" +
       char +
-      '\' src="/twemoji/2/svg/' +
+      '\' src="/statics/fluentui-emoji/' +
       id +
-      '.svg">'
+      '.png">'
     );
   });
 }

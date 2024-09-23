@@ -117,7 +117,7 @@ class NKCRender {
     if (type === 'article') {
       // twemoji本地化
       html = twemoji.parse(html, {
-        folder: '/2/svg',
+        folder: '/fluentui-emoji',
         class: 'emoji',
         attributes: () => {
           return {
@@ -125,8 +125,8 @@ class NKCRender {
             'data-type': 'twemoji',
           };
         },
-        base: '/twemoji',
-        ext: '.svg',
+        base: '/statics',
+        ext: '.png',
       });
     }
 

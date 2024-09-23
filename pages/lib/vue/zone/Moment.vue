@@ -617,8 +617,8 @@
     word-wrap: break-word;
     white-space: pre-wrap;
     &/deep/ img{
-      height: 1.5rem;
-      width: 1.5rem;
+      height: 1.8rem;
+      width: 1.8rem;
       margin: 0 0.1rem;
       vertical-align: text-bottom;
     }
