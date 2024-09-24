@@ -16,6 +16,9 @@ router
 
     if (focus) {
       page = await db.MomentModel.getPageByMomentCommentId(mode, focus);
+      if (page < 0) {
+        page = 0;
+      }
     }
     const {
       normal: normalStatus,
