@@ -48,7 +48,8 @@ $(document).ready(function () {
   }
 
   if ($('#container').length) {
-    autoSaveDraft();
+    // 暂时取消初始保存草稿
+    // autoSaveDraft();
   }
 
   var surveyFormsDom = $('.module-survey-form');
@@ -755,6 +756,15 @@ function restoreDefaultOrder(tid, type) {
 }
 // 发表回复
 function submit(tid) {
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
+  }
+  if (mTimer) {
+    clearTimeout(mTimer);
+    mTimer = null;
+  }
+  manualSave = true;
   Promise.resolve()
     .then(function () {
       // 屏蔽发表按钮
@@ -791,6 +801,12 @@ function submit(tid) {
     .catch(function (data) {
       sweetError(data);
       setSubmitButton(false);
+    })
+    .finally(() => {
+      mTimer = setTimeout(() => {
+        manualSave = false;
+        mTimer = null;
+      }, 2000);
     });
 }
 //最新的回复排序号
