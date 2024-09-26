@@ -2146,8 +2146,9 @@ messageSchema.statics.extendMessages = async (messages = []) => {
         message.content = message.content.replace(
           /\[f\/(.*?)]/g,
           function (r, v1) {
+            const emojiUrl = getUrl('emoji', v1);
             return (
-              '<img class="message-emoji" src="/statics/fluentui-emoji/' + v1 + '.png"/>'
+              '<img class="message-emoji" src="' + emojiUrl + '"/>'
             );
           },
         );

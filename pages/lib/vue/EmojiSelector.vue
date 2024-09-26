@@ -1,81 +1,78 @@
 <template lang="pug">
-  .emoji-selector
-    .emoji-header
-      .emoji-title(ref="draggableHandle") 表情选择
-      .emoji-close(@click="close")
-        .fa.fa-remove
-    .emoji-form
-      .checkbox
-        label.m-r-1
-          input(type="checkbox" v-model="multipleSelection")
-          span 多选模式
-        span.text-success(v-if="selected") 已选择
+  draggable-dialog(title="Emoji 表情" width="50rem" height='35rem' heightXS='70%' ref="draggableDialog")
+    .emoji-selector-container
+      .emoji-selector-nav-container
+        .emoji-selector-nav-item(
+          v-for="item in emojiGroups"
+          @click="selectGroup(item.name)"
+          :class="{'active': selectedGroupName === item.name}"
+          ) {{ item.name }}
+      .emoji-selector-image-container
+        .emoji-selector-image-item(
+          v-for="emoji in selectedGroup.emoji"
+          @click="selectEmoji(emoji)"
+          :key="emoji.unicode"
+          :class="{'bg-info': selectedEmoji.includes(emoji)}"
+          :title="emoji.tts"
+          )
+          img(:src="getUrl('emoji', emoji.unicode)")
 
-    .emoji-container
-      .emoji-item(v-for="(url, index) in emojiUrl" @click="selectEmoji(index)")
-        img(:src="url")
+
 </template>
 <style lang="less" scoped>
-  .emoji-selector{
-    display: none;
-    position: fixed;
-    width: 46rem;
-    max-width: 100%;
-    top: 100px;
-    right: 0;
+  .emoji-selector-container{
     background-color: #fff;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    border: 1px solid #c7c7c7;
-    .emoji-form{
-      padding: 0 1rem;
-      .checkbox{
-        margin-bottom: 0;
-        margin-top: 0.5rem;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+    .emoji-selector-nav-container{
+      flex-shrink: 0;
+      display: flex;
+      overflow-x: auto; /* 允许水平滚动 */
+      white-space: nowrap; /* 防止子元素换行 */
+      padding: 0.4rem 0;
+      background-color: #fefefe;
+      height: 4rem;
+      .emoji-selector-nav-item{
+        cursor: pointer;
+        flex: 0 0 auto; /* 子元素不会缩小，保持原始宽度 */
+        padding: 0 1rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid #eee;
+        &:active{
+          background-color: #f4f4f4;
+        }
+        &.active{
+          color: #2b90d9;
+        }
+        &:last-child{
+          border-right: none;
+        }
       }
     }
-    .emoji-container{
-      padding: 1rem;
-      .emoji-item{
-        display: inline-block;
-        margin: 0 0.5rem 0.5rem 0;
-        height: 2rem;
-        width: 2rem;
-        cursor: pointer;
-        border: 1px solid #fff;
-        &:hover{
-          border-color: #aaa;
+    .emoji-selector-image-container{
+      max-height: 100%;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap; /* 允许子元素换行 */
+      justify-content: flex-start; /* 子元素按顺序从左到右排列 */
+      gap: 10px; /* 子元素之间的间距 */
+      padding: 10px;
+      .emoji-selector-image-item{
+        height: 2.8rem;
+        width: 2.8rem;
+        cursor: pointer; /* 鼠标移上去时显示为手型 */
+        &:active, &:hover{
+          background-color: #eee;
         }
         img{
           height: 100%;
           width: 100%;
-        }
-      }
-    }
-    .emoji-header{
-      height: 3rem;
-      cursor: move;
-      line-height: 3rem;
-      background-color: #f6f6f6;
-      position: relative;
-      padding-right: 3rem;
-      .emoji-title{
-        margin-left: 1rem;
-        color: #666;
-        cursor: move;
-      }
-      .emoji-close{
-        height: 3rem;
-        width: 3rem;
-        position: absolute;
-        top: 0;
-        right: 0;
-        text-align: center;
-        line-height: 3rem;
-        color: #888;
-        cursor: pointer;
-        &:hover{
-          color: #777;
-          background-color: #ddd;
         }
       }
     }
@@ -84,8 +81,9 @@
 <script>
   import {sweetError} from "../js/sweetAlert";
   import {getUrl} from "../js/tools";
-  import {DraggableElement} from "../js/draggable";
   import {localStorageKeys, getFromLocalStorage, saveToLocalStorage} from "../js/localStorage";
+  import {emojiGroups} from "../js/emoji";
+  import DraggableDialog from './DraggableDialog/DraggableDialog.vue';
 
   const emojiSelectorKey = localStorageKeys.emojiSelector;
 
@@ -96,7 +94,14 @@
       multipleSelection: true,
       selected: false,
       statusTimeout: null,
+      emojiGroups: emojiGroups,
+      selectedGroupName: emojiGroups[0].name,
+      selectedEmoji: [],
+      debug: false,
     }),
+    components: {
+      'draggable-dialog': DraggableDialog,
+    },
     watch: {
       multipleSelection() {
         saveToLocalStorage(emojiSelectorKey, {multipleSelection: !!this.multipleSelection});
@@ -104,7 +109,6 @@
     },
     mounted() {
       this.initMultipleSelection();
-      this.initDraggableElement();
     },
     destroyed(){
       this.draggableElement && this.draggableElement.destroy();
@@ -117,20 +121,30 @@
           url.push(getUrl('emoji', e));
         }
         return url;
+      },
+      emojiGroupsObject() {
+        const obj = {};
+        for(const item of emojiGroups) {
+          obj[item.name] = item;
+        }
+        return obj;
+      },
+      selectedGroup() {
+        return this.emojiGroupsObject[this.selectedGroupName];
       }
     },
     methods: {
+      getUrl: getUrl,
+      selectGroup(groupName) {
+        this.selectedGroupName = groupName;
+      },
       initMultipleSelection() {
         const {
           multipleSelection = true
         } = getFromLocalStorage(emojiSelectorKey);
         this.multipleSelection = multipleSelection;
       },
-      initDraggableElement() {
-        this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
-        this.draggableElement.setPositionCenter();
 
-      },
       initData() {
         const self = this;
         nkcAPI(`/sticker`, 'GET')
@@ -140,10 +154,10 @@
           .catch(sweetError);
       },
       show() {
-        this.draggableElement.show();
+        this.$refs.draggableDialog.open();
       },
       hide() {
-        this.draggableElement.hide();
+        this.$refs.draggableDialog.close();
       },
       open(callback) {
         this.initMultipleSelection();
@@ -155,13 +169,35 @@
       close() {
         this.hide();
       },
-      selectEmoji(index) {
-        const {callback, emoji, emojiUrl} = this;
+      selectEmoji(emoji) {
+        const {unicode} = emoji;
+        if(this.debug) {
+          // 开发模式
+          if(this.selectedEmoji.length === 0) {
+            // 选择第一个表情
+            this.selectedEmoji.push(emoji);
+          } else if(!this.selectedEmoji.includes(emoji)) {
+            // 第二个表情
+            const emoji_1 =  this.selectedEmoji[0];
+            const emoji_2 = emoji;
+            const group = this.selectedGroup;
+            const index_1 = group.emoji.indexOf(emoji_1);
+            const index_2 = group.emoji.indexOf(emoji_2);
+            group.emoji[index_1] = emoji_2;
+            group.emoji[index_2] = emoji_1;
+
+            this.selectedEmoji = [];
+
+            console.log(JSON.stringify(group.emoji));
+          }
+        }
+
+        const {callback} = this;
         if(!callback) return;
         this.callback({
-          code: emoji[index],
-          url: emojiUrl[index]
-        });
+          code: unicode,
+          url: getUrl('emoji', unicode),
+        })
         if(!this.multipleSelection){
           this.close();
         } else {
