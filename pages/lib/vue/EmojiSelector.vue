@@ -1,6 +1,6 @@
 <template lang="pug">
   draggable-dialog(title="Emoji 表情" width="50rem" height='35rem' heightXS='70%' ref="draggableDialog")
-    .emoji-selector-container
+    .emoji-selector-container(v-if="initialized")
       .emoji-selector-nav-container
         .emoji-selector-nav-item(
           v-for="item in emojiGroups"
@@ -89,6 +89,7 @@
 
   export default {
     data: () => ({
+      initialized: false,
       callback: null,
       emoji: [],
       multipleSelection: true,
@@ -160,6 +161,7 @@
         this.$refs.draggableDialog.close();
       },
       open(callback) {
+        this.initialized = true;
         this.initMultipleSelection();
         const self = this;
         self.callback = callback;
