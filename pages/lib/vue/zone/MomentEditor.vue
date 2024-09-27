@@ -651,7 +651,9 @@
           resourcesId
         })
           .then(() => {
-            self.sendPublishedEvent();
+            self.sendPublishedEvent({
+              momentId: momentId,
+            });
             self.unlockButton();
           })
           .catch(err => {

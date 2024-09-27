@@ -6,13 +6,28 @@ const siteSpecificPath = path.resolve(staticPath, './site');
 const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
 const smallWatermark = path.resolve(defaultPath, './watermark_small.png');
-const watermarkPath = path.resolve(resourcesPath, './watermark')
-const normalPictureWatermark = path.resolve(watermarkPath, './picture_watermark_normal.png')
-const smallPictureWatermark = path.resolve(watermarkPath, './picture_watermark_small.png')
-const normalVideoWatermark = path.resolve(watermarkPath, './video_watermark_normal.png')
-const smallVideoWatermark = path.resolve(watermarkPath, './video_watermark_small.png')
+const watermarkPath = path.resolve(resourcesPath, './watermark');
+const normalPictureWatermark = path.resolve(
+  watermarkPath,
+  './picture_watermark_normal.png',
+);
+const smallPictureWatermark = path.resolve(
+  watermarkPath,
+  './picture_watermark_small.png',
+);
+const normalVideoWatermark = path.resolve(
+  watermarkPath,
+  './video_watermark_normal.png',
+);
+const smallVideoWatermark = path.resolve(
+  watermarkPath,
+  './video_watermark_small.png',
+);
 const fontTtf = path.resolve(defaultPath, './simsun.ttc');
-const fontNotoSansHansMedium = path.resolve(defaultPath, './NotoSansHans-Medium.otf');
+const fontNotoSansHansMedium = path.resolve(
+  defaultPath,
+  './NotoSansHans-Medium.otf',
+);
 // const fontTtf = fontNotoSansHansMedium;
 const banner = path.resolve(siteSpecificPath, './ad_default.jpg');
 const defaultPfBannerPath = defaultPath + '/default_pf_banner.jpg';
@@ -27,13 +42,14 @@ const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 const defaultUserBannerPath = defaultPath + '/default_user_banner.jpg';
 const defaultMessageFilePath = defaultPath + '/default_resource_image.jpg';
-const defaultMessageVideoFramePath = defaultPath + '/default_message_video_frame.jpg';
+const defaultMessageVideoFramePath =
+  defaultPath + '/default_message_video_frame.jpg';
 const defaultVideoCoverPath = defaultPath + '/videoCover.jpg';
-const defaultPostCoverPath = defaultPath + "/default_resource_image.jpg";
-const defaultForumBannerPath = defaultPath + "/forum_banner.jpg";
-const defaultColumnAvatarPath = defaultPath + "/column_avatar.jpg";
-const defaultColumnBannerPath = defaultPath + "/column_banner.jpg";
-const defaultPosterPath = defaultPath + "/default_resource_image.jpg";
+const defaultPostCoverPath = defaultPath + '/default_resource_image.jpg';
+const defaultForumBannerPath = defaultPath + '/forum_banner.jpg';
+const defaultColumnAvatarPath = defaultPath + '/column_avatar.jpg';
+const defaultColumnBannerPath = defaultPath + '/column_banner.jpg';
+const defaultPosterPath = defaultPath + '/default_resource_image.jpg';
 const defaultRoleIconPath = staticPath + '/role_icon';
 const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
 const deletedPhotoPath = defaultPath + '/deleted_photo.jpg';
@@ -42,6 +58,8 @@ const defaultSiteIconPath = siteSpecificPath + '/favicon.ico';
 const defaultNoAccessImagePath = defaultPath + '/no_access.jpg';
 // 默认表情图
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
+const disabledStickerImage = defaultPath + '/sticker_disabled.gif';
+const lostStickerImage = defaultPath + '/sticker_lost.gif';
 const defaultScoreIconPath = defaultPath + '/kcb.png';
 const defaultPreviewJPG = defaultPath + '/preview_footer.jpg';
 // 网站 logo
@@ -54,6 +72,8 @@ const logoICO = path.resolve(resourceLogoPath, './favicon.ico');
 const logoSM = path.resolve(resourceLogoPath, './logo_sm.png');
 const logoMD = path.resolve(resourceLogoPath, './logo_md.png');
 const logoLG = path.resolve(resourceLogoPath, './logo_lg.png');
+
+const lostImage = defaultPath + '/image_lost.png';
 
 module.exports = {
   defaultPreviewJPG,
@@ -77,7 +97,7 @@ module.exports = {
   defaultThumbnailPath,
   defaultMediumPath,
   defaultOriginPath,
-	defaultUserBannerPath,
+  defaultUserBannerPath,
   defaultPath,
   attachIconPath,
   defaultPostCoverPath,
@@ -97,6 +117,9 @@ module.exports = {
   smallPictureWatermark,
   normalVideoWatermark,
   smallVideoWatermark,
+  disabledStickerImage,
+  lostStickerImage,
+  lostImage,
 
   defaultLogoICO,
   defaultLogoLG,
@@ -105,5 +128,5 @@ module.exports = {
   logoICO,
   logoSM,
   logoMD,
-  logoLG
+  logoLG,
 };

@@ -16,8 +16,8 @@
 
     }),
     methods: {
-      onPublished() {
-        visitUrl('/g/moment')
+      onPublished(res) {
+        visitUrl(`/z/m/${res.momentId}`)
       }
     }
 }

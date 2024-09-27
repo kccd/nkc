@@ -1,6 +1,5 @@
 const mongoose = require('../settings/database');
-const { twemoji } = require('../settings/editor');
-const { fromNow } = require('../nkcModules/tools');
+const { fluentuiEmojiUnicode } = require('../nkcModules/fluentuiEmoji');
 
 // 包含所有document的状态
 // 并且额外包含 deleted, cancelled
@@ -1511,6 +1510,7 @@ schema.statics.getQuoteDefaultContent = async (quoteType) => {
  * */
 schema.statics.renderContent = async (content) => {
   const nkcRender = require('../nkcModules/nkcRender');
+  const { getUrl } = require('../nkcModules/tools');
   const { filterMessageContent } = require('../nkcModules/xssFilters');
   // 替换空格
   // content = content.replace(/ /g, '&nbsp;');
@@ -1522,10 +1522,11 @@ schema.statics.renderContent = async (content) => {
   // 替换换行符
   content = content.replace(/\n/g, '<br/>');
   content = content.replace(/\[(.*?)]/g, function (r, v1) {
-    if (!twemoji.includes(v1)) {
+    if (!fluentuiEmojiUnicode.includes(v1)) {
       return r;
     }
-    return '<img class="message-emoji" src="/twemoji/2/svg/' + v1 + '.svg"/>';
+    const emojiUrl = getUrl('emoji', v1);
+    return '<img class="message-emoji" src="' + emojiUrl + '"/>';
   });
   return content;
 };

@@ -99,10 +99,12 @@ var Tools = function () {
         return fileDomain + '/sticker/' + id;
       }
       case 'emoji': {
-        return '/twemoji/2/svg/' + id + '.svg';
+        return '/statics/fluentui-emoji/' + id + '.png';
+        // return '/twemoji/2/svg/' + id + '.svg';
       }
       case 'twemoji': {
-        return '/twemoji/2/svg/' + id + '.svg';
+        return '/statics/fluentui-emoji/' + id + '.png';
+        // return '/twemoji/2/svg/' + id + '.svg';
       }
       case 'post': {
         if (t) {

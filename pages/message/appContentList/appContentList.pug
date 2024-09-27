@@ -64,7 +64,7 @@ block content
           input.hidden(type='file' multiple='true' ref='file' @change="selectedLocalFiles")
           .option-body.sticker-panel(v-if="showStickerPanel")
             .sticker-item(v-for="tmj in twemoji")
-              img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectSticker(tmj)")
+              img.emoji(:src="getUrl('emoji', tmj)" @click="selectSticker(tmj)")
           .options
             .option-item.sticker(@click.stop="switchStickerPanel(undefined)")
               .fa.fa-smile-o
