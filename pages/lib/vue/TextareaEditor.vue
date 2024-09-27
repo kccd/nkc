@@ -11,7 +11,8 @@
       div
         textarea(
           ref="textarea"
-          @input="setTextareaSize"
+          @input="onInput"
+          @blur="onBlur"
           :style="textareaStyle"
           v-model="content"
           :placeholder="placeholder || defaultPlaceholder"
@@ -66,6 +67,7 @@
       defaultMaxHeight: "100rem",
       content: '',
       textareaHeight: '0',
+      cursorPosition: 0,
     }),
     computed: {
       minHeight() {
@@ -85,6 +87,13 @@
       'content': 'onContentChange',
     },
     methods: {
+      onInput() {
+        this.cursorPosition = this.$refs.textarea.selectionStart;
+        this.setTextareaSize();
+      },
+      onBlur() {
+        this.cursorPosition = this.$refs.textarea.selectionStart;
+      },
       setTextareaSize() {
         const self = this;
         setTimeout(() => {
@@ -119,15 +128,11 @@
       insertContent(text) {
         const {content} = this;
         const element = this.$refs.textarea;
-        const insert = element.selectionStart;
-        const startContent = content.slice(0, insert);
-        const endContent = content.slice(insert, content.length);
+        const startContent = content.slice(0, this.cursorPosition);
+        const endContent = content.slice(this.cursorPosition, content.length);
         this.content = startContent + text + endContent;
-        const newPosition = insert + text.length;
-        const self = this;
-        setTimeout(() => {
-          self.resetFocus(newPosition);
-        });
+        this.cursorPosition += text.length;
+
       },
       keyUpEnter() {
         this.$emit('click-ctrl-enter');
