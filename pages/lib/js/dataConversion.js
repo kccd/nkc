@@ -7,6 +7,7 @@
 import { marked } from 'marked';
 import createDOMPurify from 'dompurify';
 import { getState } from './state';
+import { getEmojiCharByUnicode } from '../../../nkcModules/fluentuiEmoji';
 
 export function strToObj(str) {
   return JSON.parse(decodeURIComponent(str));
@@ -108,7 +109,7 @@ export function resourceToHtml(type, rid, name) {
       );
     },
     twemoji: function () {
-      var emojiChar = twemoji.convert.fromCodePoint(rid);
+      const emojiChar = getEmojiCharByUnicode(rid);
       return (
         "<img data-tag='nkcsource' data-type='twemoji' data-id='" +
         rid +

@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const filePath = path.resolve(__dirname, './sources');
 const files = fs.readdirSync(filePath);
+const { replaceEmojiWithImgTags } = require('../fluentuiEmoji');
 
 const sources = {};
 for (const filename of files) {
@@ -115,10 +116,21 @@ class NKCRender {
     }
     html = body.html();
     if (type === 'article') {
-      // twemoji本地化
+      html = replaceEmojiWithImgTags(html);
+      /*// twemoji本地化
       html = twemoji.parse(html, {
         folder: '/fluentui-emoji',
         class: 'emoji',
+        callback: function (icon, options) {
+          console.log(icon, options);
+          return ''.concat(
+            options.base, // by default Twitter Inc. CDN
+            options.size, // by default "72x72" string
+            '/',
+            icon, // the found emoji as code point
+            options.ext, // by default ".png"
+          );
+        },
         attributes: () => {
           return {
             'data-tag': 'nkcsource',
@@ -127,7 +139,7 @@ class NKCRender {
         },
         base: '/statics',
         ext: '.png',
-      });
+      });*/
     }
 
     // 过滤标签及样式

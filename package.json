@@ -82,6 +82,7 @@
     "echarts": "^5.3.2",
     "elasticsearch": "^16.7.2",
     "element-ui": "^2.15.2",
+    "emoji-regex": "^10.4.0",
     "fastclick": "^1.0.6",
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
