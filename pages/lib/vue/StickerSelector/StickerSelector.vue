@@ -21,7 +21,7 @@
         .sticker-selector-nav-option-container(@click="selectFiles")
           <upload-one theme="filled" size="24" fill="#333"/>
           div 上传
-      emoji-list(v-if="type === 'emoji'" @select="selectEmoji")
+      emoji-list(v-if="type === 'emoji' && showEmoji" @select="selectEmoji")
       .sticker-selector-own-sticker-container.m-t-05(v-else)
         .sticker-selector-own-sticker-option-container(v-if="type === 'own'")
           .sticker-selector-option(@click="switchManageSticker") {{manageSticker? '完成': '管理'}}
@@ -76,6 +76,7 @@ export default {
     uploading: false,
     uploadingProgress: 0,
     getting: false,
+    showEmoji: false,
     selectedStickerId: [],
     files: [],
     types: [
@@ -120,6 +121,7 @@ export default {
   },
   methods: {
     open(callback) {
+      this.showEmoji = true;
       this.callback = callback;
       this.getStickers();
       this.$refs.draggableDialog.open();
