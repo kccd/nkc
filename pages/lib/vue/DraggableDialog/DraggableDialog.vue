@@ -1,12 +1,10 @@
 <template>
-  <div class="draggable-dialog-root" v-show="show">
-    <draggable-dialog-lg v-if="!isScreenXS" :title="title" :height="height" :width="width" @close="close">
-      <slot></slot>
-    </draggable-dialog-lg>
-    <draggable-dialog-xs v-else :title="title" :height="heightXS" @close="close">
-      <slot></slot>
-    </draggable-dialog-xs>
-  </div>
+  <draggable-dialog-lg v-if="!isScreenXS" :title="title" :height="height" :width="width" @close="close" v-show="show">
+    <slot></slot>
+  </draggable-dialog-lg>
+  <draggable-dialog-xs v-else :title="title" :height="heightXS" @close="close" v-show="show">
+    <slot></slot>
+  </draggable-dialog-xs>
 </template>
 
 <script>
@@ -46,14 +44,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-  .draggable-dialog-root{
-    position: fixed;
-    z-index: 10000;
-    height: 0;
-    width: 0;
-    top: 0;
-    left: 0;
-  }
-</style>

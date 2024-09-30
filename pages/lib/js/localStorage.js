@@ -1,6 +1,7 @@
 export const localStorageKeys = {
   emojiSelectorMultipleSelection: 'emojiSelectorMultipleSelection',
   registerActivationCode: 'registerActivationCode',
+  shareStickerWhenUploading: 'shareStickerWhenUploading',
 };
 
 /*
