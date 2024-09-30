@@ -65,16 +65,20 @@ export default {
   mounted() {
     this.initDraggableElement();
     this.initContainerMouseEvent();
+  },
+  destroyed() {
+    this.draggableElement && this.draggableElement.destroy();
   }
 }
 </script>
 
 <style scoped>
 .draggable-dialog-container{
+  position: fixed;
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 3px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   width: 100%;
   height: 100%;
   display: flex;

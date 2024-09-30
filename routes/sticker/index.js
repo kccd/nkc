@@ -37,7 +37,8 @@ router
       for (let i = 0; i < stickers.length; i++) {
         const newSticker = stickers[i].toObject();
         const model = await db.ResourceModel.findOne({ rid: newSticker.rid });
-        newSticker.reason = newSticker.reason.replace('\n', '');
+        newSticker.reason =
+          model.errorInfo || newSticker.reason.replace('\n', '');
         newSticker.state = model.state || 'useless';
         arr.push(newSticker);
       }

@@ -22,6 +22,10 @@ body img{
 [data-tag="nkcsource"][data-type="picture"] {
   max-width: 60%;
 }
+[data-tag='nkcsource'][data-type="sticker"] {
+  max-height: 80px;
+  max-width: 80px;
+}
 
 /*twemoji*/
 [data-tag="nkcsource"][data-type="twemoji"] {

@@ -92,3 +92,30 @@ export function base64ToFile(base64) {
 export function getFileObjectUrl(file) {
   return URL.createObjectURL(file);
 }
+
+export function selectFiles(props) {
+  const { accept } = props;
+  return selectFile({
+    accept,
+    multiple: true,
+  });
+}
+
+export function selectFile(props) {
+  return new Promise(function (resolve) {
+    const { accept, multiple = false } = props;
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.multiple = multiple;
+    fileInput.accept = accept;
+
+    fileInput.addEventListener('change', function (event) {
+      const files = event.target.files;
+      resolve(files);
+      fileInput.remove();
+    });
+
+    // 模拟点击 input 元素以打开文件选择对话框
+    fileInput.click();
+  });
+}

@@ -42,6 +42,7 @@
 <style scoped>
 .draggable-dialog-xs-root{
   position: fixed;
+  z-index: 1000;
 }
 .draggable-dialog-xs-mask{
   position: fixed;
