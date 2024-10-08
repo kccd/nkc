@@ -17,7 +17,7 @@ script.
     html = html.replace(/\s/g, '&nbsp;');
     // 替换表情
     html = html.replace(/\[f\/(.*?)]/g, function(r, v1) {
-    return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
+    return '<img class="message-emoji" src="/statics/fluentui-emoji/'+ v1 +'.png"/>';
     });
     // 处理链接
     html = common.URLifyHTML(html);

@@ -99,6 +99,7 @@ export default {
             self.voteDown_ = data.article.voteDown;
             self.switchVote(type);
           })
+          .catch(sweetError)
       } else {
         let url = '/comment/' + cid + '/vote/down';
         if(type === 'up') {
@@ -110,6 +111,7 @@ export default {
             self.voteDown_ = data.comment.voteDown;
             self.switchVote(type);
           })
+          .catch(sweetError)
       }
 
     },

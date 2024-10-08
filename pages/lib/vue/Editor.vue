@@ -107,7 +107,7 @@
   import {fixImageWithNoData, resourceToHtml} from "../js/dataConversion";
   import ResourceSelector from './ResourceSelector';
   import DraftSelector from './DraftSelector';
-  import StickerSelector from './StickerSelector';
+  import StickerSelector from './StickerSelector/StickerSelector.vue';
   import MathJaxSelector from "./MathJaxSelector";
   import XsfSelector from './XsfSelector';
   import DraftsSelector from "./DraftsSelector";

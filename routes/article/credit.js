@@ -1,5 +1,7 @@
 const router = require('koa-router')();
-
+const {
+  blacklistCheckerService,
+} = require('../../services/blacklist/blacklistChecker.service');
 router
   .post('/xsf', async (ctx, next) => {
     const { db, data, params, permission, body } = ctx;
@@ -122,6 +124,11 @@ router
     try {
       const { user } = data;
       const { aid } = params;
+      const article = await db.ArticleModel.findOnly({ _id: aid });
+      await blacklistCheckerService.checkInteractPermission(
+        user.uid,
+        article.uid,
+      );
       let { num, description } = body;
       if (!permission('creditKcb')) {
         ctx.throw(403, '权限不足');
@@ -134,7 +141,6 @@ router
       if (num % 1 !== 0) {
         ctx.throw(400, `${creditScore.name}仅支持小数点后两位`);
       }
-      const article = await db.ArticleModel.findOnly({ _id: aid });
       const toUser = await db.UserModel.findOnly({ uid: article.uid });
       if (fromUser.uid === toUser.uid) {
         ctx.throw(400, '无法给自己鼓励');
