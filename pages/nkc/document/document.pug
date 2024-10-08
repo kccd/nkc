@@ -98,7 +98,7 @@ block nkcContent
               .post-content-source
                 for file in document.momentInfo.files
                   if file.type === 'picture'
-                    img.m-r-05(src=file.url data-global-click="viewImage" data-global-data=objToStr({url: file.url}))
+                    img.m-r-05(src=file.url data-global-click="viewImage" data-global-long-press="longPressImageForRN" data-global-data=objToStr({url: file.url}))
                   else if file.type === 'video'
                     video(controls).m-r-05
                       for source in file.sources

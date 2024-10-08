@@ -397,6 +397,11 @@ export function RNSaveImage(data) {
     index: 0,
   });
 }
+export function longPressImage(data) {
+  RNEmit('longPressImage', {
+    ...data,
+  });
+}
 
 /*
  * 打开app下载列表
