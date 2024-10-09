@@ -14,6 +14,9 @@
         a.option(v-if="options.disable" @click="disableMoment")
           .fa.fa-ban
           span 屏蔽
+        a.option(v-if="options.recovery" @click="recoveryMoment")
+          .fa.fa-unlock
+          span 解除屏蔽
         .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
           .fa.fa-check-circle-o
           span 通过审核
@@ -360,6 +363,20 @@ export default {
               sweetError(err);
             })
         })
+    },
+    //解除屏蔽
+    recoveryMoment(){
+      const {momentId, momentCommentId} = this.moment;
+      let _id = momentCommentId || '';
+      if(!_id) {
+        _id = momentId;
+      }
+      if(!_id) return;
+      nkcAPI(`/moment/${_id}/recovery`, 'POST')
+      .then(() => {
+        sweetSuccess('解除屏蔽成功');
+      })
+      .catch(sweetError);
     },
     //查看详情
     detail() {
