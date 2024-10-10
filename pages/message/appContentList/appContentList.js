@@ -10,11 +10,48 @@ window.audio = audio;
 
 import {onWithdrawn, withdrawn} from '../message.2.0.js';
 import {
+  longPressImage,
   RNGetKeyboardStatus, RNTakeAudioAndSendToUser, RNTakePictureAndSendToUser,
   RNTakeVideoAndSendToUser,
   RNToast,
   RNViewImage
 } from '../../lib/js/reactNative';
+Vue.directive('long-press', {
+  bind(el, binding) {
+    if (typeof binding.value !== 'function') {
+      console.warn(`Expect a function, got ${typeof binding.value}`);
+      return;
+    }
+
+    let pressTimer = null;
+
+    const start = (e) => {
+      if (e.type === 'click' && e.button !== 0) {
+        return;
+      }
+
+      if (pressTimer === null) {
+        pressTimer = setTimeout(() => {
+          binding.value(e);
+        }, 1000); // 长按时间为 1000 毫秒
+      }
+    };
+
+    const cancel = () => {
+      if (pressTimer !== null) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+    };
+
+    el.addEventListener('mousedown', start);
+    el.addEventListener('touchstart', start);
+    el.addEventListener('click', cancel);
+    el.addEventListener('mouseout', cancel);
+    el.addEventListener('touchend', cancel);
+    el.addEventListener('touchcancel', cancel);
+  }
+});
 
 window.app = new Vue({
   el: '#app',
@@ -48,6 +85,19 @@ window.app = new Vue({
     playVoiceId: null,
   },
   methods: {
+    longPress(url) {
+      let images = [];
+      for(const m of this.messages) {
+        if(m.contentType === 'image') {
+          images.push({
+            name: m.content.filename,
+            url: m.content.fileUrl
+          });
+        }
+      }
+      const index = images.findIndex(item=>item.url===url);
+      longPressImage({images:[images[index]],index:0});
+    },
     // 格式化时间
     timeFormat: NKC.methods.timeFormat,
     // 获取链接

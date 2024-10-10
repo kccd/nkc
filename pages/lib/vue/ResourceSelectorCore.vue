@@ -885,6 +885,7 @@ export default {
         self.getResources(0, data.requestType);
       }
       this.socketEventListenerDebounce = this.debounce(this.socketEventListener, 500);
+      if(!socket) return;
       // 统一用一个防抖函数，最大程度的减少相同请求
       socket.on("fileTransformProcess", this.socketEventListenerDebounce );
       socket.on('resources',this.socketEventListenerDebounce );

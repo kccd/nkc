@@ -12,10 +12,10 @@
             .account-box-mask
               .account-user-info.row
                 .account-user-avatar.col-xs-3.col-sm-2.col-md-2.hidden-xs
-                  img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+                  img(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" data-global-long-press="longPressImageForRN" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
                 .account-user-introduce.col-xs-12.col-sm-10.col-md-10
                   .account-user-avatar-xs
-                    img.xs.hidden-sm.hidden-md.hidden-lg(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
+                    img.xs.hidden-sm.hidden-md.hidden-lg(:src="getUrl('userAvatar', targetUser.avatar)" data-global-click="viewImage" data-global-long-press="longPressImageForRN" :data-global-data="objToStr({url: getUrl('userAvatar', targetUser.avatar)})")
                   .account-user-name {{targetUser.username}}
                   .account-user-certs
                     user-level(ref="userLevel" :target-user="targetUser")
