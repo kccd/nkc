@@ -4,6 +4,10 @@ block title
 block content
   #app.container-fluid.max-width
     sticker-selector(ref='stickerSelector')
+    //editor-light
+    editor-tiptap
 
 block scripts
+  //+includeCSS('/quill/dist/quill.snow.css')
+  //+includeJS('/quill/dist/quill.core.js')
   +includeJS('/test/test.js')
