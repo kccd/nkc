@@ -12,6 +12,7 @@ import {
 } from "./methods";
 import {getState} from "../lib/js/state";
 import {
+  longPressImage,
   RNDownloadFile,
   RNOpenNewPageThrottle, RNSaveImage,
   RNUrlPathEval
@@ -88,6 +89,10 @@ function saveImage(data) {
   RNSaveImage(name, url);
 }
 
+// APP长按保存图片
+function longPressImageForRN(data) {
+  longPressImage(data);
+}
 /*
 * 显示用户悬浮名片
 * */
@@ -147,6 +152,7 @@ const eventFunctions = {
   viewSticker,
   showSharePanel,
   showCreditPanel,
+  longPressImageForRN,
 }
 
 /*

@@ -47,6 +47,16 @@ module.exports = async (ctx, next) => {
   } else if (isSubscribedUser) {
     match.visibleType.$in = [attention, everyone];
   }
+  if (ctx.permission('managementMoment')) {
+    match.$or.push({
+      status: {
+        $in: [disabledMoment, faultyMoment, unknownMoment],
+      },
+      visibleType: {
+        $in: [own, everyone, attention],
+      },
+    });
+  }
   const count = await db.MomentModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count, 20);
   const moments = await db.MomentModel.find(match)

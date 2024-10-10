@@ -580,7 +580,7 @@ function nkc_render(options){
     return html
       // 图片处理
       .replace(/<img\ssrc="\/r\/([0-9]+?)" \/>/img, function(content, v1) {
-        if(script) return `<img data-tag="nkcsource" data-type="picture" data-global-long-press="downloadFile" data-global-click="viewImage" data-global-data="${imgUrl}" data-id="${v1}" src="/r/${v1}"></img>`;
+        if(script) return `<img data-tag="nkcsource" data-type="picture" data-global-long-press="longPressImageForRN" data-global-click="viewImage" data-global-data="${imgUrl}" data-id="${v1}" src="/r/${v1}"></img>`;
         var resource = resources[v1];
         if(!resource) {
           resource = {
@@ -589,8 +589,8 @@ function nkc_render(options){
             oname: "图片已丢失"
           }
         }
-        var lazyImgStr = '<img data-src="/r/' + v1 + '" data-global-click="viewImage" data-global-long-press="downloadFile"  data-global-click="viewImage" data-global-data="${imgUrl}" data-global-data="${objToStr({})}" class="lazyload" dataimg="content" data-type="view" alt="'+resource.oname+'"/>';
-        var imgStr = '<img src="/r/' + v1 + '"  data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data="${imgUrl}" dataimg="content" data-type="view" alt="'+resource.oname+'"/>';
+        var lazyImgStr = '<img data-src="/r/' + v1 + '" data-global-click="viewImage" data-global-long-press="longPressImageForRN"  data-global-click="viewImage" data-global-data="${imgUrl}" data-global-data="${objToStr({})}" class="lazyload" dataimg="content" data-type="view" alt="'+resource.oname+'"/>';
+        var imgStr = '<img src="/r/' + v1 + '"  data-global-click="viewImage" data-global-long-press="longPressImageForRN" data-global-data="${imgUrl}" dataimg="content" data-type="view" alt="'+resource.oname+'"/>';
         if(!resource.width || !resource.height) {
           return '<div class="article-img-body">'+imgStr+'</div>';
         }

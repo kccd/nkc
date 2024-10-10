@@ -13,7 +13,7 @@ router.get('/', async (ctx, next) => {
   let isAuthor = await moment.getAuthorByUid(uid);
   //判断当动态的状态不正常时用户是否具有操作权限
   if (moment.status !== normal) {
-    if (!permission('review') && !isAuthor) {
+    if (!permission('managementMoment') && !isAuthor) {
       ctx.throw(400, '权限不足');
     }
   }
@@ -29,7 +29,7 @@ router.get('/', async (ctx, next) => {
       return ctx.throw(404, '未找到文章，请刷新后重试');
     }
   }
-  if (!permission('review')) {
+  if (!permission('managementMoment')) {
     if (moment.status !== normal && !isAuthor) {
       ctx.throw(401, '权限不足');
     }
@@ -47,13 +47,18 @@ router.get('/', async (ctx, next) => {
     editorMoment: null,
     visitHistory: null,
     ipInfo: null,
+    recovery: false,
   };
   if (user) {
-    //审核权限
-    if (permission('review')) {
+    //管理动态权限
+    if (permission('managementMoment')) {
       optionStatus.reviewed = moment.status;
       if (moment.status !== disabled) {
+        // 屏蔽
         optionStatus.disable = true;
+      } else {
+        // 解除屏蔽
+        optionStatus.recovery = true;
       }
     }
     if (isAuthor && moment.status !== deleted) {

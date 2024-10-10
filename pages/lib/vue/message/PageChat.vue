@@ -79,7 +79,7 @@
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
                 //- 发送的图片消息
                 .image(v-else-if="message.contentType === 'image'")
-                  img.chat-message-image(:src="message.content.fileUrlSM" data-global-click="viewImage" data-global-long-press="downloadFile" :data-global-data="objToStr({name: '', url: message.content.fileUrl})" :data-src="message.content.fileUrl")
+                  img.chat-message-image(:src="message.content.fileUrlSM" data-global-click="viewImage" data-global-long-press="longPressImageForRN" :data-global-data="objToStr({name: '', url: message.content.fileUrl})" :data-src="message.content.fileUrl")
                 //- 发送的文件消息
                 .file(v-else-if="message.contentType === 'file'")
                   a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}

@@ -24,6 +24,7 @@ router
       normal: normalStatus,
       faulty: faultyStatus,
       unknown: unknownStatus,
+      disabled: disabledStatus,
     } = await db.MomentModel.getMomentStatus();
     const match = {
       parent: moment._id,
@@ -44,6 +45,13 @@ router
         delete match.$or[1].uid;
       }
     }
+    if (ctx.permission('managementMoment')) {
+      match.$or.push({
+        status: {
+          $in: [disabledStatus],
+        },
+      });
+    }
     const sortObj = sort === 'hot' ? { voteUp: -1, top: 1 } : { top: 1 };
     const count = await db.MomentModel.countDocuments(match);
     const perPage = await db.MomentModel.getMomentCommentPerPage(mode);
@@ -60,6 +68,7 @@ router
       commentsData,
       state.uid,
       mode,
+      ctx.permission('managementMoment'),
     );
     data.commentsData = commentsData;
     data.paging = paging;

@@ -1731,19 +1731,34 @@ schema.statics.insertSystemRecordContent = async (type, user, ctx) => {
   const SettingModel = mongoose.model('settings');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const UserModel = mongoose.model('users');
-  const KcbsTypeModel = mongoose.model('kcbsTypes');
+  // const KcbsTypeModel = mongoose.model('kcbsTypes');
   const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
   const { address: ip, port, data } = ctx;
   if (!user) {
     return;
   }
+  // 获取积分策略对象
+  const operation = await SettingModel.getScoreOperationsByType(type);
+  if (!operation) return;
   //获取后台积分设置
   const enabledScores = await SettingModel.getEnabledScores();
+  const scores = {};
+  // 获取当天此人当前操作执行的次数
+  const operationLogCount = await ScoreOperationLogModel.getOperationLogCount(
+    user,
+    type,
+  );
+  if (operation.count !== -1 && operation.count <= operationLogCount) return;
+  for (const e of enabledScores) {
+    const scoreType = e.type;
+    scores[scoreType] = operation[scoreType];
+  }
   let recordsId = [];
   for (const enabledScore of enabledScores) {
     const scoreType = enabledScore.type;
-    const kcbsType = await KcbsTypeModel.findOnly({ _id: type });
-    const number = kcbsType.num * 100;
+    // const kcbsType = await KcbsTypeModel.findOnly({ _id: type });
+    const number = scores[scoreType];
+    // const number = kcbsType.num * 100;
     if (number === undefined) {
       continue;
     }
@@ -1828,9 +1843,9 @@ schema.statics.disabledToDraftDocuments = async function () {
     delType: faultyStatus,
     postType: { $in: [articleSource, commentSource] },
     modifyType: false,
-    toc: {
-      $lte: Date.now() - 3 * 24 * 60 * 1000,
-    },
+      toc: {
+        $lte: Date.now() - 3 * 24 * 60 * 1000,
+      },
   };
   //查找对document的退修记录
   const onLog = await DelPostLogModel.find(match);
