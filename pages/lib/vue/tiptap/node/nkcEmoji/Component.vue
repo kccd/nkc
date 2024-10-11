@@ -32,7 +32,7 @@ export default {
     height: 2rem;
     width: 2rem;
     margin: 0 0.2rem;
-    vertical-align: bottom;
+    vertical-align: text-bottom;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="tiptap-editor-container">
-    <editor-content :editor="editor" />
+    <editor-content :editor="editor" class="tiptap-editor-content" />
     <button @click="getJSON">GET JSON</button>
   </div>
 </template>
@@ -13,8 +13,9 @@ import nkcSticker from './node/nkcSticker/nkcSticker.js'
 import nkcPictureBlock from './node/nkcPictureBlock/nkcPictureBlock.js'
 import nkcPictureInline from './node/nkcPictureInline/nkcPictureInline.js'
 import nkcPictureFloat from './node/nkcPictureFloat/nkcPictureFloat.js'
-
-
+import EnsureTrailingParagraph from './plugins/EnsureTrailingProagraph.js'
+import nkcVideoBlock from './node/nkcVideoBlock/nkcVideoBlock.js'
+import nkcXSFLimit from './node/nkcXSFLimit/nkcXSFLimit.js'
 
 export default {
   components: {
@@ -44,11 +45,35 @@ export default {
         </p>
         <nkc-picture-block id="360354" desc="风景优美"></nkc-picture-block>
         <p>这是末尾的内容</p>
-        <nkc-picture-float id="360356" float="left" ><p>234234</p></nkc-picture-float>
+        <nkc-xsf-limit xsf="21" ><p>这是隐藏的内容。。。。。</p></nkc-xsf-limit>
 
+        <nkc-picture-float id="360356" float="right" ></nkc-picture-float>
+        <nkc-video-block id="360363" desc="这是视频的介绍"></nkc-video-block>
+        <nkc-picture-float id="360356" float="left" ><p>我们先从那些新晋创新者类别的主题开始。检索增强生成（RAG）技术对于那些希望利用大语言模型的能力但又不想将数据发送给大模型厂商的公司来说将变得极为关键。此外，RAG 技术在大规模应用大模型的场景中同样展现出了价值。
+
+
+
+
+在创新者类别中，另一个新晋者是集成了人工智能的硬件，包括支持人工智能的 GPU 基础设施，以及由人工智能技术驱动的个人电脑、智能手机和边缘计算设备。预计在未来 12 个月内，这一领域将迎来显著的增长。
+
+
+
+
+基于大语言模型的解决方案在基础设施部署和管理成本方面面临着挑战。为了应对这些问题，业界正在探索和采纳新的语言模型——小语言模型（SLM）。小语言模型特别适合在资源受限的小型设备上运行，尤其是在边缘计算场景中。一些行业巨头，如微软，已经推出了 Phi-3 等小模型产品，为社区提供了尝鲜的机会，用以比较小模型与大模型在成本和效益方面的差异。</p></nkc-picture-float>
+<p>这是末尾的内容</p>
 `,
 
-      extensions: [StarterKit, nkcEmoji, nkcSticker, nkcPictureBlock, nkcPictureInline, nkcPictureFloat],
+      extensions: [
+        StarterKit,
+        nkcEmoji,
+        nkcSticker,
+        nkcPictureBlock,
+        nkcPictureInline,
+        nkcPictureFloat,
+        EnsureTrailingParagraph,
+        nkcVideoBlock,
+        nkcXSFLimit,
+      ],
     })
   },
 
@@ -69,7 +94,15 @@ export default {
 .tiptap-editor-container{
   ::v-deep{
     p {
-      font-size: 15px;
+      font-size: 16px;
+      line-height: 30px;
+    }
+  }
+}
+.tiptap-editor-content{
+  ::v-deep{
+    .tiptap.ProseMirror{
+      padding: 1rem;
     }
   }
 }

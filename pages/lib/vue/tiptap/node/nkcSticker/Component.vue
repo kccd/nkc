@@ -33,7 +33,7 @@ export default {
     max-height: 5rem;
     max-width: 5rem;
     margin: 0 0.2rem;
-    vertical-align: bottom;
+    vertical-align: text-bottom;
   }
 }
 </style>

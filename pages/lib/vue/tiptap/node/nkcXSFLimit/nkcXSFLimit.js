@@ -4,28 +4,27 @@ import { VueNodeViewRenderer } from '@tiptap/vue-2';
 import Component from './Component.vue';
 
 export default Node.create({
-  name: 'nkc-picture-float',
+  name: 'nkc-xsf-limit',
   group: 'block',
   content: 'block+',
 
   addAttributes() {
     return {
-      id: '',
-      float: '', // left or right
+      xsf: '',
     };
   },
 
   parseHTML() {
     return [
       {
-        tag: 'nkc-picture-float',
+        tag: 'nkc-xsf-limit',
       },
     ];
   },
 
   renderHTML(props) {
     const { HTMLAttributes } = props;
-    return ['nkc-picture-float', mergeAttributes(HTMLAttributes), 0];
+    return ['nkc-xsf-limit', mergeAttributes(HTMLAttributes), 0];
   },
 
   addNodeView() {

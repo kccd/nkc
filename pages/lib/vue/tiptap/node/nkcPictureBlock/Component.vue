@@ -33,6 +33,7 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 1rem 0;
+  margin-bottom: 1rem;
   img{
     max-width: 100%;
     border-radius: 5px;

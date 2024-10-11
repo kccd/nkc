@@ -1,24 +1,29 @@
 <template>
   <node-view-wrapper class="node-view-wrapper">
+    <div class="resource-selector-container">
+      <resource-selector ref="resourceSelector" />
+    </div>
+
     <span :class="'float-' + this.float">
       <img :src="pictureUrl" :alt="originProps.id" >
       <span>
         <span @click="switchFloat">{{float === 'left'? '右移': '左移'}}</span>
-        <span>选择图片</span>
+        <span @click="selectResource">选择图片</span>
       </span>
     </span>
-    <node-view-content as="p" class="node-view-content" />
+    <node-view-content class="node-view-content" />
   </node-view-wrapper>
 </template>
 
 <script>
 import {nodeViewProps, NodeViewContent, NodeViewWrapper} from "@tiptap/vue-2";
 import {getUrl} from "../../../../js/tools";
-
+import ResourceSelector from '../../../ResourceSelector.vue';
 export default {
   components: {
     'node-view-wrapper': NodeViewWrapper,
     'node-view-content': NodeViewContent,
+    'resource-selector': ResourceSelector,
   },
   props: nodeViewProps,
   computed: {
@@ -31,18 +36,37 @@ export default {
         float: this.node.attrs.float,
       }
     },
-    switchFloat() {
-      this.node.attrs.float = this.float === 'left' ? 'right' : 'left';
-    },
     pictureUrl() {
       return getUrl('resource', this.originProps.id);
     }
   },
+  methods: {
+    switchFloat() {
+      this.node.attrs.float = this.float === 'left' ? 'right' : 'left';
+    },
+    selectResource() {
+      this.$refs.resourceSelector.open((res) => {
+        this.node.attrs.id = res.resourcesId[0];
+        this.$refs.resourceSelector.close();
+      }, {
+        countLimit: 1,
+        allowedExt: ['picture'],
+        fastSelect: false,
+      });
+    }
+  }
 }
 </script>
 
 <style scoped lang="less">
+.resource-selector-container{
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
 .node-view-wrapper{
+  margin-bottom: 1rem;
   overflow: hidden;
   .node-view-content{
     border: 1px solid #f4f4f4;
@@ -58,8 +82,8 @@ export default {
     object-fit: cover;
   }
   &>span{
-    width: 30%;
-    padding-top: 20%;
+    width: 39%;
+    padding-top: 26%;
     position: relative;
     margin-bottom: 1rem;
     &.float-left{
@@ -74,6 +98,7 @@ export default {
       position: absolute;
       top: 1.3rem;
       right: 0.5rem;
+      user-select: none;
       span{
         cursor: pointer;
         display: inline-block;

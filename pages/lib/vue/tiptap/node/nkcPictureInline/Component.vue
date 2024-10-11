@@ -26,7 +26,7 @@ export default {
 <style scoped lang="less">
 .node-view-wrapper{
   display: inline-block;
-  vertical-align: bottom;
+  vertical-align: text-bottom;
   img{
     max-width: 100%;
     border-radius: 5px;

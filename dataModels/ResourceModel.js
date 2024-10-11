@@ -6,6 +6,8 @@ const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require('fs');
 const FILE = require('../nkcModules/file');
+const videoSize = require('../settings/video');
+const { getUrl } = require('../nkcModules/tools');
 const fsPromises = fs.promises;
 const resourceSchema = new Schema(
   {
@@ -288,6 +290,35 @@ resourceSchema.statics.getResourcesByTags = async (tags = '') => {
     await resource.setFileExist();
   }
   return resources;
+};
+
+resourceSchema.methods.extendVideoPlayerData = async function () {
+  const r = this;
+  await r.setFileExist();
+  const { defaultFile, disabled, isFileExist, visitorAccess, mask } = r;
+
+  const { name: filename } = defaultFile;
+  const sources = [];
+  for (const { size, dataSize } of r.videoSize) {
+    const { height } = videoSize[size];
+    const url = getUrl('resource', this.rid, size) + '&w=' + r.token;
+    sources.push({
+      url,
+      height,
+      dataSize,
+    });
+  }
+  return {
+    rid: r.rid,
+    type: 'video',
+    coverUrl: getUrl('resource', r.rid, 'cover'),
+    visitorAccess,
+    mask,
+    sources,
+    filename,
+    disabled,
+    lost: !isFileExist,
+  };
 };
 
 /*

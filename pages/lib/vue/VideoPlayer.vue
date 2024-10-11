@@ -1,6 +1,7 @@
 <template lang="pug">
   .video-player
-    download-panel(ref="downloadPanel")
+    div(style="position: fixed; left: 0; top:0; z-index: 1000;")
+      download-panel(ref="downloadPanel")
     div(v-if="file")
       .video-mask(v-if="showMask")
         .video-mask-container
