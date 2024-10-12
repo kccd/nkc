@@ -23,7 +23,6 @@ import nkcXSFLimit from './node/nkcXSFLimit/nkcXSFLimit.js'
 import nkcAudioBlock from './node/nkcAudioBlock/nkcAudioBlock.js'
 import ResourceSelector from '../ResourceSelector.vue'
 import nkcMath from './node/nkcMath/nkcMath.js'
-import nkcParagraph from './node/nkcParagraph/nkcParagraph.js'
 
 export default {
   components: {
@@ -89,7 +88,6 @@ export default {
         nkcXSFLimit,
         nkcAudioBlock,
         nkcMath,
-        nkcParagraph,
       ],
     })
   },
