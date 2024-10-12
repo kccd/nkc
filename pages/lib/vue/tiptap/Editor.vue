@@ -16,6 +16,8 @@ import nkcPictureFloat from './node/nkcPictureFloat/nkcPictureFloat.js'
 import EnsureTrailingParagraph from './plugins/EnsureTrailingProagraph.js'
 import nkcVideoBlock from './node/nkcVideoBlock/nkcVideoBlock.js'
 import nkcXSFLimit from './node/nkcXSFLimit/nkcXSFLimit.js'
+import nkcMath from './node/nkcMath/nkcMath.js'
+import nkcParagraph from './node/nkcParagraph/nkcParagraph.js'
 
 export default {
   components: {
@@ -33,9 +35,14 @@ export default {
       content: `
         <p>I’m running Tiptap with Vue.js. 🎉</p>
         <p>
+        AI 应用于公司的日常决策中。AI 代理结合知识库和其他技术，帮助我们理解岗位<nkc-math text="a + b = c" block="false"></nkc-math>背景能力，并辅助从运维到公司内部决策的各个方面。在项目开发和交付过程中，使用 Copilot 等工具辅助开发，以及在测试和运维阶段利用 AI 机器人进行监控和问题处理。AI 在预测和处理问题方面的能力远超传统算法，使我们能够以更低的成本实现更高的效能。
+        </p>
+        <p>
           啊啊啊啊啊啊啊
           <nkc-emoji unicode="1f602"></nkc-emoji>
           啊啊啊啊啊啊
+          <nkc-math text="a + b = c" block="true"></nkc-math>
+          公式公式公式公式
           <nkc-sticker id="308179"></nkc-sticker>
           啊啊啊啊啊啊
           <nkc-sticker id="360353"></nkc-sticker>
@@ -73,6 +80,8 @@ export default {
         EnsureTrailingParagraph,
         nkcVideoBlock,
         nkcXSFLimit,
+        nkcMath,
+        nkcParagraph,
       ],
     })
   },
@@ -93,7 +102,7 @@ export default {
 <style scoped lang="less">
 .tiptap-editor-container{
   ::v-deep{
-    p {
+    .nkc-paragraph {
       font-size: 16px;
       line-height: 30px;
     }

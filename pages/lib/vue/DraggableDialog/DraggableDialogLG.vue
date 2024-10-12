@@ -1,13 +1,15 @@
 <template>
-  <div class="draggable-dialog-container" ref="draggableBox" :style="containerStyle">
-    <div class="draggable-dialog-title-container">
-      <div class="draggable-dialog-title" ref="draggableHandle">{{title}}</div>
-      <div class="draggable-dialog-option" @click="toClose">
-        <close theme="filled" size="18" fill="#555"/>
+  <div class="draggable-dialog-root">
+    <div class="draggable-dialog-container" ref="draggableBox" :style="containerStyle">
+      <div class="draggable-dialog-title-container">
+        <div class="draggable-dialog-title" ref="draggableHandle">{{title}}</div>
+        <div class="draggable-dialog-option" @click="toClose">
+          <close theme="filled" size="18" fill="#555"/>
+        </div>
       </div>
-    </div>
-    <div class="draggable-dialog-body-container">
-      <slot></slot>
+      <div class="draggable-dialog-body-container">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -30,7 +32,7 @@ export default {
   },
   methods: {
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+      this.draggableElement = new DraggableElement(this.$refs.draggableBox, this.$refs.draggableHandle);
       this.draggableElement.setPositionCenter();
     },
     toClose() {
@@ -72,9 +74,14 @@ export default {
 }
 </script>
 
-<style scoped>
-.draggable-dialog-container{
+<style scoped lang='less'>
+.draggable-dialog-root{
+  top: 0;
+  left: 0;
   position: fixed;
+  z-index: 1000;
+}
+.draggable-dialog-container{
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 3px;
@@ -84,11 +91,14 @@ export default {
   display: flex;
   flex-direction: column;
   .draggable-dialog-title-container{
+    user-select: none;
+    line-height: initial;
     height: 3rem;
     width: 100%;
     display: flex;
     background-color: #f4f4f4;
     .draggable-dialog-title{
+      font-size: 1.2rem;
       cursor: move;
       flex: 1;
       display: flex;
