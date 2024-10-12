@@ -69,7 +69,6 @@ export default {
   margin-bottom: 1rem;
   overflow: hidden;
   .node-view-content{
-    border: 1px solid #f4f4f4;
     min-height: 10rem;
   }
   img{
