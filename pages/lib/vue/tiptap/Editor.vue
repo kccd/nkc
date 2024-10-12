@@ -1,5 +1,9 @@
 <template>
   <div class="tiptap-editor-container">
+    <div>
+      <button @click="insertResource">插入资源</button>
+      <resource-selector ref="resourceSelector"></resource-selector>
+    </div>
     <editor-content :editor="editor" class="tiptap-editor-content" />
     <button @click="getJSON">GET JSON</button>
   </div>
@@ -16,12 +20,15 @@ import nkcPictureFloat from './node/nkcPictureFloat/nkcPictureFloat.js'
 import EnsureTrailingParagraph from './plugins/EnsureTrailingProagraph.js'
 import nkcVideoBlock from './node/nkcVideoBlock/nkcVideoBlock.js'
 import nkcXSFLimit from './node/nkcXSFLimit/nkcXSFLimit.js'
+import nkcAudioBlock from './node/nkcAudioBlock/nkcAudioBlock.js'
+import ResourceSelector from '../ResourceSelector.vue'
 import nkcMath from './node/nkcMath/nkcMath.js'
 import nkcParagraph from './node/nkcParagraph/nkcParagraph.js'
 
 export default {
   components: {
     EditorContent,
+    'resource-selector': ResourceSelector,
   },
 
   data() {
@@ -80,6 +87,7 @@ export default {
         EnsureTrailingParagraph,
         nkcVideoBlock,
         nkcXSFLimit,
+        nkcAudioBlock,
         nkcMath,
         nkcParagraph,
       ],
@@ -90,7 +98,49 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
-    }
+    },
+    insertResource() {
+      const self = this;
+      this.$refs.resourceSelector.open(data => {
+        self.$refs.resourceSelector.close();
+        this.editor.commands.focus(); // 确保编辑器获得焦点
+        if (data.resources) {
+          data = data.resources;
+        } else {
+          data = [data];
+        }
+        const insertContent = [];
+        for (let i = 0; i < data.length; i++) {
+          let source = data[i];
+          let type = source.mediaType;
+          type = type.substring(5);
+          type = type[0].toLowerCase() + type.substring(1);
+          console.log('====================================');
+          console.log(type, source.rid, source);
+          console.log('====================================');
+          switch (type) {
+            case 'picture': break;
+            case 'video': break;
+            case 'audio': {
+              insertContent.push({
+                type: 'nkc-audio-block',
+                attrs: {
+                  id: source.rid,
+                  name: source.oname,
+                  size: source.size,
+                }
+              })
+              break;
+            }
+            case 'attachment': break;
+            default: break;
+          }
+        }
+        self.editor.commands.insertContent([...insertContent,{ type: 'paragraph' }]);
+      }, {
+        fastSelect: true
+      });
+    },
   },
 
   beforeDestroy() {
@@ -108,10 +158,11 @@ export default {
     }
   }
 }
-.tiptap-editor-content{
-  ::v-deep{
-    .tiptap.ProseMirror{
+.tiptap-editor-content {
+  ::v-deep {
+    .tiptap.ProseMirror {
       padding: 1rem;
+      border: 1px solid green !important;
     }
   }
 }
