@@ -13,6 +13,8 @@ export default Node.create({
       id: '',
       name: '',
       size: 0,
+      ext: '',
+      hits: 0,
     };
   },
 

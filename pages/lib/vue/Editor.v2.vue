@@ -1,34 +1,73 @@
 <template lang="pug">
-  .tiptap-editor-container
-    .tiptap-editor-toolBar(v-if="editor")
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().undo().run()")
-          <return theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().redo().run()")
-          <go-on theme="filled" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleBold().run()" :class="{'is-active': editor.isActive('bold')}")
-          <text-bold theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleItalic().run()" :class="{'is-active': editor.isActive('italic')}")
-          <text-italic theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleUnderline().run()" :class="{'is-active': editor.isActive('underline')}")
-          <text-underline theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleStrike().run()" :class="{'is-active': editor.isActive('strike')}")
-          <strikethrough theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}")
-          <code-one theme="filled" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="setLink" :class="{'is-active': editor.isActive('link')}")
-          <link-one theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().unsetLink().run()")
-          <unlink theme="filled" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
-          <right-small-down theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
-          <right-small-up theme="filled" :size="iconFontSize" />
-    editor-content.tiptap-editor-content(:editor="editor")
-    button(@click="getJSON") GET JSON
+.tiptap-editor-container
+  .tiptap-editor-toolBar(v-if='editor')
+    .tiptap-editor-toolBar-icon-group.m-r-05
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().undo().run()'
+      )
+        <return theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().redo().run()'
+      )
+        <go-on theme="filled" :size="iconFontSize" />
+    .tiptap-editor-toolBar-icon-group.m-r-05
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleBold().run()',
+        :class='{ "is-active": editor.isActive("bold") }'
+      )
+        <text-bold theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleItalic().run()',
+        :class='{ "is-active": editor.isActive("italic") }'
+      )
+        <text-italic theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleUnderline().run()',
+        :class='{ "is-active": editor.isActive("underline") }'
+      )
+        <text-underline theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleStrike().run()',
+        :class='{ "is-active": editor.isActive("strike") }'
+      )
+        <strikethrough theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleCode().run()',
+        :class='{ "is-active": editor.isActive("code") }'
+      )
+        <code-one theme="filled" :size="iconFontSize" />
+    .tiptap-editor-toolBar-icon-group.m-r-05
+      .tiptap-editor-toolBar-icon-box(
+        @click='setLink',
+        :class='{ "is-active": editor.isActive("link") }'
+      )
+        <link-one theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().unsetLink().run()'
+      )
+        <unlink theme="filled" :size="iconFontSize" />
+    .tiptap-editor-toolBar-icon-group.m-r-05
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleSubscript().run()',
+        :class='{ "is-active": editor.isActive("subscript") }'
+      )
+        <right-small-down theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-box(
+        @click='editor.chain().focus().toggleSuperscript().run()',
+        :class='{ "is-active": editor.isActive("superscript") }'
+      )
+        <right-small-up theme="filled" :size="iconFontSize" />
+    .tiptap-editor-toolBar-icon-group.m-r-05
+      .tiptap-editor-toolBar-icon-box(
+        @click='insertResource',
+        :class='{ "is-active": editor.isActive("nkc-audio-block") || editor.isActive("nkc-file-block") }'
+      )
+        // <right-small-up theme="filled" :size="iconFontSize" />
+        <add-picture theme="filled" :size="iconFontSize"/>
+      //button(@click="insertResource") 插入资源
+      resource-selector(ref='resourceSelector')
+  editor-content.tiptap-editor-content(:editor='editor')
+  button(@click='getJSON') GET JSON
 </template>
 
 <script>
@@ -67,7 +106,11 @@ import {
   Strikethrough,
   Code as CodeIcon,
   CodeOne,
+  AddPicture
 } from '@icon-park/vue';
+import ResourceSelector from './ResourceSelector.vue';
+import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
+import nkcFileBlock from './tiptap/node/nkcFileBlock/nkcFileBlock.js';
 
 
 export default {
@@ -85,6 +128,8 @@ export default {
     'code-icon': CodeIcon,
     'code-one': CodeOne,
     'strikethrough': Strikethrough,
+    'add-picture': AddPicture,
+    'resource-selector': ResourceSelector,
   },
 
   data() {
@@ -99,7 +144,7 @@ export default {
 
   methods: {
     initEditor(props) {
-      const {loading = false, toolBarTop = '' } = props || {};
+      const { loading = false, toolBarTop = '' } = props || {};
       this.editor = new Editor({
         content: `
         <p>I’m running Tiptap with Vue.js. 🎉</p>
@@ -124,7 +169,7 @@ export default {
         <nkc-xsf-limit xsf="21" ><p>这是隐藏的内容。。。。。</p></nkc-xsf-limit>
 
         <nkc-picture-float id="360356" float="right" ></nkc-picture-float>
-        <nkc-video-block id="360363" desc="这是视频的介绍"></nkc-video-block>
+        <nkc-video-block id="352197 " desc="这是视频的介绍"></nkc-video-block>
         <nkc-picture-float id="360356" float="left" ><p>我们先从那些新晋创新者类别的主题开始。检索增强生成（RAG）技术对于那些希望利用大语言模型的能力但又不想将数据发送给大模型厂商的公司来说将变得极为关键。此外，RAG 技术在大规模应用大模型的场景中同样展现出了价值。
 
 
@@ -163,6 +208,8 @@ export default {
           nkcVideoBlock,
           nkcXSFLimit,
           nkcMath,
+          nkcAudioBlock,
+          nkcFileBlock,
         ],
       })
     },
@@ -198,7 +245,61 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
-    }
+    },
+    insertResource() {
+      const self = this;
+      this.$refs.resourceSelector.open(data => {
+        self.$refs.resourceSelector.close();
+        this.editor.commands.focus(); // 确保编辑器获得焦点
+        if (data.resources) {
+          data = data.resources;
+        } else {
+          data = [data];
+        }
+        const insertContent = [];
+        for (let i = 0; i < data.length; i++) {
+          let source = data[i];
+          let type = source.mediaType;
+          type = type.substring(5);
+          type = type[0].toLowerCase() + type.substring(1);
+          // console.log('====================================');
+          // console.log(type, source.rid, source);
+          // console.log('====================================');
+          switch (type) {
+            case 'picture': break;
+            case 'video': break;
+            case 'audio': {
+              insertContent.push({
+                type: 'nkc-audio-block',
+                attrs: {
+                  id: source.rid,
+                  name: source.oname,
+                  size: source.size,
+                }
+              });
+              break;
+            }
+            case 'attachment': {
+              insertContent.push({
+                type: 'nkc-file-block',
+                attrs: {
+                  id: source.rid,
+                  name: source.oname,
+                  size: source.size,
+                  ext: source.ext,
+                  hits: source.hits,
+                }
+              });
+              break;
+            }
+            default: break;
+          }
+        }
+        self.editor.commands.insertContent([...insertContent]);
+      }, {
+        fastSelect: true
+      });
+    },
   },
 
   beforeDestroy() {
@@ -208,10 +309,10 @@ export default {
 </script>
 
 <style scoped lang="less">
-.tiptap-editor-toolBar{
+.tiptap-editor-toolBar {
   display: flex;
   margin-bottom: 1rem;
-  .tiptap-editor-toolBar-icon-group{
+  .tiptap-editor-toolBar-icon-group {
     background-color: rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
@@ -219,7 +320,7 @@ export default {
     border: 1px solid #eee;
     padding: 0 1rem;
   }
-  .tiptap-editor-toolBar-icon-box{
+  .tiptap-editor-toolBar-icon-box {
     cursor: pointer;
     padding-top: 4px;
     height: 2.6rem;
@@ -228,25 +329,26 @@ export default {
     align-items: center;
     justify-content: center;
     color: #777;
-    &:hover, &.is-active{
+    &:hover,
+    &.is-active {
       color: #2b90d9;
     }
   }
 }
-.tiptap-editor-container{
+.tiptap-editor-container {
   position: relative;
 }
-.tiptap-editor-content{
+.tiptap-editor-content {
   padding: 2rem;
   border: 1px solid #eee;
   border-radius: 5px;
   background-color: #fff;
-  ::v-deep{
-    p{
+  ::v-deep {
+    p {
       font-size: 16px;
       line-height: 30px;
     }
-    .tiptap.ProseMirror{
+    .tiptap.ProseMirror {
       outline: none;
     }
   }
