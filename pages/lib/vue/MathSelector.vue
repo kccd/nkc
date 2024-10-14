@@ -50,6 +50,7 @@ export default {
     open(callback, options) {
       options = options || {};
       this.text = options.text || '';
+      this.block = options.block || false;
       this.callback = callback;
       this.$refs.dialog.open();
     },
