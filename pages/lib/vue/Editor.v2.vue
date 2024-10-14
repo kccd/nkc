@@ -15,13 +15,34 @@
           <text-underline theme="filled" :size="iconFontSize" />
         .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleStrike().run()" :class="{'is-active': editor.isActive('strike')}")
           <strikethrough theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}")
-          <code-one theme="filled" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box  
+          <clear-format theme="outline" :size="iconFontSize" />
       .tiptap-editor-toolBar-icon-group.m-r-05
         .tiptap-editor-toolBar-icon-box(@click="setLink" :class="{'is-active': editor.isActive('link')}")
           <link-one theme="filled" :size="iconFontSize" />
         .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().unsetLink().run()")
           <unlink theme="filled" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box
+          <list-numbers theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box
+          <list-two theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box  
+          <quote theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}")
+          <code-one theme="filled" :size="iconFontSize" />  
+        .tiptap-editor-toolBar-icon-box(@click='editor.chain().focus().toggleCodeBlock().run()' :class="editorIsActive('codeBlock')")
+          <terminal theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box
+          <dividing-line-one theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box  
+          <align-text-left theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box
+          <align-text-center theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box
+          <align-text-right theme="outline" :size="iconFontSize" />
+        .tiptap-editor-toolBar-icon-box
+          <more-one theme="outline" :size="iconFontSize" />
+
       .tiptap-editor-toolBar-icon-group.m-r-05
         .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
           <right-small-down theme="filled" :size="iconFontSize" />
@@ -42,7 +63,8 @@ import Link from '@tiptap/extension-link'
 import Subscript from '@tiptap/extension-subscript'
 import Strike from '@tiptap/extension-strike'
 import Superscript from '@tiptap/extension-superscript'
-
+import ListItem from '@tiptap/extension-list-item'
+import OrderedList from '@tiptap/extension-ordered-list'
 import Code from '@tiptap/extension-code'
 import Text from '@tiptap/extension-text'
 import Underline from '@tiptap/extension-underline'
@@ -55,7 +77,19 @@ import EnsureTrailingParagraph from './tiptap/plugins/EnsureTrailingProagraph.js
 import nkcVideoBlock from './tiptap/node/nkcVideoBlock/nkcVideoBlock.js'
 import nkcXSFLimit from './tiptap/node/nkcXSFLimit/nkcXSFLimit.js'
 import nkcMath from './tiptap/node/nkcMath/nkcMath.js'
+import TextStyle from '@tiptap/extension-text-style'
+
 import {
+  DividingLineOne,
+  ClearFormat,
+  AlignTextLeft,
+  AlignTextCenter,
+  AlignTextRight,
+  Quote,
+  Minus,
+  Terminal,
+  ListNumbers,
+  ListTwo,
   Return,
   GoOn,
   TextBold,
@@ -68,11 +102,23 @@ import {
   Strikethrough,
   Code as CodeIcon,
   CodeOne,
+  MoreOne,
 } from '@icon-park/vue';
 
 
 export default {
   components: {
+    'more-one': MoreOne,
+    'dividing-line-one': DividingLineOne,
+    'clear-format': ClearFormat,
+    'align-text-left': AlignTextLeft,
+    'align-text-center': AlignTextCenter, 
+    'align-text-right': AlignTextRight,
+    'minus': Minus,
+    'quote': Quote,
+    'Terminal': Terminal,
+    'list-numbers': ListNumbers,
+    'list-two': ListTwo,
     'editor-content': EditorContent,
     'return': Return,
     'go-on': GoOn,
@@ -141,6 +187,9 @@ export default {
 `,
 
         extensions: [
+          TextStyle,
+          ListItem,
+          OrderedList,
           History,
           Superscript,
           Subscript,
@@ -167,6 +216,9 @@ export default {
           nkcMath,
         ],
       })
+    },
+    editorIsActive(name) {
+      return this.editor.isActive(name)? 'is-active': ''
     },
     setLink() {
       const previousUrl = this.editor.getAttributes('link').href
