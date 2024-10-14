@@ -75,6 +75,7 @@ import { Editor, EditorContent } from '@tiptap/vue-2'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Italic from '@tiptap/extension-italic'
+import History from '@tiptap/extension-history'
 import Bold from '@tiptap/extension-bold'
 import Link from '@tiptap/extension-link'
 import Subscript from '@tiptap/extension-subscript'
@@ -135,7 +136,7 @@ export default {
   data() {
     return {
       editor: null,
-      iconFontSize: 14,
+      iconFontSize: 16,
     }
   },
   mounted() {
@@ -185,6 +186,7 @@ export default {
 `,
 
         extensions: [
+          History,
           Superscript,
           Subscript,
           Strike,

@@ -1,5 +1,5 @@
 <template>
-  <draggable-dialog ref="dialog" title="LaTeX 数学公式编辑器" width="50rem" height="34.5rem" heightXS="70%">
+  <draggable-dialog ref="dialog" title="LaTeX 数学公式编辑器" width="43rem" height="34.5rem" heightXS="70%">
     <div style='background-color: #fff;height: 100%;'>
       <div class="math-selector-input-container">
         <div>输入公式：</div>
