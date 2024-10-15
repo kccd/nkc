@@ -68,7 +68,13 @@ const baseConfig = {
   mode: process.env.NODE_ENV || 'development',
   devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
   target: 'es5',
-  cache: true,
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '.webpack_cache'),
+    buildDependencies: {
+      config: [__filename],
+    },
+  },
 };
 
 module.exports = {
