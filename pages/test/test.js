@@ -19,6 +19,7 @@ import style from './test.module.less';
 import bundle from './lib/bundle.preval.js';
 import StickerSelector from '../lib/vue/StickerSelector/StickerSelector.vue';
 import EditorTiptap from '../lib/vue/Editor.v2.vue';
+import LinkEditor from '../lib/vue/LinkEditor.vue';
 
 console.log('模块化CSS:', style);
 console.log('宏脚本导出:', bundle);
@@ -34,5 +35,6 @@ new Vue({
     FunctionalComponentSfc,
     'sticker-selector': StickerSelector,
     'editor-tiptap': EditorTiptap,
+    'link-editor': LinkEditor,
   },
 }).$mount('#app');

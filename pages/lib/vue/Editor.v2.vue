@@ -1,52 +1,53 @@
 <template lang="pug">
   .tiptap-editor-container
+    link-editor(ref='linkEditor')
     .tiptap-editor-toolBar(v-if="editor")
       .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().undo().run()")
+        div(@click="editor.chain().focus().undo().run()")
           <return theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().redo().run()")
+        div(@click="editor.chain().focus().redo().run()")
           <go-on theme="filled" :size="iconFontSize" />
       .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleBold().run()" :class="{'is-active': editor.isActive('bold')}")
+        div(@click="editor.chain().focus().toggleBold().run()" :class="{'is-active': editor.isActive('bold')}" title='粗体')
           <text-bold theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleItalic().run()" :class="{'is-active': editor.isActive('italic')}")
+        div(@click="editor.chain().focus().toggleItalic().run()" :class="{'is-active': editor.isActive('italic')}" title='斜体')
           <text-italic theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleUnderline().run()" :class="{'is-active': editor.isActive('underline')}")
+        div(@click="editor.chain().focus().toggleUnderline().run()" :class="{'is-active': editor.isActive('underline')}" title='下划线')
           <text-underline theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleStrike().run()" :class="{'is-active': editor.isActive('strike')}")
+        div(@click="editor.chain().focus().toggleStrike().run()" :class="{'is-active': editor.isActive('strike')}" title='删除线')
           <strikethrough theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box  
+        div(@click="editor.chain().focus().clearNodes().unsetAllMarks().run()" title='清除格式')
           <clear-format theme="outline" :size="iconFontSize" />
       .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="setLink" :class="{'is-active': editor.isActive('link')}")
+        div(@click="setLink" :class="{'is-active': editor.isActive('link')}" title='插入链接')
           <link-one theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().unsetLink().run()")
-          <unlink theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box
+        div(@click="editor.chain().focus().unsetLink().run()" title='取消链接')
+          <unlink theme="filled" :size="iconFontSize" />  
+        div
           <list-numbers theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box
+        div
           <list-two theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box  
+        div
           <quote theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}")
+        div(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}")
           <code-one theme="filled" :size="iconFontSize" />  
-        .tiptap-editor-toolBar-icon-box(@click='editor.chain().focus().toggleCodeBlock().run()' :class="editorIsActive('codeBlock')")
+        div(@click='editor.chain().focus().toggleCodeBlock().run()' :class="editorIsActive('codeBlock')")
           <terminal theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box
+        div
           <dividing-line-one theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box  
+        div
           <align-text-left theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box
+        div
           <align-text-center theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box
+        div
           <align-text-right theme="outline" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box
+        div
           <more-one theme="outline" :size="iconFontSize" />
 
       .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
+        div(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
           <right-small-down theme="filled" :size="iconFontSize" />
-        .tiptap-editor-toolBar-icon-box(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
+        div(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
           <right-small-up theme="filled" :size="iconFontSize" />
     editor-content.tiptap-editor-content(:editor="editor")
     button(@click="getJSON") GET JSON
@@ -78,6 +79,9 @@ import nkcVideoBlock from './tiptap/node/nkcVideoBlock/nkcVideoBlock.js'
 import nkcXSFLimit from './tiptap/node/nkcXSFLimit/nkcXSFLimit.js'
 import nkcMath from './tiptap/node/nkcMath/nkcMath.js'
 import TextStyle from '@tiptap/extension-text-style'
+import FontFamily from '@tiptap/extension-font-family'
+import Color from '@tiptap/extension-color'
+import LinkEditor from './LinkEditor.vue'
 
 import {
   DividingLineOne,
@@ -108,6 +112,7 @@ import {
 
 export default {
   components: {
+    'link-editor': LinkEditor,
     'more-one': MoreOne,
     'dividing-line-one': DividingLineOne,
     'clear-format': ClearFormat,
@@ -187,6 +192,8 @@ export default {
 `,
 
         extensions: [
+          FontFamily,
+          Color,
           TextStyle,
           ListItem,
           OrderedList,
@@ -221,33 +228,55 @@ export default {
       return this.editor.isActive(name)? 'is-active': ''
     },
     setLink() {
-      const previousUrl = this.editor.getAttributes('link').href
-      const url = window.prompt('URL', previousUrl)
+      const link = this.editor.getAttributes('link');
+      // 拓展选区
+      this.editor.chain().focus().extendMarkRange('link').run();
+      // 获取选区位置
+      const { from, to } = this.editor.state.selection;
+      // 读取链接文本
+      const linkText = this.editor.state.doc.textBetween(from, to, ' '); 
+      this.$refs.linkEditor.open(res => {
+        // empty
+        if (res.href === '') {
+          this.editor
+            .chain()
+            .focus()
+            .extendMarkRange('link')
+            .unsetLink()
+            .run()
 
-      // cancelled
-      if (url === null) {
-        return
-      }
+          return
+        }
 
-      // empty
-      if (url === '') {
+        // update link
         this.editor
           .chain()
           .focus()
           .extendMarkRange('link')
-          .unsetLink()
+          .setLink({
+              href: res.href,
+              rel: res.rel,
+              target: res.newWindow? '_blank': '_self',
+            })
           .run()
 
-        return
-      }
+        this.editor
+          .chain()
+          .focus()
+          .extendMarkRange('link')
+          .insertContentAt({
+            from: this.editor.state.selection.from,
+            to: this.editor.state.selection.to,
+          }, res.text)
+          .run()
 
-      // update link
-      this.editor
-        .chain()
-        .focus()
-        .extendMarkRange('link')
-        .setLink({ href: url })
-        .run()
+          this.$refs.linkEditor.close();
+      }, {
+        href: link.href || '',
+        rel: link.rel || '',
+        text: linkText,
+        newWindow: link.target === '_blank',
+      })
     },
     getJSON() {
       const json = this.editor.getJSON();
@@ -272,18 +301,18 @@ export default {
     border-radius: 1.8rem;
     border: 1px solid #eee;
     padding: 0 1rem;
-  }
-  .tiptap-editor-toolBar-icon-box{
-    cursor: pointer;
-    padding-top: 4px;
-    height: 2.6rem;
-    width: 2.6rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #777;
-    &:hover, &.is-active{
-      color: #2b90d9;
+    &>div{
+      cursor: pointer;
+      padding-top: 4px;
+      height: 2.6rem;
+      width: 2.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #777;
+      &:hover, &.is-active{
+        color: #2b90d9;
+      }
     }
   }
 }
