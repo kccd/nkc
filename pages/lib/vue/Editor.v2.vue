@@ -8,24 +8,36 @@
         div(@click="editor.chain().focus().redo().run()")
           <go-on theme="filled" :size="iconFontSize" />
       .tiptap-editor-toolBar-icon-group.m-r-05
-        div(@click="editor.chain().focus().toggleBold().run()" :class="{'is-active': editor.isActive('bold')}" title='粗体')
+        div(@click="editor.chain().focus().toggleBold().run()" :class="editorIsActive('bold')" title='粗体')
           <text-bold theme="filled" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleItalic().run()" :class="{'is-active': editor.isActive('italic')}" title='斜体')
+        div(@click="editor.chain().focus().toggleItalic().run()" :class="editorIsActive('italic')" title='斜体')
           <text-italic theme="filled" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleUnderline().run()" :class="{'is-active': editor.isActive('underline')}" title='下划线')
+        div(@click="editor.chain().focus().toggleUnderline().run()" :class="editorIsActive('underline')" title='下划线')
           <text-underline theme="filled" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleStrike().run()" :class="{'is-active': editor.isActive('strike')}" title='删除线')
+        div(@click="editor.chain().focus().toggleStrike().run()" :class="editorIsActive('strike')" title='删除线')
           <strikethrough theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().clearNodes().unsetAllMarks().run()" title='清除格式')
           <clear-format theme="outline" :size="iconFontSize" />
       .tiptap-editor-toolBar-icon-group.m-r-05
+        select(:value="getHeadline()" @click="setHeadline" @blur="isHeadlineSelectOpen = false")
+          option(value="0") 正文
+          option(value="1") 标题1
+          option(value="2") 标题2
+          option(value="3") 标题3
+          option(value="4") 标题4
+          option(value="5") 标题5
+          option(value="6") 标题6
+        select(:value='getFontSize()' @click="setFontSize" @blur="isFontSizeSelectOpen = false")
+          option(v-for='size in nkcFontSizeOptions.sizes' :key="size" :value="size") {{size}}
+
+
         div(@click="setLink" :class="{'is-active': editor.isActive('link')}" title='插入链接')
           <link-one theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().unsetLink().run()" title='取消链接')
           <unlink theme="filled" :size="iconFontSize" />  
-        div
+        div(@click="editor.chain().focus().toggleOrderedList().run()" :class="editorIsActive('orderedList')" title="有序列表")
           <list-numbers theme="outline" :size="iconFontSize" />
-        div
+        div(@click="editor.chain().focus().toggleBulletList().run()" :class="editorIsActive('bulletList')" title="无序列表")
           <list-two theme="outline" :size="iconFontSize" />
         div
           <quote theme="outline" :size="iconFontSize" />
@@ -81,7 +93,10 @@ import nkcMath from './tiptap/node/nkcMath/nkcMath.js'
 import TextStyle from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
 import Color from '@tiptap/extension-color'
+import Heading from '@tiptap/extension-heading'
 import LinkEditor from './LinkEditor.vue'
+import BulletList from '@tiptap/extension-bullet-list'
+import nkcFontSize, {nkcFontSizeOptions} from './tiptap/marks/nkcFontSize.js'
 
 import {
   DividingLineOne,
@@ -143,6 +158,10 @@ export default {
     return {
       editor: null,
       iconFontSize: 16,
+      headline: 0,
+      isHeadlineSelectOpen: false,
+      nkcFontSizeOptions,
+      isFontSizeSelectOpen: false,
     }
   },
   mounted() {
@@ -190,13 +209,15 @@ export default {
 基于大语言模型的解决方案在基础设施部署和管理成本方面面临着挑战。为了应对这些问题，业界正在探索和采纳新的语言模型——小语言模型（SLM）。小语言模型特别适合在资源受限的小型设备上运行，尤其是在边缘计算场景中。一些行业巨头，如微软，已经推出了 Phi-3 等小模型产品，为社区提供了尝鲜的机会，用以比较小模型与大模型在成本和效益方面的差异。</p></nkc-picture-float>
 <p>这是末尾的内容</p>
 `,
-
         extensions: [
+          nkcFontSize,
+          Heading,
           FontFamily,
           Color,
           TextStyle,
-          ListItem,
+          BulletList,
           OrderedList,
+          ListItem,
           History,
           Superscript,
           Subscript,
@@ -281,9 +302,53 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
+    },
+    getHeadline() {
+      for(let i = 1; i <= 6; i++) {
+        if(this.editor.isActive('heading', {level: i}))   {
+          return `${i}`;
+        }
+      }
+      return '0';
+    },
+    // 设置标题
+    // 由于重复点击select相同的option不会重复触发change事件
+    // 所有当前方法通过click事件触发，然后手动读取select的值
+    // 由于点击select展开option也算一次click，所以需要过滤掉第一次click
+    setHeadline(e) {
+      if(!this.isHeadlineSelectOpen) {
+        this.isHeadlineSelectOpen = true;
+      } else {
+        if(e.target.value === '0') {
+          this.editor.commands.setParagraph();
+        } else {
+          this.editor.chain().focus().toggleHeading({ level: parseInt(e.target.value) }).run();
+        }
+        this.isHeadlineSelectOpen = false;
+      }
+    },
+    getFontSize() {
+      for(const size of nkcFontSizeOptions.sizes) {
+        if(this.editor.isActive('nkc-font-size', {size: size})) {
+          return size;
+        }
+      }
+      return nkcFontSizeOptions.defaultSize;
+    },
+    setFontSize(e) {
+      if(!this.isFontSizeSelectOpen) {
+        this.isFontSizeSelectOpen = true;
+      } else {
+        const fontSize = e.target.value;
+        if(fontSize === nkcFontSizeOptions.defaultSize) {
+          this.editor.commands.unsetFontSize();
+        } else {
+          this.editor.commands.setFontSize(fontSize);
+        }
+        this.isFontSizeSelectOpen = false;
+      }
     }
   },
-
   beforeDestroy() {
     this.editor.destroy()
   },
@@ -295,6 +360,7 @@ export default {
   display: flex;
   margin-bottom: 1rem;
   .tiptap-editor-toolBar-icon-group{
+    user-select: none;
     background-color: rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
@@ -313,6 +379,12 @@ export default {
       &:hover, &.is-active{
         color: #2b90d9;
       }
+    }
+    &>select{
+      color: #777;
+      cursor: pointer;
+      outline: none;
+      border: none;
     }
   }
 }
