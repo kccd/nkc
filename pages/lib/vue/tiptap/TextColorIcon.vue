@@ -1,8 +1,7 @@
 <template lang="pug">
   div.tiptap-text-color-icon
-    div
-      <font-size-two theme="outline" size="14" />
-      div(:style="`background-color: ${color}`")
+    <font-size-two theme="outline" size="14" />
+    div(:style="`background-color: ${color}`")
 </template>
 
 <script>
