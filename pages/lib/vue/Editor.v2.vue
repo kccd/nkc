@@ -29,8 +29,10 @@
           option(value="6") 标题6
         select(:value='getFontSize()' @click="setFontSize" @blur="isFontSizeSelectOpen = false")
           option(v-for='size in nkcFontSizeOptions.sizes' :key="size" :value="size") {{size}}
-
-
+        div(title="文字颜色")
+          text-color-icon(color="red")
+        div(title="背景颜色")
+          background-color-icon(color="green")
         div(@click="setLink" :class="{'is-active': editor.isActive('link')}" title='插入链接')
           <link-one theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().unsetLink().run()" title='取消链接')
@@ -101,6 +103,8 @@ import Blockquote from '@tiptap/extension-blockquote'
 import CodeBlock from '@tiptap/extension-code-block'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import TextAlign from '@tiptap/extension-text-align'
+import TextColorIcon from './tiptap/TextColorIcon.vue'
+import BackgroundColorIcon from './tiptap/BackgroundColorIcon.vue'
 
 import {
   DividingLineOne,
@@ -156,6 +160,8 @@ export default {
     'code-icon': CodeIcon,
     'code-one': CodeOne,
     'strikethrough': Strikethrough,
+    'text-color-icon': TextColorIcon,
+    'background-color-icon': BackgroundColorIcon,
   },
 
   data() {
@@ -379,7 +385,7 @@ export default {
     padding: 0 1rem;
     &>div{
       cursor: pointer;
-      padding-top: 4px;
+      padding-top: 5px;
       height: 2.6rem;
       width: 2.6rem;
       display: flex;
