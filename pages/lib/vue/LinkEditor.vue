@@ -4,7 +4,7 @@
       .form-group.m-b-05
         span 文本内容
         input.form-control(type='text' v-model='text')
-      .form-group.m-b-05
+      .form-group.m-b-05(:class="hrefFromGroupClass")
         span 链接地址
         input.form-control(type='text' v-model='href')
       .form-group.m-b-05
@@ -23,6 +23,7 @@
 
 <script>
 import DraggableDialog from './DraggableDialog/DraggableDialog.vue';
+import { isUrl } from '../js/url';
 export default {
   components: {
     'draggable-dialog': DraggableDialog,
@@ -34,20 +35,24 @@ export default {
     rel: '',
     callback: null,
   }),
+  computed: {
+    invalidHref() {
+      return !isUrl(this.href);
+    },
+    hrefFromGroupClass() {
+      return this.invalidHref? 'has-error': ''
+    }
+  },
   methods: {
     open(callback, options) {
+      console.log(options)
       this.callback = callback;
       this.$refs.draggableDialog.open();
-      const {
-        newWindow = true,
-        text = '新链接',
-        href = '',
-        rel = '',
-      } = options || {};
-      this.newWindow = newWindow;
-      this.text = text;
-      this.href = href;
-      this.rel = rel;
+      options = options || {};
+      this.newWindow = !!options.newWindow;
+      this.text = options.text || '新链接';
+      this.href = options.href || 'https://';
+      this.rel = options.rel || '';
     },
     close(){
       this.$refs.draggableDialog.close();

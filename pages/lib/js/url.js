@@ -48,3 +48,9 @@ export function isFileDomainV2(url) {
     return url.indexOf(window.location.origin) === 0;
   }
 }
+
+export function isUrl(text) {
+  const regex =
+    /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/;
+  return regex.test(text);
+}
