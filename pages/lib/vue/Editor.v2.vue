@@ -39,19 +39,19 @@
           <list-numbers theme="outline" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleBulletList().run()" :class="editorIsActive('bulletList')" title="无序列表")
           <list-two theme="outline" :size="iconFontSize" />
-        div
+        div(@click="editor.chain().focus().toggleBlockquote().run()" :class="editorIsActive('blockquote')" title="引用")
           <quote theme="outline" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}")
+        div(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}" title="代码")
           <code-one theme="filled" :size="iconFontSize" />  
-        div(@click='editor.chain().focus().toggleCodeBlock().run()' :class="editorIsActive('codeBlock')")
+        div(@click='editor.chain().focus().toggleCodeBlock().run()' :class="editorIsActive('codeBlock')" title="代码块")
           <terminal theme="outline" :size="iconFontSize" />
-        div
+        div(@click="editor.chain().focus().setHorizontalRule().run()" title="分割线")
           <dividing-line-one theme="outline" :size="iconFontSize" />
-        div
+        div(@click="editor.chain().focus().setTextAlign('left').run()" title="左对齐" :class="editorIsActive({textAlign: 'left'})")
           <align-text-left theme="outline" :size="iconFontSize" />
-        div
+        div(@click="editor.chain().focus().setTextAlign('center').run()" title="居中" :class="editorIsActive({textAlign: 'center'})")
           <align-text-center theme="outline" :size="iconFontSize" />
-        div
+        div(@click="editor.chain().focus().setTextAlign('right').run()" title="右对齐" :class="editorIsActive({textAlign: 'right'})")
           <align-text-right theme="outline" :size="iconFontSize" />
         div
           <more-one theme="outline" :size="iconFontSize" />
@@ -97,6 +97,10 @@ import Heading from '@tiptap/extension-heading'
 import LinkEditor from './LinkEditor.vue'
 import BulletList from '@tiptap/extension-bullet-list'
 import nkcFontSize, {nkcFontSizeOptions} from './tiptap/marks/nkcFontSize.js'
+import Blockquote from '@tiptap/extension-blockquote'
+import CodeBlock from '@tiptap/extension-code-block'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import TextAlign from '@tiptap/extension-text-align'
 
 import {
   DividingLineOne,
@@ -210,6 +214,12 @@ export default {
 <p>这是末尾的内容</p>
 `,
         extensions: [
+          TextAlign.configure({
+            types: ['heading', 'paragraph'],
+          }),
+          HorizontalRule,
+          CodeBlock,
+          Blockquote,
           nkcFontSize,
           Heading,
           FontFamily,
