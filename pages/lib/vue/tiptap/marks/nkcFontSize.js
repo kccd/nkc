@@ -54,13 +54,16 @@ export default Mark.create({
     return {
       setFontSize:
         (size) =>
-        ({ commands }) => {
-          return commands.setMark(this.name, { size });
+        ({ commands, editor }) => {
+          return (
+            commands.setMark(this.name, { size }) &&
+            editor.chain().focus().run()
+          );
         },
       unsetFontSize:
         () =>
-        ({ commands }) => {
-          return commands.unsetMark(this.name);
+        ({ commands, editor }) => {
+          return commands.unsetMark(this.name) && editor.chain().focus().run();
         },
     };
   },
