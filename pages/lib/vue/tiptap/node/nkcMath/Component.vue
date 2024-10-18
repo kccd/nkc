@@ -57,6 +57,7 @@ export default {
         this.node.attrs.text = text;
       }, {
         text: this.node.attrs.text,
+        block: this.node.attrs.block,
       });
     }
   }
