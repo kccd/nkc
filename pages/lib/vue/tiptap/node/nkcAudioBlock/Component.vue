@@ -38,7 +38,6 @@ export default {
   watch: {
   },
   mounted() {
-    console.log(this.node.attrs);
     this.player = new Plyr(this.$refs.audioDom, {
       ratio: '4:3',
       title: this.node.attrs.name,
@@ -69,7 +68,7 @@ export default {
 }
 .ProseMirror-selectednode {
   .audio-box {
-    border: 1px solid #00b3ff !important; /* 聚焦时边框颜色 */
+    border: 1px solid #66afe9 !important; /* 聚焦时边框颜色 */
   }
 }
 </style>

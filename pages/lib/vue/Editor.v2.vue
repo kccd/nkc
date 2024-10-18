@@ -63,7 +63,14 @@
           <right-small-down theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
           <right-small-up theme="filled" :size="iconFontSize" />
+      .tiptap-editor-toolBar-icon-group.m-r-05
+        .tiptap-editor-toolBar-icon-box(
+          @click='insertResource',
+          :class='{ "is-active": editor.isActive("nkc-audio-block") || editor.isActive("nkc-file-block") }'
+        )
+          <add-picture theme="filled" :size="iconFontSize"/>
     editor-content.tiptap-editor-content(:editor="editor")
+    resource-selector(ref='resourceSelector')
     button(@click="getJSON") GET JSON
 </template>
 
@@ -129,9 +136,15 @@ import {
   Strikethrough,
   Code as CodeIcon,
   CodeOne,
+  AddPicture,
   MoreOne,
 } from '@icon-park/vue';
-
+import ResourceSelector from './ResourceSelector.vue';
+import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
+import nkcFileBlock from './tiptap/node/nkcFileBlock/nkcFileBlock.js';
+import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBlock.js';
+import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
+import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
 
 export default {
   components: {
@@ -148,17 +161,19 @@ export default {
     'list-numbers': ListNumbers,
     'list-two': ListTwo,
     'editor-content': EditorContent,
-    'return': Return,
+    return: Return,
     'go-on': GoOn,
     'text-bold': TextBold,
     'text-italic': TextItalic,
     'text-underline': TextUnderline,
     'link-one': LinkOne,
-    'unlink': Unlink,
+    unlink: Unlink,
     'right-small-down': RightSmallDown,
     'right-small-up': RightSmallUp,
     'code-icon': CodeIcon,
     'code-one': CodeOne,
+    'add-picture': AddPicture,
+    'resource-selector': ResourceSelector,
     'strikethrough': Strikethrough,
     'text-color-icon': TextColorIcon,
     'background-color-icon': BackgroundColorIcon,
@@ -180,10 +195,12 @@ export default {
 
   methods: {
     initEditor(props) {
-      const {loading = false, toolBarTop = '' } = props || {};
+      const { loading = false, toolBarTop = '' } = props || {};
       this.editor = new Editor({
         content: `
+        <nkc-file-status-inline id='222' info="处理中"></nkc-file-status-inline>
         <p>I’m running Tiptap with Vue.js. 🎉</p>
+        <nkc-file-status-block id='122' info="处理中"></nkc-file-status-block>
         <p>
         AI 应用于公司的日常决策中。AI 代理结合知识库和其他技术，帮助我们理解岗位<nkc-math text="a + b = c" block="false"></nkc-math>背景能力，并辅助从运维到公司内部决策的各个方面。在项目开发和交付过程中，使用 Copilot 等工具辅助开发，以及在测试和运维阶段利用 AI 机器人进行监控和问题处理。AI 在预测和处理问题方面的能力远超传统算法，使我们能够以更低的成本实现更高的效能。
         </p>
@@ -200,12 +217,12 @@ export default {
           除了获得该奖项所带来的<nkc-picture-inline id="360355"></nkc-picture-inline>全球声望之外，诺贝尔化学奖还附带 1100 万瑞典克朗（100 万美元）的现金奖励，其中一半将归 David Baker 所有，另一半由 Hassabis 和 Jumper 平分。
           AAAAAAAAAA
         </p>
-        <nkc-picture-block id="360354" desc="风景优美"></nkc-picture-block>
+        <nkc-picture-block id="352352" desc="风景优美"></nkc-picture-block>
         <p>这是末尾的内容</p>
         <nkc-xsf-limit xsf="21" ><p>这是隐藏的内容。。。。。</p></nkc-xsf-limit>
 
         <nkc-picture-float id="360356" float="right" ></nkc-picture-float>
-        <nkc-video-block id="360363" desc="这是视频的介绍"></nkc-video-block>
+        <nkc-video-block id="352197 " desc="这是视频的介绍"></nkc-video-block>
         <nkc-picture-float id="360356" float="left" ><p>我们先从那些新晋创新者类别的主题开始。检索增强生成（RAG）技术对于那些希望利用大语言模型的能力但又不想将数据发送给大模型厂商的公司来说将变得极为关键。此外，RAG 技术在大规模应用大模型的场景中同样展现出了价值。
 
 
@@ -258,8 +275,13 @@ export default {
           nkcVideoBlock,
           nkcXSFLimit,
           nkcMath,
+          nkcAudioBlock,
+          nkcFileBlock,
+          PasteOrDropFile,
+          nkcFileStatusBlock,
+          nkcFileStatusInline
         ],
-      })
+      });
     },
     editorIsActive(name) {
       return this.editor.isActive(name)? 'is-active': ''
@@ -319,6 +341,76 @@ export default {
       const json = this.editor.getJSON();
       console.log(json);
     },
+    insertResource() {
+      const self = this;
+      this.$refs.resourceSelector.open(
+        (data) => {
+          self.$refs.resourceSelector.close();
+          this.editor.commands.focus(); // 确保编辑器获得焦点
+          if (data.resources) {
+            data = data.resources;
+          } else {
+            data = [data];
+          }
+          const insertContent = [];
+          for (let i = 0; i < data.length; i++) {
+            let source = data[i];
+            let type = source.mediaType;
+            type = type.substring(5);
+            type = type[0].toLowerCase() + type.substring(1);
+            // console.log('====================================');
+            // console.log(type, source.rid, source);
+            // console.log('====================================');
+            switch (type) {
+              case 'picture': {
+                insertContent.push({
+                  type: 'nkc-picture-block',
+                  attrs: {
+                    id: source.rid,
+                    desc: ''
+                  },
+                });
+                break;
+              }
+              case 'video':
+                break;
+              case 'audio': {
+                insertContent.push({
+                  type: 'nkc-audio-block',
+                  attrs: {
+                    id: source.rid,
+                    name: source.oname,
+                    size: source.size,
+                  },
+                });
+                break;
+              }
+              case 'attachment': {
+                insertContent.push({
+                  type: 'nkc-file-block',
+                  attrs: {
+                    id: source.rid,
+                    name: source.oname,
+                    size: source.size,
+                    ext: source.ext,
+                    hits: source.hits,
+                  },
+                });
+                break;
+              }
+              default:
+                break;
+            }
+          }
+          if (insertContent.length > 0) {
+            self.editor.commands.insertContent([...insertContent]);
+          }
+        },
+        {
+          fastSelect: true,
+        },
+      );
+    },
     getHeadline() {
       for(let i = 1; i <= 6; i++) {
         if(this.editor.isActive('heading', {level: i}))   {
@@ -374,13 +466,13 @@ export default {
     }
   },
   beforeDestroy() {
-    this.editor.destroy()
+    this.editor.destroy();
   },
-}
+};
 </script>
 
 <style scoped lang="less">
-.tiptap-editor-toolBar{
+.tiptap-editor-toolBar {
   display: flex;
   margin-bottom: 1rem;
   .tiptap-editor-toolBar-icon-group{
@@ -416,20 +508,20 @@ export default {
     }
   }
 }
-.tiptap-editor-container{
+.tiptap-editor-container {
   position: relative;
 }
-.tiptap-editor-content{
+.tiptap-editor-content {
   padding: 2rem;
   border: 1px solid #eee;
   border-radius: 5px;
   background-color: #fff;
-  ::v-deep{
-    p{
+  ::v-deep {
+    p {
       font-size: 16px;
       line-height: 30px;
     }
-    .tiptap.ProseMirror{
+    .tiptap.ProseMirror {
       outline: none;
     }
   }
