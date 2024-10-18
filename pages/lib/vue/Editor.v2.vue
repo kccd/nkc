@@ -8,13 +8,13 @@
         div(@click="editor.chain().focus().redo().run()")
           <go-on theme="filled" :size="iconFontSize" />
       .tiptap-editor-toolBar-icon-group.m-r-05
-        div(@click="editor.chain().focus().toggleBold().run()" :class="editorIsActive('bold')" title='粗体')
+        div(@click="editor.chain().focus().toggleBold().run()" :class="editorIsActive('bold')" title='粗体 Ctrl + B')
           <text-bold theme="filled" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleItalic().run()" :class="editorIsActive('italic')" title='斜体')
+        div(@click="editor.chain().focus().toggleItalic().run()" :class="editorIsActive('italic')" title='斜体 Ctrl + I')
           <text-italic theme="filled" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleUnderline().run()" :class="editorIsActive('underline')" title='下划线')
+        div(@click="editor.chain().focus().toggleUnderline().run()" :class="editorIsActive('underline')" title='下划线 Ctrl + U')
           <text-underline theme="filled" :size="iconFontSize" />
-        div(@click="editor.chain().focus().toggleStrike().run()" :class="editorIsActive('strike')" title='删除线')
+        div(@click="editor.chain().focus().toggleStrike().run()" :class="editorIsActive('strike')" title='删除线 Ctrl + Shift + S')
           <strikethrough theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().clearNodes().unsetAllMarks().run()" title='清除格式')
           <clear-format theme="outline" :size="iconFontSize" />
@@ -27,12 +27,12 @@
           option(value="4") 标题4
           option(value="5") 标题5
           option(value="6") 标题6
-        select(:value='getFontSize()' @click="setFontSize" @blur="isFontSizeSelectOpen = false")
+        select.m-r-05(:value='getFontSize()' @click="setFontSize" @blur="isFontSizeSelectOpen = false")
           option(v-for='size in nkcFontSizeOptions.sizes' :key="size" :value="size") {{size}}
-        div(data-type="custom")
-          text-color-icon(title="文字颜色" @select="selectedColor")
-        div(title="背景颜色" data-type="custom")
-          background-color-icon(@select="selectedColor")
+        div.m-r-05(data-type="custom")
+          text-color-icon(title="文字颜色" @select="selectedTextColor" category="color")
+        div.m-r-05(data-type="custom")
+          text-color-icon(title="背景颜色" @select="selectedBGColor" category="backgroundColor")
         div(@click="setLink" :class="{'is-active': editor.isActive('link')}" title='插入链接')
           <link-one theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().unsetLink().run()" title='取消链接')
@@ -45,8 +45,6 @@
           <quote theme="outline" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleCode().run()" :class="{'is-active': editor.isActive('code')}" title="代码")
           <code-one theme="filled" :size="iconFontSize" />  
-        div(@click='editor.chain().focus().toggleCodeBlock().run()' :class="editorIsActive('codeBlock')" title="代码块")
-          <terminal theme="outline" :size="iconFontSize" />
         div(@click="editor.chain().focus().setHorizontalRule().run()" title="分割线")
           <dividing-line-one theme="outline" :size="iconFontSize" />
         div(@click="editor.chain().focus().setTextAlign('left').run()" title="左对齐" :class="editorIsActive({textAlign: 'left'})")
@@ -55,20 +53,16 @@
           <align-text-center theme="outline" :size="iconFontSize" />
         div(@click="editor.chain().focus().setTextAlign('right').run()" title="右对齐" :class="editorIsActive({textAlign: 'right'})")
           <align-text-right theme="outline" :size="iconFontSize" />
-        div
-          <more-one theme="outline" :size="iconFontSize" />
+        div(data-type="custom")
+          app-menu(ref="appMenu" @select="appMenuClick")
 
       .tiptap-editor-toolBar-icon-group.m-r-05
         div(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
           <right-small-down theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
           <right-small-up theme="filled" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        .tiptap-editor-toolBar-icon-box(
-          @click='insertResource',
-          :class='{ "is-active": editor.isActive("nkc-audio-block") || editor.isActive("nkc-file-block") }'
-        )
-          <add-picture theme="filled" :size="iconFontSize"/>
+    .bubble-menu-table-container(ref="bubbleMenuTableContainer")
+      button Test BubbleMenu
     editor-content.tiptap-editor-content(:editor="editor")
     resource-selector(ref='resourceSelector')
     button(@click="getJSON") GET JSON
@@ -111,7 +105,8 @@ import CodeBlock from '@tiptap/extension-code-block'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import TextAlign from '@tiptap/extension-text-align'
 import TextColorIcon from './tiptap/TextColorIcon.vue'
-import BackgroundColorIcon from './tiptap/BackgroundColorIcon.vue'
+import Highlight from '@tiptap/extension-highlight'
+import BubbleMenu from '@tiptap/extension-bubble-menu'
 
 import {
   DividingLineOne,
@@ -138,6 +133,7 @@ import {
   CodeOne,
   AddPicture,
   MoreOne,
+  FontSizeTwo,
 } from '@icon-park/vue';
 import ResourceSelector from './ResourceSelector.vue';
 import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
@@ -145,6 +141,7 @@ import nkcFileBlock from './tiptap/node/nkcFileBlock/nkcFileBlock.js';
 import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBlock.js';
 import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
+import AppMenu from './tiptap/AppMenu.vue'
 
 export default {
   components: {
@@ -176,7 +173,9 @@ export default {
     'resource-selector': ResourceSelector,
     'strikethrough': Strikethrough,
     'text-color-icon': TextColorIcon,
-    'background-color-icon': BackgroundColorIcon,
+    'font-size-two': FontSizeTwo,
+    'bubble-menu': BubbleMenu,
+    'app-menu': AppMenu,
   },
 
   data() {
@@ -237,6 +236,16 @@ export default {
 <p>这是末尾的内容</p>
 `,
         extensions: [
+          BubbleMenu.configure({
+            pluginKey: 'bubbleMenuTable',
+            shouldShow: ({editor}) => {
+              return editor.isActive('table')
+            },
+            element: this.$refs.bubbleMenuTableContainer,
+          }),
+          Highlight.configure({
+            multicolor: true,
+          }),
           TextAlign.configure({
             types: ['heading', 'paragraph'],
           }),
@@ -341,11 +350,10 @@ export default {
       const json = this.editor.getJSON();
       console.log(json);
     },
-    insertResource() {
+    insertResource(resourceType) {
       const self = this;
       this.$refs.resourceSelector.open(
         (data) => {
-          self.$refs.resourceSelector.close();
           this.editor.commands.focus(); // 确保编辑器获得焦点
           if (data.resources) {
             data = data.resources;
@@ -373,6 +381,13 @@ export default {
                 break;
               }
               case 'video':
+                insertContent.push({
+                  type: 'nkc-video-block',
+                  attrs: {
+                    id: source.rid,
+                    desc: '',
+                  }
+                })
                 break;
               case 'audio': {
                 insertContent.push({
@@ -408,6 +423,7 @@ export default {
         },
         {
           fastSelect: true,
+          resourceType: resourceType,
         },
       );
     },
@@ -456,12 +472,46 @@ export default {
         this.isFontSizeSelectOpen = false;
       }
     },
-    selectedColor(res) {
+    selectedTextColor(res) {
       const {type, color} = res;
       if(type === 'default') {
         this.editor.chain().focus().unsetColor().run();
       } else {
         this.editor.chain().focus().setColor(color).run();
+      }
+    },
+    selectedBGColor(res) {
+      if(res.type === 'default') {
+        this.editor.chain().focus().unsetHighlight().run();
+      } else {
+        this.editor.chain().focus().toggleHighlight({ color: res.color }).run()
+      }
+    },
+    appMenuClick(type) {
+      switch(type) {
+        case 'terminal': {
+          this.editor.chain().focus().toggleCodeBlock().run();
+          return;
+        }
+        case 'picture': {
+          this.insertResource('picture');
+          return;
+        }
+        case 'audio': {
+          this.insertResource('audio');
+          return;
+        }
+        case 'video': {
+          this.insertResource('video');
+          return;
+        }
+        case 'attachment': {
+          this.insertResource('attachment');
+          return;
+        }
+        case 'table': {
+          //
+        }
       }
     }
   },

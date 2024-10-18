@@ -1,7 +1,8 @@
 <template lang="pug">
   div.color-palette-container
-    div(v-if="defaultColor")
-      div.color-palette-color-item.pointer(:style="`background-color: ${defaultColor}`" @click="selectDefaultColor(defaultColor)")
+    div
+      div.color-palette-color-item.pointer.color-palette-color-item-transparent(v-if="defaultColor === ''" @click="selectDefaultColor(defaultColor)")
+      div.color-palette-color-item.pointer(v-else :style="`background-color: ${defaultColor}`" @click="selectDefaultColor(defaultColor)")
       span.font-size-1rem 默认
     div.color-palette-list(v-for="colorList in colors")
       div.color-palette-color-item.pointer(:style="`background-color: ${color}`" v-for="color in colorList" :title="color" @click="selectColor(color)")
@@ -32,6 +33,22 @@
   height: 1.5rem;
   width: 1.5rem;
   border: 1px solid #e6e6e6;
+}
+.color-palette-color-item-transparent{
+  background-color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.color-palette-color-item-transparent::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px; /* 红色条的厚度 */
+  background-color: red;
+  transform: rotate(45deg);
+  transform-origin: center;
 }
 </style>
 

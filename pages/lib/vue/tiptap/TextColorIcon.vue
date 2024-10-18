@@ -1,17 +1,18 @@
 <template lang="pug">
   div.tiptap-text-color-icon(ref="container")
     div.pointer(:title="title" @click="selectedColor({color: color, type: type})")
-      <font-size-two theme="outline" size="12"/>
+      <font-size-two theme="outline" size="12" v-if="category === 'color'" />
+      <high-light theme="outline" size="14" v-else />
       div(:style="`background-color: ${color}`")
     div.pointer(@click.stop="showPanel")
       <down theme="outline" size="10" />
     div(v-if="isPanelShow" :style="`transform: translateX(${colorPaletteContainerLeft}px)`" ref="colorPaletteContainer")
-      color-palette(default-color="#333" @select="selectedColor")
+      color-palette(:default-color="defaultColor" @select="selectedColor")
 </template>
 
 <script>
 import ColorPalette from '../ColorPalette.vue'
-import {FontSizeTwo, Down} from '@icon-park/vue'
+import {FontSizeTwo, Down, HighLight} from '@icon-park/vue'
 import {colorPaletteColors} from "../ColorPalette.vue";
 
 export default {
@@ -19,14 +20,20 @@ export default {
     'font-size-two': FontSizeTwo,
     'down': Down,
     'color-palette': ColorPalette,
+    'high-light': HighLight,
   },
   data: () => ({
     isPanelShow: false,
     colorPaletteContainerLeft: 0,
-    color: colorPaletteColors[0][0],
-    type: 'default',
+    color: colorPaletteColors[1][2],
+    type: 'custom',
   }),
-  props: ['title'],
+  computed: {
+    defaultColor() {
+      return this.category === 'color'? '#333': ''
+    }
+  },
+  props: ['title', 'category'],
   mounted() {
     window.addEventListener('click', this.hidePanel);
     window.addEventListener('resize', this.resetColorPalettePosition)
@@ -52,9 +59,8 @@ export default {
       if(!container || !colorPaletteContainer) return;
       const info = container.getClientRects()[0];
       const right = info.left + colorPaletteContainer.offsetWidth;
-      if (right > window.innerWidth) {
-        const overflow = right - window.innerWidth;
-        this.colorPaletteContainerLeft = - overflow ;
+      if (right + 16 > window.innerWidth) {
+        this.colorPaletteContainerLeft = window.innerWidth - right - 16;
       } else {
         this.colorPaletteContainerLeft = 0;
       }
