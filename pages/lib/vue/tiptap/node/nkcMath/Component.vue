@@ -51,6 +51,7 @@ export default {
       })
     },
     openMathEditor() {
+      return;
       this.$refs.mathSelector.open(res => {
         const {text, block} = res;
         this.node.attrs.block = block;

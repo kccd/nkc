@@ -61,10 +61,9 @@
           <right-small-down theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
           <right-small-up theme="filled" :size="iconFontSize" />
-    .bubble-menu-table-container(ref="bubbleMenuTableContainer")
-      button Test BubbleMenu
     editor-content.tiptap-editor-content(:editor="editor")
     resource-selector(ref='resourceSelector')
+    table-editor(ref="tableEditor")
     button(@click="getJSON") GET JSON
 </template>
 
@@ -107,6 +106,11 @@ import TextAlign from '@tiptap/extension-text-align'
 import TextColorIcon from './tiptap/TextColorIcon.vue'
 import Highlight from '@tiptap/extension-highlight'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
+import TableEditor from './tiptap/TableEditor.vue'
+import Table from '@tiptap/extension-table'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
+import TableRow from '@tiptap/extension-table-row'
 
 import {
   DividingLineOne,
@@ -176,6 +180,7 @@ export default {
     'font-size-two': FontSizeTwo,
     'bubble-menu': BubbleMenu,
     'app-menu': AppMenu,
+    'table-editor': TableEditor,
   },
 
   data() {
@@ -236,13 +241,12 @@ export default {
 <p>这是末尾的内容</p>
 `,
         extensions: [
-          BubbleMenu.configure({
-            pluginKey: 'bubbleMenuTable',
-            shouldShow: ({editor}) => {
-              return editor.isActive('table')
-            },
-            element: this.$refs.bubbleMenuTableContainer,
+          Table.configure({
+            resizable: true,
           }),
+          TableRow,
+          TableHeader,
+          TableCell,
           Highlight.configure({
             multicolor: true,
           }),
@@ -510,7 +514,9 @@ export default {
           return;
         }
         case 'table': {
-          //
+          this.$refs.tableEditor.open(res => {
+            this.editor.chain().focus().insertTable({ rows: res.row, cols: res.col, withHeaderRow: true }).run()
+          });
         }
       }
     }
@@ -573,6 +579,52 @@ export default {
     }
     .tiptap.ProseMirror {
       outline: none;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 0;
+      overflow: hidden;
+      table-layout: fixed;
+      width: 100%;
+    }
+    td,
+    th {
+      border: 1px solid rgba(61, 37, 20, .12);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 6px 8px;
+      position: relative;
+      vertical-align: top;
+
+      > * {
+        margin-bottom: 0;
+      }
+    }
+
+    th {
+      background-color: rgba(61, 37, 20, .05);
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .selectedCell:after {
+      background: rgba(61, 37, 20, .08);
+      content: "";
+      left: 0; right: 0; top: 0; bottom: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .column-resize-handle {
+      background-color: #6A00F5;
+      bottom: -2px;
+      pointer-events: none;
+      position: absolute;
+      right: -2px;
+      top: 0;
+      width: 4px;
     }
   }
 }
