@@ -29,10 +29,10 @@
           option(value="6") 标题6
         select(:value='getFontSize()' @click="setFontSize" @blur="isFontSizeSelectOpen = false")
           option(v-for='size in nkcFontSizeOptions.sizes' :key="size" :value="size") {{size}}
-        div(title="文字颜色")
-          text-color-icon(color="red")
-        div(title="背景颜色")
-          background-color-icon(color="green")
+        div(data-type="custom")
+          text-color-icon(title="文字颜色" @select="selectedColor")
+        div(title="背景颜色" data-type="custom")
+          background-color-icon(@select="selectedColor")
         div(@click="setLink" :class="{'is-active': editor.isActive('link')}" title='插入链接')
           <link-one theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().unsetLink().run()" title='取消链接')
@@ -363,6 +363,14 @@ export default {
         }
         this.isFontSizeSelectOpen = false;
       }
+    },
+    selectedColor(res) {
+      const {type, color} = res;
+      if(type === 'default') {
+        this.editor.chain().focus().unsetColor().run();
+      } else {
+        this.editor.chain().focus().setColor(color).run();
+      }
     }
   },
   beforeDestroy() {
@@ -394,6 +402,10 @@ export default {
       color: #777;
       &:hover, &.is-active{
         color: #2b90d9;
+      }
+      &[data-type="custom"]:hover, &[data-type="custom"].is-active{
+        color: #777;
+        cursor: inherit;
       }
     }
     &>select{
