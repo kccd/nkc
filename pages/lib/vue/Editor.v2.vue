@@ -455,6 +455,10 @@ export default {
         this.isHeadlineSelectOpen = false;
       }
     },
+    /**
+     * Return the current font size.
+     * @return {string} The size of current font size, default value is nkcFontSizeOptions.defaultSize.
+     */
     getFontSize() {
       for(const size of nkcFontSizeOptions.sizes) {
         if(this.editor.isActive('nkc-font-size', {size: size})) {
@@ -463,6 +467,10 @@ export default {
       }
       return nkcFontSizeOptions.defaultSize;
     },
+    /**
+     * Change the font size.
+     * @param {Event} e - The <select> element's change event.
+     *
     setFontSize(e) {
       if(!this.isFontSizeSelectOpen) {
         this.isFontSizeSelectOpen = true;
@@ -476,6 +484,12 @@ export default {
         this.isFontSizeSelectOpen = false;
       }
     },
+    /**
+     * Select a text color.
+     * @param {Object} res - Object returned by ColorPicker.
+     * @param {String} res.type - Color type, 'default' or 'custom'.
+     * @param {String} res.color - Color in hex.
+     */
     selectedTextColor(res) {
       const {type, color} = res;
       if(type === 'default') {
