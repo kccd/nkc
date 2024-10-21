@@ -588,6 +588,9 @@ export default {
   border-radius: 5px;
   background-color: #fff;
   ::v-deep {
+    .tiptap.resize-cursor {
+      cursor: ew-resize;
+    }
     p {
       font-size: 16px;
       line-height: 30px;
