@@ -57,6 +57,7 @@ export default {
   padding: 1rem 0;
   text-align: center;
   .file-status-box {
+    user-select: none;
     border: 1px solid transparent;
     width: 100%;
     background-color: #f0f0f0; /* 灰色背景 */
