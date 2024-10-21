@@ -471,6 +471,7 @@ export default {
      * Change the font size.
      * @param {Event} e - The <select> element's change event.
      *
+     */
     setFontSize(e) {
       if(!this.isFontSizeSelectOpen) {
         this.isFontSizeSelectOpen = true;
