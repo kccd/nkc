@@ -2,8 +2,9 @@ require('colors');
 const moment = require('moment');
 const PATH = require('path');
 const schedule = require('node-schedule');
-const archiver = require('archiver');
+const yazl = require('yazl');
 const fs = require('fs');
+const fsPromises = fs.promises;
 const { spawn } = require('child_process');
 const { folder, time } = require('../../config/backup.json');
 const {
@@ -80,45 +81,51 @@ async function backupDatabase() {
   });
 }
 
+async function addDirectoryToZip(zipfile, dirPath, basePath) {
+  const files = await fs.promises.readdir(dirPath);
+
+  for (const file of files) {
+    const filePath = PATH.join(dirPath, file);
+    const relativePath = PATH.join(basePath, file);
+    const stats = await fsPromises.stat(filePath);
+
+    if (stats.isDirectory()) {
+      await addDirectoryToZip(zipfile, filePath, relativePath);
+    } else {
+      zipfile.addFile(filePath, relativePath);
+    }
+  }
+}
+
 async function compressedDir(dirPath, zipFilePath) {
   return new Promise((resolve, reject) => {
-    try {
-      const targetDirPath = PATH.dirname(zipFilePath);
-      fs.mkdirSync(targetDirPath, {
-        recursive: true,
-      });
+    (async () => {
+      try {
+        const targetDirPath = PATH.dirname(zipFilePath);
+        await fsPromises.mkdir(targetDirPath, {
+          recursive: true,
+        });
+        const zipFile = fs.createWriteStream(zipFilePath);
 
-      const zipFile = fs.createWriteStream(zipFilePath);
-
-      zipFile.on('error', (err) => {
-        reject(err);
-      });
-      zipFile.on('finish', () => {
-        resolve();
-      });
-
-      const archive = archiver('zip', {
-        zlib: { level: 9 },
-      });
-      archive.on('warning', function (err) {
-        if (err.code === 'ENOENT') {
-          console.log(err);
-        } else {
+        zipFile.on('error', (err) => {
           reject(err);
-        }
-      });
+        });
+        zipFile.on('finish', () => {
+          resolve();
+        });
 
-      archive.on('error', function (err) {
+        const zip = new yazl.ZipFile();
+
+        await addDirectoryToZip(zip, dirPath, './');
+
+        zip.outputStream.pipe(zipFile).on('close', () => {
+          console.log('ZIP file created');
+        });
+        zip.end();
+      } catch (err) {
         reject(err);
-      });
-
-      archive.directory(dirPath, false);
-
-      archive.pipe(zipFile);
-      archive.finalize();
-    } catch (err) {
-      reject(err);
-    }
+      }
+    })();
   });
 }
 
