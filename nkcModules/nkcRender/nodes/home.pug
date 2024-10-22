@@ -1,0 +1,15 @@
+include ./paragraph.pug
+include ./text.pug
+mixin loopRender(nodes) 
+  for node in nodes
+    case node.type
+      when 'paragraph'
+        +renderParagraph(node)
+      when 'text'
+        +renderText(node)
+      default
+        p= `Unknown node type: ${node.type}`
+div 
+  h1 JSON RENDER TEST
+
+  +loopRender(data.content)

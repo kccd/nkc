@@ -350,6 +350,9 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
+
+      
+
     },
     insertResource(resourceType) {
       const self = this;
