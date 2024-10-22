@@ -107,7 +107,6 @@ import TextColorIcon from './tiptap/TextColorIcon.vue'
 import Highlight from '@tiptap/extension-highlight'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import TableEditor from './tiptap/TableEditor.vue'
-import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
@@ -145,7 +144,8 @@ import nkcFileBlock from './tiptap/node/nkcFileBlock/nkcFileBlock.js';
 import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBlock.js';
 import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
-import AppMenu from './tiptap/AppMenu.vue'
+import AppMenu from './tiptap/menus/AppMenu.vue'
+import {nkcTable} from "./tiptap/node/nkcTable/nkcTable.js";
 
 export default {
   components: {
@@ -241,9 +241,7 @@ export default {
 <p>这是末尾的内容</p>
 `,
         extensions: [
-          Table.configure({
-            resizable: true,
-          }),
+          nkcTable,
           TableRow,
           TableHeader,
           TableCell,
@@ -530,7 +528,7 @@ export default {
         }
         case 'table': {
           this.$refs.tableEditor.open(res => {
-            this.editor.chain().focus().insertTable({ rows: res.row, cols: res.col, withHeaderRow: true }).run()
+            this.editor.chain().focus().insertTable({ rows: res.row, cols: res.col, withHeaderRow: false }).run()
           });
         }
       }
@@ -643,6 +641,21 @@ export default {
       right: -2px;
       top: 0;
       width: 4px;
+    }
+    .table-toolbar{
+      margin-bottom: 0.5rem;
+      user-select: none;
+      button{
+        margin-right: 0.5rem;
+        background-color: #f5f5f5;
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        padding: 0.2rem 0.5rem;
+        cursor: pointer;
+        &:hover{
+          background-color: #e8e8e8;
+        }
+      }
     }
   }
 }
