@@ -53,14 +53,13 @@
           <align-text-center theme="outline" :size="iconFontSize" />
         div(@click="editor.chain().focus().setTextAlign('right').run()" title="右对齐" :class="editorIsActive({textAlign: 'right'})")
           <align-text-right theme="outline" :size="iconFontSize" />
-        div(data-type="custom")
-          app-menu(ref="appMenu" @select="appMenuClick")
-
-      .tiptap-editor-toolBar-icon-group
         div(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
           <right-small-down theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
-          <right-small-up theme="filled" :size="iconFontSize" />
+          <right-small-up theme="filled" :size="iconFontSize" />  
+        div(data-type="custom")
+          app-menu(ref="appMenu" @select="appMenuClick")
+
     editor-content.tiptap-editor-content(:editor="editor")
     resource-selector(ref='resourceSelector')
     table-editor(ref="tableEditor")
