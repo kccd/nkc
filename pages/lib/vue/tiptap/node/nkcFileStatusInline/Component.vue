@@ -55,6 +55,7 @@ export default {
 
 <style scoped lang="less">
 .file-status-view-wrapper {
+  user-select: none;
   display: inline-block;
   vertical-align: text-bottom;
   border: 1px solid transparent;

@@ -56,7 +56,7 @@
         div(data-type="custom")
           app-menu(ref="appMenu" @select="appMenuClick")
 
-      .tiptap-editor-toolBar-icon-group.m-r-05
+      .tiptap-editor-toolBar-icon-group
         div(@click="editor.chain().focus().toggleSubscript().run()" :class="{'is-active': editor.isActive('subscript')}")
           <right-small-down theme="filled" :size="iconFontSize" />
         div(@click="editor.chain().focus().toggleSuperscript().run()" :class="{'is-active': editor.isActive('superscript')}")
@@ -543,6 +543,10 @@ export default {
 <style scoped lang="less">
 .tiptap-editor-toolBar {
   display: flex;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 4rem;
+  z-index: 999;
   margin-bottom: 1rem;
   .tiptap-editor-toolBar-icon-group{
     user-select: none;
@@ -552,6 +556,7 @@ export default {
     border-radius: 1.8rem;
     border: 1px solid #eee;
     padding: 0 1rem;
+    flex-wrap: wrap;
     &>div{
       cursor: pointer;
       padding-top: 5px;
@@ -570,6 +575,7 @@ export default {
       }
     }
     &>select{
+      background-color: transparent;
       color: #777;
       cursor: pointer;
       outline: none;
