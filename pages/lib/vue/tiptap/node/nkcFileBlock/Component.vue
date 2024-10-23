@@ -1,29 +1,31 @@
 <template>
   <node-view-wrapper class="file-view-wrapper">
     <div class="file-box">
-      <span class="article-attachment-icon">
+      <span class="file-attachment-icon">
         <img :src="getUrl('fileCover', node.attrs.ext)" alt="attachment icon" />
       </span>
-      <span class="article-attachment-content">
-        <span class="article-attachment-name" :title="node.attrs.name">{{
+      <span class="file-attachment-content">
+        <span class="file-attachment-name" :title="node.attrs.name">{{
           node.attrs.name
         }}</span>
-        <span class="article-attachment-info">
-          <span class="article-attachment-size">{{
+        <span>
+          <span class="file-attachment-size">{{
             getSize(node.attrs.size)
           }}</span>
-          <span class="article-attachment-ext">{{
+          <span class="file-attachment-ext">{{
             node.attrs.ext.toUpperCase()
           }}</span>
-          <span class="article-attachment-hits"
+          <span 
             >{{ node.attrs.hits }}次下载</span
           >
           <span
-            class="article-attachment-reader"
+            class="file-attachment-reader"
             v-if="node.attrs.ext === 'pdf'"
           >
             <a
-              :href="`/reader/pdf/web/viewer?file=%2fr%2f${node.attrs.id}?time%3D${Date.now()}`"
+              :href="`/reader/pdf/web/viewer?file=%2fr%2f${
+                node.attrs.id
+              }?time%3D${Date.now()}`"
               target="_blank"
               >预览</a
             >
@@ -74,6 +76,51 @@ export default {
     border: 1px solid #d6d6d6;
     background: #fff;
     max-width: 100%;
+    .file-attachment-icon {
+      display: table-cell;
+      vertical-align: top;
+      width: 3.3rem;
+      img {
+        width: 3.3rem;
+        max-width: none;
+        height: 3.3rem;
+      }
+    }
+    .file-attachment-content {
+      padding-left: 0.5rem;
+      vertical-align: top;
+      width: 30rem;
+      max-width: 100%;
+      display: table-cell;
+      .file-attachment-name {
+        display: block;
+        height: 1.8rem;
+        font-size: 1.3rem;
+        color: #2b90d9;
+        font-weight: 700;
+        word-break: break-all;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        &:hover,
+        &:focus {
+          color: #2b90d9;
+        }
+      }
+      .file-attachment-size {
+        color: #e85a71;
+        font-weight: 700;
+      }
+      .file-attachment-ext {
+        color: #e85a71;
+        font-weight: 700;
+      }
+      .file-attachment-reader {
+        color: #2b90d9;
+        font-weight: 700;
+      }
+    }
   }
 }
 .ProseMirror-selectednode {

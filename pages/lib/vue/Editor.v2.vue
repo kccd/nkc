@@ -145,6 +145,7 @@ import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatus
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
 import AppMenu from './tiptap/menus/AppMenu.vue'
 import {nkcTable} from "./tiptap/node/nkcTable/nkcTable.js";
+import { nkcAPI } from '../js/netAPI.js'
 const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
 
 export default {
@@ -313,6 +314,7 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
+      nkcAPI('/test', 'POST', {json})
     },
     insertResource(resourceType) {
       const self = this;
