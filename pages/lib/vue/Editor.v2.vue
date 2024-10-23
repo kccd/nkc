@@ -134,7 +134,7 @@
       )
         <align-text-right theme="outline" :size="iconFontSize" />
       div(
-        @click='editor.chain().focus().updateAttributes("paragraph", {textIndent: 2}).run()',
+        @click='setTextIndent'
         title='首行缩进',
         :class='editorIsActive({ textIndent: 2 })'
       )
@@ -206,6 +206,8 @@ import TableRow from '@tiptap/extension-table-row';
 import StickerSelector from './StickerSelector/StickerSelector.vue';
 import DraftSelector from './DraftSelector.vue';
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
+import TaskItem from '@tiptap/extension-task-item'
+import TaskList from '@tiptap/extension-task-list'
 
 import {
   ClearFormat,
@@ -316,6 +318,10 @@ export default {
       this.editor = new Editor({
         content: jsonContentTemplate,
         extensions: [
+          TaskItem.configure({
+            nested: false,
+          }),
+          TaskList,
           nkcTable,
           TableRow,
           TableHeader,
@@ -371,6 +377,14 @@ export default {
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';
+    },
+    setTextIndent() {
+      // @click='editor.chain().focus().updateAttributes("paragraph", {textIndent: 2}).run()',
+      if (this.editor.isActive({ textIndent: 2 })) {
+        this.editor.chain().focus().updateAttributes('paragraph', { textIndent: 0 }).run();
+      } else {
+        this.editor.chain().focus().updateAttributes('paragraph', { textIndent: 2 }).run();
+      }
     },
     setLink() {
       const link = this.editor.getAttributes('link');
@@ -687,6 +701,10 @@ export default {
           });
           return;
         }
+        case 'taskList': {
+          this.editor.chain().focus().toggleTaskList().run();
+          return;
+        }
       }
     },
   },
@@ -824,6 +842,34 @@ export default {
         }
       }
     }
+    /* Task list specific styles */
+  ul[data-type="taskList"] {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+      align-items: center;
+      display: flex;
+
+      &>label {
+        margin: 0 0.5rem 0 0;
+        user-select: none;
+      }
+
+      &>div {
+        flex: 1 1 auto;
+      }
+    }
+
+    input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    ul[data-type="taskList"] {
+      margin: 0;
+    }
+  }
   }
 }
 </style>

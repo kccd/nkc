@@ -15,6 +15,9 @@
       .app-menu-item(@click="onClick('hr')")    
         <dividing-line-one theme="outline" size="18"/>
         span 分割线
+      .app-menu-item(@click="onClick('taskList')")    
+        <check-correct theme="outline" size="18"/>
+        span 任务表
       .app-menu-item(@click="onClick('sticker')")
         <smiling-face theme="outline" size="18"/>
         span 表情
@@ -58,7 +61,7 @@
     border-radius: 5px;
     box-shadow: 1px  1px 5px rgba(0, 0, 0, 0.2);
     padding: 0.5rem 0;
-    width: 8rem;
+    width: 9rem;
     .app-menu-item{
       padding: 0 1rem;
       display: flex;
@@ -92,6 +95,7 @@ import {
   Box,
   Formula,
   DividingLineOne,
+  CheckCorrect,
 } from "@icon-park/vue";
 export default {
   components: {
@@ -106,6 +110,7 @@ export default {
     'box': Box,
     'formula': Formula,
     'dividing-line-one': DividingLineOne,
+    'check-correct': CheckCorrect,
   },
   data: () => ({
     callback: null,

@@ -86,8 +86,8 @@
                         {
                             "type": "textStyle",
                             "attrs": {
-                                "fontFamily": null,
-                                "color": "#ecaa04"
+                                "color": "#ecaa04",
+                                "fontFamily": null
                             }
                         }
                     ],
@@ -321,8 +321,8 @@
                         {
                             "type": "textStyle",
                             "attrs": {
-                                "fontFamily": null,
-                                "color": "#df2a3f"
+                                "color": "#df2a3f",
+                                "fontFamily": null
                             }
                         }
                     ],
@@ -343,8 +343,8 @@
                         {
                             "type": "textStyle",
                             "attrs": {
-                                "fontFamily": null,
-                                "color": "#df2a3f"
+                                "color": "#df2a3f",
+                                "fontFamily": null
                             }
                         },
                         {
@@ -362,8 +362,8 @@
                         {
                             "type": "textStyle",
                             "attrs": {
-                                "fontFamily": null,
-                                "color": "#df2a3f"
+                                "color": "#df2a3f",
+                                "fontFamily": null
                             }
                         },
                         {
@@ -407,8 +407,8 @@
                                         {
                                             "type": "textStyle",
                                             "attrs": {
-                                                "fontFamily": null,
-                                                "color": "#ecaa04"
+                                                "color": "#ecaa04",
+                                                "fontFamily": null
                                             }
                                         }
                                     ],
@@ -1158,6 +1158,160 @@
                 {
                     "type": "text",
                     "text": "这个一个包含首行缩进的段落。"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "color": null,
+                                "fontFamily": "SimSun"
+                            }
+                        }
+                    ],
+                    "text": "这段文本"
+                },
+                {
+                    "type": "text",
+                    "text": "使用"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "color": null,
+                                "fontFamily": "KaiTi"
+                            }
+                        }
+                    ],
+                    "text": "了不一样"
+                },
+                {
+                    "type": "text",
+                    "text": "的"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "color": null,
+                                "fontFamily": "SimHei"
+                            }
+                        }
+                    ],
+                    "text": "字体"
+                },
+                {
+                    "type": "text",
+                    "text": "。"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "color": null,
+                                "fontFamily": "Impact"
+                            }
+                        }
+                    ],
+                    "text": "It is awesome"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "下面是一个任务列表"
+                }
+            ]
+        },
+        {
+            "type": "taskList",
+            "content": [
+                {
+                    "type": "taskItem",
+                    "attrs": {
+                        "checked": false
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "第一"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "taskItem",
+                    "attrs": {
+                        "checked": false
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "第二"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "taskItem",
+                    "attrs": {
+                        "checked": false
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "第三"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         },
