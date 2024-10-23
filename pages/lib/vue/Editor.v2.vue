@@ -145,6 +145,7 @@
   table-editor(ref='tableEditor')
   sticker-selector(ref='stickerSelector')
   draft-selector(ref='draftSelector')
+  math-selector(ref='mathSelector')
   button(@click='getJSON') GET JSON
 </template>
 
@@ -230,6 +231,7 @@ import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
 import AppMenu from './tiptap/menus/AppMenu.vue';
 import { nkcTable } from './tiptap/node/nkcTable/nkcTable.js';
 const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
+import MathSelector from './MathSelector.vue';
 
 export default {
   components: {
@@ -267,6 +269,7 @@ export default {
     'table-editor': TableEditor,
     'sticker-selector': StickerSelector,
     'draft-selector': DraftSelector,
+    'math-selector': MathSelector,
   },
 
   data() {
@@ -628,6 +631,19 @@ export default {
         case 'draft': {
           this.$refs.draftSelector.open((res) => {
             this.editor.chain().focus().insertContent(res.content).run();
+          });
+          return;
+        }
+        case 'math': {
+          this.$refs.mathSelector.open((res) => {
+            console.log(res);
+            this.editor.chain().focus().insertContent({
+              type: 'nkc-math',
+              attrs: {
+                text: res.text,
+                block: res.block,
+              },
+            }).run();
           });
           return;
         }

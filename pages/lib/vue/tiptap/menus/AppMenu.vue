@@ -6,6 +6,9 @@
       .app-menu-item(@click="onClick('table')")
         <insert-table theme="outline" size="18"/>
         span 表格
+      .app-menu-item(@click="onClick('math')")
+        <formula theme="outline" size="18"/>
+        span 公式  
       .app-menu-item(@click="onClick('terminal')")
         <terminal theme="outline" size="18"/>
         span 代码块    
@@ -84,6 +87,7 @@ import {
   Terminal,
   SmilingFace,
   Box,
+  Formula,
 } from "@icon-park/vue";
 export default {
   components: {
@@ -96,6 +100,7 @@ export default {
     'terminal': Terminal,
     'smiling-face': SmilingFace,
     'box': Box,
+    'formula': Formula,
   },
   data: () => ({
     callback: null,
