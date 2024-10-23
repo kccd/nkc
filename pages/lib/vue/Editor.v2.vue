@@ -208,6 +208,7 @@ import DraftSelector from './DraftSelector.vue';
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
+import Gapcursor from '@tiptap/extension-gapcursor'
 
 import {
   ClearFormat,
@@ -318,6 +319,7 @@ export default {
       this.editor = new Editor({
         content: jsonContentTemplate,
         extensions: [
+          Gapcursor,
           TaskItem.configure({
             nested: false,
           }),
@@ -363,7 +365,7 @@ export default {
           nkcPictureBlock,
           nkcPictureInline,
           nkcPictureFloat,
-          EnsureTrailingParagraph,
+          // EnsureTrailingParagraph,
           nkcVideoBlock,
           nkcXSFLimit,
           nkcMath,
@@ -653,6 +655,7 @@ export default {
               })
               .run();
           });
+          return;
         }
         case 'sticker': {
           this.$refs.stickerSelector.open((res) => {
