@@ -5,7 +5,6 @@ mixin renderParagraph(node)
     if(textAlign) {
       style += `text-align: ${textAlign};`;
     }
-    console.log(style);
   p(style=style)
     if node.content
       +loopRender(node.content)

@@ -1,2 +1,64 @@
 mixin renderText(node) 
-  span= node.text
+  - 
+    var style = '';
+    var link = null;
+    var isCode = false;
+    if(node.marks) {
+      for(var i = 0; i < node.marks.length; i++) {
+        var mark = node.marks[i];
+        switch (mark.type) {
+          case 'bold':
+            style += 'font-weight: bold;';
+            break;
+          case 'italic':
+            style += 'font-style: italic;';
+            break;
+          case 'underline':
+            style += 'text-decoration: underline;';
+            break;
+          case 'strike':
+            style += 'text-decoration: line-through;';
+            break;
+          case 'nkc-font-size':
+            style += `font-size: ${mark.attrs.size};`;
+            break;
+          case 'textStyle':
+            style += `color: ${mark.attrs.color};`;
+            style += `font-family: ${mark.attrs.font};`;
+            break;
+          case 'highlight':
+            style += `background-color: ${mark.attrs.color};`;    
+            break;
+          case 'link':
+            link = {
+              href: mark.attrs.href,
+              target: mark.attrs.target,
+              rel: mark.attrs.title
+            }
+            break;  
+          case 'code':
+            isCode = true;
+            break;  
+          case 'subscript':
+            style += 'vertical-align: sub;';
+            break;
+          case 'superscript':
+            style += 'vertical-align: super;';
+            break;
+          default:
+            console.log(`Unknown mark type: ${mark.type}`);
+        }
+      }
+    }      
+  span(style=style)
+    if link !== null
+      a(href=link.href target=link.target rel=link.rel)
+        if isCode
+          code=node.text
+        else  
+          span= node.text
+    else  
+      if isCode
+        code=node.text
+      else  
+        span= node.text

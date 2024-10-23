@@ -1,5 +1,16 @@
 include ./paragraph.pug
 include ./text.pug
+include ./heading.pug
+include ./orderedList.pug
+include ./bulletList.pug
+include ./blockquote.pug
+include ./horizontalRule.pug
+include ./codeBlock.pug
+include ./listItem.pug
+include ./table.pug
+include ./tableRow.pug
+include ./tableCell.pug
+
 mixin loopRender(nodes) 
   for node in nodes
     case node.type
@@ -7,9 +18,27 @@ mixin loopRender(nodes)
         +renderParagraph(node)
       when 'text'
         +renderText(node)
+      when 'heading'
+        +renderHeading(node)  
+      when 'orderedList'
+        +renderOrderedList(node)
+      when 'bulletList'
+        +renderBulletList(node)
+      when 'listItem'  
+        +renderListItem(node)
+      when 'blockquote'
+        +renderBlockquote(node)  
+      when 'horizontalRule'
+        +renderHorizontalRule(node)
+      when 'codeBlock'
+        +renderCodeBlock(node)  
+      when 'table'
+        +renderTable(node)
+      when 'tableRow'
+        +renderTableRow(node)
+      when 'tableCell'
+        +renderTableCell(node)    
       default
         p= `Unknown node type: ${node.type}`
-div 
-  h1 JSON RENDER TEST
-
+div
   +loopRender(data.content)

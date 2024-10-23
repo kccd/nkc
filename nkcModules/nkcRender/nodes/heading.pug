@@ -1,0 +1,22 @@
+mixin renderHeading(node)
+  case node.attrs.level
+    when 1
+      h1
+        +loopRender(node.content)
+    when 2
+      h2
+        +loopRender(node.content)
+    when 3
+      h3
+        +loopRender(node.content)
+    when 4
+      h4
+        +loopRender(node.content)
+    when 5
+      h5
+        +loopRender(node.content)
+    when 6
+      h6
+        +loopRender(node.content)
+    default
+      p= `Unknown heading level: ${node.attrs.level}`
