@@ -3,6 +3,18 @@
     div.pointer(@click.stop='showPanel')
       <more-one theme="outline" size="16" />
     .app-menu-content(v-if="show" :style="`left: ${left}px;`" ref="appMenuContent")
+      .app-menu-item(@click="onClick('table')")
+        <insert-table theme="outline" size="18"/>
+        span 表格
+      .app-menu-item(@click="onClick('terminal')")
+        <terminal theme="outline" size="18"/>
+        span 代码块    
+      .app-menu-item(@click="onClick('sticker')")
+        <smiling-face theme="outline" size="18"/>
+        span 表情
+      .app-menu-item(@click="onClick('draft')")
+        <box theme="outline" size="18"/>
+        span 草稿箱
       .app-menu-item(@click="onClick('picture')")
         <new-picture theme="outline" size="18"/>
         span 图片
@@ -14,16 +26,7 @@
         span 视频
       .app-menu-item(@click="onClick('attachment')")
         <paperclip theme="outline" size="18"/>
-        span 附件
-      .app-menu-item(@click="onClick('sticker')")
-        <smiling-face theme="outline" size="18"/>
-        span 表情
-      .app-menu-item(@click="onClick('table')")
-        <insert-table theme="outline" size="18"/>
-        span 表格
-      .app-menu-item(@click="onClick('terminal')")
-        <terminal theme="outline" size="18"/>
-        span 代码块
+        span 附件  
 </template>
 
 <style scoped lang="less">
@@ -80,6 +83,7 @@ import {
   Paperclip,
   Terminal,
   SmilingFace,
+  Box,
 } from "@icon-park/vue";
 export default {
   components: {
@@ -91,6 +95,7 @@ export default {
     'paperclip': Paperclip,
     'terminal': Terminal,
     'smiling-face': SmilingFace,
+    'box': Box,
   },
   data: () => ({
     callback: null,

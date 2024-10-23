@@ -144,6 +144,7 @@
   resource-selector(ref='resourceSelector')
   table-editor(ref='tableEditor')
   sticker-selector(ref='stickerSelector')
+  draft-selector(ref='draftSelector')
   button(@click='getJSON') GET JSON
 </template>
 
@@ -190,7 +191,8 @@ import TableEditor from './tiptap/TableEditor.vue';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
-import StickerSelector from '../vue/StickerSelector/StickerSelector.vue';
+import StickerSelector from './StickerSelector/StickerSelector.vue';
+import DraftSelector from './DraftSelector.vue';
 
 import {
   DividingLineOne,
@@ -264,6 +266,7 @@ export default {
     'app-menu': AppMenu,
     'table-editor': TableEditor,
     'sticker-selector': StickerSelector,
+    'draft-selector': DraftSelector,
   },
 
   data() {
@@ -619,6 +622,12 @@ export default {
                 })
                 .run();
             }
+          });
+          return;
+        }
+        case 'draft': {
+          this.$refs.draftSelector.open((res) => {
+            this.editor.chain().focus().insertContent(res.content).run();
           });
           return;
         }
