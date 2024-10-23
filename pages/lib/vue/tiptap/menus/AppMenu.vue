@@ -11,7 +11,10 @@
         span 公式  
       .app-menu-item(@click="onClick('terminal')")
         <terminal theme="outline" size="18"/>
-        span 代码块    
+        span 代码块  
+      .app-menu-item(@click="onClick('hr')")    
+        <dividing-line-one theme="outline" size="18"/>
+        span 分割线
       .app-menu-item(@click="onClick('sticker')")
         <smiling-face theme="outline" size="18"/>
         span 表情
@@ -88,6 +91,7 @@ import {
   SmilingFace,
   Box,
   Formula,
+  DividingLineOne,
 } from "@icon-park/vue";
 export default {
   components: {
@@ -101,6 +105,7 @@ export default {
     'smiling-face': SmilingFace,
     'box': Box,
     'formula': Formula,
+    'dividing-line-one': DividingLineOne,
   },
   data: () => ({
     callback: null,

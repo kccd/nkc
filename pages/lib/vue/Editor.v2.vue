@@ -39,6 +39,17 @@
         <clear-format theme="outline" :size="iconFontSize" />
     .tiptap-editor-toolBar-icon-group.m-r-05
       select(
+        style='width: 6.8rem;'
+        :value='getFontFamily()',
+        @click='setFontFamily',
+        @blur='isFontFamilySelectOpen = false'
+      )
+        option(
+          v-for='font in fontFamilies' 
+          :value='font[0]'
+          :style="`font-family: ${font[0]}`"
+          ) {{font[1]}}
+      select(
         :value='getHeadline()',
         @click='setHeadline',
         @blur='isHeadlineSelectOpen = false'
@@ -105,11 +116,6 @@
       )
         <code-one theme="filled" :size="iconFontSize" />  
       div(
-        @click='editor.chain().focus().setHorizontalRule().run()',
-        title='分割线'
-      )
-        <dividing-line-one theme="outline" :size="iconFontSize" />
-      div(
         @click='editor.chain().focus().setTextAlign("left").run()',
         title='左对齐',
         :class='editorIsActive({ textAlign: "left" })'
@@ -158,7 +164,6 @@
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2';
 import Document from '@tiptap/extension-document';
-import Paragraph from '@tiptap/extension-paragraph';
 import Italic from '@tiptap/extension-italic';
 import History from '@tiptap/extension-history';
 import Bold from '@tiptap/extension-bold';
@@ -203,7 +208,6 @@ import DraftSelector from './DraftSelector.vue';
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 
 import {
-  DividingLineOne,
   ClearFormat,
   AlignTextLeft,
   AlignTextCenter,
@@ -245,7 +249,6 @@ export default {
   components: {
     'link-editor': LinkEditor,
     'more-one': MoreOne,
-    'dividing-line-one': DividingLineOne,
     'clear-format': ClearFormat,
     'align-text-left': AlignTextLeft,
     'align-text-center': AlignTextCenter,
@@ -289,6 +292,18 @@ export default {
       isHeadlineSelectOpen: false,
       nkcFontSizeOptions,
       isFontSizeSelectOpen: false,
+      isFontFamilySelectOpen: false,
+      fontFamilies: [
+        ['Arial', 'Arial'],
+        ['SimSun', '宋体'],
+        ['SimHei', '黑体'],
+        ['KaiTi', '楷体'],
+        ['FangSong', '仿宋'],
+        ['Microsoft YaHei', '微软雅黑'],
+        ['Impact', 'Impact'],
+        ['Tahoma', 'Tahoma'],
+        ['Verdana', 'Verdana'],
+      ],
     };
   },
   mounted() {
@@ -316,9 +331,9 @@ export default {
           Blockquote,
           nkcFontSize,
           Heading,
-          FontFamily,
           Color,
           TextStyle,
+          FontFamily,
           BulletList,
           OrderedList,
           ListItem,
@@ -553,6 +568,22 @@ export default {
         this.isFontSizeSelectOpen = false;
       }
     },
+    getFontFamily() {
+      for(const font of this.fontFamilies) {
+        if (this.editor.isActive('textStyle', { fontFamily: font[0] })) {
+          return font[0];
+        }
+      }
+      return this.fontFamilies[0][0];
+    },
+    setFontFamily(e) {
+      if(!this.isFontFamilySelectOpen) {
+        this.isFontFamilySelectOpen = true;
+      } else {
+      this.editor.chain().focus().setFontFamily(e.target.value).run();
+      }
+    },
+
     /**
      * Select a text color.
      * @param {Object} res - Object returned by ColorPicker.
