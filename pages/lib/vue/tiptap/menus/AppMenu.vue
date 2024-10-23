@@ -24,6 +24,9 @@
       .app-menu-item(@click="onClick('draft')")
         <box theme="outline" size="18"/>
         span 草稿箱
+      .app-menu-item(@click="onClick('xsfLimit')")
+        <protect theme="outline" size="18"/>
+        span 学术分
       .app-menu-item(@click="onClick('picture')")
         <new-picture theme="outline" size="18"/>
         span 图片
@@ -96,6 +99,7 @@ import {
   Formula,
   DividingLineOne,
   CheckCorrect,
+  Protect,
 } from "@icon-park/vue";
 export default {
   components: {
@@ -111,6 +115,7 @@ export default {
     'formula': Formula,
     'dividing-line-one': DividingLineOne,
     'check-correct': CheckCorrect,
+    'protect': Protect,
   },
   data: () => ({
     callback: null,

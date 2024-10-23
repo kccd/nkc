@@ -697,7 +697,6 @@ export default {
         }
         case 'math': {
           this.$refs.mathSelector.open((res) => {
-            console.log(res);
             this.editor.chain().focus().insertContent({
               type: 'nkc-math',
               attrs: {
@@ -710,6 +709,26 @@ export default {
         }
         case 'taskList': {
           this.editor.chain().focus().toggleTaskList().run();
+          return;
+        }
+        case 'xsfLimit': {
+          this.editor.chain().focus().insertContent({
+            type: 'nkc-xsf-limit',
+            attrs: {
+              xsf: 1,
+            },
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: '学术分限制',
+                  },
+                ],
+              }
+            ]
+          }).run();
           return;
         }
       }
