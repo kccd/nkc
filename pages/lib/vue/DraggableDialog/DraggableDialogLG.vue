@@ -1,15 +1,13 @@
 <template>
-  <div class="draggable-dialog-root">
-    <div class="draggable-dialog-container" ref="draggableBox" :style="containerStyle">
-      <div class="draggable-dialog-title-container">
-        <div class="draggable-dialog-title" ref="draggableHandle">{{title}}</div>
-        <div class="draggable-dialog-option" @click="toClose">
-          <close theme="filled" size="18" fill="#555"/>
-        </div>
+  <div class="draggable-dialog-container" ref="draggableBox" :style="containerStyle">
+    <div class="draggable-dialog-title-container">
+      <div class="draggable-dialog-title" ref="draggableHandle">{{title}}</div>
+      <div class="draggable-dialog-option" @click="toClose">
+        <close theme="filled" size="18" fill="#555"/>
       </div>
-      <div class="draggable-dialog-body-container">
-        <slot></slot>
-      </div>
+    </div>
+    <div class="draggable-dialog-body-container">
+      <slot></slot>
     </div>
   </div>
 </template>
@@ -75,13 +73,8 @@ export default {
 </script>
 
 <style scoped lang='less'>
-.draggable-dialog-root{
-  top: 0;
-  left: 0;
-  position: fixed;
-  z-index: 1000;
-}
 .draggable-dialog-container{
+  position: fixed;
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 3px;
