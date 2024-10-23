@@ -128,6 +128,12 @@
       )
         <align-text-right theme="outline" :size="iconFontSize" />
       div(
+        @click='editor.chain().focus().updateAttributes("paragraph", {textIndent: 2}).run()',
+        title='首行缩进',
+        :class='editorIsActive({ textIndent: 2 })'
+      )
+        <indent-left theme="outline" :size="iconFontSize" />  
+      div(
         @click='editor.chain().focus().toggleSubscript().run()',
         :class='{ "is-active": editor.isActive("subscript") }'
       )
@@ -194,6 +200,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
 import StickerSelector from './StickerSelector/StickerSelector.vue';
 import DraftSelector from './DraftSelector.vue';
+import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 
 import {
   DividingLineOne,
@@ -221,6 +228,7 @@ import {
   AddPicture,
   MoreOne,
   FontSizeTwo,
+  IndentLeft,
 } from '@icon-park/vue';
 import ResourceSelector from './ResourceSelector.vue';
 import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
@@ -270,6 +278,7 @@ export default {
     'sticker-selector': StickerSelector,
     'draft-selector': DraftSelector,
     'math-selector': MathSelector,
+    'indent-left': IndentLeft,
   },
 
   data() {
@@ -324,7 +333,7 @@ export default {
           Bold,
           Code,
           Document,
-          Paragraph,
+          nkcParagraph,
           Text,
           Italic,
           Underline,

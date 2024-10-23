@@ -1,1125 +1,1172 @@
 {
-  "type": "doc",
-  "content": [
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "AI 应用于公司的日常决策中。"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "bold"
-                      }
-                  ],
-                  "text": "AI 代理结合知识库和其他技术"
-              },
-              {
-                  "type": "text",
-                  "text": "，"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "italic"
-                      }
-                  ],
-                  "text": "帮助我们理解岗位背景能力"
-              },
-              {
-                  "type": "text",
-                  "text": "，"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "underline"
-                      }
-                  ],
-                  "text": "并辅助从运维到公司内部决策的各个方面"
-              },
-              {
-                  "type": "text",
-                  "text": "。"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "strike"
-                      }
-                  ],
-                  "text": "在项目开发和交付过程中"
-              },
-              {
-                  "type": "text",
-                  "text": "，"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "nkc-font-size",
-                          "attrs": {
-                              "size": "36px"
-                          }
-                      }
-                  ],
-                  "text": "使用 Copilot 等工具辅助开发"
-              },
-              {
-                  "type": "text",
-                  "text": "，"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "textStyle",
-                          "attrs": {
-                              "fontFamily": null,
-                              "color": "#ecaa04"
-                          }
-                      }
-                  ],
-                  "text": "以及在测试和运维阶段利用 AI 机器人进行监控和问题处理"
-              },
-              {
-                  "type": "text",
-                  "text": "。"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#ecaa04"
-                          }
-                      }
-                  ],
-                  "text": "AI 在预测和处理问题方面的能力远超传统算法"
-              },
-              {
-                  "type": "text",
-                  "text": "，使我们能够以更低的成本实现更高的效能。"
-              }
-          ]
-      },
-      {
-          "type": "heading",
-          "attrs": {
-              "textAlign": "left",
-              "level": 1
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这是一级"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#ecaa04"
-                          }
-                      }
-                  ],
-                  "text": "标题"
-              }
-          ]
-      },
-      {
-          "type": "heading",
-          "attrs": {
-              "textAlign": "left",
-              "level": 2
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这是二级"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#74b602"
-                          }
-                      }
-                  ],
-                  "text": "标题"
-              }
-          ]
-      },
-      {
-          "type": "heading",
-          "attrs": {
-              "textAlign": "left",
-              "level": 3
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这是三级"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#2f4bda"
-                          }
-                      }
-                  ],
-                  "text": "标题"
-              }
-          ]
-      },
-      {
-          "type": "heading",
-          "attrs": {
-              "textAlign": "left",
-              "level": 4
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这是四级"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#d22d8d"
-                          }
-                      }
-                  ],
-                  "text": "标题"
-              }
-          ]
-      },
-      {
-          "type": "heading",
-          "attrs": {
-              "textAlign": "left",
-              "level": 5
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这是五级"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#ad1a2b"
-                          }
-                      }
-                  ],
-                  "text": "标题"
-              }
-          ]
-      },
-      {
-          "type": "heading",
-          "attrs": {
-              "textAlign": "left",
-              "level": 6
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这是六"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#fbde28"
-                          }
-                      }
-                  ],
-                  "text": "级标题"
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "這段内容居左"
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "center"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "這段内容居中"
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "right"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "這段内容居右"
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这段内容"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "textStyle",
-                          "attrs": {
-                              "fontFamily": null,
-                              "color": "#df2a3f"
-                          }
-                      }
-                  ],
-                  "text": "中包含一个"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "link",
-                          "attrs": {
-                              "href": "https://www.kechuang.org",
-                              "target": "_blank",
-                              "rel": "科创",
-                              "class": null
-                          }
-                      },
-                      {
-                          "type": "textStyle",
-                          "attrs": {
-                              "fontFamily": null,
-                              "color": "#df2a3f"
-                          }
-                      },
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#117cee"
-                          }
-                      }
-                  ],
-                  "text": "链接"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "textStyle",
-                          "attrs": {
-                              "fontFamily": null,
-                              "color": "#df2a3f"
-                          }
-                      },
-                      {
-                          "type": "highlight",
-                          "attrs": {
-                              "color": "#117cee"
-                          }
-                      }
-                  ],
-                  "text": "，就是"
-              },
-              {
-                  "type": "text",
-                  "text": "这个。"
-              }
-          ]
-      },
-      {
-          "type": "orderedList",
-          "attrs": {
-              "start": 1
-          },
-          "content": [
-              {
-                  "type": "listItem",
-                  "content": [
-                      {
-                          "type": "paragraph",
-                          "attrs": {
-                              "textAlign": "left"
-                          },
-                          "content": [
-                              {
-                                  "type": "text",
-                                  "text": "有序"
-                              },
-                              {
-                                  "type": "text",
-                                  "marks": [
-                                      {
-                                          "type": "textStyle",
-                                          "attrs": {
-                                              "fontFamily": null,
-                                              "color": "#ecaa04"
-                                          }
-                                      }
-                                  ],
-                                  "text": "列表1"
-                              }
-                          ]
-                      }
-                  ]
-              },
-              {
-                  "type": "listItem",
-                  "content": [
-                      {
-                          "type": "paragraph",
-                          "attrs": {
-                              "textAlign": "left"
-                          },
-                          "content": [
-                              {
-                                  "type": "text",
-                                  "text": "有序"
-                              },
-                              {
-                                  "type": "text",
-                                  "marks": [
-                                      {
-                                          "type": "highlight",
-                                          "attrs": {
-                                              "color": "#ecaa04"
-                                          }
-                                      }
-                                  ],
-                                  "text": "列表2"
-                              }
-                          ]
-                      }
-                  ]
-              },
-              {
-                  "type": "listItem",
-                  "content": [
-                      {
-                          "type": "paragraph",
-                          "attrs": {
-                              "textAlign": "left"
-                          },
-                          "content": [
-                              {
-                                  "type": "text",
-                                  "text": "有序列表3"
-                              }
-                          ]
-                      }
-                  ]
-              }
-          ]
-      },
-      {
-          "type": "bulletList",
-          "content": [
-              {
-                  "type": "listItem",
-                  "content": [
-                      {
-                          "type": "paragraph",
-                          "attrs": {
-                              "textAlign": "left"
-                          },
-                          "content": [
-                              {
-                                  "type": "text",
-                                  "text": "无"
-                              },
-                              {
-                                  "type": "text",
-                                  "marks": [
-                                      {
-                                          "type": "nkc-font-size",
-                                          "attrs": {
-                                              "size": "12px"
-                                          }
-                                      }
-                                  ],
-                                  "text": "序列"
-                              },
-                              {
-                                  "type": "text",
-                                  "text": "表1"
-                              }
-                          ]
-                      }
-                  ]
-              },
-              {
-                  "type": "listItem",
-                  "content": [
-                      {
-                          "type": "paragraph",
-                          "attrs": {
-                              "textAlign": "left"
-                          },
-                          "content": [
-                              {
-                                  "type": "text",
-                                  "text": "无序"
-                              },
-                              {
-                                  "type": "text",
-                                  "marks": [
-                                      {
-                                          "type": "nkc-font-size",
-                                          "attrs": {
-                                              "size": "36px"
-                                          }
-                                      }
-                                  ],
-                                  "text": "列表"
-                              },
-                              {
-                                  "type": "text",
-                                  "text": "2"
-                              }
-                          ]
-                      }
-                  ]
-              },
-              {
-                  "type": "listItem",
-                  "content": [
-                      {
-                          "type": "paragraph",
-                          "attrs": {
-                              "textAlign": "left"
-                          },
-                          "content": [
-                              {
-                                  "type": "text",
-                                  "text": "无"
-                              },
-                              {
-                                  "type": "text",
-                                  "marks": [
-                                      {
-                                          "type": "link",
-                                          "attrs": {
-                                              "href": "https://www.baidu.colm",
-                                              "target": "_self",
-                                              "rel": "",
-                                              "class": null
-                                          }
-                                      },
-                                      {
-                                          "type": "nkc-font-size",
-                                          "attrs": {
-                                              "size": "11px"
-                                          }
-                                      }
-                                  ],
-                                  "text": "序列表"
-                              },
-                              {
-                                  "type": "text",
-                                  "text": "3"
-                              }
-                          ]
-                      }
-                  ]
-              }
-          ]
-      },
-      {
-          "type": "blockquote",
-          "content": [
-              {
-                  "type": "paragraph",
-                  "attrs": {
-                      "textAlign": "left"
-                  },
-                  "content": [
-                      {
-                          "type": "text",
-                          "text": "这是一段引用的内容，在这里可以输入带样式的内容，例如"
-                      },
-                      {
-                          "type": "text",
-                          "marks": [
-                              {
-                                  "type": "bold"
-                              }
-                          ],
-                          "text": "加粗"
-                      },
-                      {
-                          "type": "text",
-                          "text": "、"
-                      },
-                      {
-                          "type": "text",
-                          "marks": [
-                              {
-                                  "type": "italic"
-                              }
-                          ],
-                          "text": "斜体"
-                      },
-                      {
-                          "type": "text",
-                          "text": "等。"
-                      }
-                  ]
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这段内容中包含代码，例如"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "code"
-                      }
-                  ],
-                  "text": "console.log(123);"
-              },
-              {
-                  "type": "text",
-                  "text": "就是一句代码。"
-              }
-          ]
-      },
-      {
-          "type": "horizontalRule"
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "上面有一根分割线"
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "这段文字包含"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "superscript"
-                      }
-                  ],
-                  "text": "上标"
-              },
-              {
-                  "type": "text",
-                  "text": "和"
-              },
-              {
-                  "type": "text",
-                  "marks": [
-                      {
-                          "type": "subscript"
-                      }
-                  ],
-                  "text": "下标"
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "下面是一个代码块"
-              }
-          ]
-      },
-      {
-          "type": "codeBlock",
-          "attrs": {
-              "language": null
-          },
-          "content": [
-              {
-                  "type": "text",
-                  "text": "const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json.js'); \nconst path = require('path'); \nconst jsonObj = require('../../pages/lib/vue/tiptap/jsonContentTemplate.json'); \nconst fs = require('fs'); \nconst html = renderHTMLByJSON(JSON.stringify(jsonObj)); \nconsole.log(html); \nconst htmlFilePath = path.resolve(__dirname, './content.html'); \nfs.writeFileSync(htmlFilePath, html); \nconsole.log(`写入文件 ${htmlFilePath} 成功`);"
-              }
-          ]
-      },
-      {
-          "type": "table",
-          "content": [
-              {
-                  "type": "tableRow",
-                  "content": [
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "1"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "2"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "3"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "4"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "5"
-                                      }
-                                  ]
-                              }
-                          ]
-                      }
-                  ]
-              },
-              {
-                  "type": "tableRow",
-                  "content": [
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "11"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "22"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "33"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "44"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "55"
-                                      }
-                                  ]
-                              }
-                          ]
-                      }
-                  ]
-              },
-              {
-                  "type": "tableRow",
-                  "content": [
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "text": "这一行包含富文本"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "marks": [
-                                              {
-                                                  "type": "bold"
-                                              }
-                                          ],
-                                          "text": "这是加粗的字体"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "text",
-                                          "marks": [
-                                              {
-                                                  "type": "italic"
-                                              }
-                                          ],
-                                          "text": "这是斜体"
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "orderedList",
-                                  "attrs": {
-                                      "start": 1
-                                  },
-                                  "content": [
-                                      {
-                                          "type": "listItem",
-                                          "content": [
-                                              {
-                                                  "type": "paragraph",
-                                                  "attrs": {
-                                                      "textAlign": "left"
-                                                  },
-                                                  "content": [
-                                                      {
-                                                          "type": "text",
-                                                          "text": "这里有列表"
-                                                      }
-                                                  ]
-                                              }
-                                          ]
-                                      },
-                                      {
-                                          "type": "listItem",
-                                          "content": [
-                                              {
-                                                  "type": "paragraph",
-                                                  "attrs": {
-                                                      "textAlign": "left"
-                                                  },
-                                                  "content": [
-                                                      {
-                                                          "type": "text",
-                                                          "text": "选项2"
-                                                      }
-                                                  ]
-                                              }
-                                          ]
-                                      },
-                                      {
-                                          "type": "listItem",
-                                          "content": [
-                                              {
-                                                  "type": "paragraph",
-                                                  "attrs": {
-                                                      "textAlign": "left"
-                                                  },
-                                                  "content": [
-                                                      {
-                                                          "type": "text",
-                                                          "text": "选项3"
-                                                      }
-                                                  ]
-                                              }
-                                          ]
-                                      }
-                                  ]
-                              }
-                          ]
-                      },
-                      {
-                          "type": "tableCell",
-                          "attrs": {
-                              "colspan": 1,
-                              "rowspan": 1,
-                              "colwidth": null
-                          },
-                          "content": [
-                              {
-                                  "type": "paragraph",
-                                  "attrs": {
-                                      "textAlign": "left"
-                                  }
-                              }
-                          ]
-                      }
-                  ]
-              }
-          ]
-      },
-      {
-          "type": "paragraph",
-          "attrs": {
-              "textAlign": "left"
-          }
-      }
-  ]
+    "type": "doc",
+    "content": [
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "AI 应用于公司的日常决策中。"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "bold"
+                        }
+                    ],
+                    "text": "AI 代理结合知识库和其他技术"
+                },
+                {
+                    "type": "text",
+                    "text": "，"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "italic"
+                        }
+                    ],
+                    "text": "帮助我们理解岗位背景能力"
+                },
+                {
+                    "type": "text",
+                    "text": "，"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "underline"
+                        }
+                    ],
+                    "text": "并辅助从运维到公司内部决策的各个方面"
+                },
+                {
+                    "type": "text",
+                    "text": "。"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "strike"
+                        }
+                    ],
+                    "text": "在项目开发和交付过程中"
+                },
+                {
+                    "type": "text",
+                    "text": "，"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "nkc-font-size",
+                            "attrs": {
+                                "size": "36px"
+                            }
+                        }
+                    ],
+                    "text": "使用 Copilot 等工具辅助开发"
+                },
+                {
+                    "type": "text",
+                    "text": "，"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "fontFamily": null,
+                                "color": "#ecaa04"
+                            }
+                        }
+                    ],
+                    "text": "以及在测试和运维阶段利用 AI 机器人进行监控和问题处理"
+                },
+                {
+                    "type": "text",
+                    "text": "。"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#ecaa04"
+                            }
+                        }
+                    ],
+                    "text": "AI 在预测和处理问题方面的能力远超传统算法"
+                },
+                {
+                    "type": "text",
+                    "text": "，使我们能够以更低的成本实现更高的效能。"
+                }
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {
+                "textAlign": "left",
+                "level": 1
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这是一级"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#ecaa04"
+                            }
+                        }
+                    ],
+                    "text": "标题"
+                }
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {
+                "textAlign": "left",
+                "level": 2
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这是二级"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#74b602"
+                            }
+                        }
+                    ],
+                    "text": "标题"
+                }
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {
+                "textAlign": "left",
+                "level": 3
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这是三级"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#2f4bda"
+                            }
+                        }
+                    ],
+                    "text": "标题"
+                }
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {
+                "textAlign": "left",
+                "level": 4
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这是四级"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#d22d8d"
+                            }
+                        }
+                    ],
+                    "text": "标题"
+                }
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {
+                "textAlign": "left",
+                "level": 5
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这是五级"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#ad1a2b"
+                            }
+                        }
+                    ],
+                    "text": "标题"
+                }
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {
+                "textAlign": "left",
+                "level": 6
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这是六"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#fbde28"
+                            }
+                        }
+                    ],
+                    "text": "级标题"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "這段内容居左"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "center",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "這段内容居中"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "right",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "這段内容居右"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这段内容"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "fontFamily": null,
+                                "color": "#df2a3f"
+                            }
+                        }
+                    ],
+                    "text": "中包含一个"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "link",
+                            "attrs": {
+                                "href": "https://www.kechuang.org",
+                                "target": "_blank",
+                                "rel": "科创",
+                                "class": null
+                            }
+                        },
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "fontFamily": null,
+                                "color": "#df2a3f"
+                            }
+                        },
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#117cee"
+                            }
+                        }
+                    ],
+                    "text": "链接"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "textStyle",
+                            "attrs": {
+                                "fontFamily": null,
+                                "color": "#df2a3f"
+                            }
+                        },
+                        {
+                            "type": "highlight",
+                            "attrs": {
+                                "color": "#117cee"
+                            }
+                        }
+                    ],
+                    "text": "，就是"
+                },
+                {
+                    "type": "text",
+                    "text": "这个。"
+                }
+            ]
+        },
+        {
+            "type": "orderedList",
+            "attrs": {
+                "start": 1
+            },
+            "content": [
+                {
+                    "type": "listItem",
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "有序"
+                                },
+                                {
+                                    "type": "text",
+                                    "marks": [
+                                        {
+                                            "type": "textStyle",
+                                            "attrs": {
+                                                "fontFamily": null,
+                                                "color": "#ecaa04"
+                                            }
+                                        }
+                                    ],
+                                    "text": "列表1"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "listItem",
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "有序"
+                                },
+                                {
+                                    "type": "text",
+                                    "marks": [
+                                        {
+                                            "type": "highlight",
+                                            "attrs": {
+                                                "color": "#ecaa04"
+                                            }
+                                        }
+                                    ],
+                                    "text": "列表2"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "listItem",
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "有序列表3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "bulletList",
+            "content": [
+                {
+                    "type": "listItem",
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "无"
+                                },
+                                {
+                                    "type": "text",
+                                    "marks": [
+                                        {
+                                            "type": "nkc-font-size",
+                                            "attrs": {
+                                                "size": "12px"
+                                            }
+                                        }
+                                    ],
+                                    "text": "序列"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "表1"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "listItem",
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "无序"
+                                },
+                                {
+                                    "type": "text",
+                                    "marks": [
+                                        {
+                                            "type": "nkc-font-size",
+                                            "attrs": {
+                                                "size": "36px"
+                                            }
+                                        }
+                                    ],
+                                    "text": "列表"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "2"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "listItem",
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "attrs": {
+                                "textAlign": "left",
+                                "textIndent": 0
+                            },
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "无"
+                                },
+                                {
+                                    "type": "text",
+                                    "marks": [
+                                        {
+                                            "type": "link",
+                                            "attrs": {
+                                                "href": "https://www.baidu.colm",
+                                                "target": "_self",
+                                                "rel": "",
+                                                "class": null
+                                            }
+                                        },
+                                        {
+                                            "type": "nkc-font-size",
+                                            "attrs": {
+                                                "size": "11px"
+                                            }
+                                        }
+                                    ],
+                                    "text": "序列表"
+                                },
+                                {
+                                    "type": "text",
+                                    "text": "3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "blockquote",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "attrs": {
+                        "textAlign": "left",
+                        "textIndent": 0
+                    },
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "这是一段引用的内容，在这里可以输入带样式的内容，例如"
+                        },
+                        {
+                            "type": "text",
+                            "marks": [
+                                {
+                                    "type": "bold"
+                                }
+                            ],
+                            "text": "加粗"
+                        },
+                        {
+                            "type": "text",
+                            "text": "、"
+                        },
+                        {
+                            "type": "text",
+                            "marks": [
+                                {
+                                    "type": "italic"
+                                }
+                            ],
+                            "text": "斜体"
+                        },
+                        {
+                            "type": "text",
+                            "text": "等。"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这段内容中包含代码，例如"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "code"
+                        }
+                    ],
+                    "text": "console.log(123);"
+                },
+                {
+                    "type": "text",
+                    "text": "就是一句代码。"
+                }
+            ]
+        },
+        {
+            "type": "horizontalRule"
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "上面有一根分割线"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这段文字包含"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "superscript"
+                        }
+                    ],
+                    "text": "上标"
+                },
+                {
+                    "type": "text",
+                    "text": "和"
+                },
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "subscript"
+                        }
+                    ],
+                    "text": "下标"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "下面是一个代码块"
+                }
+            ]
+        },
+        {
+            "type": "codeBlock",
+            "attrs": {
+                "language": null
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json.js'); \nconst path = require('path'); \nconst jsonObj = require('../../pages/lib/vue/tiptap/jsonContentTemplate.json'); \nconst fs = require('fs'); \nconst html = renderHTMLByJSON(JSON.stringify(jsonObj)); \nconsole.log(html); \nconst htmlFilePath = path.resolve(__dirname, './content.html'); \nfs.writeFileSync(htmlFilePath, html); \nconsole.log(`写入文件 ${htmlFilePath} 成功`);"
+                }
+            ]
+        },
+        {
+            "type": "table",
+            "content": [
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "1"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "2"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "3"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "4"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "5"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "11"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "22"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "33"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "44"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "55"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "tableRow",
+                    "content": [
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "这一行包含富文本"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "marks": [
+                                                {
+                                                    "type": "bold"
+                                                }
+                                            ],
+                                            "text": "这是加粗的字体"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "marks": [
+                                                {
+                                                    "type": "italic"
+                                                }
+                                            ],
+                                            "text": "这是斜体"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "orderedList",
+                                    "attrs": {
+                                        "start": 1
+                                    },
+                                    "content": [
+                                        {
+                                            "type": "listItem",
+                                            "content": [
+                                                {
+                                                    "type": "paragraph",
+                                                    "attrs": {
+                                                        "textAlign": "left",
+                                                        "textIndent": 0
+                                                    },
+                                                    "content": [
+                                                        {
+                                                            "type": "text",
+                                                            "text": "这里有列表"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "listItem",
+                                            "content": [
+                                                {
+                                                    "type": "paragraph",
+                                                    "attrs": {
+                                                        "textAlign": "left",
+                                                        "textIndent": 0
+                                                    },
+                                                    "content": [
+                                                        {
+                                                            "type": "text",
+                                                            "text": "选项2"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "listItem",
+                                            "content": [
+                                                {
+                                                    "type": "paragraph",
+                                                    "attrs": {
+                                                        "textAlign": "left",
+                                                        "textIndent": 0
+                                                    },
+                                                    "content": [
+                                                        {
+                                                            "type": "text",
+                                                            "text": "选项3"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "tableCell",
+                            "attrs": {
+                                "colspan": 1,
+                                "rowspan": 1,
+                                "colwidth": null
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "attrs": {
+                                        "textAlign": "left",
+                                        "textIndent": 0
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 2
+            },
+            "content": [
+                {
+                    "type": "text",
+                    "text": "这个一个包含首行缩进的段落。"
+                }
+            ]
+        },
+        {
+            "type": "paragraph",
+            "attrs": {
+                "textAlign": "left",
+                "textIndent": 0
+            }
+        }
+    ]
 }
