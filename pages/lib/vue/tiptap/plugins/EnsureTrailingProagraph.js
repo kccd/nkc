@@ -13,7 +13,6 @@ const EnsureTrailingParagraph = Extension.create({
             update: (view) => {
               // 防抖处理，避免频繁触发
               this.timer = setTimeout(() => {
-                const t = Date.now();
                 const { doc, selection } = view.state;
                 const lastNode = doc.lastChild;
 

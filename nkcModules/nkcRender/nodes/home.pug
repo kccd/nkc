@@ -14,6 +14,8 @@ include ./pictureBlock.pug
 include ./audioBlock.pug
 include ./videoBlock.pug
 include ./fileBlock.pug
+include ./taskList.pug
+include ./taskItem.pug
 
 mixin loopRender(nodes) 
   for node in nodes
@@ -53,6 +55,11 @@ mixin loopRender(nodes)
         +renderVideoBlock(node)
       when 'nkc-file-block'
         +renderFileBlock(node)
+        +renderTableCell(node)    
+      when 'taskList'
+        +renderTaskList(node)
+      when 'taskItem'
+        +renderTaskItem(node)    
       default
         p= `Unknown node type: ${node.type}`
 div
