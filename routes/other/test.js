@@ -1,4 +1,5 @@
 const testRouter = require('koa-router')();
+let jsonContentTemplate = require('../../pages/lib/vue/tiptap/jsonContentTemplate.json');
 testRouter
   .get('/', async (ctx, next) => {
     ctx.template = "test/test.pug";
@@ -98,6 +99,17 @@ testRouter
       isAttachment: false,
       filename: 'success.mp4',
     };
+    await next();
+      })
+  .get('/json', async (ctx, next) => {
+    ctx.data.content = jsonContentTemplate.content;
+    ctx.data.tools = ctx.nkcModules.tools;
+    ctx.template = 'test/jsonRender.pug';
+    await next();
+  })
+  .post('/', async (ctx, next) => {
+    const { json } = ctx.body;
+    jsonContentTemplate = json;
     await next();
   });
 

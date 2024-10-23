@@ -1,0 +1,10 @@
+mixin renderPictureBlock(node)
+  //- p
+    span(data-tag="nkcsource" data-type="picture" data-id=`${node.attrs.id}` style="width:100%")
+      span(style="padding-top:20%")
+        img(src=`/r/${node.attrs.id}`)
+  p(style="display:flex;text-align:center;flex-direction: column;align-items: center;padding:1rem 0;margin-bottom: 1rem;")
+    img(src=`/r/${node.attrs.id}` style="width:100%;")
+    span=node.attrs.desc
+
+      

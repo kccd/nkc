@@ -244,8 +244,9 @@ import nkcFileBlock from './tiptap/node/nkcFileBlock/nkcFileBlock.js';
 import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBlock.js';
 import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
-import AppMenu from './tiptap/menus/AppMenu.vue';
-import { nkcTable } from './tiptap/node/nkcTable/nkcTable.js';
+import AppMenu from './tiptap/menus/AppMenu.vue'
+import {nkcTable} from "./tiptap/node/nkcTable/nkcTable.js";
+import { nkcAPI } from '../js/netAPI.js'
 const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
 import MathSelector from './MathSelector.vue';
 
@@ -452,6 +453,7 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
+      nkcAPI('/test', 'POST', {json})
     },
     insertResource(resourceType) {
       const self = this;

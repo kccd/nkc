@@ -6,7 +6,7 @@
         <source :src="`/r/${node.attrs.id}`" type="audio/mp3" />
         你的浏览器不支持audio标签，请升级。
       </audio>
-      <span data-type="nkcsource-audio-title" class="nkcsource-audio-title"
+      <span class="audio-title"
         >{{ node.attrs.name }}
         <span class="display-i-b text-danger" style="font-weight: 700">{{
           getSize(node.attrs.size)
@@ -64,6 +64,21 @@ export default {
     border: 1px solid #d6d6d6;
     background: #fff;
     width: 100%;
+    .audio-title {
+      display: block;
+      color: #000;
+      font-size: 1.2rem;
+      margin: 0 auto;
+      text-align: center;
+      margin-bottom: 0.3rem;
+      span {
+        margin-right: 0.5rem;
+      }
+      a {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
   }
 }
 .ProseMirror-selectednode {
