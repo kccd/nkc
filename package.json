@@ -69,6 +69,7 @@
     "@tiptap/extension-list-item": "^2.8.0",
     "@tiptap/extension-ordered-list": "^2.8.0",
     "@tiptap/extension-paragraph": "^2.8.0",
+    "@tiptap/extension-placeholder": "^2.9.0",
     "@tiptap/extension-strike": "^2.8.0",
     "@tiptap/extension-subscript": "^2.8.0",
     "@tiptap/extension-superscript": "^2.8.0",

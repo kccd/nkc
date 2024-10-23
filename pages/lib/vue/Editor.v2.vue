@@ -181,7 +181,7 @@ import nkcSticker from './tiptap/node/nkcSticker/nkcSticker.js';
 import nkcPictureBlock from './tiptap/node/nkcPictureBlock/nkcPictureBlock.js';
 import nkcPictureInline from './tiptap/node/nkcPictureInline/nkcPictureInline.js';
 import nkcPictureFloat from './tiptap/node/nkcPictureFloat/nkcPictureFloat.js';
-import EnsureTrailingParagraph from './tiptap/plugins/EnsureTrailingProagraph.js';
+// import EnsureTrailingParagraph from './tiptap/plugins/EnsureTrailingProagraph.js';
 import nkcVideoBlock from './tiptap/node/nkcVideoBlock/nkcVideoBlock.js';
 import nkcXSFLimit from './tiptap/node/nkcXSFLimit/nkcXSFLimit.js';
 import nkcMath from './tiptap/node/nkcMath/nkcMath.js';
@@ -209,6 +209,7 @@ import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import Gapcursor from '@tiptap/extension-gapcursor'
+import Placeholder from '@tiptap/extension-placeholder'
 
 import {
   ClearFormat,
@@ -319,6 +320,9 @@ export default {
       this.editor = new Editor({
         content: jsonContentTemplate,
         extensions: [
+          Placeholder.configure({
+            placeholder: '开始输入...',
+          }),
           Gapcursor,
           TaskItem.configure({
             nested: false,
