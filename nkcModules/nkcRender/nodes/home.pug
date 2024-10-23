@@ -10,6 +10,8 @@ include ./listItem.pug
 include ./table.pug
 include ./tableRow.pug
 include ./tableCell.pug
+include ./taskList.pug
+include ./taskItem.pug
 
 mixin loopRender(nodes) 
   for node in nodes
@@ -38,6 +40,10 @@ mixin loopRender(nodes)
         +renderTableRow(node)
       when 'tableCell'
         +renderTableCell(node)    
+      when 'taskList'
+        +renderTaskList(node)
+      when 'taskItem'
+        +renderTaskItem(node)    
       default
         p= `Unknown node type: ${node.type}`
 div

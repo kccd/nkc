@@ -23,8 +23,12 @@ mixin renderText(node)
             style += `font-size: ${mark.attrs.size};`;
             break;
           case 'textStyle':
-            style += `color: ${mark.attrs.color};`;
-            style += `font-family: ${mark.attrs.font};`;
+            if(mark.attrs.color) {
+              style += `color: ${mark.attrs.color};`;
+            }
+            if(mark.attrs.fontFamily) {
+              style += `font-family: ${mark.attrs.fontFamily};`;  
+            }
             break;
           case 'highlight':
             style += `background-color: ${mark.attrs.color};`;    

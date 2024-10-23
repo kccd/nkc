@@ -1253,7 +1253,7 @@
                 {
                     "type": "taskItem",
                     "attrs": {
-                        "checked": false
+                        "checked": true
                     },
                     "content": [
                         {
@@ -1274,7 +1274,7 @@
                 {
                     "type": "taskItem",
                     "attrs": {
-                        "checked": false
+                        "checked": true
                     },
                     "content": [
                         {
