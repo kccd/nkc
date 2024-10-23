@@ -181,7 +181,7 @@ import nkcSticker from './tiptap/node/nkcSticker/nkcSticker.js';
 import nkcPictureBlock from './tiptap/node/nkcPictureBlock/nkcPictureBlock.js';
 import nkcPictureInline from './tiptap/node/nkcPictureInline/nkcPictureInline.js';
 import nkcPictureFloat from './tiptap/node/nkcPictureFloat/nkcPictureFloat.js';
-// import EnsureTrailingParagraph from './tiptap/plugins/EnsureTrailingProagraph.js';
+import EnsureTrailingParagraph from './tiptap/plugins/EnsureTrailingProagraph.js';
 import nkcVideoBlock from './tiptap/node/nkcVideoBlock/nkcVideoBlock.js';
 import nkcXSFLimit from './tiptap/node/nkcXSFLimit/nkcXSFLimit.js';
 import nkcMath from './tiptap/node/nkcMath/nkcMath.js';
@@ -369,7 +369,7 @@ export default {
           nkcPictureBlock,
           nkcPictureInline,
           nkcPictureFloat,
-          // EnsureTrailingParagraph,
+          EnsureTrailingParagraph,
           nkcVideoBlock,
           nkcXSFLimit,
           nkcMath,
