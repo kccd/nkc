@@ -15,6 +15,9 @@
       .app-menu-item(@click="onClick('attachment')")
         <paperclip theme="outline" size="18"/>
         span 附件
+      .app-menu-item(@click="onClick('sticker')")
+        <smiling-face theme="outline" size="18"/>
+        span 表情
       .app-menu-item(@click="onClick('table')")
         <insert-table theme="outline" size="18"/>
         span 表格
@@ -76,6 +79,7 @@ import {
   Music,
   Paperclip,
   Terminal,
+  SmilingFace,
 } from "@icon-park/vue";
 export default {
   components: {
@@ -86,6 +90,7 @@ export default {
     'music': Music,
     'paperclip': Paperclip,
     'terminal': Terminal,
+    'smiling-face': SmilingFace,
   },
   data: () => ({
     callback: null,
