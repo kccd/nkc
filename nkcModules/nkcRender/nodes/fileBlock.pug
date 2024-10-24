@@ -1,6 +1,6 @@
 mixin renderFileBlock(node)
-  - var  fileCover = data.tools.getUrl('fileCover', node.attrs.ext); 
-  - var  size = data.tools.getSize(node.attrs.size);
+  - var  fileCover = tools.getUrl('fileCover', node.attrs.ext); 
+  - var  size = tools.getSize(node.attrs.size);
   p
     span(data-tag="nkcsource" data-type="attachment" data-visitor-access="${visitorAccess}")
       span.article-attachment-icon

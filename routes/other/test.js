@@ -1,4 +1,5 @@
 const testRouter = require('koa-router')();
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 let jsonContentTemplate = require('../../pages/lib/vue/tiptap/jsonContentTemplate.json');
 testRouter
   .get('/', async (ctx, next) => {
@@ -102,8 +103,7 @@ testRouter
     await next();
       })
   .get('/json', async (ctx, next) => {
-    ctx.data.content = jsonContentTemplate.content;
-    ctx.data.tools = ctx.nkcModules.tools;
+    ctx.data.c = renderHTMLByJSON(jsonContentTemplate);
     ctx.template = 'test/jsonRender.pug';
     await next();
   })
