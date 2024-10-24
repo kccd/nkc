@@ -1,14 +1,13 @@
 <template>
-  <node-view-wrapper class="node-view-wrapper" title='点击编辑公式'>
-    <math-selector ref="mathSelector"></math-selector>
-    <span v-html="mathHTML" @click="openMathEditor"></span>
+  <node-view-wrapper class="node-view-wrapper" title="点击编辑公式">
+    <math-selector ref="mathSelector" />
+    <span @click="openMathEditor" v-html="mathHTML" />
   </node-view-wrapper>
-
 </template>
 
 <script>
-import {nodeViewProps, NodeViewWrapper} from "@tiptap/vue-2";
-import MathSelector from "../../../MathSelector.vue";
+import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
+import MathSelector from '../../../MathSelector.vue';
 
 export default {
   components: {
@@ -33,7 +32,7 @@ export default {
     },
     block() {
       this.renderMathHTML();
-    }
+    },
   },
   mounted() {
     this.renderMathHTML();
@@ -41,31 +40,34 @@ export default {
   methods: {
     renderMathHTML() {
       MathJax.typesetPromise()
-      .then(() => {
-        return MathJax.tex2chtmlPromise(this.text, {
-          display: this.block,
+        .then(() => {
+          return MathJax.tex2chtmlPromise(this.text, {
+            display: this.block,
+          });
         })
-      })
-      .then(html => {
-        this.mathHTML = html.outerHTML;
-      })
+        .then((html) => {
+          this.mathHTML = html.outerHTML;
+        });
     },
     openMathEditor() {
-      this.$refs.mathSelector.open(res => {
-        const {text, block} = res;
-        this.node.attrs.block = block;
-        this.node.attrs.text = text;
-      }, {
-        text: this.node.attrs.text,
-        block: this.node.attrs.block,
-      });
-    }
-  }
-}
+      this.$refs.mathSelector.open(
+        (res) => {
+          const { text, block } = res;
+          this.node.attrs.block = block;
+          this.node.attrs.text = text;
+        },
+        {
+          text: this.node.attrs.text,
+          block: this.node.attrs.block,
+        },
+      );
+    },
+  },
+};
 </script>
 
 <style scoped lang="less">
-.node-view-wrapper{
+.node-view-wrapper {
   display: inline;
   cursor: pointer;
 }

@@ -1,7 +1,7 @@
 <template>
   <node-view-wrapper class="file-status-view-wrapper">
     <span class="info">图片{{ info }}</span>
-    <span class="dot-animation" v-if="process !== 1">
+    <span v-if="process !== 1" class="dot-animation">
       <span
         v-for="(dot, index) in 3"
         :key="index"
@@ -13,13 +13,13 @@
 </template>
 
 <script>
-import { nodeViewProps, NodeViewWrapper } from "@tiptap/vue-2";
+import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
 
 export default {
-  props: nodeViewProps,
   components: {
     'node-view-wrapper': NodeViewWrapper,
   },
+  props: nodeViewProps,
   data() {
     return {
       currentDot: 0, // 当前显示的点
@@ -32,7 +32,7 @@ export default {
     },
     info() {
       return this.node.attrs.info;
-    }
+    },
   },
   mounted() {
     this.startAnimation();
@@ -50,7 +50,7 @@ export default {
       clearInterval(this.interval);
     },
   },
-}
+};
 </script>
 
 <style scoped lang="less">
@@ -78,6 +78,6 @@ export default {
   }
 }
 .ProseMirror-selectednode {
-    border: 1px solid #66afe9 !important; /* 聚焦时边框颜色 */
-  }
+  border: 1px solid #66afe9 !important; /* 聚焦时边框颜色 */
+}
 </style>

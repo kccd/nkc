@@ -8,14 +8,14 @@
         span 表格
       .app-menu-item(@click="onClick('math')")
         <formula theme="outline" size="18"/>
-        span 公式  
+        span 公式
       .app-menu-item(@click="onClick('terminal')")
         <terminal theme="outline" size="18"/>
-        span 代码块  
-      .app-menu-item(@click="onClick('hr')")    
+        span 代码块
+      .app-menu-item(@click="onClick('hr')")
         <dividing-line-one theme="outline" size="18"/>
         span 分割线
-      .app-menu-item(@click="onClick('taskList')")    
+      .app-menu-item(@click="onClick('taskList')")
         <check-correct theme="outline" size="18"/>
         span 任务表
       .app-menu-item(@click="onClick('sticker')")
@@ -38,46 +38,46 @@
         span 视频
       .app-menu-item(@click="onClick('attachment')")
         <paperclip theme="outline" size="18"/>
-        span 附件  
+        span 附件
 </template>
 
 <style scoped lang="less">
-.app-menu-container{
+.app-menu-container {
   height: 100%;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  &>div:first-child {
+  & > div:first-child {
     height: 100%;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
   }
-  .app-menu-content{
+  .app-menu-content {
     background-color: #fff;
     position: absolute;
     top: 2rem;
     z-index: 100;
     border-radius: 5px;
-    box-shadow: 1px  1px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
     padding: 0.5rem 0;
     width: 9rem;
-    .app-menu-item{
+    .app-menu-item {
       padding: 0 1rem;
       display: flex;
       align-items: center;
       cursor: pointer;
       height: 2.5rem;
-      &:hover{
+      &:hover {
         background-color: rgba(0, 0, 0, 0.05);
       }
-      &>*:first-child{
+      & > *:first-child {
         padding-top: 4px;
       }
-      &>span{
+      & > span {
         margin-left: 0.5rem;
       }
     }
@@ -100,22 +100,22 @@ import {
   DividingLineOne,
   CheckCorrect,
   Protect,
-} from "@icon-park/vue";
+} from '@icon-park/vue';
 export default {
   components: {
     'more-one': MoreOne,
     'new-picture': NewPicture,
     'video-two': VideoTwo,
     'insert-table': InsertTable,
-    'music': Music,
-    'paperclip': Paperclip,
-    'terminal': Terminal,
+    music: Music,
+    paperclip: Paperclip,
+    terminal: Terminal,
     'smiling-face': SmilingFace,
-    'box': Box,
-    'formula': Formula,
+    box: Box,
+    formula: Formula,
     'dividing-line-one': DividingLineOne,
     'check-correct': CheckCorrect,
-    'protect': Protect,
+    protect: Protect,
   },
   data: () => ({
     callback: null,
@@ -145,7 +145,9 @@ export default {
     resetLeft() {
       const container = this.$refs.container;
       const appMenuContent = this.$refs.appMenuContent;
-      if(!container || !appMenuContent) return;
+      if (!container || !appMenuContent) {
+        return;
+      }
       const info = container.getClientRects()[0];
       const right = info.left + appMenuContent.offsetWidth;
       if (right + 16 > window.innerWidth) {
@@ -154,6 +156,6 @@ export default {
         this.left = 0;
       }
     },
-  }
-}
+  },
+};
 </script>
