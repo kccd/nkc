@@ -123,7 +123,11 @@ testRouter
       }
       resourcesObj[r.rid] = r;
     }
-    ctx.data.c = renderHTMLByJSON(jsonContentTemplate, resourcesObj);
+    ctx.data.c = renderHTMLByJSON(
+      jsonContentTemplate,
+      resourcesObj,
+      ctx.data.user,
+    );
     ctx.template = 'test/jsonRender.pug';
     await next();
   })

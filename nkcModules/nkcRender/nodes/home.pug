@@ -17,6 +17,9 @@ include ./fileBlock.pug
 include ./taskList.pug
 include ./taskItem.pug
 include ./emoji.pug
+include ./sticker.pug
+include ./xsfLimit.pug
+include ./math.pug
 
 mixin loopRender(nodes) 
   for node in nodes
@@ -58,7 +61,14 @@ mixin loopRender(nodes)
       when 'taskItem'
         +renderTaskItem(node)
       when 'nkc-emoji'
-        +renderEmoji(node)    
+        +renderEmoji(node)
+      when 'nkc-sticker'
+        +renderSticker(node)
+      //- 学术分隐藏非叶子节点
+      when 'nkc-xsf-limit'
+        +renderXsfLimit(node)
+      when 'nkc-math'
+        +renderMath(node)
       default
         p= `Unknown node type: ${node.type}`
 div
