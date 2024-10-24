@@ -16,6 +16,7 @@ include ./videoBlock.pug
 include ./fileBlock.pug
 include ./taskList.pug
 include ./taskItem.pug
+include ./emoji.pug
 
 mixin loopRender(nodes) 
   for node in nodes
@@ -44,9 +45,6 @@ mixin loopRender(nodes)
         +renderTableRow(node)
       when 'tableCell'
         +renderTableCell(node)  
-      //-自定义节点==>还需要绑定事件方法
-      //- 对于图片节点一般情况是叶子节点
-      //- 后期需需要在服务端拓展图片相关信息
       when 'nkc-picture-block'
         +renderPictureBlock(node)
       when 'nkc-audio-block'
@@ -58,7 +56,9 @@ mixin loopRender(nodes)
       when 'taskList'
         +renderTaskList(node)
       when 'taskItem'
-        +renderTaskItem(node)    
+        +renderTaskItem(node)
+      when 'nkc-emoji'
+        +renderEmoji(node)    
       default
         p= `Unknown node type: ${node.type}`
 div

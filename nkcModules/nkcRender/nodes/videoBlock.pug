@@ -1,2 +1,24 @@
 mixin renderVideoBlock(node)
-  p vvv
+  - 
+    const { visitorAccess = true, videoSize=[],token='',isFileExist=true ,disabled, rid : id, files,defaultFile = {} } = resourcesObj[node.attrs.id] || {};
+    const oname = defaultFile.name || '未知';
+    const poster = tools.getUrl('resourceCover', id);
+  p
+    if disabled
+      span(data-tag="nkcsource" data-type="video-not-found" data-id=`${id}`)
+        span 视频已被屏蔽
+    else
+      if isFileExist
+        span(span data-tag="nkcsource" data-type="video" data-id=`${id}` data-visitor-access=`${visitorAccess}` )
+          span 
+            video.plyr-dom(preload="none" controls="controls" poster=`${poster}` data-rid=`${id}` data-plyr-title=`${oname}`) 你的浏览器不支持video标签，请升级。
+              each item in videoSize
+                source(src=`${tools.getUrl('resource', id, item.size)}&w=${token}` type="video/mp4" size=`${videoQuality[item.size].height}` data-size=`${item.dataSize}`)
+          span.nkcsource-video-title(data-type="nkcsource-video-title" data-title=`${oname}`)
+            span=oname
+            span &nbsp;
+            span
+              a(data-type="downloadPanel" data-id=`${id}`) 点击下载
+      else
+        span(data-tag="nkcsource" data-type="video-not-found" data-id=`${id}`)
+          span=`视频已丢失（${name}）` 

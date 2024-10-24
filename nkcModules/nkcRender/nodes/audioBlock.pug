@@ -1,13 +1,22 @@
 //- 需要兼容app的呈现场景
 mixin renderAudioBlock(node)
- - var visitorAccess = true;
- //-- var url = getUrl('resource', id) + '&w=' + resource.token;
- - var url = tools.getUrl('resource', node.attrs.id);
- - var size = tools.getSize(node.attrs.size);
+  - 
+    const { rid : id, oname = '未知', disabled ,isFileExist=true, visitorAccess = true, defaultFile = {},token = ''} = resourcesObj[node.attrs.id];
+    const url = tools.getUrl('resource', id) + '&w=' + token;
   p
-    span(data-tag="nkcsource" data-type="audio" data-id=`${node.attrs.id}` data-visitor-access=`${visitorAccess}`)
-      audio.plyr-dom(preload="none" controls data-rid="${id}" data-size=`${node.attrs.size}`) 你的浏览器不支持audio标签，请升级。
-        source(src=`${url}` type="audio/mp3")
-      span.nkcsource-audio-title(data-type="nkcsource-audio-title")=node.attrs.name
-        span.display-i-b.text-danger(style="font-weight: 700")=size
-        a(data-type='downloadPanel' data-id=`${node.attrs.id}`) 立即下载
+    if disabled
+      span(data-tag="nkcsource" data-type="audio-not-found" data-id=`${id}`)
+        span 音频已被屏蔽
+    else
+      if !isFileExist
+        span(data-tag="nkcsource" data-type="audio-not-found" data-id=`${id}`)
+          span 音频已丢失
+          br
+          span=oname
+      else
+        span(data-tag="nkcsource" data-type="audio" data-id=`${id}` data-visitor-access=`${visitorAccess}`)
+          audio.plyr-dom( preload="none" controls data-rid=`${id}` data-size=`${defaultFile.size}`) 你的浏览器不支持audio标签，请升级。
+            source(src=`${url}` type="audio/mp3")
+          span.nkcsource-audio-title(data-type="nkcsource-audio-title")=oname
+            span.display-i-b.text-danger(style="font-weight: 700")=tools.getSize(defaultFile.size)
+            a(data-type='downloadPanel' data-id=`${id}`) 立即下载
