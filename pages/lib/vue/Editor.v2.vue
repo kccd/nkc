@@ -45,7 +45,7 @@
         @blur='isFontFamilySelectOpen = false'
       )
         option(
-          v-for='font in fontFamilies' 
+          v-for='font in fontFamilies'
           :value='font[0]'
           :style="`font-family: ${font[0]}`"
           ) {{font[1]}}
@@ -90,7 +90,7 @@
       )
         <link-one theme="filled" :size="iconFontSize" />
       div(@click='editor.chain().focus().unsetLink().run()', title='取消链接')
-        <unlink theme="filled" :size="iconFontSize" />  
+        <unlink theme="filled" :size="iconFontSize" />
       div(
         @click='editor.chain().focus().toggleOrderedList().run()',
         :class='editorIsActive("orderedList")',
@@ -114,7 +114,7 @@
         :class='{ "is-active": editor.isActive("code") }',
         title='代码'
       )
-        <code-one theme="filled" :size="iconFontSize" />  
+        <code-one theme="filled" :size="iconFontSize" />
       div(
         @click='editor.chain().focus().setTextAlign("left").run()',
         title='左对齐',
@@ -138,7 +138,7 @@
         title='首行缩进',
         :class='editorIsActive({ textIndent: 2 })'
       )
-        <indent-left theme="outline" :size="iconFontSize" />  
+        <indent-left theme="outline" :size="iconFontSize" />
       div(
         @click='editor.chain().focus().toggleSubscript().run()',
         :class='{ "is-active": editor.isActive("subscript") }'
@@ -148,7 +148,7 @@
         @click='editor.chain().focus().toggleSuperscript().run()',
         :class='{ "is-active": editor.isActive("superscript") }'
       )
-        <right-small-up theme="filled" :size="iconFontSize" />  
+        <right-small-up theme="filled" :size="iconFontSize" />
       div(data-type='custom')
         app-menu(ref='appMenu', @select='appMenuClick')
 
@@ -158,7 +158,9 @@
   sticker-selector(ref='stickerSelector')
   draft-selector(ref='draftSelector')
   math-selector(ref='mathSelector')
+  textarea.form-control(rows="20" v-model="jsonContent")
   button(@click='getJSON') GET JSON
+  button(@click='setJSON') SET JSON AND POST
 </template>
 
 <script>
@@ -309,6 +311,7 @@ export default {
         ['Tahoma', 'Tahoma'],
         ['Verdana', 'Verdana'],
       ],
+      jsonContent: '',
     };
   },
   mounted() {
@@ -453,7 +456,12 @@ export default {
     getJSON() {
       const json = this.editor.getJSON();
       console.log(json);
-      nkcAPI('/test', 'POST', {json})
+      this.jsonContent = JSON.stringify(json, null ,2);
+    },
+    setJSON() {
+      this.editor.commands.setContent(JSON.parse(this.jsonContent));
+      nkcAPI('/test', 'POST', {json: JSON.parse(this.jsonContent)})
+        .catch(sweetError)
     },
     insertResource(resourceType) {
       const self = this;
