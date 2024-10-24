@@ -2,8 +2,8 @@
 mixin renderAudioBlock(node)
  - var visitorAccess = true;
  //-- var url = getUrl('resource', id) + '&w=' + resource.token;
- - var url = data.tools.getUrl('resource', node.attrs.id);
- - var size = data.tools.getSize(node.attrs.size);
+ - var url = tools.getUrl('resource', node.attrs.id);
+ - var size = tools.getSize(node.attrs.size);
   p
     span(data-tag="nkcsource" data-type="audio" data-id=`${node.attrs.id}` data-visitor-access=`${visitorAccess}`)
       audio.plyr-dom(preload="none" controls data-rid="${id}" data-size=`${node.attrs.size}`) 你的浏览器不支持audio标签，请升级。
