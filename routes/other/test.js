@@ -107,7 +107,7 @@ testRouter
       'nkc-audio-block',
       'nkc-picture-block',
       'nkc-video-block',
-      'nkc-file-block',
+      'nkc-attachment-block',
     ];
     const rids = jsonContentTemplate.content
       .filter((item) => targetTypes.includes(item.type)) // 过滤出指定类型

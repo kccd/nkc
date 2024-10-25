@@ -13,7 +13,7 @@ include ./tableCell.pug
 include ./pictureBlock.pug
 include ./audioBlock.pug
 include ./videoBlock.pug
-include ./fileBlock.pug
+include ./attachmentBlock.pug
 include ./taskList.pug
 include ./taskItem.pug
 include ./emoji.pug
@@ -54,8 +54,8 @@ mixin loopRender(nodes)
         +renderAudioBlock(node)
       when 'nkc-video-block'
         +renderVideoBlock(node)
-      when 'nkc-file-block'
-        +renderFileBlock(node)   
+      when 'nkc-attachment-block'
+        +renderAttachmentBlock(node)   
       when 'taskList'
         +renderTaskList(node)
       when 'taskItem'
