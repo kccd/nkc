@@ -2,13 +2,17 @@ const pug = require('pug');
 const path = require('path');
 const tools = require('../tools');
 const homePugFilePath = path.resolve(__dirname, './nodes/home.pug');
+const videoSize = require('../../settings/video');
 
-function renderHTMLByJSON(json) {
+function renderHTMLByJSON(json, resourcesObj = {}, user = {}) {
   const jsonObj = typeof json === 'string' ? JSON.parse(json) : json;
   const html = pug.renderFile(homePugFilePath, {
     pretty: true,
     data: jsonObj,
     tools: tools,
+    resourcesObj,
+    videoQuality: videoSize,
+    user,
     cache: false,
   });
 

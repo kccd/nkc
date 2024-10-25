@@ -1,0 +1,2 @@
+mixin renderEmoji(node)
+  img.emoji(src=`${tools.getUrl('emoji',node.attrs.unicode)}` alt=`${node.attrs.unicode}` data-tag="nkcsource" data-type="twemoji")

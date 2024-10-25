@@ -244,7 +244,7 @@ import {
 } from '@icon-park/vue';
 import ResourceSelector from './ResourceSelector.vue';
 import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
-import nkcFileBlock from './tiptap/node/nkcFileBlock/nkcFileBlock.js';
+import nkcAttachmentBlock from './tiptap/node/nkcAttachmentBlock/nkcAttachmentBlock.js';
 import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBlock.js';
 import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
@@ -384,7 +384,7 @@ export default {
           nkcXSFLimit,
           nkcMath,
           nkcAudioBlock,
-          nkcFileBlock,
+          nkcAttachmentBlock,
           PasteOrDropFile,
           nkcFileStatusBlock,
           nkcFileStatusInline,
@@ -521,13 +521,13 @@ export default {
               }
               case 'attachment': {
                 insertContent.push({
-                  type: 'nkc-file-block',
+                  type: 'nkc-attachment-block',
                   attrs: {
                     id: source.rid,
-                    name: source.oname,
-                    size: source.size,
-                    ext: source.ext,
-                    hits: source.hits,
+                    // name: source.oname,
+                    // size: source.size,
+                    // ext: source.ext,
+                    // hits: source.hits,
                   },
                 });
                 break;

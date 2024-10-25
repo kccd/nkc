@@ -1,0 +1,5 @@
+mixin renderMath(node)
+  if !node.attrs.block
+    span=`$${node.attrs.text}$`
+  else 
+    p=`$$${node.attrs.text}$$`

@@ -1,0 +1,3 @@
+mixin renderSticker(node)
+  span(data-tag="nkcsource" data-type="sticker" data-id=`${node.attrs.id}`)
+    img(src=`${tools.getUrl('sticker', node.attrs.id)}` data-global-click="viewSticker" data-global-data=`${tools.objToStr({ rid: node.attrs.id })}`)

@@ -1,10 +1,22 @@
 mixin renderPictureBlock(node)
-  //- p
-    span(data-tag="nkcsource" data-type="picture" data-id=`${node.attrs.id}` style="width:100%")
-      span(style="padding-top:20%")
-        img(src=`/r/${node.attrs.id}`)
-  p(style="display:flex;text-align:center;flex-direction: column;align-items: center;padding:1rem 0;margin-bottom: 1rem;")
-    img(src=`/r/${node.attrs.id}` style="width:100%;")
-    span=node.attrs.desc
+  -
+    const { rid : id, disabled, defaultFile = {} } = resourcesObj[node.attrs.id] || {};
+    const oname = defaultFile.name || '未知';
+    const { width, height } = defaultFile;
+    const url = tools.getUrl('resource', id);
+    const lgUrl = tools.getUrl('resource', id, 'lg');
+  p
+    if disabled
+      span(data-tag="nkcsource" data-type="picture-is-disable" data-id=`${id}` style="text-align: center")
+        span.fa.fa-ban(data-type="disabled" data-id=`${id}-${disabled}` title="屏蔽")
+        span(data-type="view" style="font-size: 32px;width: 100%") 图片已被屏蔽
+    else 
+      if !width || !height
+        span(data-tag="nkcsource" data-type="picture" data-id=`${id}`)
+          img(data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data=`${tools.objToStr({ name: oname, url: lgUrl },)}` src=`${url}` alt=`${oname}` data-type="view" dataimg="content")
+      else 
+        span(data-tag="nkcsource" data-type="picture" data-id=`${id}` style=`width: ${width}px;`)
+          span(style=`padding-top: ${(height * 100) / width}%`)
+            img(data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data=`${tools.objToStr({ name: oname, url: lgUrl, height: height, width: width },)}` data-src=`${url}` alt=`${oname}` data-type="view" dataimg="content" class="lazyload")
 
       

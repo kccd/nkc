@@ -13,9 +13,13 @@ include ./tableCell.pug
 include ./pictureBlock.pug
 include ./audioBlock.pug
 include ./videoBlock.pug
-include ./fileBlock.pug
+include ./attachmentBlock.pug
 include ./taskList.pug
 include ./taskItem.pug
+include ./emoji.pug
+include ./sticker.pug
+include ./xsfLimit.pug
+include ./math.pug
 include ./image.pug
 
 mixin loopRender(nodes) 
@@ -44,21 +48,28 @@ mixin loopRender(nodes)
       when 'tableRow'
         +renderTableRow(node)
       when 'tableCell'
-        +renderTableCell(node)  
-      //-自定义节点==>还需要绑定事件方法
-      //- 对于图片节点一般情况是叶子节点
-      //- 后期需需要在服务端拓展图片相关信息
+        +renderTableCell(node)
       when 'nkc-picture-block'
         +renderPictureBlock(node)
       when 'nkc-audio-block'
         +renderAudioBlock(node)
       when 'nkc-video-block'
         +renderVideoBlock(node)
-      when 'nkc-file-block'
-        +renderFileBlock(node)   
+      when 'nkc-attachment-block'
+        +renderAttachmentBlock(node)
       when 'taskList'
         +renderTaskList(node)
       when 'taskItem'
+        +renderTaskItem(node)
+      when 'nkc-emoji'
+        +renderEmoji(node)
+      when 'nkc-sticker'
+        +renderSticker(node)
+      //- 学术分隐藏非叶子节点
+      when 'nkc-xsf-limit'
+        +renderXsfLimit(node)
+      when 'nkc-math'
+        +renderMath(node)
         +renderTaskItem(node)
       when 'image'
         +renderImage(node)

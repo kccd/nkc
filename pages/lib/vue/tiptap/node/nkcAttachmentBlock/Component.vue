@@ -2,29 +2,29 @@
   <node-view-wrapper class="file-view-wrapper">
     <div class="file-box">
       <span class="file-attachment-icon">
-        <img :src="getUrl('fileCover', node.attrs.ext)" alt="attachment icon" />
+        <img :src="getUrl('fileCover', ext)" alt="attachment icon" />
       </span>
       <span class="file-attachment-content">
-        <span class="file-attachment-name" :title="node.attrs.name">{{
-          node.attrs.name
+        <span class="file-attachment-name" :title="name">{{
+          name
         }}</span>
         <span>
           <span class="file-attachment-size">{{
-            getSize(node.attrs.size)
+            getSize(size)
           }}</span>
           <span class="file-attachment-ext">{{
-            node.attrs.ext.toUpperCase()
+            ext.toUpperCase()
           }}</span>
-          <span 
-            >{{ node.attrs.hits }}次下载</span
-          >
+          <!-- <span 
+            >{{ hits }}次下载</span
+          > -->
           <span
             class="file-attachment-reader"
-            v-if="node.attrs.ext === 'pdf'"
+            v-if="ext === 'pdf'"
           >
             <a
               :href="`/reader/pdf/web/viewer?file=%2fr%2f${
-                node.attrs.id
+                id
               }?time%3D${Date.now()}`"
               target="_blank"
               >预览</a
@@ -50,16 +50,39 @@ export default {
     'node-view-wrapper': NodeViewWrapper,
   },
   data: () => ({
+    name: '',
+    size: 0,
+    ext: '',
+    hits: 0,
   }),
   computed: {
+    id() {
+      return this.node.attrs.id;
+    }
   },
   watch: {
+    id() {
+      this.getAttachmentInfo();
+    }
   },
   mounted() {
+    this.getAttachmentInfo();
   },
   methods: {
     getSize,
     getUrl,
+    getAttachmentInfo() {
+      const self = this;
+      if(!this.node.attrs.id) return;
+      nkcAPI(`/rs?rid=${this.node.attrs.id}`, 'GET')
+        .then(res => {
+          const { oname,size,ext}=res.resources[0];
+          self.name = oname;
+          self.size = size;
+          self.ext = ext;
+        })
+        .catch(console.error);
+    }
   },
 }
 </script>

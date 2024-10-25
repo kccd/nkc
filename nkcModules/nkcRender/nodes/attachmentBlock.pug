@@ -1,0 +1,37 @@
+mixin renderAttachmentBlock(node)
+  -
+    const {
+      ext = '',
+      hits = 0,
+      rid : id,
+      visitorAccess = true,
+      disabled,
+      defaultFile = {},
+      isFileExist = true
+    } = resourcesObj[node.attrs.id];
+    const oname = defaultFile.name || '未知';
+    const size = defaultFile.size;
+    const fileCover = tools.getUrl('fileCover', ext);
+  p
+    if disabled
+      span(data-tag="nkcsource" data-type="attachment-disabled")
+        span.attachment-disabled
+          span 附件已被屏蔽
+    else
+      span(data-tag="nkcsource" data-type="attachment" data-visitor-access=`${visitorAccess}`)
+        span.article-attachment-icon
+          img(src=`${fileCover}`, alt="attachment icon")
+        span.article-attachment-content
+          if isFileExist
+            span.article-attachment-name( title=`${oname}` data-type="downloadPanel" data-id=`${id}`)=oname
+            span.article-attachment-info
+              span.article-attachment-size=tools.getSize(size)
+              span.article-attachment-ext=ext.toUpperCase()
+              span.article-attachment-hits=`${hits}次下载`
+              if ext === 'pdf'
+                span.article-attachment-reader
+                  a(href=`/reader/pdf/web/viewer?file=%2fr%2f${id}?time%3D${Date.now()}` target="_blank") 预览
+                  span.fa.fa-question-circle(title="预览文件已被压缩处理，并不代表真实文件质量")
+          else
+            span.article-attachment-name(title=`${oname}（附件已丢失）`)=oname
+        
