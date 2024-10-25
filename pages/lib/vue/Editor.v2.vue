@@ -201,12 +201,14 @@ import TextAlign from '@tiptap/extension-text-align';
 import TextColorIcon from './tiptap/TextColorIcon.vue';
 import Highlight from '@tiptap/extension-highlight';
 import BubbleMenu from '@tiptap/extension-bubble-menu';
+import Image from '@tiptap/extension-image'
 import TableEditor from './tiptap/TableEditor.vue';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
 import StickerSelector from './StickerSelector/StickerSelector.vue';
 import DraftSelector from './DraftSelector.vue';
+import HardBreak from '@tiptap/extension-hard-break'
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
@@ -324,6 +326,10 @@ export default {
       this.editor = new Editor({
         content: jsonContentTemplate,
         extensions: [
+          HardBreak,
+          Image.configure({
+            inline: true,
+          }),
           Placeholder.configure({
             placeholder: '开始输入...',
           }),

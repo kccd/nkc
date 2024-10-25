@@ -1354,6 +1354,97 @@
       "attrs": {
         "textAlign": "left",
         "textIndent": 0
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "图片"
+        }
+      ]
+    },
+    {
+      "type": "nkc-picture-block",
+      "attrs": {
+        "id": "360962",
+        "desc": ""
+      }
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left",
+        "textIndent": 0
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "音频"
+        }
+      ]
+    },
+    {
+      "type": "nkc-audio-block",
+      "attrs": {
+        "id": "360963",
+        "name": "06. 擱淺.mp3",
+        "size": 3811758
+      }
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left",
+        "textIndent": 0
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "视频"
+        }
+      ]
+    },
+    {
+      "type": "nkc-video-block",
+      "attrs": {
+        "id": "360964",
+        "desc": "123"
+      }
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left",
+        "textIndent": 0
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "附件"
+        }
+      ]
+    },
+    {
+      "type": "nkc-file-block",
+      "attrs": {
+        "id": "360965",
+        "name": "5.apk",
+        "size": 84608756,
+        "ext": "apk",
+        "hits": 0
+      }
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left",
+        "textIndent": 0
+      }
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": "left",
+        "textIndent": 0
       }
     }
   ]

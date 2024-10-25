@@ -16,6 +16,7 @@ include ./videoBlock.pug
 include ./fileBlock.pug
 include ./taskList.pug
 include ./taskItem.pug
+include ./image.pug
 
 mixin loopRender(nodes) 
   for node in nodes
@@ -58,7 +59,9 @@ mixin loopRender(nodes)
       when 'taskList'
         +renderTaskList(node)
       when 'taskItem'
-        +renderTaskItem(node)    
+        +renderTaskItem(node)
+      when 'image'
+        +renderImage(node)
       default
         p= `Unknown node type: ${node.type}`
 div
