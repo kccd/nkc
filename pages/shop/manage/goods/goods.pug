@@ -31,7 +31,10 @@ block shopContent
                   .order-cover
                     img(src=`/r/${product.imgMaster}`)
                   .order-name
-                    a(href=`/shop/product/${product.productId}` title=product.name target="_blank")=product.name
+                    if product.productStatus === 'notonshelf'
+                      a(href=`/shop/manage/shelf?productId=${product.productId}` target="_blank")=product.name
+                    else 
+                      a(href=`/shop/product/${product.productId}` title=product.name target="_blank")=product.name
                     .order-param=`上架时间：${format("YYYY/MM/DD HH:mm:ss", product.toc)}`
               th
                 div.stocks-surplus=total
@@ -55,7 +58,10 @@ block shopContent
                 else
                   div 待上架
               th.order-links
-                a(href=`/editor?type=modifyThread&id=${product.oc}` target="_blank") 修改商品信息
+                if product.productStatus === 'notonshelf'
+                  a(href=`/shop/manage/shelf?productId=${product.productId}` target="_blank") 修改商品信息
+                else
+                  a(href=`/editor?type=modifyThread&id=${product.oc}` target="_blank") 修改商品信息
                 a(href=`/shop/manage/shelf?productId=${product.productId}` target="_blank") 修改出售信息
                 if product.productStatus === "insale"
                   a.pointer(onclick=`stopSale('${product.productId}')`) 停售

@@ -1,6 +1,6 @@
 const data = NKC.methods.getDataById("data");
 
-const {grades, dealInfo, product} = data;
+const {grades, dealInfo, product,selectForumsInfo=[]} = data;
 
 const vipDisGroupObj = {};
 
@@ -49,6 +49,7 @@ window.app = new Vue({
   data: {
 
     type: product? "modify": "create", // 新上架：create, 编辑：modify
+    productStatus: product ? product.productStatus : '',
 
     submitting: false,
 
@@ -56,14 +57,14 @@ window.app = new Vue({
 
     // 提供选择的交易板块
     shopForums: data.shopForumTypes,
-    selectedShopForumId: "",
+    selectedShopForumId: product ? product.mainForumsId[0] : '',
     // 辅助板块
-    mainForums: [],
+    mainForums: product ? selectForumsInfo.filter(item=>product.mainForumsId.slice(1).includes(item.fid)) : [],
     // 商品标题、描述、关键词
-    title: "",
-    abstract: "",
-    content: "",
-    keywords: [],
+    title: product ? product.threadInfo.title :"",
+    abstract: product ? product.threadInfo.abstractCn :"",
+    content: product ? product.threadInfo.content : "",
+    keywords: product ? product.threadInfo.keyWordsCn : [],
     // 商品介绍图
     imgIntroductions: product? product.imgIntroductions: ["", "", "", "", ""],
 
@@ -132,6 +133,10 @@ window.app = new Vue({
     // 编辑商品 预制内容
     if(product) {
 
+      if(this.productStatus === 'notonshelf'){
+        window.CommonModal = new NKC.modules.CommonModal();
+        window.SelectForums = new NKC.modules.ForumSelector();
+      }
     } else {
       window.CommonModal = new NKC.modules.CommonModal();
       window.SelectForums = new NKC.modules.ForumSelector();
@@ -187,7 +192,7 @@ window.app = new Vue({
       Promise.resolve()
         .then(() => {
           self.submitting = true;
-          if(self.type === "create") {
+          if(self.type === "create" || self.productStatus === 'notonshelf') {
             self.content = self.$refs.shopEditor.getContent();
             if(!self.selectedShopForumId) throw "请选择商品分类";
             // if(!self.mainForums.length) throw "请选择商品辅助分类";
@@ -523,7 +528,12 @@ window.app = new Vue({
         self.addParam(self.newParam(name));
       })
       this.paramForum = false;
-    }
+    },
+    readyEditorCall() {
+      if (product && product.productStatus === 'notonshelf') {
+        this.$refs.shopEditor.setContent(product.threadInfo.content);
+      }
+    },
   }
 });
 
