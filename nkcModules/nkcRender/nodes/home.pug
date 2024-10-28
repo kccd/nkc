@@ -11,6 +11,7 @@ include ./table.pug
 include ./tableRow.pug
 include ./tableCell.pug
 include ./pictureBlock.pug
+include ./pictureInline.pug
 include ./audioBlock.pug
 include ./videoBlock.pug
 include ./attachmentBlock.pug
@@ -51,6 +52,8 @@ mixin loopRender(nodes)
         +renderTableCell(node)
       when 'nkc-picture-block'
         +renderPictureBlock(node)
+      when 'nkc-picture-inline'
+        +renderPictureInline(node)
       when 'nkc-audio-block'
         +renderAudioBlock(node)
       when 'nkc-video-block'
