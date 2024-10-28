@@ -27,12 +27,15 @@ export default {
 
 <style scoped lang="less">
 .node-view-wrapper{
-  display: inline;
+  display: inline-block;
+  height: 2rem;
+  width: 2rem;
   img{
-    height: 2rem;
-    width: 2rem;
-    margin: 0 0.2rem;
-    vertical-align: text-bottom;
+    height: 100%;
+    width: 100%;
   }
+}
+.ProseMirror-selectednode {
+  background-color: #2b90d9;
 }
 </style>
