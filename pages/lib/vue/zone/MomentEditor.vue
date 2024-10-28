@@ -451,17 +451,17 @@
       },
       initData() {
         const self = this;
+        console.log(1)
         if(!this.mid){
           nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
             .then(res => {
               const {momentId, content, picturesId, videosId, medias} = res;
-              if(!momentId) return;
-              self.momentId = momentId;
-              self.content = content;
-              self.syncEditorContent();
-              // self.picturesId = picturesId;
-              // self.videosId = videosId;
-              self.medias = medias;
+              if(momentId) {
+                self.momentId = momentId;
+                self.content = content;
+                self.syncEditorContent();
+                self.medias = medias;
+              }
               self.hideEditorLoading();
             })
             .catch(err => {
@@ -470,24 +470,14 @@
         }else {
           nkcAPI(`/api/v1/editor/moment/${this.mid}`,'GET').then((res)=>{
             const {momentId, content, picturesId, videosId,momentStatus,files,mediaType,medias} = res.data;
-            if(!momentId) return;
-            self.momentId = momentId;
-            self.content = content;
-            self.syncEditorContent();
-            self.momentStatus = momentStatus
-            self.medias = medias;
+            if(momentId) {
+              self.momentId = momentId;
+              self.content = content;
+              self.syncEditorContent();
+              self.momentStatus = momentStatus
+              self.medias = medias;
+            }
             self.hideEditorLoading();
-            // if(files.length>0){
-            //   if(mediaType === 'mediaPicture'){
-            //     self.picturesId = files
-            //   }else {
-            //     self.videosId =  files
-            //   }
-            // }else {
-            //   self.picturesId = picturesId;
-            //   self.videosId = videosId;
-            // }
-
           }).catch(err=>{
             sweetError(err,'err')
           })
