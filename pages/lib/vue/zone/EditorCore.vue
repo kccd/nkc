@@ -2,7 +2,7 @@
   .moment-editor-core
     div(v-show="loading")
       loading-icon
-    editor-content.tiptap-editor-content(:editor='editor')
+    editor-content.tiptap-editor-content(:editor='editor' ref="editorContent")
 </template>
 
 <script>
@@ -28,6 +28,12 @@ export default {
   }),
   mounted() {
     this.initEditor();
+    this.$refs.editorContent.$el.addEventListener('keydown', (e) => {
+      if (this.editor.isFocused && event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault();
+        this.$emit('click-ctrl-enter');
+      }
+    });
   },
   methods: {
     initEditor() {
