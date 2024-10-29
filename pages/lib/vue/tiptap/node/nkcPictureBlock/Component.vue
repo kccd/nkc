@@ -32,7 +32,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem 0;
   margin-bottom: 1rem;
   img{
     max-width: 100%;
@@ -43,5 +42,8 @@ export default {
     width: 30rem;
     max-width: 100%;
   }
+}
+.ProseMirror-selectednode {
+  outline: 3px solid #66afe9;
 }
 </style>
