@@ -25,7 +25,7 @@ export default Node.create({
 
   renderHTML(props) {
     const { HTMLAttributes } = props;
-    return ['nkc-picture-block', mergeAttributes(HTMLAttributes)];
+    return ['nkc-picture-inline', mergeAttributes(HTMLAttributes)];
   },
 
   addNodeView() {
