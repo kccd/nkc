@@ -53,11 +53,9 @@
       .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
       .moment-comment-reply-editor(v-if="replyEditorStatus")
         .m-b-05
-          textarea-editor(
-            ref="replyEditor"
+          editor-core(
+            ref="editorCore"
             :placeholder="editorPlaceholder"
-            max-height="20rem"
-            height="2rem"
             @content-change="onReplyEditorContentChange"
             @click-ctrl-enter="submitReplyContent"
           )
@@ -112,12 +110,12 @@ import {visitUrl} from "../../js/pageSwitch";
 import {sweetError} from "../../js/sweetAlert";
 import {getState} from "../../js/state";
 import {objToStr} from "../../js/tools";
-import TextareaEditor from '../../vue/TextareaEditor';
 import {nkcAPI} from "../../js/netAPI";
 import { WinkingFace } from "@icon-park/vue";
 import EmojiSelector from "../EmojiSelector.vue";
 import MomentFiles from './MomentFilesNew';
 import ResourceSelector from '../ResourceSelector';
+import EditorCore from './EditorCore.vue';
 import { getUrl } from '../../js/tools';
 const state = getState();
 const iconFill = {
@@ -149,10 +147,10 @@ export default {
     }
   },
   components: {
+    'editor-core': EditorCore,
     'moment-status': MomentStatus,
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
-    'textarea-editor': TextareaEditor,
     'winking-face': WinkingFace,
     'emoji-selector': EmojiSelector,
     'moment-files': MomentFiles,
@@ -256,7 +254,8 @@ export default {
       this.replyEditorStatus = true;
       this.clearReplyPicture();
       Vue.nextTick(() => {
-        this.$refs.replyEditor.focus();
+        this.$refs.editorCore.hideLoading();
+        this.$refs.editorCore.focus();
       });
 
     },
@@ -297,7 +296,7 @@ export default {
       visitUrl(`/z/m/${this.commentData._id}`, true);
     },
     insertContent(text) {
-      return this.$refs.replyEditor.insertContent(text);
+      return this.$refs.editorCore.insertContent(text);
     },
     iconMouseOver(e) {
       e.fill = iconFill.active;
@@ -309,7 +308,12 @@ export default {
       const self = this;
       this.$refs.emojiSelector.open(res => {
         const {code} = res;
-        self.insertContent(`[${code}]`);
+        self.insertContent(JSON.stringify({
+          type: 'nkc-emoji',
+          attrs: {
+            unicode: code,
+          }
+        }));
       });
     },
     selectPicture() {
@@ -407,18 +411,26 @@ export default {
       }
     }
   .moment-comment-item-content {
-    margin-bottom: 0.5rem;
-    word-break: keep-all;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+    all: initial;
     /deep/img{
-      height: 1.5rem;
-      width: 1.5rem;
+      height: 2rem;
+      width: 2rem;
       margin: 0 0.1rem;
       vertical-align: text-bottom;
     }
     /deep/a{
       color: @primary;
+    }
+    /deep/div{
+    }
+    /deep/p{
+      font-size: 1.2rem;
+      color: #000;
+      line-height: 1.6em;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+      word-wrap: break-word;
+      min-height: 1.6em;
     }
   }
 }

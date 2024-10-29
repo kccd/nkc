@@ -1,0 +1,15 @@
+include ./paragraph.pug
+include ./text.pug
+include ./emoji.pug
+
+mixin loopRender(nodes)
+  for node in nodes
+    case node.type
+      when 'paragraph'
+        +renderParagraph(node)
+      when 'text'
+        +renderText(node)
+      when 'nkc-emoji'
+        +renderEmoji(node)
+div
+  +loopRender(data.content)

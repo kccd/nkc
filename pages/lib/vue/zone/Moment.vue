@@ -37,7 +37,8 @@
             span &nbsp;IP:{{momentData.addr}}&nbsp;
       .single-moment-detail-bottom(v-if="selectedMomentId !== momentData.momentId || submitting" )
         //- 动态内容
-        .single-moment-content(v-html="momentData.content")
+        .single-moment-content
+          .single-moment-content-html(v-html="momentData.content" ref="momentDetailsContent" )
         //- 图片视频
         .single-moment-detail-files
           moment-files(:data="momentData.files")
@@ -123,11 +124,10 @@
             @selectedMomentId="handleMid"
           )
         //- 动态内容
-        .single-moment-content.pointer(:class="{'simple': !expandContent}" ref="momentDetails" @click.stop="handleClick('',$event)")
-          span(v-html="momentData.content" ref="momentDetailsContent" )
-        //-.singe-moment-details(v-if="type !== 'details' && isFold"    @click.self="visitUrl(momentData.url, true)") 显示更多
-        .singe-moment-details.m-b-1(v-if="isFold && !expandContent"    @click.self="expandContent=true") 显示更多
-        .singe-moment-details.m-b-1(v-if="isFold && expandContent"    @click.self="expandContent=false") 收起
+        .single-moment-content(:class="{'simple': !expandContent}" ref="momentDetails" @click.stop="handleClick('',$event)")
+          .single-moment-content-html(v-html="momentData.content" ref="momentDetailsContent" )
+          .singe-moment-details.extend-content(v-if="isFold && !expandContent"    @click.self.stop="expandContent=true") 显示更多
+          .singe-moment-details(v-if="isFold && expandContent"    @click.self.stop="expandContent=false") 收起
         //- 图片视频
         .single-moment-files
           moment-files(:data="momentData.files")
@@ -506,7 +506,7 @@
 
   .single-moment-header{
     padding-right: 8rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
     @optionHeight: 2rem;
     position: relative;
     .single-moment-user{
@@ -600,30 +600,37 @@
   }
   .single-moment-content{
     &.simple{
-      /* 移动端的样式 */
-      @media (max-width: 767px) {
-        .hideText(@line: 10);
-      }
-      /* PC 端样式 */
-      @media (min-width: 767px) {
-        .hideText(@line: 8);
+      overflow: hidden;
+      max-height: 192px;
+      position: relative;
+      .single-moment-content-html{
+        cursor: pointer;
       }
     }
-    font-size: 1.25rem;
-    color: #000;
-    line-height: 2rem;
-    margin-bottom: 0.5rem;
-    word-break: break-word;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    &/deep/ img{
-      height: 1.5rem;
-      width: 1.5rem;
-      margin: 0 0.1rem;
-      vertical-align: text-bottom;
-    }
-    &/deep/ a{
-      color: @primary;
+    .single-moment-content-html{
+      all: initial;
+      overflow: hidden;
+      &/deep/ div{
+        overflow: hidden;
+      }
+      &/deep/ img{
+        height: 2rem;
+        width: 2rem;
+        margin: 0 0.1rem;
+        vertical-align: text-bottom;
+      }
+      &/deep/ a{
+        color: @primary;
+      }
+      /deep/p{
+        font-size: 1.25rem;
+        color: #000;
+        line-height: 1.6em;
+        margin-bottom: 0.5rem;
+        word-break: break-word;
+        word-wrap: break-word;
+        min-height: 1.6em;
+      }
     }
   }
   .single-moment-comment-container{
@@ -635,8 +642,20 @@
   }
   .singe-moment-details{
     color: rgb(29, 155, 240);
-    display: inline-block;
     cursor: pointer;
+    padding-bottom: 0.5rem;
+    &.extend-content{
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      height: 5rem;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      background: rgb(255,255,255);
+      background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+    }
   }
   .singe-moment-details:hover{
     // text-decoration: underline;

@@ -933,6 +933,9 @@ schema.methods.checkBeforePublishing = async function () {
   const DocumentModel = mongoose.model('documents');
   const ResourceModel = mongoose.model('resources');
   const { moment: momentSource } = await DocumentModel.getDocumentSources();
+  const {
+    momentCheckerService,
+  } = require('../services/moment/momentChecker.service');
   const betaDocument = await DocumentModel.getBetaDocumentBySource(
     momentSource,
     this._id,
@@ -944,11 +947,7 @@ schema.methods.checkBeforePublishing = async function () {
   await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if (!this.quoteType || !this.quoteId) {
     const { checkString, getLength } = require('../nkcModules/checkData');
-    checkString(betaDocument.content, {
-      name: '动态内容',
-      minLength: 0,
-      maxLength: 1000,
-    });
+    momentCheckerService.checkMomentSimpleJSONLength(betaDocument.content);
     // 检测文字和图片/视频是否都没有
     if (
       getLength(betaDocument.content) === 0 &&
@@ -1508,27 +1507,12 @@ schema.statics.getQuoteDefaultContent = async (quoteType) => {
  * @param {String} content 待渲染的内容
  * @return {String} 渲染后的富文本内容
  * */
-schema.statics.renderContent = async (content) => {
-  const nkcRender = require('../nkcModules/nkcRender');
-  const { getUrl } = require('../nkcModules/tools');
-  const { filterMessageContent } = require('../nkcModules/xssFilters');
-  // 替换空格
-  // content = content.replace(/ /g, '&nbsp;');
-  // 处理链接
-  content = nkcRender.URLifyHTML(content);
-  content = nkcRender.replaceHTMLExternalLink(content);
-  // 过滤标签 仅保留标签 a['href']
-  content = filterMessageContent(content);
-  // 替换换行符
-  content = content.replace(/\n/g, '<br/>');
-  content = content.replace(/\[(.*?)]/g, function (r, v1) {
-    if (!fluentuiEmojiUnicode.includes(v1)) {
-      return r;
-    }
-    const emojiUrl = getUrl('emoji', v1);
-    return '<img class="message-emoji" src="' + emojiUrl + '"/>';
-  });
-  return content;
+schema.statics.renderContent = async (content, atUsers = []) => {
+  const {
+    momentRenderService,
+  } = require('../services/moment/render/momentRender.service');
+
+  return momentRenderService.renderingSimpleJson(content, atUsers);
 };
 
 /*
@@ -1653,9 +1637,9 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     let content = '';
     let addr = localAddr;
     if (betaDocument) {
-      const originalContent = await betaDocument.renderAtUsers();
       content = await MomentModel.renderContent(
-        originalContent || betaDocument.content,
+        betaDocument.content,
+        betaDocument.atUsers,
       );
       addr = betaDocument.addr;
     }
@@ -2026,8 +2010,10 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       continue;
     }
     addr = stableDocument.addr;
-    let content = await stableDocument.renderAtUsers();
-    content = await MomentModel.renderContent(content);
+    const content = await MomentModel.renderContent(
+      stableDocument.content,
+      stableDocument.atUsers,
+    );
     const filesData = [];
     for (const rid of stableDocument.files) {
       // 附件数据

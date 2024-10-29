@@ -4,10 +4,9 @@
     emoji-selector(ref="emojiSelector")
     .moment-comment-editor-container
       .moment-comment-textaea-ditor-container.m-b-05
-        textarea-editor(
-          ref="textareaEditor"
+        editor-core(
+          ref="editorCore"
           :placeholder="placeholder"
-          height="4rem"
           @content-change="onTextareaEditorContentChange"
           @click-ctrl-enter="onClickEnter"
           )
@@ -126,7 +125,6 @@
 </style>
 
 <script>
-  import TextareaEditor from '../TextareaEditor';
   import {sweetError} from '../../js/sweetAlert';
   import {immediateDebounce} from "../../js/execution";
   import {getLength} from "../../js/checkData";
@@ -134,10 +132,11 @@
   import ResourceSelector from '../ResourceSelector';
   import { getUrl } from '../../js/tools';
   import MomentFiles from './MomentFiles';
+  import EditorCore from './EditorCore.vue';
   export default {
     props: ['mid', 'type'],
     components: {
-      'textarea-editor': TextareaEditor,
+      'editor-core': EditorCore,
       'emoji-selector': EmojiSelector,
       'resource-selector': ResourceSelector,
       'moment-files': MomentFiles,
@@ -161,6 +160,7 @@
     },
     mounted() {
       this.getMomentComment()
+      this.$refs.editorCore.hideLoading();
     },
     computed: {
       placeholder() {
@@ -219,7 +219,12 @@
         const self = this;
         this.$refs.emojiSelector.open(res => {
           const {code} = res;
-          self.insertContent(`[${code}]`);
+          self.insertContent(JSON.stringify({
+            type: 'nkc-emoji',
+            attrs: {
+              unicode: code,
+            }
+          }));
         });
       },
       selectPicture(){
@@ -237,7 +242,7 @@
         arr.splice(index, 1)
       },
       insertContent(text) {
-        this.$refs.textareaEditor.insertContent(text);
+        this.$refs.editorCore.insertContent(text);
       },
       getMomentComment() {
         const {momentId} = this;
@@ -254,7 +259,7 @@
           .catch(sweetError)
       },
       setTextareaEditorContent(content) {
-        this.$refs.textareaEditor.setContent(content);
+        this.$refs.editorCore.setContent(content);
       },
       syncTextareaEditorContent() {
         this.setTextareaEditorContent(this.content);
@@ -315,7 +320,6 @@
         this.lockPost();
         return Promise.resolve()
           .then(() => {
-            // if(content.length === 0) throw new Error(`请输入内容`);
             return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
               type: momentCommentId ? 'publish' : 'forward',
               content,

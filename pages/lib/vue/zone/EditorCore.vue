@@ -22,6 +22,7 @@ export default {
     'editor-content': EditorContent,
     'loading-icon': Loading,
   },
+  props: ['placeholder'],
   data: () => ({
     editor: null,
     loading: true,
@@ -45,7 +46,7 @@ export default {
           History,
           nkcEmoji,
           Placeholder.configure({
-            placeholder: '想分享什么新鲜事？',
+            placeholder: this.placeholder || '想分享什么新鲜事？',
           }),
         ],
         onUpdate: () => {
@@ -53,8 +54,21 @@ export default {
         },
       })
     },
+    clearContent() {
+      this.editor.commands.clearContent();
+    },
     setContent(jsonString) {
-      this.editor.commands.setContent(JSON.parse(jsonString));
+      if(!jsonString) {
+        this.clearContent();
+      } else {
+        try{
+          const json = JSON.parse(jsonString);
+          this.editor.commands.setContent(json);
+        } catch(err) {
+          sweetError(`数据异常: ${err}`);
+          console.error(err);
+        }
+      }
     },
     getContent() {
       return JSON.stringify(this.editor.getJSON());

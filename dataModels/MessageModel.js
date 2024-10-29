@@ -3,7 +3,10 @@ const cheerio = require('cheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require('../nkcModules/tools');
-const { htmlToPlain } = require('../nkcModules/nkcRender');
+const {
+  getJsonStringTextSplit,
+  getJsonStringText,
+} = require('../nkcModules/json');
 const messageSchema = new Schema(
   {
     // 消息id
@@ -1156,7 +1159,7 @@ messageSchema.statics.getParametersData = async (message) => {
       }
       parameters = {
         reviewLink: _moment.url || '',
-        content: htmlToPlain(document.content, 100),
+        content: getJsonStringTextSplit(document.content, 100),
         reason: reason ? reason : '未知',
       };
     }
@@ -1625,7 +1628,7 @@ messageSchema.statics.getParametersData = async (message) => {
       userHomeUrl: getUrl('userHome', user.uid),
       username: user.username,
       momentUrl: getUrl('zoneMoment', momentId),
-      content: await MomentModel.renderContent(betaDocument.content),
+      content: getJsonStringText(betaDocument.content),
     };
   }
   return parameters;
@@ -2147,9 +2150,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
           /\[f\/(.*?)]/g,
           function (r, v1) {
             const emojiUrl = getUrl('emoji', v1);
-            return (
-              '<img class="message-emoji" src="' + emojiUrl + '"/>'
-            );
+            return '<img class="message-emoji" src="' + emojiUrl + '"/>';
           },
         );
       }

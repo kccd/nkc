@@ -259,7 +259,10 @@ router
         filesData.push(fileData);
       }
     }
-    const newContent = await db.MomentModel.renderContent(newDocument.content);
+    const newContent = await db.MomentModel.renderContent(
+      newDocument.content,
+      newDocument.atUsers,
+    );
     ctx.apiData = {
       content: newContent,
       files: filesData,

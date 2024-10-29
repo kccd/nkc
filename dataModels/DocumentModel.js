@@ -1882,12 +1882,12 @@ schema.statics.disabledToDraftDocuments = async function () {
 /*
  * 替换内容中的at为用户主页链接
  * */
-schema.methods.renderAtUsers = async function () {
+schema.methods.renderAtUsers = function () {
   const DocumentModel = mongoose.model('documents');
-  return await DocumentModel.renderAtUsers(this.content, this.atUsers);
+  return DocumentModel.renderAtUsers(this.content, this.atUsers);
 };
 
-schema.statics.renderAtUsers = async (content, atUsers) => {
+schema.statics.renderAtUsers = (content, atUsers = []) => {
   const { getUrl } = require('../nkcModules/tools');
   const usersObj = {};
   const names = [];
