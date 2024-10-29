@@ -1,11 +1,13 @@
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { UploadResource } from '../../../js/resource';
+import { UploadResource, UploadResourceV2 } from '../../../js/resource';
 import { screenTopWarning } from '../../../js/topAlert';
 import { getSocket } from '../../../js/socket';
 import { sweetError } from '../../../js/sweetAlert';
 import { base64ToFile } from '../../../js/file';
 import { nkcAPI } from '../../../js/netAPI';
+import { isFileDomainV2 } from '../../../js/url';
+import { getState } from '../../../js/state';
 
 const socket = getSocket();
 let imageUploadingOrder = Date.now() + Math.round(Math.random() * 10000);
@@ -91,15 +93,20 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
       .run();
   }
   tempData.forEach((item) => {
-    UploadResource({
+    UploadResourceV2({
       file: item.file,
       defaultFileName: 'image.jpg',
       onProgress: (e, index) => {},
     })
       .then((res) => {
+        const { uploaded } = res;
         const { rid } = res.r;
         // 需要替换响应的上传状态的节点。。。
-        replaceFileStatusAttrs(editor, item.id, rid, '处理中');
+        if (!!uploaded) {
+          replaceFileStatusNode(editor, item.id, rid);
+        } else {
+          replaceFileStatusAttrs(editor, item.id, rid, '处理中');
+        }
       })
       .catch((err) => {
         // 需要替换响应的上传状态为失败状态。。。
@@ -110,11 +117,7 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
       });
   });
   // html类型==》常常出现在直接从网页里面拖拽而来,可能包含图片等文件
-  if (
-    files.length === 0 &&
-    dataTransfer.types.includes('text/plain') &&
-    dataTransfer.types.includes('text/html')
-  ) {
+  if (files.length === 0 && dataTransfer.types.includes('text/html')) {
     const srcData = [];
     //处理图片和文本混合的html片段==>提取除img 上传后插入自定义图片节点，并按照文字和图片的顺序
     const parser = new DOMParser();
@@ -129,29 +132,45 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
       // 替换为自定义标签==>对于大多数img场景属于行内式
       // 对于img 的src属性==》绝对链接、相对链接、base64、
       // 1.替换成行内上传状态 2.对于不同类型的src 进行上传，3.更新对应节点的的上传状态
-      const customTag = document.createElement('nkc-file-status-inline');
-      imageUploadingOrder++;
-      const $index = imageUploadingOrder.toString();
-      customTag.setAttribute('id', $index);
-      customTag.setAttribute('info', '上传中');
-      if (src) {
-        if (/^https?:\/\/.*$/.test(src)) {
-          // 绝对地址
-          srcData.push({
-            id: $index,
-            isAbsoluteUrl: true,
-            src,
-          });
-        } else if (new RegExp(/^data:image\/(jpeg|png|gif);base64,/).test()) {
-          // base64==测试时情况较少
-          srcData.push({
-            id: $index,
-            isBase64: true,
-            src,
-          });
+
+      const { fileDomain } = getState();
+      let fileLink = '';
+      if (src.indexOf(`${fileDomain}/r/`) === 0) {
+        fileLink = fileDomain;
+      } else if (src.indexOf(`${window.location.origin}/r/`) === 0) {
+        fileLink = window.location.origin;
+      }
+      if (isFileDomainV2(src) && fileLink) {
+        const rid = src.replace(`${fileLink}/r/`, '').split('?')[0];
+
+        const imagTag = document.createElement('nkc-picture-inline');
+        imagTag.setAttribute('id', rid);
+        img.replaceWith(imagTag);
+      } else {
+        const customTag = document.createElement('nkc-file-status-inline');
+        imageUploadingOrder++;
+        const $index = imageUploadingOrder.toString();
+        customTag.setAttribute('id', $index);
+        customTag.setAttribute('info', '上传中');
+        if (src) {
+          if (/^https?:\/\/.*$/.test(src)) {
+            // 绝对地址
+            srcData.push({
+              id: $index,
+              isAbsoluteUrl: true,
+              src,
+            });
+          } else if (new RegExp(/^data:image\/(jpeg|png|gif);base64,/).test()) {
+            // base64==测试时情况较少
+            srcData.push({
+              id: $index,
+              isBase64: true,
+              src,
+            });
+          }
+          // 对于其他情形的src内容后期待兼容
+          img.replaceWith(customTag);
         }
-        // 对于其他情形的src内容后期待兼容
-        img.replaceWith(customTag);
       }
     });
     editor.chain().focus().insertContent(doc.body.innerHTML).run();
@@ -175,7 +194,7 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
           });
       } else if (item.isBase64) {
         const file = base64ToFile(item.src);
-        UploadResource({
+        UploadResourceV2({
           file,
           defaultFileName: 'image.jpg',
         })
@@ -193,8 +212,8 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
           });
       }
     });
-    return true;
   }
+  return true;
 };
 const replaceFileStatusAttrs = (editor, id, rid, info, process = 0) => {
   const { state, view } = editor;
