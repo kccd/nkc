@@ -325,6 +325,7 @@ export default {
         maxWordCount: 100000,
       },
       currentTextLength: 0,
+      noticeFunc: null,
     };
   },
   created() {
@@ -337,6 +338,7 @@ export default {
   },
   mounted() {
     this.initEditor();
+    this.initNoticeEvent();
   },
 
   methods: {
@@ -347,14 +349,21 @@ export default {
       return this.editor.getJSON();
     },
     setJSON(jsonString) {
+      console.log(jsonString);
+      
+      if(!jsonString) return;
       this.editor.commands.setContent(JSON.parse(jsonString));
     },
     getText() {
       return this.editor.getText();
     },
+    //==>兼容旧编辑器
+    getContentTxt() {
+        return this.editor.getText();
+    },
     // 获取JSON字符串数据
     getContent() {
-      return this.getJSON();
+      return JSON.stringify(this.getJSON());
     },
     // 设置JSON字符串数据
     setContent(jsonString) {
@@ -799,6 +808,22 @@ export default {
           return;
         }
       }
+    },
+    initNoticeEvent() {
+      this.removeNoticeEvent();
+      this.noticeFunc = function(e) {
+        const info = '关闭页面会导致已输入的数据丢失，确定要继续？';
+        e = e || window.event;
+        if(e) {
+          e.returnValue = info;
+        }
+        return info;
+      };
+      window.onbeforeunload = this.noticeFunc;
+    },
+    removeNoticeEvent() {
+      if(!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc) return;
+      window.onbeforeunload = null;
     },
   },
   beforeDestroy() {
