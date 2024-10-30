@@ -58,6 +58,8 @@ window.RootApp = new Vue({
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
     initGlobalMouseOverEvent();
+    // pwa 未优化使用体验，暂时屏蔽
+    // this.initPWA();
     const self = this;
     $(() => {
       // 这里的代码会在页面准备就绪之后执行
@@ -157,6 +159,18 @@ window.RootApp = new Vue({
       } else {
         visitUrl(`/c`);
         return false;
+      }
+    },
+    initPWA() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('/workers/pwa.js')
+          .then((registration) => {
+            console.log('Service Worker 注册成功:', registration);
+          })
+          .catch((error) => {
+            console.error('Service Worker 注册失败:', error);
+          });
       }
     },
   },
