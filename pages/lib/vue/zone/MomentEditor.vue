@@ -451,7 +451,6 @@
       },
       initData() {
         const self = this;
-        console.log(1)
         if(!this.mid){
           nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
             .then(res => {
