@@ -241,7 +241,7 @@ const replaceFileStatusNode = (editor, id, rid) => {
   state.doc.descendants((node, pos) => {
     if (String(node.attrs.id) === String(id)) {
       if (node.type.name === 'nkc-file-status-block') {
-        const newNode = state.schema.nodes['nkc-picture-block'].create({
+        const newNode = state.schema.nodes['nkc-picture-inline'].create({
           id: rid,
           desc: '',
         });

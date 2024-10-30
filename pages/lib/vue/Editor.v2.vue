@@ -152,7 +152,13 @@
         div(data-type='custom')
           app-menu(ref='appMenu', @select='appMenuClick')
 
-    editor-content.tiptap-editor-content(:editor='editor')
+    .tiptap-editor-content(@click.stop="editor.commands.focus()" :style="`min-height:${initConfig.minHeight}px;`")
+      editor-content(:editor='editor')
+    .word-count
+      span(:style="currentTextLength>initConfig.maxWordCount?'color:#ff6262;':''") {{`${currentTextLength}`}}
+      span {{`/${initConfig.maxWordCount}`}}
+    .mask.m-b-1(v-show="!!loading")
+      loading
     resource-selector(ref='resourceSelector')
     table-editor(ref='tableEditor')
     sticker-selector(ref='stickerSelector')
@@ -246,12 +252,14 @@ import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBl
 import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
 import AppMenu from './tiptap/menus/AppMenu.vue'
-import {nkcTable} from "./tiptap/node/nkcTable/nkcTable.js";
+import { nkcTable } from "./tiptap/node/nkcTable/nkcTable.js";
 import { nkcAPI } from '../js/netAPI.js'
 const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
 import MathSelector from './MathSelector.vue';
+import Loading from './Loading.vue';
 
 export default {
+  props: ['config', 'loading'],
   components: {
     'link-editor': LinkEditor,
     'more-one': MoreOne,
@@ -288,6 +296,7 @@ export default {
     'draft-selector': DraftSelector,
     'math-selector': MathSelector,
     'indent-left': IndentLeft,
+    loading: Loading,
   },
 
   data() {
@@ -311,7 +320,20 @@ export default {
         ['Verdana', 'Verdana'],
       ],
       jsonContent: '',
+      initConfig: {
+        minHeight: 800,
+        maxWordCount: 100000,
+      },
+      currentTextLength: 0,
     };
+  },
+  created() {
+    const { config } = this;
+    if (config) {
+      this.initConfig.minHeight = config.minHeight ?? this.initConfig.minHeight;
+      this.initConfig.maxWordCount = config.maxWordCount ?? this.initConfig.maxWordCount;
+    }
+
   },
   mounted() {
     this.initEditor();
@@ -353,6 +375,7 @@ export default {
     },
 
     initEditor() {
+      const self = this;
       this.editor = new Editor({
         content: jsonContentTemplate,
         extensions: [
@@ -424,8 +447,11 @@ export default {
         },
         onUpdate: () => {
           this.emitContentChangeEvent();
+          const text = self.getText();
+          self.currentTextLength = text.length;
         }
       });
+      this.currentTextLength = this.editor.getText().length;
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';
@@ -516,7 +542,7 @@ export default {
             switch (type) {
               case 'picture': {
                 insertContent.push({
-                  type: 'nkc-picture-block',
+                  type: 'nkc-picture-inline',
                   attrs: {
                     id: source.rid,
                     desc: '',
@@ -800,7 +826,7 @@ export default {
     padding: 0 1rem;
     flex-wrap: wrap;
 
-    & > div {
+    &>div {
       cursor: pointer;
       padding-top: 5px;
       height: 2.6rem;
@@ -822,7 +848,7 @@ export default {
       }
     }
 
-    & > select {
+    &>select {
       background-color: transparent;
       color: #777;
       cursor: pointer;
@@ -834,6 +860,33 @@ export default {
 
 .tiptap-editor-container {
   position: relative;
+
+  .word-count {
+    user-select: none;
+    position: absolute;
+    bottom: 10px;
+    /* 距离底部的距离 */
+    right: 10px;
+    /* 距离右侧的距离 */
+    background-color: rgba(255, 255, 255, 0.8);
+    /* 半透明背景 */
+    color: #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  .mask{
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255,255,255,0.7);
+    }
 }
 
 .tiptap-editor-content {
@@ -841,6 +894,10 @@ export default {
   border: 1px solid #eee;
   border-radius: 5px;
   background-color: #fff;
+
+  &:hover {
+    cursor: text;
+  }
 
   ::v-deep {
     .tiptap.resize-cursor {
@@ -873,7 +930,7 @@ export default {
       position: relative;
       vertical-align: top;
 
-      > * {
+      >* {
         margin-bottom: 0;
       }
     }
@@ -926,7 +983,7 @@ export default {
 
     /* Task list specific styles */
 
-    ul[data-type="taskList"] {
+    ul[data-type='taskList'] {
       list-style: none;
       margin-left: 0;
       padding: 0;
@@ -935,21 +992,21 @@ export default {
         align-items: center;
         display: flex;
 
-        & > label {
+        &>label {
           margin: 0 0.5rem 0 0;
           user-select: none;
         }
 
-        & > div {
+        &>div {
           flex: 1 1 auto;
         }
       }
 
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         cursor: pointer;
       }
 
-      ul[data-type="taskList"] {
+      ul[data-type='taskList'] {
         margin: 0;
       }
     }
