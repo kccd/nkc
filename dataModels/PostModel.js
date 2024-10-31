@@ -3,6 +3,7 @@ const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
 const tools = require('../nkcModules/tools');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const mongoose = settings.database;
 const { Schema } = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -1205,11 +1206,21 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
     // 如果需要渲染html
     if (o.renderHTML) {
-      post.c = nkcRender.renderHTML({
-        type: 'article',
-        post,
-        user: o.visitor,
-      });
+      if (post.l === 'json') {
+        const resourcesObj = await ResourceModel.getResourcesObjByJson(post.c);
+        post.c = renderHTMLByJSON(post.c, resourcesObj, o.visitor);
+      } else {
+        post.c = nkcRender.renderHTML({
+          type: 'article',
+          post,
+          user: o.visitor,
+        });
+      }
+      // post.c = nkcRender.renderHTML({
+      //   type: 'article',
+      //   post,
+      //   user: o.visitor,
+      // });
 
       post.t = nkcRender.replaceTextLinkToHTML(post.t);
     }

@@ -18,7 +18,7 @@ import style from './test.module.less';
 // 宏脚本(编译时执行)  (babel-plugin-preval插件提供)
 import bundle from './lib/bundle.preval.js';
 import StickerSelector from '../lib/vue/StickerSelector/StickerSelector.vue';
-import EditorTiptap from '../lib/vue/Editor.v2.vue';
+import EditorTiptap from '../lib/vue/Editor.json.vue';
 import LinkEditor from '../lib/vue/LinkEditor.vue';
 
 console.log('模块化CSS:', style);

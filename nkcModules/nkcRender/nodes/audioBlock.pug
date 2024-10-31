@@ -1,11 +1,9 @@
 //- 需要兼容app的呈现场景
 mixin renderAudioBlock(node)
-  - 
-    if(resourcesObj[node.attrs.id]){
+  if resourcesObj[node.attrs.id]
+    - 
       const { rid : id, oname = '未知', disabled ,isFileExist=true, visitorAccess = true, defaultFile = {},token = ''} = resourcesObj[node.attrs.id];
       const url = tools.getUrl('resource', id) + '&w=' + token;
-    }
-  if id
     p
       if disabled
         span(data-tag="nkcsource" data-type="audio-not-found" data-id=`${id}`)

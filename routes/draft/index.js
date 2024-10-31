@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 // const { ObjectId } = require('mongodb');
 const nkcRender = require('../../nkcModules/nkcRender');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 // const desTypeMap = {
 //   newThread: 'forum',
 //   newPost: "thread",
@@ -36,13 +37,31 @@ router
   data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
-  data.document.content = nkcRender.renderHTML({
-    type: 'article',
-    post: {
-      c: data.document.content,
-      resources
-    },
-  });
+  if (data.document.l === 'json') {
+    const resourcesObj = await db.ResourceModel.getResourcesObjByJson(
+      data.document.content,
+    );
+    data.document.content = renderHTMLByJSON(
+      data.document.content,
+      resourcesObj,
+      data.user,
+    );
+  } else {
+    data.document.content = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: data.document.content,
+        resources,
+      },
+    });
+  }
+  // data.document.content = nkcRender.renderHTML({
+  //   type: 'article',
+  //   post: {
+  //     c: data.document.content,
+  //     resources
+  //   },
+  // });
   await next();
 })
 .get('/history', async (ctx, next)=>{
@@ -78,14 +97,25 @@ router
       if(!permission("viewUserArticle")) ctx.throw(403, "没有权限")
     }
     // const documentResourceId = await data.document.getResourceReferenceId();
-    const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
-    data.document.content = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: data.document.c,
-        resources
-      },
-    });
+    if (data.document.l === 'json') {
+      const resourcesObj = await db.ResourceModel.getResourcesObjByJson(
+        data.document.c,
+      );
+      data.document.content = renderHTMLByJSON(
+        data.document.c,
+        resourcesObj,
+        data.user,
+      );
+    } else {
+      const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
+      data.document.content = nkcRender.renderHTML({
+        type: 'article',
+        post: {
+          c: data.document.c,
+          resources,
+        },
+      });
+    }
     // 包含了将此版本改为编辑版的url 组成
     data.urlComponent = {_id: data.document._id, did: data.document.did, source, page, desTypeId, draftId};
     // 查询文章作者
@@ -155,15 +185,33 @@ router
   data.document.user = await db.UserModel.findOnly({uid: data.document.uid});
   // const documentResourceId = await data.document.getResourceReferenceId();
   // let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
-  const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
 
-  data.document.content = nkcRender.renderHTML({
-    type: 'article',
-    post: {
-      c: data.document.c,
-      resources
-    },
-  });
+  if (data.document.l === 'json') {
+    const resourcesObj = await db.ResourceModel.getResourcesObjByJson(
+      data.document.c,
+    );
+    data.document.content = renderHTMLByJSON(
+      data.document.c,
+      resourcesObj,
+      data.user,
+    );
+  } else {
+    const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
+    data.document.content = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: data.document.c,
+        resources
+      },
+    });
+  }
+  // data.document.content = nkcRender.renderHTML({
+  //   type: 'article',
+  //   post: {
+  //     c: data.document.c,
+  //     resources
+  //   },
+  // });
   // let editorUrl = {_id: data.document._id}
   data.urlComponent = {_id: data.document._id, source, did: data.document.did, page, desTypeId, draftId};
   // 查询文章作者

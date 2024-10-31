@@ -1,6 +1,6 @@
 mixin renderAttachmentBlock(node)
-  -
-    if(resourcesObj[node.attrs.id]){
+  if resourcesObj[node.attrs.id]
+    -
       const {
       ext = '',
       hits = 0,
@@ -13,8 +13,6 @@ mixin renderAttachmentBlock(node)
       const oname = defaultFile.name || '未知';
       const size = defaultFile.size;
       const fileCover = tools.getUrl('fileCover', ext);
-    }
-  if id
     p
       if disabled
         span(data-tag="nkcsource" data-type="attachment-disabled")

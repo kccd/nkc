@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const draftsRouter = new Router();
 draftsRouter
   .get('/', async (ctx, next) => {
@@ -160,7 +161,7 @@ draftsRouter
     let {
       t = '',
       c = '',
-      l = 'html',
+      l = 'json',
       abstractEn = '',
       abstractCn = '',
       keyWordsEn = [],
@@ -179,7 +180,12 @@ draftsRouter
       quote = '',
     } = post;
     // 检查草稿
-    const _content = customCheerio.load(c).text();
+    let _content = '';
+    if (l === 'json') {
+      _content = customCheerio.load(renderHTMLByJSON(c)).text();
+    } else {
+      _content = customCheerio.load(c).text();
+    }
     if (_content && _content.length > 100000) {
       ctx.throw(400, `内容不能超过10万字`);
     }

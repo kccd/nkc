@@ -34,12 +34,12 @@ export default {
   }),
   methods: {
     contentChange(data) {
-      console.log('cccc',data);
+      // console.log('cccc',data);
 
       this.$emit("content-change",data);
     },
     ready() {
-      console.log('rrrrrr');
+      // console.log('rrrrrr');
       
       this.$emit('ready');
     },

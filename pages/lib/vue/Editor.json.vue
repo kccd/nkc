@@ -326,6 +326,8 @@ export default {
       },
       currentTextLength: 0,
       noticeFunc: null,
+      // 兼容旧编辑器
+      ready: false,
     };
   },
   created() {
@@ -349,10 +351,9 @@ export default {
       return this.editor.getJSON();
     },
     setJSON(jsonString) {
-      console.log(jsonString);
-      
       if(!jsonString) return;
       this.editor.commands.setContent(JSON.parse(jsonString));
+      this.currentTextLength = this.editor.getText().length;
     },
     getText() {
       return this.editor.getText();
@@ -386,7 +387,7 @@ export default {
     initEditor() {
       const self = this;
       this.editor = new Editor({
-        content: jsonContentTemplate,
+        content: '',
         extensions: [
           HardBreak,
           Image.configure({
@@ -453,11 +454,11 @@ export default {
         ],
         onCreate: () => {
           this.emitEditorReadyEvent();
+          this.ready = true;
         },
         onUpdate: () => {
           this.emitContentChangeEvent();
-          const text = self.getText();
-          self.currentTextLength = text.length;
+          this.currentTextLength = self.editor.getText().length;
         }
       });
       this.currentTextLength = this.editor.getText().length;
