@@ -1,5 +1,4 @@
 const mongoose = require('../settings/database');
-const { fluentuiEmojiUnicode } = require('../nkcModules/fluentuiEmoji');
 
 // 包含所有document的状态
 // 并且额外包含 deleted, cancelled
@@ -36,6 +35,11 @@ const visibleType = {
   own: 'own',
   attention: 'attention',
   everyone: 'everyone',
+};
+
+const momentModes = {
+  plain: 'plain',
+  rich: 'rich',
 };
 
 const schema = new mongoose.Schema({
@@ -161,7 +165,17 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  mode: {
+    type: String,
+    default: 'plain',
+  },
 });
+
+schema.statics.getMomentModes = () => {
+  return {
+    ...momentModes,
+  };
+};
 
 /*
  * 获取动态的状态列表
