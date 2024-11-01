@@ -1,7 +1,7 @@
 <template>
   <node-view-wrapper class="node-view-wrapper">
     <video-player :file="videoInfo" class="video-player" />
-    <textarea rows="2" v-model="node.attrs.desc" class="form-control" placeholder="一句话介绍"></textarea>
+    <!-- <textarea rows="2" v-model="node.attrs.desc" class="form-control" placeholder="一句话介绍"></textarea> -->
   </node-view-wrapper>
 </template>
 

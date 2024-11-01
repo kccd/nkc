@@ -325,6 +325,9 @@ export default {
         maxWordCount: 100000,
       },
       currentTextLength: 0,
+      noticeFunc: null,
+      // 兼容旧编辑器
+      ready: false,
     };
   },
   created() {
@@ -337,6 +340,7 @@ export default {
   },
   mounted() {
     this.initEditor();
+    this.initNoticeEvent();
   },
 
   methods: {
@@ -347,14 +351,20 @@ export default {
       return this.editor.getJSON();
     },
     setJSON(jsonString) {
+      if(!jsonString) return;
       this.editor.commands.setContent(JSON.parse(jsonString));
+      this.currentTextLength = this.editor.getText().length;
     },
     getText() {
       return this.editor.getText();
     },
+    //==>兼容旧编辑器
+    getContentTxt() {
+        return this.editor.getText();
+    },
     // 获取JSON字符串数据
     getContent() {
-      return this.getJSON();
+      return JSON.stringify(this.getJSON());
     },
     // 设置JSON字符串数据
     setContent(jsonString) {
@@ -377,7 +387,7 @@ export default {
     initEditor() {
       const self = this;
       this.editor = new Editor({
-        content: jsonContentTemplate,
+        content: '',
         extensions: [
           HardBreak,
           Image.configure({
@@ -444,11 +454,11 @@ export default {
         ],
         onCreate: () => {
           this.emitEditorReadyEvent();
+          this.ready = true;
         },
         onUpdate: () => {
           this.emitContentChangeEvent();
-          const text = self.getText();
-          self.currentTextLength = text.length;
+          this.currentTextLength = self.editor.getText().length;
         }
       });
       this.currentTextLength = this.editor.getText().length;
@@ -799,6 +809,22 @@ export default {
           return;
         }
       }
+    },
+    initNoticeEvent() {
+      this.removeNoticeEvent();
+      this.noticeFunc = function(e) {
+        const info = '关闭页面会导致已输入的数据丢失，确定要继续？';
+        e = e || window.event;
+        if(e) {
+          e.returnValue = info;
+        }
+        return info;
+      };
+      window.onbeforeunload = this.noticeFunc;
+    },
+    removeNoticeEvent() {
+      if(!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc) return;
+      window.onbeforeunload = null;
     },
   },
   beforeDestroy() {

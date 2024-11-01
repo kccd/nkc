@@ -292,6 +292,48 @@ resourceSchema.statics.getResourcesByTags = async (tags = '') => {
   return resources;
 };
 
+// 适用于根据tiptap输出的json数据进行查询内容里的附件信息
+resourceSchema.statics.getResourcesObjByJson = async (jsonContent = {}) => {
+  const ResourceModel = mongoose.model('resources');
+  const targetTypes = [
+    'nkc-video-block',
+    'nkc-audio-block',
+    'nkc-picture-block',
+    'nkc-picture-inline',
+    'nkc-attachment-block',
+  ];
+  function extractNodes(node, targetTypes) {
+    let result = [];
+    // 检查当前节点类型是否在目标类型列表中
+    if (targetTypes.includes(node.type)) {
+      result.push(node.attrs.id);
+    }
+    // 如果当前节点有内容，递归遍历子节点
+    if (node.content) {
+      for (const child of node.content) {
+        result = result.concat(extractNodes(child, targetTypes));
+      }
+    }
+    return result;
+  }
+  // 提取特定类型的节点
+  const rids = extractNodes(
+    typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent,
+    targetTypes,
+  );
+  const resources = await ResourceModel.find({ rid: { $in: rids } });
+  for (const resource of resources) {
+    await resource.setFileExist();
+  }
+  const resourcesObj = {};
+  for (let r of resources) {
+    if (r.toObject) {
+      r = r.toObject();
+    }
+    resourcesObj[r.rid] = r;
+  }
+  return resourcesObj;
+};
 resourceSchema.methods.extendVideoPlayerData = async function () {
   const r = this;
   await r.setFileExist();

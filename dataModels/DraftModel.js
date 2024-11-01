@@ -319,14 +319,14 @@ draftSchema.statics.getLatestModifyPost = async (
  * @return {Array} 查找到的最近新建的文章草稿
  */
 
-draftSchema.statics.getLatestNewThread = async (uid, limit = 1) => {
+draftSchema.statics.getLatestNewThread = async (uid, limit = 1, l = 'json') => {
   const DraftModel = mongoose.model('drafts');
 
   const beta = (await DraftModel.getType()).beta;
   // const forum = (await DraftModel.getType()).forum;
   const newThread = (await DraftModel.getDesType()).newThread;
   // forum 类型一定是文章(获取新文章)
-  return DraftModel.find({ uid, desType: newThread, type: beta })
+  return DraftModel.find({ uid, desType: newThread, type: beta, l })
     .sort({ tlm: -1 })
     .limit(limit);
 };

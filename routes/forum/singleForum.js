@@ -18,6 +18,7 @@ const {
 const { subscribeSources } = require('../../settings/subscribe');
 const { forumListService } = require('../../services/forum/forumList.service');
 const { userForumService } = require('../../services/user/userForum.service');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 router
   .post('/', async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
@@ -48,6 +49,7 @@ router
       originState,
       abstractEn = '',
       abstractCn = '',
+      l = 'json',
     } = post;
     if (t.length < 3) {
       ctx.throw(400, `标题不能少于3个字`);
@@ -55,7 +57,13 @@ router
     if (t.length > 100) {
       ctx.throw(400, `标题不能超过100个字`);
     }
-    const content = customCheerio.load(c).text();
+    // 需要兼容json格式数据内容
+    let content = '';
+    if (l === 'json') {
+      content = customCheerio.load(renderHTMLByJSON(c)).text();
+    } else {
+      content = customCheerio.load(c).text();
+    }
     if (content.length < 2) {
       ctx.throw(400, `内容不能少于2个字`);
     }

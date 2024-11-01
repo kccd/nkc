@@ -1,22 +1,27 @@
 mixin renderHeading(node)
+  -
+    let style = '';
+    if(node.attrs.textAlign){
+      style+=`text-align: ${node.attrs.textAlign};`
+    }
   case node.attrs.level
     when 1
-      h1
+      h1(style=style)
         +loopRender(node.content)
     when 2
-      h2
+      h2(style=style)
         +loopRender(node.content)
     when 3
-      h3
+      h3(style=style)
         +loopRender(node.content)
     when 4
-      h4
+      h4(style=style)
         +loopRender(node.content)
     when 5
-      h5
+      h5(style=style)
         +loopRender(node.content)
     when 6
-      h6
+      h6(style=style)
         +loopRender(node.content)
     default
       p= `Unknown heading level: ${node.attrs.level}`
