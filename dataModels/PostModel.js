@@ -1091,6 +1091,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
         c: 1,
         uid: 1,
         anonymous: 1,
+        l: 1,
       },
     ).sort({ toc: 1 });
     postsId = quotePosts.map((q) => {
@@ -1193,7 +1194,10 @@ postSchema.statics.extendPosts = async (posts, options) => {
           username = user.username;
           uid = quotePost.uid;
         }
-        let c = nkcRender.htmlToPlain(quoteContent, 50);
+        let c =
+          quotePost.l === 'json'
+            ? nkcRender.htmlToPlain(renderHTMLByJSON(quoteContent), 50)
+            : nkcRender.htmlToPlain(quoteContent, 50);
         c = nkcRender.replaceLink(c);
         post.quotePost = {
           pid: quotePost.pid,
@@ -1649,7 +1653,10 @@ postSchema.statics.getSocketCommentByPid = async (post) => {
     username = user.username;
     uid = user.uid;
   }
-  content = nkcRender.htmlToPlain(post.c, 50);
+  content =
+    post.l === 'json'
+      ? nkcRender.htmlToPlain(renderHTMLByJSON(post.c), 50)
+      : nkcRender.htmlToPlain(post.c, 50);
   contentUrl = tools.getUrl('post', post.pid);
   return {
     postId: post.pid,
