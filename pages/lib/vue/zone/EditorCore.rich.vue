@@ -2,7 +2,7 @@
   .moment-editor-core
     div(v-show="loading")
       loading-icon
-    editor-content.tiptap-editor-content(:editor='editor')
+    editor-content.tiptap-editor-content(:editor='editor' ref="editorContent")
 </template>
 
 <script>
@@ -22,12 +22,19 @@ export default {
     'editor-content': EditorContent,
     'loading-icon': Loading,
   },
+  props: ['placeholder'],
   data: () => ({
     editor: null,
     loading: true,
   }),
   mounted() {
     this.initEditor();
+    this.$refs.editorContent.$el.addEventListener('keydown', (e) => {
+      if (this.editor.isFocused && event.ctrlKey && event.key === 'Enter') {
+        event.preventDefault();
+        this.$emit('click-ctrl-enter');
+      }
+    });
   },
   methods: {
     initEditor() {
@@ -39,7 +46,7 @@ export default {
           History,
           nkcEmoji,
           Placeholder.configure({
-            placeholder: '想分享什么新鲜事？',
+            placeholder: this.placeholder || '开始输入',
           }),
         ],
         onUpdate: () => {
@@ -47,8 +54,21 @@ export default {
         },
       })
     },
+    clearContent() {
+      this.editor.commands.clearContent();
+    },
     setContent(jsonString) {
-      this.editor.commands.setContent(JSON.parse(jsonString));
+      if(!jsonString) {
+        this.clearContent();
+      } else {
+        try{
+          const json = JSON.parse(jsonString);
+          this.editor.commands.setContent(json);
+        } catch(err) {
+          sweetError(`数据异常: ${err}`);
+          console.error(err);
+        }
+      }
     },
     getContent() {
       return JSON.stringify(this.editor.getJSON());

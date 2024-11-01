@@ -79,7 +79,7 @@ const { isApp } = getState();
         sweetQuestion("确定要执行当前操作？")
         .then(() => {
           // 访问api调用回滚接口，刷新页面
-          return nkcAPI(`/api/v1/editor/moment/${self.mid}/rollback`,'POST',{
+          return nkcAPI(`/api/v1/zone/moment/${self.mid}/rollback`,'POST',{
             documentId:_id
           });
         })

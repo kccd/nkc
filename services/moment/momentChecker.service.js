@@ -1,6 +1,7 @@
 const MomentModel = require('../../dataModels/MomentModel');
 const SubscribeModel = require('../../dataModels/SubscribeModel');
 const { ThrowCommonError } = require('../../nkcModules/error');
+const { getEditorJSONStringLength } = require('../../nkcModules/checkData');
 
 class MomentCheckerService {
   async checkMomentPermission(readerUid, moment, hasReviewPermission) {
@@ -52,6 +53,13 @@ class MomentCheckerService {
           }
         }
       }
+    }
+  }
+
+  checkMomentSimpleJSONLength(jsonString) {
+    const length = getEditorJSONStringLength(jsonString);
+    if (length > 1000 || jsonString.length > 100000) {
+      ThrowCommonError(400, '内容长度超过限制');
     }
   }
 }

@@ -23,11 +23,11 @@ var CheckData = function () {
     if (!jsonString) {
       return 0;
     }
-    const jsonData = JSON.parse(jsonString);
-    const getNodes = (nodes) => {
-      const newNodes = [];
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
+    var jsonData = JSON.parse(jsonString);
+    var getNodes = function (nodes) {
+      var newNodes = [];
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
         newNodes.push(node);
         if (node.content && node.content.length > 0) {
           newNodes.push(...getNodes(node.content));
@@ -36,10 +36,10 @@ var CheckData = function () {
       return newNodes;
     };
 
-    const nodes = getNodes(jsonData.content);
-    let count = 0;
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
+    var nodes = getNodes(jsonData.content);
+    var count = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
       switch (node.type) {
         case 'nkc-emoji': {
           count += 2;

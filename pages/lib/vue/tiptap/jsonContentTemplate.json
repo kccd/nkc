@@ -1424,7 +1424,7 @@
       ]
     },
     {
-      "type": "nkc-file-block",
+      "type": "nkc-attachment-block",
       "attrs": {
         "id": "360965",
         "name": "5.apk",
