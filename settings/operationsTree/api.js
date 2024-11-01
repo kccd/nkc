@@ -146,6 +146,37 @@ module.exports = {
           GET: Operations.visitZoneSingleMoment,
         },
       },
+      editor: {
+        rich: {
+          GET: Operations.momentRichEditorGetDraft,
+          PUT: Operations.momentRichEditorSaveDraft,
+          POST: Operations.momentRichEditorPublish,
+        },
+        plain: {
+          GET: Operations.momentPlainEditorGetDraft,
+          PUT: Operations.momentPlainEditorSaveDraft,
+          POST: Operations.momentPlainEditorPublish,
+        },
+      },
+      moment: {
+        PARAMETER: {
+          editor: {
+            rich: {
+              GET: Operations.momentRichEditorGetDraft,
+              PUT: Operations.momentRichEditorSaveDraft,
+              POST: Operations.momentRichEditorPublish,
+            },
+            plain: {
+              GET: Operations.momentPlainEditorGetDraft,
+              PUT: Operations.momentPlainEditorSaveDraft,
+              POST: Operations.momentPlainEditorPublish,
+            },
+          },
+          rollback: {
+            POST: Operations.rollbackZoneMomentHistory,
+          },
+        },
+      },
     },
   },
 };

@@ -291,7 +291,7 @@
   import {immediateDebounce} from '../../js/execution';
   import {nkcAPI} from '../../js/netAPI';
   import EmojiSelector from '../EmojiSelector';
-  import EditorCore from './EditorCore.vue'
+  import EditorCore from './EditorCore.plain.vue'
   import {visitUrl} from "../../js/pageSwitch";
   import {
     Home as HomeIcon,
@@ -434,7 +434,7 @@
     },
     methods: {
       visitZoneArticleEditor() {
-        visitUrl(`/creation/editor/zone/article`, true);
+        visitUrl(`/z/editor/rich`, true);
       },
       iconMouseOver(e) {
         e.fill = iconFill.active;
@@ -452,9 +452,9 @@
       initData() {
         const self = this;
         if(!this.mid){
-          nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
+          nkcAPI(`/api/v1/zone/editor/plain`, 'GET')
             .then(res => {
-              const {momentId, content, picturesId, videosId, medias} = res;
+              const {momentId, content, medias} = res.data;
               if(momentId) {
                 self.momentId = momentId;
                 self.content = content;
@@ -467,19 +467,20 @@
               sweetError(err);
             });
         }else {
-          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'GET').then((res)=>{
-            const {momentId, content, picturesId, videosId,momentStatus,files,mediaType,medias} = res.data;
-            if(momentId) {
-              self.momentId = momentId;
-              self.content = content;
-              self.syncEditorContent();
-              self.momentStatus = momentStatus
-              self.medias = medias;
-            }
-            self.hideEditorLoading();
-          }).catch(err=>{
-            sweetError(err,'err')
-          })
+          nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`, 'GET')
+            .then(res => {
+              const {momentId, content, momentStatus, medias} = res.data;
+              if(momentId) {
+                self.momentId = momentId;
+                self.content = content;
+                self.syncEditorContent();
+                self.momentStatus = momentStatus
+                self.medias = medias;
+              }
+              self.hideEditorLoading();
+            }).catch(err=>{
+              sweetError(err,'err')
+            })
         }
       },
       lockButton() {
@@ -566,7 +567,7 @@
         // const resourcesId = picturesId.length > 0? picturesId: videosId;
         const resourcesId = medias.map(item=>item.rid);
         if(momentStatus === 'normal'){
-          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'POST',{
+          nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`,'POST',{
             content,
             resourcesId
           }).then((res)=>{
@@ -577,9 +578,7 @@
             self.unlockButton();
           })
         }else {
-          nkcAPI(`/creation/zone/moment`, 'POST', {
-          type: 'publish',
-          momentId,
+          nkcAPI(`/api/v1/zone/editor/plain`, 'POST', {
           content,
           resourcesId
         })
@@ -617,16 +616,16 @@
       },
       onContentChange: immediateDebounce(function() {
         this.saveContent();
-      }, 2000),
+      }, 1000),
       saveContent() {
         const self = this;
         //暂存的
-        const {content, picturesId, videosId, momentId,momentStatus ,medias} = this;
+        const {content, momentId, momentStatus, medias} = this;
         // const resourcesId = picturesId.length > 0? picturesId: videosId;
         const resourcesId =  medias.map(item=>item.rid);
         //判断是否是已发表的电文的编辑
         if(momentStatus === 'normal'){
-          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'PUT',{
+          nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`,'PUT',{
             content,
             resourcesId
           }).then(()=>{
@@ -636,17 +635,13 @@
             sweetError(err, 'err')
           })
         }else {
-          const type = momentId? 'modify': 'create';
-          return nkcAPI(`/creation/zone/moment`, 'POST', {
-            type,
+          return nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
             content,
             momentId,
             resourcesId
           })
             .then((res) => {
-              if(type === 'create') {
-                self.momentId = res.momentId;
-              }
+              self.momentId = res.data.momentId;
               console.log(`电文已自动保存`);
             })
             .catch(err => {

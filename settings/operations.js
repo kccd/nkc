@@ -45,6 +45,13 @@ const FixedOperations = {
   getThreadOrder: 'getThreadOrder',
   visitDocument: 'visitDocument',
   visitArticle: 'visitArticle',
+  visitMomentRichEditor: 'visitMomentRichEditor',
+  momentRichEditorGetDraft: 'momentRichEditorGetDraft',
+  momentRichEditorSaveDraft: 'momentRichEditorSaveDraft',
+  momentRichEditorPublish: 'momentRichEditorPublish',
+  momentPlainEditorGetDraft: 'momentPlainEditorGetDraft',
+  momentPlainEditorSaveDraft: 'momentPlainEditorSaveDraft',
+  momentPlainEditorPublish: 'momentPlainEditorPublish',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

@@ -43,4 +43,9 @@ module.exports = {
       },
     },
   },
+  editor: {
+    rich: {
+      GET: Operations.visitMomentRichEditor,
+    },
+  },
 };

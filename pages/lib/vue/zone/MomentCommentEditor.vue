@@ -132,7 +132,7 @@
   import ResourceSelector from '../ResourceSelector';
   import { getUrl } from '../../js/tools';
   import MomentFiles from './MomentFiles';
-  import EditorCore from './EditorCore.vue';
+  import EditorCore from './EditorCore.plain.vue';
   export default {
     props: ['mid', 'type'],
     components: {
@@ -245,15 +245,15 @@
         this.$refs.editorCore.insertContent(text);
       },
       getMomentComment() {
-        const {momentId} = this;
+        const {momentId: parent} = this;
         const self = this;
-        nkcAPI(`/creation/zone/moment?from=editor&mid=${momentId}`, 'GET')
+        nkcAPI(`/api/v1/zone/editor/plain?parent=${parent}`, 'GET')
           .then(res => {
-            const {content, momentCommentId,picturesId} = res;
-            if(!momentCommentId) return;
+            const {content, momentId, medias} = res.data;
+            if(!momentId) return;
             self.content = content;
-            self.picturesId = picturesId;
-            self.momentCommentId = momentCommentId;
+            self.picturesId = medias.filter(item => item.type === 'picture').map(item => item.rid);
+            self.momentCommentId = momentId;
             self.syncTextareaEditorContent();
           })
           .catch(sweetError)
@@ -269,7 +269,7 @@
       },
       onContentChange: immediateDebounce(function() {
         this.saveContent();
-      }, 500),
+      }, 1000),
       saveContent(t) {
         const {
           content,
@@ -289,16 +289,15 @@
         } else {
           type = momentCommentId? 'modify': 'create';
         }
-        return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
-          type,
+        return nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
+          parent: momentId,
           content,
-          momentCommentId,
           resourcesId:[...picturesId],
         })
         .then(res => {
           console.log(`动态已自动保存`);
           if(type === 'create') {
-            self.momentCommentId = res.momentCommentId;
+            self.momentCommentId = res.data.momentId;
           }
         })
         .catch(err => {
@@ -316,25 +315,23 @@
       },
       async publish() {
         const self = this;
-        const {postType, alsoPost, content, momentId, momentCommentId,picturesId} = this;
+        const {postType, alsoPost, content, momentId, picturesId} = this;
         this.lockPost();
         return Promise.resolve()
           .then(() => {
-            return nkcAPI(`/creation/zone/moment/${momentId}`, 'POST', {
-              type: momentCommentId ? 'publish' : 'forward',
-              content,
+            return nkcAPI(`/api/v1/zone/editor/plain`, 'POST', {
+              parent: momentId,
               postType,
               alsoPost,
-              momentCommentId,
+              content,
               resourcesId:[...picturesId]
             })
           })
           .then(res => {
             self.unlockPost();
             self.$emit('published', {
-              momentCommentId: res.momentCommentId,
-              momentCommentPage: res.momentCommentPage,
-              repostMomentId: res.repostMomentId,
+              momentCommentId: res.data.momentId,
+              repostMomentId: res.data.repostMomentId,
             });
             self.reset();
           })

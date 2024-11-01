@@ -1,6 +1,10 @@
 const router = require('koa-router')();
 const { eventEmitter } = require('../../../events');
 const { getMomentPublishType } = require('../../../events/moment');
+const {
+  momentExtenderService,
+} = require('../../../services/moment/momentExtender.service');
+const { momentModes } = require('../../../settings/moment');
 router
   .get('/', async (ctx, next) => {
     const { query, db, data, state, nkcModules, permission, body } = ctx;
@@ -17,7 +21,10 @@ router
         );
       } else {
         //暂存的moment
-        moment = await db.MomentModel.getUnPublishedMomentDataByUid(state.uid);
+        moment = await momentExtenderService.getUnPublishedMomentDataByUid(
+          state.uid,
+          momentModes.plain,
+        );
       }
       if (moment) {
         const {
@@ -81,9 +88,13 @@ router
       ctx.throw(403, `类型指定错误 type=${type}`);
     }
     if (type === 'create') {
-      let moment = await db.MomentModel.getUnPublishedMomentByUid(state.uid);
+      let moment = await db.MomentModel.getUnPublishedMomentByUid(
+        state.uid,
+        db.MomentMode.getMomentModes().plain,
+      );
       if (moment) {
-        await moment.modifyMoment({
+        await momentExtenderService.modifyMoment({
+          moment,
           content,
           resourcesId,
         });
@@ -99,25 +110,27 @@ router
       }
       data.momentId = moment._id;
     } else if (type === 'modify') {
-      const moment = await db.MomentModel.getUnPublishedMomentByMomentId(
+      const moment = await momentExtenderService.getUnPublishedMomentByMomentId(
         momentId,
         state.uid,
       );
       if (moment) {
-        await moment.modifyMoment({
+        await momentExtenderService.modifyMoment({
+          moment,
           content,
           resourcesId,
         });
       }
     } else {
-      const moment = await db.MomentModel.getUnPublishedMomentByMomentId(
+      const moment = await momentExtenderService.getUnPublishedMomentByMomentId(
         momentId,
         state.uid,
       );
       if (!moment) {
         ctx.throw(400, `数据异常 momentId=${momentId}`);
       }
-      await moment.modifyMoment({
+      await momentExtenderService.modifyMoment({
+        moment,
         content,
         resourcesId,
       });
@@ -156,7 +169,8 @@ router
         momentId,
       );
       if (momentComment) {
-        await momentComment.modifyMoment({
+        await momentExtenderService.modifyMoment({
+          moment: momentComment,
           content,
           resourcesId,
         });
@@ -182,7 +196,8 @@ router
       if (!momentComment) {
         ctx.throw(400, `数据异常 momentCommentId=${momentCommentId}`);
       }
-      await momentComment.modifyMoment({
+      await momentExtenderService.modifyMoment({
+        moment: momentComment,
         content,
         resourcesId,
       });

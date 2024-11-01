@@ -1,18 +1,5 @@
 const mongoose = require('../settings/database');
-
-// 包含所有document的状态
-// 并且额外包含 deleted, cancelled
-const momentStatus = {
-  // document status
-  default: 'default', // 默认状态
-  disabled: 'disabled', // 禁用
-  normal: 'normal', // 正常状态 能被所有用户查看的文档
-  faulty: 'faulty', // 退修
-  unknown: 'unknown', // 需要审核
-  // 额外
-  deleted: 'deleted', // 已删除
-  cancelled: 'cancelled', // 取消发表
-};
+const { momentModes, momentStatus } = require('../settings/moment');
 
 const momentQuoteTypes = {
   article: 'article',
@@ -35,11 +22,6 @@ const visibleType = {
   own: 'own',
   attention: 'attention',
   everyone: 'everyone',
-};
-
-const momentModes = {
-  plain: 'plain',
-  rich: 'rich',
 };
 
 const schema = new mongoose.Schema({
@@ -358,14 +340,23 @@ schema.statics.createMomentCore = async (props) => {
  * @return {moment schema}
  * */
 schema.statics.createMoment = async (props) => {
-  const { uid, content, resourcesId, ip, port } = props;
+  const { uid, content, resourcesId, ip, port, parent = '' } = props;
   const MomentModel = mongoose.model('moments');
+  let parents = [];
+  if (parent) {
+    // 存在上级电文
+    const parentMoment = await MomentModel.findOnly({ _id: parent });
+    parents = [...parentMoment.parents];
+  }
+  parents.push(parent);
   return await MomentModel.createMomentCore({
     ip,
     port,
     uid,
     content,
     resourcesId,
+    parent,
+    parents,
   });
 };
 
@@ -433,37 +424,6 @@ schema.statics.createMomentComment = async (props) => {
     parent,
     parents: [parent],
   });
-};
-
-/*
- * 修改动态内容
- * @param {Object}
- *   @param {String} content 动态内容
- *   @param {[String]} resourcesId 资源 ID 组成的数组
- * */
-schema.methods.modifyMoment = async function (props) {
-  const { content, resourcesId } = props;
-  const MomentModel = mongoose.model('moments');
-  const DocumentModel = mongoose.model('documents');
-  const time = new Date();
-  const newResourcesId = await MomentModel.replaceMomentResourcesId(
-    resourcesId,
-  );
-
-  await DocumentModel.updateDocumentByDid(this.did, {
-    content,
-    resourcesId: newResourcesId,
-    tlm: time,
-  });
-  const match = {
-    $set: {
-      files: newResourcesId,
-    },
-  };
-  if (this.status !== momentStatus.default) {
-    match.$set.tlm = time;
-  }
-  await this.updateOne(match);
 };
 
 // 限制动态图片和视频的数量
@@ -710,108 +670,14 @@ schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
  * @param {String} uid 发表人 ID
  * @return {moment schema or null}
  * */
-schema.statics.getUnPublishedMomentByUid = async (uid) => {
+schema.statics.getUnPublishedMomentByUid = async (uid, mode) => {
   const MomentModel = mongoose.model('moments');
   return MomentModel.findOne({
     uid,
     parent: '',
     status: momentStatus.default,
+    mode,
   });
-};
-
-/*
- * 通过发表人ID、动态ID获取未发布的动态
- * @param {String} uid 发表人 ID
- * @param {String} momentId 动态 ID
- * @return {moment schema or null}
- * */
-schema.statics.getUnPublishedMomentByMomentId = async (momentId, uid) => {
-  const MomentModel = mongoose.model('moments');
-  return MomentModel.findOne({
-    uid,
-    parent: '',
-    _id: momentId,
-    status: momentStatus.default,
-  });
-};
-
-/*
- * 通过发表人 ID 获取未发布的动态数据
- * @param {String} uid 发表人 ID
- * @return {Object or null}
- *   @param {String} momentId 动态 ID
- *   @param {Date} toc 动态创建时间
- *   @param {Date} tlm 动态最后修改时间
- *   @param {String} uid 发表人 ID
- *   @param {String} content 动态内容 ID
- *   @param {[String]} picturesId 动态附带的图片 ID（resourceId）
- *   @param {[String]} videosId 动态附带的视频 ID（resourceId）
- * */
-schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
-  const MomentModel = mongoose.model('moments');
-  const ResourceModel = mongoose.model('resources');
-  const moment = await MomentModel.getUnPublishedMomentByUid(uid);
-  if (moment) {
-    let picturesId = [];
-    let videosId = [];
-    let medias = [];
-    const DocumentModel = mongoose.model('documents');
-    const { moment: momentSource } = await DocumentModel.getDocumentSources();
-    const betaDocument = await DocumentModel.getBetaDocumentBySource(
-      momentSource,
-      moment._id,
-    );
-    if (!betaDocument) {
-      await moment.deleteMoment();
-      return null;
-    }
-    const oldResourcesId = betaDocument.files;
-    if (oldResourcesId.length > 0) {
-      const resources = await ResourceModel.find(
-        { rid: { $in: oldResourcesId } },
-        {
-          rid: 1,
-          mediaType: 1,
-        },
-      );
-      // const resourcesId = resources.map((r) => r.rid);
-      // if (resources.length > 0) {
-      //   if (resources[0].mediaType === 'mediaPicture') {
-      //     picturesId = resourcesId;
-      //   } else {
-      //     videosId = resourcesId;
-      //   }
-      // }
-      for (const ridItem of oldResourcesId) {
-        const file = resources.find((item) => item.rid === ridItem);
-        let type = '';
-        if (!file || !['mediaPicture', 'mediaVideo'].includes(file.mediaType)) {
-          continue;
-        }
-        if (file.mediaType === 'mediaPicture') {
-          type = 'picture';
-        } else {
-          type = 'video';
-        }
-        medias.push({
-          rid: file.rid,
-          type,
-        });
-      }
-    }
-    return {
-      momentId: moment._id,
-      toc: betaDocument.toc,
-      tlm: betaDocument.tlm,
-      uid: betaDocument.uid,
-      content: betaDocument.content,
-      picturesId,
-      videosId,
-      medias,
-    };
-  } else {
-    return null;
-  }
 };
 
 /*

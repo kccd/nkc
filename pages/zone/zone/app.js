@@ -1,12 +1,8 @@
 import { getDataById } from '../../lib/js/dataConversion';
-import Moments from '../../lib/vue/zone/Moments';
 import Home from '../../lib/vue/zone/views/Home';
 import MomentDetail from '../../lib/vue/zone/views/MomentDetail';
-import { getState } from '../../lib/js/state';
-import { visitUrl } from '../../lib/js/pageSwitch';
-import { getSocket } from '../../lib/js/socket';
-import Bubble from '../../lib/vue/zone/Bubble';
 import Vuex from 'vuex';
+import EditorPage from '../../lib/vue/zone/views/Editor.vue';
 
 Vue.use(Vuex);
 
@@ -94,6 +90,11 @@ function initZoneVueApp() {
       name: 'MomentDetail',
       path: '/z/m/:mid',
       component: MomentDetail,
+    },
+    {
+      name: 'MomentEditor',
+      path: '/z/editor/rich',
+      component: EditorPage,
     },
   ];
   // 防止路由重复点击报错

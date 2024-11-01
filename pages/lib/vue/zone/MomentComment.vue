@@ -115,8 +115,9 @@ import { WinkingFace } from "@icon-park/vue";
 import EmojiSelector from "../EmojiSelector.vue";
 import MomentFiles from './MomentFilesNew';
 import ResourceSelector from '../ResourceSelector';
-import EditorCore from './EditorCore.vue';
+import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';
+import { immediateDebounce } from "../../js/execution";
 const state = getState();
 const iconFill = {
   normal: '#555',
@@ -210,6 +211,31 @@ export default {
     visitUrl,
     onReplyEditorContentChange(content) {
       this.replyContent = content;
+      this.delayedSaveReplayContent();
+    },
+    delayedSaveReplayContent: immediateDebounce(function() {
+      this.saveReplayContent();
+    }, 1000),
+    getReplayContent() {
+      nkcAPI(`/api/v1/zone/editor/plain?parent=${this.commentData._id}`, 'GET')
+        .then(res => {
+          this.picturesId = res.data.medias.filter(item => item.type === 'picture').map(item => item.rid);
+          this.replyContent = res.data.content;
+          this.$refs.editorCore.setContent(this.replyContent);
+          this.$refs.editorCore.hideLoading();
+        })
+        .catch(sweetError);
+    },
+    saveReplayContent() {
+      nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
+        parent: this.commentData._id,
+        content: this.replyContent,
+        resourcesId: this.picturesId,
+      })
+        .then(res => {
+          console.log('保存成功');
+        })
+        .catch(sweetError);
     },
     submitReplyContent() {
       const {replyContent, commentData, picturesId, disabledButton} = this;
@@ -252,9 +278,9 @@ export default {
     },
     showReplyEditor() {
       this.replyEditorStatus = true;
-      this.clearReplyPicture();
+      this.clearReplyPicture()
+      this.getReplayContent();
       Vue.nextTick(() => {
-        this.$refs.editorCore.hideLoading();
         this.$refs.editorCore.focus();
       });
 
@@ -322,6 +348,7 @@ export default {
       this.$refs.resourceSelector.open(res => {
         self.picturesId=[...new Set(res.resourcesId)].slice(0, 1);
         self.$refs.resourceSelector.close();
+        self.delayedSaveReplayContent();
       }, {
         allowedExt: ['picture'],
         countLimit: 1 - self.picturesId.length

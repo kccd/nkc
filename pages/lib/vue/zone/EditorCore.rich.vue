@@ -46,7 +46,7 @@ export default {
           History,
           nkcEmoji,
           Placeholder.configure({
-            placeholder: this.placeholder || '想分享什么新鲜事？',
+            placeholder: this.placeholder || '开始输入',
           }),
         ],
         onUpdate: () => {
