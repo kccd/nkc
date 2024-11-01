@@ -346,9 +346,8 @@ schema.statics.createMoment = async (props) => {
   if (parent) {
     // 存在上级电文
     const parentMoment = await MomentModel.findOnly({ _id: parent });
-    parents = [...parentMoment.parents];
+    parents = [...parentMoment.parents, parent];
   }
-  parents.push(parent);
   return await MomentModel.createMomentCore({
     ip,
     port,

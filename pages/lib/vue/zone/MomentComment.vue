@@ -219,10 +219,15 @@ export default {
     getReplayContent() {
       nkcAPI(`/api/v1/zone/editor/plain?parent=${this.commentData._id}`, 'GET')
         .then(res => {
-          this.picturesId = res.data.medias.filter(item => item.type === 'picture').map(item => item.rid);
-          this.replyContent = res.data.content;
-          this.$refs.editorCore.setContent(this.replyContent);
+          if(res.data.momentId) {
+            this.picturesId = res.data.medias.filter(item => item.type === 'picture').map(item => item.rid);
+            this.replyContent = res.data.content;
+            this.$refs.editorCore.setContent(this.replyContent);
+          }
           this.$refs.editorCore.hideLoading();
+          Vue.nextTick(() => {
+            this.$refs.editorCore.focus();
+          });
         })
         .catch(sweetError);
     },
@@ -244,9 +249,12 @@ export default {
         .then(() => {
           if(disabledButton) throw new Error('请输入评论内容');
           self.submitting = true;
-          return nkcAPI(`/creation/zone/moment/${commentData._id}/comment`, 'POST', {
+          return nkcAPI(`/api/v1/zone/editor/plain`, 'POST', {
+            parent: commentData._id,
             content: replyContent,
             resourcesId: picturesId,
+            postType: 'comment',
+            repost: false,
           });
         })
         .then((res) => {
@@ -269,6 +277,7 @@ export default {
     },
     clearReplyContent() {
       this.replyContent = '';
+      this.$refs.editorCore.clearContent();
     },
     clearReplyPicture() {
       this.picturesId = [];
@@ -280,10 +289,6 @@ export default {
       this.replyEditorStatus = true;
       this.clearReplyPicture()
       this.getReplayContent();
-      Vue.nextTick(() => {
-        this.$refs.editorCore.focus();
-      });
-
     },
     switchEditor() {
       if(!this.logged) return toLogin();
