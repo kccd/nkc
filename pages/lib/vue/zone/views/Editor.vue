@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Editor from '../../Editor.v2.vue';
+import Editor from '../../Editor.json.vue';
 export default {
   components: {
     'editor': Editor,
