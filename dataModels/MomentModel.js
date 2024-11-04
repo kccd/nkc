@@ -292,6 +292,7 @@ schema.statics.createMomentCore = async (props) => {
     parents = [],
     ip = '',
     port = '',
+    mode = momentModes.plain,
   } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
@@ -326,6 +327,7 @@ schema.statics.createMomentCore = async (props) => {
     top: publishTime,
     toc,
     files: resourcesId,
+    mode,
   });
   await moment.save();
   return moment;
@@ -341,7 +343,15 @@ schema.statics.createMomentCore = async (props) => {
  * @return {moment schema}
  * */
 schema.statics.createMoment = async (props) => {
-  const { uid, content, resourcesId, ip, port, parent = '' } = props;
+  const {
+    uid,
+    content,
+    resourcesId = [],
+    ip,
+    port,
+    parent = '',
+    mode = momentModes.plain,
+  } = props;
   const MomentModel = mongoose.model('moments');
   let parents = [];
   if (parent) {
@@ -352,6 +362,7 @@ schema.statics.createMoment = async (props) => {
   return await MomentModel.createMomentCore({
     ip,
     port,
+    mode,
     uid,
     content,
     resourcesId,

@@ -22,7 +22,6 @@ router
     const { parent } = ctx.query;
     const moment = await momentExtenderService.getUnPublishedMomentDataByUid(
       state.uid,
-      momentModes.plain,
       parent || '',
     );
     if (moment) {

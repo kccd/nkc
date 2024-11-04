@@ -23,7 +23,6 @@ router
         //暂存的moment
         moment = await momentExtenderService.getUnPublishedMomentDataByUid(
           state.uid,
-          momentModes.plain,
         );
       }
       if (moment) {

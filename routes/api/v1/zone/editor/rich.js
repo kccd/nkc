@@ -1,16 +1,82 @@
 const Router = require('koa-router');
+const { OnlyUser } = require('../../../../../middlewares/permission');
+const {
+  momentExtenderService,
+} = require('../../../../../services/moment/momentExtender.service');
+const { momentModes } = require('../../../../../settings/moment');
+const { getMomentPublishType } = require('../../../../../events/moment');
+const { eventEmitter } = require('../../../../../events');
 const router = new Router();
 
-router.get('/', async (ctx, next) => {
-  // 获取已经存在的草稿
-  await next();
-});
-router.put('/', async (ctx, next) => {
-  // 暂存草稿
-  await next();
-});
-router.post('/', async (ctx, next) => {
-  // 基于草稿提交
-  await next();
-});
+router
+  .get('/', OnlyUser(), async (ctx, next) => {
+    const { state } = ctx;
+    const moment =
+      await momentExtenderService.getUnPublishedMomentRichDataByUid(state.uid);
+    if (moment) {
+      const { momentId, content } = moment;
+      ctx.apiData = {
+        momentId: momentId,
+        content: content,
+      };
+    } else {
+      ctx.apiData = {};
+    }
+    await next();
+  })
+  .put('/', OnlyUser(), async (ctx, next) => {
+    const { db, body, state } = ctx;
+    const { content } = body;
+    let moment = await momentExtenderService.getUnPublishedMomentByUid(
+      state.uid,
+      momentModes.rich,
+    );
+    if (!moment) {
+      moment = await db.MomentModel.createMoment({
+        ip: ctx.address,
+        port: ctx.port,
+        content,
+        resourcesId: [],
+        uid: state.uid,
+        parent: '',
+        mode: momentModes.rich,
+      });
+    }
+    await momentExtenderService.modifyMoment({
+      moment,
+      content,
+      resourcesId: [],
+    });
+    ctx.apiData = {
+      momentId: moment._id,
+    };
+    // 暂存草稿
+    await next();
+  })
+  .post('/', OnlyUser(), async (ctx, next) => {
+    const { state, body } = ctx;
+    const { content } = body;
+    const moment = await momentExtenderService.getUnPublishedMomentByUid(
+      state.uid,
+      momentModes.rich,
+    );
+    if (!moment) {
+      ctx.throw(400, '提交的内容已过期，请刷新页面后重试');
+    }
+    await momentExtenderService.modifyMoment({
+      moment,
+      content,
+      resourcesId: [],
+    });
+    await moment.publish();
+    const { momentBubble } = getMomentPublishType();
+    eventEmitter.emit(momentBubble, {
+      uid: state.uid,
+      momentId: moment._id,
+    });
+    ctx.apiData = {
+      momentId: moment._id,
+    };
+    await next();
+  });
 module.exports = router;

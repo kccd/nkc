@@ -1,36 +1,70 @@
 <template lang="pug">
   .container-fluid.max-width.moment-rich-editor-container
-    .moment-rich-editor-toolbar
-      .moment-rich-editor-toolbar-left
-    editor(ref="editor" @content-change="editorContentChange")
+    editor(ref="editor" @content-change="editorContentChange" :loading="loading")
+    .m-t-1
+      button.btn.btn-default.btn-sm(@click="publish" :disabled="loading || submitting") 发射
 </template>
 
 <script>
+import {nkcAPI} from "../../../js/netAPI";
 import Editor from '../../Editor.json.vue';
+import {sweetError} from "../../../js/sweetAlert";
+import { immediateDebounce } from "../../../js/execution";
+import { visitUrl } from "../../../js/pageSwitch";
 export default {
   components: {
     'editor': Editor,
   },
   data() {
     return {
+      loading: true,
+      submitting: false,
       content: '',
     }
   },
   mounted() {
+    this.initDraft();
   },
   methods: {
     // 获取富文本草稿
-    getDraft() {
-
+    initDraft() {
+      nkcAPI(`/api/v1/zone/editor/rich`, 'GET').then(res => {
+        if(res.data.momentId) {
+          this.content = res.data.content;
+          this.$refs.editor.setContent(this.content);
+        }
+        this.loading = false;
+      })
+        .catch(sweetError)
     },
     editorContentChange(newContent) {
       this.content = newContent;
+      this.autoSaveDraft();
     },
     saveDraft() {
-
+      nkcAPI(`/api/v1/zone/editor/rich`, 'PUT', {
+        content: this.content,
+      }).then(res => {
+        console.log('保存成功')
+      })
+        .catch(sweetError)
     },
+    autoSaveDraft: immediateDebounce(function() {
+      this.saveDraft();
+    }, 1000),
     publish() {
-
+      this.submitting = true;
+      nkcAPI(`/api/v1/zone/editor/rich`, 'POST', {
+        content: this.content,
+      })
+        .then(() => {
+          this.$refs.editor.removeNoticeEvent();
+          visitUrl(`/z`);
+        })
+        .catch(sweetError)
+        .finally(() => {
+          this.submitting = false;
+        })
     },
   }
 }

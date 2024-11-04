@@ -60,7 +60,7 @@ class MomentExtenderService {
       parent: parentMomentId,
       status: momentStatus.default,
       mode,
-    });
+    }).sort({ toc: -1 });
   }
   async _extendMomentMedias(resourcesId) {
     const medias = [];
@@ -116,21 +116,41 @@ class MomentExtenderService {
       medias,
     };
   }
-  async getRichEditorDataByMoment(moment) {}
-  async getUnPublishedMomentDataByUid(uid, mode, parentMomentId = '') {
+  async getRichEditorDataByMoment(moment) {
+    const { moment: momentSource } = await DocumentModel.getDocumentSources();
+    const betaDocument = await DocumentModel.getBetaDocumentBySource(
+      momentSource,
+      moment._id,
+    );
+    if (!betaDocument) {
+      await moment.deleteMoment();
+      return null;
+    }
+    return {
+      momentId: moment._id,
+      toc: betaDocument.toc,
+      tlm: betaDocument.tlm,
+      uid: betaDocument.uid,
+      content: betaDocument.content,
+    };
+  }
+  async getUnPublishedMomentDataByUid(uid, parentMomentId = '') {
     const moment = await this.getUnPublishedMomentByUid(
       uid,
-      mode,
+      momentModes.plain,
       parentMomentId,
     );
     if (!moment) {
       return null;
     }
-    if (mode === momentModes.plain) {
-      return this.getPlainEditorDataByMoment(moment);
-    } else {
-      return this.getRichEditorDataByMoment(moment);
+    return this.getPlainEditorDataByMoment(moment);
+  }
+  async getUnPublishedMomentRichDataByUid(uid) {
+    const moment = await this.getUnPublishedMomentByUid(uid, momentModes.rich);
+    if (!moment) {
+      return null;
     }
+    return this.getRichEditorDataByMoment(moment);
   }
   async getUnPublishedMomentByMomentId(momentId, uid) {
     return MomentModel.findOne({
