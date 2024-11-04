@@ -378,8 +378,12 @@ export default {
       if(this.moment.status !== 'normal'){
         return sweetError('当前电文不可编辑')
       }
-      const mid = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId
-      this.$emit('selectedMomentId', mid);
+      if(this.moment.mode === 'plain') {
+        const mid = this.moment.momentCommentId ? this.moment.momentCommentId : this.moment.momentId
+        this.$emit('selectedMomentId', mid);
+      } else {
+        visitUrl(`/z/editor/rich?id=${this.moment.momentId}`, true);
+      }
     },
     // 访问历史
     visitHistory() {

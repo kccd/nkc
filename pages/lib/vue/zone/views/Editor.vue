@@ -20,15 +20,23 @@ export default {
       loading: true,
       submitting: false,
       content: '',
+      momentI: ''
     }
   },
   mounted() {
+    this.momentId = this.$route.query.id || '';
     this.initDraft();
+  },
+  computed: {
+    isEditMoment() {
+      return !!this.momentId
+    }
   },
   methods: {
     // 获取富文本草稿
     initDraft() {
-      nkcAPI(`/api/v1/zone/editor/rich`, 'GET').then(res => {
+      const url = this.isEditMoment ? `/api/v1/zone/moment/${this.momentId}/editor/rich` : `/api/v1/zone/editor/rich`;
+      nkcAPI(url, 'GET').then(res => {
         if(res.data.momentId) {
           this.content = res.data.content;
           this.$refs.editor.setContent(this.content);
@@ -42,7 +50,8 @@ export default {
       this.autoSaveDraft();
     },
     saveDraft() {
-      nkcAPI(`/api/v1/zone/editor/rich`, 'PUT', {
+      const url = this.isEditMoment ? `/api/v1/zone/moment/${this.momentId}/editor/rich` : `/api/v1/zone/editor/rich`;
+      nkcAPI(url, 'PUT', {
         content: this.content,
       }).then(res => {
         console.log('保存成功')
@@ -54,7 +63,8 @@ export default {
     }, 1000),
     publish() {
       this.submitting = true;
-      nkcAPI(`/api/v1/zone/editor/rich`, 'POST', {
+      const url = this.isEditMoment ? `/api/v1/zone/moment/${this.momentId}/editor/rich` : `/api/v1/zone/editor/rich`;
+      nkcAPI(url, 'POST', {
         content: this.content,
       })
         .then(() => {

@@ -1524,8 +1524,6 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       top,
       _id,
       voteUp,
-      order,
-      comment,
       commentAll,
       repost,
       quoteType,
@@ -1533,6 +1531,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       visibleType,
       tlm,
       hits,
+      mode,
     } = moment;
 
     let f = moment[field];
@@ -1637,6 +1636,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       files: filesData,
       url: getUrl('zoneMoment', _id),
       visibleType,
+      mode,
     };
 
     if (moment.status !== momentStatus.normal) {
