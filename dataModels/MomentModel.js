@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const { momentModes, momentStatus } = require('../settings/moment');
+const { documentSources } = require('../settings/document');
 
 const momentQuoteTypes = {
   article: 'article',
@@ -1053,6 +1054,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   if (!['comment', 'repost'].includes(postType)) {
     throwErr(500, `类型指定错误 postType=${postType}`);
   }
+  const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
   const { moment: quoteType } = momentQuoteTypes;
@@ -1065,15 +1067,31 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   let commentMomentId;
   let repostMomentId;
   const ip = await IPModel.getIpByIpId(ipId);
-  if (postType === 'comment' || alsoPost) {
+  // 是否生成评论
+  const postComment = postType === 'comment' || alsoPost;
+  // 是否生成转发
+  const postForward = postType === 'repost' || alsoPost;
+  if (postComment) {
     // 需要创建评论
     await this.updateMomentCommentOrder();
     await this.updateParentLatestId();
     await this.publish();
     commentMomentId = this._id;
+  } else {
+    // 不需要创建评论
+    // 将当前moment设置为quoteMoment
+    await DocumentModel.deleteMany({
+      source: documentSources.moment,
+      sid: this._id,
+      did: this.did,
+    });
+    await MomentModel.deleteOne({
+      _id: this._id,
+    });
   }
-  if (postType === 'repost' || alsoPost) {
+  if (postForward) {
     // 需要转发动态
+    // 这里需要将moment作为转发的moment，避免多生成一个moment，导致原moment没地儿放
     const repostMoment = await MomentModel.createQuoteMomentAndPublish({
       ip,
       port,
@@ -1110,7 +1128,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
     const { eventEmitter } = require('../events');
     const { getMomentPublishType } = require('../events/moment');
     const { momentBubble } = getMomentPublishType();
-    await eventEmitter.emit(momentBubble, {
+    eventEmitter.emit(momentBubble, {
       uid,
       momentId: repostMomentId,
     });
