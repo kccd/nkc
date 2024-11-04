@@ -236,7 +236,6 @@ export default {
         url += "&desTypeId=" + this.pageData.thread.pid;
       }
 
-      // 后期获取草稿需要传入l
       nkcAPI(url, 'GET')
       .then(res => {
         //除了新建文章thread之外其他的都需要默认填充唯一的did 编辑版草稿

@@ -359,7 +359,7 @@ class SinglePostModule {
       let editorDom, app;
       if (this.postPermission.permit) {
         editorDom = $(
-          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="waiting" :plugs="editorPlugs"/></div>`,
+          `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="waiting" :l="l" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
           `<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
@@ -426,6 +426,7 @@ class SinglePostModule {
               mathJaxSelector: true,
             },
             waiting: true,
+            l: 'json',
           },
           mounted() {},
           computed: {
@@ -457,14 +458,18 @@ class SinglePostModule {
                   'GET',
                 )
                   .then((res) => {
-                    if (
-                      res.drafts.length &&
-                      this.$refs[`singleEditor_${pid}`].ready &&
-                      !this.$refs[`singleEditor_${pid}`].getContent()
-                    ) {
-                      this.$refs[`singleEditor_${pid}`].setContent(
-                        res.drafts[0].content,
-                      );
+                    if (res.drafts.length) {
+                      // this.$refs[`singleEditor_${pid}`].ready &&
+                      // !this.$refs[`singleEditor_${pid}`].getContent()
+                      this.l = res.drafts[0].l;
+                      setTimeout(() => {
+                        this.$refs[`singleEditor_${pid}`].setContent(
+                          res.drafts[0].content,
+                        );
+                      }, 500);
+                      // this.$refs[`singleEditor_${pid}`].setContent(
+                      //   res.drafts[0].content,
+                      // );
                       if (self.editors[pid]) {
                         self.editors[pid].draftId = res.drafts[0].did;
                         self.editors[pid]._id = res.drafts[0]._id;
@@ -545,7 +550,11 @@ class SinglePostModule {
   // 清除编辑器内的内容
   clearEditorContent(pid) {
     const editorApp = this.getEditorApp(pid);
-    editorApp.app.setContent('');
+    if (editorApp.app.l === 'json') {
+      editorApp.app.clearContent();
+    } else {
+      editorApp.app.setContent('');
+    }
   }
   // 屏蔽提交按钮
   changeEditorButtonStatus(pid, disabled) {
@@ -563,6 +572,7 @@ class SinglePostModule {
     const content = this.getEditorContent(pid);
     const editorApp = this.getEditorApp(pid);
     const self = this;
+    clearTimeout(editorApp.timeoutId);
     return Promise.resolve()
       .then(() => {
         if (!content) {
@@ -576,7 +586,7 @@ class SinglePostModule {
           postType: 'comment',
           post: {
             c: content,
-            l: 'html',
+            l: editorApp.app.l || 'json',
             anonymous: isAnonymous,
             parentPostId: pid,
             _id: editorApp._id || '',
@@ -626,7 +636,7 @@ class SinglePostModule {
         return nkcAPI(`/u/${NKC.configs.uid}/drafts`, 'POST', {
           post: {
             c: content,
-            l: 'html',
+            l: editorApp.app.l || 'json',
             parentPostId: pid,
             did: editorApp?.draftId || '',
             _id: editorApp?._id || '',

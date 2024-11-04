@@ -293,7 +293,7 @@ resourceSchema.statics.getResourcesByTags = async (tags = '') => {
 };
 
 // 适用于根据tiptap输出的json数据进行查询内容里的附件信息
-resourceSchema.statics.getResourcesObjByJson = async (jsonContent = {}) => {
+resourceSchema.statics.getResourcesByJson = async (jsonContent = {}) => {
   const ResourceModel = mongoose.model('resources');
   const targetTypes = [
     'nkc-video-block',
@@ -325,14 +325,7 @@ resourceSchema.statics.getResourcesObjByJson = async (jsonContent = {}) => {
   for (const resource of resources) {
     await resource.setFileExist();
   }
-  const resourcesObj = {};
-  for (let r of resources) {
-    if (r.toObject) {
-      r = r.toObject();
-    }
-    resourcesObj[r.rid] = r;
-  }
-  return resourcesObj;
+  return resources;
 };
 resourceSchema.methods.extendVideoPlayerData = async function () {
   const r = this;
@@ -599,6 +592,49 @@ resourceSchema.statics.toReferenceSource = async function (id, declare = '') {
   await model.updateMany(
     {
       rid: { $in: resourcesId },
+    },
+    {
+      $addToSet: {
+        references: id,
+      },
+    },
+  );
+};
+// 检测json内容中的资源并将指定id存入resource.reference
+resourceSchema.statics.toReferenceSourceByJson = async function (
+  id,
+  jsonContent = '',
+) {
+  const model = mongoose.model('resources');
+  const targetTypes = [
+    'nkc-video-block',
+    'nkc-audio-block',
+    'nkc-picture-block',
+    'nkc-picture-inline',
+    'nkc-attachment-block',
+  ];
+  function extractNodes(node, targetTypes) {
+    let result = [];
+    // 检查当前节点类型是否在目标类型列表中
+    if (targetTypes.includes(node.type)) {
+      result.push(node.attrs.id);
+    }
+    // 如果当前节点有内容，递归遍历子节点
+    if (node.content) {
+      for (const child of node.content) {
+        result = result.concat(extractNodes(child, targetTypes));
+      }
+    }
+    return result;
+  }
+  // 提取特定类型的节点
+  const rids = extractNodes(
+    typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent,
+    targetTypes,
+  );
+  await model.updateMany(
+    {
+      rid: { $in: rids },
     },
     {
       $addToSet: {

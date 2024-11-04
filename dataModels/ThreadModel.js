@@ -6,6 +6,7 @@ const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
 const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -1057,7 +1058,11 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     );
     posts.map(async (post) => {
       if (o.htmlToText) {
-        post.c = obtainPureText(post.c, true, o.count);
+        post.c = obtainPureText(
+          post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+          true,
+          o.count,
+        );
       }
       if (o.firstPostUser || o.lastPostUser) {
         usersId.add(post.uid);

@@ -18,7 +18,7 @@
               .fa.fa-remove.m-r-05
               span 内容保存失败
             .save-saving(v-if="savingInfo === 'saving'") 内容保存中...
-      .mask.m-b-1(v-show="loading")
+      //-.mask.m-b-1(v-show="loading")
         loading
 </template>
 

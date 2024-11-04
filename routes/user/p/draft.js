@@ -228,7 +228,7 @@ module.exports = async (ctx, next) => {
     d.content = d.c;
     if (d.l === 'json') {
       d.c = nkcModules.apiFunction.obtainPureText(
-        renderHTMLByJSON(d.c),
+        renderHTMLByJSON({ json: d.c }),
         true,
         300,
       );

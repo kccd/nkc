@@ -157,7 +157,7 @@
     .word-count
       span(:style="currentTextLength>initConfig.maxWordCount?'color:#ff6262;':''") {{`${currentTextLength}`}}
       span {{`/${initConfig.maxWordCount}`}}
-    .mask.m-b-1(v-show="!!loading")
+    //-.mask.m-b-1(v-show="!!loading")
       loading
     resource-selector(ref='resourceSelector')
     table-editor(ref='tableEditor')
@@ -826,6 +826,9 @@ export default {
       if(!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc) return;
       window.onbeforeunload = null;
     },
+    clearContent(){
+      this.editor.commands.clearContent();
+    }
   },
   beforeDestroy() {
     this.editor.destroy();

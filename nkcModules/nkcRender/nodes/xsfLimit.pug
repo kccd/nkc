@@ -1,7 +1,7 @@
 mixin renderXsfLimit(node)
   span(data-tag="nkcsource" data-type="xsf" data-id=`${node.attrs.xsf}`)
     span=`浏览这段内容需要${node.attrs.xsf}学术分`
-    if Number(user.xsf||0) >= Number(node.attrs.xsf)
+    if Number(xsf||0) >= Number(node.attrs.xsf)
       span
         +loopRender(node.content)
     else

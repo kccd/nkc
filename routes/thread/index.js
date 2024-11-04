@@ -14,6 +14,7 @@ const {
 } = require('../../services/subscribe/collection.service');
 const { Operations } = require('../../settings/operations');
 const { ObjectId } = require('mongodb');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -1340,7 +1341,10 @@ threadRouter
     if (post.t && post.t.length > 100) {
       ctx.throw(400, `标题不能超过100个字`);
     }
-    const content = customCheerio.load(post.c).text();
+    const content =
+      post.l === 'json'
+        ? customCheerio.load(renderHTMLByJSON({ json: post.c })).text()
+        : customCheerio.load(post.c).text();
     if (content.length < 2) {
       ctx.throw(400, `内容不能少于2个字`);
     }

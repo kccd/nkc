@@ -793,8 +793,12 @@ postSchema.pre('save', async function (next) {
   // correct reference to the post
   try {
     const ResourceModel = mongoose.model('resources');
-    const { c, pid } = this;
-    await ResourceModel.toReferenceSource(pid, c);
+    const { c, pid, l } = this;
+    if (l === 'json') {
+      await ResourceModel.toReferenceSourceByJson(pid, c);
+    } else {
+      await ResourceModel.toReferenceSource(pid, c);
+    }
     return next();
   } catch (e) {
     return next(e);
@@ -1092,6 +1096,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
         c: 1,
         uid: 1,
         anonymous: 1,
+        l: 1,
       },
     ).sort({ toc: 1 });
     postsId = quotePosts.map((q) => {
@@ -1194,7 +1199,13 @@ postSchema.statics.extendPosts = async (posts, options) => {
           username = user.username;
           uid = quotePost.uid;
         }
-        let c = nkcRender.htmlToPlain(quoteContent, 50);
+        let c =
+          quotePost.l === 'json'
+            ? nkcRender.htmlToPlain(
+                renderHTMLByJSON({ json: quoteContent }),
+                50,
+              )
+            : nkcRender.htmlToPlain(quoteContent, 50);
         c = nkcRender.replaceLink(c);
         post.quotePost = {
           pid: quotePost.pid,
@@ -1208,8 +1219,11 @@ postSchema.statics.extendPosts = async (posts, options) => {
     // 如果需要渲染html
     if (o.renderHTML) {
       if (post.l === 'json') {
-        const resourcesObj = await ResourceModel.getResourcesObjByJson(post.c);
-        post.c = renderHTMLByJSON(post.c, resourcesObj, o.visitor);
+        post.c = renderHTMLByJSON({
+          json: post.c,
+          resources: post.resources,
+          xsf: o.visitor.xsf,
+        });
       } else {
         post.c = nkcRender.renderHTML({
           type: 'article',
@@ -1650,7 +1664,10 @@ postSchema.statics.getSocketCommentByPid = async (post) => {
     username = user.username;
     uid = user.uid;
   }
-  content = nkcRender.htmlToPlain(post.c, 50);
+  content =
+    post.l === 'json'
+      ? nkcRender.htmlToPlain(renderHTMLByJSON({ json: post.c }), 50)
+      : nkcRender.htmlToPlain(post.c, 50);
   contentUrl = tools.getUrl('post', post.pid);
   return {
     postId: post.pid,

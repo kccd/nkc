@@ -182,7 +182,7 @@ draftsRouter
     // 检查草稿
     let _content = '';
     if (l === 'json') {
-      _content = customCheerio.load(renderHTMLByJSON(c)).text();
+      _content = customCheerio.load(renderHTMLByJSON({ json: c })).text();
     } else {
       _content = customCheerio.load(c).text();
     }
