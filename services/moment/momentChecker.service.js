@@ -1,8 +1,13 @@
-const MomentModel = require('../../dataModels/MomentModel');
 const SubscribeModel = require('../../dataModels/SubscribeModel');
 const { ThrowCommonError } = require('../../nkcModules/error');
-const { getEditorJSONStringLength } = require('../../nkcModules/checkData');
-
+const {
+  getMomentPlainJsonContentLength,
+  getRichJsonContentLength,
+} = require('../../nkcModules/checkData');
+const {
+  momentStatus: momentStatusSettings,
+  momentVisibleType: momentVisibleTypeSettings,
+} = require('../../settings/moment');
 class MomentCheckerService {
   async checkMomentPermission(readerUid, moment, hasReviewPermission) {
     const {
@@ -14,8 +19,8 @@ class MomentCheckerService {
       normal: normalMomentStatus,
       deleted: deleteMomentStatus,
       disabled: disabledMomentStatus,
-    } = await MomentModel.getMomentStatus();
-    const { own, attention } = await MomentModel.getMomentVisibleType();
+    } = momentStatusSettings;
+    const { own, attention } = momentVisibleTypeSettings;
 
     if (hasReviewPermission) {
       // 管理员不做限制
@@ -56,9 +61,16 @@ class MomentCheckerService {
     }
   }
 
-  checkMomentSimpleJSONLength(jsonString) {
-    const length = getEditorJSONStringLength(jsonString);
+  checkMomentPlainJSONLength(jsonString) {
+    const length = getMomentPlainJsonContentLength(jsonString);
     if (length > 1000 || jsonString.length > 100000) {
+      ThrowCommonError(400, '内容长度超过限制');
+    }
+  }
+
+  checkMomentRichJSONLength(jsonString) {
+    const length = getRichJsonContentLength(jsonString);
+    if (length > 100000 || jsonString.length > 1000000) {
       ThrowCommonError(400, '内容长度超过限制');
     }
   }

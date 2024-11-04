@@ -20,7 +20,7 @@ class MomentExtenderService {
   // 只允许添加自己的资源
   // 做多只能添加9个资源
   async fixMomentResourceId(props) {
-    const { uid, resourcesId } = props;
+    const { uid, resourcesId, count = 9 } = props;
     const resources = await ResourceModel.find(
       {
         uid,
@@ -29,8 +29,11 @@ class MomentExtenderService {
       {
         rid: 1,
       },
-    ).limit(9);
-    return resources.map((resource) => resource.rid);
+    ).limit(count);
+    const resourceMap = new Map(
+      resources.map((resource) => [resource.rid, resource.rid]),
+    );
+    return resourcesId.filter((rid) => resourceMap.has(rid));
   }
   async modifyMoment(props) {
     const { moment, content, resourcesId } = props;
@@ -38,6 +41,7 @@ class MomentExtenderService {
     const newResourcesId = await this.fixMomentResourceId({
       uid: moment.uid,
       resourcesId,
+      count: moment.mode === momentModes.plain ? 9 : 1000000,
     });
     await DocumentModel.updateDocumentByDid(moment.did, {
       content,

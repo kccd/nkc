@@ -2,6 +2,9 @@ const Router = require('koa-router');
 const {
   momentExtenderService,
 } = require('../../../../../../services/moment/momentExtender.service');
+const {
+  getJsonStringResourcesId,
+} = require('../../../../../../nkcModules/json');
 const router = new Router();
 
 router
@@ -17,10 +20,11 @@ router
     const { internalData, body } = ctx;
     const { moment } = internalData;
     const { content } = body;
+    const resourcesId = getJsonStringResourcesId(content);
     await momentExtenderService.modifyMoment({
       moment,
       content,
-      resourcesId: [],
+      resourcesId: resourcesId,
     });
     await next();
   })
@@ -28,10 +32,11 @@ router
     const { body, internalData } = ctx;
     const { moment } = internalData;
     const { content } = body;
+    const resourcesId = getJsonStringResourcesId(content);
     await momentExtenderService.modifyMoment({
       moment,
       content,
-      resourcesId: [],
+      resourcesId: resourcesId,
     });
     await moment.publish();
     ctx.apiData = {

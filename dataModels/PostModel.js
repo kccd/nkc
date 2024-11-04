@@ -941,6 +941,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const HistoryModel = mongoose.model('histories');
   const xsfsRecordTypes = await XsfsRecordModel.getXsfsRecordTypes();
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
+  const { obtainPureText } = require('../nkcModules/apiFunction');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
   o.usersVote = o.usersVote && !!o.uid;

@@ -1,5 +1,9 @@
 const mongoose = require('../settings/database');
-const { momentModes, momentStatus } = require('../settings/moment');
+const {
+  momentModes,
+  momentStatus,
+  momentVisibleType,
+} = require('../settings/moment');
 const { documentSources } = require('../settings/document');
 
 const momentQuoteTypes = {
@@ -19,11 +23,7 @@ const momentCommentPerPage = {
   complete: 50,
 };
 
-const visibleType = {
-  own: 'own',
-  attention: 'attention',
-  everyone: 'everyone',
-};
+const visibleType = { ...momentVisibleType };
 
 const schema = new mongoose.Schema({
   _id: String,
@@ -837,44 +837,19 @@ schema.methods.checkBeforePublishing = async function () {
   // 检测发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if (!this.quoteType || !this.quoteId) {
-    const { checkString, getLength } = require('../nkcModules/checkData');
-    momentCheckerService.checkMomentSimpleJSONLength(betaDocument.content);
+    const { getLength } = require('../nkcModules/checkData');
+    if (this.mode === momentModes.plain) {
+      momentCheckerService.checkMomentPlainJSONLength(betaDocument.content);
+    } else {
+      momentCheckerService.checkMomentRichJSONLength(betaDocument.content);
+    }
+
     // 检测文字和图片/视频是否都没有
     if (
       getLength(betaDocument.content) === 0 &&
       betaDocument.files.length === 0
     ) {
       throwErr(400, `内容不能为空`);
-    }
-  }
-  if (this.files.length > 0) {
-    let mediaType;
-    const resources = await ResourceModel.find(
-      {
-        uid: this.uid,
-        rid: { $in: this.files },
-      },
-      {
-        rid: 1,
-        mediaType: 1,
-      },
-    );
-    if (resources.length !== this.files.length) {
-      throwErr(500, `媒体文件类型错误`);
-    }
-    // for (const resource of resources) {
-    //   if (!mediaType) {
-    //     mediaType = resource.mediaType;
-    //   } else {
-    //     if (mediaType !== resource.mediaType) {
-    //       throwErr(500, `媒体文件类型错误`);
-    //     }
-    //   }
-    // }
-    for (const resource of resources) {
-      if (!['mediaPicture', 'mediaVideo'].includes(resource.mediaType)) {
-        throwErr(500, `媒体文件类型错误`);
-      }
     }
   }
 };
@@ -1556,7 +1531,11 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     const filesData = [];
     for (const rid of files) {
       const resource = resourcesObj[rid];
-      if (!resource) {
+      if (
+        !resource ||
+        !['mediaPicture', 'mediaVideo'].includes(resource.mediaType) ||
+        filesData.length >= 9
+      ) {
         continue;
       }
       await resource.setFileExist();

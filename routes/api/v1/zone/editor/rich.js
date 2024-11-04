@@ -6,6 +6,7 @@ const {
 const { momentModes } = require('../../../../../settings/moment');
 const { getMomentPublishType } = require('../../../../../events/moment');
 const { eventEmitter } = require('../../../../../events');
+const { getJsonStringResourcesId } = require('../../../../../nkcModules/json');
 const router = new Router();
 
 router
@@ -42,10 +43,11 @@ router
         mode: momentModes.rich,
       });
     }
+    const resourcesId = getJsonStringResourcesId(content);
     await momentExtenderService.modifyMoment({
       moment,
       content,
-      resourcesId: [],
+      resourcesId: resourcesId,
     });
     ctx.apiData = {
       momentId: moment._id,
@@ -63,10 +65,11 @@ router
     if (!moment) {
       ctx.throw(400, '提交的内容已过期，请刷新页面后重试');
     }
+    const resourcesId = getJsonStringResourcesId(content);
     await momentExtenderService.modifyMoment({
       moment,
       content,
-      resourcesId: [],
+      resourcesId: resourcesId,
     });
     await moment.publish();
     const { momentBubble } = getMomentPublishType();

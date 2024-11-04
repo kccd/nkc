@@ -19,7 +19,7 @@ var CheckData = function () {
     var zhCN = data.match(/[^\x00-\xff]/g) || [];
     return data.length + zhCN.length;
   };
-  (self.getEditorJSONStringLength = function (jsonString) {
+  self.getEditorJsonStringLength = function (jsonString, nodesSize = {}) {
     if (!jsonString) {
       return 0;
     }
@@ -35,69 +35,77 @@ var CheckData = function () {
       }
       return newNodes;
     };
-
     var nodes = getNodes(jsonData.content);
-    var count = 0;
+    var totalSize = 0;
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
-      switch (node.type) {
-        case 'nkc-emoji': {
-          count += 2;
-          break;
-        }
-        case 'text': {
-          count += self.getLength(node.text);
-          break;
-        }
-        case 'paragraph': {
-          break;
-        }
-        default: {
-          // 存在非法标签
-          count += 9999999999;
-        }
+      if (node.type === 'text') {
+        totalSize += self.getLength(node.text);
+      } else {
+        var currentNodeSize = nodesSize[node.type] || 0;
+        totalSize += currentNodeSize;
       }
     }
-    return count;
-  }),
-    /*
-     * 检测数字类型
-     * @param data 需要检测的数据
-     * @param {Object} options
-     *   name: 变量名
-     *   min: 最小值
-     *   max: 最大值
-     *   fractionDigits: 小数位数
-     * @author pengxiguaa 2019-9-6
-     * */
-    (this.checkNumber = function (data, options) {
-      options = options || {};
-      var min = options.min;
-      var max = options.max;
-      var fractionDigits = options.fractionDigits || 0;
-      var name = options.name || '';
-      if (typeof data !== 'number' || isNaN(data)) {
-        self.te(400, name + '数据类型错误');
-      }
-      if (min !== undefined) {
-        if (data < min) {
-          self.te(400, name + '数值不能小于' + min);
-        }
-      }
-      if (max !== undefined) {
-        if (data > max) {
-          self.te(400, name + '数值不能大于' + max);
-        }
-      }
-      var dataArr = data.toString().split('.')[1];
-      var length = (dataArr || '').length;
-      if (length > fractionDigits) {
-        if (fractionDigits === 0) {
-          self.te(400, name + '数值必须为整数');
-        }
-        self.te(400, name + '仅支持最多' + fractionDigits + '位小数的数字');
-      }
+    return totalSize;
+  };
+  //  获取纯文本电文的内容长度
+  self.getMomentPlainJsonContentLength = function (jsonString) {
+    return self.getEditorJsonStringLength(jsonString, {
+      'nkc-emoji': 2,
     });
+  };
+  // 获取富文本json的内容长度
+  self.getRichJsonContentLength = function (jsonString) {
+    return self.getEditorJsonStringLength(jsonString, {
+      'nkc-emoji': 2,
+      'nkc-attachment-block': 2,
+      'nkc-sticker': 2,
+      'nkc-file-status-block': 2,
+      'nkc-file-status-inline': 2,
+      'nkc-picture-block': 2,
+      'nkc-picture-inline': 2,
+      'nkc-video-block': 2,
+      'nkc-audio-block': 2,
+    });
+  };
+  /*
+   * 检测数字类型
+   * @param data 需要检测的数据
+   * @param {Object} options
+   *   name: 变量名
+   *   min: 最小值
+   *   max: 最大值
+   *   fractionDigits: 小数位数
+   * @author pengxiguaa 2019-9-6
+   * */
+  this.checkNumber = function (data, options) {
+    options = options || {};
+    var min = options.min;
+    var max = options.max;
+    var fractionDigits = options.fractionDigits || 0;
+    var name = options.name || '';
+    if (typeof data !== 'number' || isNaN(data)) {
+      self.te(400, name + '数据类型错误');
+    }
+    if (min !== undefined) {
+      if (data < min) {
+        self.te(400, name + '数值不能小于' + min);
+      }
+    }
+    if (max !== undefined) {
+      if (data > max) {
+        self.te(400, name + '数值不能大于' + max);
+      }
+    }
+    var dataArr = data.toString().split('.')[1];
+    var length = (dataArr || '').length;
+    if (length > fractionDigits) {
+      if (fractionDigits === 0) {
+        self.te(400, name + '数值必须为整数');
+      }
+      self.te(400, name + '仅支持最多' + fractionDigits + '位小数的数字');
+    }
+  };
   /*
    * 检测字符串
    * @param data 需要检测的数据

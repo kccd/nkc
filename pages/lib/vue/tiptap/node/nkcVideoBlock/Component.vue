@@ -59,4 +59,7 @@ export default {
     margin: 1rem auto auto auto;
   }
 }
+.ProseMirror-selectednode {
+  outline: 3px solid #66afe9;
+}
 </style>

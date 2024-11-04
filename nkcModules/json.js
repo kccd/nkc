@@ -36,7 +36,48 @@ function getJsonStringTextSplit(jsonString, count = 500) {
   return text.slice(0, count);
 }
 
+function getJsonStringNodes(jsonString) {
+  if (!jsonString) {
+    return [];
+  }
+
+  const jsonData = JSON.parse(jsonString);
+
+  const getNodes = (content) => {
+    const nodes = [];
+    for (const item of content) {
+      nodes.push(item);
+      if (item.content && item.content.length > 0) {
+        nodes.push(...getNodes(item.content));
+      }
+    }
+    return nodes;
+  };
+
+  return getNodes(jsonData.content);
+}
+
+function getJsonStringResourcesId(jsonString) {
+  const nodes = getJsonStringNodes(jsonString);
+  const resourcesId = [];
+  const resourceNodeTypes = [
+    'nkc-picture-block',
+    'nkc-picture-inline',
+    'nkc-picture-float',
+    'nkc-video-block',
+    'nkc-audio-block',
+    'nkc-attachment-block',
+  ];
+  for (const node of nodes) {
+    if (resourceNodeTypes.includes(node.type)) {
+      resourcesId.push(node.attrs.id);
+    }
+  }
+  return resourcesId;
+}
+
 module.exports = {
   getJsonStringText,
   getJsonStringTextSplit,
+  getJsonStringResourcesId,
 };

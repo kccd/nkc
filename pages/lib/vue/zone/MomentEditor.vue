@@ -285,7 +285,7 @@
 
 <script>
   import ResourceSelector from '../ResourceSelector';
-  import { getEditorJSONStringLength } from "../../js/checkData";
+  import { getMomentPlainJsonContentLength } from "../../js/checkData";
   import {getUrl} from '../../js/tools';
   import {screenTopWarning} from "../../js/topAlert";
   import {immediateDebounce} from '../../js/execution';
@@ -378,7 +378,7 @@
       },
       contentLength() {
         const {content} = this;
-        return getEditorJSONStringLength(content);
+        return getMomentPlainJsonContentLength(content);
       },
       allowedToPublish() {
         const {contentLength, maxContentLength, momentId} = this;

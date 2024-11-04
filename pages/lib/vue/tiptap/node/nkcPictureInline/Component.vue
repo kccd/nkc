@@ -32,4 +32,7 @@ export default {
     border-radius: 5px;
   }
 }
+.ProseMirror-selectednode {
+  outline: 3px solid #66afe9;
+}
 </style>

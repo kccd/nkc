@@ -17,7 +17,14 @@ const momentStatus = {
   cancelled: 'cancelled', // 取消发表
 };
 
+const momentVisibleType = {
+  own: 'own',
+  attention: 'attention',
+  everyone: 'everyone',
+};
+
 module.exports = {
   momentModes,
   momentStatus,
+  momentVisibleType,
 };
