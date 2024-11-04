@@ -67,9 +67,9 @@ export default {
       nkcAPI(url, 'POST', {
         content: this.content,
       })
-        .then(() => {
+        .then((res) => {
           this.$refs.editor.removeNoticeEvent();
-          visitUrl(`/z`);
+          visitUrl(`/z/m/${res.data.momentId}`);
         })
         .catch(sweetError)
         .finally(() => {
