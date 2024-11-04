@@ -1343,7 +1343,7 @@ threadRouter
     }
     const content =
       post.l === 'json'
-        ? customCheerio.load(renderHTMLByJSON(post.c)).text()
+        ? customCheerio.load(renderHTMLByJSON({ json: post.c })).text()
         : customCheerio.load(post.c).text();
     if (content.length < 2) {
       ctx.throw(400, `内容不能少于2个字`);

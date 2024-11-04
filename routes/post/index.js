@@ -454,7 +454,7 @@ router
 
     const content =
       l === 'json'
-        ? customCheerio.load(renderHTMLByJSON(c)).text()
+        ? customCheerio.load(renderHTMLByJSON({ json: c })).text()
         : customCheerio.load(c).text();
 
     if (content.length < 2) {

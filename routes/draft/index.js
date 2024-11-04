@@ -38,14 +38,11 @@ router
   const documentResourceId = await data.document.getResourceReferenceId();
   let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
   if (data.document.l === 'json') {
-    const resourcesObj = await db.ResourceModel.getResourcesObjByJson(
-      data.document.content,
-    );
-    data.document.content = renderHTMLByJSON(
-      data.document.content,
-      resourcesObj,
-      data.user,
-    );
+    data.document.content = renderHTMLByJSON({
+      json: data.document.content,
+      resources,
+      xsf: data.user.xsf,
+    });
   } else {
     data.document.content = nkcRender.renderHTML({
       type: 'article',
@@ -98,16 +95,18 @@ router
     }
     // const documentResourceId = await data.document.getResourceReferenceId();
     if (data.document.l === 'json') {
-      const resourcesObj = await db.ResourceModel.getResourcesObjByJson(
+      const resources = await db.ResourceModel.getResourcesByJson(
         data.document.c,
       );
-      data.document.content = renderHTMLByJSON(
-        data.document.c,
-        resourcesObj,
-        data.user,
-      );
+      data.document.content = renderHTMLByJSON({
+        json: data.document.c,
+        resources,
+        xsf: data.user.xsf,
+      });
     } else {
-      const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
+      const resources = await db.ResourceModel.getResourcesByTags(
+        data.document.c,
+      );
       data.document.content = nkcRender.renderHTML({
         type: 'article',
         post: {
@@ -187,14 +186,14 @@ router
   // let resources = await db.ResourceModel.getResourcesByReference(documentResourceId);
 
   if (data.document.l === 'json') {
-    const resourcesObj = await db.ResourceModel.getResourcesObjByJson(
+    const resources = await db.ResourceModel.getResourcesByJson(
       data.document.c,
     );
-    data.document.content = renderHTMLByJSON(
-      data.document.c,
-      resourcesObj,
-      data.user,
-    );
+    data.document.content = renderHTMLByJSON({
+      json: data.document.c,
+      resources,
+      xsf: data.user.xsf,
+    });
   } else {
     const resources = await db.ResourceModel.getResourcesByTags(data.document.c);
     data.document.content = nkcRender.renderHTML({

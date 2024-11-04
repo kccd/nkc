@@ -109,7 +109,7 @@ module.exports = async (ctx, next) => {
       }
     }
     post.c = nkcModules.nkcRender.htmlToPlain(
-      post.l === 'json' ? renderHTMLByJSON(post.c) : post.c,
+      post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
       200,
     );
     // post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);

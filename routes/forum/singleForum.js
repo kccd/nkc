@@ -60,7 +60,7 @@ router
     // 需要兼容json格式数据内容
     let content = '';
     if (l === 'json') {
-      content = customCheerio.load(renderHTMLByJSON(c)).text();
+      content = customCheerio.load(renderHTMLByJSON({ json: c })).text();
     } else {
       content = customCheerio.load(c).text();
     }

@@ -1059,7 +1059,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     posts.map(async (post) => {
       if (o.htmlToText) {
         post.c = obtainPureText(
-          post.l === 'json' ? renderHTMLByJSON(post.c) : post.c,
+          post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
           true,
           o.count,
         );

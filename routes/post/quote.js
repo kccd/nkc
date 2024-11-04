@@ -28,7 +28,10 @@ router
       step: postsId.indexOf(targetPost.pid),
       c:
         targetPost.l === 'json'
-          ? nkcModules.nkcRender.htmlToPlain(renderHTMLByJSON(targetPost.c), 50)
+          ? nkcModules.nkcRender.htmlToPlain(
+              renderHTMLByJSON({ json: targetPost.c }),
+              50,
+            )
           : nkcModules.nkcRender.htmlToPlain(targetPost.c, 50),
     };
     await next();
