@@ -344,6 +344,7 @@ export default {
   },
 
   methods: {
+    getRichJsonContentLength: NKC.methods.checkData.getRichJsonContentLength,
     getHTML() {
       return this.editor.getHTML()
     },
@@ -353,10 +354,13 @@ export default {
     setJSON(jsonString) {
       if(!jsonString) return;
       this.editor.commands.setContent(JSON.parse(jsonString));
-      this.currentTextLength = this.editor.getText().length;
+      this.currentTextLength = this.getSize();
     },
     getText() {
       return this.editor.getText();
+    },
+    getSize() {
+      return this.getRichJsonContentLength(JSON.stringify(this.getJSON()));
     },
     //==>兼容旧编辑器
     getContentTxt() {
@@ -458,10 +462,10 @@ export default {
         },
         onUpdate: () => {
           this.emitContentChangeEvent();
-          this.currentTextLength = self.editor.getText().length;
+          this.currentTextLength = self.getSize();
         }
       });
-      this.currentTextLength = this.editor.getText().length;
+      this.currentTextLength = this.getSize();
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';

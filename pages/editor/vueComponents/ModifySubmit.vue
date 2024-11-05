@@ -176,6 +176,7 @@ export default {
       this.submitStatus = v
     },
     checkString: NKC.methods.checkData.checkString,
+    getRichJsonContentLength: NKC.methods.checkData.getRichJsonContentLength,
     checkEmail: NKC.methods.checkData.checkEmail,
     visitUrl: NKC.methods.visitUrl,
     handleNoticeContentChange:debounce(function(event){
@@ -453,6 +454,16 @@ export default {
         throw new Error("内容不能少于2个字");
       }
     },
+    // 检测json内容
+    checkJsonContent(jsonString) {
+      const size = this.getRichJsonContentLength(jsonString);
+      if (size > 100000) {
+        throw new Error("内容不能超过10万字");
+      }
+      if (size < 2) {
+        throw new Error("内容不能少于2个字");
+      }
+    },
     // 检测摘要
     checkAbstract(cn, en) {
       this.checkString(cn, {
@@ -524,7 +535,11 @@ export default {
           if (type === "newThread") {
             // 发新帖：从专业点发表、首页点发表、草稿箱
             this.checkTitle(submitData.t);
-            this.checkContent(submitData.c);
+            if(submitData.l==='json'){
+              this.checkJsonContent(submitData.c);
+            }else{
+              this.checkContent(submitData.c);
+            }
             this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
             this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
             this.checkAuthorInfos(submitData.authorInfos);
