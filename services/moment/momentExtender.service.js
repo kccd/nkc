@@ -5,6 +5,7 @@ const { momentModes, momentStatus } = require('../../settings/moment');
 const { ResponseTypes } = require('../../settings/response');
 const { ThrowBadRequestResponseTypeError } = require('../../nkcModules/error');
 const { documentSources, documentTypes } = require('../../settings/document');
+const { getRichJsonContentLength } = require('../../nkcModules/checkData');
 
 class MomentExtenderService {
   async getMomentById(momentId) {
@@ -34,6 +35,30 @@ class MomentExtenderService {
       resources.map((resource) => [resource.rid, resource.rid]),
     );
     return resourcesId.filter((rid) => resourceMap.has(rid));
+  }
+  async saveRichDraftHistory(props) {
+    const { content, moment } = props;
+    // 判断是否需要生成历史
+    const historyDocument = await DocumentModel.findOne({
+      source: documentSources.moment,
+      sid: moment._id,
+      type: {
+        $in: [documentTypes.betaHistory, documentTypes.stableHistory],
+      },
+    }).sort({ toc: -1 });
+    let historyDocumentWordCount = 0;
+    if (historyDocument) {
+      historyDocumentWordCount = getRichJsonContentLength(
+        historyDocument.content,
+      );
+    }
+    const contentWordCount = getRichJsonContentLength(content);
+    if (Math.abs(historyDocumentWordCount - contentWordCount) > 200) {
+      await DocumentModel.copyBetaToHistoryBySource(
+        documentSources.moment,
+        moment._id,
+      );
+    }
   }
   async modifyMoment(props) {
     const { moment, content, resourcesId } = props;

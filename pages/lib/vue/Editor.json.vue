@@ -257,6 +257,8 @@ import { nkcAPI } from '../js/netAPI.js'
 const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
 import MathSelector from './MathSelector.vue';
 import Loading from './Loading.vue';
+import { getRichJsonContentLength } from "../js/checkData";
+import { immediateDebounce } from "../js/execution";
 
 export default {
   props: ['config', 'loading'],
@@ -353,7 +355,7 @@ export default {
     setJSON(jsonString) {
       if(!jsonString) return;
       this.editor.commands.setContent(JSON.parse(jsonString));
-      this.currentTextLength = this.editor.getText().length;
+      this.updateTextLength();
     },
     getText() {
       return this.editor.getText();
@@ -365,6 +367,14 @@ export default {
     // 获取JSON字符串数据
     getContent() {
       return JSON.stringify(this.getJSON());
+    },
+    // 定时更新文本长度
+    updateTextLength: immediateDebounce(function() {
+      this.currentTextLength = this.getTextLength();
+    }, 1000),
+    // 获取文本长度
+    getTextLength() {
+      return getRichJsonContentLength(this.getJSON());
     },
     // 设置JSON字符串数据
     setContent(jsonString) {
@@ -458,10 +468,10 @@ export default {
         },
         onUpdate: () => {
           this.emitContentChangeEvent();
-          this.currentTextLength = self.editor.getText().length;
+          this.updateTextLength();
         }
       });
-      this.currentTextLength = this.editor.getText().length;
+      this.updateTextLength();
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';

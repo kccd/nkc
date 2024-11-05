@@ -151,6 +151,12 @@ module.exports = {
           GET: Operations.momentRichEditorGetDraft,
           PUT: Operations.momentRichEditorSaveDraft,
           POST: Operations.momentRichEditorPublish,
+          history: {
+            GET: Operations.momentRichEditorGetHistory,
+            rollback: {
+              POST: Operations.momentRichEditorHistoryRollback,
+            },
+          },
         },
         plain: {
           GET: Operations.momentPlainEditorGetDraft,

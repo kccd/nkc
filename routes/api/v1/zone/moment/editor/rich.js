@@ -21,11 +21,18 @@ router
     const { moment } = internalData;
     const { content } = body;
     const resourcesId = getJsonStringResourcesId(content);
+    await momentExtenderService.saveRichDraftHistory({
+      content,
+      moment,
+    });
     await momentExtenderService.modifyMoment({
       moment,
       content,
       resourcesId: resourcesId,
     });
+    ctx.apiData = {
+      momentId: moment._id,
+    };
     await next();
   })
   .post('/', async (ctx, next) => {

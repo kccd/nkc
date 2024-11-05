@@ -1,12 +1,15 @@
 const Router = require('koa-router');
-const { OnlyUser } = require('../../../../../middlewares/permission');
+const { OnlyUser } = require('../../../../../../middlewares/permission');
 const {
   momentExtenderService,
-} = require('../../../../../services/moment/momentExtender.service');
-const { momentModes } = require('../../../../../settings/moment');
-const { getMomentPublishType } = require('../../../../../events/moment');
-const { eventEmitter } = require('../../../../../events');
-const { getJsonStringResourcesId } = require('../../../../../nkcModules/json');
+} = require('../../../../../../services/moment/momentExtender.service');
+const { momentModes } = require('../../../../../../settings/moment');
+const { getMomentPublishType } = require('../../../../../../events/moment');
+const { eventEmitter } = require('../../../../../../events');
+const {
+  getJsonStringResourcesId,
+} = require('../../../../../../nkcModules/json');
+const historyRouter = require('./history');
 const router = new Router();
 
 router
@@ -44,6 +47,10 @@ router
       });
     }
     const resourcesId = getJsonStringResourcesId(content);
+    await momentExtenderService.saveRichDraftHistory({
+      moment,
+      content,
+    });
     await momentExtenderService.modifyMoment({
       moment,
       content,
@@ -82,4 +89,6 @@ router
     };
     await next();
   });
+
+router.use('/history', historyRouter.routes(), historyRouter.allowedMethods());
 module.exports = router;
