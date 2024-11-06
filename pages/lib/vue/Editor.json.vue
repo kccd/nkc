@@ -351,7 +351,35 @@ export default {
     },
     setJSON(jsonString) {
       if(!jsonString) return;
-      this.editor.commands.setContent(JSON.parse(jsonString));
+      let jsonData;
+      try{
+        jsonData = JSON.parse(jsonString);
+      } catch(err) {
+        jsonData = {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: err.message,
+                },
+              ],
+            },
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: jsonString,
+                },
+              ],
+            },
+          ],
+        }
+      }
+      this.editor.commands.setContent(jsonData);
       this.updateTextLength();
     },
     getText() {
