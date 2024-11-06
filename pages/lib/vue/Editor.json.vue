@@ -1006,24 +1006,6 @@ export default {
       width: 4px;
     }
 
-    .table-toolbar {
-      margin-bottom: 0.5rem;
-      user-select: none;
-
-      button {
-        margin-right: 0.5rem;
-        background-color: #f5f5f5;
-        border: 1px solid #e8e8e8;
-        border-radius: 4px;
-        padding: 0.2rem 0.5rem;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #e8e8e8;
-        }
-      }
-    }
-
     /* Task list specific styles */
 
     ul[data-type='taskList'] {
