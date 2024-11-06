@@ -2,6 +2,7 @@
   .app-menu-container(ref="container")
     div.pointer(@click.stop='showPanel')
       <more-one theme="outline" size="16" />
+    .app-menu-content-mask(v-if="show" @click="hidePanel")
     .app-menu-content(v-if="show" :style="`left: ${left}px;`" ref="appMenuContent")
       .app-menu-item(@click="onClick('table')")
         <insert-table theme="outline" size="18"/>
@@ -55,6 +56,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .app-menu-content-mask{
+    position: fixed;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
   }
   .app-menu-content {
     background-color: #fff;

@@ -74,7 +74,7 @@ export default {
 
 <style scoped lang='less'>
 .draggable-dialog-container{
-  position: fixed;
+  position: fixed!important;
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 3px;

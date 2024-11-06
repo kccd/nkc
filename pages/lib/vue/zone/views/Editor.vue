@@ -1,5 +1,6 @@
 <template lang="pug">
   .container-fluid.max-width.moment-rich-editor-container
+
     editor(
       ref="editor"
       @content-change="editorContentChange"

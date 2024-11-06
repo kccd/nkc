@@ -2,12 +2,11 @@
   .tiptap-editor-container
     link-editor(ref='linkEditor')
     .tiptap-editor-toolBar(v-if='editor')
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        div(@click='editor.chain().focus().undo().run()')
+      .tiptap-editor-toolBar-icon-group
+        div(@click='editor.chain().focus().undo().run()' title="撤销 Ctrl + Z")
           <return theme="filled" :size="iconFontSize" />
-        div(@click='editor.chain().focus().redo().run()')
+        div(@click='editor.chain().focus().redo().run()' title="重做 Ctrl + Shift + Z")
           <go-on theme="filled" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
         div(
           @click='editor.chain().focus().toggleBold().run()',
           :class='editorIsActive("bold")',
@@ -37,9 +36,8 @@
           title='清除格式'
         )
           <clear-format theme="outline" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
         select(
-          style='width: 6.8rem;'
+          style='width: 4.5rem;'
           :value='getFontFamily()',
           @click='setFontFamily',
           @blur='isFontFamilySelectOpen = false'
@@ -864,7 +862,7 @@ export default {
     background-color: rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
-    border-radius: 1.8rem;
+    border-radius: 5px;
     border: 1px solid #eee;
     padding: 0 1rem;
     flex-wrap: wrap;

@@ -8,6 +8,7 @@
       <down theme="outline" size="10" />
     div(v-if="isPanelShow" :style="`transform: translateX(${colorPaletteContainerLeft}px)`" ref="colorPaletteContainer")
       color-palette(:default-color="defaultColor" @select="selectedColor")
+    div(v-if="isPanelShow" @click="hidePanel")
 </template>
 
 <script>
@@ -118,6 +119,15 @@ export default {
     border-radius: 5px;
     box-shadow: 1px  1px 5px rgba(0, 0, 0, 0.2);
     padding: 1rem;
+  }
+
+  & > div:nth-child(4) {
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
   }
 }
 </style>

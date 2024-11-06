@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {nodeViewProps, findParentNode, NodeViewWrapper, NodeViewContent} from "@tiptap/vue-2";
+import {nodeViewProps, NodeViewWrapper, NodeViewContent} from "@tiptap/vue-2";
 
 export default {
   components: {
