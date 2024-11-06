@@ -136,7 +136,7 @@
       position: relative;
       img {
         position: relative;
-        width: 100%;
+        max-width: 100%;
         display: block;
         top: 0;
         left: 0;
