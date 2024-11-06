@@ -141,13 +141,6 @@ module.exports = {
     },
     moment: {
       GET: Operations.creationCenter,
-      POST: Operations.publishMoment,
-      PARAMETER: {
-        POST: Operations.publishMomentComment,
-        comment: {
-          POST: Operations.publishMomentComment,
-        },
-      },
     },
   },
   community: {

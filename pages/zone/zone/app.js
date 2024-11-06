@@ -3,6 +3,7 @@ import Home from '../../lib/vue/zone/views/Home';
 import MomentDetail from '../../lib/vue/zone/views/MomentDetail';
 import Vuex from 'vuex';
 import EditorPage from '../../lib/vue/zone/views/Editor.vue';
+import EditorHistoryPage from '../../lib/vue/zone/views/EditorHistory.vue';
 
 Vue.use(Vuex);
 
@@ -95,6 +96,11 @@ function initZoneVueApp() {
       name: 'MomentEditor',
       path: '/z/editor/rich',
       component: EditorPage,
+    },
+    {
+      name: 'MomentEditorHistory',
+      path: '/z/editor/rich/history',
+      component: EditorHistoryPage,
     },
   ];
   // 防止路由重复点击报错

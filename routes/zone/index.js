@@ -220,7 +220,7 @@ router
     data.paging = paging;
     await next();
   })
-  .get(['/editor/rich'], async (ctx, next) => {
+  .get(['/editor/rich', '/editor/rich/history'], async (ctx, next) => {
     ctx.remoteTemplate = 'zone/zone.pug';
     await next();
   })

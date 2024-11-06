@@ -17,6 +17,7 @@ router.get('/', async (ctx, next) => {
       ctx.throw(400, '权限不足');
     }
   }
+  const hasParent = !!moment.parent;
   const { stable: stableType } = await db.DocumentModel.getDocumentTypes();
   const { moment: momentSource } = await db.DocumentModel.getDocumentSources();
   if (moment.did) {
@@ -71,27 +72,18 @@ router.get('/', async (ctx, next) => {
         //投诉权限
         optionStatus.complaint = permission('complaintPost') ? true : null;
         optionStatus.visibleMoment =
-          !moment.parents.length && permission('setMomentVisibleOther')
-            ? true
-            : null;
-        optionStatus.editorMoment =
-          !moment.parents.length &&
-          permission('editOtherUserMoment') &&
-          !moment.quoteType
-            ? true
-            : null;
-        optionStatus.visitHistory = permission(
-          Operations.visitZoneMomentHistory,
-        );
+          !hasParent && permission('setMomentVisibleOther') ? true : null;
+        optionStatus.editorMoment = false;
+        optionStatus.visitHistory =
+          !hasParent && permission(Operations.visitOtherUserZoneMomentHistory);
       } else {
         // 违规记录
         optionStatus.violation = permission('violationRecord') ? true : null;
         // 电文可见状态设置
-        optionStatus.visibleMoment = !moment.parents.length;
-        optionStatus.editorMoment = !moment.parents.length && !moment.quoteType;
-        optionStatus.visitHistory = permission(
-          Operations.visitOtherUserZoneMomentHistory,
-        );
+        optionStatus.visibleMoment = !hasParent;
+        optionStatus.editorMoment = !hasParent;
+        optionStatus.visitHistory =
+          !hasParent && permission(Operations.visitZoneMomentHistory);
       }
     }
     if (permission(Operations.getMomentIpInfo)) {

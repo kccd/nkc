@@ -2,12 +2,11 @@
   .tiptap-editor-container
     link-editor(ref='linkEditor')
     .tiptap-editor-toolBar(v-if='editor')
-      .tiptap-editor-toolBar-icon-group.m-r-05
-        div(@click='editor.chain().focus().undo().run()')
+      .tiptap-editor-toolBar-icon-group
+        div(@click='editor.chain().focus().undo().run()' title="撤销 Ctrl + Z")
           <return theme="filled" :size="iconFontSize" />
-        div(@click='editor.chain().focus().redo().run()')
+        div(@click='editor.chain().focus().redo().run()' title="重做 Ctrl + Shift + Z")
           <go-on theme="filled" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
         div(
           @click='editor.chain().focus().toggleBold().run()',
           :class='editorIsActive("bold")',
@@ -37,9 +36,8 @@
           title='清除格式'
         )
           <clear-format theme="outline" :size="iconFontSize" />
-      .tiptap-editor-toolBar-icon-group.m-r-05
         select(
-          style='width: 6.8rem;'
+          style='width: 4.5rem;'
           :value='getFontFamily()',
           @click='setFontFamily',
           @blur='isFontFamilySelectOpen = false'
@@ -253,10 +251,11 @@ import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatus
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
 import AppMenu from './tiptap/menus/AppMenu.vue'
 import { nkcTable } from "./tiptap/node/nkcTable/nkcTable.js";
-import { nkcAPI } from '../js/netAPI.js'
-const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
 import MathSelector from './MathSelector.vue';
 import Loading from './Loading.vue';
+import { getRichJsonContentLength } from "../js/checkData";
+import { immediateDebounce } from "../js/execution";
+import { HotKeys } from "./tiptap/plugins/HotKeys";
 
 export default {
   props: ['config', 'loading'],
@@ -344,7 +343,6 @@ export default {
   },
 
   methods: {
-    getRichJsonContentLength: NKC.methods.checkData.getRichJsonContentLength,
     getHTML() {
       return this.editor.getHTML()
     },
@@ -353,14 +351,39 @@ export default {
     },
     setJSON(jsonString) {
       if(!jsonString) return;
-      this.editor.commands.setContent(JSON.parse(jsonString));
-      this.currentTextLength = this.getSize();
+      let jsonData;
+      try{
+        jsonData = JSON.parse(jsonString);
+      } catch(err) {
+        jsonData = {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: err.message,
+                },
+              ],
+            },
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: jsonString,
+                },
+              ],
+            },
+          ],
+        }
+      }
+      this.editor.commands.setContent(jsonData);
+      this.updateTextLength();
     },
     getText() {
       return this.editor.getText();
-    },
-    getSize() {
-      return this.getRichJsonContentLength(JSON.stringify(this.getJSON()));
     },
     //==>兼容旧编辑器
     getContentTxt() {
@@ -369,6 +392,14 @@ export default {
     // 获取JSON字符串数据
     getContent() {
       return JSON.stringify(this.getJSON());
+    },
+    // 定时更新文本长度
+    updateTextLength: immediateDebounce(function() {
+      this.currentTextLength = this.getTextLength();
+    }, 1000),
+    // 获取文本长度
+    getTextLength() {
+      return getRichJsonContentLength(this.getJSON());
     },
     // 设置JSON字符串数据
     setContent(jsonString) {
@@ -393,6 +424,11 @@ export default {
       this.editor = new Editor({
         content: '',
         extensions: [
+          HotKeys.configure({
+            onSave: () => {
+              this.$emit('manual-save')
+            }
+          }),
           HardBreak,
           Image.configure({
             inline: true,
@@ -462,10 +498,10 @@ export default {
         },
         onUpdate: () => {
           this.emitContentChangeEvent();
-          this.currentTextLength = self.getSize();
-        }
+          this.updateTextLength();
+        },
       });
-      this.currentTextLength = this.getSize();
+      this.updateTextLength();
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';
@@ -858,7 +894,7 @@ export default {
     background-color: rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
-    border-radius: 1.8rem;
+    border-radius: 5px;
     border: 1px solid #eee;
     padding: 0 1rem;
     flex-wrap: wrap;
@@ -998,24 +1034,6 @@ export default {
       right: -2px;
       top: 0;
       width: 4px;
-    }
-
-    .table-toolbar {
-      margin-bottom: 0.5rem;
-      user-select: none;
-
-      button {
-        margin-right: 0.5rem;
-        background-color: #f5f5f5;
-        border: 1px solid #e8e8e8;
-        border-radius: 4px;
-        padding: 0.2rem 0.5rem;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #e8e8e8;
-        }
-      }
     }
 
     /* Task list specific styles */

@@ -19,11 +19,17 @@ var CheckData = function () {
     var zhCN = data.match(/[^\x00-\xff]/g) || [];
     return data.length + zhCN.length;
   };
-  self.getEditorJsonStringLength = function (jsonString, nodesSize = {}) {
+  self.getEditorJsonLength = function (jsonString, nodesSize = {}) {
     if (!jsonString) {
       return 0;
     }
-    var jsonData = JSON.parse(jsonString);
+    var jsonData;
+    if (typeof jsonString === 'string') {
+      jsonData = JSON.parse(jsonString);
+    } else {
+      jsonData = jsonString;
+    }
+
     var getNodes = function (nodes) {
       var newNodes = [];
       for (var i = 0; i < nodes.length; i++) {
@@ -50,13 +56,13 @@ var CheckData = function () {
   };
   //  获取纯文本电文的内容长度
   self.getMomentPlainJsonContentLength = function (jsonString) {
-    return self.getEditorJsonStringLength(jsonString, {
+    return self.getEditorJsonLength(jsonString, {
       'nkc-emoji': 2,
     });
   };
   // 获取富文本json的内容长度
   self.getRichJsonContentLength = function (jsonString) {
-    return self.getEditorJsonStringLength(jsonString, {
+    return self.getEditorJsonLength(jsonString, {
       'nkc-emoji': 2,
       'nkc-attachment-block': 2,
       'nkc-sticker': 2,
@@ -66,6 +72,7 @@ var CheckData = function () {
       'nkc-picture-inline': 2,
       'nkc-video-block': 2,
       'nkc-audio-block': 2,
+      'nkc-math': 2,
     });
   };
   /*
