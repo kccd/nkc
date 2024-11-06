@@ -18,6 +18,6 @@ mixin renderAudioBlock(node)
           span(data-tag="nkcsource" data-type="audio" data-id=`${id}` data-visitor-access=`${visitorAccess}`)
             audio.plyr-dom( preload="none" controls data-rid=`${id}` data-size=`${defaultFile.size}`) 你的浏览器不支持audio标签，请升级。
               source(src=`${url}` type="audio/mp3")
-            span.nkcsource-audio-title(data-type="nkcsource-audio-title")=oname
+            span.nkcsource-audio-title(data-type="nkcsource-audio-title")=defaultFile.name
               span.display-i-b.text-danger(style="font-weight: 700")=tools.getSize(defaultFile.size)
               a(data-type='downloadPanel' data-id=`${id}`) 立即下载

@@ -5,7 +5,7 @@ const homePugFilePath = path.resolve(__dirname, './nodes/home.pug');
 const videoSize = require('../../settings/video');
 const { domainWhitelistReg, urlReg } = require('../../nkcModules/regExp');
 const { replaceEmojiWithImgTags } = require('../fluentuiEmoji');
-const plain_escape = require('../plainEscaper');
+const { plainEscape } = require('.');
 
 function renderHTMLByJSON({
   json,
@@ -17,9 +17,10 @@ function renderHTMLByJSON({
   const jsonObj = typeof json === 'string' ? JSON.parse(json) : json;
   const resourcesObj = {};
   for (let r of resources) {
-    if (r.toObject) {
+    if (r.toObject && !r._rendered) {
       r = r.toObject();
-      // r.oname = plain_escape(r.oname || '');
+      r.oname = plainEscape(r.oname || '');
+      r._rendered = true;
     }
     resourcesObj[r.rid] = r;
   }
