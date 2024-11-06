@@ -1,6 +1,11 @@
 <template lang="pug">
   .container-fluid.max-width.moment-rich-editor-container
-    editor(ref="editor" @content-change="editorContentChange" :loading="loading")
+    editor(
+      ref="editor"
+      @content-change="editorContentChange"
+      @manual-save="saveDraftManual"
+      :loading="loading"
+      )
     .m-t-1
       button.btn.btn-primary.m-r-05(:class="{'disabled': disablePublish}" v-if="submitting" title="提交中，请稍候")
         .fa.fa-spinner.fa-spin
@@ -13,6 +18,7 @@
 import {nkcAPI} from "../../../js/netAPI";
 import Editor from '../../Editor.json.vue';
 import {sweetError} from "../../../js/sweetAlert";
+import {screenTopAlert} from "../../../js/topAlert";
 import { immediateDebounce } from "../../../js/execution";
 import { visitUrl } from "../../../js/pageSwitch";
 import {getRichJsonContentLength} from '../../../js/checkData'
@@ -72,7 +78,7 @@ export default {
     },
     saveDraftManual() {
       this.saveDraft().then(() => {
-        sweetSuccess('保存成功');
+        screenTopAlert('保存成功');
       }).catch(sweetError);
     },
     saveDraftDebounce: immediateDebounce(function() {

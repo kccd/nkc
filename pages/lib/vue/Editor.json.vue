@@ -253,12 +253,11 @@ import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatus
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
 import AppMenu from './tiptap/menus/AppMenu.vue'
 import { nkcTable } from "./tiptap/node/nkcTable/nkcTable.js";
-import { nkcAPI } from '../js/netAPI.js'
-const jsonContentTemplate = require('./tiptap/jsonContentTemplate.json');
 import MathSelector from './MathSelector.vue';
 import Loading from './Loading.vue';
 import { getRichJsonContentLength } from "../js/checkData";
 import { immediateDebounce } from "../js/execution";
+import { HotKeys } from "./tiptap/plugins/HotKeys";
 
 export default {
   props: ['config', 'loading'],
@@ -399,6 +398,11 @@ export default {
       this.editor = new Editor({
         content: '',
         extensions: [
+          HotKeys.configure({
+            onSave: () => {
+              this.$emit('manual-save')
+            }
+          }),
           HardBreak,
           Image.configure({
             inline: true,
@@ -469,7 +473,7 @@ export default {
         onUpdate: () => {
           this.emitContentChangeEvent();
           this.updateTextLength();
-        }
+        },
       });
       this.updateTextLength();
     },
