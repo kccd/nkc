@@ -573,10 +573,12 @@ postSchema.pre("save", async function(next) {
 // 解析@信息
 postSchema.pre('save', async function (next) {
   const UserModel = mongoose.model('users');
-  const { c } = this;
+  const { c, l } = this;
   const atUsers = [];
   const atUsersId = [];
-  const $ = customCheerio.load(c);
+  const $ = customCheerio.load(
+    l === 'json' ? renderHTMLByJSON({ json: c }) : c,
+  );
   const html = $('body')[0];
   const texts = [];
   const getNodesText = function (node) {
@@ -1223,6 +1225,8 @@ postSchema.statics.extendPosts = async (posts, options) => {
           json: post.c,
           resources: post.resources,
           xsf: o.visitor.xsf,
+          atUsers: post.atUsers,
+          pid: post.pid,
         });
       } else {
         post.c = nkcRender.renderHTML({

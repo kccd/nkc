@@ -586,9 +586,6 @@ export default {
             let type = source.mediaType;
             type = type.substring(5);
             type = type[0].toLowerCase() + type.substring(1);
-            // console.log('====================================');
-            // console.log(type, source.rid, source);
-            // console.log('====================================');
             switch (type) {
               case 'picture': {
                 insertContent.push({
@@ -808,7 +805,14 @@ export default {
         }
         case 'draft': {
           this.$refs.draftSelector.open((res) => {
-            this.editor.chain().focus().insertContent(res.content).run();
+            // 后期需要完善判断方式l
+            let content = '';
+            try {
+              content = JSON.parse(res.content);
+            } catch (e) {
+              content = res.content
+            }
+            this.editor.chain().focus().insertContent(content).run();
           });
           return;
         }

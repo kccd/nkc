@@ -6,6 +6,7 @@ const { ThrowCommonError } = require('../nkcModules/error');
 const esConfig = require('../config/elasticSearch');
 const cheerio = require('cheerio');
 const filterSearchContent = require('./xssFilters/filterSearchContent');
+const { renderHTMLByJSON } = require('./nkcRender/json');
 
 const { analyzer, searchAnalyzer, indexName } = esConfig;
 
@@ -212,6 +213,7 @@ func.save = async (docType, document) => {
     description = '',
     username = '',
     tcId = [],
+    l = '',
   } = document;
 
   if (docType === 'thread') {
@@ -259,7 +261,9 @@ func.save = async (docType, document) => {
       mainForumsId,
       tcId,
       title: t,
-      content: apiFunction.obtainPureText(c),
+      content: apiFunction.obtainPureText(
+        l === 'json' ? renderHTMLByJSON({ json: c }) : c,
+      ),
       abstractCN: abstractCn,
       abstractEN: abstractEn,
       keywordsCN: keyWordsCn,

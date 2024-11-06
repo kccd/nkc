@@ -79,5 +79,5 @@ mixin loopRender(nodes)
           +renderImage(node)
         default
           p= `Unknown node type: ${node.type}`
-div
+div.render-content.math-jax(data-type="nkc-render-content" data-id=`${pid}` data-source="post" data-sid=`${pid}`)
   +loopRender(data.content)

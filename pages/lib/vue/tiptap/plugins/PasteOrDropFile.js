@@ -63,6 +63,7 @@ const handleResources = (editor, data) => {
 };
 const handlePasteAndDropData = (dataTransfer, editor) => {
   const files = dataTransfer.files;
+  let imageInHtml = false;
   const insertContent = [];
   const tempData = [];
   for (const file of files) {
@@ -173,7 +174,10 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
         }
       }
     });
-    editor.chain().focus().insertContent(doc.body.innerHTML).run();
+    if (images.length > 0) {
+      imageInHtml = true;
+      editor.chain().focus().insertContent(doc.body.innerHTML).run();
+    }
     srcData.forEach((item) => {
       if (item.isAbsoluteUrl) {
         nkcAPI('/download', 'POST', {
@@ -213,7 +217,9 @@ const handlePasteAndDropData = (dataTransfer, editor) => {
       }
     });
   }
-  return true;
+  if (insertContent.length > 0 || imageInHtml) {
+    return true;
+  }
 };
 const replaceFileStatusAttrs = (editor, id, rid, info, process = 0) => {
   const { state, view } = editor;
