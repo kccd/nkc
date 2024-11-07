@@ -1,13 +1,13 @@
 <template lang="pug">
   node-view-wrapper
-    .table-toolbar
+    .table-toolbar.p-t-05
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="toggleHeaderRow" :disabled="!isTableFocused") 标题行
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="toggleHeaderCell" :disabled="!isTableFocused") 标题列
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="addRow" :disabled="!isTableFocused") 添加行
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="addColumn" :disabled="!isTableFocused") 添加列
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="removeRow" :disabled="!isTableFocused") 删除行
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="removeColumn" :disabled="!isTableFocused") 删除列
-      button.m-r-05.m-b-05.btn.btn-danger.btn-xs(@mousedown="removeTable") 删除表格
+      button.m-r-05.m-b-05.btn.btn-danger.btn-xs(@mousedown="removeTable" :disabled="!isTableFocused") 删除表格
     node-view-content(as="table")
 </template>
 
@@ -72,7 +72,8 @@ export default {
     },
     removeTable(e) {
       e.preventDefault();
-      this.editor.chain().focus().deleteTable().run();
+      this.deleteNode();
+      // this.editor.chain().focus().deleteTable().run();
     },
   }
 }

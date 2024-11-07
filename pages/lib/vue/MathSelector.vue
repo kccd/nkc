@@ -66,19 +66,20 @@ export default {
       this.close();
     },
     renderPreviewHTML() {
-      MathJax.typesetPromise()
-      .then(() => {
-        return MathJax.tex2chtmlPromise(this.text, {
-          display: true,
+      MathJax.startup.promise
+        .then(() => {
+          return MathJax.tex2chtmlPromise(this.text, {
+            display: true,
+          })
         })
-      })
-      .then(html => {
-        this.previewHTML = html.outerHTML;
-      });
+        .then(html => {
+          this.previewHTML = html.outerHTML;
+        });
     }
   },
   mounted() {
     this.renderPreviewHTML();
+
   },
   watch: {
     text() {

@@ -1,22 +1,34 @@
 <template>
   <node-view-wrapper class="node-view-wrapper" title="点击编辑公式">
+    <span v-if="isFocused">
+      <span class="m-r-05" title="编辑" @mouseup.stop="openMathEditor">
+        <write-icon theme="outline" size="12" fill="#333" />
+      </span>
+      <span title="删除" @mouseup="deleteNode">
+        <delete-icon theme="outline" size="12" fill="#333"/>
+      </span>
+    </span>
     <math-selector ref="mathSelector" />
-    <span @click="openMathEditor" v-html="mathHTML" />
+    <span class="nkc-math-html-container" :key="formula" ref="mathContainer" @click="selectMath">{{formula}}</span>
   </node-view-wrapper>
 </template>
 
 <script>
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
 import MathSelector from '../../../MathSelector.vue';
+import {Delete, Write} from '@icon-park/vue';
 
 export default {
   components: {
     'node-view-wrapper': NodeViewWrapper,
     'math-selector': MathSelector,
+    'delete-icon': Delete,
+    'write-icon': Write,
   },
   props: nodeViewProps,
   data: () => ({
     mathHTML: '',
+    isFocused: false,
   }),
   computed: {
     text() {
@@ -25,29 +37,34 @@ export default {
     block() {
       return this.node.attrs.block;
     },
-  },
-  watch: {
-    text() {
-      this.renderMathHTML();
-    },
-    block() {
-      this.renderMathHTML();
-    },
+    formula() {
+      return `$${this.text}$`
+    }
   },
   mounted() {
     this.renderMathHTML();
+    window.addEventListener('mouseup', this.cancelFocus)
+  },
+  beforeDestroy() {
+    window.removeEventListener('mouseup', this.cancelFocus)
+  },
+  watch: {
+    formula() {
+      setTimeout(() => {
+        this.renderMathHTML();
+      }, 10)
+
+    }
   },
   methods: {
+    selectMath() {
+      this.isFocused = true;
+    },
+    cancelFocus() {
+      this.isFocused = false;
+    },
     renderMathHTML() {
-      MathJax.typesetPromise()
-        .then(() => {
-          return MathJax.tex2chtmlPromise(this.text, {
-            display: this.block,
-          });
-        })
-        .then((html) => {
-          this.mathHTML = html.outerHTML;
-        });
+      window.MathJax.typeset([this.$refs.mathContainer]);
     },
     openMathEditor() {
       this.$refs.mathSelector.open(
@@ -68,7 +85,37 @@ export default {
 
 <style scoped lang="less">
 .node-view-wrapper {
-  display: inline;
+  position: relative;
+  display: inline-block;
   cursor: pointer;
+  &>span:first-child{
+    position: absolute;
+    top: -1.4rem;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    span{
+      height: 1.5rem;
+      width: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #e9e9e9;
+      border-radius: 3px;
+      &:hover, &:active{
+        opacity: 0.7;
+      }
+    }
+  }
+  span.nkc-math-html-container{
+    ::v-deep{
+      .MathJax{
+        font-size: inherit!important;
+      }
+    }
+  }
+}
+.ProseMirror-selectednode {
+  outline: 1px solid #66afe9;
 }
 </style>

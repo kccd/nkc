@@ -155,6 +155,7 @@
     "lowlight": "^3.1.0",
     "markdown-it": "^12.3.2",
     "marked": "^4.0.14",
+    "mathjax": "^3.2.2",
     "mathjs": "^7.0.1",
     "mime": "^2.2.0",
     "mint-filter": "^3.0.1",
