@@ -126,7 +126,11 @@ router
       origin,
       selectCategory,
       authorInfos,
+      l,
     } = JSON.parse(fields.article);
+    if (l !== 'html' && l !== 'json') {
+      l = 'json';
+    }
     if (type === 'publish') {
       //内容校验
       if (title && title.length > 100) {
@@ -153,6 +157,7 @@ router
         origin,
         selectCategory,
         authorInfos,
+        l,
       }),
       {
         name: '内容',
@@ -170,7 +175,7 @@ router
       minLength: 0,
       maxLength: 1000,
     });
-    if (coverFile && (coverFile.size / (1024 * 1024)) > 30) {
+    if (coverFile && coverFile.size / (1024 * 1024) > 30) {
       ctx.throw(400, '封面图片大小不得超过30MB');
     }
     let article;
@@ -194,6 +199,7 @@ router
         // sid,
         authorInfos,
         tcId,
+        l,
       });
     } else if (article) {
       if (!articleId) {

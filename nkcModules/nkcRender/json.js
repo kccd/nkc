@@ -13,7 +13,20 @@ function renderHTMLByJSON({
   xsf = 0,
   atUsers = [],
   pid = '',
+  source = 'post',
+  sid = '',
 }) {
+  if (!json) {
+    json = {
+      type: 'doc',
+      content: [
+        { type: 'paragraph', attrs: { textAlign: 'left', textIndent: 0 } },
+      ],
+    };
+  }
+  if (source === 'post') {
+    sid = pid;
+  }
   const jsonObj = typeof json === 'string' ? JSON.parse(json) : json;
   const resourcesObj = {};
   for (let r of resources) {
@@ -28,6 +41,8 @@ function renderHTMLByJSON({
     pretty: true,
     data: jsonObj,
     pid,
+    source,
+    sid,
     tools: tools,
     resourcesObj,
     videoQuality: videoSize,

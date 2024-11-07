@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const mongoose = require('../settings/database');
 const commentSource = {
   article: 'article',
@@ -502,7 +503,7 @@ schema.statics.extendPostComments = async (props) => {
   //获取引用评论
   const quoteDocuments = await DocumentModel.find({ _id: { $in: quoteIdArr } });
   for (const document of quoteDocuments) {
-    const { uid, toc, content, _id, sid, did, tlm } = document;
+    const { uid, toc, content, _id, sid, did, tlm, l } = document;
     const comment = await CommentModel.findOne({ did });
     const user = await UserModel.findOne({ uid });
     const { username, avatar } = user;
@@ -512,7 +513,10 @@ schema.statics.extendPostComments = async (props) => {
       uid,
       toc,
       tlm,
-      content: htmlToPlain(content, 100),
+      content: htmlToPlain(
+        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+        100,
+      ),
       docId: _id,
       sid,
       did,
@@ -649,7 +653,7 @@ schema.statics.extendSingleComment = async (comment) => {
   let quoteDocument;
   if (document.quoteDid) {
     quoteDocument = await DocumentModel.findOne({ _id: document.quoteDid });
-    const { uid, toc, content, _id, sid, did, tlm } = quoteDocument;
+    const { uid, toc, content, _id, sid, did, tlm, l } = quoteDocument;
     let quoteComment = await CommentModel.findOnly({ did });
     const user = await UserModel.findOnly({ uid });
     const { username, avatar } = user;
@@ -658,7 +662,10 @@ schema.statics.extendSingleComment = async (comment) => {
       uid,
       toc,
       tlm,
-      content: htmlToPlain(content, 100),
+      content: htmlToPlain(
+        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+        100,
+      ),
       docId: _id,
       sid,
       did,
@@ -850,7 +857,7 @@ schema.methods.extendEditorComment = async function () {
   }
   const quoteDocuments = await DocumentModel.find({ _id: { $in: quoteIdArr } });
   for (const document of quoteDocuments) {
-    const { uid, toc, content, _id, sid, did, tlm } = document;
+    const { uid, toc, content, _id, sid, did, tlm, l } = document;
     const comment = await CommentModel.findOne({ did });
     const user = await UserModel.findOne({ uid });
     const { username, avatar } = user;
@@ -859,7 +866,10 @@ schema.methods.extendEditorComment = async function () {
       uid,
       toc,
       tlm,
-      content: htmlToPlain(content, 100),
+      content: htmlToPlain(
+        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+        100,
+      ),
       docId: _id,
       sid,
       did,
@@ -884,6 +894,7 @@ schema.methods.extendEditorComment = async function () {
     quoteDid: betaComment ? betaComment.quoteDid : stableComment.quoteDid,
     time: timeFormat(toc),
     did,
+    l: betaComment ? betaComment.l : 'json',
     quote:
       quoteObj[betaComment ? betaComment.quoteDid : stableComment.quoteDid],
   };
@@ -1002,17 +1013,27 @@ schema.statics.renderComment = async function (_id, targetUser) {
   const resources = await ResourceModel.getResourcesByReference(
     resourceReferenceId,
   );
-  const c = nkcRender.renderHTML({
-    type: 'article',
-    post: {
-      c: document.content,
-      resources,
-      atUsers: document.atUsers,
-    },
-    source: 'document',
-    sid: _id,
-    user: targetUser,
-  });
+  const c =
+    document.l === 'json'
+      ? renderHTMLByJSON({
+          json: document.content,
+          resources,
+          atUsers: document.atUsers,
+          source: 'document',
+          sid: _id,
+          xsf: targetUser ? targetUser.xsf : 0,
+        })
+      : nkcRender.renderHTML({
+          type: 'article',
+          post: {
+            c: document.content,
+            resources,
+            atUsers: document.atUsers,
+          },
+          source: 'document',
+          sid: _id,
+          user: targetUser,
+        });
   return c;
 };
 
@@ -1272,7 +1293,11 @@ schema.statics.getCommentsInfo = async function (comments) {
       url,
       isAuthor: commentDocument.uid === articleDocument.uid,
       commentUrl,
-      content: nkcRender.htmlToPlain(commentDocument.content),
+      content: nkcRender.htmlToPlain(
+        commentDocument.l === 'json'
+          ? renderHTMLByJSON({ json: commentDocument.content })
+          : commentDocument.content,
+      ),
       credits,
     });
   }

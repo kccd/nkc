@@ -872,10 +872,12 @@ export default {
     },
     clearContent(){
       this.editor.commands.clearContent();
+      this.updateTextLength();
     }
   },
   beforeDestroy() {
     this.editor.destroy();
+    this.removeNoticeEvent();
   },
 };
 </script>

@@ -19,7 +19,7 @@
           .article-do(@click="editArticle(article._id)")
             span 继续编辑
         .article-more(@click="more") 查看更多
-      document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange")
+      document-editor(ref="documentEditor" :configs="configs" @ready='editorReady' @content-change="watchContentChange" :l="article.l")
       // 多维分类
       .form-group(v-if="tcId && (articleStatus === 'default' || !articleStatus)" )
         .m-b-2
@@ -238,6 +238,7 @@ export default {
       originState: '',
       selectCategory: [],
       authorInfos: [],
+      l:'',
     },
     lockPost: false,
     // 是否具有添加专栏文章分类的权限
@@ -393,6 +394,7 @@ export default {
               abstractEN,
               origin,
               authorInfos,
+              l='',
             } = data.editorInfo.document;
             self.cover = cover;
             self.article = {
@@ -405,6 +407,7 @@ export default {
               abstractEN,
               origin,
               authorInfos,
+              l
             };
             self.setContent(self.article);
           } else if(data.editorInfo.articles) {
@@ -549,7 +552,8 @@ export default {
         abstract = '',
         abstractEN = '',
         origin = '',
-        authorInfos = []
+        authorInfos = [],
+        l = 'json',
       } = this.article;
       const article = {
         title,
@@ -561,7 +565,8 @@ export default {
         abstractEN,
         origin,
         selectCategory,
-        authorInfos
+        authorInfos,
+        l
       };
       if(articleId) {
         formData.append('articleId', articleId);
@@ -779,6 +784,7 @@ export default {
         abstractEN,
         originState,
         authorInfos,
+        l,
       } = data;
       this.coverFile = coverFile;
       this.cover = cover;
@@ -790,7 +796,8 @@ export default {
         abstract,
         abstractEN,
         origin: originState,
-        authorInfos
+        authorInfos,
+        l,
       };
       this.modifyArticle();
     },

@@ -2,6 +2,7 @@ const mongoose = require('../settings/database');
 const moment = require('moment');
 const tools = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 
 const articleSources = {
   column: 'column',
@@ -304,6 +305,7 @@ schema.statics.getZoneArticle = async (id, targetUser) => {
     'collectedCount',
     'tlm',
     'dt',
+    'l',
   ];
   // 返回需要的数据
   const filteredDocument = await ArticleModel.filterData(
@@ -317,15 +319,23 @@ schema.statics.getZoneArticle = async (id, targetUser) => {
   let resources = await ResourceModel.getResourcesByReference(
     documentResourceId,
   );
-  documentContent.c = nkcRender.renderHTML({
-    type: 'article',
-    post: {
-      c: documentContent.c,
-      resources,
-      atUsers: document.atUsers,
-    },
-    user: targetUser,
-  });
+  documentContent.c =
+    documentContent.l === 'json'
+      ? renderHTMLByJSON({
+          json: documentContent.c,
+          resources,
+          atUsers: document.atUsers,
+          xsf: targetUser.xsf,
+        })
+      : nkcRender.renderHTML({
+          type: 'article',
+          post: {
+            c: documentContent.c,
+            resources,
+            atUsers: document.atUsers,
+          },
+          user: targetUser,
+        });
   return {
     docNumber: `D${document.did}`,
     post: documentContent,
@@ -362,6 +372,7 @@ schema.statics.changeKey = async (content) => {
     collectedCount: 'collectedCount',
     tlm: 'tlm',
     dt: 'dt',
+    l: 'l',
   };
   for (const key in content) {
     if (Object.hasOwnProperty.call(content, key)) {
@@ -453,6 +464,7 @@ schema.statics.createArticle = async (props) => {
     sid,
     authorInfos,
     tcId,
+    l = 'json',
   } = props;
   const toc = new Date();
   const ArticleModel = mongoose.model('articles');
@@ -476,6 +488,7 @@ schema.statics.createArticle = async (props) => {
     source: documentSource,
     sid: aid,
     authorInfos,
+    l,
   });
   const article = new ArticleModel({
     _id: aid,

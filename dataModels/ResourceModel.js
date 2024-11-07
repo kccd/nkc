@@ -603,8 +603,9 @@ resourceSchema.statics.toReferenceSource = async function (id, declare = '') {
 // 检测json内容中的资源并将指定id存入resource.reference
 resourceSchema.statics.toReferenceSourceByJson = async function (
   id,
-  jsonContent = '',
+  jsonContent,
 ) {
+  if (!jsonContent) return;
   const model = mongoose.model('resources');
   const targetTypes = [
     'nkc-video-block',
