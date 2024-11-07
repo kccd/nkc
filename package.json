@@ -11,7 +11,7 @@
     "serve": "npm run init && node ./server.js",
     "test": "mocha -t 10000",
     "watch-node": "nodemon server.js",
-    "watch-pages": "cross-env NODE_OPTIONS=--max_old_space_size=4096 npm run build-pages -- -w",
+    "watch-pages": "cross-env NODE_OPTIONS=--max_old_space_size=8192 npm run build-pages -- -w",
     "watch": "concurrently -p \"[{name}]\" -n \"node,pages\" -c \"green,cyan\" \"npm run watch-node\" \"npm run watch-pages\"",
     "build-pages": "webpack",
     "build-pages-p": "cross-env NODE_ENV=production webpack",

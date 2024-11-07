@@ -19,13 +19,45 @@ var CheckData = function () {
     var zhCN = data.match(/[^\x00-\xff]/g) || [];
     return data.length + zhCN.length;
   };
+  self.getErrorJsonData = function (jsonStr, errorMessage) {
+    return {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: errorMessage,
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: jsonStr,
+            },
+          ],
+        },
+      ],
+    };
+  };
   self.getEditorJsonLength = function (jsonString, nodesSize = {}) {
     if (!jsonString) {
       return 0;
     }
     var jsonData;
     if (typeof jsonString === 'string') {
-      jsonData = JSON.parse(jsonString);
+      try {
+        jsonData = JSON.parse(jsonString);
+      } catch (err) {
+        jsonData = self.getErrorJsonData(
+          jsonString,
+          `JSON解析错误：${err.message}`,
+        );
+      }
     } else {
       jsonData = jsonString;
     }
