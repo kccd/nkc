@@ -1133,7 +1133,11 @@ postSchema.statics.extendPosts = async (posts, options) => {
       post = post.toObject();
     }
     if (o.htmlToText) {
-      post.c = obtainPureText(post.c, true, o.count);
+      post.c = obtainPureText(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+        true,
+        o.count,
+      );
     }
     post.ownPost = post.uid === o.uid;
     if (post.anonymous && o.excludeAnonymousPost) {
@@ -1224,7 +1228,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
         post.c = renderHTMLByJSON({
           json: post.c,
           resources: post.resources,
-          xsf: o.visitor.xsf,
+          xsf: o?.visitor?.xsf,
           atUsers: post.atUsers,
           pid: post.pid,
         });
@@ -1563,6 +1567,7 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
       anonymous: 1,
       parentPostId: 1,
       tid: 1,
+      l: 1,
     },
   )
     .sort({ toc: -1 })
@@ -1600,7 +1605,11 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     if (!user || !thread) {
       return;
     }
-    post.c = obtainPureText(post.c, true, 200);
+    post.c = obtainPureText(
+      post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      true,
+      200,
+    );
     if (!post.anonymous) {
       post.user = user;
     }
@@ -2094,6 +2103,7 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       toc: 1,
       cover: 1,
       parentPostId: 1,
+      l: 1,
     },
   );
   for (const fp of firstPosts) {
@@ -2125,6 +2135,7 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       cover,
       mainForumsId,
       parentPostId,
+      l,
     } = post;
     let user;
     if (anonymous) {
@@ -2147,7 +2158,12 @@ postSchema.statics.extendActivityPosts = async (posts) => {
         toc: firstPost.toc,
         title: firstPost.t,
         url: tools.getUrl('thread', firstPost.tid),
-        content: nkcRender.htmlToPlain(firstPost.c, 200),
+        content: nkcRender.htmlToPlain(
+          firstPost.l === 'json'
+            ? renderHTMLByJSON({ json: firstPost.c })
+            : firstPost.c,
+          200,
+        ),
         cover: firstPost.cover
           ? tools.getUrl('postCover', firstPost.cover)
           : null,
@@ -2164,7 +2180,10 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       toc,
       url,
       title: t,
-      content: nkcRender.htmlToPlain(c, 200),
+      content: nkcRender.htmlToPlain(
+        l === 'json' ? renderHTMLByJSON({ json: c }) : c,
+        200,
+      ),
       cover: cover ? tools.getUrl('postCover', cover) : null,
       forumsId: mainForumsId,
       quote,
@@ -2280,6 +2299,7 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       disabled: 1,
       parentPostId: 1,
       toDraft: 1,
+      l: 1,
     },
   );
   const usersId = [];
@@ -2316,6 +2336,7 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       uid: 1,
       cover: 1,
       c: 1,
+      l: 1,
     },
   );
   threadFirstPosts = threadFirstPosts.concat(posts);
@@ -2360,7 +2381,12 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       // 文章相关
       result.title = nkcRender.replaceLink(threadPost.t);
       result.content = nkcRender.replaceLink(
-        nkcRender.htmlToPlain(threadPost.c, 200),
+        nkcRender.htmlToPlain(
+          threadPost.l === 'json'
+            ? renderHTMLByJSON({ json: threadPost.c })
+            : threadPost.c,
+          200,
+        ),
       );
       result.coverUrl = threadPost.cover
         ? getUrl('postCover', threadPost.cover)
@@ -2384,7 +2410,12 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
         result.replyTime = timeFormat(targetPost.toc);
         result.replyUrl = getUrl('post', targetPost.pid);
         result.replyContent = nkcRender.replaceLink(
-          nkcRender.htmlToPlain(targetPost.c, 200),
+          nkcRender.htmlToPlain(
+            targetPost.l === 'json'
+              ? renderHTMLByJSON({ json: targetPost.c })
+              : targetPost.c,
+            200,
+          ),
         );
         result.replyUsername = targetUser.username;
         result.replyUid = targetUser.uid;

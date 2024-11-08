@@ -7,7 +7,7 @@
     .single-comment-editor-container(v-else)
       .single-comment-prompt 请避免因为你的修改而导致他人的发言文不对题，请确保输入内容合法、友善。
       .single-comment-editor
-        editor(:configs="editorConfigs" :ref="`commentEditor_${cid}`" @ready="removeEvent" :plugs="editorPlugs" @content-change="editorContentChange")
+        editor(:configs="editorConfigs" :ref="`commentEditor_${cid}`" @ready="removeEvent" :plugs="editorPlugs" @content-change="editorContentChange" :l="comment ? comment.l : '' ")
       .single-comment-button(:data-tyep="this.cid")
         .checkbox
           label
@@ -145,7 +145,7 @@ export default {
     },
     //设置编辑器保存状态 succeeded failed saving
     setSavedStatus(type) {
-      this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
+      // this.$refs[`commentEditor_${this.comment._id}`].changeSaveInfo(type);
     },
     //提交内容
     post(type,isTs) {
@@ -164,6 +164,7 @@ export default {
           source: self.comment.source,
           aid: self.aid,
           commentId: self.comment._id,
+          l: self.comment?.l,
         }).then(res => {
             self.commentId = res.commentId;
             if(type !== 'publish') {

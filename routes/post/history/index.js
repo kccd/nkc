@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
 const rollback = require('./rollback');
+const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 
 router
   .get('/', async (ctx, next) => {
@@ -53,7 +54,11 @@ router
     for (let i = 0; i < histories.length; i++) {
       const history = histories[i];
       if (!t) {
-        history.c = nkcRender.htmlToPlain(history.c);
+        history.c = nkcRender.htmlToPlain(
+          history.l === 'json'
+            ? renderHTMLByJSON({ json: history.c })
+            : history.c,
+        );
       }
       history.ipoc = ipsObj[history.ipoc];
       history.iplm = ipsObj[history.iplm];

@@ -198,6 +198,7 @@
           quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
           toColumn: null,
+          l: self.l,
         };
         // const toColumn = self.$refs.column.getStatus();
         // if(toColumn.checkbox) {

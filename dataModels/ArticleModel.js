@@ -1339,7 +1339,12 @@ schema.statics.extendArticlesList = async (articles) => {
       hits,
       comment,
       title: stableDocument.title,
-      content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      content: nkcRender.htmlToPlain(
+        stableDocument.l === 'json'
+          ? renderHTMLByJSON({ json: stableDocument.content })
+          : stableDocument.content,
+        200,
+      ),
       coverUrl: stableDocument.cover
         ? tools.getUrl('documentCover', stableDocument.cover)
         : '',
@@ -1525,7 +1530,12 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
       hits,
       comment,
       title: stableDocument.title,
-      content: nkcRender.htmlToPlain(stableDocument.content, 200),
+      content: nkcRender.htmlToPlain(
+        stableDocument.l === 'json'
+          ? renderHTMLByJSON({ json: stableDocument.content })
+          : stableDocument.content,
+        200,
+      ),
       coverUrl: stableDocument.cover
         ? tools.getUrl('documentCover', stableDocument.cover)
         : '',
@@ -1598,7 +1608,7 @@ schema.statics.extendArticlesDraftList = async (articles) => {
         };
       }
     }
-    const { title, content, toc, tlm, cover } = betaDocument;
+    const { title, content, toc, tlm, cover, l } = betaDocument;
     const { _id: articleId, status, source, sid } = article;
     let articleUrl = '',
       editorUrl = '';
@@ -1618,7 +1628,10 @@ schema.statics.extendArticlesDraftList = async (articles) => {
       type: status === 'default' ? 'create' : 'modify',
       articleId,
       title: title || '未填写',
-      content: nkcRender.htmlToPlain(content, 200),
+      content: nkcRender.htmlToPlain(
+        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+        200,
+      ),
       coverUrl: cover ? tools.getUrl('documentCover', cover) : '',
       articleUrl,
       articleEditorUrl: editorUrl,
@@ -2043,7 +2056,7 @@ schema.statics.getArticlesDataByArticlesId = async function (
     if (!user) {
       continue;
     }
-    const { title, content, cover } = stableDocument;
+    const { title, content, cover, l } = stableDocument;
     let articleData;
     // 暂时屏蔽被撤稿的文章，待专栏改进时一同调整
     // if (!articleUrl.articleUrl) {
@@ -2054,7 +2067,10 @@ schema.statics.getArticlesDataByArticlesId = async function (
         status: articleStatus.normal,
         statusInfo: '',
         title,
-        content: nkcRender.htmlToPlain(content, 200),
+        content: nkcRender.htmlToPlain(
+          l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+          200,
+        ),
         coverUrl: cover ? getUrl('documentCover', cover) : '',
         username: user.username,
         uid: user.uid,
@@ -2275,7 +2291,12 @@ schema.statics.extendArticlesPanelData = async function (articles) {
       title: document.title,
       url: article.url,
       digest: article.digest,
-      abstract: nkcRender.htmlToPlain(document.content, 200),
+      abstract: nkcRender.htmlToPlain(
+        document.l === 'json'
+          ? renderHTMLByJSON({ json: document.content })
+          : document.content,
+        200,
+      ),
       readCount: article.hits,
       voteUpCount: article.voteUp,
       replyCount: article.count,
@@ -2319,7 +2340,12 @@ schema.statics.extendArticlesPanelData = async function (articles) {
         content: {
           time: commentDocument.toc,
           url: commentUrl,
-          abstract: nkcRender.htmlToPlain(commentDocument.content, 200),
+          abstract: nkcRender.htmlToPlain(
+            commentDocument.l === 'json'
+              ? renderHTMLByJSON({ json: commentDocument.content })
+              : commentDocument.content,
+            200,
+          ),
         },
       };
     }

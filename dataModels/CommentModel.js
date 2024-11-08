@@ -1366,6 +1366,7 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       title,
       cover,
       uid: articleUid,
+      l,
     } = articleDocument;
     const articleUser = userObj[articleUid];
     const commentUser = userObj[commentUid];
@@ -1376,7 +1377,12 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       title: nkcRender.replaceLink(title),
       status,
       content: nkcRender.replaceLink(
-        nkcRender.htmlToPlain(articleContent, 200),
+        nkcRender.htmlToPlain(
+          l === 'json'
+            ? renderHTMLByJSON({ json: articleContent })
+            : articleContent,
+          200,
+        ),
       ),
       coverUrl: cover ? getUrl('postCover', cover) : '',
       username: articleUser.username,
@@ -1392,7 +1398,12 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       replyTime: timeFormat(commentDocument.toc),
       replyUrl: comment.commentUrl,
       replyContent: nkcRender.replaceLink(
-        nkcRender.htmlToPlain(commentContent, 200),
+        nkcRender.htmlToPlain(
+          commentDocument.l === 'json'
+            ? renderHTMLByJSON({ json: commentContent })
+            : commentContent,
+          200,
+        ),
       ),
       replyUsername: commentUser.username,
       replyUid: commentUid,

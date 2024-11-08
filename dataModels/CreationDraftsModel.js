@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const nkcRender = require("../nkcModules/nkcRender");
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const schema = new mongoose.Schema({
   _id: String,
   toc: {
@@ -109,6 +110,7 @@ schema.statics.extentDraftsData = async function (drafts) {
     did: 1,
     title: 1,
     content: 1,
+    l: 1,
   });
   const draftsData = [];
   for(const document of documents) {
@@ -120,13 +122,18 @@ schema.statics.extentDraftsData = async function (drafts) {
     if(!document) continue;
     const {
       title = "",
-      content = ""
+      content = "",
+      l
     } = document;
     const draftData = {
       draftId: _id,
       deleted: del,
-      title: title || "未填写标题",
-      content: await nkcRender.htmlToPlain(content || "未填写内容", 500),
+      title: title || '未填写标题',
+      content:
+        nkcRender.htmlToPlain(
+          l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+          500,
+        ) || '未填写内容',
       time: tools.timeFormat(tlm || toc),
     };
     draftsData.push(draftData);
