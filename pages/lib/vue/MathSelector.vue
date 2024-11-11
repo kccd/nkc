@@ -84,10 +84,11 @@ export default {
         return `$$${this.text}$$`;
       } else {
         return `$${this.text}$`;
+      }  
     }
   },
   watch: {
-    text() {
+    formula() {
       setTimeout(() => {
         this.renderPreviewHTML();
       }, 10);
