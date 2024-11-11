@@ -75,12 +75,7 @@ export default {
   },
   computed: {
     formula() {
-      if(
-        this.text.startsWith('$') && this.text.endsWith('$') ||
-        this.text.startsWith('\[') && this.text.endsWith('\]')
-      ) {
-        return this.text;
-      } else if(this.block) {
+      if(this.block) {
         return `$$${this.text}$$`;
       } else {
         return `$${this.text}$`;
