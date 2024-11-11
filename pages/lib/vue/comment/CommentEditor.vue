@@ -13,7 +13,7 @@
         .quote-content {{quote.content}}
 
     .m-b-05#container
-      editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" )
+      editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" :l="l")
     .m-b-05
       //column(
         ref="column"
@@ -91,6 +91,7 @@
       saving: false,
       setTimeout: null,
       commentId: null,
+      l:'',
     }),
     components: {
       'editor': Editor,
@@ -116,6 +117,7 @@
           this.commentId = this.comment._id;
           if(this.comment.quote) this.quote = this.comment.quote;
           this.setContent(this.comment.content);
+          this.l = this.comment.l;
         } else {
           this.contentChangeEventFlag = true;
         }
@@ -166,7 +168,7 @@
       },
       //设置编辑器保存状态 succeeded failed saving
       setSavedStatus(type) {
-        this.$refs.editor.changeSaveInfo(type);
+        // this.$refs.editor.changeSaveInfo(type);
       },
       //填入编辑器内容
       setContent(content) {
@@ -196,6 +198,7 @@
           quoteDid: self.quote?self.quote.docId:'',
           commentId: self.commentId,
           toColumn: null,
+          l: self.l,
         };
         // const toColumn = self.$refs.column.getStatus();
         // if(toColumn.checkbox) {
@@ -235,7 +238,11 @@
       },
       //清空编辑器中的内容
       clearContent() {
-        this.$refs.editor.setContent('');
+        if(this.l==='html'){
+          this.$refs.editor.setContent('');
+        }else{
+          this.$refs.editor.clearContent();
+        }
         this.commentContent = '';
       },
       //发布评论

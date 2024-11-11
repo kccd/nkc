@@ -1,3 +1,5 @@
+const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
+
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
   const { db, data, query, state, nkcModules } = ctx;
@@ -124,6 +126,7 @@ router.get('/', async (ctx, next) => {
       // keywords = [],
       // keywordsEN = [],
       status = '',
+      l,
     } = document;
     const keywords = document.keywords || [];
     const keywordsEN = document.keywordsEN || [];
@@ -215,13 +218,16 @@ router.get('/', async (ctx, next) => {
       keywords: keywords || [],
       keywordsEN: keywordsEN || [],
       title,
-      content: nkcModules.nkcRender.renderHTML({
-        type: 'article',
-        post: {
-          c: content,
-          resources,
-        },
-      }),
+      content:
+        l === 'json'
+          ? renderHTMLByJSON({ json: content, resources })
+          : nkcModules.nkcRender.renderHTML({
+              type: 'article',
+              post: {
+                c: content,
+                resources,
+              },
+            }),
       // 类型相关
       from, // string 来源
       url,

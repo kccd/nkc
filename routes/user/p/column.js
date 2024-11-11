@@ -1,3 +1,5 @@
+const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
+
 module.exports = async (ctx, next) => {
   //获取用户在专栏下发表的文章
   const {data, db, state, params, query, nkcModules, permission} = ctx;
@@ -118,7 +120,12 @@ module.exports = async (ctx, next) => {
           const column = await c.extendColumnPost();
           //获取当前引用的专栏
           t.type = 'article';
-          need_t.content = nkcModules.nkcRender.htmlToPlain(t.document.content, 200);
+          need_t.content = nkcModules.nkcRender.htmlToPlain(
+            t.document.l === 'json'
+              ? renderHTMLByJSON({ json: t.document.content })
+              : t.document.content,
+            200,
+          );
           need_t.title = t.document.title;
           need_t.cover = t.document.cover;
             //获取文章的专栏信息

@@ -1,3 +1,5 @@
+const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
+
 module.exports = async (ctx, next) => {
   const {db, data, nkcModules, query, state} = ctx;
   const {targetUser, user} = data;
@@ -68,7 +70,11 @@ module.exports = async (ctx, next) => {
       post.parentPost = parentPostsObj[post.parentPostId];
     }
     post.url = await db.PostModel.getUrl(post.pid);
-    post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
+    post.c = nkcModules.apiFunction.obtainPureText(
+      post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      true,
+      200,
+    );
     data.posts.push(post);
   }
   data.paging = paging;

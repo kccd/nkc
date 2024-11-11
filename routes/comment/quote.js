@@ -1,3 +1,5 @@
+const { renderHTMLByJSON } = require("../../nkcModules/nkcRender/json");
+
 module.exports = async (ctx, next) => {
   //获取引用数据
   const {db, data, params, query, nkcModules} = ctx;
@@ -23,7 +25,12 @@ module.exports = async (ctx, next) => {
     did,
     sid,
     commentSource,
-    content: nkcModules.nkcRender.htmlToPlain(document.content, 100)
-  }
+    content: nkcModules.nkcRender.htmlToPlain(
+      document.l === 'json'
+        ? renderHTMLByJSON({ json: document.content })
+        : document.content,
+      100,
+    ),
+  };
   await next();
 };

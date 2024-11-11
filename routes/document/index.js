@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const nkcRender = require('../../nkcModules/nkcRender');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { DynamicOperations } = require('../../settings/operations');
 
 router
@@ -105,13 +106,21 @@ router
     let resources = await db.ResourceModel.getResourcesByReference(
       documentResourceId,
     );
-    data.document.content = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: data.document.content,
+    if (data.document.l === 'json') {
+      data.document.content = renderHTMLByJSON({
+        json: data.document.content,
         resources,
-      },
-    });
+      });
+    } else {
+      data.document.content = nkcRender.renderHTML({
+        type: 'article',
+        post: {
+          c: data.document.content,
+          resources,
+        },
+      });
+    }
+
     // 查询文章作者
     const user = await db.UserModel.findOnly({ uid: data.document.uid });
     const avatarUrl = nkcModules.tools.getUrl('userAvatar', user.avatar);
@@ -155,13 +164,21 @@ router
       let resources = await db.ResourceModel.getResourcesByReference(
         documentResourceId,
       );
-      data.document.content = nkcRender.renderHTML({
-        type: 'article',
-        post: {
-          c: data.document.content,
+      if (data.document.l === 'json') {
+        data.document.content = renderHTMLByJSON({
+          json: data.document.content,
           resources,
-        },
-      });
+        });
+      } else {
+        data.document.content = nkcRender.renderHTML({
+          type: 'article',
+          post: {
+            c: data.document.content,
+            resources,
+          },
+        });
+      }
+
       let article;
       let editorUrl;
       if (source === 'article') {
@@ -250,13 +267,21 @@ router
     let resources = await db.ResourceModel.getResourcesByReference(
       documentResourceId,
     );
-    data.document.content = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: data.document.content,
+    if (data.document.l === 'json') {
+      data.document.content = renderHTMLByJSON({
+        json: data.document.content,
         resources,
-      },
-    });
+      });
+    } else {
+      data.document.content = nkcRender.renderHTML({
+        type: 'article',
+        post: {
+          c: data.document.content,
+          resources,
+        },
+      });
+    }
+
     let article;
     let editorUrl;
     if (source === 'article') {

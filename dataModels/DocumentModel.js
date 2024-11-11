@@ -6,6 +6,7 @@ const {
 const cheerio = require('cheerio');
 const markNotes = require('../nkcModules/nkcRender/markNotes');
 const documentSettings = require('../settings/document');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 
 /*
  * document状态
@@ -192,6 +193,11 @@ const schema = new mongoose.Schema(
       default: '',
     },
     // 已发送过@通知的用户
+    // 内容格式
+    l: {
+      type: String,
+      default: '',
+    },
   },
   {
     collection: 'documents',
@@ -397,6 +403,7 @@ schema.statics.createBetaDocument = async (props) => {
     port,
     files = [],
     dt = toc,
+    l = 'json',
   } = props;
   const IPModel = mongoose.model('ips');
   const DocumentModel = mongoose.model('documents');
@@ -432,6 +439,7 @@ schema.statics.createBetaDocument = async (props) => {
     port,
     addr,
     files,
+    l,
   });
   await document.save();
   await document.updateResourceReferences();
@@ -998,16 +1006,25 @@ schema.methods.getRenderingData = async function (uid) {
   const resources = await ResourceModel.getResourcesByReference(
     resourceReferenceId,
   );
-  const content = nkcRender.renderHTML({
-    type: 'article',
-    post: {
-      c: this.content,
-      resources,
-      user,
-    },
-    source: 'document',
-    sid: this._id,
-  });
+  const content =
+    this.l === 'json'
+      ? nkcRender.renderHTML({
+          type: 'article',
+          post: {
+            c: this.content,
+            resources,
+            user,
+          },
+          source: 'document',
+          sid: this._id,
+        })
+      : renderHTMLByJSON({
+          json: this.content,
+          resources,
+          xsf: user.xsf,
+          source: 'document',
+          sid: this._id,
+        });
   return {
     time: timeFormat(this.toc),
     coverUrl: this.cover ? getUrl('documentCover', this.cover) : '',
@@ -1044,7 +1061,11 @@ schema.statics.getStableArticleById = async (sid) => {
 schema.methods.updateResourceReferences = async function () {
   const id = await this.getResourceReferenceId();
   const ResourceModel = mongoose.model('resources');
-  await ResourceModel.toReferenceSource(id, this.content);
+  if (this.l === 'json') {
+    await ResourceModel.toReferenceSourceByJson(id, this.content);
+  } else {
+    await ResourceModel.toReferenceSource(id, this.content);
+  }
 };
 
 /*
@@ -1521,6 +1542,7 @@ schema.methods.pushToSearchDB = async function () {
     abstractEN,
     keywords,
     keywordsEN,
+    l,
   } = this;
   const elasticSearch = require('../nkcModules/elasticSearch');
   await elasticSearch
@@ -1534,6 +1556,7 @@ schema.methods.pushToSearchDB = async function () {
       abstractCN: abstract,
       keywordsCN: keywords || [],
       keywordsEN: keywordsEN || [],
+      l,
     })
     .catch((err) => {
       console.log(err);

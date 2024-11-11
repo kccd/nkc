@@ -1,5 +1,6 @@
 const mongoose = require('../settings/database');
 const { obtainPureText } = require('../nkcModules/apiFunction');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const Schema = mongoose.Schema;
 const columnPostTypes = {
   post: 'post',
@@ -162,6 +163,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
       content,
       dt,
       authorInfos,
+      l,
     } = article.document;
     //获取文章评论数
     thread.count = article.count;
@@ -194,6 +196,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
           article.documentResourceId,
           xsf,
           atUsers,
+          l,
         ),
       },
       cid,
@@ -228,6 +231,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
       tlm,
       authorInfos,
       dt,
+      l,
     } = article;
     thread.url = url;
     res = {
@@ -252,7 +256,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
         abstractEn,
         keyWordsCn,
         keyWordsEn,
-        c: await ColumnPostModel.getRenderHTML(c, resources, xsf, atUsers),
+        c: await ColumnPostModel.getRenderHTML(c, resources, xsf, atUsers, l),
       },
       cid,
       mcid,
@@ -271,6 +275,7 @@ schema.statics.getRenderHTML = async function (
   documentResourceId,
   xsf,
   atUsers = [],
+  l,
 ) {
   const nkcRender = require('../nkcModules/nkcRender');
   const ResourceModel = mongoose.model('resources');
@@ -280,14 +285,21 @@ schema.statics.getRenderHTML = async function (
   } else {
     resources = documentResourceId;
   }
-  return nkcRender.renderHTML({
-    post: {
-      c: content,
-      resources,
-      atUsers,
-    },
-    user: { xsf },
-  });
+  return l === 'json'
+    ? renderHTMLByJSON({
+        json: content,
+        resources,
+        atUsers,
+        xsf,
+      })
+    : nkcRender.renderHTML({
+        post: {
+          c: content,
+          resources,
+          atUsers,
+        },
+        user: { xsf },
+      });
 };
 
 /*
@@ -429,7 +441,7 @@ schema.statics.extendColumnPosts = async (options) => {
     articleMatch.source = { $in: [columnSource, zoneSource] };
   }
   let articles = await ArticleModel.find(articleMatch);
-  const articleOptions = ['_id', 'content', 'title', 'cover', 'toc'];
+  const articleOptions = ['_id', 'content', 'title', 'cover', 'toc', 'l'];
   articles = await ArticleModel.extendDocumentsOfArticles(
     articles,
     'stable',
@@ -489,7 +501,11 @@ schema.statics.extendColumnPosts = async (options) => {
         p.post.user = usersObj[p.post.uid];
       }
       p.post = p.post.toObject();
-      p.post.c = obtainPureText(p.post.c, true, 200);
+      p.post.c = obtainPureText(
+        p.post.l === 'json' ? renderHTMLByJSON({ json: p.post.c }) : p.post.c,
+        true,
+        200,
+      );
     } else if (p.type === 'article') {
       p.article = articleObj[p.pid];
       if (!p.article) {
@@ -497,7 +513,9 @@ schema.statics.extendColumnPosts = async (options) => {
       }
       p.article.user = usersObj[p.article.uid];
       p.article.document.content = obtainPureText(
-        p.article.document.content,
+        p.article.document.l === 'json'
+          ? renderHTMLByJSON({ json: p.article.document.content })
+          : p.article.document.content,
         true,
         200,
       );

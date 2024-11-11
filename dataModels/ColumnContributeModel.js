@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require("../nkcModules/nkcRender/json");
 const mongoose = require("../settings/database");
 const Schema = mongoose.Schema;
 const schema = new Schema({
@@ -187,7 +188,7 @@ schema.statics.extendColumnContributes = async (contributes) => {
                     { $eq: [ "$pid",  "$$oc_pid" ] },
                 }
             },
-            { $project: {c: 1, pid: 1, t: 1, toc: 1 } }
+            { $project: {c: 1, pid: 1, t: 1, toc: 1, l:1 } }
           ],
           as: "content"
         }
@@ -203,8 +204,11 @@ schema.statics.extendColumnContributes = async (contributes) => {
         toc: thread.toc,
         t: thread.t,
         source: 'thread',
-        c: nkcRender.htmlToPlain(thread.c,20),
-        url: tools.getUrl('thread', thread.tid)
+        c: nkcRender.htmlToPlain(
+          thread.l === 'json' ? renderHTMLByJSON({ json: thread.c }) : thread.c,
+          20,
+        ),
+        url: tools.getUrl('thread', thread.tid),
       };
     });
   }
@@ -244,7 +248,7 @@ schema.statics.extendColumnContributes = async (contributes) => {
 
                 }
             },
-            { $project: {title: 1, content: 1, dt: 1 , _id: 0 } }
+            { $project: {title: 1, content: 1, dt: 1 , l: 1, _id: 0 } }
           ],
           as: "doc"
         }
@@ -286,8 +290,13 @@ schema.statics.extendColumnContributes = async (contributes) => {
         source: 'article',
         toc: article.dt,
         t: article.title,
-        c: nkcRender.htmlToPlain(article.content,20),
-        url
+        c: nkcRender.htmlToPlain(
+          article.l === 'json'
+            ? renderHTMLByJSON({ json: article.content })
+            : article.content,
+          20,
+        ),
+        url,
       };
     });
   }
