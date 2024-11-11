@@ -13,7 +13,7 @@ const schema = new Schema({
   },
   l: {
     type: String,
-    default: "html"
+    default: "json"
   },
   t: {
     type: String,
@@ -44,7 +44,11 @@ const schema = new Schema({
 schema.pre("save", async function(next) {
   const id = `column-${this._id}`;
   const ResourceModel = mongoose.model("resources");
-  await ResourceModel.toReferenceSource(id, this.c);
+  if (this.l === 'json') {
+    await ResourceModel.toReferenceSourceByJson(id, this.c);
+  } else {
+    await ResourceModel.toReferenceSource(id, this.c);
+  }
   await next();
 });
 
@@ -58,7 +62,8 @@ schema.statics.toSearch = async (pageId) => {
     tid: page._id,
     t: page.t,
     c: page.c,
-    toc: page.toc
+    toc: page.toc,
+    l: page.l,
   };
   const es = require("../nkcModules/elasticSearch");
   await es.save("columnPage", data);

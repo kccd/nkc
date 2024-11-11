@@ -61,7 +61,7 @@ const documentSchema = new Schema(
     l: {
       //pwbb
       type: String,
-      default: 'html',
+      default: 'json',
     },
     t: {
       type: String,
@@ -169,7 +169,14 @@ documentSchema.methods.extendResources = async function () {
 
 documentSchema.pre('save', async function (next) {
   const ResourceModel = mongoose.model('resources');
-  await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c || '');
+  if (this.l === 'json') {
+    await ResourceModel.toReferenceSourceByJson(
+      `fund-${this._id}`,
+      this.c || '',
+    );
+  } else {
+    await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c || '');
+  }
   return next();
 
   /*try {

@@ -1,3 +1,4 @@
+import { getDataById } from '../../lib/js/dataConversion';
 import {getExperimentalProtocolEditorConfigs} from '../../lib/js/editor'
 import Editor from '../../lib/vue/Editor'
 const  protocolEditor = $('#protocolEditorContainer');
@@ -11,6 +12,12 @@ if(protocolEditor.length > 0) {
         stickerSelector: true,
         xsfSelector: true,
         mathJaxSelector: true,
+      },
+      protocol: null,
+    },
+    created() {
+      if (getDataById('protocolHide')) {
+        this.protocol = getDataById('protocolHide');
       }
     },
     mounted() {
@@ -28,9 +35,12 @@ if(protocolEditor.length > 0) {
         return this.$refs.protocolEditor;
       },
       setContent() {
-        if($("#protocolHide").length > 0) {
-          var protocolHide = $("#protocolHide").text();
-          this.$refs.protocolEditor.setContent(protocolHide);
+        // if($("#protocolHide").length > 0) {
+        //   var protocolHide = $("#protocolHide").text();
+        //   this.$refs.protocolEditor.setContent(protocolHide);
+        // }
+        if (this.protocol) {
+          this.$refs.protocolEditor.setContent(this.protocol.protocolContent);
         }
       },
       removeEvent() {

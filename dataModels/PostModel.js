@@ -54,7 +54,7 @@ const postSchema = new Schema(
     // 旧 内容格式，数据统一成了html
     l: {
       type: String,
-      default: 'html',
+      default: 'json',
     },
     // 旧 收藏的用户
     recUsers: {
@@ -1375,7 +1375,7 @@ postSchema.statics.newPost = async (options) => {
     keyWordsCn,
     ipoc: ipToken,
     iplm: ipToken,
-    l: 'html',
+    l: 'json',
     mainForumsId: thread.mainForumsId,
     minorForumsId: thread.minorForumsId,
     tid,

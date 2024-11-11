@@ -41,11 +41,12 @@ block eContent
                     input#protocolTypeName.form-control( placeholder='请输入协议名称，20个字节以内'  value=`${data.protocol.protocolTypeName}`)
                     h5.text-danger 唯一，由中文组成，不可有空格。
                 .form-group
-                  .hidden#protocolHide= data.protocol.protocolContent
+                  //- .hidden#protocolHide= data.protocol.protocolContent
+                  .hidden#protocolHide=objToStr({protocolContent: data.protocol.protocolContent,l:data.protocol.l})
                   label.col-sm-2.control-label 协议内容
                   .col-sm-10#protocolEditorContainer
                     // 加载编辑器的容器
-                    editor#container(:configs="editorConfigs" ref="protocolEditor" @ready="setContent" :plugs="editorPlugs")
+                    editor#container(:configs="editorConfigs" ref="protocolEditor" @ready="setContent" :plugs="editorPlugs" :l="protocol?.l")
             .col-xs-12.col-md-12(style="text-align:end")
               button#updateEdit.btn.btn-warning.btn-sm(onclick=`updateProtocol('${data.protocol.protocolTypeId}')`) 保存修改
       else

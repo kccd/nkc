@@ -6,6 +6,7 @@ const giveUpRouter = require('./giveUp');
 const deleteRouter = require('./delete');
 const withdrawRouter = require('./withdraw');
 const cheerio = require('cheerio');
+const { renderHTMLByJSON } = require('../../../../nkcModules/nkcRender/json');
 settingsRouter
   .use('/', async (ctx, next) => {
     const {data, state} = ctx;
@@ -96,6 +97,7 @@ settingsRouter
     const {
       t,
       c,
+      l,
       abstractEn,
       abstractCn,
       keyWordsEn,
@@ -299,11 +301,13 @@ settingsRouter
           maxLength: 30
         });
       }
-      checkString(c, {
-        name: '项目内容',
-        maxLength: 1000000
-      });
-      const content = cheerio.load(c);
+      // checkString(c, {
+      //   name: '项目内容',
+      //   maxLength: 1000000
+      // });
+      const content = cheerio.load(
+        l === 'json' ? renderHTMLByJSON({ json: c }) : c,
+      );
       const count = content('body').text().length;
       if(count === 0) ctx.throw(400, `项目内容不能为空`);
       if(count > 100000) ctx.throw(400, `项目内容不能超过 10 万字`);

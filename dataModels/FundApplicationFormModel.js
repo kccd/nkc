@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const settings = require('../settings');
 const moment = require('moment');
 const mongoose = settings.database;
@@ -1070,7 +1071,7 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (
       abstractCn: form.project.abstractCn,
       keyWordsEn: form.project.keyWordsEn,
       keyWordsCn: form.project.keyWordsCn,
-      l: 'html',
+      l: form.project.l,
     });
     form.tid = formPost.tid;
     await elasticSearch.save('thread', formPost);
@@ -1094,7 +1095,7 @@ fundApplicationFormSchema.statics.publishByApplicationFormId = async (
     formPost.abstractCn = form.project.abstractCn;
     formPost.keyWordsEn = form.project.keyWordsEn;
     formPost.keyWordsCn = form.project.keyWordsCn;
-    formPost.l = 'html';
+    // formPost.l = 'html';
     formPost.mainForumsId = fundForumsId;
     formPost.uid = form.uid;
     formPost.tlm = form.tlm;
@@ -1735,25 +1736,43 @@ fundApplicationFormSchema.methods.extendProjectPost = async function () {
       tid: this.tid,
       type: 'thread',
     });
-    firstPost.c = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: firstPost.c,
-        resources: await ResourceModel.getResourcesByReference(firstPost.pid),
-      },
-    });
+    firstPost.c =
+      firstPost.l === 'json'
+        ? renderHTMLByJSON({
+            json: firstPost.c,
+            resources: await ResourceModel.getResourcesByReference(
+              firstPost.pid,
+            ),
+          })
+        : nkcRender.renderHTML({
+            type: 'article',
+            post: {
+              c: firstPost.c,
+              resources: await ResourceModel.getResourcesByReference(
+                firstPost.pid,
+              ),
+            },
+          });
     this.projectPost = firstPost;
   } else {
     const project = this.project ? this.project : await this.extendProject();
-    project.c = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: project.c,
-        resources: await ResourceModel.getResourcesByReference(
-          `fund-${project._id}`,
-        ),
-      },
-    });
+    project.c =
+      project.l === 'json'
+        ? renderHTMLByJSON({
+            json: project.c,
+            resources: await ResourceModel.getResourcesByReference(
+              `fund-${project._id}`,
+            ),
+          })
+        : nkcRender.renderHTML({
+            type: 'article',
+            post: {
+              c: project.c,
+              resources: await ResourceModel.getResourcesByReference(
+                `fund-${project._id}`,
+              ),
+            },
+          });
     this.projectPost = project;
   }
 };
