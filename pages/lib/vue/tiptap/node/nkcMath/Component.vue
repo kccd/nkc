@@ -1,5 +1,8 @@
 <template>
-  <node-view-wrapper class="node-view-wrapper" title="点击编辑公式">
+  <node-view-wrapper
+    :class="{'node-view-wrapper': true, 'node-view-wrapper-block': block}"
+    title="点击编辑公式"
+  >
     <span v-if="isFocused">
       <span class="m-r-05" title="编辑" @mouseup.stop="openMathEditor">
         <write-icon theme="outline" size="12" fill="#333" />
@@ -38,7 +41,11 @@ export default {
       return this.node.attrs.block;
     },
     formula() {
-      return `$${this.text}$`
+      if(this.block) {
+        return `$$${this.text}$$`
+      }  else {
+        return `$${this.text}$`
+      }
     }
   },
   mounted() {
@@ -88,6 +95,9 @@ export default {
   position: relative;
   display: inline-block;
   cursor: pointer;
+  &.node-view-wrapper-block{
+    display: block;
+  }
   &>span:first-child{
     position: absolute;
     top: -1.4rem;
