@@ -196,7 +196,7 @@ const schema = new mongoose.Schema(
     // 内容格式
     l: {
       type: String,
-      default: '',
+      default: 'json',
     },
   },
   {

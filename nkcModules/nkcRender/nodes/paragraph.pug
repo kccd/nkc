@@ -1,7 +1,8 @@
 mixin renderParagraph(node)
   -
     var style='';
-    var {textAlign, textIndent} = node.attrs;
+    var {attrs} = node;
+    var {textAlign, textIndent} = attrs || {};
     if(textAlign) {
       style += `text-align: ${textAlign};`;
     }
