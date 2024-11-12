@@ -1,4 +1,6 @@
 const Router = require("koa-router");
+const customCheerio = require("../../nkcModules/nkcRender/customCheerio");
+const { renderHTMLByJSON } = require("../../nkcModules/nkcRender/json");
 const router = new Router();
 router
   // 查看全部分类
@@ -123,11 +125,18 @@ router
       minLength: 1,
       maxLength: 100
     });
-    checkString(description, {
-      name: '分类介绍',
-      minLength: 0,
-      maxLength: 100000,
-    });
+    // checkString(description, {
+    //   name: '分类介绍',
+    //   minLength: 0,
+    //   maxLength: 100000,
+    // });
+    let content = '';
+    content = customCheerio
+      .load(renderHTMLByJSON({ json: description }))
+      .text();
+    if (content.length > 100000) {
+      ctx.throw(400, `分类介绍不能超过100000字`);
+    }
     if(type === 'main') {
       if(parentId) {
         const parentCategory = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: parentId});
@@ -147,7 +156,11 @@ router
     });
     await category.save();
     data.category = category;
-    await db.ResourceModel.toReferenceSource("columnCategory-" + category._id, description);
+    await db.ResourceModel.toReferenceSourceByJson(
+      'columnCategory-' + category._id,
+      description,
+    );
+    // await db.ResourceModel.toReferenceSource("columnCategory-" + category._id, description);
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
@@ -191,17 +204,38 @@ router
       minLength: 1,
       maxLength: 100
     });
-    checkString(description, {
-      name: '分类介绍',
-      minLength: 0,
-      maxLength: 100000,
-    });
+    // checkString(description, {
+    //   name: '分类介绍',
+    //   minLength: 0,
+    //   maxLength: 100000,
+    // });
+    let content = '';
+    if (category.l === 'json') {
+      content = customCheerio
+        .load(renderHTMLByJSON({ json: description }))
+        .text();
+    } else {
+      content = customCheerio.load(description).text();
+    }
+    if (content.length > 100000) {
+      ctx.throw(400, `分类介绍不能超过100000字`);
+    }
     await category.updateOne({
       name,
       brief,
       description
     });
-    await db.ResourceModel.toReferenceSource("columnCategory-" + category._id, description);
+    if (category.l === 'json') {
+      await db.ResourceModel.toReferenceSourceByJson(
+        'columnCategory-' + category._id,
+        description,
+      );
+    } else {
+      await db.ResourceModel.toReferenceSource(
+        'columnCategory-' + category._id,
+        description,
+      );
+    }
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })

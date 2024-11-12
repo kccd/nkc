@@ -1,4 +1,5 @@
 import Sortable from "sortablejs";
+import Editor from "../../lib/vue/Editor.vue";
 
 var data = NKC.methods.getDataById('data');
 
@@ -305,29 +306,48 @@ window.categoryForm = new Vue({
     brief: '',
     description: '',
     categoryEditor: null,
+    columnCategory: NKC.configs.ueditor.columnCategory,
+    l: '',
+  },
+  components: {
+    editor: Editor,
   },
   mounted() {
-    this.categoryEditor = UE.getEditor("columnCategoryEditor", NKC.configs.ueditor.columnCategory);
-    NKC.methods.ueditor.initDownloadEvent(this.categoryEditor);
+    // this.categoryEditor = UE.getEditor("columnCategoryEditor", NKC.configs.ueditor.columnCategory);
+    // NKC.methods.ueditor.initDownloadEvent(this.categoryEditor);
   },
   methods: {
     setDescription() {
-    this.categoryEditor.setContent(this.description);
+    // this.categoryEditor.setContent(this.description);
+      if (!this.description && this.l === 'json') {
+        this.$refs.categoryEditor.clearContent();
+      } else {
+        this.$refs.categoryEditor.setContent(this.description);
+      }
     },
     getDescription() {
-      this.description = this.categoryEditor.getContent();
+      // this.description = this.categoryEditor.getContent();
+      this.description = this.$refs.categoryEditor.getContent();
     },
     newCategory() {
+      this.showForm = true;
       this.disableCategoryType = false;
       this.type = 'main';
       this.name = '';
       this.brief = '';
       this.description = '';
       this.categoryId = '';
-      this.setDescription();
-      this.showForm = true;
+      this.l = '';
+      if (
+        this.$refs?.categoryEditor &&
+        this.$refs?.categoryEditor?.$refs?.editor.ready
+      ) {
+        this.setDescription();
+      }
+      window.location.href = window.location.pathname + `#`;
     },
     editCategory(categoryId) {
+      this.showForm = true;
       nkcAPI(`/m/${data.columnId}/settings/category/${categoryId}`, 'GET')
         .then(({category}) => {
           const {
@@ -336,15 +356,21 @@ window.categoryForm = new Vue({
             name,
             brief,
             description,
+            l,
           } = category;
+          this.l = l;
           this.categoryId = _id;
           this.name = name;
           this.brief = brief;
           this.description = description;
           this.type = type;
           this.disableCategoryType = true;
-          this.setDescription();
-          this.showForm = true;
+          if (
+            this.$refs?.categoryEditor &&
+            this.$refs?.categoryEditor?.$refs?.editor.ready
+          ) {
+            this.setDescription();
+          }
           window.location.href = window.location.pathname + `#${_id}`;
           // window.location.href = window.location.pathname + `?cid=${_id}`;
         })
@@ -384,6 +410,7 @@ window.categoryForm = new Vue({
       const _this = this;
       nkcAPI(url, method, body)
         .then(() => {
+          _this.$refs?.categoryEditor.removeNoticeEvent();
           if(method === 'POST') {
             window.location.reload();
           } else {
@@ -405,6 +432,7 @@ window.categoryForm = new Vue({
     },
     closeCategoryForm() {
       this.showForm = false;
+      window.location.href = window.location.pathname + `#`;
     }
   }
 })
@@ -427,9 +455,9 @@ $(function () {
   const cid = window.location.hash.substring(1);
   if (cid && !isNaN(Number(cid))) {
     window.categoryForm.$nextTick().then((app) => {
-      app.categoryEditor.ready(() => {
+      // app.$refs.categoryEditor.ready(() => {
         app.editCategory(cid);
-      });
+      // });
     });
   }
 })

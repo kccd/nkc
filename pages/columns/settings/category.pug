@@ -51,7 +51,9 @@ block settingsContent
               textarea.form-control(rows=2 v-model='brief' placeholder='不超过100个字符')
           .form-group
             label.col-sm-2.control-label 分类介绍
-            .col-sm-8
+            .col-sm-8(v-if="showForm")
+              editor(:configs="columnCategory" ref="categoryEditor" @ready="setDescription" :l="l")
+            //-.col-sm-8
               #columnCategoryEditor
           .form-group
             label.col-sm-2.control-label
