@@ -787,10 +787,11 @@ schema.statics.updateDocumentByDid = async (did, props) => {
   if (!betaDocument) {
     betaDocument = await DocumentModel.createBetaDocumentByStableDocument(did);
   }
-  const html = await DocumentModel.updateNoteInfoAndClearNoteMark(
+  const html = await DocumentModel.updateNoteInfoAndClearNoteMark({
     content,
-    betaDocument._id,
-  );
+    docId: betaDocument._id,
+    l: betaDocument.l,
+  });
   let updateObject = {
     title,
     content: html,
@@ -939,10 +940,12 @@ schema.methods.insertNoteMarkToContent = async function () {
  * @param {String} content
  * @param {Number} docId
  * */
-schema.statics.updateNoteInfoAndClearNoteMark = async function (
-  content,
-  docId,
-) {
+schema.statics.updateNoteInfoAndClearNoteMark = async function (props) {
+  const { content, docId, l } = props;
+  if (l === 'json') {
+    // 临时措施，这里应该调用识别&去掉JSON内容中笔记选区的相关方法
+    return content;
+  }
   const { html, notes } = markNotes.getMark(content);
   const NoteModel = mongoose.model('notes');
   const notesObj = {};
@@ -1008,20 +1011,20 @@ schema.methods.getRenderingData = async function (uid) {
   );
   const content =
     this.l === 'json'
-      ? nkcRender.renderHTML({
+      ? renderHTMLByJSON({
+          json: this.content,
+          resources,
+          xsf: user.xsf,
+          source: 'document',
+          sid: this._id,
+        })
+      : nkcRender.renderHTML({
           type: 'article',
           post: {
             c: this.content,
             resources,
             user,
           },
-          source: 'document',
-          sid: this._id,
-        })
-      : renderHTMLByJSON({
-          json: this.content,
-          resources,
-          xsf: user.xsf,
           source: 'document',
           sid: this._id,
         });

@@ -215,7 +215,6 @@ import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import Gapcursor from '@tiptap/extension-gapcursor'
 import Placeholder from '@tiptap/extension-placeholder'
-import { logger } from '../js/logger';
 import {
   ClearFormat,
   AlignTextLeft,
@@ -347,9 +346,7 @@ export default {
       return this.editor.getHTML()
     },
     getJSON() {
-      const json = this.editor.getJSON();
-      logger.debug('editor getJSON', json);
-      return json;
+      return this.editor.getJSON();
     },
     setJSON(jsonString) {
       if(!jsonString) return;
