@@ -1,4 +1,6 @@
 import { strToObj, objToStr } from './dataConversion';
+import { getState } from './state';
+const isLogged = !!getState().uid;
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
     '.render-content img[data-global-click="viewImage"]',
@@ -117,7 +119,7 @@ export function renderingNKCVideo() {
     `;
     const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     // 渲染游客访问限制遮罩
-    if (!visitorAccess) {
+    if (!isLogged && !visitorAccess) {
       const maskDom = window.$(`
         <div style="${maskDomStyle}" data-nkc-video-mask-id="${uniqueId}">
           <div style="${maskTextStyle}">视频暂不能访问，请登录试试。</div>
@@ -186,7 +188,7 @@ export function renderingNKCAudio() {
       ],
       autopause: true,
     });
-    if (!visitorAccess) {
+    if (!isLogged && !visitorAccess) {
       const maskDomStyle = `
       display: flex;
       height: 100%;
