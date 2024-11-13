@@ -38,7 +38,7 @@ function renderHTMLByJSON({
     resourcesObj[r.rid] = r;
   }
   let html = pug.renderFile(homePugFilePath, {
-    pretty: true,
+    pretty: false,
     data: jsonObj,
     pid,
     source,

@@ -8,6 +8,7 @@ include ./horizontalRule.pug
 include ./codeBlock.pug
 include ./listItem.pug
 include ./table.pug
+include ./tableHeader.pug
 include ./tableRow.pug
 include ./tableCell.pug
 include ./pictureBlock.pug
@@ -45,12 +46,14 @@ mixin loopRender(nodes)
           +renderHorizontalRule(node)
         when 'codeBlock'
           +renderCodeBlock(node)  
-        when 'table'
+        when 'nkc-table'
           +renderTable(node)
         when 'tableRow'
           +renderTableRow(node)
         when 'tableCell'
           +renderTableCell(node)
+        when 'tableHeader'  
+          +renderTableHeader(node)
         when 'nkc-picture-block'
           +renderPictureBlock(node)
         when 'nkc-picture-inline'

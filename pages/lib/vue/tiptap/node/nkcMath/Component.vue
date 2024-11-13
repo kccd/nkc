@@ -1,6 +1,9 @@
 <template>
-  <node-view-wrapper class="node-view-wrapper" title="点击编辑公式">
-    <span v-if="isFocused">
+  <node-view-wrapper
+    :class="{'node-view-wrapper': true, 'node-view-wrapper-block': block}"
+    title="点击编辑公式"
+  >
+    <span class="nkc-math-option-container" v-if="isFocused">
       <span class="m-r-05" title="编辑" @mouseup.stop="openMathEditor">
         <write-icon theme="outline" size="12" fill="#333" />
       </span>
@@ -8,20 +11,17 @@
         <delete-icon theme="outline" size="12" fill="#333"/>
       </span>
     </span>
-    <math-selector ref="mathSelector" />
     <span class="nkc-math-html-container" :key="formula" ref="mathContainer" @click="selectMath">{{formula}}</span>
   </node-view-wrapper>
 </template>
 
 <script>
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
-import MathSelector from '../../../MathSelector.vue';
 import {Delete, Write} from '@icon-park/vue';
 
 export default {
   components: {
     'node-view-wrapper': NodeViewWrapper,
-    'math-selector': MathSelector,
     'delete-icon': Delete,
     'write-icon': Write,
   },
@@ -38,7 +38,11 @@ export default {
       return this.node.attrs.block;
     },
     formula() {
-      return `$${this.text}$`
+      if(this.block) {
+        return `$$${this.text}$$`
+      }  else {
+        return `$${this.text}$`
+      }
     }
   },
   mounted() {
@@ -67,17 +71,14 @@ export default {
       window.MathJax.typeset([this.$refs.mathContainer]);
     },
     openMathEditor() {
-      this.$refs.mathSelector.open(
-        (res) => {
-          const { text, block } = res;
-          this.node.attrs.block = block;
-          this.node.attrs.text = text;
-        },
-        {
-          text: this.node.attrs.text,
-          block: this.node.attrs.block,
-        },
-      );
+      this.editor.commands.openMathSelector((res) => {
+        const {text, block} = res;
+        this.node.attrs.block = block;
+        this.node.attrs.text = text;
+      }, {
+        text: this.text,
+        block: this.block,
+      });
     },
   },
 };
@@ -88,7 +89,10 @@ export default {
   position: relative;
   display: inline-block;
   cursor: pointer;
-  &>span:first-child{
+  &.node-view-wrapper-block{
+    display: block;
+  }
+  &>span.nkc-math-option-container{
     position: absolute;
     top: -1.4rem;
     right: 0;
@@ -107,7 +111,7 @@ export default {
       }
     }
   }
-  span.nkc-math-html-container{
+  &>span.nkc-math-html-container{
     ::v-deep{
       .MathJax{
         font-size: inherit!important;

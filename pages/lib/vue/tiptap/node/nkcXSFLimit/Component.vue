@@ -1,9 +1,10 @@
 <template>
   <node-view-wrapper class="node-view-wrapper">
-    <div class="nkc-xsf-limit-header">
+    <div class="nkc-xsf-limit-header" @mousedown.stop="noneFunc" @focus.stop="noneFunc" @mouseup.stop="noneFunc" @click.stop="noneFunc">
       浏览这段内容需要
-      <input type="text" v-model="node.attrs.xsf">
-      学术分
+      <input type="text" v-model.number="node.attrs.xsf" @blur.stop="onBlur">
+      <span class="m-r-1">学术分</span>
+      <button class="btn btn-danger btn-xs" @click="deleteNode">删除</button>
     </div>
     <node-view-content class="node-view-content" />
   </node-view-wrapper>
@@ -20,7 +21,12 @@ export default {
   mounted() {
   },
   methods: {
-
+    noneFunc() {},
+    onBlur() {
+      if(!(this.node.attrs.xsf >= 1)) {
+        this.node.attrs.xsf = 1;
+      }
+    }
   }
 }
 </script>

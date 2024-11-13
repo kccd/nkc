@@ -30,9 +30,11 @@ export default {
   display: inline-block;
   height: 2rem;
   width: 2rem;
+  line-height: 0;
   img{
     height: 100%;
     width: 100%;
+    vertical-align: text-bottom;
   }
 }
 .ProseMirror-selectednode {

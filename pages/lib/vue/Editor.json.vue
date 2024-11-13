@@ -215,7 +215,7 @@ import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import Gapcursor from '@tiptap/extension-gapcursor'
 import Placeholder from '@tiptap/extension-placeholder'
-
+import { logger } from '../js/logger';
 import {
   ClearFormat,
   AlignTextLeft,
@@ -347,7 +347,9 @@ export default {
       return this.editor.getHTML()
     },
     getJSON() {
-      return this.editor.getJSON();
+      const json = this.editor.getJSON();
+      logger.debug('editor getJSON', json);
+      return json;
     },
     setJSON(jsonString) {
       if(!jsonString) return;
@@ -420,7 +422,6 @@ export default {
     },
 
     initEditor() {
-      const self = this;
       this.editor = new Editor({
         content: '',
         extensions: [
@@ -485,7 +486,9 @@ export default {
           EnsureTrailingParagraph,
           nkcVideoBlock,
           nkcXSFLimit,
-          nkcMath,
+          nkcMath.configure({
+            mathSelector: this.$refs.mathSelector,
+          }),
           nkcAudioBlock,
           nkcAttachmentBlock,
           PasteOrDropFile,
@@ -502,6 +505,7 @@ export default {
         },
       });
       this.updateTextLength();
+
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';

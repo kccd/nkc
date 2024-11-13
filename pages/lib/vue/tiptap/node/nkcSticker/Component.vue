@@ -26,7 +26,8 @@ export default {
 
 <style scoped lang="less">
 .node-view-wrapper{
-  display: inline;
+  display: inline-block;
+  line-height: 0;
   img{
     min-height: 2rem;
     min-width: 2rem;
@@ -35,5 +36,8 @@ export default {
     margin: 0 0.2rem;
     vertical-align: text-bottom;
   }
+}
+.ProseMirror-selectednode {
+  background-color: #2b90d9;
 }
 </style>

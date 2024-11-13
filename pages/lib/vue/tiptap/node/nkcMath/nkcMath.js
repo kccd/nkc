@@ -9,6 +9,12 @@ export default Node.create({
   inline: true,
   atom: true,
 
+  addOptions() {
+    return {
+      mathSelector: null,
+    };
+  },
+
   addAttributes() {
     return {
       text: '',
@@ -31,5 +37,22 @@ export default Node.create({
 
   addNodeView() {
     return VueNodeViewRenderer(Component);
+  },
+
+  addCommands() {
+    return {
+      openMathSelector:
+        (callback, { text, block }) =>
+        () => {
+          if (this.options.mathSelector) {
+            this.options.mathSelector.open(callback, {
+              text,
+              block,
+            });
+          }
+
+          return true;
+        },
+    };
   },
 });

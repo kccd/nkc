@@ -37,7 +37,7 @@ export default {
       // 遍历从当前选区位置到根节点的路径
       for (let depth = $from.depth; depth > 0; depth--) {
         const node = $from.node(depth);
-        if (node.type.name === 'nkc-table') {
+        if(node === this.node) {
           return true;
         }
       }

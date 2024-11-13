@@ -1,13 +1,14 @@
 <template>
   <draggable-dialog ref="dialog" title="LaTeX 数学公式编辑器" width="43rem" height="34.5rem" heightXS="70%">
     <div style='background-color: #fff;height: 100%;'>
-      <div class="math-selector-input-container">
+      <!-- 阻止一些事件，避免在输入公式内容时触发tiptap编辑器的相关事件而导致闪动 -->
+      <div class="math-selector-input-container" @mousedown.stop="noneFunc" @focus.stop="noneFunc" @mouseup.stop="noneFunc" @click.stop="noneFunc">
         <div>输入公式：</div>
         <textarea class='form-control' rows='4' resize="none" v-model="text"></textarea>
       </div>
       <div class="math-selector-preview-container">
         <div>预览：</div>
-        <div v-html="previewHTML"></div>
+        <div :key="text" ref="mathContainer">{{formula}}</div>
       </div>
       <div class="math-selector-block-container">
         <div class="math-selector-block-container-radio">
@@ -43,15 +44,16 @@ export default {
       text: '',
       block: false,
       callback: null,
-      previewHTML: '',
     }
   },
   methods: {
+    noneFunc() {},
     open(callback, options) {
       options = options || {};
       this.text = options.text || '';
       this.block = options.block || false;
       this.callback = callback;
+      this.renderPreviewHTML();
       this.$refs.dialog.open();
     },
     close() {
@@ -66,24 +68,25 @@ export default {
       this.close();
     },
     renderPreviewHTML() {
-      MathJax.startup.promise
-        .then(() => {
-          return MathJax.tex2chtmlPromise(this.text, {
-            display: true,
-          })
-        })
-        .then(html => {
-          this.previewHTML = html.outerHTML;
-        });
+      window.MathJax.typeset([
+        this.$refs.mathContainer,
+      ]);
     }
   },
-  mounted() {
-    this.renderPreviewHTML();
-
+  computed: {
+    formula() {
+      if(this.block) {
+        return `$$${this.text}$$`;
+      } else {
+        return `$${this.text}$`;
+      }  
+    }
   },
   watch: {
-    text() {
-      this.renderPreviewHTML();
+    formula() {
+      setTimeout(() => {
+        this.renderPreviewHTML();
+      }, 10);
     }
   },
 }
@@ -109,6 +112,7 @@ export default {
 }
 .math-selector-preview-container{
   padding: 0 1rem;
+  text-align: center;
   margin-bottom: 1rem;
   line-height: initial;
   div:first-child{
@@ -120,6 +124,9 @@ export default {
     border: 3px dotted #9baec8;
     margin: auto;
     border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 .math-selector-button-container{
