@@ -62,7 +62,7 @@ block content
                 label.col-sm-2.control-label 专业说明
                 .col-sm-10
                   span.editor-title(v-if="!professionalDescription" @click="showEditor(editorName.professionalDescription)") {{professionalDescriptionTitle}}
-                  editor(v-if="professionalDescription" :configs="EditorConfigs" ref="forumExplainEditor" @ready="editorReady(editorName.professionalDescription)" :plugs="editorPlugs" @content-change="professionalDescriptionContent")
+                  editor(v-if="professionalDescription" :configs="EditorConfigs" ref="forumExplainEditor" @ready="editorReady(editorName.professionalDescription)" :plugs="editorPlugs" @content-change="professionalDescriptionContent" l="html")
                   //-button.btn.btn-default(@click=`toEditor`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 专业公告
@@ -73,7 +73,7 @@ block content
 
                 .col-sm-10
                   span.editor-title(v-if="!latestProfessional" @click="showEditor(editorName.latestProfessional)") {{latestProfessionalNoticeTitle}}
-                  editor(v-if="latestProfessional" :configs="EditorConfigs" ref="forumNoticeEditor" @ready="editorReady(editorName.latestProfessional)" :plugs="editorPlugs" @content-change="latestProfessionalContent")
+                  editor(v-if="latestProfessional" :configs="EditorConfigs" ref="forumNoticeEditor" @ready="editorReady(editorName.latestProfessional)" :plugs="editorPlugs" @content-change="latestProfessionalContent" l="html")
                   //-button.btn.btn-default(@click=`toLatestNoticeEditor`) 去编辑器
               .form-group
                 label.col-sm-2.control-label 快速入门

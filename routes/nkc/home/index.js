@@ -3,6 +3,7 @@ const router = new Router();
 const blockRouter = require('./block');
 const nkcRender = require('../../../nkcModules/nkcRender');
 const { getUrl, getAnonymousInfo } = require('../../../nkcModules/tools');
+const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 const anonymousUserInfo = getAnonymousInfo();
 router
   .get('/', async (ctx, next) => {
@@ -111,6 +112,11 @@ router
     });
     articles = await db.ArticleModel.getArticlesInfo(articles);
     articles.map((article) => {
+      if (article.document.l === 'json') {
+        article.document.content = renderHTMLByJSON({
+          json: article.document.content,
+        });
+      }
       articlesObj[article._id] = {
         type: 'article',
         id: article._id,

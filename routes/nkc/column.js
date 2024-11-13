@@ -1,3 +1,5 @@
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+
 const router = require('koa-router')();
 
 router
@@ -42,13 +44,16 @@ router
         p = p.toObject();
         p.column = columnsObj[p.columnId];
         const pageResources = resourcesObj[`column-${p._id}`] || [];
-        p.c = nkcRender.renderHTML({
-          type: 'article',
-          post: {
-            c: p.c,
-            resources: pageResources
-          },
-        });
+        p.c =
+          p.l === 'json'
+            ? renderHTMLByJSON({ json: p.c, resources: pageResources })
+            : nkcRender.renderHTML({
+                type: 'article',
+                post: {
+                  c: p.c,
+                  resources: pageResources,
+                },
+              });
         p.color = getColor();
         return p;
       });

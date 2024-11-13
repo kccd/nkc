@@ -225,7 +225,7 @@ block fundContent
                 | 项目内容
               .editor-notice.pre-wrap {{fund.reminder.inputProject}}
               //-#fundEditor
-              editor(:configs="editorConfigs" ref="fundEditor" :plugs="editorPlugs")
+              editor(:configs="editorConfigs" ref="fundEditor" :plugs="editorPlugs" :l="project?.l")
             .m-t-1
               .time-auto-save(v-if='timeAutoSave').text-success
                 .fa.fa-check-circle

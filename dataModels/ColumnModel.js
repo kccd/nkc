@@ -3,6 +3,7 @@ const { ThrowServerInternalError } = require('../nkcModules/error');
 const moment = require('moment');
 const Schema = mongoose.Schema;
 const { subscribeSources } = require('../settings/subscribe');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const columnUserPermission = {
   column_post_order: '文章调序',
   column_post_add: '添加文章',
@@ -971,15 +972,23 @@ schema.statics.getHomePageByColumnId = async function (columnId) {
     asHome: true,
   });
   if (page) {
-    page.c = nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: page.c,
-        resources: await ResourceModel.getResourcesByReference(
-          `column-${page._id}`,
-        ),
-      },
-    });
+    page.c =
+      page.l === 'json'
+        ? renderHTMLByJSON({
+            json: page.c,
+            resources: await ResourceModel.getResourcesByReference(
+              `column-${page._id}`,
+            ),
+          })
+        : nkcRender.renderHTML({
+            type: 'article',
+            post: {
+              c: page.c,
+              resources: await ResourceModel.getResourcesByReference(
+                `column-${page._id}`,
+              ),
+            },
+          });
   }
   return page;
 };

@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const { eventEmitter } = require('../../events');
 const { getMomentPublishType } = require('../../events/moment');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 router
   .get('/', async (ctx, next) => {
     ctx.template = 'review/review.pug';
@@ -141,6 +142,7 @@ router
       content: 1,
       sid: 1,
       source: 1,
+      l: 1,
     })
       .sort({ toc: -1 })
       .skip(paging.start)
@@ -155,7 +157,9 @@ router
     const uid = new Set();
     for (const document of documents) {
       document.content = await nkcModules.apiFunction.obtainPureText(
-        document.content,
+        document.l === 'json'
+          ? renderHTMLByJSON({ json: document.content })
+          : document.content,
         true,
         100,
       );

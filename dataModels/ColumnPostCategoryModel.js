@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require("../nkcModules/nkcRender/json");
 const mongoose = require("../settings/database");
 // const {getUrl} = require("../nkcModules/tools");
 const Schema = mongoose.Schema;
@@ -49,6 +50,11 @@ const schema = new Schema({
   description: {
     type: String,
     default: ""
+  },
+  // 分类编辑内容的类型
+  l: {
+    type: String,
+    default: "json"
   },
   // 分类简介
   brief: {
@@ -402,13 +408,17 @@ schema.methods.renderDescription = async function() {
   const referenceId = `columnCategory-${_id}`;
   const resources = await ResourceModel.getResourcesByReference(referenceId);
   const nkcRender = require('../nkcModules/nkcRender');
-  this.description = nkcRender.renderHTML({
-    type: "article",
-    post: {
-      c: description,
-      resources
-    }
-  });
+  if (this.l === 'json') {
+    this.description = renderHTMLByJSON({ json: description, resources });
+  } else {
+    this.description = nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: description,
+        resources,
+      },
+    });
+  }
   return this.description;
 };
 /*

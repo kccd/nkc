@@ -1,4 +1,5 @@
 const permissions = require('../../../../middlewares/permission');
+const { renderHTMLByJSON } = require('../../../../nkcModules/nkcRender/json');
 const router = require('koa-router')();
 router
   .get('/', permissions.OnlyUser(), async (ctx, next) => {
@@ -53,7 +54,7 @@ router
                 },
               },
             },
-            { $project: { title: 1, content: 1, dt: 1, _id: 0 } },
+            { $project: { title: 1, content: 1, dt: 1, _id: 0, l: 1 } },
           ],
           as: 'doc',
         },
@@ -112,7 +113,12 @@ router
           source: item.source,
           toc: item.dt,
           t: item.title,
-          c: nkcModules.nkcRender.htmlToPlain(item.content, 200),
+          c: nkcModules.nkcRender.htmlToPlain(
+            item.l === 'json'
+              ? renderHTMLByJSON({ json: item.content })
+              : item.content,
+            200,
+          ),
           url,
         };
       }),

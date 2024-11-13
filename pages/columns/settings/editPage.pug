@@ -16,7 +16,7 @@ block settingsContent
             input.form-control(type="text" v-model="title")
           .form-group
             label 页面内容（必填）
-            editor(:configs="editorConfigs" ref="editorPageEditor" @ready="setEditorContent" :plugs="editorPlugs")
+            editor(:configs="editorConfigs" ref="editorPageEditor" @ready="setEditorContent" :plugs="editorPlugs" :l="data?.page?.l")
           .form-group
             button.btn.btn-primary(@click="save()") 保存
 block settingsScripts

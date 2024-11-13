@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const redisClient = require('../settings/redisClient');
 const { obtainPureText } = require('../nkcModules/apiFunction');
 const { subscribeSources } = require('../settings/subscribe');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 
 const schema = new Schema(
   {
@@ -839,7 +840,7 @@ schema.statics.extendSubscribes = async (subscribes) => {
         voteUp,
         _id,
       } = articleObj[sid];
-      const { cover, title, content, abstract } = document;
+      const { cover, title, content, abstract, l } = document;
       subscribe.article = {
         _id,
         status,
@@ -855,7 +856,11 @@ schema.statics.extendSubscribes = async (subscribes) => {
         voteUp,
         cover,
         title,
-        content: await obtainPureText(content, true, 100),
+        content: await obtainPureText(
+          l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+          true,
+          100,
+        ),
         abstract,
       };
       if (articleSource === 'column') {
