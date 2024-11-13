@@ -1008,20 +1008,20 @@ schema.methods.getRenderingData = async function (uid) {
   );
   const content =
     this.l === 'json'
-      ? nkcRender.renderHTML({
+      ? renderHTMLByJSON({
+          json: this.content,
+          resources,
+          xsf: user.xsf,
+          source: 'document',
+          sid: this._id,
+        })
+      : nkcRender.renderHTML({
           type: 'article',
           post: {
             c: this.content,
             resources,
             user,
           },
-          source: 'document',
-          sid: this._id,
-        })
-      : renderHTMLByJSON({
-          json: this.content,
-          resources,
-          xsf: user.xsf,
           source: 'document',
           sid: this._id,
         });
