@@ -1,7 +1,7 @@
 mixin renderVideoBlock(node)
   if resourcesObj[node.attrs.id]
     - 
-      const { visitorAccess = true, videoSize=[],token='',isFileExist=true ,disabled, rid : id, files,defaultFile = {} } = resourcesObj[node.attrs.id] || {};
+      const { mask, visitorAccess = true, videoSize=[],token='',isFileExist=true ,disabled, rid : id, files,defaultFile = {} } = resourcesObj[node.attrs.id] || {};
       const oname = defaultFile.name || '未知';
       const poster = tools.getUrl('resourceCover', id);
     p
@@ -10,7 +10,7 @@ mixin renderVideoBlock(node)
           span 视频已被屏蔽
       else
         if isFileExist
-          span(span data-tag="nkcsource" data-type="video" data-id=`${id}` data-visitor-access=`${visitorAccess}` )
+          span(span data-tag="nkcsource" data-type="video" data-id=`${id}` data-visitor-access=`${visitorAccess}` data-mask=mask)
             span 
               video.plyr-dom(preload="none" controls="controls" poster=`${poster}` data-rid=`${id}` data-plyr-title=`${oname}`) 你的浏览器不支持video标签，请升级。
                 each item in videoSize
@@ -19,7 +19,7 @@ mixin renderVideoBlock(node)
               span=oname
               span &nbsp;
               span
-                a(data-type="downloadPanel" data-id=`${id}`) 点击下载
+                a(data-global-click="openDownloadPanel" data-global-data=tools.objToStr({rid: id})) 点击下载
         else
           span(data-tag="nkcsource" data-type="video-not-found" data-id=`${id}`)
             span=`视频已丢失（${name}）` 

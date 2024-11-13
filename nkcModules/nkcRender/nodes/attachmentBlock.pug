@@ -24,7 +24,7 @@ mixin renderAttachmentBlock(node)
             img(src=`${fileCover}`, alt="attachment icon")
           span.article-attachment-content
             if isFileExist
-              span.article-attachment-name( title=`${oname}` data-type="downloadPanel" data-id=`${id}`)=oname
+              span.article-attachment-name( title=`${oname}` data-global-click="openDownloadPanel" data-global-data=tools.objToStr({rid: id}))=oname
               span.article-attachment-info
                 span.article-attachment-size=tools.getSize(size)
                 span.article-attachment-ext=ext.toUpperCase()

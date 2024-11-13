@@ -1,6 +1,6 @@
-import {initNKCRenderImagesView} from "../lib/js/nkcSource";
+import { initNKCRenderImagesView } from '../lib/js/nkcSource';
 
-$(function() {
-  NKC.methods.highlightNKCSource();
+window.$(function () {
+  window.NKC.methods.highlightNKCSource();
   initNKCRenderImagesView();
 });

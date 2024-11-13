@@ -25,7 +25,10 @@ block head
     +includeJS("/external_pkgs/vue.min.js", true)
   else
     +includeJS("/external_pkgs/vue.js", true)
+  // 音视频播放器相关
+  +includeJS("/external_pkgs/plyr/plyr.min.js")  
   +includeJS('/external_pkgs/plyr/plyr.polyfilled.min.js')
+  +includeCSS("/external_pkgs/plyr/plyr.css")
   // promise polyfill
   +includeJS('/Promise/promise.min.js', true)
   // babel polyfill
@@ -92,6 +95,7 @@ block body
     credit(ref='credit')
     share-float-panel(ref='shareFloatPanel')
     preview-model(ref='preview')
+    download-panel(ref='downloadPanel')
   +includeJS('/global/root.js')
 
   block navbar

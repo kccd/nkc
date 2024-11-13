@@ -1515,15 +1515,20 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       continue;
     }
     const { username, avatar } = user;
-    const betaDocument = stableDocumentsObj[_id];
+    const stableDocument = stableDocumentsObj[_id];
     let content = '';
     let addr = localAddr;
-    if (betaDocument) {
-      content = await MomentModel.renderContent(
-        betaDocument.content,
-        betaDocument.atUsers,
-      );
-      addr = betaDocument.addr;
+    if (stableDocument) {
+      if (mode === momentModes.plain) {
+        content = await MomentModel.renderContent(
+          stableDocument.content,
+          stableDocument.atUsers,
+        );
+      } else {
+        const renderingData = await stableDocument.getRenderingData(uid);
+        content = renderingData.content;
+      }
+      addr = stableDocument.addr;
     }
     if (!content && quoteType) {
       content = await MomentModel.getQuoteDefaultContent(quoteType);

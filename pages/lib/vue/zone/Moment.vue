@@ -610,10 +610,7 @@
     .single-moment-content-html{
       all: initial;
       overflow: hidden;
-      &/deep/ div{
-        overflow: hidden;
-      }
-      &/deep/ img{
+      &/deep/ img.message-emoji{
         height: 2rem;
         width: 2rem;
         margin: 0 0.1rem;
@@ -707,6 +704,8 @@
   import {toLogin} from "../../js/account";
   import MomentEditor from "./MomentEditor.vue";
   import {subUsers} from "../../../lib/js/subscribe";
+  import "../../../../public/external_pkgs/lazysizes/lazysizes.min.js";
+  import { renderingNKCSource } from "../../js/nkcSource.js";
 
   const state = getState();
   export default {
@@ -748,6 +747,11 @@
     }),
     mounted() {
       this.initData();
+      if(this.momentData.mode === 'rich') {
+        setTimeout(() => {
+          renderingNKCSource();
+      }, 10)
+      }
     },
     computed: {
       focusCommentId() {
