@@ -94,7 +94,11 @@ draftsRouter
           url: `/f/${forum.fid}`
         };
       } */
-      d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
+      d.c = nkcModules.apiFunction.obtainPureText(
+        d.l === 'json' ? renderHTMLByJSON({ json: d.c }) : d.c,
+        true,
+        300,
+      );
       data.drafts.push(d);
     }
     ctx.template = 'user/drafts/drafts.pug';

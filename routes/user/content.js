@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { subscribeSources } = require('../../settings/subscribe');
 const router = require('koa-router')();
 router
@@ -146,7 +147,10 @@ router
           continue;
         }
       }
-      post.c = nkcModules.nkcRender.htmlToPlain(post.c, 200);
+      post.c = nkcModules.nkcRender.htmlToPlain(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+        200,
+      );
       // post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
       let firstPost = {};
       let link;

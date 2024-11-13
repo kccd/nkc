@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
@@ -538,7 +539,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: firstPost.t,
       cover: getUrl('postCover', post.cover),
-      desc: nkcRender.htmlToPlain(post.c, 100),
+      desc: nkcRender.htmlToPlain(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+        100,
+      ),
     };
   } else if (type === shareTypes.thread) {
     const thread = await ThreadModel.findOnly({ tid: id });
@@ -549,12 +553,18 @@ shareSchema.statics.getShareContent = async function (props) {
         t: 1,
         cover: 1,
         c: 1,
+        l: 1,
       },
     );
     shareContent = {
       title: targetPost.t,
       cover: getUrl('postCover', targetPost.cover),
-      desc: nkcRender.htmlToPlain(targetPost.c, 100),
+      desc: nkcRender.htmlToPlain(
+        targetPost.l === 'json'
+          ? renderHTMLByJSON({ json: targetPost.c })
+          : targetPost.c,
+        100,
+      ),
     };
   } else if (type === shareTypes.forum) {
     const forum = await ForumModel.findOnly({ fid: id });
@@ -570,7 +580,12 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: comment.articleDocument.title,
       cover: getUrl('documentCover', comment.cover),
-      desc: nkcRender.htmlToPlain(comment.commentDocument.content, 100),
+      desc: nkcRender.htmlToPlain(
+        comment.commentDocument.l === 'json'
+          ? renderHTMLByJSON({ json: comment.commentDocument.content })
+          : comment.commentDocument.content,
+        100,
+      ),
     };
   } else if (type === shareTypes.article) {
     let article = await ArticleModel.findOnly({ _id: id });
@@ -578,7 +593,12 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: article.document.title,
       cover: getUrl('documentCover', article.document.cover),
-      desc: nkcRender.htmlToPlain(article.document.content, 100),
+      desc: nkcRender.htmlToPlain(
+        article.document.l === 'json'
+          ? renderHTMLByJSON({ json: article.document.content })
+          : article.document.content,
+        100,
+      ),
     };
   } else if (type === shareTypes.user) {
     const targetUser = await UserModel.findOnly({ uid: id });
@@ -605,6 +625,9 @@ shareSchema.statics.getShareContent = async function (props) {
     if (form.project) {
       title = form.project.title;
       content = form.project.content;
+      if (form.project.l === 'json') {
+        content = renderHTMLByJSON({ json: content });
+      }
     }
     shareContent = {
       title: `「${fundSettings.fundName}申请」${title}`,

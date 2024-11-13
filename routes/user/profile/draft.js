@@ -1,3 +1,5 @@
+const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
+
 module.exports = async (ctx, next) => {
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
@@ -79,7 +81,11 @@ module.exports = async (ctx, next) => {
       }
     }
     d.content = d.c;
-    d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
+    d.c = nkcModules.apiFunction.obtainPureText(
+      d.l === 'json' ? renderHTMLByJSON({ json: d.c }) : d.c,
+      true,
+      300,
+    );
     data.drafts.push(d);
   }
 
