@@ -1,4 +1,3 @@
-import { openImageViewer } from '../lib/js/imageViewer';
 import { strToObj } from '../lib/js/dataConversion';
 import { initLongPressEvent } from '../lib/js/longPress';
 import {
@@ -11,6 +10,7 @@ import {
   openCreditPanel,
   openDownloadPanel,
 } from './methods';
+import { viewImage, viewImages, viewMedias } from '../lib/js/mediaViewer';
 import { getState } from '../lib/js/state';
 import {
   RNDownloadFile,
@@ -21,51 +21,6 @@ import {
 
 const state = getState();
 const isReactNative = state.isApp && state.platform === 'reactNative';
-
-/*
- * 查看单张图片
- * @param {Object} data
- *   @param {String} url 图片链接
- *   @param {String} name 图片名称
- * */
-function viewImage(data) {
-  const { name = '', url = '' } = data;
-  const images = [
-    {
-      name,
-      url,
-    },
-  ];
-  if (isReactNative) {
-    openImageViewer(images, 0);
-  } else {
-    const readyFiles = images.map((item) => {
-      return { ...item, type: 'picture' };
-    });
-    window.RootApp.$refs.preview.setData(true, 0, readyFiles);
-    window.RootApp.$refs.preview.init(0);
-  }
-}
-/*
- * 查看多张图片
- * @param {Object} data
- *   @param {[Object]} images
- *     @param {String} url 图片链接
- *     @param {String} name 图片名称
- *   @param {Number} index 默认打开的图片索引
- * */
-function viewImages(data) {
-  const { images, index } = data;
-  if (isReactNative) {
-    openImageViewer(images, index);
-  } else {
-    const readyFiles = images.map((item) => {
-      return { ...item, type: 'picture' };
-    });
-    window.RootApp.$refs.preview.setData(true, index, readyFiles);
-    window.RootApp.$refs.preview.init(index);
-  }
-}
 
 /*
  * 下载文件
@@ -139,6 +94,7 @@ function showCreditPanel(data) {
 const eventFunctions = {
   viewImage,
   viewImages,
+  viewMedias,
   downloadFile,
   saveImage,
   showUserPanel,

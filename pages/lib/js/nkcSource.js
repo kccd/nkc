@@ -1,5 +1,6 @@
 import { strToObj, objToStr } from './dataConversion';
 import { getState } from './state';
+import { getUrl } from './tools';
 const isLogged = !!getState().uid;
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -244,15 +245,31 @@ export function renderingNKCAudio() {
 // 基本结构来自后端：
 // nkcModules/nkcRender/nodes/picutreInline.pug
 // nkcModules/nkcRender/sources/article.js
-export function renderingNKCMediaViewer() {
+export function renderingNKCPicure() {
   const containers = document.querySelectorAll(
-    '[data-tag="nkcsource"][data-type="picture"],[data-tag="nkcsource"][data-type="video"]',
+    '[data-tag="nkcsource"][data-type="picture"]',
   );
-  const resourcesId = [];
-  for (const container of containers) {
+  const images = [];
+  for (let i = 0; i < containers.length; i++) {
+    const container = containers[i];
     const rid = container.getAttribute('data-id');
-    const type = container.getAttribute('data-type');
-    console.log(rid, type);
+    images.push({
+      url: getUrl('resource', rid),
+      name: '',
+    });
+  }
+  const globalClick = 'viewImages';
+  for (let i = 0; i < containers.length; i++) {
+    const container = containers[i];
+    const globalData = objToStr({
+      index: i,
+      images: images,
+    });
+    const image = container.querySelector('img');
+    if (image) {
+      image.setAttribute('data-global-click', globalClick);
+      image.setAttribute('data-global-data', globalData);
+    }
   }
 }
 
@@ -260,5 +277,5 @@ export function initNKCSource() {
   renderingMathJax();
   renderingNKCVideo();
   renderingNKCAudio();
-  renderingNKCMediaViewer();
+  renderingNKCPicure();
 }
