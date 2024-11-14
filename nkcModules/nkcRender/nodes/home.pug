@@ -23,6 +23,8 @@ include ./sticker.pug
 include ./xsfLimit.pug
 include ./math.pug
 include ./image.pug
+include ./fileStatus.pug
+include ./hardBreak.pug
 
 mixin loopRender(nodes)
   if nodes
@@ -79,6 +81,12 @@ mixin loopRender(nodes)
           +renderMath(node)
         when 'image'
           +renderImage(node)
+        when 'nkc-file-status-block'
+          +renderFileStatus(node)
+        when 'nkc-file-status-inline'  
+          +renderFileStatus(node)
+        when 'hardBreak'  
+          +renderHardBreak(node)
         default
           p= `Unknown node type: ${node.type}`
 div.render-content.math-jax(data-type="nkc-render-content" data-id=`${pid}` data-source=`${source}` data-sid=`${sid}`)

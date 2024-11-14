@@ -705,7 +705,7 @@
   import MomentEditor from "./MomentEditor.vue";
   import {subUsers} from "../../../lib/js/subscribe";
   import "../../../../public/external_pkgs/lazysizes/lazysizes.min.js";
-  import { renderingNKCSource } from "../../js/nkcSource.js";
+  import { initNKCSource } from "../../js/nkcSource.js";
 
   const state = getState();
   export default {
@@ -749,7 +749,7 @@
       this.initData();
       if(this.momentData.mode === 'rich') {
         setTimeout(() => {
-          renderingNKCSource();
+          initNKCSource();
       }, 10)
       }
     },

@@ -165,6 +165,10 @@ export function renderingNKCVideo() {
   }
 }
 
+// 渲染富文本中的音频
+// 基本结构来自后端：
+// nkcModules/nkcRender/nodes/audioBlock.pug
+// nkcModules/nkcRender/sources/article.js
 export function renderingNKCAudio() {
   const audioContainers = document.querySelectorAll(
     `[data-tag="nkcsource"][data-type="audio"]`,
@@ -236,8 +240,25 @@ export function renderingNKCAudio() {
   }
 }
 
-export function renderingNKCSource() {
+// 渲染富文本中的图片
+// 基本结构来自后端：
+// nkcModules/nkcRender/nodes/picutreInline.pug
+// nkcModules/nkcRender/sources/article.js
+export function renderingNKCMediaViewer() {
+  const containers = document.querySelectorAll(
+    '[data-tag="nkcsource"][data-type="picture"],[data-tag="nkcsource"][data-type="video"]',
+  );
+  const resourcesId = [];
+  for (const container of containers) {
+    const rid = container.getAttribute('data-id');
+    const type = container.getAttribute('data-type');
+    console.log(rid, type);
+  }
+}
+
+export function initNKCSource() {
   renderingMathJax();
   renderingNKCVideo();
   renderingNKCAudio();
+  renderingNKCMediaViewer();
 }
