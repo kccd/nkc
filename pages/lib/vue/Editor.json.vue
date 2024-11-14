@@ -853,6 +853,10 @@ export default {
           }).run();
           return;
         }
+        case 'hr': {
+          this.editor.chain().focus().setHorizontalRule().run();
+          return;
+        }
       }
     },
     initNoticeEvent() {
