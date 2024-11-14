@@ -49,7 +49,7 @@
 </style>
 
 <script>
-  import Moment from './Moment';
+  import Moment from './Moment.vue';
   import Complaint from "../Complaint";
   import ViolationRecord from "../ViolationRecord";
   // import MomentOption from "./momentOption/MomentOption";

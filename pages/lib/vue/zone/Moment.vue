@@ -60,11 +60,11 @@
       //- 动态内容
       .single-moment-content
         .single-moment-content-html(
-          v-html='momentData.content',
+          v-html='targetContent',
           ref='momentDetailsContent'
         )
       //- 图片视频
-      .single-moment-detail-files
+      .single-moment-detail-files(v-if='momentData.mode === "plain"')
         moment-files(:data='momentData.files')
       //- 引用内容
       .single-moment-detail-quote(v-if='momentData.quoteData')
@@ -166,16 +166,16 @@
         @click.stop='handleClick("", $event)'
       )
         .single-moment-content-html(
-          v-html='momentData.content',
+          v-html='targetContent',
           ref='momentDetailsContent'
         )
         .singe-moment-details.extend-content(
           v-if='isFold && !expandContent',
-          @click.self.stop='expandContent = true'
+          @click.self.stop='openContent'
         ) 显示更多
         .singe-moment-details(
           v-if='isFold && expandContent',
-          @click.self.stop='expandContent = false'
+          @click.self.stop='closeContent'
         ) 收起
       //- 图片视频
       .single-moment-files
@@ -808,6 +808,16 @@ export default {
     focusCommentId() {
       return this.focus;
     },
+    inDetails() {
+      return this.type === 'details';
+    },
+    targetContent() {
+      if(this.momentData.mode === 'plain' || this.inDetails) {
+        return this.momentData.content;
+      } else {
+        return this.momentData.plain;
+      }
+    }
   },
   destroyed() {
     this.clearTimer();
@@ -998,6 +1008,16 @@ export default {
       this.$refs.momentEditor.reset();
       this.showLoadMore();
     },
+    openContent() {
+      if(this.momentData.mode === 'rich') {
+        this.$router.push(`${this.momentData.url}`);
+      } else {
+        this.expandContent = true;
+      }
+    },
+    closeContent() {
+      this.expandContent = false;
+    }
   },
 };
 </script>

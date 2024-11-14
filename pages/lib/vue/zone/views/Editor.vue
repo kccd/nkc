@@ -9,7 +9,8 @@
       )
     .m-t-1
       button.btn.btn-primary.m-r-05(:class="{'disabled': disablePublish}" v-if="submitting" title="提交中，请稍候")
-        .fa.fa-spinner.fa-spin
+        .fa.fa-spinner.fa-spin.m-r-05
+        span 提交中...
       button.btn.btn-primary.m-r-05(:class="{'disabled': disablePublish}" v-else-if="disablePublish") 提交
       button.btn.btn-primary.m-r-05(@click="publish" v-else) 提交
       button.btn.btn-default(@click="visitHistory" :disabled="loading || submitting") 历史版本

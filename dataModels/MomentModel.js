@@ -1412,6 +1412,7 @@ schema.statics.renderContent = async (content, atUsers = []) => {
  *   @param {String} time 格式化后的发表时间
  *   @param {Date} toc 发表时间
  *   @param {String} content 动态内容
+ *   @param {String} plain 富文本模式动态的文本内容（可用于电文列表页）
  *   @param {Number} voteUp 点赞数
  *   @param {String} statusInfo 动态状态的说明
  *   @param {Number} commentCount 评论数
@@ -1517,6 +1518,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     const { username, avatar } = user;
     const stableDocument = stableDocumentsObj[_id];
     let content = '';
+    let plain = '';
     let addr = localAddr;
     if (stableDocument) {
       if (mode === momentModes.plain) {
@@ -1526,6 +1528,10 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
         );
       } else {
         const renderingData = await stableDocument.getRenderingData(uid);
+        plain = await MomentModel.renderContent(
+          stableDocument.content,
+          stableDocument.atUsers,
+        );
         content = renderingData.content;
       }
       addr = stableDocument.addr;
@@ -1608,6 +1614,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       toc: top,
       tlm,
       content,
+      plain,
       voteUp,
       status,
       addr,
