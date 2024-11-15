@@ -1437,6 +1437,7 @@ schema.statics.renderContent = async (content, atUsers = []) => {
  *       @param {Number} dataSize 视频大小
  * */
 schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
+  const visitorUid = uid;
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
@@ -1527,7 +1528,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
           stableDocument.atUsers,
         );
       } else {
-        const renderingData = await stableDocument.getRenderingData(uid);
+        const renderingData = await stableDocument.getRenderingData(visitorUid);
         plain = await MomentModel.renderContent(
           stableDocument.content,
           stableDocument.atUsers,
