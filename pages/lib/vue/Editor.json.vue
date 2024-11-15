@@ -972,7 +972,7 @@ export default {
 }
 
 .tiptap-editor-content {
-  padding: 0 1rem;
+  padding: 1rem;
   border: 1px solid #eee;
   border-radius: 5px;
   background-color: #fff;
