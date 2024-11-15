@@ -1527,6 +1527,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
           stableDocument.content,
           stableDocument.atUsers,
         );
+        plain = content;
       } else {
         const renderingData = await stableDocument.getRenderingData(visitorUid);
         plain = await MomentModel.renderContent(

@@ -812,7 +812,7 @@ export default {
       return this.type === 'details';
     },
     targetContent() {
-      if(this.momentData.mode === 'plain' || this.inDetails) {
+      if(this.inDetails) {
         return this.momentData.content;
       } else {
         return this.momentData.plain;
