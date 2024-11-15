@@ -213,8 +213,8 @@ import HardBreak from '@tiptap/extension-hard-break'
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
-import Gapcursor from '@tiptap/extension-gapcursor'
 import Placeholder from '@tiptap/extension-placeholder'
+import Gapcursor from '@tiptap/extension-gapcursor'
 import {
   ClearFormat,
   AlignTextLeft,
@@ -773,6 +773,8 @@ export default {
                 withHeaderRow: false,
               })
               .run();
+          }, {
+            mode: 'fast'
           });
           return;
         }
