@@ -216,6 +216,7 @@ schema.methods.getDraftData = async function() {
     docId: betaDocument._id,
     title: betaDocument.title,
     content: betaDocument.content,
+    l: betaDocument.l,
     deleted: this.del,
   };
 };
