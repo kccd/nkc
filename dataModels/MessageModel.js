@@ -1143,7 +1143,7 @@ messageSchema.statics.getParametersData = async (message) => {
         //获取document所在article的url
         reviewLink: article[0].url || '',
         reason: reason ? reason : '未知',
-        title: document.title + article[0].url ? '' : '[文章已被删除]',
+        title: document.title + (article[0].url ? '' : '[文章已被删除]'),
       };
     } else if (document.source === 'comment') {
       const comment = await CommentModel.findOnly({ _id: document.sid });
@@ -1179,7 +1179,10 @@ messageSchema.statics.getParametersData = async (message) => {
       }
       parameters = {
         reviewLink: _moment.url || '',
-        content: getJsonStringTextSplit(document.content, 100),
+        content:
+          document.l === 'json'
+            ? getJsonStringTextSplit(document.content, 100)
+            : htmlToPlain(document.content, 100),
         reason: reason ? reason : '未知',
       };
     }

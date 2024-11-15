@@ -325,7 +325,7 @@ schema.statics.getZoneArticle = async (id, targetUser) => {
           json: documentContent.c,
           resources,
           atUsers: document.atUsers,
-          xsf: targetUser.xsf,
+          xsf: targetUser ? targetUser.xsf : 0,
         })
       : nkcRender.renderHTML({
           type: 'article',
