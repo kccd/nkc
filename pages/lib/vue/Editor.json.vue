@@ -896,14 +896,14 @@ export default {
   position: sticky;
   top: 4rem;
   z-index: 999;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
 
   .tiptap-editor-toolBar-icon-group {
     user-select: none;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.84);
     display: flex;
     align-items: center;
-    border-radius: 5px;
+    border-radius: 5px 5px 0 0;
     border: 1px solid #eee;
     padding: 0 1rem;
     flex-wrap: wrap;
@@ -972,9 +972,10 @@ export default {
 }
 
 .tiptap-editor-content {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #eee;
-  border-radius: 5px;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
   background-color: #fff;
 
   &:hover {
