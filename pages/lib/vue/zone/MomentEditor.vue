@@ -39,7 +39,7 @@
         @click="visitZoneArticleEditor"
         @mouseover="iconMouseOver(icons.article)"
         @mouseleave="iconMouseLeave(icons.article)"
-        title="发长电文"
+        title="去编辑器"
         )
         newspaper-folding(
           :theme="icons.article.theme"

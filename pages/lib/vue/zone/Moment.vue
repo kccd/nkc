@@ -28,6 +28,7 @@
             v-if='momentData.tlm > momentData.toc',
             :time='momentData.tlm'
           )
+        //- .single-moment-rich-icon(v-if='momentData.mode === "rich"' @click="visitRichContent" title='查看详情') 长文
         //- 其他操作
         .single-moment-detail-tips
           button.btn-xs.btn.btn-default(
@@ -143,7 +144,8 @@
           //span(v-if="momentData.tlm>momentData.toc" ) &nbsp;编辑于
           //from-now(v-if="momentData.tlm>momentData.toc" :time="momentData.tlm"  )
           span &nbsp;IP:{{ momentData.addr }}
-          span(v-if='momentData.tlm > momentData.toc') &nbsp;已编辑
+          span(v-if='momentData.tlm > momentData.toc') &nbsp;已编辑   
+        //- .single-moment-rich-icon(v-if='momentData.mode === "rich"' @click="visitRichContent" title='查看详情') 长文
         //- 其他操作
         .single-moment-tag(
           :class='momentData.visibleType',
@@ -177,6 +179,8 @@
           v-if='isFold && expandContent',
           @click.self.stop='closeContent'
         ) 收起
+      .singe-moment-rich-link(v-if="momentData.mode === 'rich' && !isFold")
+        router-link(:to="momentData.url") 查看详情  
       //- 图片视频
       .single-moment-files
         moment-files(:data='momentData.files')
@@ -261,8 +265,6 @@
         width: 100%;
       }
     }
-  }
-  .single-moment-right {
   }
 
   .single-moment-quote {
@@ -368,7 +370,7 @@
       position: relative;
       .single-moment-user {
         display: inline-block;
-        margin-right: 0.5rem;
+        margin-right: 0.3rem;
         font-weight: 700;
         font-size: 1.25rem;
         a {
@@ -436,8 +438,6 @@
         font-size: 12px;
       }
     }
-  }
-  .single-moment-detail-bottom {
   }
 
   .single-moment-detail-quote {
@@ -516,10 +516,30 @@
 .single-moment-bottom-container {
   padding-left: 5rem;
   //padding-right: 4rem;
-  .single-moment-bottom {
-  }
 }
-
+.single-moment-rich-icon{
+  display: inline-block;
+  font-size: 10px;
+  border: 1px solid #ddd;
+  color: #777;
+  border-radius: 2px;
+  height: 1.2rem;
+  line-height: 1.2rem;
+  box-sizing: content-box;
+  text-align: center;
+  padding: 0 0.3rem;
+  vertical-align: text-bottom;
+  margin-left: 0.3rem;
+  cursor: pointer;
+}
+.singe-moment-rich-link{
+  a{
+    color: #1d9bf0;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  padding-bottom: 0.5rem;
+}
 .single-moment-center-container {
   padding-left: 5rem;
   margin-bottom: 0.5rem;
@@ -534,8 +554,6 @@
   .single-moment-top-container {
     padding-left: 0;
     padding-right: 0;
-  }
-  .single-moment-files {
   }
 }
 
@@ -558,7 +576,7 @@
   position: relative;
   .single-moment-user {
     display: inline-block;
-    margin-right: 0.5rem;
+    margin-right: 0.3rem;
     font-weight: 700;
     font-size: 1.25rem;
     a {
@@ -705,9 +723,6 @@
       rgba(255, 255, 255, 0) 100%
     );
   }
-}
-.singe-moment-details:hover {
-  // text-decoration: underline;
 }
 .moment-editor-header {
   @momentEditorHeader: 2.5rem;
@@ -988,13 +1003,13 @@ export default {
           // 详情页面没有ref('momentDetails')
           return;
         }
-        const momentDetailsHeight = this.$refs.momentDetails.clientHeight;
-        const momentDetailsContentHeight =
-          this.$refs.momentDetailsContent.getBoundingClientRect().height;
-        const overFold = momentDetailsContentHeight > momentDetailsHeight;
-        this.isFold = this.$refs.momentDetailsContent.innerHTML
-          ? overFold
-          : false;
+          const momentDetailsHeight = this.$refs.momentDetails.clientHeight;
+          const momentDetailsContentHeight =
+            this.$refs.momentDetailsContent.getBoundingClientRect().height;
+          const overFold = momentDetailsContentHeight > momentDetailsHeight;
+          this.isFold = this.$refs.momentDetailsContent.innerHTML
+            ? overFold
+            : false;
       });
     },
     onPublished(data) {
@@ -1010,10 +1025,13 @@ export default {
     },
     openContent() {
       if(this.momentData.mode === 'rich') {
-        this.$router.push(`${this.momentData.url}`);
+        this.visitRichContent();
       } else {
         this.expandContent = true;
       }
+    },
+    visitRichContent() {
+      this.$router.push(`${this.momentData.url}`);
     },
     closeContent() {
       this.expandContent = false;
