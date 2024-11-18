@@ -180,6 +180,7 @@ import Code from '@tiptap/extension-code';
 import Text from '@tiptap/extension-text';
 import Underline from '@tiptap/extension-underline';
 import nkcEmoji from './tiptap/node/nkcEmoji/nkcEmoji.js';
+import nkcNoteTag from './tiptap/node/nkcNoteTag/nkcNoteTag.js';
 import nkcSticker from './tiptap/node/nkcSticker/nkcSticker.js';
 import nkcPictureBlock from './tiptap/node/nkcPictureBlock/nkcPictureBlock.js';
 import nkcPictureInline from './tiptap/node/nkcPictureInline/nkcPictureInline.js';
@@ -476,6 +477,7 @@ export default {
           Italic,
           Underline,
           nkcEmoji,
+          nkcNoteTag,
           nkcSticker,
           nkcPictureBlock,
           nkcPictureInline,

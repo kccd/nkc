@@ -1,0 +1,4 @@
+mixin renderNoteTag(node)
+  em(note-tag note-id=`${node.attrs.id}` tag-type='start')
+  +loopRender(node.content)
+  em(note-tag note-id=`${node.attrs.id}` tag-type='end')

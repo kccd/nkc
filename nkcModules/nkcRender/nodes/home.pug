@@ -23,6 +23,7 @@ include ./sticker.pug
 include ./xsfLimit.pug
 include ./math.pug
 include ./image.pug
+include ./noteTag.pug
 
 mixin loopRender(nodes)
   if nodes
@@ -80,6 +81,8 @@ mixin loopRender(nodes)
           +renderTaskItem(node)
         when 'image'
           +renderImage(node)
+        when 'nkc-note-tag'
+          +renderNoteTag(node)
         default
           p= `Unknown node type: ${node.type}`
 div.render-content.math-jax(data-type="nkc-render-content" data-id=`${pid}` data-source=`${source}` data-sid=`${sid}`)

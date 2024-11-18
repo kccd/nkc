@@ -315,6 +315,147 @@ exports.setMark = setMark;
 
 
 
+function setMarkByJson(jsonString, notes = []) {
+  let currentStart = 0;
+  // 递归处理节点
+  const wrapNodes = (nodes, { targetStart, targetEnd, noteId }) => {
+    let wrapped = false; // 标记是否已处理目标节点
+    return nodes.flatMap((node) => {
+      if (wrapped) {
+        return node;
+      }
+      // 处理文本节点
+      if (node.type === 'text') {
+        const textLength = node.text.length;
+        const currentTextEnd = currentStart + textLength;
+        // if(currentTextEnd>=targetStart){
+        //   // 文字最后的累计数大于目标开始索引==》包裹开始
+        // }
+        // if (currentTextEnd >= targetEnd) {
+        //   // 文字最后的累计数大于目标最后索引==》包裹结束
+
+        // }
+        // 情况1,目标文字在一个文字节点内或者正好是这个文字节点
+        if (currentStart <= targetStart && currentTextEnd >= targetEnd) {
+          const wrappedNodes = [];
+          // 添加前面的文本部分（如果有）
+          if (currentStart < targetStart) {
+            wrappedNodes.push({
+              ...node,
+              text: node.text.slice(0, targetStart - currentStart),
+            });
+          }
+
+          // 添加包裹的 nkc-note-tag 节点
+          const targetText = node.text.slice(
+            targetStart - currentStart,
+            targetEnd - currentStart,
+          );
+
+          wrappedNodes.push({
+            type: 'nkc-note-tag',
+            attrs: {
+              id: noteId,
+            },
+            content: [
+              {
+                ...node,
+                text: targetText,
+              },
+            ],
+          });
+
+          // 添加后面的文本部分（如果有）
+          if (currentTextEnd > targetEnd) {
+            wrappedNodes.push({
+              ...node,
+              text: node.text.slice(targetEnd - currentStart),
+            });
+          }
+          wrapped = true;
+          return wrappedNodes; // 返回包裹后的节点
+        }
+        currentStart += node.text.length;
+        // console.log('====================================');
+        // console.log(currentStart,node.text);
+        // console.log('====================================');
+        // 情况2,目标文字在一个文字节点内开始（开头、中间、结尾），在其他节点（相邻节点及其相邻节点子孙级、父级及祖先级节点）结束====》需要建立一个宏观的思维
+        // if (currentOffset <= endOffset && nodeEnd >= startOffset) {
+        //   const wrappedNodes = [];
+
+        //   // 添加前面的文本部分（如果有）
+        //   if (currentOffset < startOffset) {
+        //     wrappedNodes.push({
+        //       ...node,
+        //       text: node.text.slice(0, startOffset - currentOffset),
+        //     });
+        //   }
+
+        //   // 添加包裹的 nkc-note-tag 节点
+        //   const targetText = node.text.slice(
+        //     Math.max(0, startOffset - currentOffset),
+        //     Math.min(textLength, endOffset - currentOffset),
+        //   );
+
+        //   wrappedNodes.push({
+        //     type: 'nkc-note-tag',
+        //     attrs: {
+        //       id: noteId,
+        //     },
+        //     content: [
+        //       {
+        //         type: 'text',
+        //         text: targetText,
+        //         marks: node.marks, // 保留原有的标记
+        //       },
+        //     ],
+        //   });
+
+        //   // 添加后面的文本部分（如果有）
+        //   if (nodeEnd > endOffset) {
+        //     wrappedNodes.push({
+        //       ...node,
+        //       text: node.text.slice(endOffset - currentOffset),
+        //     });
+        //   }
+
+        //   currentOffset = nodeEnd;
+        //   return wrappedNodes; // 返回包裹后的节点
+        // }
+      } else {
+        // 对于非文本节点，递归处理其内容
+        if (node.content) {
+          const originalContent = node.content;
+          node.content = wrapNodes(originalContent, {
+            targetStart,
+            targetEnd,
+            noteId,
+          });
+        }
+      }
+      return node; // 返回未修改的节点
+    });
+  };
+  // 处理文档节点
+  const jsonObj = JSON.parse(jsonString);
+  let content = jsonObj.content;
+  for (const note of notes) {
+    const targetStart = note.node.offset;
+    const targetEnd = targetStart + note.node.length;
+    const noteId = note._id;
+    currentStart = 0;
+    content = wrapNodes(content, { targetStart, targetEnd, noteId });
+  }
+
+  console.log('====================================');
+  console.log(22, JSON.stringify(content, undefined, 2));
+  console.log('====================================');
+  jsonObj.content = content;
+  return JSON.stringify(jsonObj);
+}
+
+exports.setMarkByJson = setMarkByJson;
+
 /**
  * 把标记取出来
  * @param {string} html - html文本

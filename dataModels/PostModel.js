@@ -498,7 +498,12 @@ postSchema.pre('save', async function (next) {
   const { getMark } = require('../nkcModules/nkcRender/markNotes');
   // 去掉插入post中的选区标记
   // 重新计算选区信息
-  const { html, notes } = getMark(this.c);
+  let c = this.c;
+  if (this.l === 'json') {
+    c = renderHTMLByJSON({ json: c });
+  }
+  // const { html, notes } = getMark(this.c);
+  const { html, notes } = getMark(c);
   // 将去掉选区标记后的内容存到数据库
   // 与更改前的内容比较
   // 如果有改动则更新选区信息
@@ -506,7 +511,10 @@ postSchema.pre('save', async function (next) {
   if (!_post) {
     return await next();
   }
-  this.c = html;
+  // 后期需要兼容json格式,似乎对html进行了过滤或者校验
+  if (this.l === 'html') {
+    this.c = html;
+  }
   if (this.c !== _post.c) {
     const oldCV = this.cv;
     this.cv++;
