@@ -1,10 +1,13 @@
 const mongoose = require('../settings/database');
+const logger = require('../nkcModules/logger');
 const {
   momentModes,
   momentStatus,
   momentVisibleType,
 } = require('../settings/moment');
 const { documentSources } = require('../settings/document');
+const {momentRenderService} = require('../services/moment/render/momentRender.service');
+const { ThrowCommonError } = require('../nkcModules/error');
 
 const momentQuoteTypes = {
   article: 'article',
@@ -207,7 +210,7 @@ schema.statics.getMomentVisibleType = async () => {
 schema.statics.checkMomentQuoteType = async (quoteType) => {
   const quoteTypes = Object.values(momentQuoteTypes);
   if (!quoteTypes.includes(quoteType)) {
-    throwErr(500, `动态引用类型错误`);
+    ThrowCommonError(500, `动态引用类型错误`);
   }
 };
 
@@ -242,7 +245,7 @@ schema.statics.getNewId = async () => {
   let n = 10;
   const lock = await redLock.lock(key, 10000);
   try {
-    while (true) {
+    while (n > 0) {
       n = n - 1;
       const _id = getRandomString('a0', 6);
       const moment = await MomentModel.findOne(
@@ -257,14 +260,13 @@ schema.statics.getNewId = async () => {
         newId = _id;
         break;
       }
-      if (n === 0) {
-        break;
-      }
     }
-  } catch (err) {}
+  } catch (err) {
+    logger.error(err);
+  }
   await lock.unlock();
   if (!newId) {
-    throwErr(500, `moment id error`);
+    ThrowCommonError(500, `moment id error`);
   }
   return newId;
 };
@@ -455,7 +457,7 @@ schema.statics.replaceMomentResourcesId = async function (resourcesId) {
     resourcesObj[r.rid] = r;
   }
   let newResourcesId = [];
-  let type = '';
+  // let type = '';
   for (const rid of resourcesId) {
     const resource = resourcesObj[rid];
     if (!resource) {
@@ -561,7 +563,7 @@ schema.methods.changeStatus = async function (status) {
   const MomentModel = mongoose.model('moments');
   const momentStatus = await MomentModel.getMomentStatus();
   if (!momentStatus[status]) {
-    throwErr(400, '不存在该状态');
+    ThrowCommonError(400, '不存在该状态');
   }
   await this.updateOne({
     $set: {
@@ -822,7 +824,6 @@ schema.methods.getBetaDocument = async function () {
  * */
 schema.methods.checkBeforePublishing = async function () {
   const DocumentModel = mongoose.model('documents');
-  const ResourceModel = mongoose.model('resources');
   const { moment: momentSource } = await DocumentModel.getDocumentSources();
   const {
     momentCheckerService,
@@ -832,7 +833,7 @@ schema.methods.checkBeforePublishing = async function () {
     this._id,
   );
   if (!betaDocument) {
-    throwErr(500, `动态数据错误 momentId=${this._id}`);
+    ThrowCommonError(500, `动态数据错误 momentId=${this._id}`);
   }
   // 检测发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
@@ -849,7 +850,7 @@ schema.methods.checkBeforePublishing = async function () {
       getLength(betaDocument.content) === 0 &&
       betaDocument.files.length === 0
     ) {
-      throwErr(400, `内容不能为空`);
+      ThrowCommonError(400, `内容不能为空`);
     }
   }
 };
@@ -975,7 +976,7 @@ schema.methods.updateMomentCommentOrder = async function () {
     await lock.unlock();
   } catch (err) {
     await lock.unlock();
-    throwErr(500, err.message);
+    ThrowCommonError(500, err.message);
   }
 };
 
@@ -1038,13 +1039,13 @@ schema.statics.createMessageAndSendMessage = async (type, uid, momentId) => {
  * */
 schema.methods.publishMomentComment = async function (postType, alsoPost) {
   if (!['comment', 'repost'].includes(postType)) {
-    throwErr(500, `类型指定错误 postType=${postType}`);
+    ThrowCommonError(500, `类型指定错误 postType=${postType}`);
   }
   const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
   const { moment: quoteType } = momentQuoteTypes;
-  const { uid, resourcesId, parent } = this;
+  const { uid, parent } = this;
   const { content, ip: ipId, port, files } = await this.getBetaDocument();
   const { uid: parentUid } = await MomentModel.findOne(
     { _id: parent },
@@ -1193,7 +1194,7 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
     { parent: 1, parents: 1, uid: 1 },
   );
   if (!parentComment.parent) {
-    throwErr(500, `回复的不是一条动态评论(id=${parent})`);
+    ThrowCommonError(500, `回复的不是一条动态评论(id=${parent})`);
   }
   const parentMoment = await MomentModel.findOne(
     { _id: parentComment.parents[0] },
@@ -1386,19 +1387,6 @@ schema.statics.getQuoteDefaultContent = async (quoteType) => {
 };
 
 /*
- * 渲染动态或评论内容
- * @param {String} content 待渲染的内容
- * @return {String} 渲染后的富文本内容
- * */
-schema.statics.renderContent = async (content, atUsers = []) => {
-  const {
-    momentRenderService,
-  } = require('../services/moment/render/momentRender.service');
-
-  return momentRenderService.renderingSimpleJson(content, atUsers);
-};
-
-/*
  * 获取动态显示所需要的基础数据
  * @param {[schema moment]}
  * @param {String} uid 访问者 ID
@@ -1523,17 +1511,18 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     let addr = localAddr;
     if (stableDocument) {
       if (mode === momentModes.plain) {
-        content = await MomentModel.renderContent(
-          stableDocument.content,
-          stableDocument.atUsers,
-        );
+        content = momentRenderService.renderingSimpleJson({
+          content: stableDocument.content,
+          atUsers: stableDocument.atUsers,
+        });
         plain = content;
       } else {
         const renderingData = await stableDocument.getRenderingData(visitorUid);
-        plain = await MomentModel.renderContent(
-          stableDocument.content,
-          stableDocument.atUsers,
-        );
+        plain = momentRenderService.renderingSimpleJson({
+          content: stableDocument.content,
+          atUsers: stableDocument.atUsers,
+          removeEmptyParagraphs: true,
+        });
         content = renderingData.content;
       }
       addr = stableDocument.addr;
@@ -1858,7 +1847,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const IPModel = mongoose.model('ips');
   const ResourceModel = mongoose.model('resources');
   const localAddr = await IPModel.getLocalAddr();
-  const momentStatus = await MomentModel.getMomentStatus();
   const { getUrl, timeFormat } = require('../nkcModules/tools');
   const source = await ReviewModel.getDocumentSources();
   const usersId = [];
@@ -1898,7 +1886,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       parents,
       voteUp,
       status,
-      did,
       latest = [],
     } = comment;
     const user = usersObj[uid];
@@ -1911,10 +1898,10 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       continue;
     }
     addr = stableDocument.addr;
-    const content = await MomentModel.renderContent(
-      stableDocument.content,
-      stableDocument.atUsers,
-    );
+    const content = await momentRenderService.renderingSimpleJson({
+      content: stableDocument.content,
+      atUsers: stableDocument.atUsers,
+    });
     const filesData = [];
     for (const rid of stableDocument.files) {
       // 附件数据
