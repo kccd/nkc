@@ -1,4 +1,3 @@
 mixin renderNoteTag(node)
-  em(note-tag note-id=`${node.attrs.id}` tag-type='start')
+  em(note-tag note-id=`${node.attrs.id}` tag-type=`${node.attrs.start?'start':'end'}`)
   +loopRender(node.content)
-  em(note-tag note-id=`${node.attrs.id}` tag-type='end')

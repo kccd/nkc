@@ -1,5 +1,7 @@
 <template>
   <node-view-wrapper class="node-view-wrapper">
+    <!-- <span v-if="node.attrs.start">{{ `[${node.attrs.id}` }}</span>
+    <span v-if="node.attrs.end">{{ `${node.attrs.id}]` }}</span> -->
   </node-view-wrapper>
 </template>
 
@@ -20,6 +22,6 @@ export default {
 <style scoped lang="less">
 .node-view-wrapper{
   display: inline;
-  background-color: aqua;
+  color:  aqua;
 }
 </style>
