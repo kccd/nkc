@@ -315,35 +315,20 @@ exports.setMark = setMark;
 
 
 
-function getJsonTextLength(nodes = []) {
-  let length = 0;
-  nodes.forEach((node) => {
-    if (node.type === 'text') {
-      length += node.text.length;
-    } else if (node.content) {
-      length += getJsonTextLength(node.content);
-    }
-  });
-  return length;
-}
+
 function setMarkByJson(jsonString, notes = []) {
-  console.log('================处理前====================');
-  console.log(
-    11,
-    JSON.stringify(JSON.parse(jsonString).content, undefined, 2),
-    notes,
-  );
-  console.log('====================================');
   let currentStart = 0;
   let wrapped = false; // 标记是否已处理目标节点
   // 递归处理节点
   const wrapNodes = (nodes, { targetStart, targetEnd, noteId }) => {
     return nodes.flatMap((node) => {
-      if (wrapped) {
+      if (wrapped || node.type === 'codeBlock') {
         return node;
       }
       // 处理文本节点
       if (node.type === 'text') {
+        const { emojiPosition, pureText } = findEmojisInText(node.text);
+        node.text = pureText;
         const textLength = node.text.length;
         const currentTextEnd = currentStart + textLength;
         const wrappedNodes = [];
@@ -483,6 +468,30 @@ function setMarkByJson(jsonString, notes = []) {
           wrapped = true;
         }
         currentStart += textLength;
+        // 还原emoji
+        // 在确定emojiPosition中的emoji是按照开始位置的顺序后
+        emojiPosition.forEach((item) => {
+          let singTextStart = 0;
+          // let jump = false;
+          wrappedNodes.forEach((iter) => {
+            if (iter.type === 'text') {
+              const singTextEnd = singTextStart + iter.text.length;
+              if (singTextStart <= item.start && item.start <= singTextEnd) {
+                iter.text =
+                  iter.text.slice(0, item.start - singTextStart) +
+                  item.emoji +
+                  iter.text.slice(item.start - singTextStart);
+              }
+              singTextStart += iter.text.length;
+            }
+          });
+          if (wrappedNodes.length === 0) {
+            node.text =
+              node.text.slice(0, item.start) +
+              item.emoji +
+              node.text.slice(item.start);
+          }
+        });
         if (wrappedNodes.length > 0) {
           return wrappedNodes;
         }
@@ -511,30 +520,12 @@ function setMarkByJson(jsonString, notes = []) {
     wrapped = false;
     content = wrapNodes(content, { targetStart, targetEnd, noteId });
   }
-  console.log('==================处理后==================');
-  console.log(22, JSON.stringify(content, undefined, 2));
-  console.log('====================================');
   jsonObj.content = content;
   return JSON.stringify(jsonObj);
 }
 
-function getNodesText(nodes = []) {
-  let text = '';
-  for (const node of nodes) {
-    if (node.type === 'text') {
-      text += node.text;
-    } else if (node.content && node.content.length > 0) {
-      text += getNodesText(node.content);
-    }
-  }
-  return text;
-}
 // 获取标记位置的方法并还原内容
 function getMarkByJson(jsonString) {
-  testEmojis();
-  console.log('================处理前====================');
-  console.log(11, JSON.stringify(JSON.parse(jsonString).content, undefined, 2));
-  console.log('====================================');
   const jsonObj = JSON.parse(jsonString);
   const idsMap = new Map(); // 存储每个 ID 的开始和结束位置
   let currentStart = 0; // 当前文本的起始位置
@@ -542,7 +533,8 @@ function getMarkByJson(jsonString) {
   const traverseNodes = (nodes) => {
     nodes.forEach((node) => {
       if (node.type === 'text') {
-        const textLength = node.text.length;
+        const { pureText } = findEmojisInText(node.text);
+        const textLength = pureText.length;
         currentStart += textLength; // 更新当前起始位置
       } else if (node.type === 'nkc-note-tag') {
         const { id, start, end } = node.attrs;
@@ -559,7 +551,7 @@ function getMarkByJson(jsonString) {
             idsMap.set(id, { start: null, end: currentStart });
           }
         }
-      } else if (node.content) {
+      } else if (node.content && node.type !== 'codeBlock') {
         traverseNodes(node.content); // 递归处理子节点
       }
     });
@@ -572,14 +564,11 @@ function getMarkByJson(jsonString) {
       marks.push({
         _id: id,
         offset: positions.start,
-        length: positions.end - positions.start
+        length: positions.end - positions.start,
       });
     }
   }
   jsonObj.content = removeNoteTags(jsonObj.content);
-  console.log('==================处理后==================');
-  console.log(22, JSON.stringify(jsonObj.content, undefined, 2), marks);
-  console.log('====================================');
   return {
     marks,
     jsonString: JSON.stringify(jsonObj), // 返回还原后的 JSON
@@ -597,34 +586,30 @@ function removeNoteTags(nodes) {
       return node;
     });
 }
-function testEmojis() {
-  const calculateTextLength = (text) => {
-    let emojiCount = 0;
-    let charCount = 0;
-
-    // 使用正则表达式查找 emoji
-    const matches = text.matchAll(emojiRegex());
-
-    for (const match of matches) {
-      emojiCount += match[0].length;
-    }
-
-    // 计算总字符长度减去 emoji 的长度
-    charCount = text.length - emojiCount;
-
-    return {
-      totalLength: text.length,
-      emojiCount: emojiCount,
-      charCount: charCount,
-    };
+function findEmojisInText(text) {
+  let emojiTotalLength = 0;
+  let charTotalLength = 0;
+  const emojiPosition = [];
+  // 使用正则表达式查找 emoji
+  const matches = text.matchAll(emojiRegex());
+  for (const match of matches) {
+    emojiPosition.push({
+      emoji: match[0],
+      start: match.index,
+      end: match.index + match[0].length,
+    });
+    emojiTotalLength += match[0].length;
+  }
+  // 计算总字符长度减去 emoji 的长度
+  charTotalLength = text.length - emojiTotalLength;
+  return {
+    totalLength: text.length,
+    emojiTotalLength,
+    charTotalLength,
+    emojiPosition,
+    pureText: text.replace(emojiRegex(), ''),
   };
-
   // 使用示例
-  const text = '🎨🎨🎨fs';
-  const result = calculateTextLength(text);
-  console.log(
-    `总长度: ${result.totalLength}, Emoji长度: ${result.emojiCount}, 字符长度: ${result.charCount}`,
-  );
 }
 exports.setMarkByJson = setMarkByJson;
 exports.getMarkByJson = getMarkByJson;
