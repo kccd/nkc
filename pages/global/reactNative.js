@@ -2,13 +2,10 @@ import {
   RNDownloadFile,
   RNEmit,
   RNOpenNewPage,
-  RNSyncPageInfo,
   RNUrlPathEval,
-  RNViewImage
+  RNViewImage,
 } from '../lib/js/reactNative';
-import {getState} from '../lib/js/state';
-import {initLongPressEvent} from "../lib/js/longPress";
-const {uid} = getState();
+import { initLongPressEvent } from '../lib/js/longPress';
 
 function RNInitLongPressEventToDownloadImage() {
   initLongPressEvent(document, (e) => {
@@ -16,9 +13,11 @@ function RNInitLongPressEventToDownloadImage() {
     const targetNodeName = target.nodeName.toLowerCase();
     const dataType = target.getAttribute('data-type');
     let src = target.getAttribute('data-src');
-    if(!src) src = target.getAttribute('src');
-    if(targetNodeName === 'img' && dataType === 'view' && src) {
-      if(src.indexOf('http') !== 0) {
+    if (!src) {
+      src = target.getAttribute('src');
+    }
+    if (targetNodeName === 'img' && dataType === 'view' && src) {
+      if (src.indexOf('http') !== 0) {
         src = window.location.origin + src;
       }
       const name = target.getAttribute('alt') || '';
@@ -26,48 +25,52 @@ function RNInitLongPressEventToDownloadImage() {
         urls: [
           {
             url: src,
-            name
-          }
+            name,
+          },
         ],
         index: 0,
       });
       e.preventDefault();
     }
-  })
+  });
 }
 
 function RNInitClientEvent() {
-  document.addEventListener('click', e => {
+  document.addEventListener('click', (e) => {
     const target = e.target;
     const targetNodeName = target.nodeName.toLowerCase();
     const dataType = target.getAttribute('data-type');
     let src = target.getAttribute('data-src');
-    if(!src) src = target.getAttribute('src');
-    if(targetNodeName === 'img' && dataType === 'view' && src) {
-      if(src.indexOf('http') !== 0) {
+    if (!src) {
+      src = target.getAttribute('src');
+    }
+    if (targetNodeName === 'img' && dataType === 'view' && src) {
+      if (src.indexOf('http') !== 0) {
         src = window.location.origin + src;
       }
       // 图片处理
       const images = document.querySelectorAll('img[data-type="view"]');
       const urls = [];
       let index;
-      for(let i = 0; i < images.length; i++) {
+      for (let i = 0; i < images.length; i++) {
         const image = images[i];
         const name = image.getAttribute('alt');
         let _src = image.getAttribute('data-src');
-        if(!_src) {
+        if (!_src) {
           _src = image.getAttribute('src');
         }
-        if(!_src) return;
-        if(_src.indexOf('http') !== 0) {
+        if (!_src) {
+          return;
+        }
+        if (_src.indexOf('http') !== 0) {
           _src = window.location.origin + _src;
         }
-        if(_src === src) {
+        if (_src === src) {
           index = i;
         }
         urls.push({
           url: _src,
-          name
+          name,
         });
       }
       RNViewImage(urls, index);
@@ -79,26 +82,30 @@ function RNInitClientEvent() {
         $a = target;
       } else {
         $a = $(target).parents('a');
-        if($a.length) $a = $a[0];
+        if ($a.length) {
+          $a = $a[0];
+        }
       }
       let href, title;
-      if($a && $a.getAttribute) {
+      if ($a && $a.getAttribute) {
         href = $a.getAttribute('href');
         title = $a.getAttribute('title');
       }
-      if(!href) return;
+      if (!href) {
+        return;
+      }
       const aDataType = $a.getAttribute('data-type');
       const aDataTitle = $a.getAttribute('data-title');
-      if(aDataType === 'download') {
+      if (aDataType === 'download') {
         e.preventDefault();
         RNDownloadFile(aDataTitle, href);
-      } else if(aDataType !== 'reload') {
+      } else if (aDataType !== 'reload') {
         e.preventDefault();
         const targetUrl = RNUrlPathEval(location.href, href);
-        RNOpenNewPage(targetUrl, title)
+        RNOpenNewPage(targetUrl, title);
       }
     }
-  })
+  });
 }
 
 // 初始化链接点击事件

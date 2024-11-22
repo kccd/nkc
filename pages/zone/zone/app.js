@@ -86,21 +86,25 @@ function initZoneVueApp() {
       name: 'Zone',
       path: '/z',
       component: Home,
+      meta: { title: '电波' },
     },
     {
       name: 'MomentDetail',
       path: '/z/m/:mid',
       component: MomentDetail,
+      meta: { title: '电文详情' },
     },
     {
       name: 'MomentEditor',
       path: '/z/editor/rich',
       component: EditorPage,
+      meta: { title: '电文编辑器' },
     },
     {
       name: 'MomentEditorHistory',
       path: '/z/editor/rich/history',
       component: EditorHistoryPage,
+      meta: { title: '电文历史' },
     },
   ];
   // 防止路由重复点击报错
@@ -139,15 +143,12 @@ function initZoneVueApp() {
         y: scrollPosition,
       });
     }
+    if (to.meta && to.meta.title) {
+      document.title = to.meta.title;
+    }
     next();
   });
-  router.afterEach((to, from) => {
-    let title = '电波 - 科创网';
-    if (to.name === 'MomentDetail') {
-      title = '电文详情';
-    }
-    document.title = title;
-  });
+  router.afterEach((to, from) => {});
   const app = new Vue({
     el: `#${zoneElementId}`,
     router,

@@ -214,8 +214,8 @@ import HardBreak from '@tiptap/extension-hard-break'
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
-import Gapcursor from '@tiptap/extension-gapcursor'
 import Placeholder from '@tiptap/extension-placeholder'
+import Gapcursor from '@tiptap/extension-gapcursor'
 import {
   ClearFormat,
   AlignTextLeft,
@@ -775,6 +775,8 @@ export default {
                 withHeaderRow: false,
               })
               .run();
+          }, {
+            mode: 'fast'
           });
           return;
         }
@@ -855,6 +857,10 @@ export default {
           }).run();
           return;
         }
+        case 'hr': {
+          this.editor.chain().focus().setHorizontalRule().run();
+          return;
+        }
       }
     },
     initNoticeEvent() {
@@ -892,14 +898,14 @@ export default {
   position: sticky;
   top: 4rem;
   z-index: 999;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
 
   .tiptap-editor-toolBar-icon-group {
     user-select: none;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.84);
     display: flex;
     align-items: center;
-    border-radius: 5px;
+    border-radius: 5px 5px 0 0;
     border: 1px solid #eee;
     padding: 0 1rem;
     flex-wrap: wrap;
@@ -968,9 +974,10 @@ export default {
 }
 
 .tiptap-editor-content {
-  padding: 0 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #eee;
-  border-radius: 5px;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
   background-color: #fff;
 
   &:hover {

@@ -1014,7 +1014,7 @@ schema.methods.getRenderingData = async function (uid) {
       ? renderHTMLByJSON({
           json: this.content,
           resources,
-          xsf: user.xsf,
+          xsf: user ? user.xsf : 0,
           source: 'document',
           sid: this._id,
         })

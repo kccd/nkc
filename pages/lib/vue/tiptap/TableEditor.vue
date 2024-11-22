@@ -1,5 +1,5 @@
 <template lang="pug">
-  draggable-dialog(title="插入表格" width="20rem" height="24rem" heightXS="70%" ref="draggableDialog")
+  draggable-dialog(title="插入表格" width="20rem" :height="height" heightXS="70%" ref="draggableDialog")
     div.tiptap-table-editor-root
       div.tiptap-table-editor-content(@mouseleave="rowHover = 0; colHover = 0;")
         div(v-for="rowItem in rows")
@@ -9,12 +9,12 @@
             @click="onSelect(rowItem, colItem)"
             :class="{'hover': rowItem <= rowHover && colItem <= colHover, 'select': rowItem <= row && colItem <= col}"
             )
-      div.tiptap-table-editor-form
+      div.tiptap-table-editor-form(v-if='mode === "normal"')
         span 行
         input(type="text" v-model.number="row")
         span 列
         input(type="text" v-model.number="col")
-      div.p-l-1.p-r-1.m-t-05
+      div.p-l-1.p-r-1.m-t-05(v-if='mode === "normal"')
         button.btn.btn-primary.btn-sm.btn-block(:disabled="row === 0 || col === 0" @click="submit") 确定
 </template>
 
@@ -33,9 +33,21 @@ export default {
     rows: [1, 2, 3, 4, 5, 6, 7, 8],
     cols: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     callback: null,
+    mode: 'normal', // normal, fast
   }),
+  computed: {
+    height() {
+      if(this.mode === 'fast') {
+        return '18.5rem';
+      } else {
+        return '24rem'
+      }
+    }
+  },
   methods: {
-    open(callback) {
+    open(callback, options) {
+      const {mode = 'normal'} = options || {};
+      this.mode = mode;
       this.callback = callback;
       this.$refs.draggableDialog.open();
     },
@@ -49,6 +61,10 @@ export default {
     onSelect(row, col) {
       this.row = row;
       this.col = col;
+      if(this.mode === 'fast') {
+        this.submit(); 
+      }
+      
     },
     submit() {
       if(!this.callback) return;

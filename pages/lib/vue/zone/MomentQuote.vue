@@ -16,7 +16,7 @@
 
   mixin momentBody
     .moment-quote-body-moment
-      .moment-quote-content.pointer(v-html="quoteData.data.content" @click="visitUrl(quoteData.data.url, true)")
+      .moment-quote-content.pointer(v-html="quoteData.data.plain" @click="visitUrl(quoteData.data.url, true)")
       .moment-quote-files(v-if="quoteData.data.files && quoteData.data.files.length > 0")
         moment-files(:data="quoteData.data.files")
 

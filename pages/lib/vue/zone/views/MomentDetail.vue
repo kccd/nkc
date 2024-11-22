@@ -54,6 +54,12 @@
 //     // background-color: rgba(255, 255, 255, 0.3);
 //   }
 // }
+.zone-moment-container{
+  padding: 1rem;
+  @media screen and (max-width: 768px) {
+    padding: 0;  
+  }
+}
 .bubble-back {
   cursor: pointer;
   padding: 0 0.7rem;

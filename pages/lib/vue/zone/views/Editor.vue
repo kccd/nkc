@@ -1,6 +1,9 @@
 <template lang="pug">
   .container-fluid.max-width.moment-rich-editor-container
-
+    div.m-b-1(v-if='isEditMoment')
+      span 正在编辑电文：
+      router-link(:to="editMomentUrl" target="_blank") {{momentId}}
+    div.m-b-1(v-else) 正在编写新电文：
     editor(
       ref="editor"
       @content-change="editorContentChange"
@@ -9,7 +12,8 @@
       )
     .m-t-1
       button.btn.btn-primary.m-r-05(:class="{'disabled': disablePublish}" v-if="submitting" title="提交中，请稍候")
-        .fa.fa-spinner.fa-spin
+        .fa.fa-spinner.fa-spin.m-r-05
+        span 提交中...
       button.btn.btn-primary.m-r-05(:class="{'disabled': disablePublish}" v-else-if="disablePublish") 提交
       button.btn.btn-primary.m-r-05(@click="publish" v-else) 提交
       button.btn.btn-default(@click="visitHistory" :disabled="loading || submitting") 历史版本
@@ -23,6 +27,7 @@ import {screenTopAlert} from "../../../js/topAlert";
 import { immediateDebounce } from "../../../js/execution";
 import { visitUrl } from "../../../js/pageSwitch";
 import {getRichJsonContentLength} from '../../../js/checkData'
+import { getUrl } from "../../../js/tools";
 export default {
   components: {
     'editor': Editor,
@@ -48,7 +53,10 @@ export default {
     },
     wordCount() {
       return getRichJsonContentLength(this.content)
-    }
+    },
+    editMomentUrl() {
+      return getUrl('zoneMoment', this.momentId);
+    },
   },
   methods: {
     // 获取富文本草稿

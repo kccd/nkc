@@ -1,4 +1,5 @@
 const pug = require('pug');
+const cheerio = require('cheerio');
 const xss = require('xss');
 const path = require('path');
 const tools = require('../../../nkcModules/tools');
@@ -34,16 +35,17 @@ class MomentRenderService {
     });
   }
 
-  renderingSimpleJson(jsonString, atUsers = []) {
+  renderingSimpleJson(props) {
+    const { content = '', atUsers = [], removeEmptyParagraphs = false } = props;
     // 如果内容为空字符串，则直接返回空字符串
-    if (!jsonString) {
+    if (!content) {
       return '';
     }
     let jsonObj;
     // 尝试解析JSON字符串
     // 如果解析失败，则返回一个符合tiptap规则且包含错误信息的JSON对象
     try {
-      jsonObj = JSON.parse(jsonString);
+      jsonObj = JSON.parse(content);
     } catch (err) {
       console.log(err);
       jsonObj = {
@@ -63,7 +65,7 @@ class MomentRenderService {
             content: [
               {
                 type: 'text',
-                text: `数据：${jsonString}`,
+                text: `数据：${content}`,
               },
             ],
           },
@@ -77,6 +79,18 @@ class MomentRenderService {
       tools,
       cache: false,
     });
+    if (removeEmptyParagraphs) {
+      // 在这里移除空的p标签
+      const $ = cheerio.load(html);
+      $('p').each(function () {
+        const text = $(this).text().trim();
+        const isEmpty = !text || text === '\n';
+        if(isEmpty) {
+          $(this).remove();
+        }
+      });
+      html = $.html();
+    }
     // 处理AT功能，识别@符号，然后将@符号后的用户名识别出来，然后将其替换为a标签
     html = DocumentModel.renderAtUsers(html, atUsers);
     // 识别文本链接，将其替换为a标签

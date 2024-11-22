@@ -1,4 +1,7 @@
 import { strToObj, objToStr } from './dataConversion';
+import { getState } from './state';
+import { getUrl } from './tools';
+const isLogged = !!getState().uid;
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
     '.render-content img[data-global-click="viewImage"]',
@@ -117,7 +120,7 @@ export function renderingNKCVideo() {
     `;
     const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     // 渲染游客访问限制遮罩
-    if (!visitorAccess) {
+    if (!isLogged && !visitorAccess) {
       const maskDom = window.$(`
         <div style="${maskDomStyle}" data-nkc-video-mask-id="${uniqueId}">
           <div style="${maskTextStyle}">视频暂不能访问，请登录试试。</div>
@@ -163,6 +166,10 @@ export function renderingNKCVideo() {
   }
 }
 
+// 渲染富文本中的音频
+// 基本结构来自后端：
+// nkcModules/nkcRender/nodes/audioBlock.pug
+// nkcModules/nkcRender/sources/article.js
 export function renderingNKCAudio() {
   const audioContainers = document.querySelectorAll(
     `[data-tag="nkcsource"][data-type="audio"]`,
@@ -186,7 +193,7 @@ export function renderingNKCAudio() {
       ],
       autopause: true,
     });
-    if (!visitorAccess) {
+    if (!isLogged && !visitorAccess) {
       const maskDomStyle = `
       display: flex;
       height: 100%;
@@ -234,8 +241,41 @@ export function renderingNKCAudio() {
   }
 }
 
-export function renderingNKCSource() {
+// 渲染富文本中的图片
+// 基本结构来自后端：
+// nkcModules/nkcRender/nodes/picutreInline.pug
+// nkcModules/nkcRender/sources/article.js
+export function renderingNKCPicure() {
+  const containers = document.querySelectorAll(
+    '[data-tag="nkcsource"][data-type="picture"]',
+  );
+  const images = [];
+  for (let i = 0; i < containers.length; i++) {
+    const container = containers[i];
+    const rid = container.getAttribute('data-id');
+    images.push({
+      url: getUrl('resource', rid),
+      name: '',
+    });
+  }
+  const globalClick = 'viewImages';
+  for (let i = 0; i < containers.length; i++) {
+    const container = containers[i];
+    const globalData = objToStr({
+      index: i,
+      images: images,
+    });
+    const image = container.querySelector('img');
+    if (image) {
+      image.setAttribute('data-global-click', globalClick);
+      image.setAttribute('data-global-data', globalData);
+    }
+  }
+}
+
+export function initNKCSource() {
   renderingMathJax();
   renderingNKCVideo();
   renderingNKCAudio();
+  renderingNKCPicure();
 }

@@ -33,6 +33,6 @@ export default {
   }
 }
 .ProseMirror-selectednode {
-  outline: 3px solid #66afe9;
+  outline: 2px solid #66afe9;
 }
 </style>

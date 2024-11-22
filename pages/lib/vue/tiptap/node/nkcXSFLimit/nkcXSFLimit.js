@@ -30,4 +30,27 @@ export default Node.create({
   addNodeView() {
     return VueNodeViewRenderer(Component);
   },
+
+  addKeyboardShortcuts() {
+    return {
+      Enter: ({ editor }) => {
+        const inNode = isInCustomNode(editor);
+        const { commands } = editor;
+        if (inNode) {
+          commands.splitBlock();
+          return true;
+        }
+        return false;
+      },
+    };
+  },
 });
+
+function isInCustomNode(editor) {
+  const { state } = editor;
+  const { selection } = state;
+  const { $from } = selection;
+  const nodeStartPos = $from.start();
+  const nodeEndPos = $from.end();
+  return selection.from >= nodeStartPos && selection.to <= nodeEndPos;
+}
