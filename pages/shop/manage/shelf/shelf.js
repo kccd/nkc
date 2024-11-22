@@ -64,6 +64,7 @@ window.app = new Vue({
     title: product ? product.threadInfo.title :"",
     abstract: product ? product.threadInfo.abstractCn :"",
     content: product ? product.threadInfo.content : "",
+    l:product ? product.threadInfo.l : 'json',
     keywords: product ? product.threadInfo.keyWordsCn : [],
     // 商品介绍图
     imgIntroductions: product? product.imgIntroductions: ["", "", "", "", ""],
@@ -223,6 +224,7 @@ window.app = new Vue({
               maxLength: 100000
             });
             body.productDetails = self.content;
+            body.l = self.l;
           }
           // 判断商品图
           const picturesId = self.imgIntroductions.filter(i => !!i);

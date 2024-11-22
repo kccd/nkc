@@ -56,6 +56,7 @@ shelfRouter
       attention, // 关键词
       productDescription, // 商品简介
       productDetails, // 图文描述
+      l,
       mainForumsId, // 专业分类，商品分类和辅助分类
       imgIntroductions, // 商品图
       isFreePost, // 是否免邮
@@ -75,6 +76,7 @@ shelfRouter
       productId, // 商品ID 就在编辑商品信息时有值
     } = body.post;
 
+    l = ['html', 'json'].includes(l) ? l : 'json';
     let product;
 
     if (productId) {
@@ -310,6 +312,7 @@ shelfRouter
         abstractCn: productDescription,
         keyWordsCn: attention,
         content: productDetails,
+        l,
         uid: user.uid,
         fids: mainForumsId,
         cids: [],
@@ -426,6 +429,7 @@ shelfRouter
           abstractCn: productDescription,
           keyWordsCn: attention,
           content: productDetails,
+          l,
           uid: user.uid,
           fids: mainForumsId,
           cids: [],

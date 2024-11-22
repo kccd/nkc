@@ -321,6 +321,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
         product.description = product.threadInfo.description;
         product.abstract = product.threadInfo.abstract;
         product.keywords = product.threadInfo.keywords;
+        product.l = product.threadInfo.l;
       } else {
         product.name = "商品名称丢失";
         product.description = "商品描述丢失";
