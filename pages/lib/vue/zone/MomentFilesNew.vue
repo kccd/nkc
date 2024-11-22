@@ -16,6 +16,7 @@
         :style=" `background-image: url(${fileData.url || fileData.coverUrl});${fileData.pictureContainerStyle}` "
         :class="fileData.pictureContainerClass"
         @click="viewMedias(index)"
+        v-long-press="() => longPress(index)"
         )
         img(
           :src=" fileData.type === types.picture ? fileData.url : fileData.coverUrl"
@@ -168,6 +169,7 @@
 
 <script>
 import { openImageViewer } from '../../js/imageViewer';
+import { longPressImage } from '../../js/reactNative';
 import { getState } from '../../js/state';
 import VideoPlayer from '../VideoPlayer';
 import {PlayOne} from '@icon-park/vue'
@@ -310,6 +312,16 @@ export default {
         window.RootApp.$refs.preview.init(index);
       }
     },
+    longPress(index){
+      const { filesData, isZoneDetail } = this;
+      if(isApp && isZoneDetail){
+        const clickType = filesData[index]?.type;
+        if(clickType === 'picture' ){
+          longPressImage({images:[{url:filesData[index].url,name:filesData[index].filename }],index:0});
+        }
+
+      }
+    }
   },
 };
 </script>

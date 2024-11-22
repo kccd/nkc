@@ -7,7 +7,7 @@ block shopTitle
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
 block shopContent
   #app(v-cloak).shop-shelf
-    div(v-if="type === 'create'")
+    div(v-if="type === 'create' || productStatus === 'notonshelf'")
       .shop-header 基本信息
       .form.form-horizontal.m-t-1
         .form-group
@@ -44,7 +44,7 @@ block shopContent
         .form-group
           label.col-sm-2.control-label 图文描述
           .col-sm-10
-            editor(:configs="editorConfigs" ref="shopEditor" :plugs="editorPlugs" l="html")
+            editor(:configs="editorConfigs" ref="shopEditor" :plugs="editorPlugs" @ready="readyEditorCall" l="html")
             //script#container(name='content', type='text/plain')
 
     .shop-header 其他信息
@@ -266,7 +266,7 @@ block shopContent
       button.shop-btn.primary(v-if="!submitting" @click="save") 提交
       button.shop-btn.disabled(v-else) 提交中..
         .fa.fa-spinner.fa-spin.fa-fw
-  #data.hidden=objToStr({order: data.order, shopForumTypes: data.shopForumTypes, grades: data.grades, dealInfo: data.dealInfo, product: data.product})
+  #data.hidden=objToStr({order: data.order, shopForumTypes: data.shopForumTypes, grades: data.grades, dealInfo: data.dealInfo, product: data.product,selectForumsInfo:data.selectForumsInfo})
 block shopScripts
   include ../../../publicModules/commonModal/commonModal
   include ../../../publicModules/forumSelector/forumSelector

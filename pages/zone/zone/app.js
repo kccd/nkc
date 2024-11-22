@@ -6,6 +6,43 @@ import EditorPage from '../../lib/vue/zone/views/Editor.vue';
 import EditorHistoryPage from '../../lib/vue/zone/views/EditorHistory.vue';
 
 Vue.use(Vuex);
+//自定义长按事件
+Vue.directive('long-press', {
+  bind(el, binding) {
+    if (typeof binding.value !== 'function') {
+      console.warn(`Expect a function, got ${typeof binding.value}`);
+      return;
+    }
+
+    let pressTimer = null;
+
+    const start = (e) => {
+      if (e.type === 'click' && e.button !== 0) {
+        return;
+      }
+
+      if (pressTimer === null) {
+        pressTimer = setTimeout(() => {
+          binding.value(e);
+        }, 1000); // 长按时间为 1000 毫秒
+      }
+    };
+
+    const cancel = () => {
+      if (pressTimer !== null) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+    };
+
+    el.addEventListener('mousedown', start);
+    el.addEventListener('touchstart', start);
+    el.addEventListener('click', cancel);
+    el.addEventListener('mouseout', cancel);
+    el.addEventListener('touchend', cancel);
+    el.addEventListener('touchcancel', cancel);
+  }
+});
 
 const zoneElementId = 'zoneApp';
 $(function () {

@@ -130,6 +130,20 @@ router
       data.subUid = subUid;
     }
 
+    if (ctx.permission('managementMoment')) {
+      match.$or.push({
+        status: {
+          $in: [
+            momentStatus.disabled,
+            momentStatus.faulty,
+            momentStatus.unknown,
+          ],
+        },
+        visibleType: {
+          $in: [own, everyone, attention],
+        },
+      });
+    }
     //获取当前用户对动态的审核权限
     const permissions = {
       reviewed: null,

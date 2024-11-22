@@ -1708,6 +1708,7 @@ schema.statics.extendCommentsDataCommentsData = async function (
   commentsData,
   uid,
   mode = momentCommentModes.simple,
+  managementMoment = false,
 ) {
   const MomentModel = mongoose.model('moments');
   const momentStatus = await MomentModel.getMomentStatus();
@@ -1746,6 +1747,13 @@ schema.statics.extendCommentsDataCommentsData = async function (
     };
   }
 
+  if (managementMoment) {
+    match.$or.push({
+      status: {
+        $in: [momentStatus.disabled, momentStatus.faulty, momentStatus.unknown],
+      },
+    });
+  }
   const latestComments = await MomentModel.find(match);
   const latestCommentsDataObj = {};
   let latestCommentsData = await MomentModel.extendCommentsData(

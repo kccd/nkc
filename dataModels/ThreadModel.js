@@ -610,7 +610,7 @@ threadSchema.methods.updateThreadMessage = async function (toSearch = true) {
   const PostModel = mongoose.model('posts');
   const updateObj = {};
   const oc = await PostModel.findOneAndUpdate(
-    { tid: thread.tid },
+    { tid: thread.tid, type: 'thread' },
     {
       $set: {
         reviewed: thread.reviewed,

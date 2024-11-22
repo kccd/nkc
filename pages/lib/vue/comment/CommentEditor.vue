@@ -13,7 +13,7 @@
         .quote-content {{quote.content}}
 
     .m-b-05#container
-      editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" :l="l")
+      editor(ref="editor" :configs="editorConfigs" @ready="editorReady" @content-change="editorContentChange" :loading="loading" :l="l")
     .m-b-05
       //column(
         ref="column"
@@ -92,6 +92,7 @@
       setTimeout: null,
       commentId: null,
       l:'',
+      loading: true,
     }),
     components: {
       'editor': Editor,
@@ -121,6 +122,7 @@
         } else {
           this.contentChangeEventFlag = true;
         }
+        this.loading = false;
       },
       //编辑器内容发生变化时
       // editorContentChange: debounce(function() {

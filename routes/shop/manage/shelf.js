@@ -35,6 +35,10 @@ shelfRouter
       if (!product) {
         ctx.throw(400, `商品不存在，productId: ${productId}`);
       }
+      data.selectForumsInfo = await db.ForumModel.find(
+        { fid: { $in: product.mainForumsId } },
+        { fid: 1, color: 1, displayName: 1 },
+      );
       data.product = (await db.ShopGoodsModel.extendProductsInfo([product]))[0];
       data.navType = 'goods';
     } else {
@@ -80,7 +84,7 @@ shelfRouter
       }
     }
 
-    if (!product) {
+    if (!product || (product && product.productStatus === 'notonshelf')) {
       // 验证商品文字信息
       checkString(productName, {
         name: '商品标题',
@@ -414,6 +418,31 @@ shelfRouter
             1,
           );
           await db.ShopProductsParamModel(param).save();
+        }
+      }
+      if (product.productStatus === 'notonshelf') {
+        const options = {
+          title: productName,
+          abstractCn: productDescription,
+          keyWordsCn: attention,
+          content: productDetails,
+          uid: user.uid,
+          fids: mainForumsId,
+          cids: [],
+          ip: ctx.address,
+          type: 'product',
+        };
+        await db.ForumModel.checkGlobalPostAndForumWritePermission(
+          options.uid,
+          options.fids,
+        );
+        await db.ForumModel.checkForumCategoryBeforePost(options.fids);
+        await product.updateOne({
+          threadInfo: options,
+          mainForumsId,
+        });
+        if (productStatus === 'insale') {
+          await product.onshelf();
         }
       }
     }

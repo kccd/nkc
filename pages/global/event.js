@@ -13,6 +13,7 @@ import {
 import { viewImage, viewImages, viewMedias } from '../lib/js/mediaViewer';
 import { getState } from '../lib/js/state';
 import {
+  longPressImage,
   RNDownloadFile,
   RNOpenNewPageThrottle,
   RNSaveImage,
@@ -44,6 +45,10 @@ function saveImage(data) {
   RNSaveImage(name, url);
 }
 
+// APP长按保存图片
+function longPressImageForRN(data) {
+  longPressImage(data);
+}
 /*
  * 显示用户悬浮名片
  * */
@@ -105,7 +110,8 @@ const eventFunctions = {
   showSharePanel,
   showCreditPanel,
   openDownloadPanel,
-};
+  longPressImageForRN,
+}
 
 /*
  * 点击事件、触摸时间触发之后执行的函数，统一处理
