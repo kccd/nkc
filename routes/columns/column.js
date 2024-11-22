@@ -125,7 +125,9 @@ router
         ctx.throw(400, `文章分类【${cid}】不存在或已被专栏主删除`);
       }
       if (page === 0 && !mcid) {
-        data.categoryDescription = await category.renderDescription();
+        data.categoryDescription = await category.renderDescription(
+          data?.user?.xsf,
+        );
       }
       //主分类的子分类
       data.childCategories = await category.getChildCategories();
@@ -168,7 +170,7 @@ router
       if (minorCategory) {
         q.mcid = minorCategory._id;
         data.minorCategory = minorCategory;
-        await data.minorCategory.renderDescription();
+        await data.minorCategory.renderDescription(data?.user?.xsf);
       }
       q.cid = { $in: childCategoryId };
       data.topped = await db.ColumnPostModel.getToppedColumnPosts({

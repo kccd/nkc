@@ -67,7 +67,7 @@ router
       const html = renderHTMLByJSON({
         json: targetDocument.content,
         resources: resources,
-        xsf: data.user.xsf,
+        xsf: data.user ? data.user.xsf : 0,
       });
       documentInfo = {
         toc: targetDocument.toc,

@@ -402,14 +402,14 @@ schema.statics.checkCategoriesId = async (categoriesId) => {
 /*
 * 渲染分类介绍
 * */
-schema.methods.renderDescription = async function() {
-  const {_id, description} = this;
+schema.methods.renderDescription = async function (xsf = 0) {
+  const { _id, description } = this;
   const ResourceModel = mongoose.model('resources');
   const referenceId = `columnCategory-${_id}`;
   const resources = await ResourceModel.getResourcesByReference(referenceId);
   const nkcRender = require('../nkcModules/nkcRender');
   if (this.l === 'json') {
-    this.description = renderHTMLByJSON({ json: description, resources });
+    this.description = renderHTMLByJSON({ json: description, resources, xsf });
   } else {
     this.description = nkcRender.renderHTML({
       type: 'article',

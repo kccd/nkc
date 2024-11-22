@@ -113,7 +113,9 @@ router
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
     data.pageContent = nkcModules.nkcRender.htmlToPlain(
-      page.l === 'json' ? renderHTMLByJSON({ json: page.c }) : page.c,
+      page.l === 'json'
+        ? renderHTMLByJSON({ json: page.c, xsf: data?.user?.xsf })
+        : page.c,
       150,
     );
     page.c =

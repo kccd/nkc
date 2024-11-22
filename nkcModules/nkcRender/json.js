@@ -27,7 +27,39 @@ function renderHTMLByJSON({
   if (source === 'post') {
     sid = pid;
   }
-  const jsonObj = typeof json === 'string' ? JSON.parse(json) : json;
+  let jsonObj = '';
+  if (typeof json === 'string') {
+    try {
+      jsonObj = JSON.parse(json);
+    } catch (err) {
+      // console.log(err);
+      jsonObj = {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: `JSON解析错误：${err.message}`,
+              },
+            ],
+          },
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: `数据：${json}`,
+              },
+            ],
+          },
+        ],
+      };
+    }
+  } else {
+    jsonObj = json;
+  }
   const resourcesObj = {};
   for (let r of resources) {
     if (r.toObject && !r._rendered) {
