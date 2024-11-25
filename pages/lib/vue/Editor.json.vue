@@ -1,7 +1,7 @@
 <template lang="pug">
   .tiptap-editor-container
     link-editor(ref='linkEditor')
-    .tiptap-editor-toolBar(v-if='editor')
+    .tiptap-editor-toolBar(v-if='editor' :style="{ top:isApp ? '0rem' : '4rem' }")
       .tiptap-editor-toolBar-icon-group
         div(@click='editor.chain().focus().undo().run()' title="撤销 Ctrl + Z")
           <return theme="filled" :size="iconFontSize" />
@@ -256,6 +256,7 @@ import Loading from './Loading.vue';
 import { getRichJsonContentLength } from "../js/checkData";
 import { immediateDebounce } from "../js/execution";
 import { HotKeys } from "./tiptap/plugins/HotKeys";
+import { getState } from '../js/state.js';
 
 export default {
   props: ['config', 'loading'],
@@ -301,6 +302,7 @@ export default {
   data() {
     return {
       editor: null,
+      isApp: getState().isApp,
       iconFontSize: 16,
       headline: 0,
       isHeadlineSelectOpen: false,
@@ -889,7 +891,7 @@ export default {
     this.removeNoticeEvent();
   },
 };
-</script>
+</script> 
 
 <style scoped lang="less">
 .tiptap-editor-subscript{
