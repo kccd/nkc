@@ -128,5 +128,8 @@ export default {
   max-width: 100%;
   padding: 2rem;
   background-color: #fff;
+  @media(max-width: 768px) {
+    padding: 1rem;
+  }
 }
 </style>

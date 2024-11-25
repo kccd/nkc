@@ -137,16 +137,16 @@
           :class='editorIsActive({ textIndent: 2 })'
         )
           <indent-left theme="outline" :size="iconFontSize" />
-        div(
+        div.tiptap-editor-subscript(
           @click='editor.chain().focus().toggleSubscript().run()',
           :class='{ "is-active": editor.isActive("subscript") }'
         )
-          <right-small-down theme="filled" :size="iconFontSize" />
-        div(
+          <i class="fa fa-subscript" />
+        div.tiptap-editor-subscript(
           @click='editor.chain().focus().toggleSuperscript().run()',
           :class='{ "is-active": editor.isActive("superscript") }'
         )
-          <right-small-up theme="filled" :size="iconFontSize" />
+          <i class="fa fa-superscript" />
         div(data-type='custom')
           app-menu(ref='appMenu', @select='appMenuClick')
 
@@ -892,6 +892,10 @@ export default {
 </script>
 
 <style scoped lang="less">
+.tiptap-editor-subscript{
+  font-size: 1.3rem;
+  padding-top: 0!important;
+}
 .tiptap-editor-toolBar {
   display: flex;
   flex-wrap: wrap;
@@ -909,6 +913,7 @@ export default {
     border: 1px solid #eee;
     padding: 0 1rem;
     flex-wrap: wrap;
+    width: 100%;
 
     &>div {
       cursor: pointer;
