@@ -1182,7 +1182,11 @@ shopOrdersSchema.statics.completeTrackNumber = async (props) => {
       receiveMobile.length,
     )}`;
     if (!trackNumber.includes(endString)) {
-      if (trackName === 'SFEXPRESS' || (trackName === 'AUTO' && isSF)) {
+      if (
+        trackName === 'SFEXPRESS' ||
+        (trackName === 'AUTO' && isSF) ||
+        trackName === 'ZTO'
+      ) {
         trackNumber = trackNumber + endString;
       }
     }
