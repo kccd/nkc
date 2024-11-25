@@ -1,26 +1,14 @@
 <template lang="pug">
   .zone-moment-editor
     .standard-fluid-max-container
-      article-editor(ref="articleEditor" time="60000" source="zone" :configs="configs")
+      moment-rich-editor(id="")
 </template>
 
 <script>
-import ArticleEditor from "../../../../../lib/vue/article/ArticleEditor";
+import MomentRichEditor from '../../../../../lib/vue/zone/MomentRichEditor.vue'
 export default {
   components: {
-    "article-editor": ArticleEditor
+    "moment-rich-editor": MomentRichEditor,
   },
-  data: () => ({
-    configs: {
-      cover: true,
-      title: true,
-      keywords: true,
-      keywordsEN: true,
-      abstract: true,
-      abstractEN: true,
-      origin: true,
-      authorInfos: true,
-    },
-  })
 }
 </script>
