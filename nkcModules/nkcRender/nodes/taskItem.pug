@@ -8,7 +8,7 @@ mixin renderTaskItem(node)
       align-items: center;
     `;
   li(style=liStyle)
-    label(style='margin-right: 0.5rem;')
+    label(style='margin: 0 0.5rem 0 0;')
       if node.attrs.checked
         input(type='checkbox' checked onclick="this.checked = !this.checked")
       else
