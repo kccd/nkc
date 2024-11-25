@@ -44,7 +44,7 @@ block shopContent
         .form-group
           label.col-sm-2.control-label 图文描述
           .col-sm-10
-            editor(:configs="editorConfigs" ref="shopEditor" :plugs="editorPlugs" @ready="readyEditorCall")
+            editor(:configs="editorConfigs" ref="shopEditor" :plugs="editorPlugs" @ready="readyEditorCall" :l="l")
             //script#container(name='content', type='text/plain')
 
     .shop-header 其他信息

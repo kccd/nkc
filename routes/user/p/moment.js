@@ -1,3 +1,4 @@
+const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 const {
   subscribeUserService,
 } = require('../../../services/subscribe/subscribeUser.service');
@@ -97,7 +98,9 @@ module.exports = async (ctx, next) => {
       data.momentsData.push({
         type: 'article',
         content: nkcModules.nkcRender.htmlToPlain(
-          article.document.content,
+          article.document.l === 'json'
+            ? renderHTMLByJSON({ json: article.document.content })
+            : article.document.content,
           200,
         ),
         title: article.document.title,

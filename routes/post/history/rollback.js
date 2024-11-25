@@ -18,7 +18,14 @@ router
       authorInfos
     } = targetPost;
     const notes = await db.NoteModel.getNotesByPost(targetPost);
-    originPost.c = nkcModules.nkcRender.markNotes.setMark(c, notes.notes);
+    if (l === 'json') {
+      originPost.c = nkcModules.nkcRender.markNotes.setMarkByJson(
+        c,
+        notes.notes,
+      );
+    } else {
+      originPost.c = nkcModules.nkcRender.markNotes.setMark(c, notes.notes);
+    }
     originPost.t = t;
     originPost.l = l;
     originPost.abstractEn = abstractEn;

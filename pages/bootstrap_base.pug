@@ -8,7 +8,8 @@ block head
   meta(name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no")
   meta(name="format-detection" content="telephone=no")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
-  link(ref='manifest' href="/manifest.json")
+  // pwa 未优化使用体验，暂时屏蔽
+  //link(rel='manifest' href="/manifest.json")
 
   //- 渲染页面时将浏览器JS环境所需数据藏到meta元素中
   include ./publicModules/state
@@ -24,7 +25,10 @@ block head
     +includeJS("/external_pkgs/vue.min.js", true)
   else
     +includeJS("/external_pkgs/vue.js", true)
+  // 音视频播放器相关
+  +includeJS("/external_pkgs/plyr/plyr.min.js")  
   +includeJS('/external_pkgs/plyr/plyr.polyfilled.min.js')
+  +includeCSS("/external_pkgs/plyr/plyr.css")
   // promise polyfill
   +includeJS('/Promise/promise.min.js', true)
   // babel polyfill
@@ -91,6 +95,7 @@ block body
     credit(ref='credit')
     share-float-panel(ref='shareFloatPanel')
     preview-model(ref='preview')
+    download-panel(ref='downloadPanel')
   +includeJS('/global/root.js')
 
   block navbar

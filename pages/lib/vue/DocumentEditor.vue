@@ -6,7 +6,7 @@
         input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题" maxlength='100')
       .form-group
 
-        editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady")
+        editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady" :l="language")
       .form-group(v-if="formConfigs.cover")
         .m-b-2
           .editor-header 封面图
@@ -269,7 +269,7 @@ import {getDocumentEditorConfigs} from "../js/editor";
 import {debounce} from '../js/execution';
 import {getState} from "../js/state";
 export default {
-  props: ['configs'],
+  props: ['configs','l'],
   data: () => ({
     title: '',
     cover: "",
@@ -314,6 +314,7 @@ export default {
     cnOverLength: false,
     enOverLength: false,
     timer: null,
+    language:'',
   }),
   watch: {
     title() {
@@ -341,6 +342,12 @@ export default {
       deep: true,
       handler(newValue, oldValue) {
         this.watchContentChange();
+      },
+    },
+    l: {
+      deep: true,
+      handler(newValue) {
+        this.language = newValue;
       },
     }
   },
@@ -435,7 +442,7 @@ export default {
       this.watchContentChange();
     },
     setSavedStatus(type) {
-      this.$refs.editor.changeSaveInfo(type);
+      // this.$refs.editor.changeSaveInfo(type);
     },
     //编辑器准备完成填入数据
     editorReady() {
@@ -606,10 +613,12 @@ export default {
         keywordsEN,
         originState,
         formConfigs,
-        authorInfos
+        authorInfos,
+        l,
       } = this;
       const data = {
         content: this.$refs.editor.getContent(),
+        l,
       };
       if(formConfigs.cover) {
         data.coverFile = coverFile || null;
@@ -635,6 +644,7 @@ export default {
         abstractEN = '',
         origin = '',
         authorInfos= [],
+        l='',
       } = data;
       this.title = title;
       if(content) {

@@ -9,8 +9,8 @@ block zoneContent
     });
 
   #latestZoneMoments(v-cloak)
-    include ./zoneTypes
-    +renderLatestZoneTypes(data.t, data.zoneTypes)
+    //- include ./zoneTypes
+    //- +renderLatestZoneTypes(data.t, data.zoneTypes)
 
     include ../../publicModules/paging/paging
     moments(:moments="momentsData" :permissions="permissions" v-if='momentsData.length > 0')

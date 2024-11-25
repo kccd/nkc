@@ -21,7 +21,7 @@ if !isIncluded('mathJax')
         processHtmlClass:"pre-view-formula|render-content",
         renderActions: {
           addMenu: [0, '', '']
-        }
+        },
       },
 
       tex: {
@@ -30,5 +30,4 @@ if !isIncluded('mathJax')
         processEscapes: false, // use \$ to produce a literal dollar sign
       }
     }
-
-  script(async src="/external_pkgs/MathJax-3.0.1/es5/tex-mml-chtml.js")
+  +includeJS('/mathjax/es5/tex-mml-chtml.js')

@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const permissions = require('../../../../middlewares/permission');
+const { renderHTMLByJSON } = require('../../../../nkcModules/nkcRender/json');
 router
   .get('/', permissions.OnlyUser(), async (ctx, next) => {
     //获取当前登录用户的独立文章信息
@@ -49,7 +50,7 @@ router
                 },
               },
             },
-            { $project: { c: 1, pid: 1, t: 1, toc: 1 } },
+            { $project: { c: 1, pid: 1, t: 1, toc: 1, l: 1 } },
           ],
           as: 'content',
         },
@@ -71,7 +72,10 @@ router
           toc: item.toc,
           t: item.t,
           source: postType.thread,
-          c: nkcModules.nkcRender.htmlToPlain(item.c, 200),
+          c: nkcModules.nkcRender.htmlToPlain(
+            item.l === 'json' ? renderHTMLByJSON({ json: item.c }) : item.c,
+            200,
+          ),
           url: nkcModules.tools.getUrl('thread', item.tid),
         });
       }

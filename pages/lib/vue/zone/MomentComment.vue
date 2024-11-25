@@ -53,11 +53,9 @@
       .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
       .moment-comment-reply-editor(v-if="replyEditorStatus")
         .m-b-05
-          textarea-editor(
-            ref="replyEditor"
+          editor-core(
+            ref="editorCore"
             :placeholder="editorPlaceholder"
-            max-height="20rem"
-            height="2rem"
             @content-change="onReplyEditorContentChange"
             @click-ctrl-enter="submitReplyContent"
           )
@@ -112,13 +110,14 @@ import {visitUrl} from "../../js/pageSwitch";
 import {sweetError} from "../../js/sweetAlert";
 import {getState} from "../../js/state";
 import {objToStr} from "../../js/tools";
-import TextareaEditor from '../../vue/TextareaEditor';
 import {nkcAPI} from "../../js/netAPI";
 import { WinkingFace } from "@icon-park/vue";
 import EmojiSelector from "../EmojiSelector.vue";
 import MomentFiles from './MomentFilesNew';
 import ResourceSelector from '../ResourceSelector';
+import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';
+import { immediateDebounce } from "../../js/execution";
 const state = getState();
 const iconFill = {
   normal: '#555',
@@ -149,10 +148,10 @@ export default {
     }
   },
   components: {
+    'editor-core': EditorCore,
     'moment-status': MomentStatus,
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
-    'textarea-editor': TextareaEditor,
     'winking-face': WinkingFace,
     'emoji-selector': EmojiSelector,
     'moment-files': MomentFiles,
@@ -212,6 +211,36 @@ export default {
     visitUrl,
     onReplyEditorContentChange(content) {
       this.replyContent = content;
+      this.delayedSaveReplayContent();
+    },
+    delayedSaveReplayContent: immediateDebounce(function() {
+      this.saveReplayContent();
+    }, 1000),
+    getReplayContent() {
+      nkcAPI(`/api/v1/zone/editor/plain?parent=${this.commentData._id}`, 'GET')
+        .then(res => {
+          if(res.data.momentId) {
+            this.picturesId = res.data.medias.filter(item => item.type === 'picture').map(item => item.rid);
+            this.replyContent = res.data.content;
+            this.$refs.editorCore.setContent(this.replyContent);
+          }
+          this.$refs.editorCore.hideLoading();
+          Vue.nextTick(() => {
+            this.$refs.editorCore.focus();
+          });
+        })
+        .catch(sweetError);
+    },
+    saveReplayContent() {
+      nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
+        parent: this.commentData._id,
+        content: this.replyContent,
+        resourcesId: this.picturesId,
+      })
+        .then(res => {
+          console.log('保存成功');
+        })
+        .catch(sweetError);
     },
     submitReplyContent() {
       const {replyContent, commentData, picturesId, disabledButton} = this;
@@ -220,9 +249,12 @@ export default {
         .then(() => {
           if(disabledButton) throw new Error('请输入评论内容');
           self.submitting = true;
-          return nkcAPI(`/creation/zone/moment/${commentData._id}/comment`, 'POST', {
+          return nkcAPI(`/api/v1/zone/editor/plain`, 'POST', {
+            parent: commentData._id,
             content: replyContent,
             resourcesId: picturesId,
+            postType: 'comment',
+            repost: false,
           });
         })
         .then((res) => {
@@ -245,6 +277,7 @@ export default {
     },
     clearReplyContent() {
       this.replyContent = '';
+      this.$refs.editorCore.clearContent();
     },
     clearReplyPicture() {
       this.picturesId = [];
@@ -254,11 +287,8 @@ export default {
     },
     showReplyEditor() {
       this.replyEditorStatus = true;
-      this.clearReplyPicture();
-      Vue.nextTick(() => {
-        this.$refs.replyEditor.focus();
-      });
-
+      this.clearReplyPicture()
+      this.getReplayContent();
     },
     switchEditor() {
       if(!this.logged) return toLogin();
@@ -297,7 +327,7 @@ export default {
       visitUrl(`/z/m/${this.commentData._id}`, true);
     },
     insertContent(text) {
-      return this.$refs.replyEditor.insertContent(text);
+      return this.$refs.editorCore.insertContent(text);
     },
     iconMouseOver(e) {
       e.fill = iconFill.active;
@@ -309,7 +339,12 @@ export default {
       const self = this;
       this.$refs.emojiSelector.open(res => {
         const {code} = res;
-        self.insertContent(`[${code}]`);
+        self.insertContent(JSON.stringify({
+          type: 'nkc-emoji',
+          attrs: {
+            unicode: code,
+          }
+        }));
       });
     },
     selectPicture() {
@@ -318,6 +353,7 @@ export default {
       this.$refs.resourceSelector.open(res => {
         self.picturesId=[...new Set(res.resourcesId)].slice(0, 1);
         self.$refs.resourceSelector.close();
+        self.delayedSaveReplayContent();
       }, {
         allowedExt: ['picture'],
         countLimit: 1 - self.picturesId.length
@@ -407,18 +443,26 @@ export default {
       }
     }
   .moment-comment-item-content {
-    margin-bottom: 0.5rem;
-    word-break: keep-all;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+    all: initial;
     /deep/img{
-      height: 1.5rem;
-      width: 1.5rem;
+      height: 2rem;
+      width: 2rem;
       margin: 0 0.1rem;
       vertical-align: text-bottom;
     }
     /deep/a{
       color: @primary;
+    }
+    /deep/div{
+    }
+    /deep/p{
+      font-size: 1.2rem;
+      color: #000;
+      line-height: 1.6em;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+      word-wrap: break-word;
+      min-height: 1.6em;
     }
   }
 }

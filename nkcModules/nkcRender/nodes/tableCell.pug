@@ -1,0 +1,3 @@
+mixin renderTableCell(node)
+  td(colspan=node.colspan rowspan=node.rowspan)
+    +loopRender(node.content)

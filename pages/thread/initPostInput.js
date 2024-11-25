@@ -16,6 +16,7 @@ if (container.length > 0) {
       uid: NKC.configs.uid,
       desTypeId: document.getElementById('threadId').innerText,
       waiting: true,
+      l: 'json',
     },
     mounted() {},
     computed: {
@@ -47,14 +48,19 @@ if (container.length > 0) {
             'GET',
           )
             .then((res) => {
-              if (
-                res.drafts.length &&
-                this.$refs.postEditor.ready &&
-                !this.$refs.postEditor.getContent()
-              ) {
-                this.$refs.postEditor.setContent(res.drafts[0].content);
+              if (res.drafts.length) {
+                // this.$refs.postEditor.$refs.editor.ready &&
+                // !this.$refs.postEditor.getContent()
+                this.l = res.drafts[0].l;
+                setTimeout(() => {
+                  this.$refs.postEditor.setContent(res.drafts[0].content);
+                }, 500);
                 if (window.initDraft) {
-                  window.initDraft(res.drafts[0].did, res.drafts[0]._id);
+                  window.initDraft(
+                    res.drafts[0].did,
+                    res.drafts[0]._id,
+                    res.drafts[0].l,
+                  );
                 }
                 if (window.quotePost && res.drafts[0].quotePostId) {
                   window.quotePost(res.drafts[0].quotePostId);

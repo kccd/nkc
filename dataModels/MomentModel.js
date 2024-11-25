@@ -1,19 +1,13 @@
 const mongoose = require('../settings/database');
-const { fluentuiEmojiUnicode } = require('../nkcModules/fluentuiEmoji');
-
-// 包含所有document的状态
-// 并且额外包含 deleted, cancelled
-const momentStatus = {
-  // document status
-  default: 'default', // 默认状态
-  disabled: 'disabled', // 禁用
-  normal: 'normal', // 正常状态 能被所有用户查看的文档
-  faulty: 'faulty', // 退修
-  unknown: 'unknown', // 需要审核
-  // 额外
-  deleted: 'deleted', // 已删除
-  cancelled: 'cancelled', // 取消发表
-};
+const logger = require('../nkcModules/logger');
+const {
+  momentModes,
+  momentStatus,
+  momentVisibleType,
+} = require('../settings/moment');
+const { documentSources } = require('../settings/document');
+const {momentRenderService} = require('../services/moment/render/momentRender.service');
+const { ThrowCommonError } = require('../nkcModules/error');
 
 const momentQuoteTypes = {
   article: 'article',
@@ -32,11 +26,7 @@ const momentCommentPerPage = {
   complete: 50,
 };
 
-const visibleType = {
-  own: 'own',
-  attention: 'attention',
-  everyone: 'everyone',
-};
+const visibleType = { ...momentVisibleType };
 
 const schema = new mongoose.Schema({
   _id: String,
@@ -161,7 +151,17 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  mode: {
+    type: String,
+    default: 'plain',
+  },
 });
+
+schema.statics.getMomentModes = () => {
+  return {
+    ...momentModes,
+  };
+};
 
 /*
  * 获取动态的状态列表
@@ -210,7 +210,7 @@ schema.statics.getMomentVisibleType = async () => {
 schema.statics.checkMomentQuoteType = async (quoteType) => {
   const quoteTypes = Object.values(momentQuoteTypes);
   if (!quoteTypes.includes(quoteType)) {
-    throwErr(500, `动态引用类型错误`);
+    ThrowCommonError(500, `动态引用类型错误`);
   }
 };
 
@@ -245,7 +245,7 @@ schema.statics.getNewId = async () => {
   let n = 10;
   const lock = await redLock.lock(key, 10000);
   try {
-    while (true) {
+    while (n > 0) {
       n = n - 1;
       const _id = getRandomString('a0', 6);
       const moment = await MomentModel.findOne(
@@ -260,14 +260,13 @@ schema.statics.getNewId = async () => {
         newId = _id;
         break;
       }
-      if (n === 0) {
-        break;
-      }
     }
-  } catch (err) {}
+  } catch (err) {
+    logger.error(err);
+  }
   await lock.unlock();
   if (!newId) {
-    throwErr(500, `moment id error`);
+    ThrowCommonError(500, `moment id error`);
   }
   return newId;
 };
@@ -295,6 +294,7 @@ schema.statics.createMomentCore = async (props) => {
     parents = [],
     ip = '',
     port = '',
+    mode = momentModes.plain,
   } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
@@ -329,6 +329,7 @@ schema.statics.createMomentCore = async (props) => {
     top: publishTime,
     toc,
     files: resourcesId,
+    mode,
   });
   await moment.save();
   return moment;
@@ -344,14 +345,31 @@ schema.statics.createMomentCore = async (props) => {
  * @return {moment schema}
  * */
 schema.statics.createMoment = async (props) => {
-  const { uid, content, resourcesId, ip, port } = props;
+  const {
+    uid,
+    content,
+    resourcesId = [],
+    ip,
+    port,
+    parent = '',
+    mode = momentModes.plain,
+  } = props;
   const MomentModel = mongoose.model('moments');
+  let parents = [];
+  if (parent) {
+    // 存在上级电文
+    const parentMoment = await MomentModel.findOnly({ _id: parent });
+    parents = [...parentMoment.parents, parent];
+  }
   return await MomentModel.createMomentCore({
     ip,
     port,
+    mode,
     uid,
     content,
     resourcesId,
+    parent,
+    parents,
   });
 };
 
@@ -421,37 +439,6 @@ schema.statics.createMomentComment = async (props) => {
   });
 };
 
-/*
- * 修改动态内容
- * @param {Object}
- *   @param {String} content 动态内容
- *   @param {[String]} resourcesId 资源 ID 组成的数组
- * */
-schema.methods.modifyMoment = async function (props) {
-  const { content, resourcesId } = props;
-  const MomentModel = mongoose.model('moments');
-  const DocumentModel = mongoose.model('documents');
-  const time = new Date();
-  const newResourcesId = await MomentModel.replaceMomentResourcesId(
-    resourcesId,
-  );
-
-  await DocumentModel.updateDocumentByDid(this.did, {
-    content,
-    resourcesId: newResourcesId,
-    tlm: time,
-  });
-  const match = {
-    $set: {
-      files: newResourcesId,
-    },
-  };
-  if (this.status !== momentStatus.default) {
-    match.$set.tlm = time;
-  }
-  await this.updateOne(match);
-};
-
 // 限制动态图片和视频的数量
 schema.statics.replaceMomentResourcesId = async function (resourcesId) {
   const ResourceModel = mongoose.model('resources');
@@ -470,7 +457,7 @@ schema.statics.replaceMomentResourcesId = async function (resourcesId) {
     resourcesObj[r.rid] = r;
   }
   let newResourcesId = [];
-  let type = '';
+  // let type = '';
   for (const rid of resourcesId) {
     const resource = resourcesObj[rid];
     if (!resource) {
@@ -576,7 +563,7 @@ schema.methods.changeStatus = async function (status) {
   const MomentModel = mongoose.model('moments');
   const momentStatus = await MomentModel.getMomentStatus();
   if (!momentStatus[status]) {
-    throwErr(400, '不存在该状态');
+    ThrowCommonError(400, '不存在该状态');
   }
   await this.updateOne({
     $set: {
@@ -696,108 +683,14 @@ schema.statics.getUnPublishedMomentCommentDataById = async (uid, mid) => {
  * @param {String} uid 发表人 ID
  * @return {moment schema or null}
  * */
-schema.statics.getUnPublishedMomentByUid = async (uid) => {
+schema.statics.getUnPublishedMomentByUid = async (uid, mode) => {
   const MomentModel = mongoose.model('moments');
   return MomentModel.findOne({
     uid,
     parent: '',
     status: momentStatus.default,
+    mode,
   });
-};
-
-/*
- * 通过发表人ID、动态ID获取未发布的动态
- * @param {String} uid 发表人 ID
- * @param {String} momentId 动态 ID
- * @return {moment schema or null}
- * */
-schema.statics.getUnPublishedMomentByMomentId = async (momentId, uid) => {
-  const MomentModel = mongoose.model('moments');
-  return MomentModel.findOne({
-    uid,
-    parent: '',
-    _id: momentId,
-    status: momentStatus.default,
-  });
-};
-
-/*
- * 通过发表人 ID 获取未发布的动态数据
- * @param {String} uid 发表人 ID
- * @return {Object or null}
- *   @param {String} momentId 动态 ID
- *   @param {Date} toc 动态创建时间
- *   @param {Date} tlm 动态最后修改时间
- *   @param {String} uid 发表人 ID
- *   @param {String} content 动态内容 ID
- *   @param {[String]} picturesId 动态附带的图片 ID（resourceId）
- *   @param {[String]} videosId 动态附带的视频 ID（resourceId）
- * */
-schema.statics.getUnPublishedMomentDataByUid = async (uid) => {
-  const MomentModel = mongoose.model('moments');
-  const ResourceModel = mongoose.model('resources');
-  const moment = await MomentModel.getUnPublishedMomentByUid(uid);
-  if (moment) {
-    let picturesId = [];
-    let videosId = [];
-    let medias = [];
-    const DocumentModel = mongoose.model('documents');
-    const { moment: momentSource } = await DocumentModel.getDocumentSources();
-    const betaDocument = await DocumentModel.getBetaDocumentBySource(
-      momentSource,
-      moment._id,
-    );
-    if (!betaDocument) {
-      await moment.deleteMoment();
-      return null;
-    }
-    const oldResourcesId = betaDocument.files;
-    if (oldResourcesId.length > 0) {
-      const resources = await ResourceModel.find(
-        { rid: { $in: oldResourcesId } },
-        {
-          rid: 1,
-          mediaType: 1,
-        },
-      );
-      // const resourcesId = resources.map((r) => r.rid);
-      // if (resources.length > 0) {
-      //   if (resources[0].mediaType === 'mediaPicture') {
-      //     picturesId = resourcesId;
-      //   } else {
-      //     videosId = resourcesId;
-      //   }
-      // }
-      for (const ridItem of oldResourcesId) {
-        const file = resources.find((item) => item.rid === ridItem);
-        let type = '';
-        if (!file || !['mediaPicture', 'mediaVideo'].includes(file.mediaType)) {
-          continue;
-        }
-        if (file.mediaType === 'mediaPicture') {
-          type = 'picture';
-        } else {
-          type = 'video';
-        }
-        medias.push({
-          rid: file.rid,
-          type,
-        });
-      }
-    }
-    return {
-      momentId: moment._id,
-      toc: betaDocument.toc,
-      tlm: betaDocument.tlm,
-      uid: betaDocument.uid,
-      content: betaDocument.content,
-      picturesId,
-      videosId,
-      medias,
-    };
-  } else {
-    return null;
-  }
 };
 
 /*
@@ -931,60 +824,33 @@ schema.methods.getBetaDocument = async function () {
  * */
 schema.methods.checkBeforePublishing = async function () {
   const DocumentModel = mongoose.model('documents');
-  const ResourceModel = mongoose.model('resources');
   const { moment: momentSource } = await DocumentModel.getDocumentSources();
+  const {
+    momentCheckerService,
+  } = require('../services/moment/momentChecker.service');
   const betaDocument = await DocumentModel.getBetaDocumentBySource(
     momentSource,
     this._id,
   );
   if (!betaDocument) {
-    throwErr(500, `动态数据错误 momentId=${this._id}`);
+    ThrowCommonError(500, `动态数据错误 momentId=${this._id}`);
   }
   // 检测发表权限
   await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
   if (!this.quoteType || !this.quoteId) {
-    const { checkString, getLength } = require('../nkcModules/checkData');
-    checkString(betaDocument.content, {
-      name: '动态内容',
-      minLength: 0,
-      maxLength: 1000,
-    });
+    const { getLength } = require('../nkcModules/checkData');
+    if (this.mode === momentModes.plain) {
+      momentCheckerService.checkMomentPlainJSONLength(betaDocument.content);
+    } else {
+      momentCheckerService.checkMomentRichJSONLength(betaDocument.content);
+    }
+
     // 检测文字和图片/视频是否都没有
     if (
       getLength(betaDocument.content) === 0 &&
       betaDocument.files.length === 0
     ) {
-      throwErr(400, `内容不能为空`);
-    }
-  }
-  if (this.files.length > 0) {
-    let mediaType;
-    const resources = await ResourceModel.find(
-      {
-        uid: this.uid,
-        rid: { $in: this.files },
-      },
-      {
-        rid: 1,
-        mediaType: 1,
-      },
-    );
-    if (resources.length !== this.files.length) {
-      throwErr(500, `媒体文件类型错误`);
-    }
-    // for (const resource of resources) {
-    //   if (!mediaType) {
-    //     mediaType = resource.mediaType;
-    //   } else {
-    //     if (mediaType !== resource.mediaType) {
-    //       throwErr(500, `媒体文件类型错误`);
-    //     }
-    //   }
-    // }
-    for (const resource of resources) {
-      if (!['mediaPicture', 'mediaVideo'].includes(resource.mediaType)) {
-        throwErr(500, `媒体文件类型错误`);
-      }
+      ThrowCommonError(400, `内容不能为空`);
     }
   }
 };
@@ -1110,7 +976,7 @@ schema.methods.updateMomentCommentOrder = async function () {
     await lock.unlock();
   } catch (err) {
     await lock.unlock();
-    throwErr(500, err.message);
+    ThrowCommonError(500, err.message);
   }
 };
 
@@ -1173,12 +1039,13 @@ schema.statics.createMessageAndSendMessage = async (type, uid, momentId) => {
  * */
 schema.methods.publishMomentComment = async function (postType, alsoPost) {
   if (!['comment', 'repost'].includes(postType)) {
-    throwErr(500, `类型指定错误 postType=${postType}`);
+    ThrowCommonError(500, `类型指定错误 postType=${postType}`);
   }
+  const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
   const { moment: quoteType } = momentQuoteTypes;
-  const { uid, resourcesId, parent } = this;
+  const { uid, parent } = this;
   const { content, ip: ipId, port, files } = await this.getBetaDocument();
   const { uid: parentUid } = await MomentModel.findOne(
     { _id: parent },
@@ -1187,15 +1054,31 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   let commentMomentId;
   let repostMomentId;
   const ip = await IPModel.getIpByIpId(ipId);
-  if (postType === 'comment' || alsoPost) {
+  // 是否生成评论
+  const postComment = postType === 'comment' || alsoPost;
+  // 是否生成转发
+  const postForward = postType === 'repost' || alsoPost;
+  if (postComment) {
     // 需要创建评论
     await this.updateMomentCommentOrder();
     await this.updateParentLatestId();
     await this.publish();
     commentMomentId = this._id;
+  } else {
+    // 不需要创建评论
+    // 将当前moment设置为quoteMoment
+    await DocumentModel.deleteMany({
+      source: documentSources.moment,
+      sid: this._id,
+      did: this.did,
+    });
+    await MomentModel.deleteOne({
+      _id: this._id,
+    });
   }
-  if (postType === 'repost' || alsoPost) {
+  if (postForward) {
     // 需要转发动态
+    // 这里需要将moment作为转发的moment，避免多生成一个moment，导致原moment没地儿放
     const repostMoment = await MomentModel.createQuoteMomentAndPublish({
       ip,
       port,
@@ -1232,7 +1115,7 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
     const { eventEmitter } = require('../events');
     const { getMomentPublishType } = require('../events/moment');
     const { momentBubble } = getMomentPublishType();
-    await eventEmitter.emit(momentBubble, {
+    eventEmitter.emit(momentBubble, {
       uid,
       momentId: repostMomentId,
     });
@@ -1311,7 +1194,7 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
     { parent: 1, parents: 1, uid: 1 },
   );
   if (!parentComment.parent) {
-    throwErr(500, `回复的不是一条动态评论(id=${parent})`);
+    ThrowCommonError(500, `回复的不是一条动态评论(id=${parent})`);
   }
   const parentMoment = await MomentModel.findOne(
     { _id: parentComment.parents[0] },
@@ -1504,34 +1387,6 @@ schema.statics.getQuoteDefaultContent = async (quoteType) => {
 };
 
 /*
- * 渲染动态或评论内容
- * @param {String} content 待渲染的内容
- * @return {String} 渲染后的富文本内容
- * */
-schema.statics.renderContent = async (content) => {
-  const nkcRender = require('../nkcModules/nkcRender');
-  const { getUrl } = require('../nkcModules/tools');
-  const { filterMessageContent } = require('../nkcModules/xssFilters');
-  // 替换空格
-  // content = content.replace(/ /g, '&nbsp;');
-  // 处理链接
-  content = nkcRender.URLifyHTML(content);
-  content = nkcRender.replaceHTMLExternalLink(content);
-  // 过滤标签 仅保留标签 a['href']
-  content = filterMessageContent(content);
-  // 替换换行符
-  content = content.replace(/\n/g, '<br/>');
-  content = content.replace(/\[(.*?)]/g, function (r, v1) {
-    if (!fluentuiEmojiUnicode.includes(v1)) {
-      return r;
-    }
-    const emojiUrl = getUrl('emoji', v1);
-    return '<img class="message-emoji" src="' + emojiUrl + '"/>';
-  });
-  return content;
-};
-
-/*
  * 获取动态显示所需要的基础数据
  * @param {[schema moment]}
  * @param {String} uid 访问者 ID
@@ -1545,6 +1400,7 @@ schema.statics.renderContent = async (content) => {
  *   @param {String} time 格式化后的发表时间
  *   @param {Date} toc 发表时间
  *   @param {String} content 动态内容
+ *   @param {String} plain 富文本模式动态的文本内容（可用于电文列表页）
  *   @param {Number} voteUp 点赞数
  *   @param {String} statusInfo 动态状态的说明
  *   @param {Number} commentCount 评论数
@@ -1569,6 +1425,7 @@ schema.statics.renderContent = async (content) => {
  *       @param {Number} dataSize 视频大小
  * */
 schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
+  const visitorUid = uid;
   const videoSize = require('../settings/video');
   const UserModel = mongoose.model('users');
   const ResourceModel = mongoose.model('resources');
@@ -1632,8 +1489,6 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       top,
       _id,
       voteUp,
-      order,
-      comment,
       commentAll,
       repost,
       quoteType,
@@ -1641,6 +1496,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       visibleType,
       tlm,
       hits,
+      mode,
     } = moment;
 
     let f = moment[field];
@@ -1649,15 +1505,27 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       continue;
     }
     const { username, avatar } = user;
-    const betaDocument = stableDocumentsObj[_id];
+    const stableDocument = stableDocumentsObj[_id];
     let content = '';
+    let plain = '';
     let addr = localAddr;
-    if (betaDocument) {
-      const originalContent = await betaDocument.renderAtUsers();
-      content = await MomentModel.renderContent(
-        originalContent || betaDocument.content,
-      );
-      addr = betaDocument.addr;
+    if (stableDocument) {
+      if (mode === momentModes.plain) {
+        content = momentRenderService.renderingSimpleJson({
+          content: stableDocument.content,
+          atUsers: stableDocument.atUsers,
+        });
+        plain = content;
+      } else {
+        const renderingData = await stableDocument.getRenderingData(visitorUid);
+        plain = momentRenderService.renderingSimpleJson({
+          content: stableDocument.content,
+          atUsers: stableDocument.atUsers,
+          removeEmptyParagraphs: true,
+        });
+        content = renderingData.content;
+      }
+      addr = stableDocument.addr;
     }
     if (!content && quoteType) {
       content = await MomentModel.getQuoteDefaultContent(quoteType);
@@ -1665,7 +1533,11 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     const filesData = [];
     for (const rid of files) {
       const resource = resourcesObj[rid];
-      if (!resource) {
+      if (
+        !resource ||
+        !['mediaPicture', 'mediaVideo'].includes(resource.mediaType) ||
+        filesData.length >= 9
+      ) {
         continue;
       }
       await resource.setFileExist();
@@ -1733,6 +1605,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       toc: top,
       tlm,
       content,
+      plain,
       voteUp,
       status,
       addr,
@@ -1745,6 +1618,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       files: filesData,
       url: getUrl('zoneMoment', _id),
       visibleType,
+      mode,
     };
 
     if (moment.status !== momentStatus.normal) {
@@ -1981,7 +1855,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const IPModel = mongoose.model('ips');
   const ResourceModel = mongoose.model('resources');
   const localAddr = await IPModel.getLocalAddr();
-  const momentStatus = await MomentModel.getMomentStatus();
   const { getUrl, timeFormat } = require('../nkcModules/tools');
   const source = await ReviewModel.getDocumentSources();
   const usersId = [];
@@ -2021,7 +1894,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       parents,
       voteUp,
       status,
-      did,
       latest = [],
     } = comment;
     const user = usersObj[uid];
@@ -2034,8 +1906,10 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       continue;
     }
     addr = stableDocument.addr;
-    let content = await stableDocument.renderAtUsers();
-    content = await MomentModel.renderContent(content);
+    const content = await momentRenderService.renderingSimpleJson({
+      content: stableDocument.content,
+      atUsers: stableDocument.atUsers,
+    });
     const filesData = [];
     for (const rid of stableDocument.files) {
       // 附件数据

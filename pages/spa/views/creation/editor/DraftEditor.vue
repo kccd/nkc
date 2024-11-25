@@ -7,12 +7,11 @@
         info-block(:mode="'info'")
           span 在编辑器中的草稿箱面板内，您可以快速将图文片段插入到正在编辑的文章内容中。
       .m-b-1
-        document-editor(
-          ref="documentEditor"
-          :configs="formConfigs"
-          @content-change="watchContentChange"
-          @ready="editorReady"
-          )
+        .form
+          .form-group
+            input.form-control.form-title(type="text" v-model="document.title" placeholder="请输入标题" maxlength='100' @input="contentChange")
+          .form-group(v-if="ready")
+            editor(:configs="editorConfigs" ref="draftEditor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="insertContent" :l="document.l")
       .m-b-1
         button.btn.btn-primary.m-r-05(@click="submit" :disabled="!draftId") 提交
         button.btn.btn-default.m-r-05(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
@@ -62,36 +61,42 @@ a {
     -webkit-font-smoothing: antialiased;
   }
 }
-.form-title{
-  height: 5rem;
-  padding: 0;
-  font-size: 2rem;
-  box-shadow: none;
-  border: none;
-  border-bottom: 1px solid #f4f4f4;
-  &:focus{
-    outline: none;
+.form {
+    .form-title{
+      height: 5rem;
+      padding: 0;
+      font-size: 2rem;
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid #f4f4f4;
+      &:focus{
+        outline: none;
+      }
+    }
   }
-}
 </style>
 
 <script>
-import DocumentEditor from '../../../../lib/vue/DocumentEditor';
 import {nkcAPI} from '../../../../lib/js/netAPI'
 import { getUrl, timeFormat } from '../../../../lib/js/tools'
 import InfoBlock from '../../../components/InfoBlock';
+import Editor from '../../../../lib/vue/Editor.vue';
+import { getDocumentEditorConfigs } from '../../../../lib/js/editor';
+import { debounce } from '../../../../lib/js/execution';
 
 export default {
   data: function (){
     return {
-      formConfigs: {
-        title: true,
+      editorConfigs:getDocumentEditorConfigs(),
+      editorPlugs:{
+        resourceSelector: true
       },
       draftId: '',
       ready: false,
       document: {
         title: '',
-        content: ''
+        content: '',
+        l: ''
       },
       navList: [
         {
@@ -114,42 +119,34 @@ export default {
     }
   },
   mounted() {
-    const self = this;
-    self.initId();
-    self.initAuthSaveDraftTimeout();
+    //如果路由有query参数，需要初始化草稿参数。 
+    const {id} = this.$route.query;
+    if(id){
+      this.draftId = id;
+      const self = this;
+      nkcAPI(`/creation/drafts/editor?draftId=${id}`, 'GET', {})
+        .then(res => {
+          const {content, title,l} = res.draftData;
+          self.document.content = content;
+          self.document.title = title;
+          self.document.l = l;
+        })
+        .catch(err => {
+          sweetError(err);
+        }).finally(()=>{
+          self.ready = true;
+        });
+    }else{
+      this.ready = true;
+    }
   },
   destroyed() {
-    clearInterval(this.setInterval);
   },
   components: {
-    'document-editor': DocumentEditor,
     'info-block': InfoBlock,
+    'editor': Editor,
   },
   watch: {
-    draftId() {
-      this.$router.replace({
-        name: this.$route.name,
-        query: {
-          id: this.draftId,
-        }
-      })
-    },
-    $route(to){
-      if(to.path === "/creation/drafts"){
-        this.$refs.documentEditor.removeNoticeEvent()
-      }else if(to.path === "/creation/editor/draft"){
-
-        // console.log("进入编辑器")
-        if(this.editorInitOk){
-          this.$refs.documentEditor.initDocumentForm({
-            content: '',
-            title: ''
-          });
-          this.initId();
-          this.initData()
-        }
-      }
-    },
   },
 
   computed: {
@@ -172,50 +169,25 @@ export default {
         name: 'drafts'
       });
     },
-    editorReady() {
-      this.editorInitOk = true;
-      this.initData();
-    },
-    //获取ID
-    initId() {
+    insertContent(){
+      // 只有路由存在query参数的情况才会进行内容的填充
       const {id} = this.$route.query;
-      this.draftId = id;
-    },
-    //插入编辑数据
-    initData() {
-      const self = this;
-      if(!self.draftId) return;
-      nkcAPI(`/creation/drafts/editor?draftId=${self.draftId}`, 'GET', {})
-        .then(res => {
-          const {content, title} = res.draftData;
-          self.document.content = content;
-          self.document.title = title;
-          self.initDocumentForm();
-        })
-        .then(() => {
-          self.ready = true;
-        })
-        .catch(err => {
-          sweetError(err);
-        })
-    },
-    initDocumentForm() {
-      const {content, title} = this.document;
-      this.$refs.documentEditor.initDocumentForm({
-        content,
-        title
-      });
+      if(id){
+        // 进行填充内容
+        this.$refs?.draftEditor.setContent(this.document.content);
+      }
     },
     //提交表单或自动保存表单
     post(type){
       const self = this;
       const {draftId} = this;
-      const {title = '', content = ''} = this.document;
+      const {title = '', content = '',l} = this.document;
       return nkcAPI('/creation/drafts/editor', 'POST', {
         title,
         content,
         type,
         draftId,
+        l,
       })
         .then(res => {
           self.draftId = res.draftId;
@@ -228,94 +200,40 @@ export default {
       const self = this;
       this.post(this.types.modify)
         .then(() => {
+          self.$refs?.draftEditor?.removeNoticeEvent();
           self.$router.push({
             name: 'creationDrafts'
           });
         })
         .catch(sweetError);
     },
-    initAuthSaveDraftTimeout() {
-      const self = this;
-      self.setInterval = setTimeout(() => {
-        self.authSaveAsHistory()
-          .then(() => {
-            self.initAuthSaveDraftTimeout();
-          })
-          .catch(err =>{
-            self.initAuthSaveDraftTimeout();
-          })
-      }, 60000);
-    },
     // 手动保存成历史版
     manuallySaveAsHistory() {
-      this
-        .saveAsHistory(this.types.save)
+      this.post(this.types.save)
         .then(() => {
           sweetSuccess('保存成功');
           this.saveToDraftSuccess();
+          this.$refs?.draftEditor?.removeNoticeEvent();
         })
         .catch(sweetError);
     },
-    // 自动定时保存成历史版
-    authSaveAsHistory() {
-      return this
-        .saveAsHistory(this.types.autoSave)
-        .catch(err => {
-          screenTopWarning(`快照自动保存失败 error: ${err.error || err.message}`);
-        });
-    },
-    // 保存编辑版内容，并根据编辑版内容生成历史版
-    saveAsHistory(type) {
-      const {draftId, post} = this;
-      return Promise.resolve()
-        .then(() =>{
-          if(draftId) {
-            return post(type)
-          }
-        })
-    },
-    // 输入框内容变动自动保存，覆盖编辑版内容
-    saveChangedDraftContent() {
-      const self = this;
-      return Promise.resolve()
-        .then(() => {
-          self.setSavedStatus('saving');
-          return self.post(self.type);
-        })
-        .then(() => {
-          self.setSavedStatus('succeeded');
-        })
-        .catch(err => {
-          self.setSavedStatus('failed');
-          screenTopWarning(err.error || err.message);
-        });
-    },
     // 检测到编辑器内容改变后触发
-    watchContentChange(data) {
-      const  {content, title} = data;
-      this.document.title = title;
-      this.document.content = content;
-      this.saveChangedDraftContent();
-    },
-    // 调用编辑器显示保存状态信息 succeeded, failed, saving
-    setSavedStatus(status) {
-      this.$refs.documentEditor.setSavedStatus(status);
-    },
+    watchContentChange:debounce(function(){
+      this.document.content = this.$refs?.draftEditor.getContent();
+      this.post(this.type)
+    },1000),
+    // 标题变化
+    contentChange:debounce(function (){
+      if(this.$refs.draftEditor.ready){
+        this.document.content = this.$refs.draftEditor.getContent();
+      }
+      this.post(this.type);
+    },1000),
     //保存草稿成功提示
     saveToDraftSuccess() {
       let time = new Date();
       this.autoSaveInfo = "草稿已保存 " + timeFormat(time);
     },
-    //自动保存草稿
-    autoSaveToDraft() {
-      const self = this;
-      if(self.draftId) {
-        self.post('save')
-          .then(() => {
-            self.saveToDraftSuccess();
-          })
-      }
-    }
   }
 }
 </script>

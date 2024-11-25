@@ -1,0 +1,20 @@
+mixin renderCodeBlock(node)
+  //- pre
+  //-   code
+  //-     +loopRender(node.content)
+  -
+    // 获取json内容的文本
+    function getNodesText(nodes = []) {
+      let text = '';
+      for (const node of nodes) {
+        if (node.type === 'text') {
+          text += node.text;
+        } else if (node.content && node.content.length > 0) {
+          text += getNodesText(node.content);
+        }
+      }
+      return text;
+    }
+    const textContent = getNodesText(node?.content);
+    const la = node?.attrs?.language || 'plain';
+  pre(data-tag="nkcsource" data-type="pre" data-id=`${la}`)=textContent

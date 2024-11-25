@@ -4,53 +4,14 @@
     emoji-selector(ref="emojiSelector")
     .content-body
       .textarea-editor-container
-        textarea-editor(ref="textareaEditor" @content-change="onTextareaEditorContentChange" @click-ctrl-enter="onClickEnter")
+        editor-core(ref="editorCore" @content-change="onEditorContentChange" @click-ctrl-enter="onClickEnter")
       .files-container
         .medias(v-if="mediasUrl.length > 0")
-          //-.media-item(v-for="(media, index) in mediasUrl" :style=" media.type==='picture'? `background-image: url(${media.url})` :`background-image: url(${media.cover})` ")
-            .icon-remove(@click="removeFromArr(medias, index)" title="取消选择")
-              .fa.fa-trash-o
-            .fa.fa-play-circle-o(v-if=" media.type==='video' " class='play-icon')
           .media-item(v-for="(media, index) in mediasUrl" :style=" media.type==='picture'? `background-image: url(${media.url})` : '' ")
             .icon-remove(@click="removeFromArr(medias, index)" title="取消选择")
               .fa.fa-trash-o
-            //-.fa.fa-play-circle-o(v-if=" media.type==='video' " class='play-icon')
             video(v-if=" media.type==='video' " :src="media.url" :poster="media.cover" controls="controls")
-        //-.pictures(v-if="picturesUrl.length > 0")
-          .picture-item(v-for="(url, index) in picturesUrl" :style="'background-image: url('+url+')'")
-            .icon-remove(@click="removeFromArr(picturesId, index)" title="取消选择")
-              .fa.fa-trash-o
-        //-.videos(v-if="videosUrl.length > 0")
-          .video-item(v-for="(videoUrl, index) in videosUrl")
-            .icon-remove(@click="removeFromArr(videosId, index)" title="取消选择")
-              .fa.fa-trash-o
-            video(:src="videoUrl.url" :poster="videoUrl.cover" controls="controls")
     .buttons-container.m-b-1
-      //-.button-icon(
-        @click="selectMedia('picture')"
-        :class="{'disabled': !allowedToSelectMedia}"
-        @mouseover="iconMouseOver(icons.image)"
-        @mouseleave="iconMouseLeave(icons.image)"
-        title="图片"
-        )
-        add-picture(
-          :theme="icons.image.theme"
-          :size="icons.image.size"
-          :fill="icons.image.fill"
-          )
-      //-.button-icon(
-        @click="selectMedia('video')"
-        :class="{'disabled': !allowedToSelectMedia}"
-        @mouseover="iconMouseOver(icons.video)"
-        @mouseleave="iconMouseLeave(icons.video)"
-        title="视频"
-        )
-        //.icon.fa.fa-file-video-o
-        video-two(
-          :theme="icons.video.theme"
-          :size="icons.video.size"
-          :fill="icons.video.fill"
-          )
       .button-icon(
         @click="selectMedia"
         :class="{'disabled': !allowedToSelectMedia}"
@@ -78,7 +39,7 @@
         @click="visitZoneArticleEditor"
         @mouseover="iconMouseOver(icons.article)"
         @mouseleave="iconMouseLeave(icons.article)"
-        title="发长电文"
+        title="去编辑器"
         )
         newspaper-folding(
           :theme="icons.article.theme"
@@ -324,13 +285,13 @@
 
 <script>
   import ResourceSelector from '../ResourceSelector';
-  import {getLength} from '../../js/checkData';
+  import { getMomentPlainJsonContentLength } from "../../js/checkData";
   import {getUrl} from '../../js/tools';
   import {screenTopWarning} from "../../js/topAlert";
   import {immediateDebounce} from '../../js/execution';
   import {nkcAPI} from '../../js/netAPI';
   import EmojiSelector from '../EmojiSelector';
-  import TextareaEditor from '../TextareaEditor';
+  import EditorCore from './EditorCore.plain.vue'
   import {visitUrl} from "../../js/pageSwitch";
   import {
     Home as HomeIcon,
@@ -348,9 +309,9 @@
   export default {
     props: ['published','mid'],
     components: {
+      'editor-core': EditorCore,
       'resource-selector': ResourceSelector,
       'emoji-selector': EmojiSelector,
-      'textarea-editor': TextareaEditor,
       'home-icon': HomeIcon,
       'add-picture': AddPicture,
       'video-two': VideoTwo,
@@ -417,7 +378,7 @@
       },
       contentLength() {
         const {content} = this;
-        return getLength(content);
+        return getMomentPlainJsonContentLength(content);
       },
       allowedToPublish() {
         const {contentLength, maxContentLength, momentId} = this;
@@ -473,7 +434,7 @@
     },
     methods: {
       visitZoneArticleEditor() {
-        visitUrl(`/creation/editor/zone/article`, true);
+        visitUrl(`/z/editor/rich`, true);
       },
       iconMouseOver(e) {
         e.fill = iconFill.active;
@@ -483,7 +444,7 @@
       },
       reset() {
         this.momentId = '';
-        this.setTextareaEditorContent('');
+        this.setEditorContent('');
         this.picturesId = [];
         this.videosId = [];
         this.medias = [];
@@ -491,43 +452,35 @@
       initData() {
         const self = this;
         if(!this.mid){
-          nkcAPI(`/creation/zone/moment?from=editor`, 'GET')
+          nkcAPI(`/api/v1/zone/editor/plain`, 'GET')
             .then(res => {
-              const {momentId, content, picturesId, videosId, medias} = res;
-              if(!momentId) return;
-              self.momentId = momentId;
-              self.content = content;
-              self.syncTextareaEditorContent();
-              // self.picturesId = picturesId;
-              // self.videosId = videosId;
-              self.medias = medias;
+              const {momentId, content, medias} = res.data;
+              if(momentId) {
+                self.momentId = momentId;
+                self.content = content;
+                self.syncEditorContent();
+                self.medias = medias;
+              }
+              self.hideEditorLoading();
             })
             .catch(err => {
               sweetError(err);
             });
         }else {
-          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'GET').then((res)=>{
-            const {momentId, content, picturesId, videosId,momentStatus,files,mediaType,medias} = res.data;
-            if(!momentId) return;
-            self.momentId = momentId;
-            self.content = content;
-            self.syncTextareaEditorContent();
-            self.momentStatus = momentStatus
-            self.medias = medias;
-            // if(files.length>0){
-            //   if(mediaType === 'mediaPicture'){
-            //     self.picturesId = files
-            //   }else {
-            //     self.videosId =  files
-            //   }
-            // }else {
-            //   self.picturesId = picturesId;
-            //   self.videosId = videosId;
-            // }
-
-          }).catch(err=>{
-            sweetError(err,'err')
-          })
+          nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`, 'GET')
+            .then(res => {
+              const {momentId, content, momentStatus, medias} = res.data;
+              if(momentId) {
+                self.momentId = momentId;
+                self.content = content;
+                self.syncEditorContent();
+                self.momentStatus = momentStatus
+                self.medias = medias;
+              }
+              self.hideEditorLoading();
+            }).catch(err=>{
+              sweetError(err,'err')
+            })
         }
       },
       lockButton() {
@@ -578,30 +531,6 @@
         temMedia.push(...readyMedia);
         this.medias= temMedia.slice(0, this.maxMediaCount);
       },
-      selectPicture() {
-        const self = this;
-        if(!this.allowedToSelectPicture) return;
-        const type = 'picture';
-        this.$refs.resourceSelector.open(res => {
-          self.addResourcesId(type, res.resourcesId);
-          self.$refs.resourceSelector.close();
-        }, {
-          allowedExt: [type],
-          countLimit: self.maxPictureCount - self.picturesId.length
-        });
-      },
-      selectVideo() {
-        const self = this;
-        if(!this.allowedToSelectVideo) return;
-        const type = 'video';
-        this.$refs.resourceSelector.open(res => {
-          self.addResourcesId(type, res.resourcesId);
-          self.$refs.resourceSelector.close();
-        }, {
-          allowedExt: [type],
-          countLimit: self.maxVideoCount - self.videosId.length
-        });
-      },
       selectMedia() {
         const self = this;
         if(!this.allowedToSelectMedia) return;
@@ -615,13 +544,18 @@
         });
       },
       insertContent(text) {
-        return this.$refs.textareaEditor.insertContent(text);
+        return this.$refs.editorCore.insertContent(text);
       },
       selectEmoji() {
         const self = this;
         this.$refs.emojiSelector.open(res => {
           const {code} = res;
-          self.insertContent(`[${code}]`);
+          self.insertContent(JSON.stringify({
+            type: 'nkc-emoji',
+            attrs: {
+              unicode: code,
+            }
+          }));
         });
       },
       removeFromArr(arr, index) {
@@ -633,7 +567,7 @@
         // const resourcesId = picturesId.length > 0? picturesId: videosId;
         const resourcesId = medias.map(item=>item.rid);
         if(momentStatus === 'normal'){
-          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'POST',{
+          nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`,'POST',{
             content,
             resourcesId
           }).then((res)=>{
@@ -644,9 +578,7 @@
             self.unlockButton();
           })
         }else {
-          nkcAPI(`/creation/zone/moment`, 'POST', {
-          type: 'publish',
-          momentId,
+          nkcAPI(`/api/v1/zone/editor/plain`, 'POST', {
           content,
           resourcesId
         })
@@ -667,30 +599,33 @@
         const newData = {...data,submitting:this.submitting}
         this.$emit('published',newData)
       },
-      onTextareaEditorContentChange(content) {
+      onEditorContentChange(content) {
         this.content = content;
       },
-      setTextareaEditorContent(content) {
-        this.$refs.textareaEditor.setContent(content);
+      setEditorContent(content) {
+        this.$refs.editorCore.setContent(content);
       },
-      syncTextareaEditorContent() {
-        this.setTextareaEditorContent(this.content);
+      syncEditorContent() {
+        this.setEditorContent(this.content);
+      },
+      hideEditorLoading() {
+        this.$refs.editorCore.hideLoading();
       },
       onClickEnter() {
         this.publishContent();
       },
       onContentChange: immediateDebounce(function() {
         this.saveContent();
-      }, 2000),
+      }, 1000),
       saveContent() {
         const self = this;
         //暂存的
-        const {content, picturesId, videosId, momentId,momentStatus ,medias} = this;
+        const {content, momentId, momentStatus, medias} = this;
         // const resourcesId = picturesId.length > 0? picturesId: videosId;
         const resourcesId =  medias.map(item=>item.rid);
         //判断是否是已发表的电文的编辑
         if(momentStatus === 'normal'){
-          nkcAPI(`/api/v1/editor/moment/${this.mid}`,'PUT',{
+          nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`,'PUT',{
             content,
             resourcesId
           }).then(()=>{
@@ -700,17 +635,13 @@
             sweetError(err, 'err')
           })
         }else {
-          const type = momentId? 'modify': 'create';
-          return nkcAPI(`/creation/zone/moment`, 'POST', {
-            type,
+          return nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
             content,
             momentId,
             resourcesId
           })
             .then((res) => {
-              if(type === 'create') {
-                self.momentId = res.momentId;
-              }
+              self.momentId = res.data.momentId;
               console.log(`电文已自动保存`);
             })
             .catch(err => {

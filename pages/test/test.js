@@ -18,6 +18,8 @@ import style from './test.module.less';
 // 宏脚本(编译时执行)  (babel-plugin-preval插件提供)
 import bundle from './lib/bundle.preval.js';
 import StickerSelector from '../lib/vue/StickerSelector/StickerSelector.vue';
+import EditorTiptap from '../lib/vue/Editor.json.vue';
+import LinkEditor from '../lib/vue/LinkEditor.vue';
 
 console.log('模块化CSS:', style);
 console.log('宏脚本导出:', bundle);
@@ -32,8 +34,7 @@ new Vue({
     VueXcomponent,
     FunctionalComponentSfc,
     'sticker-selector': StickerSelector,
-  },
-  mounted() {
-    this.$refs.stickerSelector.open();
+    'editor-tiptap': EditorTiptap,
+    'link-editor': LinkEditor,
   },
 }).$mount('#app');

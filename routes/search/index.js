@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const router = new Router();
 router.get('/', async (ctx, next) => {
   const time = Date.now();
@@ -351,7 +352,11 @@ router.get('/', async (ctx, next) => {
     });
     posts.map((post) => {
       tids.add(post.tid);
-      post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
+      post.c = nkcModules.apiFunction.obtainPureText(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+        true,
+        200,
+      );
       postObj[post.pid] = post;
     });
 
@@ -581,7 +586,11 @@ router.get('/', async (ctx, next) => {
             continue;
           }
         }
-        page.c = nkcModules.apiFunction.obtainPureText(page.c, true, 200);
+        page.c = nkcModules.apiFunction.obtainPureText(
+          page.l === 'json' ? renderHTMLByJSON({ json: page.c }) : page.c,
+          true,
+          200,
+        );
         r = {
           docType,
           t: highlightObj[`${tid}_t`] || page.t,
@@ -635,7 +644,9 @@ router.get('/', async (ctx, next) => {
             highlightObj[`${tid}_content`] ||
             '内容：' +
               nkcModules.apiFunction.obtainPureText(
-                document.content,
+                document.l === 'json'
+                  ? renderHTMLByJSON({ json: document.content })
+                  : document.content,
                 true,
                 200,
               ),
@@ -680,7 +691,9 @@ router.get('/', async (ctx, next) => {
             highlightObj[`${tid}_content`] ||
             '内容：' +
               nkcModules.apiFunction.obtainPureText(
-                commentDocument.content,
+                commentDocument.l === 'json'
+                  ? renderHTMLByJSON({ json: commentDocument.content })
+                  : commentDocument.content,
                 true,
                 200,
               ),

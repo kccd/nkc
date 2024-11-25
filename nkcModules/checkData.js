@@ -1,7 +1,7 @@
-var inBrowser = (typeof document !== 'undefined');
+var inBrowser = typeof document !== 'undefined';
 var CheckData = function () {
-  if(inBrowser) {
-    this.te = function(status, info) {
+  if (inBrowser) {
+    this.te = function (status, info) {
       throw info;
     };
   } else {
@@ -9,80 +9,180 @@ var CheckData = function () {
   }
   var self = this;
   /*
-  * 获取数据长度
-  * @param {Number/String} data 待检测的数据
-  * @return {Number}
-  * @author pengxiguaa 2019-9-6
-  * */
-  self.getLength = function(data) {
+   * 获取数据长度
+   * @param {Number/String} data 待检测的数据
+   * @return {Number}
+   * @author pengxiguaa 2019-9-6
+   * */
+  self.getLength = function (data) {
     data = data.toString();
     var zhCN = data.match(/[^\x00-\xff]/g) || [];
     return data.length + zhCN.length;
   };
+  self.getErrorJsonData = function (jsonStr, errorMessage) {
+    return {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: errorMessage,
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: jsonStr,
+            },
+          ],
+        },
+      ],
+    };
+  };
+  self.getEditorJsonLength = function (jsonString, nodesSize = {}) {
+    if (!jsonString) {
+      return 0;
+    }
+    var jsonData;
+    if (typeof jsonString === 'string') {
+      try {
+        jsonData = JSON.parse(jsonString);
+      } catch (err) {
+        jsonData = self.getErrorJsonData(
+          jsonString,
+          `JSON解析错误：${err.message}`,
+        );
+      }
+    } else {
+      jsonData = jsonString;
+    }
+
+    var getNodes = function (nodes) {
+      var newNodes = [];
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        newNodes.push(node);
+        if (node.content && node.content.length > 0) {
+          newNodes.push(...getNodes(node.content));
+        }
+      }
+      return newNodes;
+    };
+    var nodes = getNodes(jsonData.content);
+    var totalSize = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (node.type === 'text') {
+        totalSize += self.getLength(node.text);
+      } else {
+        var currentNodeSize = nodesSize[node.type] || 0;
+        totalSize += currentNodeSize;
+      }
+    }
+    return totalSize;
+  };
+  //  获取纯文本电文的内容长度
+  self.getMomentPlainJsonContentLength = function (jsonString) {
+    return self.getEditorJsonLength(jsonString, {
+      'nkc-emoji': 2,
+    });
+  };
+  // 获取富文本json的内容长度
+  self.getRichJsonContentLength = function (jsonString) {
+    return self.getEditorJsonLength(jsonString, {
+      'nkc-emoji': 2,
+      'nkc-attachment-block': 2,
+      'nkc-sticker': 2,
+      'nkc-file-status-block': 2,
+      'nkc-file-status-inline': 2,
+      'nkc-picture-block': 2,
+      'nkc-picture-inline': 2,
+      'nkc-video-block': 2,
+      'nkc-audio-block': 2,
+      'nkc-math': 2,
+    });
+  };
   /*
-  * 检测数字类型
-  * @param data 需要检测的数据
-  * @param {Object} options
-  *   name: 变量名
-  *   min: 最小值
-  *   max: 最大值
-  *   fractionDigits: 小数位数
-  * @author pengxiguaa 2019-9-6
-  * */
-  this.checkNumber = function(data, options) {
+   * 检测数字类型
+   * @param data 需要检测的数据
+   * @param {Object} options
+   *   name: 变量名
+   *   min: 最小值
+   *   max: 最大值
+   *   fractionDigits: 小数位数
+   * @author pengxiguaa 2019-9-6
+   * */
+  this.checkNumber = function (data, options) {
     options = options || {};
     var min = options.min;
     var max = options.max;
     var fractionDigits = options.fractionDigits || 0;
-    var name = options.name || "";
-    if(typeof(data) !== "number" || isNaN(data)) {
-      self.te(400, name + "数据类型错误");
+    var name = options.name || '';
+    if (typeof data !== 'number' || isNaN(data)) {
+      self.te(400, name + '数据类型错误');
     }
-    if(min !== undefined) {
-      if(data < min) self.te(400, name + "数值不能小于" + min);
+    if (min !== undefined) {
+      if (data < min) {
+        self.te(400, name + '数值不能小于' + min);
+      }
     }
-    if(max !== undefined) {
-      if(data > max) self.te(400, name + "数值不能大于" + max);
+    if (max !== undefined) {
+      if (data > max) {
+        self.te(400, name + '数值不能大于' + max);
+      }
     }
-    var dataArr = data.toString().split(".")[1];
-    var length = (dataArr || "").length;
-    if(length > fractionDigits) {
-      if(fractionDigits === 0) self.te(400, name + "数值必须为整数");
-      self.te(400, name + "仅支持最多" + fractionDigits + "位小数的数字");
+    var dataArr = data.toString().split('.')[1];
+    var length = (dataArr || '').length;
+    if (length > fractionDigits) {
+      if (fractionDigits === 0) {
+        self.te(400, name + '数值必须为整数');
+      }
+      self.te(400, name + '仅支持最多' + fractionDigits + '位小数的数字');
     }
   };
   /*
-  * 检测字符串
-  * @param data 需要检测的数据
-  * @param {Object} options
-  *   name: 变量名
-  *   minLength: 最小字节长度
-  *   maxLength: 最大字节长度
-  *   minTextLength: 最小字数 通过 $(content).text().length 获得的字数，可用于判断 html
-  *   maxTextLength: 最大字数 通过 $(content).text().length 获得的字数，可用于判断 html
-  * @author pengxiguaa 2019-9-6
-  * */
-  this.checkString = function(data, options) {
+   * 检测字符串
+   * @param data 需要检测的数据
+   * @param {Object} options
+   *   name: 变量名
+   *   minLength: 最小字节长度
+   *   maxLength: 最大字节长度
+   *   minTextLength: 最小字数 通过 $(content).text().length 获得的字数，可用于判断 html
+   *   maxTextLength: 最大字数 通过 $(content).text().length 获得的字数，可用于判断 html
+   * @author pengxiguaa 2019-9-6
+   * */
+  this.checkString = function (data, options) {
     options = options || {};
-    var name = options.name || "";
+    var name = options.name || '';
     var minLength = options.minLength;
     var maxLength = options.maxLength;
     var minTextLength = options.minTextLength;
     var maxTextLength = options.maxTextLength;
 
-    if(typeof(data) !== "string") {
-      self.te(400, name + "数据类型错误");
+    if (typeof data !== 'string') {
+      self.te(400, name + '数据类型错误');
     }
-    if(minLength !== undefined && self.getLength(data) < minLength) {
-      self.te(400, name + "长度不能小于" + minLength + "个字节");
+    if (minLength !== undefined && self.getLength(data) < minLength) {
+      self.te(400, name + '长度不能小于' + minLength + '个字节');
     }
-    if(maxLength !== undefined && self.getLength(data) > maxLength) {
-      self.te(400, name + "长度不能大于" + maxLength + "个字节");
+    if (maxLength !== undefined && self.getLength(data) > maxLength) {
+      self.te(400, name + '长度不能大于' + maxLength + '个字节');
     }
-    if(minTextLength !== undefined && self.getHTMLTextLength(data) < minTextLength) {
-      self.te(400, name + "字数不能小于" + minTextLength + "个字");
+    if (
+      minTextLength !== undefined &&
+      self.getHTMLTextLength(data) < minTextLength
+    ) {
+      self.te(400, name + '字数不能小于' + minTextLength + '个字');
     }
-    if(maxTextLength !== undefined && self.getHTMLTextLength(data) > maxTextLength) {
+    if (
+      maxTextLength !== undefined &&
+      self.getHTMLTextLength(data) > maxTextLength
+    ) {
       self.te(400, name + '字数不能大于' + maxTextLength + '个字');
     }
   };
@@ -117,9 +217,9 @@ var CheckData = function () {
     }
   };*/
 
-  this.getHTMLTextLength = function(html) {
+  this.getHTMLTextLength = function (html) {
     html = html || '';
-    if(inBrowser) {
+    if (inBrowser) {
       return $(html).text().length;
     } else {
       const cheerio = require('cheerio');
@@ -128,17 +228,17 @@ var CheckData = function () {
   };
 
   /*
-  * 检测邮箱格式
-  * */
-  this.checkEmail = function(data) {
-    var path = /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-    if(!path.test(data)) {
-      self.te(400, "邮箱格式不符合要求");
+   * 检测邮箱格式
+   * */
+  this.checkEmail = function (data) {
+    var path =
+      /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    if (!path.test(data)) {
+      self.te(400, '邮箱格式不符合要求');
     }
   };
-
 };
-if(inBrowser) {
+if (inBrowser) {
   NKC.methods.checkData = new CheckData();
 } else {
   module.exports = new CheckData();

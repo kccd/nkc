@@ -1,0 +1,16 @@
+extends ../bootstrap_base
+block title
+  title json渲染数据
+block content
+  .container-fluid.max-width
+    .col-xs-12.col-md-9.box-shadow-panel.m-b-1
+      .col-xs-12.col-md-12
+        .row
+          .col-xs-12.col-md-12
+            div!=data.c
+            include ../../pages/publicModules/nkcSource.pug
+    .col-xs-12.col-md-3
+     .m-b-1.box-shadow 其他他他他他他
+
+block scripts
+  //- +includeJS('/test/test.js')

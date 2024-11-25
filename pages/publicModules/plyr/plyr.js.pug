@@ -1,6 +1,7 @@
 if !isIncluded('plyr')
-  +includeJS("/external_pkgs/plyr/plyr.polyfilled.min.js")
-  +includeJS("/external_pkgs/plyr/plyr.min.js")
+  // plyr相关文件已经在bootstrap_base.pug中引入，无需在此处引入
+  // +includeJS("/external_pkgs/plyr/plyr.polyfilled.min.js")
+  // +includeJS("/external_pkgs/plyr/plyr.min.js")
   include ./mask.pug
 
   +includeJS('/publicModules/plyr/controls.js')

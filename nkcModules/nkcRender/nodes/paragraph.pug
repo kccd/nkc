@@ -1,0 +1,14 @@
+mixin renderParagraph(node)
+  -
+    var style='';
+    var {attrs} = node;
+    var {textAlign, textIndent} = attrs || {};
+    if(textAlign) {
+      style += `text-align: ${textAlign};`;
+    }
+    if(textIndent) {
+      style += `text-indent: ${textIndent}em;`;
+    }
+  p(style=style)
+    if node.content
+      +loopRender(node.content)

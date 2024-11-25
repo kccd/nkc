@@ -3,6 +3,8 @@ const { OnlyUser } = require('../../../../middlewares/permission');
 const {
   momentCheckerService,
 } = require('../../../../services/moment/momentChecker.service');
+const editorRouter = require('./editor');
+const momentRouter = require('./moment');
 const router = new Router();
 const zoneTypes = {
   moment: 'm',
@@ -288,5 +290,11 @@ router
     };
     await moment.addMomentHits();
     await next();
-  });
+  })
+  .use(
+    '/moment/:momentId',
+    momentRouter.routes(),
+    momentRouter.allowedMethods(),
+  )
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods());
 module.exports = router;

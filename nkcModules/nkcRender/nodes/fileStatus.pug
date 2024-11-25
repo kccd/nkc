@@ -1,0 +1,16 @@
+mixin renderFileStatus(node) 
+  span(data-id=node.attrs.id style=`
+    display: inline-block;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+    background-color: #ffe4e4;
+    font-size: 1.2rem;
+    border: 1px solid #ff6969;
+  `) 
+    span.fa.fa-info-circle(style=`
+      font-size: 1.3rem;
+      margin-right: 0.5rem;
+      color: #ff6969;
+    `)
+    span 图片异常，请作者重新上传。

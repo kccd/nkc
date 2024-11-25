@@ -1,0 +1,119 @@
+mixin renderText(node) 
+  - 
+    var style = '';
+    var link = null;
+    var isCode = false;
+    var isStrike = false;
+    if(node.marks) {
+      for(var i = 0; i < node.marks.length; i++) {
+        var mark = node.marks[i];
+        switch (mark.type) {
+          case 'bold':
+            style += 'font-weight: bold;';
+            break;
+          case 'italic':
+            style += 'font-style: italic;';
+            break;
+          case 'underline':
+            style += 'text-decoration: underline;';
+            break;
+          case 'strike':
+            isStrike = true;
+            //- style += 'text-decoration: line-through;';
+            break;
+          case 'nkc-font-size':
+            style += `font-size: ${mark.attrs.size};`;
+            break;
+          case 'textStyle':
+            if(mark.attrs.color) {
+              style += `color: ${mark.attrs.color};`;
+            }
+            if(mark.attrs.fontFamily) {
+              style += `font-family: ${mark.attrs.fontFamily};`;  
+            }
+            break;
+          case 'highlight':
+            style += `background-color: ${mark.attrs.color};`;    
+            break;
+          case 'link':
+            link = {
+              href: mark.attrs.href,
+              target: mark.attrs.target,
+              rel: mark.attrs.title
+            }
+            break;  
+          case 'code':
+            isCode = true;
+            break;  
+          case 'subscript':
+            style += 'vertical-align: sub;';
+            break;
+          case 'superscript':
+            style += 'vertical-align: super;';
+            break;
+          default:
+            console.log(`Unknown mark type: ${mark.type}`);
+        }
+      }
+    }      
+  span(style=style)
+    mixin textNode 
+      if link !== null
+        if isCode
+          a(href=link.href target=link.target rel=link.rel)
+            code=node.text
+        else
+          if link.href && !domainWhitelistReg.test(link.href)
+            a(href=`/l?t=${encodeURIComponent(Buffer.from(link.href).toString('base64'))}` target='_blank' rel=link.rel)
+              span= node.text
+          else 
+            a(href=link.href target=link.target rel=link.rel)
+              span= node.text
+            
+      else  
+        if isCode
+          code=node.text
+        else
+          -
+            const usersObj = {};
+            const usersName = [];
+            for (let i = 0; i < atUsers.length; i++) {
+              const u = atUsers[i];
+              let username = u.username ? u.username.toLowerCase() : '';
+              if (!username) {
+                continue;
+              }
+              usersObj[username] = u;
+              usersName.push(`@${username}`);
+            }
+            const atReg = new RegExp(`(${usersName.join('|')})`, 'gi');
+            const replacedTextWithAtUsers  = node.text.replace(atReg, (match) => {
+              const username = match.slice(1).toLowerCase(); // 去掉 @ 符号
+              const user = usersObj[username];
+              if (user) {
+                  return `<a href="/u/${user.uid}" target="_blank">${match}</a>`;
+              }
+              return match; 
+            });
+            const replacedLink = replacedTextWithAtUsers.replace(urlReg, (c) => {
+              if (domainWhitelistReg.test(c)) {
+                return c;
+              } else {
+                const arr = Array(c.length).fill('X');
+                //- return arr.join('');
+                return `<span data-type="nkc-url" data-url="${Buffer.from(encodeURIComponent(c)).toString('base64')}">${arr.join('')}</span>`;
+              }
+            });
+            const replacedText = replacedLink.replace(/#((D|t)?\d+)/g, (match, p1) => {
+              const link = /^D(\d+)$/.test(p1)
+                ? `/document/d/${p1.replace(/^D/, '')}`
+                : `/p/${p1}?redirect=true`;
+              return `<a href="${link}" target="_blank">${match}</a>`;
+            });
+          span!=replacedText
+          //- span= node.text
+    if isStrike
+      s
+        +textNode      
+    else 
+      +textNode  

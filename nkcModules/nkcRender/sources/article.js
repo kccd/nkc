@@ -2,6 +2,7 @@ const { getUrl, getSize, objToStr } = require('../../tools');
 const cheerio = require('../customCheerio');
 const { htmlEscape } = require('../htmlEscape');
 const videoSize = require('../../../settings/video');
+const tools = require('../../tools');
 module.exports = {
   picture(html = '', id, resource = {}) {
     const { rid = id, disabled, defaultFile = {} } = resource || {};
@@ -49,7 +50,7 @@ module.exports = {
   },
 
   video(html = '', id, resource = {}) {
-    const { visitorAccess = true, rid = id, defaultFile = {} } = resource;
+    const { visitorAccess = true, rid = id, defaultFile = {}, mask } = resource;
     const oname = defaultFile.name || '未知';
     const poster = getUrl('resourceCover', rid);
     if (resource.disabled) {
@@ -65,9 +66,11 @@ module.exports = {
         sourceHtml += `<source src="${url}" type="video/mp4" size="${height}" data-size="${dataSize}"> 你的浏览器不支持video标签，请升级。`;
         // downloadHtml += `<a href="${downloadUrl}" data-type="download" data-title="${oname}" target="_blank">${height}p(${dataSize})</a> `;
       }
-      downloadHtml = `<a data-type="downloadPanel" data-id="${resource.rid}">点击下载</a>`;
+      downloadHtml = `<a data-global-click="openDownloadPanel" data-global-data="${tools.objToStr(
+        { rid: resource.rid },
+      )}">点击下载</a>`;
       return `
-      <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}" >
+      <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}" data-mask="${mask}">
         <span>
           <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
             ${sourceHtml}
@@ -95,7 +98,9 @@ module.exports = {
     if (!resource.isFileExist) {
       return `<span data-tag="nkcsource" data-type="audio-not-found" data-id="${id}"><span>音频已丢失</span></br><span>${oname}</span></span>`;
     }
-    const downloadHtml = `<a data-type='downloadPanel' data-id="${resource.rid}">立即下载</a>`;
+    const downloadHtml = `<a data-global-click="openDownloadPanel" data-global-data="${tools.objToStr(
+      { rid: resource.rid },
+    )}">立即下载</a>`;
     return `
         <span data-tag="nkcsource" data-type="audio" data-id="${id}" data-visitor-access="${visitorAccess}">
           <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${
@@ -152,7 +157,9 @@ module.exports = {
           <span class="article-attachment-content">
             ${
               resource.isFileExist
-                ? `<span class="article-attachment-name" title="${oname}" data-type="downloadPanel" data-id="${id}">${oname}</span>`
+                ? `<span class="article-attachment-name" title="${oname}" data-global-click="openDownloadPanel" data-global-data="${objToStr(
+                    { rid: id },
+                  )}">${oname}</span>`
                 : `<span class="article-attachment-name" title="${oname}" title="${oname}（附件已丢失）">${oname}</span>`
             }
             <span class="article-attachment-info">

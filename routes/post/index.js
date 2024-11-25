@@ -26,6 +26,7 @@ const {
 const noticeRouter = require('./notice');
 const noticesRouter = require('./notices');
 const { checkString } = require('../../nkcModules/checkData');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 
 router
   .use('/', async (ctx, next) => {
@@ -427,6 +428,7 @@ router
       noticeContent,
       _id,
       type,
+      l,
     } = post;
     const { pid } = ctx.params;
     const { state, data, db, nkcModules } = ctx;
@@ -450,7 +452,10 @@ router
       }
     }
 
-    const content = customCheerio.load(c).text();
+    const content =
+      l === 'json'
+        ? customCheerio.load(renderHTMLByJSON({ json: c })).text()
+        : customCheerio.load(c).text();
 
     if (content.length < 2) {
       ctx.throw(400, `内容不能少于2个字`);

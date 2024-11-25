@@ -2,6 +2,7 @@ const router = require('koa-router')();
 const momentRouter = require('./moment');
 const nkcRender = require('../../nkcModules/nkcRender');
 const { subscribeSources } = require('../../settings/subscribe');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 router
   .use('/', async (ctx, next) => {
     const { state, data, db, path, internalData } = ctx;
@@ -364,13 +365,16 @@ router
         } else if (sub.type === 'article') {
           const { toc, type, status, _id, document, user, url } = sub;
           const { uid, username, avatar, id } = user;
-          const { title, content, cover } = document;
+          const { title, content, cover, l } = document;
           activity.push({
             toc,
             type,
             from: '发表专栏文章',
             title,
-            content: nkcRender.htmlToPlain(content, 200),
+            content: nkcRender.htmlToPlain(
+              l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+              200,
+            ),
             url,
             cover: nkcModules.tools.getUrl('postCover', cover),
             user: {
@@ -396,6 +400,7 @@ router
         cover: 1,
         mainForumsId: 1,
         columnsId: 1,
+        l: 1,
       })
         .sort({ toc: -1 })
         .skip(paging.start)
@@ -451,7 +456,9 @@ router
                 },
                 title: document.title,
                 content: nkcModules.nkcRender.htmlToPlain(
-                  document.content,
+                  document.l === 'json'
+                    ? renderHTMLByJSON({ json: document.content })
+                    : document.content,
                   200,
                 ),
                 cover: nkcModules.tools.getUrl('postCover', document.cover),

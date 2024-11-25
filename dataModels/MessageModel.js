@@ -3,7 +3,11 @@ const cheerio = require('cheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const tools = require('../nkcModules/tools');
-const { htmlToPlain } = require('../nkcModules/nkcRender');
+const {
+  getJsonStringTextSplit,
+  getJsonStringText,
+} = require('../nkcModules/json');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const messageSchema = new Schema(
   {
     // 消息id
@@ -797,7 +801,9 @@ messageSchema.statics.getParametersData = async (message) => {
       threadURL: getUrl('thread', thread.tid),
       threadTitle: firstPost.t,
       postURL: await PostModel.getUrl(post),
-      postContent: apiFunction.obtainPureText(post.c),
+      postContent: apiFunction.obtainPureText(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      ),
     };
   } else if (type === 'replyThread') {
     const { targetPid } = message.c;
@@ -825,7 +831,9 @@ messageSchema.statics.getParametersData = async (message) => {
       threadURL: getUrl('thread', thread.tid),
       threadTitle: firstPost.t,
       postURL: await PostModel.getUrl(post),
-      postContent: apiFunction.obtainPureText(post.c),
+      postContent: apiFunction.obtainPureText(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      ),
     };
   } else if (type === 'replyArticle') {
     //独立文章通知作者文章被回复了
@@ -854,7 +862,11 @@ messageSchema.statics.getParametersData = async (message) => {
       articleURL: comment.url,
       articleTitle: articleDocument.title,
       commentURL: comment.commentUrl,
-      commentContent: apiFunction.obtainPureText(commentDocument.content),
+      commentContent: apiFunction.obtainPureText(
+        commentDocument.l === 'json'
+          ? renderHTMLByJSON({ json: commentDocument.content })
+          : commentDocument.content,
+      ),
     };
   } else if (type === 'replyComment') {
     //独立文章通知作者文章被评论了
@@ -881,7 +893,11 @@ messageSchema.statics.getParametersData = async (message) => {
       articleURL: comment.url,
       articleTitle: articleDocument.title,
       commentURL: comment.commentUrl,
-      commentContent: apiFunction.obtainPureText(commentDocument.content),
+      commentContent: apiFunction.obtainPureText(
+        commentDocument.l === 'json'
+          ? renderHTMLByJSON({ json: commentDocument.content })
+          : commentDocument.content,
+      ),
     };
   } else if (type === 'comment') {
     const { pid } = message.c;
@@ -900,7 +916,9 @@ messageSchema.statics.getParametersData = async (message) => {
     }
     parameters = {
       postURL: await PostModel.getUrl(post),
-      postContent: apiFunction.obtainPureText(post.c),
+      postContent: apiFunction.obtainPureText(
+        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      ),
       userURL: user.uid ? getUrl('userHome', user.uid) : '',
       username: user.username,
     };
@@ -1125,7 +1143,7 @@ messageSchema.statics.getParametersData = async (message) => {
         //获取document所在article的url
         reviewLink: article[0].url || '',
         reason: reason ? reason : '未知',
-        title: document.title + article[0].url ? '' : '[文章已被删除]',
+        title: document.title + (article[0].url ? '' : '[文章已被删除]'),
       };
     } else if (document.source === 'comment') {
       const comment = await CommentModel.findOnly({ _id: document.sid });
@@ -1139,7 +1157,12 @@ messageSchema.statics.getParametersData = async (message) => {
       parameters = {
         //获取document所在comment的url
         reviewLink: _comment[0].url || '',
-        content: htmlToPlain(document.content, 100),
+        content: htmlToPlain(
+          document.l === 'json'
+            ? renderHTMLByJSON({ json: document.content })
+            : document.content,
+          100,
+        ),
         reason: reason ? reason : '未知',
         title: _comment[0].title || '未知',
       };
@@ -1156,7 +1179,10 @@ messageSchema.statics.getParametersData = async (message) => {
       }
       parameters = {
         reviewLink: _moment.url || '',
-        content: htmlToPlain(document.content, 100),
+        content:
+          document.l === 'json'
+            ? getJsonStringTextSplit(document.content, 100)
+            : htmlToPlain(document.content, 100),
         reason: reason ? reason : '未知',
       };
     }
@@ -1625,7 +1651,7 @@ messageSchema.statics.getParametersData = async (message) => {
       userHomeUrl: getUrl('userHome', user.uid),
       username: user.username,
       momentUrl: getUrl('zoneMoment', momentId),
-      content: await MomentModel.renderContent(betaDocument.content),
+      content: getJsonStringText(betaDocument.content),
     };
   }
   return parameters;
@@ -2147,9 +2173,7 @@ messageSchema.statics.extendMessages = async (messages = []) => {
           /\[f\/(.*?)]/g,
           function (r, v1) {
             const emojiUrl = getUrl('emoji', v1);
-            return (
-              '<img class="message-emoji" src="' + emojiUrl + '"/>'
-            );
+            return '<img class="message-emoji" src="' + emojiUrl + '"/>';
           },
         );
       }

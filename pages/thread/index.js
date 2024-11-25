@@ -13,6 +13,7 @@ import Vue from 'vue';
 const socket = getSocket();
 var surveyForms = [],
   draftId = '',
+  la = 'json',
   author = {},
   _id;
 
@@ -418,7 +419,7 @@ function assemblePostObject() {
   /* 2020-3-26 pengxiguaa */
   var post = {
     c: ue.getContent(),
-    l: 'html',
+    l: la || 'json',
   };
   if (window.quotePostApp && window.quotePostApp) {
     post.quote = window.quotePostApp.pid;
@@ -559,9 +560,10 @@ function saveDraft(threadId, userId) {
     });
 }
 // 用于初始化草稿参数
-function initDraft(draftDid, draft_id) {
+function initDraft(draftDid, draft_id, _la) {
   draftId = draftDid;
   _id = draft_id;
+  la = _la;
 }
 // 设置回复提交按钮的样式
 function setSubmitButton(submitting) {
@@ -783,7 +785,11 @@ function submit(tid) {
       });
     })
     .then(function (data) {
-      ue.setContent('');
+      if(!la || la === 'json'){
+        ue.clearContent();
+      }else{
+        ue.setContent('');
+      }
       draftId = '';
       _id = '';
       setSubmitButton(false);
@@ -880,6 +886,7 @@ function at(username) {
   if (!ue) {
     return screenTopAlert('权限不足');
   }
+  // 后期需要兼容新编辑器
   ue.execCommand('inserthtml', '@' + username);
   window.location.href = '#container';
   // openToNewLocation('#container');

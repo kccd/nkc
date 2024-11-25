@@ -10,7 +10,7 @@
               button.btn.btn-default(:class="{'btn-primary': tab === zoneTab.subscribe }" @click="getList(type,'s')") 我的关注
           .m-b-05.p-t-05(v-if="uid")
             moment-editor(@published='published')
-          .paging-button
+          //.paging-button
             a.button.radius-left(:class="{'active': type === zoneTypes.moment }" @click="getList('m',tab)") 电文
             a.button.radius-right(:class="{'active': type === zoneTypes.article }" @click="getList('a',tab)") 长电文
           paging(ref="paging" :pages="pageButtons" @click-button="clickButton")

@@ -1,7 +1,7 @@
 const cheerio = require('cheerio');
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
-
+const emojiRegex = require('emoji-regex');
 
 const dataStoreIndexKey = 'data-store-index';
 const dataStoreElement = 'data-store-element';
@@ -314,6 +314,305 @@ function setMark(html, notes = []) {
 exports.setMark = setMark;
 
 
+
+
+function setMarkByJson(jsonString, notes = []) {
+  let currentStart = 0;
+  let wrapped = false; // 标记是否已处理目标节点
+  // 递归处理节点
+  const wrapNodes = (nodes, { targetStart, targetEnd, noteId }) => {
+    return nodes.flatMap((node) => {
+      if (wrapped || node.type === 'codeBlock') {
+        return node;
+      }
+      // 处理文本节点
+      if (node.type === 'text') {
+        const { emojiPosition, pureText } = findEmojisInText(node.text);
+        node.text = pureText;
+        const textLength = node.text.length;
+        const currentTextEnd = currentStart + textLength;
+        const wrappedNodes = [];
+        if (currentStart <= targetStart && targetStart < currentTextEnd) {
+          // 文字最后的累计数大于目标开始索引==》标识开始
+          if (currentStart === targetStart) {
+            wrappedNodes.push({
+              type: 'nkc-note-tag',
+              attrs: {
+                id: noteId,
+                start: true,
+              },
+            });
+            wrappedNodes.push(node);
+          } else if (currentStart < targetStart) {
+            // 添加前面的文本部分（如果有）
+            wrappedNodes.push({
+              ...node,
+              text: node.text.slice(0, targetStart - currentStart),
+            });
+            wrappedNodes.push({
+              type: 'nkc-note-tag',
+              attrs: {
+                id: noteId,
+                start: true,
+              },
+            });
+            wrappedNodes.push({
+              ...node,
+              text: node.text.slice(targetStart - currentStart, textLength),
+            });
+          }
+          // node = wrappedNodes;
+        }
+        if (currentStart < targetEnd && targetEnd <= currentTextEnd) {
+          // 文字最后的累计数大于目标最后索引==》标识结束
+          // const wrappedNodes = [];
+          if (wrappedNodes.length !== 0) {
+            // 目标文字在一个文字节点内
+            if (wrappedNodes.length === 2) {
+              const tempNodes = [];
+              if (targetEnd === currentTextEnd) {
+                tempNodes.push(node);
+                tempNodes.push({
+                  type: 'nkc-note-tag',
+                  attrs: {
+                    id: noteId,
+                    end: true,
+                  },
+                });
+              } else if (targetEnd < currentTextEnd) {
+                tempNodes.push({
+                  ...node,
+                  text: node.text.slice(0, targetEnd - currentStart),
+                });
+                tempNodes.push({
+                  type: 'nkc-note-tag',
+                  attrs: {
+                    id: noteId,
+                    end: true,
+                  },
+                });
+                tempNodes.push({
+                  ...node,
+                  text: node.text.slice(targetEnd - currentStart, textLength),
+                });
+              }
+              wrappedNodes.pop();
+              wrappedNodes.push(...tempNodes);
+            } else if (wrappedNodes.length === 3) {
+              const tempNode = wrappedNodes.pop();
+              const TempTextLength = tempNode.text.length;
+              const tempCurrentStart =
+                currentStart + textLength - TempTextLength;
+              const tempCurrentTextEnd = tempCurrentStart + TempTextLength;
+              const tempNodes = [];
+              if (targetEnd === tempCurrentTextEnd) {
+                tempNodes.push(tempNode);
+                tempNodes.push({
+                  type: 'nkc-note-tag',
+                  attrs: {
+                    id: noteId,
+                    end: true,
+                  },
+                });
+              } else if (targetEnd < tempCurrentTextEnd) {
+                tempNodes.push({
+                  ...tempNode,
+                  text: tempNode.text.slice(0, targetEnd - tempCurrentStart),
+                });
+                tempNodes.push({
+                  type: 'nkc-note-tag',
+                  attrs: {
+                    id: noteId,
+                    end: true,
+                  },
+                });
+                tempNodes.push({
+                  ...tempNode,
+                  text: tempNode.text.slice(
+                    targetEnd - tempCurrentStart,
+                    TempTextLength,
+                  ),
+                });
+              }
+              wrappedNodes.push(...tempNodes);
+            }
+          } else {
+            if (targetEnd === currentTextEnd) {
+              wrappedNodes.push(node);
+              wrappedNodes.push({
+                type: 'nkc-note-tag',
+                attrs: {
+                  id: noteId,
+                  end: true,
+                },
+              });
+            } else if (targetEnd < currentTextEnd) {
+              wrappedNodes.push({
+                ...node,
+                text: node.text.slice(0, targetEnd - currentStart),
+              });
+              wrappedNodes.push({
+                type: 'nkc-note-tag',
+                attrs: {
+                  id: noteId,
+                  end: true,
+                },
+              });
+              wrappedNodes.push({
+                ...node,
+                text: node.text.slice(targetEnd - currentStart, textLength),
+              });
+            }
+          }
+          // node = wrappedNodes;
+          wrapped = true;
+        }
+        currentStart += textLength;
+        // 还原emoji
+        // 在确定emojiPosition中的emoji是按照开始位置的顺序后
+        emojiPosition.forEach((item) => {
+          let singTextStart = 0;
+          // let jump = false;
+          wrappedNodes.forEach((iter) => {
+            if (iter.type === 'text') {
+              const singTextEnd = singTextStart + iter.text.length;
+              if (singTextStart <= item.start && item.start <= singTextEnd) {
+                iter.text =
+                  iter.text.slice(0, item.start - singTextStart) +
+                  item.emoji +
+                  iter.text.slice(item.start - singTextStart);
+              }
+              singTextStart += iter.text.length;
+            }
+          });
+          if (wrappedNodes.length === 0) {
+            node.text =
+              node.text.slice(0, item.start) +
+              item.emoji +
+              node.text.slice(item.start);
+          }
+        });
+        if (wrappedNodes.length > 0) {
+          return wrappedNodes;
+        }
+      } else {
+        // 对于非文本节点，递归处理其内容
+        if (node.content) {
+          const originalContent = node.content;
+          node.content = wrapNodes(originalContent, {
+            targetStart,
+            targetEnd,
+            noteId,
+          });
+        }
+      }
+      return node; // 返回未修改的节点
+    });
+  };
+  // 处理文档节点
+  const jsonObj = JSON.parse(jsonString);
+  let content = jsonObj.content;
+  for (const note of notes) {
+    const targetStart = note.node.offset;
+    const targetEnd = targetStart + note.node.length;
+    const noteId = note._id;
+    currentStart = 0;
+    wrapped = false;
+    content = wrapNodes(content, { targetStart, targetEnd, noteId });
+  }
+  jsonObj.content = content;
+  return JSON.stringify(jsonObj);
+}
+
+// 获取标记位置的方法并还原内容
+function getMarkByJson(jsonString) {
+  const jsonObj = JSON.parse(jsonString);
+  const idsMap = new Map(); // 存储每个 ID 的开始和结束位置
+  let currentStart = 0; // 当前文本的起始位置
+  // 递归遍历节点
+  const traverseNodes = (nodes) => {
+    nodes.forEach((node) => {
+      if (node.type === 'text') {
+        const { pureText } = findEmojisInText(node.text);
+        const textLength = pureText.length;
+        currentStart += textLength; // 更新当前起始位置
+      } else if (node.type === 'nkc-note-tag') {
+        const { id, start, end } = node.attrs;
+
+        if (start) {
+          // 记录开始标记
+          idsMap.set(id, { start: currentStart, end: null });
+        } else if (end) {
+          // 记录结束标记
+          if (idsMap.has(id)) {
+            idsMap.get(id).end = currentStart; // 设置结束位置
+          } else {
+            // 如果没有开始位置，记录结束位置
+            idsMap.set(id, { start: null, end: currentStart });
+          }
+        }
+      } else if (node.content && node.type !== 'codeBlock') {
+        traverseNodes(node.content); // 递归处理子节点
+      }
+    });
+  };
+  traverseNodes(jsonObj.content); // 开始遍历文档内容
+  // 过滤出有效的 ID
+  const marks = [];
+  for (const [id, positions] of idsMap.entries()) {
+    if (positions.start !== null && positions.end !== null) {
+      marks.push({
+        _id: id,
+        offset: positions.start,
+        length: positions.end - positions.start,
+      });
+    }
+  }
+  jsonObj.content = removeNoteTags(jsonObj.content);
+  return {
+    marks,
+    jsonString: JSON.stringify(jsonObj), // 返回还原后的 JSON
+  };
+}
+
+// 删除所有 nkc-note-tag 节点
+function removeNoteTags(nodes) {
+  return nodes
+    .filter((node) => node.type !== 'nkc-note-tag')
+    .map((node) => {
+      if (node.content) {
+        node.content = removeNoteTags(node.content); // 递归处理子节点
+      }
+      return node;
+    });
+}
+function findEmojisInText(text) {
+  let emojiTotalLength = 0;
+  let charTotalLength = 0;
+  const emojiPosition = [];
+  // 使用正则表达式查找 emoji
+  const matches = text.matchAll(emojiRegex());
+  for (const match of matches) {
+    emojiPosition.push({
+      emoji: match[0],
+      start: match.index,
+      end: match.index + match[0].length,
+    });
+    emojiTotalLength += match[0].length;
+  }
+  // 计算总字符长度减去 emoji 的长度
+  charTotalLength = text.length - emojiTotalLength;
+  return {
+    totalLength: text.length,
+    emojiTotalLength,
+    charTotalLength,
+    emojiPosition,
+    pureText: text.replace(emojiRegex(), ''),
+  };
+  // 使用示例
+}
+exports.setMarkByJson = setMarkByJson;
+exports.getMarkByJson = getMarkByJson;
 
 /**
  * 把标记取出来

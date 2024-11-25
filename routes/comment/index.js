@@ -10,6 +10,7 @@ const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const collectionRouter = require('./collection');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 module.exports = router;
 router
   .get('/', async (ctx, next) => {
@@ -83,6 +84,7 @@ router
       commentId,
       commentType, //用于判断当前提交的数据的sid是articleId还是articlePostId
       toColumn,
+      l = 'json',
     } = body;
     // let articlePost;
     // //当sid为comment的sid时
@@ -99,7 +101,9 @@ router
     if (article.status !== normalStatus) {
       return ctx.throw(403, '文章状态异常,暂不可评论');
     }
-    const _content = customCheerio.load(content).text();
+    const _content = customCheerio
+      .load(l === 'json' ? renderHTMLByJSON({ json: content }) : content)
+      .text();
     if (_content.length > 100000) {
       ctx.throw(400, '内容不能超过100000字');
     }

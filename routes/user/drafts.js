@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const draftsRouter = new Router();
 draftsRouter
   .get('/', async (ctx, next) => {
@@ -93,7 +94,11 @@ draftsRouter
           url: `/f/${forum.fid}`
         };
       } */
-      d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
+      d.c = nkcModules.apiFunction.obtainPureText(
+        d.l === 'json' ? renderHTMLByJSON({ json: d.c }) : d.c,
+        true,
+        300,
+      );
       data.drafts.push(d);
     }
     ctx.template = 'user/drafts/drafts.pug';
@@ -160,7 +165,7 @@ draftsRouter
     let {
       t = '',
       c = '',
-      l = 'html',
+      l = 'json',
       abstractEn = '',
       abstractCn = '',
       keyWordsEn = [],
@@ -179,7 +184,12 @@ draftsRouter
       quote = '',
     } = post;
     // 检查草稿
-    const _content = customCheerio.load(c).text();
+    let _content = '';
+    if (l === 'json') {
+      _content = customCheerio.load(renderHTMLByJSON({ json: c })).text();
+    } else {
+      _content = customCheerio.load(c).text();
+    }
     if (_content && _content.length > 100000) {
       ctx.throw(400, `内容不能超过10万字`);
     }

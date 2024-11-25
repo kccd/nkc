@@ -51,7 +51,8 @@ module.exports = async (ctx, next) => {
     cover: 1,
     c: 1,
     abstractCn: 1,
-    cv: 1
+    cv: 1,
+    l: 1,
   });
 
   const postsObj = {};
@@ -106,6 +107,9 @@ module.exports = async (ctx, next) => {
     }
     r.title = fp.t;
     r.cover = fp.cover;
+    if (fp.l === 'json') {
+      fp.c = renderHTMLByJSON({ json: fp.c });
+    }
     r.abstract = nkcModules.apiFunction.obtainPureText(fp.abstractCn || fp.c, true, 200);
     data.threads.push(r)
   }

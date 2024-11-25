@@ -1,4 +1,6 @@
 const testRouter = require('koa-router')();
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+let jsonContentTemplate = require('../../pages/lib/vue/tiptap/jsonContentTemplate.json');
 testRouter
   .get('/', async (ctx, next) => {
     ctx.template = "test/test.pug";
@@ -98,6 +100,40 @@ testRouter
       isAttachment: false,
       filename: 'success.mp4',
     };
+    await next();
+      })
+  .get('/json', async (ctx, next) => {
+    const targetTypes = [
+      'nkc-audio-block',
+      'nkc-picture-block',
+      'nkc-video-block',
+      'nkc-attachment-block',
+    ];
+    const rids = jsonContentTemplate.content
+      .filter((item) => targetTypes.includes(item.type)) // 过滤出指定类型
+      .map((item) => item.attrs.id); // 提取 id
+    const resources = await ctx.db.ResourceModel.find({ rid: { $in: rids } });
+    for (let resource of resources) {
+      await resource.setFileExist();
+    }
+    const resourcesObj = {};
+    for (let r of resources) {
+      if (r.toObject) {
+        r = r.toObject();
+      }
+      resourcesObj[r.rid] = r;
+    }
+    ctx.data.c = renderHTMLByJSON(
+      jsonContentTemplate,
+      resourcesObj,
+      ctx.data.user,
+    );
+    ctx.template = 'test/jsonRender.pug';
+    await next();
+  })
+  .post('/', async (ctx, next) => {
+    const { json } = ctx.body;
+    jsonContentTemplate = json;
     await next();
   });
 

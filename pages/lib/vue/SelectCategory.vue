@@ -6,8 +6,8 @@
         .fa.fa-remove
     .module-dialog-content
       //- 资源分组列表
-      .folders.loading(v-if="loading") 加载中...
-      .folders(v-else="!loading")
+      .folders.loading(v-if="loading" ref="folders") 加载中...
+      .folders(v-else="!loading" ref="folders")
         .folder-name(@click="selectCategory('default')" :class="{active:selectCid === 'default'}")
           span 默认
         .folder-name.folder-categories(v-for="item in categories" @click="selectCategory(item._id)" :data-cid="item._id" :class="{active:selectCid === item._id}")
@@ -157,8 +157,7 @@ export default {
     },
     //创建可拖动dom
     initSortable() {
-      const masterContainer = document.getElementsByClassName('folders')[0];
-      new Sortable(masterContainer, {
+      new Sortable(this.$refs.folders, {
         group: 'master',
         invertSwap: true,
         handle: '.folders-category-master-handles',

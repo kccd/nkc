@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const router = new Router();
 
 router
@@ -25,7 +26,13 @@ router
       uid,
       pid: targetPost.pid,
       step: postsId.indexOf(targetPost.pid),
-      c: nkcModules.nkcRender.htmlToPlain(targetPost.c, 50)
+      c:
+        targetPost.l === 'json'
+          ? nkcModules.nkcRender.htmlToPlain(
+              renderHTMLByJSON({ json: targetPost.c }),
+              50,
+            )
+          : nkcModules.nkcRender.htmlToPlain(targetPost.c, 50),
     };
     await next();
   });

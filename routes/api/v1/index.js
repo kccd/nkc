@@ -12,7 +12,6 @@ const usersRouter = require('./users');
 const examRouter = require('./exam');
 const forumsRouter = require('./forums');
 const registerRouter = require('./register');
-const editorRouter = require('./editor');
 const zoneRouter = require('./zone');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
@@ -27,6 +26,5 @@ router
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/thread/:tid', threadRouter.routes(), threadRouter.allowedMethods())
   .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
-  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 module.exports = router;

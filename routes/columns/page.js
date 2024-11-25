@@ -1,4 +1,5 @@
 const Router = require("koa-router");
+const { renderHTMLByJSON } = require("../../nkcModules/nkcRender/json");
 const router = new Router();
 router
   .post("/", async (ctx, next) => {
@@ -17,7 +18,8 @@ router
       _id: await db.SettingModel.operateSystemID("columnPages", 1),
       columnId: column._id,
       t: title,
-      c: content
+      c: content,
+      l: 'json',
     });
     await page.save();
     data.page = page;
@@ -110,15 +112,31 @@ router
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
-    data.pageContent = nkcModules.nkcRender.htmlToPlain(page.c, 150);
-    page.c = nkcModules.nkcRender.renderHTML({
-      type: 'article',
-      post: {
-        c: page.c,
-        resources: await db.ResourceModel.getResourcesByReference(`column-${pageId}`)
-      },
-      user: data.user
-    });
+    data.pageContent = nkcModules.nkcRender.htmlToPlain(
+      page.l === 'json'
+        ? renderHTMLByJSON({ json: page.c, xsf: data?.user?.xsf })
+        : page.c,
+      150,
+    );
+    page.c =
+      page.l === 'json'
+        ? renderHTMLByJSON({
+            json: page.c,
+            resources: await db.ResourceModel.getResourcesByReference(
+              `column-${pageId}`,
+            ),
+            xsf: data?.user?.xsf,
+          })
+        : nkcModules.nkcRender.renderHTML({
+            type: 'article',
+            post: {
+              c: page.c,
+              resources: await db.ResourceModel.getResourcesByReference(
+                `column-${pageId}`,
+              ),
+            },
+            user: data.user,
+          });
     data.page = page;
     data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
       uid: column.uid

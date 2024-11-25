@@ -3,9 +3,6 @@ const router = new Router();
 const { OnlyUser } = require('../../middlewares/permission');
 const articleRouter = require('./article');
 const momentRouter = require('./moment');
-const {
-  subscribeUserService,
-} = require('../../services/subscribe/subscribeUser.service');
 const zoneTypes = {
   moment: 'm',
   article: 'a',
@@ -235,6 +232,10 @@ router
       articles,
     );
     data.paging = paging;
+    await next();
+  })
+  .get(['/editor/rich', '/editor/rich/history'], async (ctx, next) => {
+    ctx.remoteTemplate = 'zone/zone.pug';
     await next();
   })
   .use('/m', momentRouter.routes(), momentRouter.allowedMethods())

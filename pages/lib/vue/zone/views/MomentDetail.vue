@@ -2,7 +2,7 @@
 .container-fluid.max-width
   mixin buttonGroup
     .bubble-back(v-if="showBack" @click="backZoneList")
-      .back-box
+      .back-box.user-select-none
         span.icon.fa.fa-angle-left
         span.text(v-if="fromZone") 返回上级
         span.text(v-else) 回到电波
@@ -54,6 +54,12 @@
 //     // background-color: rgba(255, 255, 255, 0.3);
 //   }
 // }
+.zone-moment-container{
+  padding: 1rem;
+  @media screen and (max-width: 768px) {
+    padding: 0;  
+  }
+}
 .bubble-back {
   cursor: pointer;
   padding: 0 0.7rem;

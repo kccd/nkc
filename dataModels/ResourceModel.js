@@ -6,6 +6,8 @@ const Schema = mongoose.Schema;
 const PATH = require('path');
 const fs = require('fs');
 const FILE = require('../nkcModules/file');
+const videoSize = require('../settings/video');
+const { getUrl } = require('../nkcModules/tools');
 const fsPromises = fs.promises;
 const resourceSchema = new Schema(
   {
@@ -290,6 +292,70 @@ resourceSchema.statics.getResourcesByTags = async (tags = '') => {
   return resources;
 };
 
+// 适用于根据tiptap输出的json数据进行查询内容里的附件信息
+resourceSchema.statics.getResourcesByJson = async (jsonContent = {}) => {
+  const ResourceModel = mongoose.model('resources');
+  const targetTypes = [
+    'nkc-video-block',
+    'nkc-audio-block',
+    'nkc-picture-block',
+    'nkc-picture-inline',
+    'nkc-attachment-block',
+  ];
+  function extractNodes(node, targetTypes) {
+    let result = [];
+    // 检查当前节点类型是否在目标类型列表中
+    if (targetTypes.includes(node.type)) {
+      result.push(node.attrs.id);
+    }
+    // 如果当前节点有内容，递归遍历子节点
+    if (node.content) {
+      for (const child of node.content) {
+        result = result.concat(extractNodes(child, targetTypes));
+      }
+    }
+    return result;
+  }
+  // 提取特定类型的节点
+  const rids = extractNodes(
+    typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent,
+    targetTypes,
+  );
+  const resources = await ResourceModel.find({ rid: { $in: rids } });
+  for (const resource of resources) {
+    await resource.setFileExist();
+  }
+  return resources;
+};
+resourceSchema.methods.extendVideoPlayerData = async function () {
+  const r = this;
+  await r.setFileExist();
+  const { defaultFile, disabled, isFileExist, visitorAccess, mask } = r;
+
+  const { name: filename } = defaultFile;
+  const sources = [];
+  for (const { size, dataSize } of r.videoSize) {
+    const { height } = videoSize[size];
+    const url = getUrl('resource', this.rid, size) + '&w=' + r.token;
+    sources.push({
+      url,
+      height,
+      dataSize,
+    });
+  }
+  return {
+    rid: r.rid,
+    type: 'video',
+    coverUrl: getUrl('resource', r.rid, 'cover'),
+    visitorAccess,
+    mask,
+    sources,
+    filename,
+    disabled,
+    lost: !isFileExist,
+  };
+};
+
 /*
  * 拓展附件信息
  * 拓展了以下字段
@@ -526,6 +592,50 @@ resourceSchema.statics.toReferenceSource = async function (id, declare = '') {
   await model.updateMany(
     {
       rid: { $in: resourcesId },
+    },
+    {
+      $addToSet: {
+        references: id,
+      },
+    },
+  );
+};
+// 检测json内容中的资源并将指定id存入resource.reference
+resourceSchema.statics.toReferenceSourceByJson = async function (
+  id,
+  jsonContent,
+) {
+  if (!jsonContent) return;
+  const model = mongoose.model('resources');
+  const targetTypes = [
+    'nkc-video-block',
+    'nkc-audio-block',
+    'nkc-picture-block',
+    'nkc-picture-inline',
+    'nkc-attachment-block',
+  ];
+  function extractNodes(node, targetTypes) {
+    let result = [];
+    // 检查当前节点类型是否在目标类型列表中
+    if (targetTypes.includes(node.type)) {
+      result.push(node.attrs.id);
+    }
+    // 如果当前节点有内容，递归遍历子节点
+    if (node.content) {
+      for (const child of node.content) {
+        result = result.concat(extractNodes(child, targetTypes));
+      }
+    }
+    return result;
+  }
+  // 提取特定类型的节点
+  const rids = extractNodes(
+    typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent,
+    targetTypes,
+  );
+  await model.updateMany(
+    {
+      rid: { $in: rids },
     },
     {
       $addToSet: {

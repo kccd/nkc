@@ -12,6 +12,7 @@ import Digest from '../lib/vue/Digest';
 import Credit from '../lib/vue/Credit';
 import ShareFloatPanel from '../lib/vue/ShareFloatPanel';
 import PreviewModel from '../lib/vue/zone/PreviewModel';
+import DownloadPanel from '../lib/vue/DownloadPanel.vue';
 import Lottery from '../lib/vue/lottery.vue';
 import { toChat } from '../lib/js/chat';
 import { sweetSuccess, sweetError } from '../lib/js/sweetAlert';
@@ -47,10 +48,14 @@ window.RootApp = new Vue({
     credit: Credit,
     'share-float-panel': ShareFloatPanel,
     'preview-model': PreviewModel,
+    'download-panel': DownloadPanel,
   },
   computed: {
     hasLogged() {
       return !!this.uid;
+    },
+    downloadPanel() {
+      return this.$refs.downloadPanel;
     },
   },
   mounted() {
@@ -58,8 +63,10 @@ window.RootApp = new Vue({
     initGlobalLongPressEvent();
     initAppGlobalClickLinkEvent();
     initGlobalMouseOverEvent();
+    // pwa 未优化使用体验，暂时屏蔽
+    // this.initPWA();
     const self = this;
-    $(() => {
+    window.$(() => {
       // 这里的代码会在页面准备就绪之后执行
       self.userPanel = initUserPanel();
     });
@@ -157,6 +164,18 @@ window.RootApp = new Vue({
       } else {
         visitUrl(`/c`);
         return false;
+      }
+    },
+    initPWA() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('/workers/pwa.js')
+          .then((registration) => {
+            console.log('Service Worker 注册成功:', registration);
+          })
+          .catch((error) => {
+            console.error('Service Worker 注册失败:', error);
+          });
       }
     },
   },

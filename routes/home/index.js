@@ -3,6 +3,7 @@ const home = require('./home');
 const reply = require('./reply');
 const thread = require('./thread');
 const column = require('./column');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 router
   // 更新用户日常登录记录
   .get('/', async (ctx, next) => {
@@ -259,6 +260,7 @@ router
           toc: 1,
           c: 1,
           anonymous: 1,
+          l: 1,
         },
       );
       const parentPostsObj = {};
@@ -313,7 +315,12 @@ router
           parentPost = {
             toc: originPost.toc,
             url: nkcModules.tools.getUrl('post', originPost.pid),
-            content: nkcModules.nkcRender.htmlToPlain(originPost.c, 200),
+            content: nkcModules.nkcRender.htmlToPlain(
+              originPost.l === 'json'
+                ? renderHTMLByJSON({ json: originPost.c })
+                : originPost.c,
+              200,
+            ),
             user: {
               uid: user.uid,
               avatar: user.avatar,

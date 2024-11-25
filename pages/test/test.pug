@@ -3,7 +3,12 @@ block title
   title 测试
 block content
   #app.container-fluid.max-width
-    sticker-selector(ref='stickerSelector')
+    .row
+      .col-xs-12.col-md-9.col-md-offset-1
+        editor-tiptap
+        link-editor(ref='linkEditor')
 
 block scripts
+  //+includeCSS('/quill/dist/quill.snow.css')
+  //+includeJS('/quill/dist/quill.core.js')
   +includeJS('/test/test.js')

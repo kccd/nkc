@@ -5,6 +5,7 @@ editor(
   @ready="editorReady",
   @content-change="onContentChange",
   :plugs="editorPlugs"
+  :l="l"
 )
 </template>
 
@@ -33,6 +34,9 @@ export default {
   }),
   props: {
     c: {
+      type: String,
+    },
+    l: {
       type: String,
     },
   },

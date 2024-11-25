@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 const columnRouter = require('./column');
 const customCheerio = require('../../../nkcModules/nkcRender/customCheerio');
+const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 router
   .get('/', async (ctx, next) => {
     await next();
@@ -126,7 +127,11 @@ router
       origin,
       selectCategory,
       authorInfos,
+      l,
     } = JSON.parse(fields.article);
+    if (l !== 'html' && l !== 'json') {
+      l = 'json';
+    }
     if (type === 'publish') {
       //内容校验
       if (title && title.length > 100) {
@@ -135,7 +140,9 @@ router
         ctx.throw(400, `标题不能小于3个字`);
       }
     }
-    const _content = customCheerio.load(content).text();
+    const _content = customCheerio
+      .load(l === 'json' ? renderHTMLByJSON({ json: content }) : content)
+      .text();
     if (_content && _content.length > 100000) {
       ctx.throw(400, `内容不能超过10万字`);
     }
@@ -153,6 +160,7 @@ router
         origin,
         selectCategory,
         authorInfos,
+        l,
       }),
       {
         name: '内容',
@@ -170,7 +178,7 @@ router
       minLength: 0,
       maxLength: 1000,
     });
-    if (coverFile && (coverFile.size / (1024 * 1024)) > 30) {
+    if (coverFile && coverFile.size / (1024 * 1024) > 30) {
       ctx.throw(400, '封面图片大小不得超过30MB');
     }
     let article;
@@ -194,6 +202,7 @@ router
         // sid,
         authorInfos,
         tcId,
+        l,
       });
     } else if (article) {
       if (!articleId) {

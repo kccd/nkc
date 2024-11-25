@@ -1,6 +1,8 @@
 // 两个要比较的草稿
 // function getLatestDrafts () {
 
+const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
+
 // }
 
 //获取用户的草稿
@@ -24,7 +26,7 @@ module.exports = async (ctx, next) => {
       .limit(paging.perpage);
   } else if (type === 'newThread') {
     if (perpage > 1) perpage = 1;
-    const threadData = await db.DraftModel.getLatestNewThread(targetUser.uid, perpage);
+    const threadData = await db.DraftModel.getLatestNewThread(targetUser.uid, perpage,'json');
     // drafts = threadData ? [threadData] : [];
     drafts = threadData || [];
   } else if (type === 'newPost') {
@@ -224,7 +226,15 @@ module.exports = async (ctx, next) => {
       }
     }
     d.content = d.c;
-    d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
+    if (d.l === 'json') {
+      d.c = nkcModules.apiFunction.obtainPureText(
+        renderHTMLByJSON({ json: d.c }),
+        true,
+        300,
+      );
+    } else {
+      d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
+    }
     data.drafts.push(d);
   }
   await next();

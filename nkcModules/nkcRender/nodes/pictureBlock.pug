@@ -1,0 +1,23 @@
+mixin renderPictureBlock(node)
+  if resourcesObj[node.attrs.id]
+    -
+      const { rid : id, disabled, defaultFile = {} } = resourcesObj[node.attrs.id] || {};
+      const oname = defaultFile.name || '未知';
+      const { width, height } = defaultFile;
+      const url = tools.getUrl('resource', id);
+      const lgUrl = tools.getUrl('resource', id, 'lg');
+    p
+      if disabled
+        span(data-tag="nkcsource" data-type="picture-is-disable" data-id=`${id}` style="text-align: center")
+          span.fa.fa-ban(data-type="disabled" data-id=`${id}-${disabled}` title="屏蔽")
+          span(data-type="view" style="font-size: 32px;width: 100%") 图片已被屏蔽
+      else 
+        if !width || !height
+          span(data-tag="nkcsource" data-type="picture" data-id=`${id}`)
+            img(data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data=`${tools.objToStr({ name: oname, url: lgUrl },)}` src=`${url}` alt=`${oname}` data-type="view" dataimg="content")
+        else 
+          span(data-tag="nkcsource" data-type="picture" data-id=`${id}` style=`width: ${width}px;`)
+            span(style=`padding-top: ${(height * 100) / width}%`)
+              img(data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data=`${tools.objToStr({ name: oname, url: lgUrl, height: height, width: width },)}` data-src=`${url}` alt=`${oname}` data-type="view" dataimg="content" class="lazyload")
+
+      

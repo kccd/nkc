@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle);
+      this.draggableElement = new DraggableElement(this.$refs.draggableBox, this.$refs.draggableHandle);
       this.draggableElement.setPositionCenter();
     },
     toClose() {
@@ -72,9 +72,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang='less'>
 .draggable-dialog-container{
-  position: fixed;
+  position: fixed!important;
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 3px;
@@ -84,11 +84,14 @@ export default {
   display: flex;
   flex-direction: column;
   .draggable-dialog-title-container{
+    user-select: none;
+    line-height: initial;
     height: 3rem;
     width: 100%;
     display: flex;
     background-color: #f4f4f4;
     .draggable-dialog-title{
+      font-size: 1.2rem;
       cursor: move;
       flex: 1;
       display: flex;

@@ -1,6 +1,7 @@
 const Router = require("koa-router");
 const router = new Router();
 const serverConfig = require("../../../config/server");
+const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 router
   .use('/', async (ctx, next) => {
     const { db } = ctx;
@@ -28,8 +29,11 @@ router
       ctx.template = "columns/settings/editPage.pug";
     } else {
       data.pages = await db.ColumnPageModel.find({columnId: column._id}).sort({toc: -1});
-      for(const page of data.pages) {
-        page.c = nkcModules.nkcRender.htmlToPlain(page.c, 200);
+      for (const page of data.pages) {
+        page.c = nkcModules.nkcRender.htmlToPlain(
+          page.l === 'json' ? renderHTMLByJSON({ json: page.c }) : page.c,
+          200,
+        );
       }
       ctx.template = "columns/settings/page.pug";
     }

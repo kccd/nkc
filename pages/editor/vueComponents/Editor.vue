@@ -27,6 +27,7 @@
         article-content(
           ref="content",
           :c="pageData.post.c",
+          :l="pageData.post.l",
           @content-change="contentChange"
         )
         .m-b-2(
@@ -411,7 +412,7 @@ export default {
     // 提交和保存时获取各组件数据
     readyData(submitFn) {
       // 编辑器是否准备完成
-      if(!this.$refs?.content?.$refs?.threadEditor?.ready) return;
+      if(!this.$refs?.content?.$refs?.threadEditor?.$refs?.editor?.ready) return;
       if (!submitFn)
         throw("callback is is undefined");
       // 每个组件下都有一个getData返回数据
@@ -433,6 +434,7 @@ export default {
         || this.pageData.post?._id;
       submitData["parentPostId"] = this.pageData.post?.parentPostId;
       submitData["desTypeId"] = this.pageData.post?.desTypeId;
+      submitData["l"] = this.pageData.post?.l || 'json';
       submitFn(submitData);
     },
   },

@@ -1,0 +1,4 @@
+mixin renderParagraph(node)
+  p
+    if node.content
+      +loopRender(node.content)

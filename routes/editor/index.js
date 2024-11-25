@@ -94,10 +94,18 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       let notes = (await db.NoteModel.getNotesByPost(post)).notes;
       data.post = post;
-      data.post.c = markNotes.setMark(
-        data.post.c,
-        notes.map((note) => note.toObject()),
-      );
+      if (data.post.l === 'html') {
+        data.post.c = markNotes.setMark(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      } else {
+        data.post.c = markNotes.setMarkByJson(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      }
+
       // <- 把笔记标记在文中
       const firstPost = await thread.extendFirstPost();
       data.thread = {
@@ -115,10 +123,17 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.post = post;
       let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
-      data.post.c = markNotes.setMark(
-        data.post.c,
-        notes.map((note) => note.toObject()),
-      );
+      if (data.post.l === 'html') {
+        data.post.c = markNotes.setMark(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      } else {
+        data.post.c = markNotes.setMarkByJson(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      }
       // <- 把笔记标记在文中
       const firstPost = await thread.extendFirstPost();
       data.thread = {
@@ -137,10 +152,18 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.post = post;
       let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
-      data.post.c = markNotes.setMark(
-        data.post.c,
-        notes.map((note) => note.toObject()),
-      );
+      if (data.post.l === 'html') {
+        data.post.c = markNotes.setMark(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      } else {
+        data.post.c = markNotes.setMarkByJson(
+          data.post.c,
+          notes.filter((note) => note.node.length > 0),
+        );
+      }
+
       // <- 把笔记标记在文中
       const firstPost = await thread.extendFirstPost();
       data.thread = {
@@ -158,10 +181,18 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.post = post;
       let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
-      data.post.c = markNotes.setMark(
-        data.post.c,
-        notes.map((note) => note.toObject()),
-      );
+      if (data.post.l === 'html') {
+        data.post.c = markNotes.setMark(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      } else {
+        data.post.c = markNotes.setMarkByJson(
+          data.post.c,
+          notes.map((note) => note.toObject()),
+        );
+      }
+
       // <- 把笔记标记在文中
       const firstPost = await thread.extendFirstPost();
       data.thread = {

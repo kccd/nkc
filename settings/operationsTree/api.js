@@ -122,18 +122,6 @@ module.exports = {
         GET: Operations.registerExamCheck,
       },
     },
-    editor: {
-      moment: {
-        PARAMETER: {
-          GET: Operations.editorMoment,
-          PUT: Operations.editorMoment,
-          POST: Operations.editorMoment,
-          rollback: {
-            POST: Operations.rollbackZoneMomentHistory,
-          },
-        },
-      },
-    },
     forums: {
       tree: {
         GET: Operations.getForumsTree,
@@ -144,6 +132,43 @@ module.exports = {
       m: {
         PARAMETER: {
           GET: Operations.visitZoneSingleMoment,
+        },
+      },
+      editor: {
+        rich: {
+          GET: Operations.momentRichEditorGetDraft,
+          PUT: Operations.momentRichEditorSaveDraft,
+          POST: Operations.momentRichEditorPublish,
+          history: {
+            GET: Operations.momentRichEditorGetHistory,
+            rollback: {
+              POST: Operations.momentRichEditorHistoryRollback,
+            },
+          },
+        },
+        plain: {
+          GET: Operations.momentPlainEditorGetDraft,
+          PUT: Operations.momentPlainEditorSaveDraft,
+          POST: Operations.momentPlainEditorPublish,
+        },
+      },
+      moment: {
+        PARAMETER: {
+          editor: {
+            rich: {
+              GET: Operations.momentRichEditorGetDraft,
+              PUT: Operations.momentRichEditorSaveDraft,
+              POST: Operations.momentRichEditorPublish,
+            },
+            plain: {
+              GET: Operations.momentPlainEditorGetDraft,
+              PUT: Operations.momentPlainEditorSaveDraft,
+              POST: Operations.momentPlainEditorPublish,
+            },
+          },
+          rollback: {
+            POST: Operations.rollbackZoneMomentHistory,
+          },
         },
       },
     },

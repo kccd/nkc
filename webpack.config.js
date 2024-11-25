@@ -64,11 +64,19 @@ function makeFilename(info) {
   return filename;
 }
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const baseConfig = {
   mode: process.env.NODE_ENV || 'development',
-  devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
+  devtool: isProduction ? false : 'inline-source-map',
   target: 'es5',
-  cache: true,
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '.webpack_cache'),
+    buildDependencies: {
+      config: [__filename],
+    },
+  },
 };
 
 module.exports = {

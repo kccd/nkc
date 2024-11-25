@@ -1,0 +1,16 @@
+mixin renderTaskItem(node) 
+  -
+    var liStyle = `
+      list-style-type: none;
+      padding-left: 0;
+      margin-left: 0;
+      display: flex;
+      align-items: center;
+    `;
+  li(style=liStyle)
+    label(style='margin-right: 0.5rem;')
+      if node.attrs.checked
+        input(type='checkbox' checked onclick="this.checked = !this.checked")
+      else
+        input(type='checkbox' onclick="this.checked = !this.checked")
+    +loopRender(node.content)
