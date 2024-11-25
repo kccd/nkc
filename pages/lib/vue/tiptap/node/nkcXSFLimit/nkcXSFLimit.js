@@ -35,8 +35,11 @@ export default Node.create({
     return {
       Enter: ({ editor }) => {
         const inNode = isInCustomNode(editor);
+        const { state } = editor.view;
+        const { $from } = state.selection;
         const { commands } = editor;
-        if (inNode) {
+        //  editor.state.selection.$from.parent
+        if ( inNode && $from.node($from.depth).type.name==='paragraph' && $from.node($from.depth-1).type.name===nodeName) {
           commands.splitBlock();
           return true;
         }

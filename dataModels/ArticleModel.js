@@ -1211,7 +1211,11 @@ schema.statics.getArticleUrlBySource = async function (
   let editorUrl = '';
   let articleUrl = '';
   if (source === columnSource) {
-    editorUrl = tools.getUrl('columnArticleEditor', sid, articleId);
+    if(sid){
+      editorUrl = tools.getUrl('columnArticleEditor', sid, articleId);
+    }else{
+      editorUrl = '/creation/editor/column?aid=' + articleId;
+    }
     const ColumnPostModel = mongoose.model('columnPosts');
     const { article: articleType } = await ColumnPostModel.getColumnPostTypes();
     const columnPost = await ColumnPostModel.findOne(
