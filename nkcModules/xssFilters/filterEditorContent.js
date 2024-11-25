@@ -71,6 +71,8 @@ defaultWL.span = [
   'data-title',
   'data-source',
   'data-sid',
+  'data-global-click',
+  'data-global-data',
 ];
 defaultWL.div = defaultWL.span;
 defaultWL.a = [
