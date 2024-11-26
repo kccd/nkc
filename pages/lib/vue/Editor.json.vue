@@ -155,8 +155,8 @@
         div(data-type='custom')
           app-menu(ref='appMenu', @select='appMenuClick')
 
-    .tiptap-editor-content(@click.stop="editor.commands.focus()" :style="`min-height:${initConfig.minHeight}px;`")
-      editor-content(:editor='editor')
+    .tiptap-editor-content(@click.stop="editor.commands.focus()")
+      editor-content(:editor='editor' ref="tiptapEditorContent")
     .word-count
       span(:style="currentTextLength>initConfig.maxWordCount?'color:#ff6262;':''") {{`${currentTextLength}`}}
       span {{`/${initConfig.maxWordCount}`}}
@@ -358,6 +358,11 @@ export default {
     getJSON() {
       return this.editor.getJSON();
     },
+    initEditorMinHeight() {
+      const div = this.$refs.tiptapEditorContent.$el.querySelector('div[contenteditable="true"]');
+      if(!div) return;
+      div.style.minHeight = this.initConfig.minHeight + 'px';
+    },
     setJSON(jsonString) {
       if(!jsonString) return;
       let jsonData;
@@ -504,6 +509,7 @@ export default {
           nkcFileStatusInline,
         ],
         onCreate: () => {
+          this.initEditorMinHeight();
           this.emitEditorReadyEvent();
           this.ready = true;
         },
