@@ -147,6 +147,11 @@
           :class='{ "is-active": editor.isActive("superscript") }'
         )
           <i class="fa fa-superscript" />
+        div(
+          @click="appMenuClick('resource')"
+          title="插入资源"
+        )
+          new-picture(theme="outline" :size="iconFontSize")
         div(data-type='custom')
           app-menu(ref='appMenu', @select='appMenuClick')
 
@@ -242,6 +247,7 @@ import {
   MoreOne,
   FontSizeTwo,
   IndentLeft,
+  NewPicture,
 } from '@icon-park/vue';
 import ResourceSelector from './ResourceSelector.vue';
 import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
@@ -297,6 +303,7 @@ export default {
     'math-selector': MathSelector,
     'indent-left': IndentLeft,
     loading: Loading,
+    'new-picture': NewPicture,
   },
 
   data() {
@@ -750,6 +757,10 @@ export default {
           this.editor.chain().focus().toggleCodeBlock().run();
           return;
         }
+        case 'resource': {
+          this.insertResource('all');
+          return;
+        }
         case 'picture': {
           this.insertResource('picture');
           return;
@@ -884,7 +895,7 @@ export default {
     clearContent(){
       this.editor.commands.clearContent();
       this.updateTextLength();
-    }
+    },
   },
   beforeDestroy() {
     this.editor.destroy();
