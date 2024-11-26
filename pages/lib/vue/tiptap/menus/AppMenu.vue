@@ -28,18 +28,18 @@
       .app-menu-item(@click="onClick('xsfLimit')")
         <protect theme="outline" size="18"/>
         span 学术分
-      .app-menu-item(@click="onClick('picture')")
-        <new-picture theme="outline" size="18"/>
-        span 图片
-      .app-menu-item(@click="onClick('audio')")
-        <music theme="outline" size="18"/>
-        span 音频
-      .app-menu-item(@click="onClick('video')")
-        <video-two theme="outline" size="18"/>
-        span 视频
-      .app-menu-item(@click="onClick('attachment')")
-        <paperclip theme="outline" size="18"/>
-        span 附件
+      //.app-menu-item(@click="onClick('picture')")
+      //  <new-picture theme="outline" size="18"/>
+      //  span 图片
+      //.app-menu-item(@click="onClick('audio')")
+      //  <music theme="outline" size="18"/>
+      //  span 音频
+      //.app-menu-item(@click="onClick('video')")
+      //  <video-two theme="outline" size="18"/>
+      //  span 视频
+      //.app-menu-item(@click="onClick('attachment')")
+      //  <paperclip theme="outline" size="18"/>
+      //  span 附件
 </template>
 
 <style scoped lang="less">

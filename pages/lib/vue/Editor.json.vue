@@ -147,11 +147,16 @@
           :class='{ "is-active": editor.isActive("superscript") }'
         )
           <i class="fa fa-superscript" />
+        div(
+          @click="appMenuClick('resource')"
+          title="插入资源"
+        )
+          new-picture(theme="outline" :size="iconFontSize")
         div(data-type='custom')
           app-menu(ref='appMenu', @select='appMenuClick')
 
-    .tiptap-editor-content(@click.stop="editor.commands.focus()" :style="`min-height:${initConfig.minHeight}px;`")
-      editor-content(:editor='editor')
+    .tiptap-editor-content(@click.stop="editor.commands.focus()")
+      editor-content(:editor='editor' ref="tiptapEditorContent")
     .word-count
       span(:style="currentTextLength>initConfig.maxWordCount?'color:#ff6262;':''") {{`${currentTextLength}`}}
       span {{`/${initConfig.maxWordCount}`}}
@@ -242,6 +247,7 @@ import {
   MoreOne,
   FontSizeTwo,
   IndentLeft,
+  NewPicture,
 } from '@icon-park/vue';
 import ResourceSelector from './ResourceSelector.vue';
 import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
@@ -257,6 +263,7 @@ import { getRichJsonContentLength } from "../js/checkData";
 import { immediateDebounce } from "../js/execution";
 import { HotKeys } from "./tiptap/plugins/HotKeys";
 import { getState } from '../js/state.js';
+import { resetSelectionEvent } from '../../global/event.js';
 
 export default {
   props: ['config', 'loading'],
@@ -297,6 +304,7 @@ export default {
     'math-selector': MathSelector,
     'indent-left': IndentLeft,
     loading: Loading,
+    'new-picture': NewPicture,
   },
 
   data() {
@@ -342,6 +350,7 @@ export default {
   mounted() {
     this.initEditor();
     this.initNoticeEvent();
+    resetSelectionEvent();
   },
 
   methods: {
@@ -350,6 +359,11 @@ export default {
     },
     getJSON() {
       return this.editor.getJSON();
+    },
+    initEditorMinHeight() {
+      const div = this.$refs.tiptapEditorContent.$el.querySelector('div[contenteditable="true"]');
+      if(!div) return;
+      div.style.minHeight = this.initConfig.minHeight + 'px';
     },
     setJSON(jsonString) {
       if(!jsonString) return;
@@ -497,6 +511,7 @@ export default {
           nkcFileStatusInline,
         ],
         onCreate: () => {
+          this.initEditorMinHeight();
           this.emitEditorReadyEvent();
           this.ready = true;
         },
@@ -750,6 +765,10 @@ export default {
           this.editor.chain().focus().toggleCodeBlock().run();
           return;
         }
+        case 'resource': {
+          this.insertResource('all');
+          return;
+        }
         case 'picture': {
           this.insertResource('picture');
           return;
@@ -884,7 +903,7 @@ export default {
     clearContent(){
       this.editor.commands.clearContent();
       this.updateTextLength();
-    }
+    },
   },
   beforeDestroy() {
     this.editor.destroy();
