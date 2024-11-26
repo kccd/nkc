@@ -90,7 +90,7 @@ export default {
 <style scoped lang="less">
 .file-view-wrapper {
   padding: 1rem 0;
-  text-align: center;
+  // text-align: center;
   .file-box {
     position: relative;
     padding: 0.5rem;
@@ -98,7 +98,7 @@ export default {
     border-radius: 2px;
     border: 1px solid #d6d6d6;
     background: #fff;
-    max-width: 100%;
+    max-width: 414px;
     .file-attachment-icon {
       display: table-cell;
       vertical-align: top;

@@ -215,3 +215,8 @@ export function initAppGlobalClickLinkEvent() {
   };
   document.addEventListener('click', handle);
 }
+// 暂时针对app默认无法选中文字事件进行重置
+export function resetSelectionEvent() {
+  if(!isReactNative) return;
+  window.document.onselectstart = null;
+}

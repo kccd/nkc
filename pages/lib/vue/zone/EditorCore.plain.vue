@@ -14,6 +14,7 @@ import nkcEmoji from '../tiptap/node/nkcEmoji/nkcEmoji.js';
 import History from '@tiptap/extension-history';
 import Placeholder from '@tiptap/extension-placeholder'
 import Loading from '../Loading.vue';
+import { resetSelectionEvent } from '../../../global/event.js';
 
 
 export default {
@@ -35,6 +36,7 @@ export default {
         this.$emit('click-ctrl-enter');
       }
     });
+    resetSelectionEvent();
   },
   methods: {
     initEditor() {

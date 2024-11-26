@@ -263,6 +263,7 @@ import { getRichJsonContentLength } from "../js/checkData";
 import { immediateDebounce } from "../js/execution";
 import { HotKeys } from "./tiptap/plugins/HotKeys";
 import { getState } from '../js/state.js';
+import { resetSelectionEvent } from '../../global/event.js';
 
 export default {
   props: ['config', 'loading'],
@@ -349,6 +350,7 @@ export default {
   mounted() {
     this.initEditor();
     this.initNoticeEvent();
+    resetSelectionEvent();
   },
 
   methods: {
