@@ -203,7 +203,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import TextColorIcon from './tiptap/TextColorIcon.vue';
 import Highlight from '@tiptap/extension-highlight';
 import BubbleMenu from '@tiptap/extension-bubble-menu';
-import Image from '@tiptap/extension-image'
+// import Image from '@tiptap/extension-image'
 import TableEditor from './tiptap/TableEditor.vue';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
@@ -433,9 +433,9 @@ export default {
             }
           }),
           HardBreak,
-          Image.configure({
-            inline: true,
-          }),
+          // Image.configure({
+          //   inline: true,
+          // }),
           Placeholder.configure({
             placeholder: '开始输入...',
           }),
@@ -450,6 +450,7 @@ export default {
           TableCell,
           Highlight.configure({
             multicolor: true,
+            HTMLAttributes:{ style: 'padding:0;' },
           }),
           TextAlign.configure({
             types: ['heading', 'paragraph'],
@@ -998,10 +999,10 @@ export default {
       cursor: ew-resize;
     }
 
-    p {
-      font-size: 16px;
-      line-height: 30px;
-    }
+    // p {
+    //   font-size: 16px;
+    //   line-height: 30px;
+    // }
 
     .tiptap.ProseMirror {
       outline: none;

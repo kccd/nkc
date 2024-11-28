@@ -12,12 +12,16 @@ export const nkcFontSizeOptions = {
     '22px',
     '24px',
     '36px',
+    '50px',
+    '70px',
+    '100px'
   ],
   defaultSize: '16px',
 };
 
 export default Mark.create({
   name: 'nkc-font-size',
+  priority: 101,
   addOptions() {
     return nkcFontSizeOptions;
   },
