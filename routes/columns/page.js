@@ -1,5 +1,6 @@
 const Router = require("koa-router");
 const { renderHTMLByJSON } = require("../../nkcModules/nkcRender/json");
+const { getJsonStringTextSlice } = require("../../nkcModules/json");
 const router = new Router();
 router
   .post("/", async (ctx, next) => {
@@ -112,10 +113,8 @@ router
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
-    data.pageContent = nkcModules.nkcRender.htmlToPlain(
-      page.l === 'json'
-        ? renderHTMLByJSON({ json: page.c, xsf: data?.user?.xsf })
-        : page.c,
+    data.pageContent = page.l === 'json' ? getJsonStringTextSlice(page.c,150) : nkcModules.nkcRender.htmlToPlain(
+       page.c,
       150,
     );
     page.c =

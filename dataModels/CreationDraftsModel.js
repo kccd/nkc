@@ -1,6 +1,7 @@
 const mongoose = require('../settings/database');
 const nkcRender = require("../nkcModules/nkcRender");
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../nkcModules/json');
 const schema = new mongoose.Schema({
   _id: String,
   toc: {
@@ -129,11 +130,10 @@ schema.statics.extentDraftsData = async function (drafts) {
       draftId: _id,
       deleted: del,
       title: title || '未填写标题',
-      content:
-        nkcRender.htmlToPlain(
-          l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+      content: (l === 'json' ? getJsonStringTextSlice(content,500) : nkcRender.htmlToPlain(
+           content,
           500,
-        ) || '未填写内容',
+        ))|| '未填写内容',
       time: tools.timeFormat(tlm || toc),
     };
     draftsData.push(draftData);

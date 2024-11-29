@@ -4,6 +4,7 @@ const reply = require('./reply');
 const thread = require('./thread');
 const column = require('./column');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../../nkcModules/json');
 router
   // 更新用户日常登录记录
   .get('/', async (ctx, next) => {
@@ -315,10 +316,10 @@ router
           parentPost = {
             toc: originPost.toc,
             url: nkcModules.tools.getUrl('post', originPost.pid),
-            content: nkcModules.nkcRender.htmlToPlain(
-              originPost.l === 'json'
-                ? renderHTMLByJSON({ json: originPost.c })
-                : originPost.c,
+            content: originPost.l === 'json'
+            ? getJsonStringTextSlice(originPost.c ,200)
+            : nkcModules.nkcRender.htmlToPlain(
+              originPost.c,
               200,
             ),
             user: {

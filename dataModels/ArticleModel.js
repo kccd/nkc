@@ -5,6 +5,7 @@ const { subscribeSources } = require('../settings/subscribe');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 
 const { articleSources, articleStatus } = require('../settings/article');
+const { getJsonStringTextSlice } = require('../nkcModules/json');
 
 const schema = new mongoose.Schema(
   {
@@ -1330,10 +1331,10 @@ schema.statics.extendArticlesList = async (articles) => {
       hits,
       comment,
       title: stableDocument.title,
-      content: nkcRender.htmlToPlain(
-        stableDocument.l === 'json'
-          ? renderHTMLByJSON({ json: stableDocument.content })
-          : stableDocument.content,
+      content: stableDocument.l === 'json'
+      ? getJsonStringTextSlice(stableDocument.content,200)
+      : nkcRender.htmlToPlain(
+        stableDocument.content,
         200,
       ),
       coverUrl: stableDocument.cover
@@ -1521,10 +1522,10 @@ schema.statics.extendArticlesListWithColumn = async (articles) => {
       hits,
       comment,
       title: stableDocument.title,
-      content: nkcRender.htmlToPlain(
-        stableDocument.l === 'json'
-          ? renderHTMLByJSON({ json: stableDocument.content })
-          : stableDocument.content,
+      content: stableDocument.l === 'json'
+      ? getJsonStringTextSlice(stableDocument.content,200)
+      : nkcRender.htmlToPlain(
+         stableDocument.content,
         200,
       ),
       coverUrl: stableDocument.cover
@@ -1619,8 +1620,8 @@ schema.statics.extendArticlesDraftList = async (articles) => {
       type: status === 'default' ? 'create' : 'modify',
       articleId,
       title: title || '未填写',
-      content: nkcRender.htmlToPlain(
-        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+      content: l === 'json' ? getJsonStringTextSlice(content,200) : nkcRender.htmlToPlain(
+        content,
         200,
       ),
       coverUrl: cover ? tools.getUrl('documentCover', cover) : '',
@@ -2058,8 +2059,8 @@ schema.statics.getArticlesDataByArticlesId = async function (
         status: articleStatus.normal,
         statusInfo: '',
         title,
-        content: nkcRender.htmlToPlain(
-          l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+        content: l === 'json' ? getJsonStringTextSlice(content,200) : nkcRender.htmlToPlain(
+           content,
           200,
         ),
         coverUrl: cover ? getUrl('documentCover', cover) : '',
@@ -2282,10 +2283,10 @@ schema.statics.extendArticlesPanelData = async function (articles) {
       title: document.title,
       url: article.url,
       digest: article.digest,
-      abstract: nkcRender.htmlToPlain(
-        document.l === 'json'
-          ? renderHTMLByJSON({ json: document.content })
-          : document.content,
+      abstract:  document.l === 'json'
+      ? getJsonStringTextSlice(document.content,200)
+      : nkcRender.htmlToPlain(
+        document.content,
         200,
       ),
       readCount: article.hits,
@@ -2331,10 +2332,10 @@ schema.statics.extendArticlesPanelData = async function (articles) {
         content: {
           time: commentDocument.toc,
           url: commentUrl,
-          abstract: nkcRender.htmlToPlain(
-            commentDocument.l === 'json'
-              ? renderHTMLByJSON({ json: commentDocument.content })
-              : commentDocument.content,
+          abstract: commentDocument.l === 'json'
+          ? getJsonStringTextSlice(commentDocument.content ,200)
+          : nkcRender.htmlToPlain(
+             commentDocument.content,
             200,
           ),
         },

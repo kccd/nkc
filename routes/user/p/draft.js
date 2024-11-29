@@ -1,6 +1,7 @@
 // 两个要比较的草稿
 // function getLatestDrafts () {
 
+const { getJsonStringTextSlice } = require("../../../nkcModules/json");
 const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 
 // }
@@ -227,11 +228,7 @@ module.exports = async (ctx, next) => {
     }
     d.content = d.c;
     if (d.l === 'json') {
-      d.c = nkcModules.apiFunction.obtainPureText(
-        renderHTMLByJSON({ json: d.c }),
-        true,
-        300,
-      );
+      d.c = getJsonStringTextSlice(d.c,300);
     } else {
       d.c = nkcModules.apiFunction.obtainPureText(d.c, true, 300);
     }

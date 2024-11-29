@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice } = require("../../../nkcModules/json");
 const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 
 module.exports = async (ctx, next) => {
@@ -81,8 +82,8 @@ module.exports = async (ctx, next) => {
       }
     }
     d.content = d.c;
-    d.c = nkcModules.apiFunction.obtainPureText(
-      d.l === 'json' ? renderHTMLByJSON({ json: d.c }) : d.c,
+    d.c = d.l === 'json' ? getJsonStringTextSlice(d.c,300) : nkcModules.apiFunction.obtainPureText(
+       d.c,
       true,
       300,
     );

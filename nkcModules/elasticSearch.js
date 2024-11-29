@@ -7,6 +7,7 @@ const esConfig = require('../config/elasticSearch');
 const cheerio = require('cheerio');
 const filterSearchContent = require('./xssFilters/filterSearchContent');
 const { renderHTMLByJSON } = require('./nkcRender/json');
+const { getJsonStringText } = require('./json');
 
 const { analyzer, searchAnalyzer, indexName } = esConfig;
 
@@ -261,8 +262,8 @@ func.save = async (docType, document) => {
       mainForumsId,
       tcId,
       title: t,
-      content: apiFunction.obtainPureText(
-        l === 'json' ? renderHTMLByJSON({ json: c }) : c,
+      content:  l === 'json' ? getJsonStringText(c) : apiFunction.obtainPureText(
+       c,
       ),
       abstractCN: abstractCn,
       abstractEN: abstractEn,
