@@ -1,3 +1,4 @@
+const { getJsonStringText } = require("../../../nkcModules/json");
 const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 
 module.exports = async (ctx, next) => {
@@ -114,7 +115,7 @@ module.exports = async (ctx, next) => {
     r.title = fp.t;
     r.cover = fp.cover;
     if (fp.l === 'json') {
-      fp.c = renderHTMLByJSON({ json: fp.c });
+      fp.c = getJsonStringText(fp.c );
     }
     r.abstract = nkcModules.apiFunction.obtainPureText(fp.abstractCn || fp.c, true, 200);
     data.threads.push(r)

@@ -3,6 +3,7 @@ const router = new Router();
 const { eventEmitter } = require('../../events');
 const { getMomentPublishType } = require('../../events/moment');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../../nkcModules/json');
 router
   .get('/', async (ctx, next) => {
     ctx.template = 'review/review.pug';
@@ -156,10 +157,10 @@ router
     const momentDocId = new Set();
     const uid = new Set();
     for (const document of documents) {
-      document.content = await nkcModules.apiFunction.obtainPureText(
-        document.l === 'json'
-          ? renderHTMLByJSON({ json: document.content })
-          : document.content,
+      document.content =  document.l === 'json'
+      ? getJsonStringTextSlice(document.content, 100)
+      : nkcModules.apiFunction.obtainPureText(
+        document.content,
         true,
         100,
       );

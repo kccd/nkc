@@ -6,6 +6,7 @@ const tools = require('../nkcModules/tools');
 const {
   getJsonStringTextSplit,
   getJsonStringText,
+  getJsonStringTextSlice,
 } = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const messageSchema = new Schema(
@@ -801,8 +802,8 @@ messageSchema.statics.getParametersData = async (message) => {
       threadURL: getUrl('thread', thread.tid),
       threadTitle: firstPost.t,
       postURL: await PostModel.getUrl(post),
-      postContent: apiFunction.obtainPureText(
-        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      postContent: post.l === 'json' ? getJsonStringText(post.c) : apiFunction.obtainPureText(
+        post.c,
       ),
     };
   } else if (type === 'replyThread') {
@@ -831,8 +832,8 @@ messageSchema.statics.getParametersData = async (message) => {
       threadURL: getUrl('thread', thread.tid),
       threadTitle: firstPost.t,
       postURL: await PostModel.getUrl(post),
-      postContent: apiFunction.obtainPureText(
-        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      postContent: post.l === 'json' ? getJsonStringText( post.c ) :apiFunction.obtainPureText(
+         post.c,
       ),
     };
   } else if (type === 'replyArticle') {
@@ -862,10 +863,10 @@ messageSchema.statics.getParametersData = async (message) => {
       articleURL: comment.url,
       articleTitle: articleDocument.title,
       commentURL: comment.commentUrl,
-      commentContent: apiFunction.obtainPureText(
-        commentDocument.l === 'json'
-          ? renderHTMLByJSON({ json: commentDocument.content })
-          : commentDocument.content,
+      commentContent: commentDocument.l === 'json'
+      ? getJsonStringText(commentDocument.content)
+      :  apiFunction.obtainPureText(
+        commentDocument.content,
       ),
     };
   } else if (type === 'replyComment') {
@@ -893,10 +894,10 @@ messageSchema.statics.getParametersData = async (message) => {
       articleURL: comment.url,
       articleTitle: articleDocument.title,
       commentURL: comment.commentUrl,
-      commentContent: apiFunction.obtainPureText(
-        commentDocument.l === 'json'
-          ? renderHTMLByJSON({ json: commentDocument.content })
-          : commentDocument.content,
+      commentContent: commentDocument.l === 'json'
+      ? getJsonStringText(commentDocument.content)
+      :apiFunction.obtainPureText(
+         commentDocument.content,
       ),
     };
   } else if (type === 'comment') {
@@ -916,8 +917,8 @@ messageSchema.statics.getParametersData = async (message) => {
     }
     parameters = {
       postURL: await PostModel.getUrl(post),
-      postContent: apiFunction.obtainPureText(
-        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      postContent: post.l === 'json' ? getJsonStringText(post.c) : apiFunction.obtainPureText(
+         post.c,
       ),
       userURL: user.uid ? getUrl('userHome', user.uid) : '',
       username: user.username,
@@ -1157,10 +1158,10 @@ messageSchema.statics.getParametersData = async (message) => {
       parameters = {
         //获取document所在comment的url
         reviewLink: _comment[0].url || '',
-        content: htmlToPlain(
-          document.l === 'json'
-            ? renderHTMLByJSON({ json: document.content })
-            : document.content,
+        content: document.l === 'json'
+        ? getJsonStringTextSlice(document.content,100)
+        : htmlToPlain(
+          document.content,
           100,
         ),
         reason: reason ? reason : '未知',

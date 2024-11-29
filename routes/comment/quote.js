@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice } = require("../../nkcModules/json");
 const { renderHTMLByJSON } = require("../../nkcModules/nkcRender/json");
 
 module.exports = async (ctx, next) => {
@@ -25,10 +26,10 @@ module.exports = async (ctx, next) => {
     did,
     sid,
     commentSource,
-    content: nkcModules.nkcRender.htmlToPlain(
-      document.l === 'json'
-        ? renderHTMLByJSON({ json: document.content })
-        : document.content,
+    content: document.l === 'json'
+    ? getJsonStringTextSlice(document.content ,100)
+    : nkcModules.nkcRender.htmlToPlain(
+      document.content,
       100,
     ),
   };

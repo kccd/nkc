@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice } = require("../nkcModules/json");
 const { renderHTMLByJSON } = require("../nkcModules/nkcRender/json");
 const mongoose = require("../settings/database");
 const Schema = mongoose.Schema;
@@ -204,8 +205,8 @@ schema.statics.extendColumnContributes = async (contributes) => {
         toc: thread.toc,
         t: thread.t,
         source: 'thread',
-        c: nkcRender.htmlToPlain(
-          thread.l === 'json' ? renderHTMLByJSON({ json: thread.c }) : thread.c,
+        c: thread.l === 'json' ? getJsonStringTextSlice(thread.c ,20) : nkcRender.htmlToPlain(
+           thread.c,
           20,
         ),
         url: tools.getUrl('thread', thread.tid),
@@ -290,10 +291,8 @@ schema.statics.extendColumnContributes = async (contributes) => {
         source: 'article',
         toc: article.dt,
         t: article.title,
-        c: nkcRender.htmlToPlain(
-          article.l === 'json'
-            ? renderHTMLByJSON({ json: article.content })
-            : article.content,
+        c: article.l === 'json' ? getJsonStringTextSlice(article.content,20) : nkcRender.htmlToPlain(
+          article.content,
           20,
         ),
         url,

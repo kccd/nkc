@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const router = new Router();
 
 router
@@ -166,10 +167,10 @@ router
         parentPost = {
           toc: originPost.toc,
           url: nkcModules.tools.getUrl('post', originPost.pid),
-          content: nkcModules.nkcRender.htmlToPlain(
-            originPost.l === 'json'
-              ? renderHTMLByJSON({ json: originPost.c })
-              : originPost.c,
+          content:  originPost.l === 'json'
+          ? getJsonStringTextSlice(originPost.c,200)
+          : nkcModules.nkcRender.htmlToPlain(
+           originPost.c,
             200,
           ),
           user: {
