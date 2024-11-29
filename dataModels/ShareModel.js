@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice, getJsonStringText } = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const settings = require('../settings');
 const mongoose = settings.database;
@@ -539,8 +540,8 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: firstPost.t,
       cover: getUrl('postCover', post.cover),
-      desc: nkcRender.htmlToPlain(
-        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      desc: post.l === 'json' ? getJsonStringTextSlice(post.c ,100) : nkcRender.htmlToPlain(
+        post.c,
         100,
       ),
     };
@@ -559,10 +560,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: targetPost.t,
       cover: getUrl('postCover', targetPost.cover),
-      desc: nkcRender.htmlToPlain(
-        targetPost.l === 'json'
-          ? renderHTMLByJSON({ json: targetPost.c })
-          : targetPost.c,
+      desc: targetPost.l === 'json'
+      ? getJsonStringTextSlice(targetPost.c,100)
+      : nkcRender.htmlToPlain(
+        targetPost.c,
         100,
       ),
     };
@@ -580,10 +581,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: comment.articleDocument.title,
       cover: getUrl('documentCover', comment.cover),
-      desc: nkcRender.htmlToPlain(
-        comment.commentDocument.l === 'json'
-          ? renderHTMLByJSON({ json: comment.commentDocument.content })
-          : comment.commentDocument.content,
+      desc: comment.commentDocument.l === 'json'
+      ? getJsonStringTextSlice(comment.commentDocument.content ,100)
+      :nkcRender.htmlToPlain(
+         comment.commentDocument.content,
         100,
       ),
     };
@@ -593,10 +594,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: article.document.title,
       cover: getUrl('documentCover', article.document.cover),
-      desc: nkcRender.htmlToPlain(
-        article.document.l === 'json'
-          ? renderHTMLByJSON({ json: article.document.content })
-          : article.document.content,
+      desc:  article.document.l === 'json'
+      ? getJsonStringTextSlice(article.document.content ,100)
+      : nkcRender.htmlToPlain(
+       article.document.content,
         100,
       ),
     };
@@ -626,7 +627,7 @@ shareSchema.statics.getShareContent = async function (props) {
       title = form.project.title;
       content = form.project.content;
       if (form.project.l === 'json') {
-        content = renderHTMLByJSON({ json: content });
+        content = getJsonStringText(content);
       }
     }
     shareContent = {

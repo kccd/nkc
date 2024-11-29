@@ -7,6 +7,7 @@ const redisClient = require('../settings/redisClient');
 const { obtainPureText } = require('../nkcModules/apiFunction');
 const { subscribeSources } = require('../settings/subscribe');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
+const { getJsonStringText } = require('../nkcModules/json');
 
 const schema = new Schema(
   {
@@ -856,8 +857,8 @@ schema.statics.extendSubscribes = async (subscribes) => {
         voteUp,
         cover,
         title,
-        content: await obtainPureText(
-          l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+        content: l === 'json' ? getJsonStringText(content ) :  obtainPureText(
+          content,
           true,
           100,
         ),

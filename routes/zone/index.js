@@ -75,15 +75,27 @@ router
       parent: '',
       quoteType: {
         $in: ['', momentQuoteTypes.moment],
-        // $in: ['', momentQuoteTypes.article, momentQuoteTypes.moment],
       },
       $or: [],
     };
-    //判断是否当前用有相应证书可以查看所有内容,或设置电文可见状态
-    const hasPermission =
-      ctx.permission('setMomentVisibleOther') ||
-      ctx.permission('viewOtherUserAbnormalMoment');
-    //获取当前用户的电文
+
+    // 关注用户的uid
+    let subUid = [];
+    // 我的关注页需要添加用户筛选
+    const condition = {};
+    if(tab === zoneTab.subscribe) {
+      const usersId = [];
+      if(state.uid) {
+        subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
+        usersId.push(...subUid, state.uid);
+      }
+      condition.uid = {
+        $in: usersId,
+      };
+    }
+
+    // 获取当前用户的电文
+    // 可看自己非正常状态的电文
     if (state.uid) {
       match.$or.push({
         uid: state.uid,
@@ -95,8 +107,28 @@ router
         },
       });
     }
+    // 看别人正常的电文
+    match.$or.push({
+      ...condition,
+      status: momentStatus.normal,
+      visibleType: everyone,
+    });
+    // 看关注的人的关注可见的电文
+    match.$or.push({
+      uid: {
+        $in: subUid,
+      },
+      status: momentStatus.normal,
+      visibleType: attention,
+    });
+    // 如果具有调整可见性的权限
+    // 可以看别人非公开的电文
+    const hasPermission =
+      ctx.permission('setMomentVisibleOther') ||
+      ctx.permission('viewOtherUserAbnormalMoment');
     if (hasPermission) {
       match.$or.push({
+        ...condition,
         status: {
           $in: [momentStatus.normal],
         },
@@ -105,46 +137,10 @@ router
         },
       });
     }
-    //获取当前用户的关注列表
-    const subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
-    const condition = {
-      uid: {
-        $in: subUid,
-      },
-      status: momentStatus.normal,
-    };
-    //查看全部
-    if (tab === zoneTab.all) {
-      //查看全部
-      match.$or.push(
-        //所有人可见
-        {
-          status: momentStatus.normal,
-          visibleType: {
-            $in: [everyone],
-          },
-        },
-        //仅关注可见
-        {
-          ...condition,
-          visibleType: {
-            $in: [attention],
-          },
-        },
-      );
-    } else {
-      //查看关注
-      match.$or.push({
-        ...condition,
-        visibleType: {
-          $in: [everyone, attention],
-        },
-      });
-      data.subUid = subUid;
-    }
-
+    // 电文管理员可看见所有的电文
     if (ctx.permission('managementMoment')) {
       match.$or.push({
+        ...condition,
         status: {
           $in: [
             momentStatus.disabled,

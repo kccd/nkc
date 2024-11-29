@@ -61,6 +61,10 @@
   left: 0;
   bottom: 0;
   z-index: 1001;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .draggable-dialog-xs-title-container{
