@@ -1,3 +1,3 @@
 export function lazySizesInit() {
-  window.lazySizes && window.lazySizes.init();
+  window.lazySizes && window.lazySizes.autoSizer.checkElems();
 }
