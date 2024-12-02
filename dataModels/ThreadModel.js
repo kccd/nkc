@@ -441,7 +441,7 @@ threadSchema.methods.extendUser = async function () {
 
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function (roles, grade, user) {
-  const throwError = require('../nkcMOdules/throwError');
+  const throwError = require('../nkcModules/throwError');
   const recycleId = await mongoose.model('settings').getRecycleId();
   if (!this.forums) {
     await this.extendForums(['mainForums']);

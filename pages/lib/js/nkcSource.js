@@ -2,6 +2,8 @@ import { strToObj, objToStr } from './dataConversion';
 import { getState } from './state';
 import { getUrl } from './tools';
 const isLogged = !!getState().uid;
+import { lazySizesInit } from './lazySizes';
+
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
     '.render-content img[data-global-click="viewImage"]',
@@ -245,7 +247,7 @@ export function renderingNKCAudio() {
 // 基本结构来自后端：
 // nkcModules/nkcRender/nodes/picutreInline.pug
 // nkcModules/nkcRender/sources/article.js
-export function renderingNKCPicure() {
+export function renderingNKCPicture() {
   const containers = document.querySelectorAll(
     '[data-tag="nkcsource"][data-type="picture"]',
   );
@@ -277,5 +279,6 @@ export function initNKCSource() {
   renderingMathJax();
   renderingNKCVideo();
   renderingNKCAudio();
-  renderingNKCPicure();
+  renderingNKCPicture();
+  lazySizesInit();
 }

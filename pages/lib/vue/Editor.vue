@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style="`position: relative;min-height:${configs.initialFrameHeight}px;`")
+div(:style="`position: relative;min-height:${minHeight}px;`")
   editor-html(
     v-if="language&&language==='html'"
     :configs="configs"
@@ -11,9 +11,10 @@ div(:style="`position: relative;min-height:${configs.initialFrameHeight}px;`")
   editor-json(
     v-else 
     ref="editor"
-    :config="configs ? {minHeight:configs.initialFrameHeight,maxWordCount:configs.maximumWords} :{}"
+    :config="{minHeight: minHeight, maxWordCount: maxWordCount}"
     @ready="ready"
     @content-change="contentChange"
+    @manual-save="manualSave"
     )
   .mask.m-b-1(v-show="!!loading")
     loading
@@ -56,15 +57,19 @@ export default {
       }
     },
   },
+  computed: {
+    minHeight() {
+      return this.configs && this.configs.initialFrameHeight?this.configs.initialFrameHeight: 200;
+    },
+    maxWordCount() {
+      return this.configs && this.configs.maximumWords?this.configs.maximumWords: 100000;
+    },
+  },
   methods: {
     contentChange(data) {
-      // console.log('cccc',data);
-
       this.$emit("content-change",data);
     },
     ready() {
-      // console.log('rrrrrr');
-      
       this.$emit('ready');
     },
     setContent(dataString){
@@ -82,6 +87,9 @@ export default {
     clearContent(){
       if(this.language!=='json') return;
       this.$refs.editor.clearContent();
+    },
+    manualSave() {
+      this.$emit('manual-save');
     }
   },
 }

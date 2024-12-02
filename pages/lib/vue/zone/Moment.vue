@@ -760,7 +760,7 @@ import { sweetError, sweetSuccess } from '../../js/sweetAlert';
 import { objToStr } from '../../js/tools';
 import FromNow from '../../../lib/vue/FromNow';
 // import MomentFiles from './MomentFiles';
-import MomentFiles from './MomentFilesNew';
+import MomentFiles from './MomentFiles';
 import MomentComments from './MomentComments';
 import MomentQuote from './MomentQuote';
 import MomentStatus from './MomentStatus';
@@ -769,9 +769,9 @@ import MomentOptionFixed from './momentOption/MomentOptionFixed';
 import { getState } from '../../js/state';
 import { toLogin } from '../../js/account';
 import MomentEditor from './MomentEditor.vue';
-import { subUsers } from '../../../lib/js/subscribe';
-import '../../../../public/external_pkgs/lazysizes/lazysizes.min.js';
+import { subUsers } from "../../js/subscribe";
 import { initNKCSource } from '../../js/nkcSource.js';
+import { lazySizesInit } from "../../js/lazySizes";
 
 const state = getState();
 export default {
@@ -817,6 +817,8 @@ export default {
       setTimeout(() => {
         initNKCSource();
       }, 10);
+    } else {
+      lazySizesInit();
     }
   },
   computed: {

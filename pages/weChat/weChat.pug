@@ -1,0 +1,31 @@
+extends ../bootstrap_base
+block title
+  title 微信支付
+  style.
+    body{
+      background-color: #fff;
+    }
+    .record-status-icon{
+      margin: 0 auto 1rem auto;
+      height: 5rem;
+      width: 5rem;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 5rem;
+      font-size: 2.5rem;
+      overflow: hidden;
+      color: #fff;
+    }
+    .record-status-icon.waiting{
+      background-color: #aaa;
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.col-md-offset-1(style='text-align: center;')
+        .record-status-icon(class="waiting")
+          .fa.fa-clock-o
+        h2 等待支付...
+      .hidden#data=objToStr({info:data.info})
+block scripts
+  +includeJS('/weChat/weChat.js')

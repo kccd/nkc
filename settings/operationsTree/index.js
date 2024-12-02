@@ -39,6 +39,7 @@ const logout = require('./logout');
 const me = require('./me');
 const column = require('./column');
 const test = require('./test');
+const weChat = require('./weChat');
 const m = require('./columns');
 const p = require('./post');
 const problem = require('./problem');
@@ -273,6 +274,7 @@ const operationTree = {
     tc, // 多维分类
     browser, // 浏览器版本检测
     apps, // 资源页
+    wx: weChat,
   },
 };
 module.exports = {
