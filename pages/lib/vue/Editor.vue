@@ -65,9 +65,6 @@ export default {
       return this.configs && this.configs.maximumWords?this.configs.maximumWords: 100000;
     },
   },
-  mounted() {
-    console.log(this.configs)
-  },
   methods: {
     contentChange(data) {
       this.$emit("content-change",data);
