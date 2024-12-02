@@ -486,10 +486,9 @@ schema.statics.copyToHistoryToEditDocument = async function (
   const currentDocument = await DocumentModel.findOne({
     uid,
     _id,
-    type: documentTypes.betaHistory,
   });
   if (!currentDocument) {
-    ThrowCommonError(400, `当前文章不存在，请刷新页面重试`);
+    ThrowCommonError(400, `当前内容数据异常，请刷新页面重试`);
   }
   // 复制当前文档数据创建历史文档
   await currentDocument.copyToHistoryDocument('edit');
