@@ -23,14 +23,19 @@ const schema = new mongoose.Schema({
   // 微信支付api名称
   apiType: {
     type: String,
-    enum: ['H5', 'native'],
+    enum: ['H5', 'native','jsApi'],
     required: true,
     index: 1,
   },
   // 支付链接
   url: {
     type: String,
-    required: true,
+    // required: true,
+  },
+  // 交易商品名称
+  description: {
+    type: String,
+    default: ''
   },
   // 调用微信api，有关此次调用记录的id，用于提供给微信排查问题
   apiLogId: {
@@ -118,7 +123,7 @@ schema.statics.getPaymentRecord = async (props) => {
   const WechatPayRecordModel = mongoose.model('wechatPayRecords');
   const checkData = require('../nkcModules/checkData');
   const SettingModel = mongoose.model('settings');
-  const {H5, native} = require('../nkcModules/weChatPay');
+  const {H5, native, jsApi} = require('../nkcModules/weChatPay');
   const {
     description = '',
     money,
@@ -130,8 +135,8 @@ schema.statics.getPaymentRecord = async (props) => {
     clientIp,
     clientPort,
   } = props;
-  if(!['native', 'H5'].includes(apiType)) throwErr(400, `微信支付apiType error`);
-  if(!['H5', 'native'].includes(apiType)) throwErr(500, `weChatPay apiType error. apiType: ${apiType}`);
+  if(!['native', 'H5','jsApi'].includes(apiType)) throwErr(400, `微信支付apiType error`);
+  if(!['H5', 'native','jsApi'].includes(apiType)) throwErr(500, `weChatPay apiType error. apiType: ${apiType}`);
   checkData.checkNumber(money, {
     name: '支付金额',
     min: 1,
@@ -155,6 +160,8 @@ schema.statics.getPaymentRecord = async (props) => {
       money,
       attach,
     });
+  } else if(apiType === 'jsApi'){
+    url = jsApi.getCallBackUrl(recordId);
   }
 
   const now = new Date();
@@ -172,7 +179,8 @@ schema.statics.getPaymentRecord = async (props) => {
     effectiveMoney,
     fee,
     ip: clientIp,
-    port: clientPort
+    port: clientPort,
+    description
   });
   await weChatPayRecord.save();
   return weChatPayRecord;
