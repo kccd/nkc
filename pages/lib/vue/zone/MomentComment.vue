@@ -113,7 +113,7 @@ import {objToStr} from "../../js/tools";
 import {nkcAPI} from "../../js/netAPI";
 import { WinkingFace } from "@icon-park/vue";
 import EmojiSelector from "../EmojiSelector.vue";
-import MomentFiles from './MomentFilesNew';
+import MomentFiles from './MomentFiles';
 import ResourceSelector from '../ResourceSelector';
 import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';

@@ -131,7 +131,6 @@
   import EmojiSelector from '../EmojiSelector';
   import ResourceSelector from '../ResourceSelector';
   import { getUrl } from '../../js/tools';
-  import MomentFiles from './MomentFiles';
   import EditorCore from './EditorCore.plain.vue';
   export default {
     props: ['mid', 'type'],
@@ -139,7 +138,6 @@
       'editor-core': EditorCore,
       'emoji-selector': EmojiSelector,
       'resource-selector': ResourceSelector,
-      'moment-files': MomentFiles,
     },
     data: () => ({
       maxContentLength: 1000,
