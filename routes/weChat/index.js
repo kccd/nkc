@@ -16,9 +16,6 @@ router.get('/', async (ctx, next) => {
   if (!code) {
     ctx.throw(400, '参数有误');
   }
-  // console.log('====================================');
-  // console.log(code, state);
-  // console.log('====================================');
   // 通过id查询数据库中的记录
   const weChatPayRecord = await db.WechatPayRecordModel.findOne({ _id: state });
   if(!weChatPayRecord){
@@ -33,11 +30,8 @@ router.get('/', async (ctx, next) => {
     attach:'{}',
     code,
   });
-  // const prepay_id = 'wx0214522393174252bb944ad40dafcc0000';
   //获取到用户的openId,并使用jsApi下单，获取prepay_id后重组数据返回。
-  // console.log('====================================');
-  // console.log('prepay_id', prepay_id);
-  // console.log('====================================');
+ 
   const nonceStr = getRandomString(`A0`, 32);
   const timeStamp = String(Math.floor(Date.now() / 1000));
   const package = `prepay_id=${prepay_id}`;
@@ -65,9 +59,6 @@ router.get('/', async (ctx, next) => {
     paySign,
   };
   data.info = info;
-  // console.log('=======info=============================');
-  // console.log(info);
-  // console.log('====================================');
   ctx.template = 'weChat/weChat.pug';
   await next();
 });
