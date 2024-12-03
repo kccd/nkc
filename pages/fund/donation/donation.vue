@@ -261,7 +261,7 @@ export default {
       if(NKC.methods.isPcBrowser()){
         apiType='native';
       }else{
-        if(navigator.userAgent.indexOf("MicroMessenger")>0 && getState().uid && (getState().uid==='102331'||getState().uid==='74185')){
+        if(navigator.userAgent.indexOf("MicroMessenger")>0){
           apiType='jsApi';
         }else{
           apiType='H5';

@@ -21,18 +21,40 @@ module.exports = {
     if (!width || !height) {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}">
-          <img data-global-click="viewImage" data-global-long-press="longPressImageForRN" data-global-data="${objToStr(
-            { name: oname, url: lgUrl },
-          )}" src="${url}" alt="${oname}" data-type="view" dataimg="content">
+          <img 
+            data-global-click="viewImage" 
+            data-global-long-press="longPressImageForRN" 
+            data-global-data="${objToStr({
+              name: oname,
+              url: lgUrl,
+            })}" 
+            data-src="${url}" 
+            alt="${oname}" 
+            data-type="view" 
+            dataimg="content"
+            class="lazyload"
+          >
         </span>
       `.trim();
     } else {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}" style="width: ${width}px;">
           <span style="padding-top: ${(height * 100) / width}%">
-            <img data-global-click="viewImage" data-global-long-press="longPressImageForRN" data-global-data="${objToStr(
-              { name: oname, url: lgUrl, height: height, width: width },
-            )}" data-src="${url}" alt="${oname}" data-type="view" dataimg="content" class="lazyload">
+            <img 
+              data-global-click="viewImage" 
+              data-global-long-press="longPressImageForRN" 
+              data-global-data="${objToStr({
+                name: oname,
+                url: lgUrl,
+                height: height,
+                width: width,
+              })}" 
+              data-src="${url}" 
+              alt="${oname}" 
+              data-type="view" 
+              dataimg="content" 
+              class="lazyload"
+            >
           </span>
         </span>
       `.trim();

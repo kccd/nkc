@@ -13,15 +13,18 @@
         video-player(:file="fileData")
       .moment-file-container(
         v-else="fileData.type === types.picture"
-        :style="`background-image: url(${fileData.url || fileData.coverUrl});${fileData.pictureContainerStyle}`"
+        :style="`${fileData.pictureContainerStyle}`"
         :class="fileData.pictureContainerClass"
         @click="viewMedias(index)"
         v-long-press="() => longPress(index)"
         )
         img(
-          :src=" fileData.type === types.picture ? fileData.url : fileData.coverUrl"
+          :class="{'lazyload': true}"
+          :data-src=" fileData.type === types.picture ? (isZoneDetail? fileData.url: fileData.urlMD) : fileData.coverUrl"
           :alt="fileData.filename"
           :title="fileData.filename"
+          :data-count="filesData.length > 1? 'more-than-one' : 'only-one'"
+          :data-direction="fileData.height > fileData.width? 'ver': 'hor'"
           )
         .play-icon(v-if="fileData.type === types.video")
           play-one(size="24" theme="filled")
@@ -58,30 +61,25 @@
         height: 100%;
       }
       img {
-        position: absolute;
-        //min-height: 100%;
-        min-width: 100%;
-        display: block;
-        top: 0;
-        left: 0;
-        opacity: 0;
-        filter: alpha(opacity=0);
-        z-index: 10;
-        /*position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-        min-height: 100%;
-        object-fit: cover;
-        display: block;*/
-        /*//min-height: 100%;
-        min-width: 100%;
-        top: 0;
-        left: 0;
-        opacity: 0;
-        filter: alpha(opacity=0);
-        z-index: 10;*/
+        &[data-count="more-than-one"] {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          &[data-direction='ver'] {
+            width: 100%;
+          }
+          &[data-direction='hor'] {
+            height: 100%;
+          }
+        }
+        &[data-count="only-one"]{
+          min-width: 100%;
+          top: 0;
+          left: 0;
+          filter: alpha(opacity=0);
+          z-index: 10;
+        }
       }
       .play-icon {
         color: #ffffff;
@@ -156,8 +154,6 @@
         display: block;
         top: 0;
         left: 0;
-        opacity: 0;
-        // filter: alpha(opacity=0);
         z-index: 10;
       }
       .play-icon {
