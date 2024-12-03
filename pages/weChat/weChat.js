@@ -58,6 +58,7 @@ $(function () {
     if (status === 'success') {
       $('.record-status-icon.success').removeClass('hidden'); // 显示成功状态
       $('#tips').text(message);
+      $('.record-links').removeClass('hidden');
     } else if (status === 'fail') {
       $('.record-status-icon.fail').removeClass('hidden'); // 显示失败状态
       $('#tips').text(message);

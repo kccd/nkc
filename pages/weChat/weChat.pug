@@ -30,6 +30,9 @@ block title
       color: #000;
       font-size: 1.6rem;
     }
+    .record-links{
+      text-align: center;
+    }
 block content
   .container-fluid.max-width
     .row
@@ -41,6 +44,13 @@ block content
         .record-status-icon(class="fail hidden")
           .fa.fa-exclamation
         .record-status-desc.m-b-05#tips 等待支付...
+        .record-links.m-b-1(class="hidden")
+          span(class=` ${state.uid ? '' : 'hidden' }`)
+            a(href='/account/finance/recharge') 充值中心
+            span &nbsp;&nbsp;
+            a(href=`/u/${state.uid}/profile/finance?t=all`) 我的账单
+            span &nbsp;&nbsp;
+            a(href='/shop/order') 我的订单
       .hidden#data=objToStr({info:data.info})
 block scripts
   +includeJS('/weChat/weChat.js')
