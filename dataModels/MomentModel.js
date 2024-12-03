@@ -1557,6 +1557,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
           rid,
           type: 'picture',
           url: getUrl('resource', rid),
+          urlMD: getUrl('resource', rid, 'md'),
           urlLG: getUrl('resource', rid, 'lg'),
           height,
           width,

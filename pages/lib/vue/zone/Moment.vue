@@ -771,7 +771,7 @@ import { toLogin } from '../../js/account';
 import MomentEditor from './MomentEditor.vue';
 import { subUsers } from "../../js/subscribe";
 import { initNKCSource } from '../../js/nkcSource.js';
-import { lazySizesInit } from "../../js/lazySizes";
+import { lazyLoadInit } from "../../js/lazyLoad";
 
 const state = getState();
 export default {
@@ -818,7 +818,9 @@ export default {
         initNKCSource();
       }, 10);
     } else {
-      lazySizesInit();
+      setTimeout(() => {
+        lazyLoadInit();
+      }, 10)
     }
   },
   computed: {

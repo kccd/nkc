@@ -2,7 +2,7 @@ import { strToObj, objToStr } from './dataConversion';
 import { getState } from './state';
 import { getUrl } from './tools';
 const isLogged = !!getState().uid;
-import { lazySizesInit } from './lazySizes';
+import { lazyLoadInit } from './lazyLoad';
 
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -280,5 +280,5 @@ export function initNKCSource() {
   renderingNKCVideo();
   renderingNKCAudio();
   renderingNKCPicture();
-  lazySizesInit();
+  lazyLoadInit();
 }

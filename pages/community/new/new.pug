@@ -36,7 +36,7 @@ block content
             if !data.posts || data.posts.length === 0
               .p-t-5.p-b-5.text-center 空空如也~
             else
-              include ../../home/postlatest
+              include ../../home/postLatest
               for a in data.posts
                 +postlatest(a)
 
