@@ -19,10 +19,12 @@
         v-long-press="() => longPress(index)"
         )
         img(
-          :class="{'lazyload': true, 'only-one': filesData.length === 1, 'more-than-one': filesData.length > 1}"
+          :class="{'lazyload': true}"
           :data-src=" fileData.type === types.picture ? (isZoneDetail? fileData.url: fileData.urlMD) : fileData.coverUrl"
           :alt="fileData.filename"
           :title="fileData.filename"
+          :data-count="filesData.length > 1? 'more-than-one' : 'only-one'"
+          :data-direction="fileData.height > fileData.width? 'ver': 'hor'"
           )
         .play-icon(v-if="fileData.type === types.video")
           play-one(size="24" theme="filled")
@@ -59,17 +61,19 @@
         height: 100%;
       }
       img {
-        &.more-than-one {
+        &[data-count="more-than-one"] {
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          width: 100%;
-          min-height: 100%;
-          object-fit: cover;
-          display: block;
+          &[data-direction='ver'] {
+            width: 100%;
+          }
+          &[data-direction='hor'] {
+            height: 100%;
+          }
         }
-        &.only-one{
+        &[data-count="only-one"]{
           min-width: 100%;
           top: 0;
           left: 0;
