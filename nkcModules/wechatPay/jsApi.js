@@ -26,9 +26,6 @@ func.getJsApiPaymentPrepayID = async (props) => {
       throw {code:res.data.errcode,message:res.data.errmsg};
     }
     openid = res.data.openid;
-    // console.log('====================================');
-    // console.log('openid', openid);
-    // console.log('====================================');
   } catch (error) {
     let status = 500,
       code = error.code || 'error';
@@ -95,7 +92,7 @@ func.getJsApiPaymentPrepayID = async (props) => {
 func.getCallBackUrl =  (paymentId) => {
   const REDIRECT_URI = encodeURIComponent('https://www.kechuang.org/wx');
   // 以下url是测试使用
-  // const REDIRECT_URI = encodeURIComponent('https://www.kechuang.org/z/');
+  // const REDIRECT_URI = encodeURIComponent('https://www.kechuang.org');
   return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${wechatPayConfigs.appId}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=snsapi_base&state=${paymentId}#wechat_redirect`;
 };
 
