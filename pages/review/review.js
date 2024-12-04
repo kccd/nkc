@@ -1,4 +1,9 @@
-var data = NKC.methods.getDataById('data');
+import { sweetError } from '../lib/js/sweetAlert';
+import { nkcAPI } from '../lib/js/netAPI';
+import { screenTopAlert, screenTopWarning } from '../lib/js/topAlert';
+import { initNKCSource } from '../lib/js/nkcSource';
+
+var data = window.NKC.methods.getDataById('data');
 var pid = [];
 var did = [];
 var nid = [];
@@ -51,7 +56,7 @@ for (var i = 0; i < data.results.length; i++) {
   }
 }
 
-var app = new Vue({
+var app = new window.Vue({
   el: '#app',
   data: {
     selectedPid: [],
@@ -63,7 +68,9 @@ var app = new Vue({
     nid: nid,
     review: review,
   },
-  mounted() {},
+  mounted() {
+    initNKCSource();
+  },
   methods: {
     selectAll: function () {
       if (this.selectedPid.length === this.pid.length) {
@@ -319,19 +326,19 @@ var app = new Vue({
     },
 
     chooseAll: function (type) {
-      for (var i = 0; i < this.selectedPid.length; i++) {
-        var p = this.selectedPid[i];
-        var reviewData = this.review[p];
+      for (let i = 0; i < this.selectedPid.length; i++) {
+        const p = this.selectedPid[i];
+        const reviewData = this.review[p];
         reviewData.pass = type;
       }
-      for (var i = 0; i < this.selectedDid.length; i++) {
-        var d = this.selectedDid[i];
-        var reviewData = this.review[d];
+      for (let i = 0; i < this.selectedDid.length; i++) {
+        const d = this.selectedDid[i];
+        const reviewData = this.review[d];
         reviewData.pass = type;
       }
-      for (var i = 0; i < this.selectedNid.length; i++) {
-        var n = this.selectedNid[i];
-        var reviewData = this.review[n];
+      for (let i = 0; i < this.selectedNid.length; i++) {
+        const n = this.selectedNid[i];
+        const reviewData = this.review[n];
         reviewData.pass = type;
       }
     },
