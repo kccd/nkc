@@ -61,6 +61,16 @@ const app = new Vue({
       const {payment, ordersId, totalPrice, totalMoney} = this;
       let newWindow = null;
       const self = this;
+      let apiType = '';
+      if(NKC.methods.isPcBrowser()){
+        apiType='native';
+      }else{
+        if(navigator.userAgent.indexOf("MicroMessenger")>0){
+          apiType='jsApi';
+        }else{
+          apiType='H5';
+        }
+      }
       return Promise.resolve()
         .then(() => {
           self.submitting = true;
@@ -71,7 +81,7 @@ const app = new Vue({
             newWindow = window.open();
           }
           return nkcAPI(`/account/finance/recharge/payment`, 'POST', {
-            apiType: NKC.methods.isPcBrowser()? 'native': 'H5',
+            apiType,
             ordersId,
             paymentType: payment,
             finalPrice: totalMoney,
@@ -81,7 +91,11 @@ const app = new Vue({
         .then((res) => {
           const {aliPaymentInfo, wechatPaymentInfo} = res;
           if(wechatPaymentInfo) {
-            NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+            if( apiType==='jsApi'){
+              newWindow.location = wechatPaymentInfo.url;
+            }else{
+              NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+            }
           } else {
             NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
           }
