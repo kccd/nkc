@@ -72,7 +72,7 @@ mixin renderText(node)
             
       else  
         if isCode
-          code=node.text
+          code(style='white-space: pre-wrap;')=node.text
         else
           -
             const usersObj = {};
@@ -110,7 +110,7 @@ mixin renderText(node)
                 : `/p/${p1}?redirect=true`;
               return `<a href="${link}" target="_blank">${match}</a>`;
             });
-          span!=replacedText
+          span(style='white-space: pre-wrap;')!=replacedText
           //- span= node.text
     if isStrike
       s
