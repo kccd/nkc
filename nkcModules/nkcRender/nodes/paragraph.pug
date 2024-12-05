@@ -12,3 +12,5 @@ mixin renderParagraph(node)
   p(style=style)
     if node.content
       +loopRender(node.content)
+    else 
+      br
