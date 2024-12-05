@@ -179,8 +179,9 @@
           v-if='isFold && expandContent',
           @click.self.stop='closeContent'
         ) 收起
-      .singe-moment-rich-link(v-if="momentData.mode === 'rich' && !isFold")
-        router-link(:to="momentData.url") 查看详情  
+      .singe-moment-rich-link(v-if="momentData.mode === 'rich' && !isFold" @click.stop='clickDetail(momentData.url,$event)')
+        //- router-link(:to="momentData.url") 查看详情  
+        a(:href="momentData.url") 查看详情  
       //- 图片视频
       .single-moment-files
         moment-files(:data='momentData.files')
@@ -889,6 +890,14 @@ export default {
         this.visitUrl(`${this.momentData.url}?type=${showType}`, true);
       }
     },
+    clickDetail(url,e){
+      e.preventDefault();
+      if(state.isApp){
+        this.visitUrl(url, true);
+      }else{
+        this.$router.push(url);
+      }
+    },
     initData() {
       const { data } = this;
       this.momentData = JSON.parse(JSON.stringify(data));
@@ -1031,7 +1040,11 @@ export default {
       }
     },
     visitRichContent() {
+      if(state.isApp){
+        this.visitUrl(this.momentData.url, true);
+      }else{
       this.$router.push(`${this.momentData.url}`);
+      }
     },
     closeContent() {
       this.expandContent = false;
