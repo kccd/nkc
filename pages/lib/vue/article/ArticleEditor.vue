@@ -329,9 +329,7 @@ export default {
      }
     },
     setContent(data) {
-      setTimeout(()=> {
-        this.$refs.documentEditor.initDocumentForm(data);
-      }, 500)
+      this.$refs.documentEditor.initDocumentForm(data);
     },
     initId() {
       if(this.source === 'column') {
