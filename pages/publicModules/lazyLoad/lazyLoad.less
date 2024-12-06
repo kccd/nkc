@@ -1,0 +1,13 @@
+img.lazyload {
+  opacity: 0;
+}
+img.lazyloading{
+  opacity: 1;
+  transition: opacity 300ms;
+  background: #c7c7c7 url(/statics/loading.gif) no-repeat center;
+  background-size: 3rem;
+}
+img.lazyloaded{
+  z-index: 101;
+  background: rgba(0, 0, 0, 0);
+}

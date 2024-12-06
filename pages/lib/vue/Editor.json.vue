@@ -208,7 +208,6 @@ import TextAlign from '@tiptap/extension-text-align';
 import TextColorIcon from './tiptap/TextColorIcon.vue';
 import Highlight from '@tiptap/extension-highlight';
 import BubbleMenu from '@tiptap/extension-bubble-menu';
-// import Image from '@tiptap/extension-image'
 import TableEditor from './tiptap/TableEditor.vue';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';

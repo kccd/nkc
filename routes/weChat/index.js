@@ -1,7 +1,7 @@
 const { getRandomString } = require('../../nkcModules/apiFunction');
-const { jsApi } = require('../../nkcModules/weChatPay');
+const { jsApi } = require('../../nkcModules/wechatPay');
 const wechatPayConfigs = require('../../config/wechatPay.json');
-const { getPrivateKey } = require('../../nkcModules/weChatPay/utils');
+const { getPrivateKey } = require('../../nkcModules/wechatPay/utils');
 const crypto = require('crypto');
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
