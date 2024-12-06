@@ -1,7 +1,8 @@
 import { getCommentEditorConfigs } from '../../lib/js/editor';
 import Editor from '../../lib/vue/Editor';
 import { toLogin } from '../../lib/js/account';
-
+import { lazyLoadInit } from '../../lib/js/lazyLoad';
+const NKC = window.NKC;
 var _id;
 class SinglePostModule {
   constructor() {
@@ -261,6 +262,7 @@ class SinglePostModule {
     NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
     NKC.methods.renderFormula();
+    lazyLoadInit();
   }
   // 移除所有评论框和定时事件
   removeAllEditorApp(pid) {
@@ -694,7 +696,9 @@ class SinglePostModule {
       return;
     }
     clearTimeout(editorApp.timeoutId);
-    if (editorApp.manualSave) return;
+    if (editorApp.manualSave) {
+      return;
+    }
     editorApp.timeoutId = setTimeout(() => {
       self
         .saveDraftData(pid)
