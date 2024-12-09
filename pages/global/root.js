@@ -1,7 +1,7 @@
 // import Chat from '../lib/vue/message/Chat';
 import MessageNotify from '../lib/vue/message/MessageNotify.vue';
 import Login from '../lib/vue/Login';
-import { RNOpenLoginPage } from '../lib/js/reactNative';
+import { RNOpenLoginPage, RNViewVideo } from '../lib/js/reactNative';
 import { getState } from '../lib/js/state';
 import UserDraw from '../lib/vue/publicVue/userDraw/UserDraw';
 import UserFloatPanel from '../lib/vue/UserFloatPanel';
@@ -26,6 +26,7 @@ import {
 import { initUserPanel } from './userPanel';
 import { subUsers } from '../lib/js/subscribe';
 import { visitUrl } from '../lib/js/pageSwitch';
+import { nkcAPI } from '../lib/js/netAPI';
 const { isApp, platform, uid } = getState();
 
 window.RootApp = new Vue({
@@ -177,6 +178,14 @@ window.RootApp = new Vue({
             console.error('Service Worker 注册失败:', error);
           });
       }
+    },
+    viewVideoForApp(rid) {
+      //通过rid请求数据后打开app预览
+      nkcAPI(`/r/${rid}/info`, 'GET')
+        .then((res) => {
+          RNViewVideo([{ ...res.videoPlayerData }], 0);
+        })
+        .catch(console.error);
     },
   },
 });

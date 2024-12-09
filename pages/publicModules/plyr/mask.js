@@ -1,3 +1,4 @@
+import {getState} from '../../lib/js/state';
 const threadSettings = NKC.methods.getDataById("threadSettings");
 NKC.methods.initPlyrMask = function(player) {
   if(player.type === 'video') {
@@ -69,8 +70,12 @@ function getVideoPreviewMask(player) {
   maskDownloadButton.attr('data-id', rid);
   maskDownloadButton.removeClass('hidden');
   maskPlayButton.on("click", () => {
-    mask.remove();
-    player.play();
+    if (getState().isApp) {
+      window.RootApp.viewVideoForApp(rid);
+    } else {
+      mask.remove();
+      player.play();
+    }
   });
   return mask;
 }

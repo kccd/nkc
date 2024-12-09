@@ -135,12 +135,18 @@ export function renderingNKCVideo() {
       maskContainer.appendChild(maskDom[0]);
     } else if (mask) {
       // 用户点击预览按钮时执行的函数
-      const previewButtonOnClick = `
+      let previewButtonOnClick = '';
+      if (getState().isApp) {
+        // 对于直接筛入原生js指令，app可以直接使用window.ReactNativeWebView.postMessage({type,data})
+        previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
+      } else {
+        previewButtonOnClick = `
         var video = document.querySelector('[data-tag=\\'nkcsource\\'][data-type=\\'video\\'] video');
         video.play();
         var mask = document.querySelector('[data-nkc-video-mask-id=\\'${uniqueId}\\']');
         mask.remove();
       `;
+      }
       const maskDom = window.$(`
         <div style="${maskDomStyle}" data-nkc-video-mask-id="${uniqueId}">
           <div style="${maskTextStyle}">${mask}</div>
