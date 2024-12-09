@@ -161,6 +161,18 @@ export function RNViewImage(urls, index) {
   });
 }
 
+export function RNViewVideo(videos, index) {
+  for (const video of videos) {
+    video.coverUrl = fixUrl(video.coverUrl);
+    for (const source of video.sources) {
+      source.url = fixUrl(source.url);
+    }
+  }
+  RNEmit('viewVideo', {
+    videos,
+    index,
+  });
+}
 /*
  * 关闭当前页面
  * @param {Object} data
