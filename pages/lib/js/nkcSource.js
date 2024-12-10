@@ -136,7 +136,7 @@ export function renderingNKCVideo() {
     } else if (mask) {
       // 用户点击预览按钮时执行的函数
       let previewButtonOnClick = '';
-      if (getState().isApp) {
+      if (getState().isApp && getState().appVersionCode >= 5) {
         // 对于直接筛入原生js指令，app可以直接使用window.ReactNativeWebView.postMessage({type,data})
         previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
       } else {
