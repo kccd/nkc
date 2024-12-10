@@ -75,8 +75,6 @@
     }
     var container = document.getElementById('container');
     container.appendChild(video);
-    const videoSize = videoInfo.sources.map(item => item.size);
-    const defaultVideoSize = videoSize[1] || videoSize[0] || 720;
     const player = new window.Plyr('video', {
       controls: ['play-large', 'play','progress', 'duration', 'settings'],
       settings: ['quality', 'speed'],
