@@ -108,7 +108,7 @@
     div(v-if='selectedMomentId === momentData.momentId && !submitting')
       .moment-editor-header
         .moment-editor-header-title.text-info 正在编辑电文：
-        button.btn.btn-default.btn-xs(@click='submitting = true') 取消
+        button.btn.btn-default.btn-xs(@click='cancelEdit') 取消
       moment-editor(
         :mid='momentData.momentId',
         @published='onPublished',
@@ -226,7 +226,7 @@
     div(v-if='selectedMomentId === momentData.momentId && !submitting')
       .moment-editor-header
         .moment-editor-header-title.text-info 正在编辑电文：
-        button.btn.btn-default.btn-xs(@click='submitting = true') 取消
+        button.btn.btn-default.btn-xs(@click='cancelEdit') 取消
       moment-editor(
         :mid='momentData.momentId',
         @published='onPublished',
@@ -1028,6 +1028,7 @@ export default {
     onPublished(data) {
       const { content, submitting, files, status, tlm, addr } = data;
       this.momentData.content = content;
+      this.momentData.plain = content;
       this.momentData.status = status;
       this.submitting = submitting;
       this.momentData.files = files;
@@ -1035,6 +1036,9 @@ export default {
       this.momentData.addr = addr;
       this.$refs.momentEditor.reset();
       this.showLoadMore();
+      this.$nextTick(()=>{
+        lazyLoadInit();
+      });
     },
     openContent() {
       if(this.momentData.mode === 'rich') {
@@ -1052,6 +1056,12 @@ export default {
     },
     closeContent() {
       this.expandContent = false;
+    },
+    cancelEdit(){
+      this.submitting = true;
+      this.$nextTick(()=>{
+        lazyLoadInit();
+      });
     }
   },
 };
