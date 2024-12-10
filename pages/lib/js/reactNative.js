@@ -441,3 +441,17 @@ export function RNSetSharePanelStatus(show = true, type, id) {
     id,
   });
 }
+/*
+ * 屏蔽下拉刷新
+ * */
+
+export function RNDisableRefresher() {
+  RNEmit('disableRefresher');
+}
+/*
+ * 解除屏蔽下拉刷新
+ * */
+
+export function RNEnableRefresher() {
+  RNEmit('enableRefresher');
+}
