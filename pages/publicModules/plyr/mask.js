@@ -70,7 +70,7 @@ function getVideoPreviewMask(player) {
   maskDownloadButton.attr('data-id', rid);
   maskDownloadButton.removeClass('hidden');
   maskPlayButton.on("click", () => {
-    if (getState().isApp) {
+    if (getState().isApp && getState().appVersionCode >= 5) {
       window.RootApp.viewVideoForApp(rid);
     } else {
       mask.remove();

@@ -13,6 +13,7 @@ export function getState() {
     column: '',
     isProduction: true,
     record: [],
+    appVersionCode: 0,
   };
   try {
     const windowDataDom = document.querySelector('meta[name="window-data"]');
@@ -36,6 +37,7 @@ export function getState() {
     state.copyright = windowData.copyright;
     state.record = windowData.record;
     state.isProduction = windowData.isProduction;
+    state.appVersionCode = windowData.appVersionCode;
     return state;
   } catch (err) {
     console.error(`获取 state 数据失败`);

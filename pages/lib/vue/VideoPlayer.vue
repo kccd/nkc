@@ -157,7 +157,7 @@
         this.maskRemoved = true;
       },
       play() {
-        if(state.isApp){
+        if(state.isApp && state.appVersionCode>=5){
           window.RootApp.viewVideoForApp(this.file.rid);
         }else{
           this.hideMask();
