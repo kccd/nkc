@@ -70,4 +70,7 @@ module.exports = {
       GET: Operations.downloadApp,
     },
   },
+  'video-player': {
+    GET: Operations.appVideoPlayer,
+  },
 };

@@ -34,7 +34,7 @@
   </video>-->
 </div>
 <script>
-  const isRN = !!window.ReactNativeWebView;
+  var isRN = !!window.ReactNativeWebView;
   window.addEventListener('error', err => {
     isRN && window.ReactNativeWebView.postMessage(err.message || err.toString());
   });
@@ -66,7 +66,7 @@
     video.crossOrigin = "";
     video.poster = poster;
     for(var i = 0; i < sources.length; i++) {
-      const sourceInfo = sources[i];
+      var sourceInfo = sources[i];
       var source = document.createElement('source');
       source.src = sourceInfo.src;
       source.type = sourceInfo.type;
@@ -75,7 +75,7 @@
     }
     var container = document.getElementById('container');
     container.appendChild(video);
-    const player = new window.Plyr('video', {
+    var player = new window.Plyr('video', {
       controls: ['play-large', 'play','progress', 'duration', 'settings'],
       settings: ['quality', 'speed'],
       disableContextMenu: true,
@@ -94,11 +94,6 @@
     })
     window.player = player;
   }
-
-  if(!isRN) {
-    initVideoPlayer();
-  }
-
 </script>
 </body>
 </html>
