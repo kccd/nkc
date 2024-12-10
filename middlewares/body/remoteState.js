@@ -36,5 +36,6 @@ module.exports = async (ctx) => {
       tipContent: state.threadSettings.playerTips.tipContent,
     },
     navbar: state.navbar || 'standard', // standard, full
+    appVersionCode: state.appVersionCode,
   };
 };

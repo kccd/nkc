@@ -4,7 +4,7 @@
     .form
       .form-group(v-if="formConfigs.title")
         input.form-control.form-title(type="text" v-model="title" placeholder="请输入标题" maxlength='100')
-      .form-group
+      .form-group(v-if="language")
 
         editor(:configs="editorConfigs" ref="editor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="editorReady" :l="language")
       .form-group(v-if="formConfigs.cover")

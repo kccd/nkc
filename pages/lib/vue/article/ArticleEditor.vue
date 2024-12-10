@@ -279,8 +279,12 @@ export default {
     },
   },
   mounted() {
+    this.initId();
+    this.initData();
     // this.getColumn();
-    this.initAutoSaveToDraft();
+    // 此功能严重怀疑没有按照编辑的渲染的顺序进行
+    // this.initAutoSaveToDraft();
+    
   },
   destroyed() {
     clearInterval(this.setInterval);
@@ -316,15 +320,16 @@ export default {
     getSelectCategory() {
       return this.$refs.selectColumnCategories.getStatus();
     },
-    //编辑器准备完毕
+    //编辑器准备完毕的回调
     editorReady() {
-      this.initId();
-      this.initData();
+     //直接调用方法进行塞入内容==>需要确认l的前提下调用
+     if(this.getRequest().aid){
+      this.setContent(this.article);
+      this.initAutoSaveToDraft();
+     }
     },
     setContent(data) {
-      setTimeout(()=> {
-        this.$refs.documentEditor.initDocumentForm(data);
-      }, 500)
+      this.$refs.documentEditor.initDocumentForm(data);
     },
     initId() {
       if(this.source === 'column') {
@@ -411,10 +416,13 @@ export default {
               authorInfos,
               l
             };
-            self.setContent(self.article);
+            // 这里需要利用回调进行初始化编辑器中的值
+            // self.setContent(self.article);
           } else if(data.editorInfo.articles) {
             //存在正在编辑中的专栏文章
             self.articles = data.editorInfo.articles;
+            //对于新建文章有草稿的情况下
+            self.article.l = data.editorInfo.articles[0]?.l || 'json';
           }
           if(data.targetColumn){
             self.columnId = data.targetColumn._id;
@@ -446,8 +454,13 @@ export default {
         if(mid) sweetError('空间编辑器不存在mid');
       }
       self.addUrlParam('aid', aid);
+      const tempL = self.article.l || 'json';
       self.initData()
         .then(() => {
+          if(tempL===self.article.l){
+            self.setContent(self.article);
+            self.initAutoSaveToDraft();
+          }
           self.articles = [];
         });
     },
@@ -535,7 +548,7 @@ export default {
       if(type === this.types.publish) clearTimeout(this.setTimeout);
       if(this.lockPost && type !== this.types.publish) return;
       this.lockPost = true;
-      this.$refs.documentEditor.setSavedStatus('saving');
+      // this.$refs.documentEditor.setSavedStatus('saving');
       const formData = new FormData();
       const {
         coverFile,
@@ -600,7 +613,7 @@ export default {
         .then(data => {
           self.oldCoverFile = self.coverFile;
           self.coverFile = null;
-          self.$refs.documentEditor.setSavedStatus('succeeded');
+          // self.$refs.documentEditor.setSavedStatus('succeeded');
           const {articleId, articleCover} = data;
           self.articleId = articleId;
           //改变地址栏参数
@@ -627,7 +640,7 @@ export default {
           return;
         })
         .catch(err => {
-          self.$refs.documentEditor.setSavedStatus('filed');
+          // self.$refs.documentEditor.setSavedStatus('filed');
           self.lockPost = false;
           let info = '';
           if(type === self.types.save || type === self.types.autoSave) {

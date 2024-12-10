@@ -157,8 +157,12 @@
         this.maskRemoved = true;
       },
       play() {
-        this.hideMask();
-        this.player.play();
+        if(state.isApp && state.appVersionCode>=5){
+          window.RootApp.viewVideoForApp(this.file.rid);
+        }else{
+          this.hideMask();
+          this.player.play();
+        }
       },
       openDownloadPanel() {
         this.$refs.downloadPanel.open(this.file.rid);

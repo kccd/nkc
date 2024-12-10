@@ -180,11 +180,12 @@
 
 <script>
 import { openImageViewer } from '../../js/imageViewer';
+import { RNViewVideo } from '../../js/reactNative';
 import { longPressImage } from '../../js/reactNative';
 import { getState } from '../../js/state';
 import VideoPlayer from '../VideoPlayer';
 import {PlayOne} from '@icon-park/vue'
-const { isApp } = getState();
+const { isApp,appVersionCode } = getState();
 export default {
   /*
    * prop {[Object]} data
@@ -290,8 +291,12 @@ export default {
           readyFiles = filesData.filter((item) => item.type === 'video');
           if (readyFiles.length === 0) return;
           const $index = readyFiles.findIndex((item) => item.rid === clickRid);
+          if(appVersionCode >= 5){
+            RNViewVideo(readyFiles,$index);
+          }else{
           window.RootApp.$refs.preview.setData(true, $index , readyFiles);
           window.RootApp.$refs.preview.init($index);
+          }
         } else if (clickType === 'picture') {
           tempArray = filesData.filter((item) => item.type === 'picture');
           for (const fileItem of tempArray) {

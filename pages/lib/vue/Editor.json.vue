@@ -1005,6 +1005,7 @@ export default {
   border-top: none;
   border-radius: 0 0 5px 5px;
   background-color: #fff;
+  font-size: 16px;
 
   &:hover {
     cursor: text;
