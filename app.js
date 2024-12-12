@@ -8,6 +8,7 @@ const koaCompress = require('koa-compress');
 const koaRewrite = require('koa-rewrite');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
+const cors = require('@koa/cors');
 const { isProduction } = require('./settings/env');
 const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
@@ -53,6 +54,14 @@ const koaBodySetting = settings.upload.koaBodySetting;
 koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
 app.keys = getCookieKeys();
 app
+  .use(
+    cors({
+      // origin: 'http://www.test.com', // 测试
+      origin: 'https://www.kechuang.org', // 允许的源
+      allowMethods: ['GET', 'HEAD', 'OPTIONS'], // 允许的请求方法
+      allowHeaders: ['Content-Type', 'Authorization'], // 允许的请求头
+    }),
+  )
   .use(rateLimit.total)
   // gzip
   .use(koaCompress({ threshold: 2048 }))
