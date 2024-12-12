@@ -5,20 +5,21 @@ window.addEventListener('error', (err) => {
 
 function initVideoPlayer(
   videoInfo = {
-    poster: 'https://img.kechuang.org:81/r/362713?c=resource&t=cover',
+    poster:
+      'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
     sources: [
       {
-        src: 'https://img.kechuang.org:81/r/362713?c=resource&t=fhd&w=gkz3wt0v',
+        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4',
         type: 'video/mp4',
         size: 576,
       },
       {
-        src: 'https://img.kechuang.org:81/r/362713?c=resource&t=fhd&w=gkz3wt0v',
+        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4',
         type: 'video/mp4',
         size: 720,
       },
       {
-        src: 'https://img.kechuang.org:81/r/362713?c=resource&t=fhd&w=gkz3wt0v',
+        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4',
         type: 'video/mp4',
         size: 1080,
       },
@@ -61,6 +62,3 @@ function initVideoPlayer(
   window.player = player;
 }
 window.initVideoPlayer = initVideoPlayer;
-if (!isRN) {
-  initVideoPlayer();
-}
