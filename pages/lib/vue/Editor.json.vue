@@ -656,6 +656,9 @@ export default {
           }
           if (insertContent.length > 0) {
             self.editor.commands.insertContent([...insertContent]);
+            const { state } = self.editor;
+            self.editor.commands.setTextSelection({ from: state.selection.from + 1, to: state.selection.from + 1 }); // 设置光标位置
+            self.editor.commands.scrollIntoView();
           }
         },
         {
