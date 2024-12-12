@@ -56,6 +56,7 @@ const FixedOperations = {
   momentPlainEditorPublish: 'momentPlainEditorPublish',
   momentRichEditorHistoryRollback: 'momentRichEditorHistoryRollback',
   weChat: 'weChat',
+  appVideoPlayer: 'appVideoPlayer',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
