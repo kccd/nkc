@@ -101,51 +101,52 @@
 </template>
 
 <script>
-import MomentStatus from "./MomentStatus";
-import MomentOptionFixed from "./momentOption/MomentOptionFixed";
+import MomentStatus from './MomentStatus';
+import MomentOptionFixed from './momentOption/MomentOptionFixed';
 import FromNow from '../FromNow';
-import {toLogin} from "../../js/account";
-import {momentVote} from "../../js/zone/vote";
-import {visitUrl} from "../../js/pageSwitch";
-import {sweetError} from "../../js/sweetAlert";
-import {getState} from "../../js/state";
-import {objToStr} from "../../js/tools";
-import {nkcAPI} from "../../js/netAPI";
-import { WinkingFace } from "@icon-park/vue";
-import EmojiSelector from "../EmojiSelector.vue";
+import { toLogin } from '../../js/account';
+import { momentVote } from '../../js/zone/vote';
+import { visitUrl } from '../../js/pageSwitch';
+import { sweetError } from '../../js/sweetAlert';
+import { getState } from '../../js/state';
+import { objToStr } from '../../js/tools';
+import { nkcAPI } from '../../js/netAPI';
+import { WinkingFace } from '@icon-park/vue';
+import EmojiSelector from '../EmojiSelector.vue';
 import MomentFiles from './MomentFiles';
 import ResourceSelector from '../ResourceSelector';
 import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';
-import { immediateDebounce } from "../../js/execution";
+import { immediateDebounce } from '../../js/execution';
+import { lazyLoadInit } from '../../js/lazyLoad';
 const state = getState();
 const iconFill = {
   normal: '#555',
-  active: '#000'
+  active: '#000',
 };
 export default {
   name: 'moment-comment',
   props: {
     comment: {
       type: Object,
-      required: true
+      required: true,
     },
     permissions: {
       type: Object,
-      required: true
+      required: true,
     },
     focus: {
       type: String,
-      default: ''
+      default: '',
     },
     type: {
       type: String,
-      required: true
+      required: true,
     },
     mode: {
       type: String,
-      default: 'simple'
-    }
+      default: 'simple',
+    },
   },
   components: {
     'editor-core': EditorCore,
@@ -166,45 +167,48 @@ export default {
       image: {
         fill: iconFill.normal,
         size: 22,
-        theme: 'outline'
+        theme: 'outline',
       },
       video: {
         fill: iconFill.normal,
         size: 22,
-        theme: 'outline'
+        theme: 'outline',
       },
       face: {
         fill: iconFill.normal,
         size: 14,
-        theme: 'outline'
+        theme: 'outline',
       },
       article: {
         fill: iconFill.normal,
         size: 22,
-        theme: 'outline'
-      }
+        theme: 'outline',
+      },
     },
-    picturesId:[],
+    picturesId: [],
   }),
   computed: {
     commentData() {
       return this.comment;
     },
     editorPlaceholder() {
-      return `回复 ${this.commentData.username}`
+      return `回复 ${this.commentData.username}`;
     },
     picturesUrl() {
-        const {picturesId} = this;
-        const filesUrl = [];
-        for(const rid of picturesId) {
-          const url = getUrl('resource', rid);
-          filesUrl.push(url);
-        }
-        return filesUrl;
-      },
-    disabledButton(){
+      const { picturesId } = this;
+      const filesUrl = [];
+      for (const rid of picturesId) {
+        const url = getUrl('resource', rid);
+        filesUrl.push(url);
+      }
+      return filesUrl;
+    },
+    disabledButton() {
       return this.replyContent.length === 0 && this.picturesUrl.length === 0;
-    }
+    },
+  },
+  mounted() {
+    lazyLoadInit();
   },
   methods: {
     objToStr,
@@ -213,14 +217,16 @@ export default {
       this.replyContent = content;
       this.delayedSaveReplayContent();
     },
-    delayedSaveReplayContent: immediateDebounce(function() {
+    delayedSaveReplayContent: immediateDebounce(function () {
       this.saveReplayContent();
     }, 1000),
     getReplayContent() {
       nkcAPI(`/api/v1/zone/editor/plain?parent=${this.commentData._id}`, 'GET')
-        .then(res => {
-          if(res.data.momentId) {
-            this.picturesId = res.data.medias.filter(item => item.type === 'picture').map(item => item.rid);
+        .then((res) => {
+          if (res.data.momentId) {
+            this.picturesId = res.data.medias
+              .filter((item) => item.type === 'picture')
+              .map((item) => item.rid);
             this.replyContent = res.data.content;
             this.$refs.editorCore.setContent(this.replyContent);
           }
@@ -237,17 +243,17 @@ export default {
         content: this.replyContent,
         resourcesId: this.picturesId,
       })
-        .then(res => {
+        .then((res) => {
           console.log('保存成功');
         })
         .catch(sweetError);
     },
     submitReplyContent() {
-      const {replyContent, commentData, picturesId, disabledButton} = this;
+      const { replyContent, commentData, picturesId, disabledButton } = this;
       const self = this;
       return Promise.resolve()
         .then(() => {
-          if(disabledButton) throw new Error('请输入评论内容');
+          if (disabledButton) throw new Error('请输入评论内容');
           self.submitting = true;
           return nkcAPI(`/api/v1/zone/editor/plain`, 'POST', {
             parent: commentData._id,
@@ -262,7 +268,7 @@ export default {
           self.clearReplyContent();
           self.clearReplyPicture();
           self.onReplyComment(res.commentId);
-          if(self.mode === 'simple') {
+          if (self.mode === 'simple') {
             sweetSuccess('提交成功');
           }
         })
@@ -270,7 +276,6 @@ export default {
         .then(() => {
           self.submitting = false;
         });
-
     },
     onReplyComment(commentId) {
       this.$emit('on-reply-comment', commentId);
@@ -287,12 +292,12 @@ export default {
     },
     showReplyEditor() {
       this.replyEditorStatus = true;
-      this.clearReplyPicture()
+      this.clearReplyPicture();
       this.getReplayContent();
     },
     switchEditor() {
-      if(!this.logged) return toLogin();
-      if(this.replyEditorStatus) {
+      if (!this.logged) return toLogin();
+      if (this.replyEditorStatus) {
         this.hideReplyEditor();
       } else {
         this.showReplyEditor();
@@ -303,23 +308,26 @@ export default {
       this.$emit('complaint', mid);
     },
     vote(commentData) {
-      if(!this.logged) return toLogin();
+      if (!this.logged) return toLogin();
       const voteType = 'up';
       const cancel = voteType === commentData.voteType;
-      const momentId = this.type === 'comment'? commentData.momentCommentId: commentData.momentId;
+      const momentId =
+        this.type === 'comment'
+          ? commentData.momentCommentId
+          : commentData.momentId;
       momentVote(momentId, voteType, cancel)
-        .then(res => {
-          const {voteUp} = res;
+        .then((res) => {
+          const { voteUp } = res;
           commentData.voteUp = voteUp;
-          commentData.voteType = cancel? '': voteType;
+          commentData.voteType = cancel ? '' : voteType;
         })
-        .catch(sweetError)
+        .catch(sweetError);
     },
     openOption(e, moment) {
       const self = this;
       const target = e.target;
       const name = `momentOption_${moment._id}`;
-      self.$refs[name].open({DOM: $(target), moment});
+      self.$refs[name].open({ DOM: $(target), moment });
       // e.stopPropagation();
     },
     visitCommentChild() {
@@ -337,43 +345,47 @@ export default {
     },
     selectEmoji() {
       const self = this;
-      this.$refs.emojiSelector.open(res => {
-        const {code} = res;
-        self.insertContent(JSON.stringify({
-          type: 'nkc-emoji',
-          attrs: {
-            unicode: code,
-          }
-        }));
+      this.$refs.emojiSelector.open((res) => {
+        const { code } = res;
+        self.insertContent(
+          JSON.stringify({
+            type: 'nkc-emoji',
+            attrs: {
+              unicode: code,
+            },
+          }),
+        );
       });
     },
     selectPicture() {
-      if(this.picturesId.length>0) return;
-      const self= this;
-      this.$refs.resourceSelector.open(res => {
-        self.picturesId=[...new Set(res.resourcesId)].slice(0, 1);
-        self.$refs.resourceSelector.close();
-        self.delayedSaveReplayContent();
-      }, {
-        allowedExt: ['picture'],
-        countLimit: 1 - self.picturesId.length
-      });
+      if (this.picturesId.length > 0) return;
+      const self = this;
+      this.$refs.resourceSelector.open(
+        (res) => {
+          self.picturesId = [...new Set(res.resourcesId)].slice(0, 1);
+          self.$refs.resourceSelector.close();
+          self.delayedSaveReplayContent();
+        },
+        {
+          allowedExt: ['picture'],
+          countLimit: 1 - self.picturesId.length,
+        },
+      );
     },
-  }
-}
+  },
+};
 </script>
-
 
 <style lang="less" scoped>
 @import '../../../publicModules/base';
-.moment-comment-item{
-  &:hover{
+.moment-comment-item {
+  &:hover {
     background-color: #f4f4f4;
   }
-  &.disable-hover:hover{
+  &.disable-hover:hover {
     background-color: inherit;
   }
-  &.active{
+  &.active {
     background-color: #ffebcf;
     padding: 0.5rem;
   }
@@ -385,17 +397,17 @@ export default {
   }
   padding: 0.5rem 0;
   margin-bottom: 0;
-  .moment-comment-item-header{
+  .moment-comment-item-header {
     margin-bottom: 0.5rem;
     position: relative;
   }
-  .moment-comment-options{
+  .moment-comment-options {
     @height: 2rem;
     position: absolute;
     top: 0;
     right: 0;
     height: @height;
-    .moment-comment-option{
+    .moment-comment-option {
       display: inline-block;
       height: @height;
       line-height: @height;
@@ -403,31 +415,30 @@ export default {
       cursor: pointer;
       padding: 0 0.2rem;
       margin-left: 0.5rem;
-      &.active{
+      &.active {
         color: @accent;
       }
-      span{
+      span {
         margin-left: 0.2rem;
       }
-      #modulePostOptions{
-
+      #modulePostOptions {
       }
     }
   }
-  .moment-comment-time{
+  .moment-comment-time {
     display: inline-block;
     font-size: 1rem;
     color: #555;
   }
-  .moment-comment-avatar{
+  .moment-comment-avatar {
     margin-right: 0.5rem;
-    span{
+    span {
       display: inline-block;
       //margin-right: 0.5rem;
       font-size: 1.25rem;
       color: @primary;
     }
-    img{
+    img {
       margin-right: 0.5rem;
       height: 2rem;
       width: 2rem;
@@ -435,27 +446,27 @@ export default {
       vertical-align: middle;
     }
   }
-  .moment-comment-item-files{
-      font-size: 0;
-      max-width: 50%;
-      @media(max-width: 768px) {
-        max-width: 80%;
-      }
+  .moment-comment-item-files {
+    font-size: 0;
+    max-width: 50%;
+    @media (max-width: 768px) {
+      max-width: 80%;
     }
+  }
   .moment-comment-item-content {
     all: initial;
-    /deep/img{
+    /deep/img {
       height: 2rem;
       width: 2rem;
       margin: 0 0.1rem;
       vertical-align: text-bottom;
     }
-    /deep/a{
+    /deep/a {
       color: @primary;
     }
-    /deep/div{
+    /deep/div {
     }
-    /deep/p{
+    /deep/p {
       font-size: 1.2rem;
       color: #000;
       line-height: 1.6em;
@@ -466,53 +477,53 @@ export default {
     }
   }
 }
-.button-container{
+.button-container {
   // position: relative;
   display: flex;
-  justify-content:space-between;
+  justify-content: space-between;
 }
-.moment-comment-reply-editor{
+.moment-comment-reply-editor {
   margin-top: 0.5rem;
-  .moment-comment-reply-pictures-container{
-    .pictures{
-        margin-bottom: 1rem;
-        .picture-item{
-          @pictureHeight: 8rem;
-          position: relative;
-          display: inline-block;
-          height: @pictureHeight;
-          width: @pictureHeight;
-          background-color: #000;
-          overflow: hidden;
-          margin-right: 0.5rem;
-          border-radius: 10px;
-          background-size: cover;
-          background-position: center;
-          .icon-remove{
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2rem;
-            line-height: 2rem;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.3);
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 100ms;
-            &:hover{
-              background-color: rgba(0, 0, 0, 0.5);
-            }
+  .moment-comment-reply-pictures-container {
+    .pictures {
+      margin-bottom: 1rem;
+      .picture-item {
+        @pictureHeight: 8rem;
+        position: relative;
+        display: inline-block;
+        height: @pictureHeight;
+        width: @pictureHeight;
+        background-color: #000;
+        overflow: hidden;
+        margin-right: 0.5rem;
+        border-radius: 10px;
+        background-size: cover;
+        background-position: center;
+        .icon-remove {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 2rem;
+          line-height: 2rem;
+          text-align: center;
+          background-color: rgba(0, 0, 0, 0.3);
+          color: #fff;
+          cursor: pointer;
+          transition: background-color 100ms;
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.5);
           }
         }
       }
+    }
   }
 }
-.moment-comment-comments{
+.moment-comment-comments {
   padding-left: 2rem;
   border-left: 1px solid #cbcbcb;
   margin-bottom: 1rem;
-  .more-comment{
+  .more-comment {
     display: inline-block;
     user-select: none;
     height: 2rem;
@@ -525,17 +536,17 @@ export default {
     margin-top: 0.5rem;
     font-size: 1rem;
     cursor: pointer;
-    &:hover{
+    &:hover {
       opacity: 0.7;
     }
   }
 }
-.submit-button-container{
-  button{
+.submit-button-container {
+  button {
     width: 4rem;
   }
 }
-.button-icon{
+.button-icon {
   // position: absolute;
   // left: 0;
   // top: 0;
@@ -547,35 +558,35 @@ export default {
   cursor: pointer;
   color: #333;
   margin-right: 1rem;
-  .icon{
+  .icon {
     font-size: 1.2rem;
     margin-right: 0.3rem;
     color: #333;
     transition: color 100ms;
-    &.icon-face{
+    &.icon-face {
       font-size: 1.3rem;
     }
   }
-  span{
+  span {
     font-size: 1rem;
     transition: color 100ms;
   }
-  &:hover{
-    .icon, span{
+  &:hover {
+    .icon,
+    span {
       color: #000;
     }
-
   }
-  .disabled{
+  .disabled {
     opacity: 0.7;
     cursor: not-allowed;
   }
-  &.disabled{
+  &.disabled {
     cursor: not-allowed;
-    .icon{
+    .icon {
       color: #aaa;
     }
-    span{
+    span {
       color: #aaa;
     }
   }
