@@ -1,120 +1,176 @@
-var logs = NKC.methods.getDataById("data").logs;
-var CommonModal = new NKC.modules.CommonModal();
+const logs = window.NKC.methods.getDataById('data').logs;
+const CommonModal = new window.NKC.modules.CommonModal();
+import { getDataById } from '../../lib/js/dataConversion';
+import {
+  sweetQuestion,
+  sweetError,
+  sweetSuccess,
+} from '../../lib/js/sweetAlert';
+import { nkcAPI } from '../../lib/js/netAPI';
+const appStoreWarning =
+  '仅会推送新版本介绍（非应用程序），用户只能借助应用市场升级应用程序。勾选前，请确保新版应用程序已上传至目标平台。';
+const appStoresNames = {
+  GooglePlay: 'Google Play',
+  iOSAPPStore: 'iOS APP Store',
+};
+
+const { appStores } = getDataById('data');
 function setStable(hash, type) {
-  sweetQuestion("确定要执行当前操作？")
-    .then(function() {
-      nkcAPI("/e/settings/app", "PUT", {
-        operation: "modifyStable",
+  sweetQuestion('确定要执行当前操作？')
+    .then(function () {
+      nkcAPI('/e/settings/app', 'PUT', {
+        operation: 'modifyStable',
         hash: hash,
-        stable: !!type
+        stable: !!type,
       })
-        .then(function() {
-          sweetSuccess("修改成功");
+        .then(function () {
+          sweetSuccess('修改成功');
           window.location.reload();
         })
-        .catch(sweetError)
+        .catch(sweetError);
     })
-    .catch(function(){})
+    .catch(function () {});
 }
 
 function setDisabled(hash, type) {
-  sweetQuestion("确定要执行当前操作？")
-    .then(function() {
-      nkcAPI("/e/settings/app", "PUT", {
-        operation: "modifyDisabled",
+  sweetQuestion('确定要执行当前操作？')
+    .then(function () {
+      nkcAPI('/e/settings/app', 'PUT', {
+        operation: 'modifyDisabled',
         hash: hash,
-        disabled: !!type
+        disabled: !!type,
       })
-        .then(function() {
-          sweetSuccess("修改成功");
+        .then(function () {
+          sweetSuccess('修改成功');
           window.location.reload();
         })
-        .catch(sweetError)
+        .catch(sweetError);
     })
-    .catch(function() {})
+    .catch(function () {});
 }
 function edit(hash) {
   var log;
-  for(var i = 0; i < logs.length; i++) {
-    if(logs[i].hash === hash) {
+  for (var i = 0; i < logs.length; i++) {
+    if (logs[i].hash === hash) {
       log = logs[i];
       break;
     }
   }
-  if(!log) return;
-  CommonModal.open(function(data) {
-    nkcAPI("/e/settings/app", "PUT", {
-      operation: "modifyVersion",
-      hash: hash,
-      version: data[0].value,
-      description: data[1].value
-    })
-      .then(function() {
-        CommonModal.close();
-        sweetSuccess("修改成功");
-        window.location.reload();
+  if (!log) {
+    return;
+  }
+  CommonModal.open(
+    function (data) {
+      nkcAPI('/e/settings/app', 'PUT', {
+        operation: 'modifyVersion',
+        hash: hash,
+        version: data[0].value,
+        description: data[1].value,
+        appStores: data[2].value,
       })
-      .catch(sweetError);
-  }, {
-    title: '修改版本信息',
-    data: [
-      {
-        dom: 'input',
-        label: "版本号",
-        value: log.appVersion
-      },
-      {
-        dom: "textarea",
-        label: "更新说明",
-        disabledKeyup: true,
-        value: log.appDescription
-      }
-    ]
-  });
+        .then(function () {
+          CommonModal.close();
+          sweetSuccess('修改成功');
+          window.location.reload();
+        })
+        .catch(sweetError);
+    },
+    {
+      title: '修改版本信息',
+      data: [
+        {
+          dom: 'input',
+          label: '版本号',
+          value: log.appVersion,
+        },
+        {
+          dom: 'textarea',
+          label: '更新说明',
+          disabledKeyup: true,
+          value: log.appDescription,
+        },
+        {
+          dom: 'checkbox',
+          label: `推送到应用商店`,
+          warning: appStoreWarning,
+          checkboxes: Object.values(appStores).map((item) => {
+            return {
+              _id: item,
+              name: appStoresNames[item] || item,
+              disabled: item === appStores.iOSAPPStore,
+            };
+          }),
+          value: log.appStores,
+        },
+      ],
+    },
+  );
 }
 
-if($("#app").length) {
-  var app = new Vue({
-    el: "#app",
+if (window.$('#app').length) {
+  var app = new window.Vue({
+    el: '#app',
     data: {
-      version: "",
-      description: "",
+      version: '',
+      description: '',
       submitting: false,
       progress: 0,
-      appPlatForm: "android",
+      appPlatForm: 'android',
+      appStores: [],
+      originAppStores: appStores,
+      appStoresNames: appStoresNames,
+      appStoreWarning,
+    },
+    computed: {
+      appStoresTypes: () => {
+        return Object.keys(appStores);
+      },
     },
     methods: {
-      submit: function() {
+      submit: function () {
         var self = this;
         Promise.resolve()
-          .then(function() {
-            if(!self.appPlatForm) throw "请选择平台";
-            if(!self.version) throw "请输入版本号";
-            if(!self.description) throw "请输入更新说明";
-            var appInput = document.getElementById("appInput");
-            if(!appInput.files.length) throw "请选择安装包";
+          .then(function () {
+            if (!self.appPlatForm) {
+              throw '请选择平台';
+            }
+            if (!self.version) {
+              throw '请输入版本号';
+            }
+            if (!self.description) {
+              throw '请输入更新说明';
+            }
+            var appInput = document.getElementById('appInput');
+            if (!appInput.files.length) {
+              throw '请选择安装包';
+            }
             var file = appInput.files[0];
             var formData = new FormData();
-            formData.append("file", file);
-            formData.append("appPlatform", self.appPlatForm);
-            formData.append("appVersion", self.version);
-            formData.append("appDescription", self.description);
+            formData.append('file', file);
+            formData.append('appPlatform', self.appPlatForm);
+            formData.append('appVersion', self.version);
+            formData.append('appDescription', self.description);
             self.submitting = true;
-            return nkcUploadFile("/e/settings/app", "POST", formData, function(e, progress) {
-              self.progress = progress;
-            })
+            return window.nkcUploadFile(
+              '/e/settings/app',
+              'POST',
+              formData,
+              function (e, progress) {
+                self.progress = progress;
+              },
+            );
           })
-          .then(function() {
+          .then(function () {
             self.submitting = false;
-            sweetSuccess("发布成功");
+            sweetSuccess('发布成功');
           })
-          .catch(function(data) {
+          .catch(function (data) {
             sweetError(data);
             self.submitting = false;
-          })
-      }
-    }
-  })
+          });
+      },
+    },
+  });
 }
 /*
 

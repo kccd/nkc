@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const config = require('../../../config/server.json');
 const checkRouter = new Router();
+const { appStores } = require('../../../settings/app');
 checkRouter.get('/', async (ctx, next) => {
   const { data, db, query, state } = ctx;
   /*
@@ -30,6 +31,10 @@ checkRouter.get('/', async (ctx, next) => {
         newVersion.hash +
         '?t=' +
         Date.now();
+      newVersion.googlePlay = latestVer.appStores.includes(
+        appStores.GooglePlay,
+      );
+      newVersion.appStore = latestVer.appStores.includes(appStores.iOSAPPStore);
       if (version && version !== newVersion.appVersion) {
         const parts1 = newVersion.appVersion.split('.').map(Number);
         const parts2 = version.split('.').map(Number);
