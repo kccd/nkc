@@ -5,6 +5,7 @@ import {shareTypes} from "../lib/js/shareTypes";
 import ColumnPosts from '../lib/vue/column/ColumnPosts.vue';
 import { nkcAPI } from "../lib/js/netAPI";
 import { sweetError } from "../lib/js/sweetAlert";
+import { screenTopWarning } from "../lib/js/topAlert";
 const state = getState();
 const logged = !!state.uid;
 
@@ -67,6 +68,38 @@ $(function () {
             })
             .catch(function (err) {
               sweetError(err);
+            });
+        },
+        movePost(type) {
+          const self = this;
+          if (!this.column) {
+            return;
+          }
+          if (["sortByPostTimeDES", "sortByPostTimeASC"].indexOf(type) !== -1) {
+            if (!confirm("按发表时间排序后，原有排序将会丢失，确定要执行此操作？")) return;
+          }
+          const urlParams = new URLSearchParams(window.location.search);
+          const c = urlParams.get('c') || '';
+          let categoryId = '';
+          let minorCategoriesId = '';
+          const { category } = this;
+          if (category) {
+            categoryId = category._id;
+            if (c.split('-').length === 2 && !isNaN(Number(c.split('-')[1]))) {
+              minorCategoriesId = Number(c.split('-')[1]);
+            }
+          }
+          nkcAPI("/m/" + this.column._id + "/post", "POST", {
+            type: type,
+            categoryId,
+            minorCategoriesId,
+          })
+            .then(function (data) {
+              // 请求数据
+              self.getPostList();
+            })
+            .catch(function (data) {
+              screenTopWarning(data);
             });
         },
       },
