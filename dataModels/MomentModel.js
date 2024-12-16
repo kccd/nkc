@@ -1490,6 +1490,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       files,
       top,
       _id,
+      did,
       voteUp,
       commentAll,
       repost,
@@ -1598,6 +1599,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     //tlm 数据编辑时间
     //top 数据第一次发布时间
     results[f] = {
+      did,
       momentId: _id,
       uid,
       user,

@@ -6,8 +6,7 @@ const { ThrowCommonError } = require('../nkcModules/error');
 const esConfig = require('../config/elasticSearch');
 const cheerio = require('cheerio');
 const filterSearchContent = require('./xssFilters/filterSearchContent');
-const { renderHTMLByJSON } = require('./nkcRender/json');
-const { getJsonStringText } = require('./json');
+const { getJsonTextFilter } = require('./json');
 
 const { analyzer, searchAnalyzer, indexName } = esConfig;
 
@@ -262,9 +261,10 @@ func.save = async (docType, document) => {
       mainForumsId,
       tcId,
       title: t,
-      content:  l === 'json' ? getJsonStringText(c) : apiFunction.obtainPureText(
-       c,
-      ),
+      content:
+        l === 'json'
+          ? getJsonTextFilter(c, ['nkc-xsf-limit'])
+          : apiFunction.obtainPureText(c),
       abstractCN: abstractCn,
       abstractEN: abstractEn,
       keywordsCN: keyWordsCn,
@@ -573,6 +573,39 @@ func.search = async (t, c, options) => {
                           ),
                           createMatch('content', c, 2, relation),
                           createMatch('authors', c, 80, relation),
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_moment',
+                      },
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch(
+                            'tid',
+                            (() => {
+                              let targetKeyword = c.toUpperCase();
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
+                                targetKeyword = targetKeyword.slice(1);
+                              }
+                              return targetKeyword;
+                            })(),
+                            5,
+                            relation,
+                          ),
+                          createMatch('content', c, 2, relation),
                         ],
                       },
                     },

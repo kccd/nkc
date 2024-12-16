@@ -53,40 +53,43 @@
         )
           .fa.fa-share-square-o
           span 分享
+        .option(@click="copyDid")
+          .fa.fa-key
+          span 复制文号
         .option.time
           span {{timeFormat(toc)}}
 </template>
 <style lang="less" scoped>
 @import '../../../../publicModules/base';
-.moment-options{
+.moment-options {
   position: absolute;
   z-index: 1000;
   right: 0;
-  .loading{
+  .loading {
     text-align: center;
     font-size: 1.2rem;
   }
-  .post-options-panel{
+  .post-options-panel {
     padding: 0.5rem 0;
     min-width: 12rem;
     background-color: #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-    border: 1px solid rgba(0, 0, 0, .23);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    border: 1px solid rgba(0, 0, 0, 0.23);
     border-radius: 4px;
     transition: height 1s;
     @optionHeight: 2rem;
-    .option{
+    .option {
       text-align: left;
-      &:hover{
+      &:hover {
         background-color: #eee;
       }
-      &.time{
+      &.time {
         padding-left: 0;
         text-align: center;
         border-top: 1px solid #eee;
         font-size: 1rem;
         padding-top: 0.25rem;
-        &:hover{
+        &:hover {
           background-color: inherit;
         }
       }
@@ -99,7 +102,7 @@
       cursor: pointer;
       font-size: 1.15rem;
       text-decoration: none;
-      .fa{
+      .fa {
         left: 1.4rem;
         top: 0;
         bottom: 0;
@@ -112,18 +115,17 @@
     }
   }
 }
-
-
 </style>
 
 <script>
-import {nkcAPI} from "../../../js/netAPI";
-import {timeFormat, objToStr} from "../../../js/tools";
-import {EventBus} from "../../../../spa/eventBus";
-import {visitUrl} from "../../../js/pageSwitch";
-import {getUrl} from "../../../js/tools";
-import MomentVisible from "../MomentVisible.vue";
-import { getState } from "../../../js/state";
+import { nkcAPI } from '../../../js/netAPI';
+import { timeFormat, objToStr } from '../../../js/tools';
+import { EventBus } from '../../../../spa/eventBus';
+import { visitUrl } from '../../../js/pageSwitch';
+import { getUrl } from '../../../js/tools';
+import MomentVisible from '../MomentVisible.vue';
+import { getState } from '../../../js/state';
+import { copyTextToClipboard } from '../../../js/clipboard';
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -134,128 +136,163 @@ export default {
     toc: null,
     stableDocument: null,
     isAddEvent: false,
+    did: '',
   }),
-  mounted() {
-  },
-  components:{
-    MomentVisible
+  mounted() {},
+  components: {
+    MomentVisible,
   },
   methods: {
     objToStr: objToStr,
     timeFormat: timeFormat,
+    copyDid() {
+      copyTextToClipboard(this.did ? `D${this.did}` : '')
+        .then(() => {
+          screenTopAlert('文号已复制到粘贴板');
+        })
+        .catch(sweetError);
+    },
     clickElement(e) {
       e.stopPropagation();
     },
     //获取当前用户的操作权限
     getPermission() {
       const self = this;
-      return nkcAPI(`/moment/${self.moment.momentCommentId?self.moment.momentCommentId:self.moment.momentId}/options`, 'GET', {})
-        .then(res => {
+      return nkcAPI(
+        `/moment/${
+          self.moment.momentCommentId
+            ? self.moment.momentCommentId
+            : self.moment.momentId
+        }/options`,
+        'GET',
+        {},
+      )
+        .then((res) => {
           self.options = res.optionStatus;
           self.stableDocument = res.stableDocument;
+          self.did = res.did || '';
           self.toc = res.toc;
           self.loading = false;
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
-        })
+        });
     },
     //评论详情
-    toMoment(url){
+    toMoment(url) {
       const self = this;
       const { isApp } = getState();
-      if (this.$route && (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') && !isApp) {
+      if (
+        this.$route &&
+        (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') &&
+        !isApp
+      ) {
         this.$router.push({
           name: 'MomentDetail',
           params: {
-            mid: self.moment.momentCommentId ? self.moment.momentCommentId : self.moment.momentId,
+            mid: self.moment.momentCommentId
+              ? self.moment.momentCommentId
+              : self.moment.momentId,
           },
         });
       } else {
-        visitUrl(url, true)
+        visitUrl(url, true);
       }
     },
     open(props) {
-      if(!this.isAddEvent){
+      if (!this.isAddEvent) {
         document.addEventListener('click', (e) => {
           this.show = false;
           this.isAddEvent = true;
           e.stopPropagation();
-        })
+        });
       }
       this.loading = true;
-      const {moment, DOM, direction} = props;
+      const { moment, DOM, direction } = props;
       this.toc = null;
       this.options = {};
       this.moment = moment;
       //获取菜单权限
-      this.getPermission()
-        .then(() => {
-          this.show = true;
-        });
+      this.getPermission().then(() => {
+        this.show = true;
+      });
     },
     close() {
       this.show = false;
     },
     //投诉或举报
     complaint() {
-      this.$emit('complaint', this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId);
+      this.$emit(
+        'complaint',
+        this.moment.momentCommentId
+          ? this.moment.momentCommentId
+          : this.moment.momentId,
+      );
     },
     //通过审核
     passReview(_id) {
       let docId;
-      if(_id) {
+      if (_id) {
         docId = _id;
       } else {
-        return
+        return;
         // if(!this.moment) return;
         // docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
       }
-      nkcAPI('/review' , 'PUT', {
+      nkcAPI('/review', 'PUT', {
         pass: true,
         docId,
-        reviewType: 'document'
+        reviewType: 'document',
       })
-        .then(res => {
+        .then((res) => {
           sweetSuccess('操作成功');
           setTimeout(() => {
             window.location.reload();
           }, 500);
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
-        })
+        });
     },
     //查看IP
     displayIpInfo() {
-      if(!this.moment) return sweetWarning('未找到评论内容');
-      const {momentId, momentCommentId}= this.moment;
-      nkcAPI(`/moment/${momentCommentId?momentCommentId:momentId}/ipInfo`, 'GET')
+      if (!this.moment) return sweetWarning('未找到评论内容');
+      const { momentId, momentCommentId } = this.moment;
+      nkcAPI(
+        `/moment/${momentCommentId ? momentCommentId : momentId}/ipInfo`,
+        'GET',
+      )
         .then((res) => {
           return res.ipInfo;
         })
         .then((info) => {
-          if(!info) return sweetError('获取ip地址失败');
-          return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.location +"</p>");
+          if (!info) return sweetError('获取ip地址失败');
+          return asyncSweetCustom(
+            "<p style='font-weight: normal;'>ip: " +
+              info.ip +
+              '<br>位置: ' +
+              info.location +
+              '</p>',
+          );
         })
         .catch((err) => {
           sweetError(err);
-        })
+        });
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {
-      const {uid: tUid, momentId, momentCommentId} = this.moment;
+      const { uid: tUid, momentId, momentCommentId } = this.moment;
       let _id = momentCommentId;
-      if(!momentCommentId) {
+      if (!momentCommentId) {
         _id = momentId;
       }
-      const {blacklist} = this.options;
-      if(blacklist) {
+      const { blacklist } = this.options;
+      if (blacklist) {
         //移除黑名单
         this.removeUserToBlackList(tUid);
       } else {
         //加入黑名单
-        this.addUserToBlackList(tUid, 'comment', _id)
+        this.addUserToBlackList(tUid, 'comment', _id);
       }
     },
     //违规记录
@@ -265,11 +302,11 @@ export default {
     //用户移除黑名单 tUid 被拉黑的用户
     removeUserToBlackList(uid) {
       nkcAPI('/blacklist?tUid=' + uid, 'GET')
-        .then(data => {
-          if(!data.bl) throw "对方未在黑名单中";
+        .then((data) => {
+          if (!data.bl) throw '对方未在黑名单中';
           return nkcAPI('/blacklist?tUid=' + uid, 'DELETE');
         })
-        .then(data => {
+        .then((data) => {
           sweetSuccess('操作成功！');
           return data;
         })
@@ -278,125 +315,126 @@ export default {
     //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 mid 被拉黑的moment
     addUserToBlackList(tUid, from, mid) {
       const self = this;
-      var isFriend = false, subscribed = false;
+      var isFriend = false,
+        subscribed = false;
       return Promise.resolve()
-        .then(function() {
-          return nkcAPI('/blacklist?tUid=' + tUid,  'GET')
+        .then(function () {
+          return nkcAPI('/blacklist?tUid=' + tUid, 'GET');
         })
-        .then(function(data) {
+        .then(function (data) {
           isFriend = data.isFriend;
           subscribed = data.subscribed;
           var bl = data.bl;
-          if(bl) throw '对方已在黑名单中';
+          if (bl) throw '对方已在黑名单中';
           var info;
-          if(isFriend) {
+          if (isFriend) {
             info = '该会员在你的联系人列表中，确定放入黑名单吗？';
-          } else if(subscribed) {
+          } else if (subscribed) {
             info = '该会员在你的关注列表中，确定放入黑名单吗？';
           }
-          if(info) return sweetQuestion(info);
+          if (info) return sweetQuestion(info);
         })
-        .then(function() {
-          if(isFriend) {
-            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {})
+        .then(function () {
+          if (isFriend) {
+            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {});
           }
         })
-        .then(function() {
-          if(subscribed) {
+        .then(function () {
+          if (subscribed) {
             return self.subscribeUserPromise(tUid, false);
           }
         })
-        .then(function() {
+        .then(function () {
           return nkcAPI('/blacklist', 'POST', {
             tUid: tUid,
             from: from,
-            mid
-          })
+            mid,
+          });
         })
-        .then(function(data) {
+        .then(function (data) {
           sweetSuccess('操作成功');
           return data;
         })
         .catch(sweetError);
     },
     subscribeUserPromise(id, sub, cid) {
-      const method = sub? "POST": "DELETE";
-      return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
+      const method = sub ? 'POST' : 'DELETE';
+      return nkcAPI('/u/' + id + '/subscribe', method, { cid: cid || [] });
     },
     //删除动态
     deleteMoment() {
-      const {momentId, momentCommentId} = this.moment;
+      const { momentId, momentCommentId } = this.moment;
       let _id = momentCommentId || '';
-      if(!_id) {
+      if (!_id) {
         _id = momentId;
       }
-      if(!_id) return;
-      sweetQuestion("删除后不可恢复，确定要删除吗？")
-        .then(() => {
-          nkcAPI(`/moment/${_id}`, 'DELETE', {
+      if (!_id) return;
+      sweetQuestion('删除后不可恢复，确定要删除吗？').then(() => {
+        nkcAPI(`/moment/${_id}`, 'DELETE', {})
+          .then(() => {
+            sweetSuccess('操作成功');
+            // 刷新
+            visitUrl(`${window.location.pathname}${window.location.search}`);
           })
-            .then(() => {
-              sweetSuccess('操作成功');
-              // 刷新
-              visitUrl(`${window.location.pathname}${window.location.search}`);
-            })
-            .catch(err => {
-              sweetError(err);
-            })
-        })
+          .catch((err) => {
+            sweetError(err);
+          });
+      });
     },
-    disableMoment(){
-      const {momentId, momentCommentId} = this.moment;
+    disableMoment() {
+      const { momentId, momentCommentId } = this.moment;
       let _id = momentCommentId || '';
-      if(!_id) {
+      if (!_id) {
         _id = momentId;
       }
-      if(!_id) return;
-      sweetQuestion("确定要屏蔽吗？")
-        .then(() => {
-          nkcAPI(`/moment/${_id}/disable`, 'POST',{
+      if (!_id) return;
+      sweetQuestion('确定要屏蔽吗？').then(() => {
+        nkcAPI(`/moment/${_id}/disable`, 'POST', {})
+          .then(() => {
+            sweetSuccess('操作成功');
           })
-            .then(() => {
-              sweetSuccess('操作成功');
-            })
-            .catch(err => {
-              sweetError(err);
-            })
-        })
+          .catch((err) => {
+            sweetError(err);
+          });
+      });
     },
     //解除屏蔽
-    recoveryMoment(){
-      const {momentId, momentCommentId} = this.moment;
+    recoveryMoment() {
+      const { momentId, momentCommentId } = this.moment;
       let _id = momentCommentId || '';
-      if(!_id) {
+      if (!_id) {
         _id = momentId;
       }
-      if(!_id) return;
+      if (!_id) return;
       nkcAPI(`/moment/${_id}/recovery`, 'POST')
-      .then(() => {
-        sweetSuccess('解除屏蔽成功');
-      })
-      .catch(sweetError);
+        .then(() => {
+          sweetSuccess('解除屏蔽成功');
+        })
+        .catch(sweetError);
     },
     //查看详情
     detail() {
-      const {url} = this.moment;
-      if(url) {
+      const { url } = this.moment;
+      if (url) {
         window.location.href = url;
       }
     },
     //设置可见状态
-    visibleMoment(){
-      const mid = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId
-      this.$refs.momentVisible.open(mid)
+    visibleMoment() {
+      const mid = this.moment.momentCommentId
+        ? this.moment.momentCommentId
+        : this.moment.momentId;
+      this.$refs.momentVisible.open(mid);
     },
     //编辑电文
-    editorMoment(){
-      if(this.moment.status !== 'normal'){
-        return sweetError('当前电文不可编辑')
+    editorMoment() {
+      if (this.moment.status !== 'normal') {
+        return sweetError('当前电文不可编辑');
       }
-      if(this.moment.mode === 'plain') {
-        const mid = this.moment.momentCommentId ? this.moment.momentCommentId : this.moment.momentId
+      if (this.moment.mode === 'plain') {
+        const mid = this.moment.momentCommentId
+          ? this.moment.momentCommentId
+          : this.moment.momentId;
         this.$emit('selectedMomentId', mid);
       } else {
         visitUrl(`/z/editor/rich?id=${this.moment.momentId}`, true);
@@ -405,7 +443,7 @@ export default {
     // 访问历史
     visitHistory() {
       visitUrl(getUrl('zoneMomentHistory', this.moment.momentId), true);
-    }
-  }
-}
+    },
+  },
+};
 </script>

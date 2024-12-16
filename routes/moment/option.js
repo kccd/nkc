@@ -107,6 +107,7 @@ router.get('/', async (ctx, next) => {
   };
   data.optionStatus = optionStatus;
   data.toc = moment.toc;
+  data.did = moment.did;
   await next();
 });
 module.exports = router;

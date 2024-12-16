@@ -9,7 +9,7 @@ block eTitle
       background-color: #cfffd2;
     }
 block eContent
-  #data.hidden=objToStr({logs: data.histories})
+  #data.hidden=objToStr({logs: data.histories, appStores: data.appStores})
   .container-fluid.max-width
     ul.nav.nav-tabs.m-b-1
       li(class=!data.t || data.t === "android"?"active":"")
@@ -36,6 +36,13 @@ block eContent
             .form-group
               label 安装包
               input(type="file" id="appInput")
+            .form-group
+              label 推送到应用商店
+              .text-danger {{appStoreWarning}}
+              .checkbox
+                label(v-for='(type, index) in appStoresTypes' :class="{'m-r-1': index === 0}")
+                  input(type='checkbox' :value='type' v-model='appStores' :disabled='type === originAppStores.iOSAPPStore')
+                  span {{appStoresNames[type] || type}}
             .form-group
               button.btn.btn-block.btn-primary(v-if="submitting") 上传中... {{progress}}%
               button.btn.btn-block.btn-primary(@click="submit" v-else) 立即上传

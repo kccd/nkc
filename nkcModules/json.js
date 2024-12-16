@@ -23,6 +23,34 @@ function getNodesText(nodes = []) {
   }
   return text;
 }
+function getJsonTextFilter(jsonString, filter = []) {
+  if (!jsonString) {
+    return '';
+  }
+  let jsonData;
+  try {
+    jsonData = JSON.parse(jsonString);
+  } catch (err) {
+    return `(JSON解析错误：${err.message})${jsonString}`;
+  }
+
+  return getNodesTextFilter(jsonData.content, filter);
+}
+
+function getNodesTextFilter(nodes = [], filter = []) {
+  let text = '';
+  for (const node of nodes) {
+    if (filter.includes(node.type)) {
+      continue;
+    }
+    if (node.type === 'text') {
+      text += node.text;
+    } else if (node.content && node.content.length > 0) {
+      text += getNodesTextFilter(node.content, filter);
+    }
+  }
+  return text;
+}
 function getNodesTextSlice(nodes = [], count = 500) {
   let text = '';
   for (const node of nodes) {
@@ -103,4 +131,5 @@ module.exports = {
   getJsonStringTextSplit,
   getJsonStringResourcesId,
   getJsonStringTextSlice,
+  getJsonTextFilter,
 };
