@@ -60,6 +60,8 @@ export function renderingNKCVideo() {
     if (plyrDom === null) {
       continue;
     }
+    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    videoContainer.setAttribute('data-unique-id', uniqueId);
     // 播放提示，为空则不显示
     const mask = videoContainer.getAttribute('data-mask');
     const rid = videoContainer.getAttribute('data-id');
@@ -99,6 +101,7 @@ export function renderingNKCVideo() {
       position: absolute;
       top: 0;
       left: 0;
+      padding: 0 1rem;
     `;
     const maskTextStyle = `
       color: #fff;
@@ -120,7 +123,6 @@ export function renderingNKCVideo() {
       padding: 0 0.5rem;
       text-decoration: none;
     `;
-    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     // 渲染游客访问限制遮罩
     if (!isLogged && !visitorAccess) {
       const maskDom = window.$(`
@@ -141,7 +143,7 @@ export function renderingNKCVideo() {
         previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
       } else {
         previewButtonOnClick = `
-        var video = document.querySelector('[data-tag=\\'nkcsource\\'][data-type=\\'video\\'] video');
+        var video = document.querySelector('[data-tag=\\'nkcsource\\'][data-type=\\'video\\'][data-id=\\'${rid}\\'][data-unique-id=\\'${uniqueId}\\'] video');
         video.play();
         var mask = document.querySelector('[data-nkc-video-mask-id=\\'${uniqueId}\\']');
         mask.remove();
@@ -203,47 +205,48 @@ export function renderingNKCAudio() {
     });
     if (!isLogged && !visitorAccess) {
       const maskDomStyle = `
-      display: flex;
-      height: 100%;
-      width: 100%;
-      z-index: 101;
-      flex-direction: column;
-      background-color: rgba(0,0,0,0.85);
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-    `;
+        display: flex;
+        height: 100%;
+        width: 100%;
+        z-index: 101;
+        flex-direction: column;
+        background-color: rgba(0,0,0,0.85);
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0 1rem;
+      `;
       const maskTextStyle = `
-      color: #fff;
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
-    `;
+        color: #fff;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      `;
       const maskButtonStyle = `
-      margin-right: 0.5rem;
-      border: none;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-      font-size: 1.2rem;
-      border-radius: 2px;
-      display: inline-block;
-      color: #fff;
-      background-color: rgba(0, 179, 255, 0.7);
-      height: 2.4rem;
-      line-height: 2.4rem;
-      padding: 0 0.5rem;
-      text-decoration: none;
-    `;
+        margin-right: 0.5rem;
+        border: none;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        font-size: 1.2rem;
+        border-radius: 2px;
+        display: inline-block;
+        color: #fff;
+        background-color: rgba(0, 179, 255, 0.7);
+        height: 2.4rem;
+        line-height: 2.4rem;
+        padding: 0 0.5rem;
+        text-decoration: none;
+      `;
       const maskDom = window.$(`
-        <div style="${maskDomStyle}">
-          <div style="${maskTextStyle}">音频暂不能访问，请登录试试。</div>
-          <div>
-            <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel()'>登录</button>
-            <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel("register")'>注册</button>
-          </div>
-        </div
-        `);
+          <div style="${maskDomStyle}">
+            <div style="${maskTextStyle}">音频暂不能访问，请登录试试。</div>
+            <div>
+              <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel()'>登录</button>
+              <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel("register")'>注册</button>
+            </div>
+          </div
+          `);
       audioContainer.appendChild(maskDom[0]);
     }
   }

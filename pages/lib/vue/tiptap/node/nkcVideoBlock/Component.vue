@@ -6,9 +6,9 @@
 </template>
 
 <script>
-import {nodeViewProps, NodeViewContent, NodeViewWrapper} from "@tiptap/vue-2";
-import VideoPlayer from '../../../VideoPlayer.vue'
-import {nkcAPI} from "../../../../js/netAPI";
+import { nodeViewProps, NodeViewContent, NodeViewWrapper } from '@tiptap/vue-2';
+import VideoPlayer from '../../../VideoPlayer.vue';
+import { nkcAPI } from '../../../../js/netAPI';
 
 export default {
   props: nodeViewProps,
@@ -23,33 +23,33 @@ export default {
   computed: {
     id() {
       return this.node.attrs.id;
-    }
+    },
   },
   mounted() {
     this.getVideoInfo();
   },
   methods: {
     getVideoInfo() {
-      if(!this.id) return;
+      if (!this.id) return;
       nkcAPI(`/r/${this.id}/info`, 'GET')
-        .then(res => {
+        .then((res) => {
           this.videoInfo = res.videoPlayerData;
         })
         .catch(console.error);
-    }
+    },
   },
   watch: {
     id() {
       this.getVideoInfo();
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped lang="less">
-.node-view-wrapper{
-  padding: 1rem 0;
-  .video-player{
+.node-view-wrapper {
+  margin: 1rem 0;
+  .video-player {
     border-radius: 5px;
     overflow: hidden;
   }

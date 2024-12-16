@@ -12,6 +12,7 @@ const cors = require('@koa/cors');
 const { isProduction } = require('./settings/env');
 const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
+const serverConfig = require('./config/server');
 const { getUrl } = require('./nkcModules/tools');
 const staticServe = (path) => {
   return require('koa-static')(path, {
@@ -56,10 +57,9 @@ app.keys = getCookieKeys();
 app
   .use(
     cors({
-      // origin: 'http://www.test.com', // 测试
-      origin: 'https://www.kechuang.org', // 允许的源
-      allowMethods: ['GET', 'HEAD', 'OPTIONS'], // 允许的请求方法
-      allowHeaders: ['Content-Type', 'Authorization'], // 允许的请求头
+      origin: serverConfig.domain,
+      allowMethods: ['GET', 'HEAD', 'OPTIONS', 'POST'],
+      allowHeaders: ['Content-Type', 'Authorization', 'FROM'],
     }),
   )
   .use(rateLimit.total)

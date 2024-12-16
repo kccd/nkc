@@ -6,7 +6,9 @@ const {
   momentVisibleType,
 } = require('../settings/moment');
 const { documentSources } = require('../settings/document');
-const {momentRenderService} = require('../services/moment/render/momentRender.service');
+const {
+  momentRenderService,
+} = require('../services/moment/render/momentRender.service');
 const { ThrowCommonError } = require('../nkcModules/error');
 
 const momentQuoteTypes = {
@@ -863,13 +865,13 @@ schema.methods.publish = async function () {
   await this.checkBeforePublishing();
   const time = new Date();
   await DocumentModel.publishDocumentByDid(this.did);
-  // this.status = momentStatus.normal;
-  await this.updateOne({
-    $set: {
-      top: time,
-      // status: this.status
-    },
-  });
+  if (this.status === momentStatus.default) {
+    await this.updateOne({
+      $set: {
+        top: time,
+      },
+    });
+  }
   await this.updateResourceReferences();
   await this.addParentMomentRepostCount();
 };
@@ -1488,6 +1490,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       files,
       top,
       _id,
+      did,
       voteUp,
       commentAll,
       repost,
@@ -1596,6 +1599,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     //tlm 数据编辑时间
     //top 数据第一次发布时间
     results[f] = {
+      did,
       momentId: _id,
       uid,
       user,

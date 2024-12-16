@@ -579,6 +579,39 @@ func.search = async (t, c, options) => {
                   ],
                 },
               },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_moment',
+                      },
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch(
+                            'tid',
+                            (() => {
+                              let targetKeyword = c.toUpperCase();
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
+                                targetKeyword = targetKeyword.slice(1);
+                              }
+                              return targetKeyword;
+                            })(),
+                            5,
+                            relation,
+                          ),
+                          createMatch('content', c, 2, relation),
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
             ],
           },
         },
