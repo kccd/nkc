@@ -70,7 +70,6 @@
               a.column-post-forum(v-else :href="`/m/${columnPost.columnId}`") {{column.name}}
       transition(name="fade")
         .settingButtons(v-if="isShow")
-          //- .centering-wrapper
           button.btn.btn-xs.btn-default(v-if="column.topped.indexOf(columnPost._id) === -1" @click="movePost('columnTop', [ columnPost._id ])") 首页置顶
           button.btn.btn-xs.btn-default(v-else @click="movePost('unColumnTop', [ columnPost._id ])") 取消首页置顶
           button.btn.btn-xs.btn-default(v-if="category  && category._id !== 'all' && category.topped.indexOf(columnPost._id) === -1" @click="movePost('categoryTop', [ columnPost._id ])") 分类置顶
@@ -79,10 +78,11 @@
           button.btn.btn-xs.btn-default(v-if="!topped" @click="movePost('categoryDown', columnPost._id)") 下移
           button.btn.btn-xs.btn-default(v-if="!topped" @click="movePost('categoryToTop', [ columnPost._id ])") 上移到最新
           button.btn.btn-xs.btn-default(v-if="!topped" @click="movePost('categoryToBottom', [ columnPost._id ])") 下移到最老
+          button.btn.btn-xs.btn-default(@click="movePost('sortByPostTimeDES')") 按发表时间降序
+          button.btn.btn-xs.btn-default(@click="movePost('sortByPostTimeASC')") 按发表时间升序
           button.btn.btn-xs.btn-success(@click="move([ columnPost._id ], columnPost.cid, columnPost.mcid)") 移动
           button.btn.btn-xs.btn-danger(@click="remove([ columnPost._id ])")  撤稿
           button.btn.btn-default.btn-xs(onclick='editColumnPosts(false)') 退出管理
-      //- paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 
 <style lang="less" scoped>
