@@ -78,11 +78,14 @@ block content
                 column-posts(@refresh="getPostList" :articles="topped" :topped="true" :column="column" :category="category" :tid="toppedId" :show="showSettingButton")
                 .column-posts-body-info(v-if="category") — 以上为分类置顶 —
                 .column-posts-body-info(v-else) — 以上为专栏置顶 —
-              div(style="margin-bottom: -0.6rem;")
+              div(style="margin-bottom: -0.6rem;overflow: hidden;")
                 .paging-button(v-if="user&&(user.uid === column.uid || column.users.some(item=>item.uid===user.uid)) && (columnPosts.length !== 0 || topped.length !== 0)")
                   a.button.radius-left.radius-right(v-if="!showSettingButton" onclick='editColumnPosts(true)') 文章管理
                   a.button.radius-left.radius-right(v-else onclick='editColumnPosts(false)') 退出管理
                 include ../publicModules/paging/paging
+                .paging-button.pull-right(v-if="user&&(user.uid === column.uid || column.users.some(item=>item.uid===user.uid)) && (columnPosts.length !== 0 || topped.length !== 0) && showSettingButton")
+                  a.radius-left.button.pointer(@click="movePost('sortByPostTimeDES')") 按发表时间降序
+                  a.radius-right.button.pointer(@click="movePost('sortByPostTimeASC')") 按发表时间升序
               .column-posts-body
                 .text-center.p-t-5.p-b-5(v-if="columnPosts.length === 0 && topped.length === 0")
                   h4 空空如也~

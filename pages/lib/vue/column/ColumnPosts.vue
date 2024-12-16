@@ -78,8 +78,6 @@
           button.btn.btn-xs.btn-default(v-if="!topped" @click="movePost('categoryDown', columnPost._id)") 下移
           button.btn.btn-xs.btn-default(v-if="!topped" @click="movePost('categoryToTop', [ columnPost._id ])") 上移到最新
           button.btn.btn-xs.btn-default(v-if="!topped" @click="movePost('categoryToBottom', [ columnPost._id ])") 下移到最老
-          button.btn.btn-xs.btn-default(@click="movePost('sortByPostTimeDES')") 按发表时间降序
-          button.btn.btn-xs.btn-default(@click="movePost('sortByPostTimeASC')") 按发表时间升序
           button.btn.btn-xs.btn-success(@click="move([ columnPost._id ], columnPost.cid, columnPost.mcid)") 移动
           button.btn.btn-xs.btn-danger(@click="remove([ columnPost._id ])")  撤稿
           button.btn.btn-default.btn-xs(onclick='editColumnPosts(false)') 退出管理
