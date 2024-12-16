@@ -1,3 +1,6 @@
+/*
+ * 从 APP 0.5.4 开始，检测新版本均走 /app/upgrade路由，次路由仅为了适配旧版 APP。
+ * */
 const Router = require('koa-router');
 const config = require('../../../config/server.json');
 const checkRouter = new Router();

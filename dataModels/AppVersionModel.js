@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const { appStores } = require('../settings/app');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
@@ -122,6 +123,8 @@ appVersionSchema.methods.extendAppData = async function () {
     extension,
     filename,
     urlPath,
+    googlePlay: this.appStores.includes(appStores.GooglePlay),
+    appStore: this.appStores.includes(appStores.iOSAPPStore),
   };
 };
 
