@@ -53,7 +53,8 @@
           @selectedMomentId='handleMid'
         )
         .single-moment-detail-hits.m-t-05
-          span 阅读 {{ momentData.hits }}&nbsp;·
+          span.pointer(@click="copyString(momentData.did?`D${momentData.did}`: '')") D{{momentData.did}}&nbsp;·
+          span &nbsp;阅读 {{ momentData.hits }}&nbsp;·
           span &nbsp;IP:{{ momentData.addr }}&nbsp;
     .single-moment-detail-bottom(
       v-if='selectedMomentId !== momentData.momentId || submitting'
@@ -518,7 +519,7 @@
   padding-left: 5rem;
   //padding-right: 4rem;
 }
-.single-moment-rich-icon{
+.single-moment-rich-icon {
   display: inline-block;
   font-size: 10px;
   border: 1px solid #ddd;
@@ -533,8 +534,8 @@
   margin-left: 0.3rem;
   cursor: pointer;
 }
-.singe-moment-rich-link{
-  a{
+.singe-moment-rich-link {
+  a {
     color: #1d9bf0;
     cursor: pointer;
     text-decoration: none;
@@ -770,9 +771,10 @@ import MomentOptionFixed from './momentOption/MomentOptionFixed';
 import { getState } from '../../js/state';
 import { toLogin } from '../../js/account';
 import MomentEditor from './MomentEditor.vue';
-import { subUsers } from "../../js/subscribe";
+import { subUsers } from '../../js/subscribe';
 import { initNKCSource } from '../../js/nkcSource.js';
-import { lazyLoadInit } from "../../js/lazyLoad";
+import { lazyLoadInit } from '../../js/lazyLoad';
+import { copyTextToClipboard } from '../../js/clipboard';
 
 const state = getState();
 export default {
@@ -821,7 +823,7 @@ export default {
     } else {
       setTimeout(() => {
         lazyLoadInit();
-      }, 10)
+      }, 10);
     }
   },
   computed: {
@@ -832,12 +834,12 @@ export default {
       return this.type === 'details';
     },
     targetContent() {
-      if(this.inDetails) {
+      if (this.inDetails) {
         return this.momentData.content;
       } else {
         return this.momentData.plain;
       }
-    }
+    },
   },
   destroyed() {
     this.clearTimer();
@@ -845,6 +847,13 @@ export default {
   methods: {
     objToStr: objToStr,
     visitUrl,
+    copyString: (text) => {
+      copyTextToClipboard(text)
+        .then(() => {
+          screenTopAlert('文号已复制到粘贴板');
+        })
+        .catch(sweetError);
+    },
     //取消关注和关注
     userFollow(status) {
       const self = this;
@@ -894,11 +903,11 @@ export default {
         this.visitUrl(`${this.momentData.url}?type=${showType}`, true);
       }
     },
-    clickDetail(url,e){
+    clickDetail(url, e) {
       e.preventDefault();
-      if(state.isApp){
+      if (state.isApp) {
         this.visitUrl(url, true);
-      }else{
+      } else {
         this.$router.push(url);
       }
     },
@@ -1016,13 +1025,13 @@ export default {
           // 详情页面没有ref('momentDetails')
           return;
         }
-          const momentDetailsHeight = this.$refs.momentDetails.clientHeight;
-          const momentDetailsContentHeight =
-            this.$refs.momentDetailsContent.getBoundingClientRect().height;
-          const overFold = momentDetailsContentHeight > momentDetailsHeight;
-          this.isFold = this.$refs.momentDetailsContent.innerHTML
-            ? overFold
-            : false;
+        const momentDetailsHeight = this.$refs.momentDetails.clientHeight;
+        const momentDetailsContentHeight =
+          this.$refs.momentDetailsContent.getBoundingClientRect().height;
+        const overFold = momentDetailsContentHeight > momentDetailsHeight;
+        this.isFold = this.$refs.momentDetailsContent.innerHTML
+          ? overFold
+          : false;
       });
     },
     onPublished(data) {
@@ -1036,33 +1045,33 @@ export default {
       this.momentData.addr = addr;
       this.$refs.momentEditor.reset();
       this.showLoadMore();
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         lazyLoadInit();
       });
     },
     openContent() {
-      if(this.momentData.mode === 'rich') {
+      if (this.momentData.mode === 'rich') {
         this.visitRichContent();
       } else {
         this.expandContent = true;
       }
     },
     visitRichContent() {
-      if(state.isApp){
+      if (state.isApp) {
         this.visitUrl(this.momentData.url, true);
-      }else{
-      this.$router.push(`${this.momentData.url}`);
+      } else {
+        this.$router.push(`${this.momentData.url}`);
       }
     },
     closeContent() {
       this.expandContent = false;
     },
-    cancelEdit(){
+    cancelEdit() {
       this.submitting = true;
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         lazyLoadInit();
       });
-    }
+    },
   },
 };
 </script>

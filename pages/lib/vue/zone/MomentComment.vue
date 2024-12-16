@@ -399,6 +399,7 @@ export default {
   margin-bottom: 0;
   .moment-comment-item-header {
     margin-bottom: 0.5rem;
+    padding-right: 6rem;
     position: relative;
   }
   .moment-comment-options {

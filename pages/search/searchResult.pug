@@ -197,6 +197,24 @@
       .search-result-time
         //-=fromNow(result.postTime)
         +fromNow(result.commentTime)
-      span=result.source==='column'?'回复于专栏文章':'回复于空间文章'
+      span=result.source==='column'?'回复于专栏文章':'回复于电波文章'
       a.clear-a-style.search-result-forum(href=result.articleUrl target="_blank")=result.articleTitle
     .search-result-abstract!= result.abstract
+  else if result.docType === 'document_moment'
+    .search-result-info
+      a.clear-a-style.search-result-author(href=`/u/${result.user.uid}`
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({ uid: result.user.uid })
+      )
+        img(src=tools.getUrl('userAvatar', result.user.avatar, 'sm'))
+        span=result.user.username
+      .search-result-time
+        //-=fromNow(result.postTime)
+        +fromNow(result.time)
+      span 电文
+      a.clear-a-style.search-result-forum(href=result.url target="_blank") 查看详情
+    .search-result-abstract
+      if result.docNumber
+        span!=result.docNumber
+      .search-result-abstract!= result.abstract
