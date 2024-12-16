@@ -42,6 +42,9 @@ function initVideoPlayer(
   }
   const container = document.getElementById('container');
   container.appendChild(video);
+  const quality = videoInfo.sources
+    .map((item) => item.size)
+    .sort((a, b) => b - a);
   const player = new window.Plyr('video', {
     controls: ['play-large', 'play', 'progress', 'duration', 'settings'],
     settings: ['quality', 'speed'],
@@ -51,6 +54,10 @@ function initVideoPlayer(
     resetOnEnd: true,
     fullscreen: {
       enabled: false,
+    },
+    quality: {
+      default: Math.max(...quality),
+      options: quality,
     },
   });
 
