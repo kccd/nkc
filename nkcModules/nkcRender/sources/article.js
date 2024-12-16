@@ -88,9 +88,7 @@ module.exports = {
         sourceHtml += `<source src="${url}" type="video/mp4" size="${height}" data-size="${dataSize}"> 你的浏览器不支持video标签，请升级。`;
         // downloadHtml += `<a href="${downloadUrl}" data-type="download" data-title="${oname}" target="_blank">${height}p(${dataSize})</a> `;
       }
-      downloadHtml = `<a data-global-click="openDownloadPanel" data-global-data="${tools.objToStr(
-        { rid: resource.rid },
-      )}">点击下载</a>`;
+      downloadHtml = `<a>点击下载</a>`;
       return `
       <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}" data-mask="${mask}">
         <span>
@@ -98,7 +96,12 @@ module.exports = {
             ${sourceHtml}
           </video>
         </span>
-        <span data-type="nkcsource-video-title" class="nkcsource-video-title" data-title="${oname}"><span>${oname}&nbsp;</span><span>${downloadHtml}</span></span>
+        <span data-type="nkcsource-video-title" class="nkcsource-video-title" data-title="${oname}">
+          <span>${oname}&nbsp;</span>
+          <span data-global-click="openDownloadPanel" data-global-data="${tools.objToStr(
+            { rid: resource.rid },
+          )}">${downloadHtml}</span>
+        </span>
       </span>
     `.trim();
     } else {
