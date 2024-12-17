@@ -4,6 +4,7 @@ const {
   getJsonStringTextSlice,
   getJsonStringText,
 } = require('../../nkcModules/json');
+const { momentVisibleType } = require('../../settings/moment');
 const router = new Router();
 router.get('/', async (ctx, next) => {
   const time = Date.now();
@@ -449,7 +450,9 @@ router.get('/', async (ctx, next) => {
     let moments = await db.MomentModel.find({
       did: { $in: [...momentDocumentId] },
       status: normalStatus,
+      visibleType: momentVisibleType.everyone,
     });
+
     articles = await db.ArticleModel.getArticlesInfo(articles);
     comments = await db.CommentModel.getCommentsInfo(comments);
     const momentObj = await db.MomentModel.extendMomentsData(
@@ -735,6 +738,9 @@ router.get('/', async (ctx, next) => {
         }
       } else if (docType === 'document_moment') {
         const moment = momentObj[tid];
+        if (!moment) {
+          continue;
+        }
         r = {
           docType,
           time: moment.toc,
