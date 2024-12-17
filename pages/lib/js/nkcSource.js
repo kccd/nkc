@@ -173,6 +173,18 @@ export function renderingNKCVideo() {
       `);
       maskContainer.appendChild(maskDom[0]);
     }
+    if (!mask && getState().isApp && getState().appVersionCode >= 5) {
+      let previewButtonOnClick = '';
+      previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
+      const maskDom = window.$(`
+        <div style="${maskDomStyle}background-color:transparent;">
+        </div>
+      `);
+      maskDom.on('click', () => {
+        window.RootApp.viewVideoForApp(rid);
+      });
+      maskContainer.appendChild(maskDom[0]);
+    }
   }
 }
 
