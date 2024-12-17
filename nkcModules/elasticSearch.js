@@ -242,6 +242,8 @@ func.save = async (docType, document) => {
     id = `article_${tid}`;
   } else if (docType === 'document_comment') {
     id = `comment_${tid}`;
+  } else if (docType === 'document_moment') {
+    id = `document_${tid}`;
   }
 
   return await client.index({
@@ -331,7 +333,11 @@ func.search = async (t, c, options) => {
     size = searchColumnList;
   } else if (t === 'resource') {
     size = searchResourceList;
-  } else if (t === 'document_article' || t === 'document_comment') {
+  } else if (
+    t === 'document_article' ||
+    t === 'document_comment' ||
+    t === 'document_moment'
+  ) {
     size = searchDocumentList;
   } else {
     size = searchAllList;
@@ -691,6 +697,12 @@ func.search = async (t, c, options) => {
     body.query.bool.must.push({
       match: {
         docType: 'document_comment',
+      },
+    });
+  } else if (t === 'document_moment') {
+    body.query.bool.must.push({
+      match: {
+        docType: 'document_moment',
       },
     });
   }

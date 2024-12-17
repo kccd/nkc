@@ -61,7 +61,7 @@
         height: 100%;
       }
       img {
-        &[data-count="more-than-one"] {
+        &[data-count='more-than-one'] {
           position: absolute;
           top: 50%;
           left: 50%;
@@ -73,7 +73,7 @@
             height: 100%;
           }
         }
-        &[data-count="only-one"]{
+        &[data-count='only-one'] {
           max-width: 100%;
           top: 0;
           left: 0;
@@ -86,7 +86,7 @@
         position: absolute;
         height: 3.2rem;
         width: 3.2rem;
-        background-color: rgba(0, 179, 255, 0.9);;
+        background-color: rgba(0, 179, 255, 0.9);
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -98,7 +98,7 @@
       }
       &:hover {
         .play-icon {
-          background-color: rgba(0, 179, 255, 1);;
+          background-color: rgba(0, 179, 255, 1);
         }
       }
     }
@@ -184,8 +184,8 @@ import { RNViewVideo } from '../../js/reactNative';
 import { longPressImage } from '../../js/reactNative';
 import { getState } from '../../js/state';
 import VideoPlayer from '../VideoPlayer';
-import {PlayOne} from '@icon-park/vue'
-const { isApp,appVersionCode } = getState();
+import { PlayOne } from '@icon-park/vue';
+const { isApp, appVersionCode } = getState();
 export default {
   /*
    * prop {[Object]} data
@@ -278,6 +278,15 @@ export default {
     },
   },
   methods: {
+    getImageDirection(fileData) {
+      let height = 0;
+      let width = 0;
+      if (fileData.type === this.types.picture) {
+        height = fileData.height;
+        width = fileData.width;
+      } else if (fileData.sources.length > 0) {
+      }
+    },
     viewMedias(index) {
       const { filesData } = this;
       let readyFiles = [];
@@ -291,11 +300,11 @@ export default {
           readyFiles = filesData.filter((item) => item.type === 'video');
           if (readyFiles.length === 0) return;
           const $index = readyFiles.findIndex((item) => item.rid === clickRid);
-          if(appVersionCode >= 5){
-            RNViewVideo(readyFiles,$index);
-          }else{
-          window.RootApp.$refs.preview.setData(true, $index , readyFiles);
-          window.RootApp.$refs.preview.init($index);
+          if (appVersionCode >= 5) {
+            RNViewVideo(readyFiles, $index);
+          } else {
+            window.RootApp.$refs.preview.setData(true, $index, readyFiles);
+            window.RootApp.$refs.preview.init($index);
           }
         } else if (clickType === 'picture') {
           tempArray = filesData.filter((item) => item.type === 'picture');
@@ -328,16 +337,20 @@ export default {
         window.RootApp.$refs.preview.init(index);
       }
     },
-    longPress(index){
+    longPress(index) {
       const { filesData, isZoneDetail } = this;
-      if(isApp && isZoneDetail){
+      if (isApp && isZoneDetail) {
         const clickType = filesData[index]?.type;
-        if(clickType === 'picture' ){
-          longPressImage({images:[{url:filesData[index].url,name:filesData[index].filename }],index:0});
+        if (clickType === 'picture') {
+          longPressImage({
+            images: [
+              { url: filesData[index].url, name: filesData[index].filename },
+            ],
+            index: 0,
+          });
         }
-
       }
-    }
+    },
   },
 };
 </script>
