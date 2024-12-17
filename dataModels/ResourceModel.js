@@ -605,7 +605,9 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
   id,
   jsonContent,
 ) {
-  if (!jsonContent) return;
+  if (!jsonContent) {
+    return;
+  }
   const model = mongoose.model('resources');
   const targetTypes = [
     'nkc-video-block',

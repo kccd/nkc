@@ -1569,7 +1569,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
           lost: !isFileExist,
         };
       } else {
-        const { name: filename } = defaultFile;
+        const { name: filename, height, width } = defaultFile;
         const sources = [];
         for (const { size, dataSize } of resource.videoSize) {
           const { height } = videoSize[size];
@@ -1589,6 +1589,8 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
           sources,
           filename,
           disabled,
+          height,
+          width,
           lost: !isFileExist,
         };
       }
