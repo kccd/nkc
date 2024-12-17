@@ -1,5 +1,4 @@
 module.exports = {
-  rateLimit: require('./rateLimit'),
   stayLogin: require('./stayLogin'),
   init: require('./init'),
   initState: require('./initState'),

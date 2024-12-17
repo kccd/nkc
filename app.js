@@ -33,7 +33,6 @@ app.on('error', (err) => {
 });
 
 const {
-  rateLimit,
   stayLogin,
   init,
   initState,
@@ -62,7 +61,6 @@ app
       allowHeaders: ['Content-Type', 'Authorization', 'FROM'],
     }),
   )
-  .use(rateLimit.total)
   // gzip
   .use(koaCompress({ threshold: 2048 }))
   // 静态文件映射
@@ -86,13 +84,6 @@ app
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
-  // 全局 频次限制 文件
-  .use(rateLimit.totalFile)
-  .use(rateLimit.totalHtml)
-
-  .use(rateLimit.userFile)
-  .use(rateLimit.userHtml)
-
   .use(stayLogin)
   .use(cache)
   .use(permission.permission)
