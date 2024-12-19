@@ -1,4 +1,8 @@
 const pug = require('pug');
+const {
+  highlightLanguages,
+  highlightLanguagesObject,
+} = require('../../nkcModules/highlightLanguages.js');
 const path = require('path');
 const tools = require('../tools');
 const homePugFilePath = path.resolve(__dirname, './nodes/home.pug');
@@ -82,6 +86,8 @@ function renderHTMLByJSON({
     domainWhitelistReg,
     atUsers,
     urlReg,
+    highlightLanguages,
+    highlightLanguagesObject,
     cache: false,
   });
 

@@ -1,4 +1,5 @@
 import { getSocket } from '../lib/js/socket';
+import { initNKCSource } from '../lib/js/nkcSource';
 import { RNSetSharePanelStatus } from '../lib/js/reactNative';
 import { shareTypes } from '../lib/js/shareTypes';
 import Product from '../lib/vue/Product.vue';
@@ -22,6 +23,7 @@ const commonModel = new NKC.modules.CommonModal();
 window.Attachments = undefined;
 window.quotePostApp = undefined;
 $(document).ready(function () {
+  initNKCSource();
   new Promise(function (resolve, reject) {
     if (NKC.configs.isApp) {
       setTimeout(function () {
@@ -473,7 +475,9 @@ function autoSaveDraft() {
     clearTimeout(timer);
     timer = null;
   }
-  if (manualSave) return;
+  if (manualSave) {
+    return;
+  }
   timer = setTimeout(function () {
     Promise.resolve()
       .then(function () {
@@ -785,9 +789,9 @@ function submit(tid) {
       });
     })
     .then(function (data) {
-      if(!la || la === 'json'){
+      if (!la || la === 'json') {
         ue.clearContent();
-      }else{
+      } else {
         ue.setContent('');
       }
       draftId = '';
@@ -1568,9 +1572,9 @@ $(function () {
     }
     next();
   });
-  NKC.methods.highlightBlockBySelector(
+  /*NKC.methods.highlightBlockBySelector(
     "[data-tag='nkcsource'][data-type='pre']",
-  );
+  );*/
   // app锚点无法滚动到指定位置，每次都会滚动到页面底部
   // 此处针对app特殊处理，一秒钟后手动触发滚动到锚点
   var hash = window.location.hash;
@@ -1636,11 +1640,11 @@ function insertRenderedPost(renderedPost) {
   var parentDom = $('.single-posts-container');
   parentDom.append(JQDOM);
   // 视频音频组件渲染
-  NKC.methods.initVideo();
+  // NKC.methods.initVideo();
   // 操作
   NKC.methods.initPostOption();
   // 外链复原
-  NKC.methods.replaceNKCUrl();
+  // NKC.methods.replaceNKCUrl();
   // 划词笔记
   const elements = document.querySelectorAll(
     `[data-type="nkc-render-content"][data-id="${renderedPost.postId}"]`,
@@ -1657,6 +1661,8 @@ function insertRenderedPost(renderedPost) {
       }),
     );
   }
+
+  initNKCSource();
 }
 function insertRenderedComment(renderedComment) {
   if (!renderedComment) {

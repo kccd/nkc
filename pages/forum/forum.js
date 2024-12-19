@@ -6,8 +6,10 @@ const socket = getSocket();
 const { isApp } = getState();
 const forumInfo = NKC.methods.getDataById('forumInfo');
 const { fid, page, digest, sort, sizeLimit } = forumInfo;
+import { initNKCSource } from '../lib/js/nkcSource';
 
 $(function () {
+  initNKCSource();
   RNSetSharePanelStatus(true, shareTypes.forum, fid);
 });
 

@@ -954,12 +954,9 @@ font-size: 14pt;
 }
 
 .ThreadPostBody span.xbbcode-code, pre code{
-
-font-size: 12px;
-
-font-family: consolas,Monospace,monospace;
-
-line-height: 1.4;
+  font-size: 12px;
+  font-family: consolas,Monospace,monospace;
+  line-height: 1.4;
 }
 
 .ThreadPostBody pre{
@@ -3963,6 +3960,40 @@ span[data-tag="nkcsource"][data-type="video"]>span:first-child>div{
 }
 span[data-tag="nkcsource"][data-type="video"] video{
   max-width: 100%;
+}
+
+pre[data-tag="nkcsource"][data-type="pre"] {
+  padding-top: 2.5rem;
+  border: 1px solid #d7d7d7;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  background: none;
+  position: relative;
+  &>div:first-child{
+    top: 0;
+    left: 0;
+    width: 100%;
+    position: absolute;
+    height: 2.5rem;
+    background-color: #f4f4f4;
+    padding: 0 0.5rem;
+    border-bottom: 1px solid #dbdbdb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    span {
+      font-weight: bold;
+      color: #555;
+    }
+  }
+  code{
+    padding: 0.5rem;
+    display: block;
+  }
+}
+[data-type="nkc-render-content"] table{
+  margin-bottom: 0.5rem;
 }
 
 /* 文章中的音频 旧*/

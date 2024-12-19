@@ -204,10 +204,34 @@ module.exports = {
     `.trim();
   },
   pre(html) {
-    return html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/gi, (content, v1, v2) => {
-      // v2 = htmlEscape(v2);
-      return `<pre${v1}>${v2}</pre>`;
-    });
+    const $ = cheerio.load(html);
+    const originCode = $('code');
+    const newCode = $('<code></code>');
+    const originPre = $('pre').eq(0);
+    let language = originPre.attr('data-id') || 'other';
+    let languageClass = '';
+    if (originCode.length === 0) {
+      newCode.text(originPre.text());
+    } else if (originCode.length > 1) {
+      let text = '';
+      for (let i = 0; i < originCode.length; i++) {
+        const originCodeItem = originCode.eq(i);
+        text += originCodeItem.text();
+      }
+      newCode.text(text);
+      languageClass = originCode.eq(0).attr('class');
+    } else {
+      newCode.text(originCode.eq(0).text());
+      languageClass = originCode.eq(0).attr('class');
+    }
+    if (languageClass) {
+      language = languageClass.split('-')[1] || language;
+    }
+    const pre = $('<pre data-tag="nkcsource" data-type="pre"></pre>');
+    pre.attr('data-id', language);
+    newCode.attr('class', `language-${language}`);
+    pre.append(newCode);
+    return pre.prop('outerHTML');
   },
   xsf(html, id, r, user = {}) {
     const { xsf = 0 } = user;

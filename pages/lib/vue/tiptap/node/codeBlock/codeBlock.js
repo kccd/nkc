@@ -1,16 +1,17 @@
 import { mergeAttributes, Node } from '@tiptap/vue-2';
 import { VueNodeViewRenderer } from '@tiptap/vue-2';
+import CodeBlock from '@tiptap/extension-code-block';
 import Component from './Component.vue';
-const nodeName = 'nkc-code-block';
+const nodeName = 'codeBlock';
 
-export default Node.create({
+export default CodeBlock.extend({
   name: nodeName,
   group: 'block',
   content: 'text*',
 
   addAttributes() {
     return {
-      language: 'text',
+      language: '',
     };
   },
 
@@ -31,7 +32,7 @@ export default Node.create({
     return VueNodeViewRenderer(Component);
   },
 
-  addKeyboardShortcuts() {
+  /*addKeyboardShortcuts() {
     return {
       Enter: ({ editor }) => {
         const inNode = isInCustomNode(editor);
@@ -50,7 +51,7 @@ export default Node.create({
         return false;
       },
     };
-  },
+  },*/
 });
 
 function isInCustomNode(editor) {

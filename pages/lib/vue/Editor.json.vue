@@ -263,7 +263,7 @@ import { immediateDebounce } from '../js/execution';
 import { HotKeys } from './tiptap/plugins/HotKeys';
 import { getState } from '../js/state.js';
 import { resetSelectionEvent } from '../../global/event.js';
-import nkcCodeBlock from './tiptap/node/nkcCodeBlock/nkcCodeBlock';
+import codeBlock from './tiptap/node/codeBlock/codeBlock';
 import { logger } from '../js/logger';
 
 export default {
@@ -471,8 +471,7 @@ export default {
             types: ['heading', 'paragraph'],
           }),
           HorizontalRule,
-          CodeBlock,
-          nkcCodeBlock,
+          codeBlock,
           Blockquote,
           nkcFontSize,
           Heading,
@@ -786,20 +785,10 @@ export default {
           this.editor
             .chain()
             .focus()
-            .insertContent({
-              type: 'nkc-code-block',
-              attrs: {
-                language: 'javascript',
-              },
+            .toggleCodeBlock({
+              language: 'text',
             })
             .run();
-          /*this.editor
-            .chain()
-            .focus()
-            .toggleCodeBlock({
-              language: 'javascript',
-            })
-            .run();*/
           return;
         }
         case 'resource': {
@@ -1049,7 +1038,7 @@ export default {
 }
 
 .tiptap-editor-content {
-  padding: 0.5rem 1rem;
+  padding: 1rem 1rem;
   border: 1px solid #eee;
   border-top: none;
   border-radius: 0 0 5px 5px;

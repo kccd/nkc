@@ -117,43 +117,26 @@ class NKCRender {
     html = body.html();
     if (type === 'article') {
       html = replaceEmojiWithImgTags(html);
-      /*// twemoji本地化
-      html = twemoji.parse(html, {
-        folder: '/fluentui-emoji',
-        class: 'emoji',
-        callback: function (icon, options) {
-          console.log(icon, options);
-          return ''.concat(
-            options.base, // by default Twitter Inc. CDN
-            options.size, // by default "72x72" string
-            '/',
-            icon, // the found emoji as code point
-            options.ext, // by default ".png"
-          );
-        },
-        attributes: () => {
-          return {
-            'data-tag': 'nkcsource',
-            'data-type': 'twemoji',
-          };
-        },
-        base: '/statics',
-        ext: '.png',
-      });*/
     }
-
     // 过滤标签及样式
-    html = htmlFilter(html);
     let id;
     if (post.pid) {
       id = `${post.pid}`;
     }
 
-    if (html) {
-      return `<div class="render-content math-jax" data-type="nkc-render-content" data-id="${id}" data-source="${source}" data-sid="${sid}">${html}</div>`;
-    } else {
-      return '';
-    }
+    const container = $('<div></div>');
+    container
+      .attr({
+        class: 'render-content math-jax',
+        'data-type': 'nkc-render-content',
+        'data-id': id,
+        'data-source': source,
+        'data-sid': sid,
+      })
+      .html(html || '');
+
+    html = container.prop('outerHTML');
+    return htmlFilter(html);
   }
 
   renderNKCWebHTML(props) {
