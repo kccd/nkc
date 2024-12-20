@@ -112,7 +112,7 @@ class NKCRender {
     if (type === 'article') {
       this.replaceATInfo($, body[0], atUsers);
       this.replaceLinkInfo($, body[0]);
-      this.addLinksToArticle($, body[0]);
+      // this.addLinksToArticle($, body[0]);
     }
     html = body.html();
     if (type === 'article') {
