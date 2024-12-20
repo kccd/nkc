@@ -428,7 +428,7 @@ export default {
     },
     //编辑电文
     editorMoment() {
-      if (this.moment.status !== 'normal') {
+      if (!['normal', 'faulty', 'unknown'].includes(this.moment.status)) {
         return sweetError('当前电文不可编辑');
       }
       if (this.moment.mode === 'plain') {
