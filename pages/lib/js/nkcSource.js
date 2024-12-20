@@ -9,6 +9,7 @@ import { copyTextToClipboard } from './clipboard';
 import { logger } from './logger';
 import { screenTopAlert } from './topAlert';
 import { fixLanguage, highlightLanguagesObject } from './highlight';
+import { renderNKCDocNumber } from './nkcDocNumber';
 
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -181,6 +182,18 @@ export function renderingNKCVideo() {
           </div>
         </div>
       `);
+      maskContainer.appendChild(maskDom[0]);
+    }
+    if (!mask && getState().isApp && getState().appVersionCode >= 5) {
+      let previewButtonOnClick = '';
+      previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
+      const maskDom = window.$(`
+        <div style="${maskDomStyle}background-color:transparent;">
+        </div>
+      `);
+      maskDom.on('click', () => {
+        window.RootApp.viewVideoForApp(rid);
+      });
       maskContainer.appendChild(maskDom[0]);
     }
   }
@@ -391,4 +404,5 @@ export function initNKCSource() {
   lazyLoadInit();
   renderCodeBlock();
   renderNKCURL();
+  renderNKCDocNumber();
 }
