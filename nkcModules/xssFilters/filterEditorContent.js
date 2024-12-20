@@ -62,6 +62,7 @@ defaultWL.span = [
   'class',
   'style',
   'data-type',
+  'data-mask',
   'data-id',
   '_rendered',
   'style',
