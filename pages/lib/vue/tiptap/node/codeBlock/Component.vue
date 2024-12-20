@@ -31,15 +31,14 @@ export default {
   props: nodeViewProps,
   mounted() {
     this.language = this.node.attrs.language;
-    this.editor.on('update', this.highlight);
     setTimeout(() => {
       this.highlight();
     });
   },
-  beforeDestroy() {
-    this.editor.off('update', this.highlight);
-  },
   watch: {
+    node() {
+      this.highlight();
+    },
     language: function () {
       this.highlight();
       this.updateAttributes({

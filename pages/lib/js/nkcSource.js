@@ -312,6 +312,7 @@ export function renderCodeBlock() {
       return;
     }
     const codeText = code.innerText;
+    const multipleLineMode = code.getAttribute('data-line-mode') === 'multiple';
     let language = fixLanguage(
       container.getAttribute('data-id').trim().toLowerCase(),
     );
@@ -333,18 +334,36 @@ export function renderCodeBlock() {
     const headerDiv = document.createElement('div');
     const span = document.createElement('span');
     span.innerText = languageName;
-    const button = document.createElement('button');
-    button.setAttribute('class', 'btn btn-default btn-xs');
-    button.innerText = 'Copy';
-    button.onclick = () => {
+    const copyButton = document.createElement('button');
+    copyButton.setAttribute('class', 'btn btn-default btn-xs');
+    copyButton.innerText = 'Copy';
+    copyButton.onclick = () => {
       copyTextToClipboard(codeText)
         .then(() => {
           return screenTopAlert('代码已复制到粘贴板');
         })
         .catch(logger.error);
     };
+    const lineButton = document.createElement('button');
+    lineButton.setAttribute('class', 'btn btn-default btn-xs m-r-05');
+    const resetLineBreakStatus = (_multipleLineMode) => {
+      lineButton.innerText = _multipleLineMode
+        ? '关闭自动换行'
+        : '开启自动换行';
+      lineButton.onclick = () => {
+        resetLineBreakStatus(!_multipleLineMode);
+      };
+      code.setAttribute(
+        'data-line-mode',
+        _multipleLineMode ? 'multiple' : 'single',
+      );
+    };
+    resetLineBreakStatus(multipleLineMode);
+    const buttonContainer = document.createElement('div');
+    buttonContainer.appendChild(lineButton);
+    buttonContainer.appendChild(copyButton);
     headerDiv.appendChild(span);
-    headerDiv.appendChild(button);
+    headerDiv.appendChild(buttonContainer);
     container.prepend(headerDiv);
   });
 }

@@ -3990,6 +3990,12 @@ pre[data-tag="nkcsource"][data-type="pre"] {
   code{
     padding: 0.5rem;
     display: block;
+    white-space: pre;
+    overflow-x: auto;
+    &[data-line-mode="multiple"] {
+      white-space: pre-wrap;
+      overflow-x: hidden;
+    }
   }
 }
 [data-type="nkc-render-content"] table{
