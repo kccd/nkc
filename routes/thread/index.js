@@ -14,7 +14,7 @@ const {
 } = require('../../services/subscribe/collection.service');
 const { Operations } = require('../../settings/operations');
 const { ObjectId } = require('mongodb');
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { editorRichService } = require('../../services/editor/rich.service');
 
 threadRouter
   .use('/', async (ctx, next) => {
@@ -1341,22 +1341,19 @@ threadRouter
     if (post.t && post.t.length > 100) {
       ctx.throw(400, `标题不能超过100个字`);
     }
-    const content =
-      post.l === 'json'
-        ? customCheerio.load(renderHTMLByJSON({ json: post.c })).text()
-        : customCheerio.load(post.c).text();
-    if (content.length < 2) {
+    let contentSize = editorRichService.getRichContentWordsSize(post.l, post.c);
+    if (contentSize < 2) {
       ctx.throw(400, `内容不能少于2个字`);
     }
     // 字数限制
     if (postType === 'comment') {
       // 作为评论 不能超过200字
-      if (content.length > 200) {
+      if (contentSize > 200) {
         ctx.throw(400, `内容不能超过200字`);
       }
     } else {
       // 作为回复 不能超过10万字
-      if (content.length > 100000) {
+      if (contentSize > 100000) {
         ctx.throw(400, `内容不能超过10万字`);
       }
     }

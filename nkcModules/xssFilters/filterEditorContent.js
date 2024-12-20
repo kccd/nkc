@@ -5,7 +5,7 @@ const defaultWL = Object.assign({}, xss.whiteList);
 defaultWL.font = ['color'];
 defaultWL.code = ['class'];
 defaultWL.p = ['align', 'style'];
-defaultWL.table = ['border', 'width', 'cellpadding', 'cellspacing'];
+defaultWL.table = ['border', 'width', 'cellpadding', 'cellspacing', 'class'];
 defaultWL.tbody = [];
 defaultWL.tr = [];
 defaultWL.th = ['width'];
@@ -19,6 +19,7 @@ defaultWL.annotation = ['encoding'];
 defaultWL.iframe = [];
 defaultWL.embed = [];
 defaultWL.section = ['data-tag', 'data-type', 'data-id', 'data-message'];
+defaultWL.ul = ['data-tag', 'data-type'];
 defaultWL.img = [
   'src',
   'alt',
@@ -61,6 +62,7 @@ defaultWL.span = [
   'class',
   'style',
   'data-type',
+  'data-mask',
   'data-id',
   '_rendered',
   'style',
@@ -101,11 +103,9 @@ for (var i = 1; i <= 6; i++) {
   defaultWL['h' + i] = ['style'];
 }
 
-module.exports = (html) => {
+module.exports = (html = '') => {
   html = xss(html, {
     whiteList: defaultWL,
-    // stripIgnoreTagBody: ["script"],
-    // stripIgnoreTag: true,
     onTagAttr: function (tag, name, value, isWhiteAttr) {
       if (isWhiteAttr) {
         if (tag === 'a' && name === 'href') {
@@ -116,7 +116,6 @@ module.exports = (html) => {
     },
     css: {
       whiteList: {
-        // position: /^fixed|relative$/, 2020-10-13 为了避免用户粘贴的html存在该样式造成布局错乱
         top: true,
         left: true,
         fontSize: true,
@@ -146,11 +145,5 @@ module.exports = (html) => {
       },
     },
   });
-  // 处理pre
-  html = html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/gi, (content, v1, v2) => {
-    v2 = v2.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return `<pre${v1}>${v2}</pre>`;
-  });
-
   return html;
 };

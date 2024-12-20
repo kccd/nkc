@@ -2,10 +2,12 @@ import { getDataById } from '../../lib/js/dataConversion';
 import { getSocket } from '../../lib/js/socket';
 const socket = getSocket();
 const data = getDataById('data');
+import { initNKCSource } from '../../lib/js/nkcSource';
 const { article } = data;
+import { sweetError } from '../../lib/js/sweetAlert';
 import CommentEditor from '../../lib/vue/comment/CommentEditor';
-if (data.type === 'article' && $('#commentEditor').length !== 0) {
-  window.commentEditor = new Vue({
+if (data.type === 'article' && window.$('#commentEditor').length !== 0) {
+  window.commentEditor = new window.Vue({
     el: '#commentEditor',
     data: {
       comment: data.comment || null,
@@ -38,7 +40,7 @@ import { nkcAPI } from '../../lib/js/netAPI';
 import { screenTopAlert, screenTopWarning } from '../../lib/js/topAlert';
 import CommentHit from '../../lib/vue/comment/CommentHit';
 import { contentTypes, creditTypes } from '../../lib/vue/Credit';
-const singleBottomDom = $('.single-post-bottom');
+const singleBottomDom = window.$('.single-post-bottom');
 const singleCommentBottom = {};
 for (let i = 0; i < singleBottomDom.length; i++) {
   const dom = singleBottomDom.eq(i);
@@ -53,7 +55,7 @@ for (let i = 0; i < singleBottomDom.length; i++) {
 }
 
 function initSingleCommentBottom(cid) {
-  singleCommentBottom[cid] = new Vue({
+  singleCommentBottom[cid] = new window.Vue({
     el: `#singleCommentBottom_${cid}`,
     data: {},
     components: {
@@ -69,7 +71,7 @@ function initSingleCommentBottom(cid) {
       getDataById: getDataById,
       //其他操作
       openOptions(e) {
-        const target = $(e);
+        const target = window.$(e);
         const direction = e.getAttribute('data-direction') || 'up';
         const cid = e.getAttribute('data-cid');
         const data = this.getDataById(`comment_${cid}`);
@@ -121,7 +123,7 @@ function initSingleCommentBottom(cid) {
       },
       //评论背景开关
       switchPostBackground(cid, show) {
-        const dom = $(`.single-post-container[data-cid="${cid}"]`);
+        const dom = window.$(`.single-post-container[data-cid="${cid}"]`);
         dom.attr('data-show-comments', show);
       },
       //通过审核
@@ -242,21 +244,21 @@ function insertRenderedComment(renderedComment) {
   var JQDOM = $(renderedComment.html).find('.single-post-container');
   JQDOM = JQDOM[0];
   // 公式渲染
-  try {
+  /*try {
     MathJax.typesetPromise([JQDOM]);
   } catch (err) {
     console.log(err);
-  }
+  }*/
   JQDOM = $(JQDOM);
   var parentDom = $('.comment-list');
   parentDom.append(JQDOM);
   $('#nullComments').remove();
   // 视频音频组件渲染
-  NKC.methods.initVideo();
+  // NKC.methods.initVideo();
   // 操作
   initSingleCommentBottom(renderedComment.commentId);
   // 外链复原
-  NKC.methods.replaceNKCUrl();
+  // NKC.methods.replaceNKCUrl();
   // 划词笔记
   // const elements = document.querySelectorAll(`[data-type="nkc-render-content"][data-id="${renderedComment.articleId}"]`);
   // for(let i = 0; i < elements.length; i++) {
@@ -268,6 +270,7 @@ function insertRenderedComment(renderedComment) {
   //     rootElement: element
   //   }));
   // }
+  initNKCSource();
 }
 
 $(function () {

@@ -1,4 +1,4 @@
 mixin renderTaskList(node) 
-  ul(style='list-style-type: none; padding-left: 0;')
+  ul(data-tag="nkcsource" data-type='task')
     +loopRender(node.content)
     

@@ -29,10 +29,11 @@ router
     const { pageSettings } = state;
     const { normal } = await db.DocumentModel.getDocumentStatus();
     const { stable } = await db.DocumentModel.getDocumentTypes();
-    const { article, comment } = await db.DocumentModel.getDocumentSources();
+    const { article, comment, moment } =
+      await db.DocumentModel.getDocumentSources();
     const match = { did, type: stable };
     const document = await db.DocumentModel.findOne(match);
-    if (!document || ![article, comment].includes(document.source)) {
+    if (!document || ![article, comment, moment].includes(document.source)) {
       ctx.throw(404, '当前访问文档不存在');
     }
     if (document.status !== normal && !permission('review')) {
@@ -40,7 +41,7 @@ router
         ctx.throw(403, '权限不足');
       }
     }
-    // 查询是长电文还是长电文的回复
+    // 查询是独立文章还是独立文章的回复
     if (document.source === article) {
       // 查询独立文章是否在唯一专栏中
       const columnPosts = await db.ColumnPostModel.find({
@@ -80,6 +81,14 @@ router
           `/z/a/${sid}?page=${page}&highlight=${document.sid}#highlight`,
         );
       }
+    }
+    // 电文
+    if (document.source === moment) {
+      const singleMoment = await db.MomentModel.findOne({ _id: document.sid });
+      if (!singleMoment) {
+        ctx.throw(404, '当前访问的电文不存在');
+      }
+      return ctx.redirect(`/z/m/${document.sid}`);
     }
     await next();
   })

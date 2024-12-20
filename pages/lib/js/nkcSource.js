@@ -1,8 +1,15 @@
 import { strToObj, objToStr } from './dataConversion';
+import { base64ToStr } from './dataConversion';
 import { getState } from './state';
 import { getUrl } from './tools';
+import hljs from 'highlight.js';
 const isLogged = !!getState().uid;
 import { lazyLoadInit } from './lazyLoad';
+import { copyTextToClipboard } from './clipboard';
+import { logger } from './logger';
+import { screenTopAlert } from './topAlert';
+import { fixLanguage, highlightLanguagesObject } from './highlight';
+import { renderNKCDocNumber } from './nkcDocNumber';
 
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -56,6 +63,10 @@ export function renderingNKCVideo() {
     `[data-tag="nkcsource"][data-type="video"]`,
   );
   for (const videoContainer of videoContainers) {
+    if (videoContainer.getAttribute('data-initialized') === 'true') {
+      continue;
+    }
+    videoContainer.setAttribute('data-initialized', 'true');
     const plyrDom = videoContainer.querySelector('video.plyr-dom');
     if (plyrDom === null) {
       continue;
@@ -173,6 +184,18 @@ export function renderingNKCVideo() {
       `);
       maskContainer.appendChild(maskDom[0]);
     }
+    if (!mask && getState().isApp && getState().appVersionCode >= 5) {
+      let previewButtonOnClick = '';
+      previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
+      const maskDom = window.$(`
+        <div style="${maskDomStyle}background-color:transparent;">
+        </div>
+      `);
+      maskDom.on('click', () => {
+        window.RootApp.viewVideoForApp(rid);
+      });
+      maskContainer.appendChild(maskDom[0]);
+    }
   }
 }
 
@@ -185,6 +208,10 @@ export function renderingNKCAudio() {
     `[data-tag="nkcsource"][data-type="audio"]`,
   );
   for (const audioContainer of audioContainers) {
+    if (audioContainer.getAttribute('data-initialized') === 'true') {
+      continue;
+    }
+    audioContainer.setAttribute('data-initialized', 'true');
     const plyrDom = audioContainer.querySelector('audio.plyr-dom');
     if (plyrDom === null) {
       continue;
@@ -284,10 +311,98 @@ export function renderingNKCPicture() {
   }
 }
 
+export function renderCodeBlock() {
+  const containers = document.querySelectorAll(
+    `pre[data-tag="nkcsource"][data-type="pre"]`,
+  );
+  containers.forEach((container) => {
+    if (container.getAttribute('data-initialized') === 'true') {
+      return;
+    }
+    container.setAttribute('data-initialized', 'true');
+    const code = container.querySelector('code');
+    if (!code) {
+      return;
+    }
+    const codeText = code.innerText;
+    const multipleLineMode = code.getAttribute('data-line-mode') === 'multiple';
+    let language = fixLanguage(
+      container.getAttribute('data-id').trim().toLowerCase(),
+    );
+    let html = '';
+    if (language === 'other') {
+      const r = hljs.highlightAuto(codeText);
+      html = r.value;
+      language = r.language;
+    } else {
+      const r = hljs.highlight(codeText, {
+        language,
+      });
+      html = r.value;
+    }
+    language = fixLanguage(language);
+    const languageName =
+      highlightLanguagesObject[language] || highlightLanguagesObject['other'];
+    code.innerHTML = html;
+    const headerDiv = document.createElement('div');
+    const span = document.createElement('span');
+    span.innerText = languageName;
+    const copyButton = document.createElement('button');
+    copyButton.setAttribute('class', 'btn btn-default btn-xs');
+    copyButton.innerText = 'Copy';
+    copyButton.onclick = () => {
+      copyTextToClipboard(codeText)
+        .then(() => {
+          return screenTopAlert('代码已复制到粘贴板');
+        })
+        .catch(logger.error);
+    };
+    const lineButton = document.createElement('button');
+    lineButton.setAttribute('class', 'btn btn-default btn-xs m-r-05');
+    const resetLineBreakStatus = (_multipleLineMode) => {
+      lineButton.innerText = _multipleLineMode
+        ? '关闭自动换行'
+        : '开启自动换行';
+      lineButton.onclick = () => {
+        resetLineBreakStatus(!_multipleLineMode);
+      };
+      code.setAttribute(
+        'data-line-mode',
+        _multipleLineMode ? 'multiple' : 'single',
+      );
+    };
+    resetLineBreakStatus(multipleLineMode);
+    const buttonContainer = document.createElement('div');
+    buttonContainer.appendChild(lineButton);
+    buttonContainer.appendChild(copyButton);
+    headerDiv.appendChild(span);
+    headerDiv.appendChild(buttonContainer);
+    container.prepend(headerDiv);
+  });
+}
+
+export function renderNKCURL() {
+  const elements = document.querySelectorAll('span[data-type="nkc-url"]');
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    let url = element.getAttribute('data-url') || '';
+    if (!url) {
+      continue;
+    }
+    url = base64ToStr(url);
+    element.innerText = url;
+    element.removeAttribute('data-type');
+    element.removeAttribute('data-url');
+  }
+}
+
 export function initNKCSource() {
   renderingMathJax();
   renderingNKCVideo();
   renderingNKCAudio();
   renderingNKCPicture();
   lazyLoadInit();
+  renderCodeBlock();
+  renderNKCURL();
+  renderNKCDocNumber();
 }

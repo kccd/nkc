@@ -1,172 +1,177 @@
 <template lang="pug">
-  .tiptap-editor-container
-    link-editor(ref='linkEditor')
-    .tiptap-editor-toolBar(v-if='editor' :style="{ top:isApp ? '0rem' : '4rem' }")
-      .tiptap-editor-toolBar-icon-group
-        div(@click='editor.chain().focus().undo().run()' title="撤销 Ctrl + Z")
-          <return theme="filled" :size="iconFontSize" />
-        div(@click='editor.chain().focus().redo().run()' title="重做 Ctrl + Shift + Z")
-          <go-on theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleBold().run()',
-          :class='editorIsActive("bold")',
-          title='粗体 Ctrl + B'
+.tiptap-editor-container
+  link-editor(ref='linkEditor')
+  .tiptap-editor-toolBar(
+    v-if='editor',
+    :style='{ top: isApp ? "0rem" : "4rem" }'
+  )
+    .tiptap-editor-toolBar-icon-group
+      div(@click='editor.chain().focus().undo().run()', title='撤销 Ctrl + Z')
+        <return theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().redo().run()',
+        title='重做 Ctrl + Shift + Z'
+      )
+        <go-on theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleBold().run()',
+        :class='editorIsActive("bold")',
+        title='粗体 Ctrl + B'
+      )
+        <text-bold theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleItalic().run()',
+        :class='editorIsActive("italic")',
+        title='斜体 Ctrl + I'
+      )
+        <text-italic theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleUnderline().run()',
+        :class='editorIsActive("underline")',
+        title='下划线 Ctrl + U'
+      )
+        <text-underline theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleStrike().run()',
+        :class='editorIsActive("strike")',
+        title='删除线 Ctrl + Shift + S'
+      )
+        <strikethrough theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().clearNodes().unsetAllMarks().run()',
+        title='清除格式'
+      )
+        <clear-format theme="outline" :size="iconFontSize" />
+      select(
+        style='width: 4.5rem',
+        :value='getFontFamily()',
+        @click='setFontFamily',
+        @blur='isFontFamilySelectOpen = false'
+      )
+        option(
+          v-for='font in fontFamilies',
+          :value='font[0]',
+          :style='`font-family: ${font[0]}`'
+        ) {{ font[1] }}
+      select(
+        :value='getHeadline()',
+        @click='setHeadline',
+        @blur='isHeadlineSelectOpen = false'
+      )
+        option(value='0') 正文
+        option(value='1') 标题1
+        option(value='2') 标题2
+        option(value='3') 标题3
+        option(value='4') 标题4
+        option(value='5') 标题5
+        option(value='6') 标题6
+      select.m-r-05(
+        :value='getFontSize()',
+        @click='setFontSize',
+        @blur='isFontSizeSelectOpen = false'
+      )
+        option(
+          v-for='size in nkcFontSizeOptions.sizes',
+          :key='size',
+          :value='size'
+        ) {{ size }}
+      .m-r-05(data-type='custom')
+        text-color-icon(
+          title='文字颜色',
+          @select='selectedTextColor',
+          category='color'
         )
-          <text-bold theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleItalic().run()',
-          :class='editorIsActive("italic")',
-          title='斜体 Ctrl + I'
+      .m-r-05(data-type='custom')
+        text-color-icon(
+          title='背景颜色',
+          @select='selectedBGColor',
+          category='backgroundColor'
         )
-          <text-italic theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleUnderline().run()',
-          :class='editorIsActive("underline")',
-          title='下划线 Ctrl + U'
-        )
-          <text-underline theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleStrike().run()',
-          :class='editorIsActive("strike")',
-          title='删除线 Ctrl + Shift + S'
-        )
-          <strikethrough theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().clearNodes().unsetAllMarks().run()',
-          title='清除格式'
-        )
-          <clear-format theme="outline" :size="iconFontSize" />
-        select(
-          style='width: 4.5rem;'
-          :value='getFontFamily()',
-          @click='setFontFamily',
-          @blur='isFontFamilySelectOpen = false'
-        )
-          option(
-            v-for='font in fontFamilies'
-            :value='font[0]'
-            :style="`font-family: ${font[0]}`"
-          ) {{font[1]}}
-        select(
-          :value='getHeadline()',
-          @click='setHeadline',
-          @blur='isHeadlineSelectOpen = false'
-        )
-          option(value='0') 正文
-          option(value='1') 标题1
-          option(value='2') 标题2
-          option(value='3') 标题3
-          option(value='4') 标题4
-          option(value='5') 标题5
-          option(value='6') 标题6
-        select.m-r-05(
-          :value='getFontSize()',
-          @click='setFontSize',
-          @blur='isFontSizeSelectOpen = false'
-        )
-          option(
-            v-for='size in nkcFontSizeOptions.sizes',
-            :key='size',
-            :value='size'
-          ) {{ size }}
-        .m-r-05(data-type='custom')
-          text-color-icon(
-            title='文字颜色',
-            @select='selectedTextColor',
-            category='color'
-          )
-        .m-r-05(data-type='custom')
-          text-color-icon(
-            title='背景颜色',
-            @select='selectedBGColor',
-            category='backgroundColor'
-          )
-        div(
-          @click='setLink',
-          :class='{ "is-active": editor.isActive("link") }',
-          title='插入链接'
-        )
-          <link-one theme="filled" :size="iconFontSize" />
-        div(@click='editor.chain().focus().unsetLink().run()', title='取消链接')
-          <unlink theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleOrderedList().run()',
-          :class='editorIsActive("orderedList")',
-          title='有序列表'
-        )
-          <list-numbers theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleBulletList().run()',
-          :class='editorIsActive("bulletList")',
-          title='无序列表'
-        )
-          <list-two theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleBlockquote().run()',
-          :class='editorIsActive("blockquote")',
-          title='引用'
-        )
-          <quote theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleCode().run()',
-          :class='{ "is-active": editor.isActive("code") }',
-          title='代码'
-        )
-          <code-one theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().setTextAlign("left").run()',
-          title='左对齐',
-          :class='editorIsActive({ textAlign: "left" })'
-        )
-          <align-text-left theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().setTextAlign("center").run()',
-          title='居中',
-          :class='editorIsActive({ textAlign: "center" })'
-        )
-          <align-text-center theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().setTextAlign("right").run()',
-          title='右对齐',
-          :class='editorIsActive({ textAlign: "right" })'
-        )
-          <align-text-right theme="outline" :size="iconFontSize" />
-        div(
-          @click='setTextIndent'
-          title='首行缩进',
-          :class='editorIsActive({ textIndent: 2 })'
-        )
-          <indent-left theme="outline" :size="iconFontSize" />
-        div.tiptap-editor-subscript(
-          @click='editor.chain().focus().toggleSubscript().run()',
-          :class='{ "is-active": editor.isActive("subscript") }'
-        )
-          <i class="fa fa-subscript" />
-        div.tiptap-editor-subscript(
-          @click='editor.chain().focus().toggleSuperscript().run()',
-          :class='{ "is-active": editor.isActive("superscript") }'
-        )
-          <i class="fa fa-superscript" />
-        div(
-          @click="appMenuClick('resource')"
-          title="插入资源"
-        )
-          new-picture(theme="outline" :size="iconFontSize")
-        div(data-type='custom')
-          app-menu(ref='appMenu', @select='appMenuClick')
+      div(
+        @click='setLink',
+        :class='{ "is-active": editor.isActive("link") }',
+        title='插入链接'
+      )
+        <link-one theme="filled" :size="iconFontSize" />
+      div(@click='editor.chain().focus().unsetLink().run()', title='取消链接')
+        <unlink theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleOrderedList().run()',
+        :class='editorIsActive("orderedList")',
+        title='有序列表'
+      )
+        <list-numbers theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleBulletList().run()',
+        :class='editorIsActive("bulletList")',
+        title='无序列表'
+      )
+        <list-two theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleBlockquote().run()',
+        :class='editorIsActive("blockquote")',
+        title='引用'
+      )
+        <quote theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleCode().run()',
+        :class='{ "is-active": editor.isActive("code") }',
+        title='代码'
+      )
+        <code-one theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().setTextAlign("left").run()',
+        title='左对齐',
+        :class='editorIsActive({ textAlign: "left" })'
+      )
+        <align-text-left theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().setTextAlign("center").run()',
+        title='居中',
+        :class='editorIsActive({ textAlign: "center" })'
+      )
+        <align-text-center theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().setTextAlign("right").run()',
+        title='右对齐',
+        :class='editorIsActive({ textAlign: "right" })'
+      )
+        <align-text-right theme="outline" :size="iconFontSize" />
+      div(
+        @click='setTextIndent',
+        title='首行缩进',
+        :class='editorIsActive({ textIndent: 2 })'
+      )
+        <indent-left theme="outline" :size="iconFontSize" />
+      .tiptap-editor-subscript(
+        @click='editor.chain().focus().toggleSubscript().run()',
+        :class='{ "is-active": editor.isActive("subscript") }'
+      )
+        <i class="fa fa-subscript" />
+      .tiptap-editor-subscript(
+        @click='editor.chain().focus().toggleSuperscript().run()',
+        :class='{ "is-active": editor.isActive("superscript") }'
+      )
+        <i class="fa fa-superscript" />
+      div(@click='appMenuClick("resource")', title='插入资源')
+        new-picture(theme='outline', :size='iconFontSize')
+      div(data-type='custom')
+        app-menu(ref='appMenu', @select='appMenuClick')
 
-    .tiptap-editor-content(@click.stop="editor.commands.focus()")
-      editor-content(:editor='editor' ref="tiptapEditorContent")
-    .word-count
-      span(:style="currentTextLength>initConfig.maxWordCount?'color:#ff6262;':''") {{`${currentTextLength}`}}
-      span {{`/${initConfig.maxWordCount}`}}
-    //-.mask.m-b-1(v-show="!!loading")
-      loading
-    resource-selector(ref='resourceSelector')
-    table-editor(ref='tableEditor')
-    sticker-selector(ref='stickerSelector')
-    draft-selector(ref='draftSelector')
-    math-selector(ref='mathSelector')
+  .tiptap-editor-content(@click.stop='editor.commands.focus()')
+    editor-content(:editor='editor', ref='tiptapEditorContent')
+  .word-count
+    span(
+      :style='currentTextLength > initConfig.maxWordCount ? "color:#ff6262;" : ""'
+    ) {{ `${currentTextLength}` }}
+    span {{ `/${initConfig.maxWordCount}` }}
+  //-.mask.m-b-1(v-show="!!loading")
+    loading
+  resource-selector(ref='resourceSelector')
+  table-editor(ref='tableEditor')
+  sticker-selector(ref='stickerSelector')
+  draft-selector(ref='draftSelector')
+  math-selector(ref='mathSelector')
 </template>
 
 <script>
@@ -214,12 +219,12 @@ import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
 import StickerSelector from './StickerSelector/StickerSelector.vue';
 import DraftSelector from './DraftSelector.vue';
-import HardBreak from '@tiptap/extension-hard-break'
+import HardBreak from '@tiptap/extension-hard-break';
 import { nkcParagraph } from './tiptap/node/nkcParagraph.js';
-import TaskItem from '@tiptap/extension-task-item'
-import TaskList from '@tiptap/extension-task-list'
-import Placeholder from '@tiptap/extension-placeholder'
-import Gapcursor from '@tiptap/extension-gapcursor'
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
+import Placeholder from '@tiptap/extension-placeholder';
+import Gapcursor from '@tiptap/extension-gapcursor';
 import {
   ClearFormat,
   AlignTextLeft,
@@ -254,15 +259,17 @@ import nkcAttachmentBlock from './tiptap/node/nkcAttachmentBlock/nkcAttachmentBl
 import nkcFileStatusBlock from './tiptap/node/nkcFileStatusBlock/nkcFileStatusBlock.js';
 import nkcFileStatusInline from './tiptap/node/nkcFileStatusInline/nkcFileStatusInline.js';
 import { PasteOrDropFile } from './tiptap/plugins/PasteOrDropFile.js';
-import AppMenu from './tiptap/menus/AppMenu.vue'
-import { nkcTable } from "./tiptap/node/nkcTable/nkcTable.js";
+import AppMenu from './tiptap/menus/AppMenu.vue';
+import { nkcTable } from './tiptap/node/nkcTable/nkcTable.js';
 import MathSelector from './MathSelector.vue';
 import Loading from './Loading.vue';
-import { getRichJsonContentLength } from "../js/checkData";
-import { immediateDebounce } from "../js/execution";
-import { HotKeys } from "./tiptap/plugins/HotKeys";
+import { getRichJsonContentLength } from '../js/checkData';
+import { immediateDebounce } from '../js/execution';
+import { HotKeys } from './tiptap/plugins/HotKeys';
 import { getState } from '../js/state.js';
 import { resetSelectionEvent } from '../../global/event.js';
+import codeBlock from './tiptap/node/codeBlock/codeBlock';
+import { logger } from '../js/logger';
 
 export default {
   props: ['config', 'loading'],
@@ -342,9 +349,9 @@ export default {
     const { config } = this;
     if (config) {
       this.initConfig.minHeight = config.minHeight ?? this.initConfig.minHeight;
-      this.initConfig.maxWordCount = config.maxWordCount ?? this.initConfig.maxWordCount;
+      this.initConfig.maxWordCount =
+        config.maxWordCount ?? this.initConfig.maxWordCount;
     }
-
   },
   mounted() {
     this.initEditor();
@@ -354,22 +361,24 @@ export default {
 
   methods: {
     getHTML() {
-      return this.editor.getHTML()
+      return this.editor.getHTML();
     },
     getJSON() {
       return this.editor.getJSON();
     },
     initEditorMinHeight() {
-      const div = this.$refs.tiptapEditorContent.$el.querySelector('div[contenteditable="true"]');
-      if(!div) return;
+      const div = this.$refs.tiptapEditorContent.$el.querySelector(
+        'div[contenteditable="true"]',
+      );
+      if (!div) return;
       div.style.minHeight = this.initConfig.minHeight + 'px';
     },
     setJSON(jsonString) {
-      if(!jsonString) return;
+      if (!jsonString) return;
       let jsonData;
-      try{
+      try {
         jsonData = JSON.parse(jsonString);
-      } catch(err) {
+      } catch (err) {
         jsonData = {
           type: 'doc',
           content: [
@@ -392,7 +401,7 @@ export default {
               ],
             },
           ],
-        }
+        };
       }
       this.editor.commands.setContent(jsonData);
       this.updateTextLength();
@@ -402,19 +411,19 @@ export default {
     },
     //==>兼容旧编辑器
     getContentTxt() {
-        return this.editor.getText();
+      return this.editor.getText();
     },
     // 获取JSON字符串数据
     getContent() {
       return JSON.stringify(this.getJSON());
     },
     // 定时更新文本长度
-    updateTextLength: immediateDebounce(function() {
+    updateTextLength: immediateDebounce(function () {
       this.currentTextLength = this.getTextLength();
     }, 1000),
     // 获取文本长度
     getTextLength() {
-      return getRichJsonContentLength(this.getJSON());
+      return Math.ceil(getRichJsonContentLength(this.getJSON()) / 2);
     },
     // 设置JSON字符串数据
     setContent(jsonString) {
@@ -440,8 +449,8 @@ export default {
         extensions: [
           HotKeys.configure({
             onSave: () => {
-              this.$emit('manual-save')
-            }
+              this.$emit('manual-save');
+            },
           }),
           HardBreak,
           // Image.configure({
@@ -461,13 +470,13 @@ export default {
           TableCell,
           Highlight.configure({
             multicolor: true,
-            HTMLAttributes:{ style: 'padding:0;' },
+            HTMLAttributes: { style: 'padding:0;' },
           }),
           TextAlign.configure({
             types: ['heading', 'paragraph'],
           }),
           HorizontalRule,
-          CodeBlock,
+          codeBlock,
           Blockquote,
           nkcFontSize,
           Heading,
@@ -521,16 +530,23 @@ export default {
         },
       });
       this.updateTextLength();
-
     },
     editorIsActive(name) {
       return this.editor.isActive(name) ? 'is-active' : '';
     },
     setTextIndent() {
       if (this.editor.isActive({ textIndent: 2 })) {
-        this.editor.chain().focus().updateAttributes('paragraph', { textIndent: 0 }).run();
+        this.editor
+          .chain()
+          .focus()
+          .updateAttributes('paragraph', { textIndent: 0 })
+          .run();
       } else {
-        this.editor.chain().focus().updateAttributes('paragraph', { textIndent: 2 }).run();
+        this.editor
+          .chain()
+          .focus()
+          .updateAttributes('paragraph', { textIndent: 2 })
+          .run();
       }
     },
     setLink() {
@@ -656,9 +672,12 @@ export default {
           }
           if (insertContent.length > 0) {
             self.editor.commands.insertContent([...insertContent]);
-            if(insertContent.at(-1).type!=='nkc-picture-inline'){
+            if (insertContent.at(-1).type !== 'nkc-picture-inline') {
               const { state } = self.editor;
-              self.editor.commands.setTextSelection({ from: state.selection.from + 1, to: state.selection.from + 1 }); // 设置光标位置
+              self.editor.commands.setTextSelection({
+                from: state.selection.from + 1,
+                to: state.selection.from + 1,
+              }); // 设置光标位置
               self.editor.commands.selectTextblockStart();
             }
             self.editor.commands.scrollIntoView();
@@ -768,7 +787,13 @@ export default {
     appMenuClick(type) {
       switch (type) {
         case 'terminal': {
-          this.editor.chain().focus().toggleCodeBlock().run();
+          this.editor
+            .chain()
+            .focus()
+            .toggleCodeBlock({
+              language: 'text',
+            })
+            .run();
           return;
         }
         case 'resource': {
@@ -792,19 +817,22 @@ export default {
           return;
         }
         case 'table': {
-          this.$refs.tableEditor.open((res) => {
-            this.editor
-              .chain()
-              .focus()
-              .insertTable({
-                rows: res.row,
-                cols: res.col,
-                withHeaderRow: false,
-              })
-              .run();
-          }, {
-            mode: 'fast'
-          });
+          this.$refs.tableEditor.open(
+            (res) => {
+              this.editor
+                .chain()
+                .focus()
+                .insertTable({
+                  rows: res.row,
+                  cols: res.col,
+                  withHeaderRow: false,
+                })
+                .run();
+            },
+            {
+              mode: 'fast',
+            },
+          );
           return;
         }
         case 'sticker': {
@@ -842,7 +870,7 @@ export default {
             try {
               content = JSON.parse(res.content);
             } catch (e) {
-              content = res.content
+              content = res.content;
             }
             this.editor.chain().focus().insertContent(content).run();
           });
@@ -850,13 +878,17 @@ export default {
         }
         case 'math': {
           this.$refs.mathSelector.open((res) => {
-            this.editor.chain().focus().insertContent({
-              type: 'nkc-math',
-              attrs: {
-                text: res.text,
-                block: res.block,
-              },
-            }).run();
+            this.editor
+              .chain()
+              .focus()
+              .insertContent({
+                type: 'nkc-math',
+                attrs: {
+                  text: res.text,
+                  block: res.block,
+                },
+              })
+              .run();
           });
           return;
         }
@@ -865,23 +897,27 @@ export default {
           return;
         }
         case 'xsfLimit': {
-          this.editor.chain().focus().insertContent({
-            type: 'nkc-xsf-limit',
-            attrs: {
-              xsf: 1,
-            },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: '学术分限制',
-                  },
-                ],
-              }
-            ]
-          }).run();
+          this.editor
+            .chain()
+            .focus()
+            .insertContent({
+              type: 'nkc-xsf-limit',
+              attrs: {
+                xsf: 1,
+              },
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: '学术分限制',
+                    },
+                  ],
+                },
+              ],
+            })
+            .run();
           return;
         }
         case 'hr': {
@@ -892,10 +928,10 @@ export default {
     },
     initNoticeEvent() {
       this.removeNoticeEvent();
-      this.noticeFunc = function(e) {
+      this.noticeFunc = function (e) {
         const info = '关闭页面会导致已输入的数据丢失，确定要继续？';
         e = e || window.event;
-        if(e) {
+        if (e) {
           e.returnValue = info;
         }
         return info;
@@ -903,10 +939,11 @@ export default {
       window.onbeforeunload = this.noticeFunc;
     },
     removeNoticeEvent() {
-      if(!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc) return;
+      if (!window.onbeforeunload || window.onbeforeunload !== this.noticeFunc)
+        return;
       window.onbeforeunload = null;
     },
-    clearContent(){
+    clearContent() {
       this.editor.commands.clearContent();
       this.updateTextLength();
     },
@@ -916,12 +953,12 @@ export default {
     this.removeNoticeEvent();
   },
 };
-</script> 
+</script>
 
 <style scoped lang="less">
-.tiptap-editor-subscript{
+.tiptap-editor-subscript {
   font-size: 1.3rem;
-  padding-top: 0!important;
+  padding-top: 0 !important;
 }
 .tiptap-editor-toolBar {
   display: flex;
@@ -942,7 +979,7 @@ export default {
     flex-wrap: wrap;
     width: 100%;
 
-    &>div {
+    & > div {
       cursor: pointer;
       padding-top: 5px;
       height: 2.6rem;
@@ -964,7 +1001,7 @@ export default {
       }
     }
 
-    &>select {
+    & > select {
       background-color: transparent;
       color: #777;
       cursor: pointer;
@@ -991,22 +1028,22 @@ export default {
     border-radius: 5px;
     font-size: 14px;
   }
-  .mask{
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 100%;
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: rgba(255,255,255,0.7);
-    }
+  .mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
 }
 
 .tiptap-editor-content {
-  padding: 0.5rem 1rem;
+  padding: 1rem 1rem;
   border: 1px solid #eee;
   border-top: none;
   border-radius: 0 0 5px 5px;
@@ -1048,7 +1085,7 @@ export default {
       position: relative;
       vertical-align: top;
 
-      >* {
+      > * {
         margin-bottom: 0;
       }
     }
@@ -1092,12 +1129,12 @@ export default {
         align-items: center;
         display: flex;
 
-        &>label {
+        & > label {
           margin: 0 0.5rem 0 0;
           user-select: none;
         }
 
-        &>div {
+        & > div {
           flex: 1 1 auto;
         }
       }
