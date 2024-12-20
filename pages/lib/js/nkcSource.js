@@ -9,6 +9,7 @@ import { copyTextToClipboard } from './clipboard';
 import { logger } from './logger';
 import { screenTopAlert } from './topAlert';
 import { fixLanguage, highlightLanguagesObject } from './highlight';
+import { renderNKCDocNumber } from '../../publicModules/nkcDocNumber/nkcDocNumber';
 
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -384,4 +385,5 @@ export function initNKCSource() {
   lazyLoadInit();
   renderCodeBlock();
   renderNKCURL();
+  renderNKCDocNumber();
 }
