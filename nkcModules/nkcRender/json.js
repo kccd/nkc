@@ -1,4 +1,5 @@
 const pug = require('pug');
+const htmlFilter = require('./htmlFilter');
 const {
   highlightLanguages,
   highlightLanguagesObject,
@@ -93,7 +94,7 @@ function renderHTMLByJSON({
 
   html = replaceEmojiWithImgTags(html);
   // 对于复选框以及其他内容暂时不支持直接过滤
-  // html = htmlFilter(html);
+  html = htmlFilter(html);
   return html;
 }
 

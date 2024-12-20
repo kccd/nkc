@@ -3880,6 +3880,25 @@ span[data-tag="nkcsource"][data-type="video-not-found"]>span{
   height: 100%;
 }
 
+[data-tag="nkcsource"][data-type="table"] {
+  th{
+    background-color: rgba(61, 37, 20, 0.05);
+  }
+}
+[data-tag="nkcsource"][data-type="task"] {
+  list-style-type: none;
+  padding-left: 0;
+  li{
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    label{
+      margin: 0 0.5rem 0 0;
+    }
+  }
+}
 
 /*文章中的图片 新*/
 
@@ -3889,6 +3908,7 @@ span[data-tag="nkcsource"][data-type="picture"]{
   vertical-align: text-bottom;
   max-width: 100%;
   font-size: 0;
+  margin-bottom: 0.5rem;
 }
 span[data-tag="nkcsource"][data-type="picture"]>span{
   width: 100%;
@@ -4089,69 +4109,6 @@ span[data-tag="nkcsource"][data-type="audio"]{
 .nkcsource-video-title {
   /*font-style: oblique;*/
 }
-
-/* 文章中的附件 旧*/
-.article-attachment{
-  display: inline-block;
-  padding: 0.5rem;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
-  border-radius: 2px;
-  border: 1px solid #d6d6d6;
-  background: #fff;
-}
-.article-attachment-icon{
-  display: table-cell;
-  vertical-align: top;
-  width: 3.3rem;
-}
-.attachment-disabled{
-  background-color: #ccc;
-  color: #919191;
-}
-.article-attachment-icon img{
-  width: 3.3rem;
-  max-width: none;
-  height: 3.3rem;
-}
-.article-attachment-content{
-  padding-left: 0.5rem;
-  vertical-align: top;
-  width: 30rem;
-  max-width: 100%;
-  display: table-cell;
-}
-.article-attachment-name:hover, .article-attachment-name:focus{
-  color: #2b90d9;
-}
-.article-attachment-name{
-  display: block;
-  height: 1.8rem;
-  font-size: 1.3rem;
-  color: #2b90d9;
-  font-weight: 700;
-  word-break: break-all;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
-.article-attachment-info>div{
-  display: inline-block;
-  font-size: 1.15rem;
-  margin-right: 0.5rem;
-}
-.article-attachment-size{
-  color: #e85a71;
-  font-weight: 700;
-}
-.article-attachment-ext{
-  color: #e85a71;
-  font-weight: 700;
-}
-.article-attachment-reader{
-  color: #2b90d9;
-  font-weight: 700;
-}
 /* 文章中的附件 新*/
 span[data-tag="nkcsource"][data-type="attachment-disabled"]{
   display: block;
@@ -4208,20 +4165,17 @@ span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-name{
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-info>span{
   display: inline-block;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   margin-right: 0.5rem;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-size{
   color: #e85a71;
-  font-weight: 700;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-ext{
   color: #e85a71;
-  font-weight: 700;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-reader{
   color: #2b90d9;
-  font-weight: 700;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-name[data-type='downloadPanel'] {
   cursor: pointer;

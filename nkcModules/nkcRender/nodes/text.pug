@@ -46,10 +46,10 @@ mixin renderText(node)
             isCode = true;
             break;  
           case 'subscript':
-            style += 'vertical-align: sub;';
+            style += 'vertical-align: sub;font-size:75%;';
             break;
           case 'superscript':
-            style += 'vertical-align: super;';
+            style += 'vertical-align: super;font-size:75%;';
             break;
           default:
             console.log(`Unknown mark type: ${mark.type}`);
