@@ -1,67 +1,73 @@
-window.moveThread = function(pid) {
-  if(!window.MoveThread) {
+import { initNKCSource } from '../../lib/js/nkcSource';
+window.$(function () {
+  initNKCSource();
+});
+window.moveThread = function (pid) {
+  if (!window.MoveThread) {
     window.MoveThread = new NKC.modules.MoveThread();
   }
   const postData = NKC.methods.getDataById(`data_${pid}`);
-  window.MoveThread.open(function(data) {
-    var forums = data.forums;
-    var moveType = data.moveType;
-    const threadCategoriesId = data.threadCategoriesId;
-    MoveThread.lock();
-    nkcAPI("/threads/move", "POST", {
-      forums: forums,
-      moveType: moveType,
-      threadCategoriesId,
-      threadsId: [postData.tid]
-    })
-      .then(function() {
-        screenTopAlert("操作成功");
-        MoveThread.close();
+  window.MoveThread.open(
+    function (data) {
+      var forums = data.forums;
+      var moveType = data.moveType;
+      const threadCategoriesId = data.threadCategoriesId;
+      MoveThread.lock();
+      nkcAPI('/threads/move', 'POST', {
+        forums: forums,
+        moveType: moveType,
+        threadCategoriesId,
+        threadsId: [postData.tid],
       })
-      .catch(function(data) {
-        sweetError(data);
-        MoveThread.unlock();
-      })
-  }, {
-    selectedCategoriesId: postData.categoriesId,
-    selectedForumsId: postData.mainForumsId,
-    selectedThreadCategoriesId: postData.tcId
-  })
-}
+        .then(function () {
+          screenTopAlert('操作成功');
+          MoveThread.close();
+        })
+        .catch(function (data) {
+          sweetError(data);
+          MoveThread.unlock();
+        });
+    },
+    {
+      selectedCategoriesId: postData.categoriesId,
+      selectedForumsId: postData.mainForumsId,
+      selectedThreadCategoriesId: postData.tcId,
+    },
+  );
+};
 
-
-window.deleteThread = function(pid) {
-  if(!window.DisabledPost) {
+window.deleteThread = function (pid) {
+  if (!window.DisabledPost) {
     window.DisabledPost = new NKC.modules.DisabledPost();
   }
-  window.DisabledPost.open(function(data) {
+  window.DisabledPost.open(function (data) {
     var type = data.type;
     var reason = data.reason;
     var remindUser = data.remindUser;
     var violation = data.violation;
-    var url, method = "POST";
+    var url,
+      method = 'POST';
     var body = {
       postsId: [pid],
       reason: reason,
       remindUser: remindUser,
-      violation: violation
+      violation: violation,
     };
-    if(type === "toDraft") {
-      url = "/threads/draft";
+    if (type === 'toDraft') {
+      url = '/threads/draft';
     } else {
-      url = "/threads/recycle";
+      url = '/threads/recycle';
     }
     DisabledPost.lock();
     nkcAPI(url, method, body)
-      .then(function() {
-        screenTopAlert("操作成功");
+      .then(function () {
+        screenTopAlert('操作成功');
         DisabledPost.close();
         DisabledPost.unlock();
       })
-      .catch(function(data) {
+      .catch(function (data) {
         sweetError(data);
         DisabledPost.unlock();
-      })
+      });
   });
-
-}
+};

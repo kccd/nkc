@@ -616,28 +616,11 @@ block content
       include ../publicModules/toColumn/toColumn
 
 block scripts
-  //include ../publicModules/plyr/plyr.js.pug
-  +includeJS('/commonmark/dist/commonmark.js', true)
-  +includeJS('/plainEscaper.js', true)
-  +includeJS('/xbbcode-parser/xbbcode.js', true)
   +includeJS('/xss/dist/xss.js', true)
-
   +includeJS("/interface_editor_reply.js")
-  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
-  +includeJS('/shop/shop.js')
   +includeJS("/publicModules/survey/form.js")
-  include ../publicModules/nkcSource
-  //include ../publicModules/selectResource/selectResource
-  //include ../publicModules/sticker/selectSticker
-  //include ../publicModules/selectDraft/selectDraft
-  //include ../publicModules/floatForumPanel/floatForumPanel
-  //include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-  //include ../publicModules/insertHideContent/insertHideContent
-  //-include ../publicModules/highlight/highlight_editor
-  //include ../publicModules/highlight/highlight
-  //include ../publicModules/complaint/complaintBox
+  //include ../publicModules/nkcSource
   include ../publicModules/subscribeTypes/subscribeTypes
-  include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../publicModules/hidePost/hidePost
   include ../publicModules/moveThread/moveThread
@@ -645,17 +628,14 @@ block scripts
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/bulletComments/bulletComments
   include ../publicModules/commentControl/commentControl
-  //include ../publicModules/replaceNKCRender
   include ../post/options/options
   include ../publicModules/commonModal/commonModal
-  //- 违规记录模块 NKC.modules.violationRecord
 
   if data.permissions.violationRecord
     include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug
   if data.permissions.viewNote
     include ../publicModules/NKCHighlighter/NKCHighlighter
-  //- include ../publicModules/postNotes/postNotes
   if data.attachmentsCount > 0
     include ../publicModules/resourceInfo/resourceInfo
     include ../publicModules/attachments/attachments_js
@@ -673,6 +653,5 @@ block scripts
   +includeJS("/thread/comments.js")
   if data.permissions.getPostAuthor
     include ../publicModules/floatUserPanel/userInfo
-  //include ../publicModules/imageViewer
   +includeJS("/thread/index.js")
   +includeJS("/thread/deletePost.js")

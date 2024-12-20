@@ -2,6 +2,8 @@ import { getCommentEditorConfigs } from '../../lib/js/editor';
 import Editor from '../../lib/vue/Editor';
 import { toLogin } from '../../lib/js/account';
 import { lazyLoadInit } from '../../lib/js/lazyLoad';
+import { initNKCSource } from '../../lib/js/nkcSource';
+
 const NKC = window.NKC;
 var _id;
 class SinglePostModule {
@@ -259,10 +261,11 @@ class SinglePostModule {
   }
   initNKCSource() {
     NKC.methods.initPostOption();
-    NKC.methods.replaceNKCUrl();
+    initNKCSource();
+    /*NKC.methods.replaceNKCUrl();
     NKC.methods.initVideo();
     NKC.methods.renderFormula();
-    lazyLoadInit();
+    lazyLoadInit();*/
   }
   // 移除所有评论框和定时事件
   removeAllEditorApp(pid) {
@@ -364,7 +367,7 @@ class SinglePostModule {
           `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="waiting" :l="l" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
-          `<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
+          `<div class="single-comment-prompt m-b-05">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
         );
         const buttonDom = $(
           `<div class="single-comment-button" data-type="${pid}"></div>`,

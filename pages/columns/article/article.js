@@ -1,34 +1,35 @@
 // import AuthorCommunication from '../lib/vue/AuthorCommunication.vue'
 // Object.assign(window, {showSetUp, displayAuthor})
-import {getDataById} from "../../lib/js/dataConversion";
+import { getDataById } from '../../lib/js/dataConversion';
 const data = getDataById('data');
-import {nkcAPI} from "../../lib/js/netAPI";
+import { nkcAPI } from '../../lib/js/netAPI';
+
 let author = {};
-$(document).ready(function(){
-  author.dom = $("#moduleAuthor");
-  new Promise(function(resolve, reject) {
-    if(NKC.configs.isApp) {
-      setTimeout(function() {
+$(document).ready(function () {
+  author.dom = $('#moduleAuthor');
+  new Promise(function (resolve, reject) {
+    if (NKC.configs.isApp) {
+      setTimeout(function () {
         resolve();
-      }, 300)
+      }, 300);
     } else {
       resolve();
     }
   })
-    .then(function() {
-      if(NKC.methods.autoHideCommentContent) {
+    .then(function () {
+      if (NKC.methods.autoHideCommentContent) {
         // 内容折叠
         NKC.methods.autoHideCommentContent();
       }
     })
-    .catch(function(data) {
+    .catch(function (data) {
       console.error(data);
     });
-})
+});
 const article = data.article;
 function deleteArticle() {
-  const {document} = article;
-  const {_id} = document;
+  const { document } = article;
+  const { _id } = document;
   NKC.methods.disabledDocuments(_id);
 }
 // function displayAuthor(contractStr) {
@@ -40,23 +41,25 @@ function deleteArticle() {
 // }
 //文章审核通过
 function reviewArticle() {
-  const {document} = article;
-  const {_id} = document;
-  if(!_id) return sweetError('未找到文章，请刷新后重试');
+  const { document } = article;
+  const { _id } = document;
+  if (!_id) {
+    return sweetError('未找到文章，请刷新后重试');
+  }
   nkcAPI('/review', 'PUT', {
     pass: true,
     docId: _id,
-    type: 'document'
+    type: 'document',
   })
-    .then(res => {
+    .then((res) => {
       sweetSuccess('操作成功');
       setTimeout(() => {
         window.location.reload();
       }, 500);
     })
-    .catch(err => {
+    .catch((err) => {
       sweetError(err);
-    })
+    });
 }
 
 //禁用或删除
@@ -66,31 +69,32 @@ function disabledArticles() {
 
 //文章解封
 function unblock() {
-  const {document, _id} = article;
-  if(!_id) return;
-  nkcAPI(`/article/${_id}/unblock`, 'POST', {
-  })
-    .then(res => {
+  const { document, _id } = article;
+  if (!_id) {
+    return;
+  }
+  nkcAPI(`/article/${_id}/unblock`, 'POST', {})
+    .then((res) => {
       screenTopAlert('已解除屏蔽');
     })
-    .catch(err => {
+    .catch((err) => {
       sweetError(err);
-    })
+    });
 }
 
 //收藏文章
 function collectArticle() {
-  const {_id} = article;
-  const {collected} = data;
+  const { _id } = article;
+  const { collected } = data;
   SubscribeTypes.collectionArticle(_id, !collected);
 }
 //收藏论坛文章
 function collectThread() {
-  const {tid} = article;
-  const {collected} = data;
+  const { tid } = article;
+  const { collected } = data;
   SubscribeTypes.collectionThreadPromise(tid, !collected)
     .then(() => {
-      if(collected) {
+      if (collected) {
         sweetSuccess(`已取消收藏`);
       } else {
         sweetSuccess(`已加入收藏`);
@@ -101,23 +105,23 @@ function collectThread() {
 
 //首页顶置
 function homeTop(type) {
-  const {_id} = article;
-  nkcAPI(`/article/${_id}/homeTop`, 'POST' , {
-    type
+  const { _id } = article;
+  nkcAPI(`/article/${_id}/homeTop`, 'POST', {
+    type,
   })
     .then(() => {
       window.location.reload();
     })
     .catch((data) => {
       screenTopWarning(data.error || data);
-    })
+    });
 }
 
 //取消首页顶置
 function unHomeTop(type) {
-  const {_id} = article;
+  const { _id } = article;
   let url = `/article/${_id}/homeTop`;
-  if(type) {
+  if (type) {
     url += `?type=${type}`;
   }
   nkcAPI(url, 'DELETE', {})
@@ -126,7 +130,7 @@ function unHomeTop(type) {
     })
     .catch((data) => {
       screenTopWarning(data.error || data);
-    })
+    });
 }
 
 function toUrl(url) {
@@ -143,4 +147,4 @@ Object.assign(window, {
   toUrl,
   homeTop,
   unHomeTop,
-})
+});

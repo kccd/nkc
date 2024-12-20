@@ -1,3 +1,9 @@
+import { initNKCSource } from '../../lib/js/nkcSource';
+
+$(function () {
+  initNKCSource();
+});
+
 window.deleteArticle = function (_id) {
   if (!window.DisabledPost) {
     window.DisabledPost = new NKC.modules.DisabledPost();
