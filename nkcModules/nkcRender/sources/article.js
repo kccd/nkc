@@ -208,24 +208,17 @@ module.exports = {
     const originCode = $('code');
     const newCode = $('<code></code>');
     const originPre = $('pre').eq(0);
-    let language = originPre.attr('data-id') || 'other';
-    let languageClass = '';
+    const language = originPre.attr('data-id') || 'other';
     if (originCode.length === 0) {
       newCode.text(originPre.text());
     } else if (originCode.length > 1) {
       let text = '';
       for (let i = 0; i < originCode.length; i++) {
-        const originCodeItem = originCode.eq(i);
-        text += originCodeItem.text();
+        text += originCode.eq(i).text();
       }
       newCode.text(text);
-      languageClass = originCode.eq(0).attr('class');
     } else {
       newCode.text(originCode.eq(0).text());
-      languageClass = originCode.eq(0).attr('class');
-    }
-    if (languageClass) {
-      language = languageClass.split('-')[1] || language;
     }
     const pre = $('<pre data-tag="nkcsource" data-type="pre"></pre>');
     pre.attr('data-id', language);

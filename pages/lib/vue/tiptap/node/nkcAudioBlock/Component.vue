@@ -17,13 +17,13 @@
 </template>
 
 <script>
-import { nodeViewProps, NodeViewWrapper } from "@tiptap/vue-2";
-import { nkcAPI } from "../../../../js/netAPI";
+import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
+import { nkcAPI } from '../../../../js/netAPI';
 
-import "../../../../../../public/external_pkgs/plyr/plyr.css";
-import "../../../../../../public/external_pkgs/plyr/plyr.polyfilled.min.js";
-import Plyr from "../../../../../../public/external_pkgs/plyr/plyr.min.js";
-import { getSize } from "../../../../js/tools";
+import '../../../../../../public/external_pkgs/plyr/plyr.css';
+import '../../../../../../public/external_pkgs/plyr/plyr.polyfilled.min.js';
+import Plyr from '../../../../../../public/external_pkgs/plyr/plyr.min.js';
+import { getSize } from '../../../../js/tools';
 export default {
   props: nodeViewProps,
   components: {
@@ -33,37 +33,48 @@ export default {
     player: null,
     isFocused: false,
   }),
-  computed: {
-  },
-  watch: {
-  },
+  computed: {},
+  watch: {},
   mounted() {
     this.player = new Plyr(this.$refs.audioDom, {
       ratio: '4:3',
       title: this.node.attrs.name,
-      controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'pip', 'airplay', 'fullscreen'],
+      controls: [
+        'play-large',
+        'play',
+        'progress',
+        'current-time',
+        'mute',
+        'volume',
+        'captions',
+        'pip',
+        'airplay',
+        'fullscreen',
+      ],
       settings: ['quality'],
       quality: { default: 480, options: [1080, 720, 480] },
-      blankVideo: "/external_pkgs/plyr/blank.mp4",
+      blankVideo: '/external_pkgs/plyr/blank.mp4',
       autopause: true,
     });
   },
   methods: {
     getSize,
   },
-}
+};
 </script>
 
 <style scoped lang="less">
 .audio-view-wrapper {
-  padding: 1rem 0;
+  padding: 0;
+  margin-bottom: 0.5rem;
   text-align: center;
+  max-width: 414px;
   .audio-box {
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
     border-radius: 2px;
     border: 1px solid #d6d6d6;
     background: #fff;
-    width: 100%;
+    max-width: 414px;
     .audio-title {
       display: block;
       color: #000;

@@ -1,4 +1,4 @@
 mixin renderTable(node)
-  .table-responsive
+  .table-responsive(data-tag="nkcsource" data-type='table')
     table.table.table-bordered
       +loopRender(node.content)

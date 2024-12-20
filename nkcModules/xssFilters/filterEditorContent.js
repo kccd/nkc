@@ -5,7 +5,7 @@ const defaultWL = Object.assign({}, xss.whiteList);
 defaultWL.font = ['color'];
 defaultWL.code = ['class'];
 defaultWL.p = ['align', 'style'];
-defaultWL.table = ['border', 'width', 'cellpadding', 'cellspacing'];
+defaultWL.table = ['border', 'width', 'cellpadding', 'cellspacing', 'class'];
 defaultWL.tbody = [];
 defaultWL.tr = [];
 defaultWL.th = ['width'];
@@ -19,6 +19,7 @@ defaultWL.annotation = ['encoding'];
 defaultWL.iframe = [];
 defaultWL.embed = [];
 defaultWL.section = ['data-tag', 'data-type', 'data-id', 'data-message'];
+defaultWL.ul = ['data-tag', 'data-type'];
 defaultWL.img = [
   'src',
   'alt',

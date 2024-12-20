@@ -5,27 +5,16 @@
         <img :src="getUrl('fileCover', ext)" alt="attachment icon" />
       </span>
       <span class="file-attachment-content">
-        <span class="file-attachment-name" :title="name">{{
-          name
-        }}</span>
+        <span class="file-attachment-name" :title="name">{{ name }}</span>
         <span>
-          <span class="file-attachment-size">{{
-            getSize(size)
-          }}</span>
-          <span class="file-attachment-ext">{{
-            ext.toUpperCase()
-          }}</span>
+          <span class="file-attachment-size">{{ getSize(size) }}</span>
+          <span class="file-attachment-ext">{{ ext.toUpperCase() }}</span>
           <!-- <span 
             >{{ hits }}次下载</span
           > -->
-          <span
-            class="file-attachment-reader"
-            v-if="ext === 'pdf'"
-          >
+          <span class="file-attachment-reader" v-if="ext === 'pdf'">
             <a
-              :href="`/reader/pdf/web/viewer?file=%2fr%2f${
-                id
-              }?time%3D${Date.now()}`"
+              :href="`/reader/pdf/web/viewer?file=%2fr%2f${id}?time%3D${Date.now()}`"
               target="_blank"
               >预览</a
             >
@@ -41,9 +30,9 @@
 </template>
 
 <script>
-import { nodeViewProps, NodeViewWrapper } from "@tiptap/vue-2";
-import { nkcAPI } from "../../../../js/netAPI";
-import { getSize, getUrl } from "../../../../js/tools";
+import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
+import { nkcAPI } from '../../../../js/netAPI';
+import { getSize, getUrl } from '../../../../js/tools';
 export default {
   props: nodeViewProps,
   components: {
@@ -58,12 +47,12 @@ export default {
   computed: {
     id() {
       return this.node.attrs.id;
-    }
+    },
   },
   watch: {
     id() {
       this.getAttachmentInfo();
-    }
+    },
   },
   mounted() {
     this.getAttachmentInfo();
@@ -73,18 +62,18 @@ export default {
     getUrl,
     getAttachmentInfo() {
       const self = this;
-      if(!this.node.attrs.id) return;
+      if (!this.node.attrs.id) return;
       nkcAPI(`/rs?rid=${this.node.attrs.id}`, 'GET')
-        .then(res => {
-          const { oname,size,ext}=res.resources[0];
+        .then((res) => {
+          const { oname, size, ext } = res.resources[0];
           self.name = oname;
           self.size = size;
           self.ext = ext;
         })
         .catch(console.error);
-    }
+    },
   },
-}
+};
 </script>
 
 <style scoped lang="less">
@@ -133,15 +122,15 @@ export default {
       }
       .file-attachment-size {
         color: #e85a71;
-        font-weight: 700;
+        font-size: 1.1rem;
       }
       .file-attachment-ext {
         color: #e85a71;
-        font-weight: 700;
+        font-size: 1.1rem;
       }
       .file-attachment-reader {
         color: #2b90d9;
-        font-weight: 700;
+        font-size: 1.1rem;
       }
     }
   }
