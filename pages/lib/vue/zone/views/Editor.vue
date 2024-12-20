@@ -25,7 +25,7 @@ export default {
       return this.$route.query.id || '';
     },
     isEditMoment() {
-      return !!this.editMomentUrl;
+      return !!this.queryMomentId;
     },
   },
 };
