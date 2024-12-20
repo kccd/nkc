@@ -37,9 +37,11 @@ export function renderNKCDocNumber() {
         const end = start + match[0].length; // 匹配字符的结束位置
         const p1 = match[1];
         const link = /^D(\d+)$/.test(p1)
-          ? `/document/d/${p1.replace(/^D/, '')}`
-          : `/p/${p1}?redirect=true`;
-
+          ? NKC.methods.tools.getUrl('documentNumber', p1.replace(/^D/, ''))
+          : NKC.methods.tools.getUrl('threadNumber', p1);
+        // const link = /^D(\d+)$/.test(p1)
+        //   ? `/document/d/${p1.replace(/^D/, '')}`
+        //   : `/p/${p1}?redirect=true`;
         tempArray.push({
           start,
           end,

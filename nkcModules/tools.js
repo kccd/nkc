@@ -295,6 +295,12 @@ var Tools = function () {
       case 'questionImage': {
         return '/exam/question/' + id + '/image';
       }
+      case 'threadNumber': {
+        return '/p/' + id + '?redirect=true';
+      }
+      case 'documentNumber': {
+        return '/document/d/' + id;
+      }
     }
   };
   self.getAnonymousInfo = function () {
