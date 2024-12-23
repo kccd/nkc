@@ -7,6 +7,14 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  getZoneMomentComments: 'getZoneMomentComments',
+  deleteZoneMomentComment: 'deleteZoneMomentComment',
+  zoneMomentCommentVote: 'zoneMomentCommentVote',
+  getZoneMomentCommentOptions: 'getZoneMomentCommentOptions',
+
+  zoneMomentVote: 'zoneMomentVote',
+  visitZoneSingleMoment: 'visitZoneSingleMoment',
+  visitZoneArticle: 'visitZoneArticle',
   getServerInfo: 'getServerInfo',
   getAccountInfo: 'getAccountInfo',
   getAccountCard: 'getAccountCard',
@@ -768,15 +776,7 @@ const DynamicOperations = {
   getCommentIpInfo: 'getCommentIpInfo',
   digestComment: 'digestComment',
   unDigestComment: 'unDigestComment',
-  visitZoneArticle: 'visitZoneArticle',
   manageZoneArticleCategory: 'manageZoneArticleCategory',
-  visitZoneSingleMoment: 'visitZoneSingleMoment',
-  zoneMomentVote: 'zoneMomentVote',
-  getZoneMomentOption: 'getZoneMomentOption',
-  getZoneMomentComments: 'getZoneMomentComments',
-  deleteZoneMomentComment: 'deleteZoneMomentComment',
-  zoneMomentCommentVote: 'zoneMomentCommentVote',
-  getZoneMomentCommentOptions: 'getZoneMomentCommentOptions',
   deleteArticle: 'deleteArticle',
   getArticleOptions: 'getArticleOptions',
   unblockArticle: 'unblockArticle',

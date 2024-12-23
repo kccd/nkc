@@ -2,7 +2,7 @@ const router = require('koa-router')();
 const {
   questionTagService,
 } = require('../../../../services/exam/questionTag.service');
-const { OnlyPermission } = require('../../../../middlewares/permission');
+const { OnlyOperation } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations.js');
 const { DynamicOperations } = require('../../../../settings/operations');
 router
@@ -18,7 +18,7 @@ router
   })
   .post(
     '/',
-    OnlyPermission(Operations.createQuestionTags),
+    OnlyOperation(Operations.createQuestionTags),
     async (ctx, next) => {
       const { body } = ctx;
       const { name, desc } = body.tag;

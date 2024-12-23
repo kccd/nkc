@@ -2,7 +2,8 @@ const router = require('koa-router')();
 const {
   blacklistCheckerService,
 } = require('../../../services/blacklist/blacklistChecker.service');
-router.post('/', async (ctx, next) => {
+const { OnlyUser } = require('../../../middlewares/permission');
+router.post('/', OnlyUser(), async (ctx, next) => {
   const { body, internalData, data, db, state, nkcModules } = ctx;
   const lock = await nkcModules.redLock.redLock.lock('momentVote', 6000);
   try {

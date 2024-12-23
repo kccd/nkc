@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const { Public } = require('../../../middlewares/permission');
 const commentRouter = require('./comments');
 const repostRouter = require('./repost');
 const voteRouter = require('./vote');
@@ -7,7 +8,7 @@ const {
   momentCheckerService,
 } = require('../../../services/moment/momentChecker.service');
 router
-  .use('/:mid', async (ctx, next) => {
+  .use('/:mid', Public(), async (ctx, next) => {
     const { internalData, db, params, state, permission } = ctx;
     const { mid } = params;
     internalData.moment = await db.MomentModel.findOne({ _id: mid });
@@ -21,7 +22,7 @@ router
     );
     await next();
   })
-  .get('/:mid', async (ctx, next) => {
+  .get('/:mid', Public(), async (ctx, next) => {
     const { data } = ctx;
     data.currentPage = 'MomentDetail';
     ctx.remoteTemplate = 'zone/zone.pug';

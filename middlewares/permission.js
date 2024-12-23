@@ -75,7 +75,7 @@ function OnlyBannedUser() {
   };
 }
 
-/*function OnlyCurrentPermission() {
+/*function OnlyCurrentOperation() {
   return async (ctx, next) => {
     const operationId = ctx.data.operationId;
     if (!ctx.data.userOperationsId.includes(operationId)) {
@@ -85,11 +85,11 @@ function OnlyBannedUser() {
   };
 }*/
 
-function OnlyPermission(operation) {
-  return OnlyPermissionsAnd([operation]);
+function OnlyOperation(operation) {
+  return OnlyOperationsAnd([operation]);
 }
 
-function OnlyPermissionsOr(operations) {
+function OnlyOperationsOr(operations) {
   return async (ctx, next) => {
     for (const operation of operations) {
       if (ctx.data.userOperationsId.includes(operation)) {
@@ -100,7 +100,7 @@ function OnlyPermissionsOr(operations) {
   };
 }
 
-function OnlyPermissionsAnd(operations) {
+function OnlyOperationsAnd(operations) {
   return async (ctx, next) => {
     for (const operation of operations) {
       if (!ctx.data.userOperationsId.includes(operation)) {
@@ -124,8 +124,8 @@ module.exports = {
   OnlyBannedUser,
   OnlyCert,
   OnlyUnbannedUser,
-  OnlyPermission,
-  OnlyPermissionsAnd,
-  OnlyPermissionsOr,
+  OnlyOperation,
+  OnlyOperationsAnd,
+  OnlyOperationsOr,
   Public,
 };
