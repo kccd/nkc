@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const {mkdirSync} = fs;
+const { mkdirSync } = fs;
 const paths = {
   uploadDir: 'tmp',
   resourcesPath: 'resources',
@@ -15,24 +15,30 @@ const paths = {
   posterPath: 'resources/poster',
   questionImagePath: 'resources/question_image',
   shopCertsPath: 'resources/shop_certs',
-  toolsPath: "resources/tools",
-  watermark: "resources/watermark",
-  watermarkCache: "resources/watermarkCache",
-  logoPath: "resources/logo"
+  toolsPath: 'resources/tools',
+  watermark: 'resources/watermark',
+  watermarkCache: 'resources/watermarkCache',
+  logoPath: 'resources/logo',
 };
+for (const item in paths) {
+  const dirPath = path.resolve(__dirname, `../${paths[item]}`);
+  fs.mkdirSync(dirPath, { recursive: true });
+}
 const pathsObj = {};
-for(const key in paths) {
-  if(!paths.hasOwnProperty(key)) continue;
-  pathsObj[key] = path.resolve(__dirname, "../" + paths[key]);
+for (const key in paths) {
+  if (!paths.hasOwnProperty(key)) {
+    continue;
+  }
+  pathsObj[key] = path.resolve(__dirname, '../' + paths[key]);
 }
 
 function extGetPath(ext) {
-  var originPath = "tmp/temporary.";
+  var originPath = 'tmp/temporary.';
   return path.resolve(originPath + ext);
 }
 
 function initFolders() {
-  for(const key in pathsObj) {
+  for (const key in pathsObj) {
     const realPath = pathsObj[key];
     try {
       fs.accessSync(realPath);
@@ -50,23 +56,26 @@ function generateFolderName(basePath) {
 
   try {
     mkdirSync(basePath);
-  } catch(e) {
-    if(e.code !== 'EEXIST')
-      throw e
+  } catch (e) {
+    if (e.code !== 'EEXIST') {
+      throw e;
+    }
   }
 
   try {
     mkdirSync(basePath + year);
-  } catch(e) {
-    if(e.code !== 'EEXIST')
-      throw e
+  } catch (e) {
+    if (e.code !== 'EEXIST') {
+      throw e;
+    }
   }
 
   try {
     mkdirSync(basePath + full);
-  } catch(e) {
-    if(e.code !== 'EEXIST')
-      throw e
+  } catch (e) {
+    if (e.code !== 'EEXIST') {
+      throw e;
+    }
   }
   return full;
 }
@@ -79,61 +88,61 @@ const uploadSettings = {
     multipart: true,
     formidable: {
       maxFields: 20,
-	    maxFileSize: 4 * 1024 * 1024 * 1024,
+      maxFileSize: 4 * 1024 * 1024 * 1024,
       uploadDir: pathsObj.uploadDir,
       hash: 'md5',
-      keepExtensions: true
-    }
+      keepExtensions: true,
+    },
   },
   sizeLimit: {
     largeImage: 1024 * 1024,
     attachment: {
       height: 16384,
-      width: 1920
+      width: 1920,
     },
     banner: {
       width: 1050,
-      height: 260
+      height: 260,
     },
-	  photo: 20*1024*1024, // 证件照上传不能超过20M
-	  photoSmall: {
-    	width: 350,
-		  height: 230
-	  },
-	  fundBanner: {
-    	width: 1370,
-		  height: 189
-	  },
-	  fundBannerSmall: {
-    	width: 320,
-		  height: 144
-	  },
+    photo: 20 * 1024 * 1024, // 证件照上传不能超过20M
+    photoSmall: {
+      width: 350,
+      height: 230,
+    },
+    fundBanner: {
+      width: 1370,
+      height: 189,
+    },
+    fundBannerSmall: {
+      width: 320,
+      height: 144,
+    },
     cover: {
       width: 640,
-      height: 480
+      height: 480,
     },
-	  lifePhoto: {
-    	width: 1920
-	  },
+    lifePhoto: {
+      width: 1920,
+    },
     messageImageSM: {
       width: 300,
-      height: 200
-    }
+      height: 200,
+    },
   },
-	count: {
-  	lifePhoto: 1000 //生活照最多1000张
-	},
+  count: {
+    lifePhoto: 1000, //生活照最多1000张
+  },
   avatarSize: 192,
-	forumAvatarSize: 96,
+  forumAvatarSize: 96,
   avatarSmallSize: 48,
-	lifePhotoCount: 16,
-	certPhotoCount: 12,
-	webLogoSize: 250,
-	webSmallLogoSize: 50,
-	userBannerSize: {
-  	height: 400,
-		width: 800
-	}
+  lifePhotoCount: 16,
+  certPhotoCount: 12,
+  webLogoSize: 250,
+  webSmallLogoSize: 50,
+  userBannerSize: {
+    height: 400,
+    width: 800,
+  },
 };
 
 module.exports = Object.assign(uploadSettings, pathsObj);

@@ -3,6 +3,7 @@ const momentRouter = require('./moment');
 const nkcRender = require('../../nkcModules/nkcRender');
 const { subscribeSources } = require('../../settings/subscribe');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../../nkcModules/json');
 router
   .use('/', async (ctx, next) => {
     const { state, data, db, path, internalData } = ctx;
@@ -371,8 +372,8 @@ router
             type,
             from: '发表专栏文章',
             title,
-            content: nkcRender.htmlToPlain(
-              l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+            content: l === 'json' ? getJsonStringTextSlice(content ,200) : nkcRender.htmlToPlain(
+              content,
               200,
             ),
             url,
@@ -455,10 +456,10 @@ router
                   id: user.uid,
                 },
                 title: document.title,
-                content: nkcModules.nkcRender.htmlToPlain(
-                  document.l === 'json'
-                    ? renderHTMLByJSON({ json: document.content })
-                    : document.content,
+                content: document.l === 'json'
+                ? getJsonStringTextSlice(document.content ,200)
+                : nkcModules.nkcRender.htmlToPlain(
+                  document.content,
                   200,
                 ),
                 cover: nkcModules.tools.getUrl('postCover', document.cover),

@@ -10,6 +10,9 @@ module.exports = async (ctx, next) => {
     isApp: false,
     // app所在系统:  android, ios
     appOS: undefined,
+    // 版本号
+    appVersion: '0.0.0',
+    appVersionCode: 0,
     // app平台: apiCloud, reactNative
     platform: undefined,
     // ReactNative
@@ -37,21 +40,21 @@ module.exports = async (ctx, next) => {
   // 判断是否为APP发起的请求
   // apiCloud: NKC/APP/android
   // ReactNative: rn-android、rn-ios
-  let userAgent = ctx.header['user-agent'] || '';
-  let reg = /NKC\/APP\/(.+)/;
-  userAgent = reg.exec(userAgent);
+  // 例子 NKC/APP/rn-android/0.5.2-6
+  const userAgent = (ctx.header['user-agent'] || '').split('/');
   if (
-    userAgent !== null &&
-    ['rn-android', 'rn-ios', 'android'].includes(userAgent[1])
+    userAgent[0] === 'NKC' &&
+    userAgent[1] === 'APP' &&
+    ['rn-android', 'rn-ios', 'android'].includes(userAgent[2])
   ) {
-    const _userAgent = userAgent[1];
     ctx.state.isApp = true;
-    ctx.state.appOS = _userAgent.replace('rn-', '');
-    if (_userAgent === 'android') {
-      // 兼容apiCloud
-      ctx.state.platform = 'apiCloud';
-    } else {
-      ctx.state.platform = 'reactNative';
+    ctx.state.appOS = userAgent[2].replace('rn-', '');
+    ctx.state.platform =
+      userAgent[2] === 'android' ? 'apiCloud' : 'reactNative';
+    if (userAgent[3]) {
+      const [version, versionCode] = userAgent[3].split('-');
+      ctx.state.appVersion = version.trim();
+      ctx.state.appVersionCode = parseInt(versionCode);
     }
   }
   await next();

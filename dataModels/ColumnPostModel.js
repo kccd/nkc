@@ -1,6 +1,7 @@
 const mongoose = require('../settings/database');
 const { obtainPureText } = require('../nkcModules/apiFunction');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../nkcModules/json');
 const Schema = mongoose.Schema;
 const columnPostTypes = {
   post: 'post',
@@ -501,8 +502,7 @@ schema.statics.extendColumnPosts = async (options) => {
         p.post.user = usersObj[p.post.uid];
       }
       p.post = p.post.toObject();
-      p.post.c = obtainPureText(
-        p.post.l === 'json' ? renderHTMLByJSON({ json: p.post.c }) : p.post.c,
+      p.post.c = p.post.l === 'json' ? getJsonStringTextSlice(p.post.c,200) : obtainPureText( p.post.c,
         true,
         200,
       );
@@ -512,10 +512,10 @@ schema.statics.extendColumnPosts = async (options) => {
         continue;
       }
       p.article.user = usersObj[p.article.uid];
-      p.article.document.content = obtainPureText(
-        p.article.document.l === 'json'
-          ? renderHTMLByJSON({ json: p.article.document.content })
-          : p.article.document.content,
+      p.article.document.content =   p.article.document.l === 'json'
+      ? getJsonStringTextSlice(p.article.document.content,200)
+      :  obtainPureText(
+      p.article.document.content,
         true,
         200,
       );

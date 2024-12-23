@@ -6,7 +6,7 @@ const { ThrowCommonError } = require('../nkcModules/error');
 const esConfig = require('../config/elasticSearch');
 const cheerio = require('cheerio');
 const filterSearchContent = require('./xssFilters/filterSearchContent');
-const { renderHTMLByJSON } = require('./nkcRender/json');
+const { getJsonTextFilter } = require('./json');
 
 const { analyzer, searchAnalyzer, indexName } = esConfig;
 
@@ -242,6 +242,8 @@ func.save = async (docType, document) => {
     id = `article_${tid}`;
   } else if (docType === 'document_comment') {
     id = `comment_${tid}`;
+  } else if (docType === 'document_moment') {
+    id = `document_${tid}`;
   }
 
   return await client.index({
@@ -261,9 +263,10 @@ func.save = async (docType, document) => {
       mainForumsId,
       tcId,
       title: t,
-      content: apiFunction.obtainPureText(
-        l === 'json' ? renderHTMLByJSON({ json: c }) : c,
-      ),
+      content:
+        l === 'json'
+          ? getJsonTextFilter(c, ['nkc-xsf-limit'])
+          : apiFunction.obtainPureText(c),
       abstractCN: abstractCn,
       abstractEN: abstractEn,
       keywordsCN: keyWordsCn,
@@ -330,7 +333,11 @@ func.search = async (t, c, options) => {
     size = searchColumnList;
   } else if (t === 'resource') {
     size = searchResourceList;
-  } else if (t === 'document_article' || t === 'document_comment') {
+  } else if (
+    t === 'document_article' ||
+    t === 'document_comment' ||
+    t === 'document_moment'
+  ) {
     size = searchDocumentList;
   } else {
     size = searchAllList;
@@ -578,6 +585,39 @@ func.search = async (t, c, options) => {
                   ],
                 },
               },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: 'document_moment',
+                      },
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch(
+                            'tid',
+                            (() => {
+                              let targetKeyword = c.toUpperCase();
+                              if (
+                                targetKeyword.indexOf('D') === 0 &&
+                                targetKeyword.slice(1)
+                              ) {
+                                targetKeyword = targetKeyword.slice(1);
+                              }
+                              return targetKeyword;
+                            })(),
+                            5,
+                            relation,
+                          ),
+                          createMatch('content', c, 2, relation),
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
             ],
           },
         },
@@ -657,6 +697,12 @@ func.search = async (t, c, options) => {
     body.query.bool.must.push({
       match: {
         docType: 'document_comment',
+      },
+    });
+  } else if (t === 'document_moment') {
+    body.query.bool.must.push({
+      match: {
+        docType: 'document_moment',
       },
     });
   }

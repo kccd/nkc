@@ -357,9 +357,6 @@ block content
 
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
-  if data.type === "home"
-    include ../publicModules/nkcSource
-  //-include ../publicModules/toTop
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
   include ../publicModules/resourceInfo/resourceInfo
@@ -383,4 +380,3 @@ block scripts
   +includeJS("/publicModules/thread_panel/management.js")
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/floatForumPanel/floatForumPanel
-  include ../publicModules/nkcSource

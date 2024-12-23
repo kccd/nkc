@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice, getJsonStringText } = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const mongoose = require('../settings/database');
 const commentSource = {
@@ -513,8 +514,8 @@ schema.statics.extendPostComments = async (props) => {
       uid,
       toc,
       tlm,
-      content: htmlToPlain(
-        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+      content:l === 'json' ? getJsonStringTextSlice(content ,100) : htmlToPlain(
+        content,
         100,
       ),
       docId: _id,
@@ -662,8 +663,8 @@ schema.statics.extendSingleComment = async (comment) => {
       uid,
       toc,
       tlm,
-      content: htmlToPlain(
-        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+      content: l === 'json' ? getJsonStringTextSlice(content ,100) : htmlToPlain(
+         content,
         100,
       ),
       docId: _id,
@@ -866,8 +867,8 @@ schema.methods.extendEditorComment = async function () {
       uid,
       toc,
       tlm,
-      content: htmlToPlain(
-        l === 'json' ? renderHTMLByJSON({ json: content }) : content,
+      content: l === 'json' ? getJsonStringTextSlice(content ,100) : htmlToPlain(
+        content,
         100,
       ),
       docId: _id,
@@ -1293,10 +1294,10 @@ schema.statics.getCommentsInfo = async function (comments) {
       url,
       isAuthor: commentDocument.uid === articleDocument.uid,
       commentUrl,
-      content: nkcRender.htmlToPlain(
-        commentDocument.l === 'json'
-          ? renderHTMLByJSON({ json: commentDocument.content })
-          : commentDocument.content,
+      content: commentDocument.l === 'json'
+      ? getJsonStringText(commentDocument.content)
+      : nkcRender.htmlToPlain(
+         commentDocument.content,
       ),
       credits,
     });
@@ -1377,10 +1378,8 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       title: nkcRender.replaceLink(title),
       status,
       content: nkcRender.replaceLink(
-        nkcRender.htmlToPlain(
-          l === 'json'
-            ? renderHTMLByJSON({ json: articleContent })
-            : articleContent,
+        l === 'json' ? getJsonStringTextSlice(articleContent,200) : nkcRender.htmlToPlain(
+          articleContent,
           200,
         ),
       ),
@@ -1398,10 +1397,10 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       replyTime: timeFormat(commentDocument.toc),
       replyUrl: comment.commentUrl,
       replyContent: nkcRender.replaceLink(
-        nkcRender.htmlToPlain(
-          commentDocument.l === 'json'
-            ? renderHTMLByJSON({ json: commentContent })
-            : commentContent,
+        commentDocument.l === 'json'
+            ? getJsonStringTextSlice(commentContent ,200)
+            : nkcRender.htmlToPlain(
+          commentContent,
           200,
         ),
       ),

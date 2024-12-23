@@ -3,9 +3,9 @@
     .creation-nav-container
       creation-nav(@select="selectNavItem")
     //- .creation-nav-container-phone.standard-max-container(:class="{'creation-nav-container-isApp': isApp}")
-    .creation-nav-container-phone.standard-max-container(v-if = "isApp")
+    .creation-nav-container-phone.standard-max-container(v-if = "!isApp")
       creation-nav(@select="selectNavItem")
-    .creation-content-container
+    .creation-content-container(:style="isApp? 'padding-top: 1rem': ''")
       transition(:name="transitionName")
         home(v-if="showHome")
         router-view(v-if="isRouterAlive")
@@ -50,7 +50,7 @@ export default {
   created(){
     const { isApp } = getState();
     // 如果是app 不显示导航
-    this.isApp = !isApp;
+    this.isApp = !!isApp;
     this.isShowHome();
     setPageTitle('创作中心');
   },
@@ -63,7 +63,7 @@ export default {
       }
     },
     navToPage(page, url) {
-      if (!this.isApp) {
+      if (this.isApp) {
         visitUrl(url, true);
         return;
       }

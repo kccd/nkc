@@ -1,0 +1,27 @@
+block title
+  meta(charset="UTF-8")
+  meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+  title Video Player
+  link(rel="stylesheet", href="/plyr/dist/plyr.css")
+  script(src="/plyr/dist/plyr.min.js")
+  style.
+    body {
+      padding: 0;
+      margin: 0;
+      background-color: #000000;
+    }
+    .container{
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container .plyr{
+      height: 100%;
+      width: 100%;
+    }
+block content
+  #container.container
+block scripts
+  script(src=`/app/videoPlayer/videoPlayer.js?v=${remoteState.startTime}`)

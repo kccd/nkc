@@ -1,22 +1,27 @@
-const data = NKC.methods.getDataById('data');
+import { sweetError } from '../../lib/js/sweetAlert';
+import { nkcAPI } from '../../lib/js/netAPI';
+
+const data = window.NKC.methods.getDataById('data');
 const audio = new Audio();
 
-const {canSendMessage, warningContent} = data.statusOfSendingMessage || {
+const { canSendMessage, warningContent } = data.statusOfSendingMessage || {
   canSendMessage: false,
-  warningContent: ''
+  warningContent: '',
 };
 
 window.audio = audio;
 
-import {onWithdrawn, withdrawn} from '../message.2.0.js';
+import { onWithdrawn, withdrawn } from '../message.2.0.js';
 import {
   longPressImage,
-  RNGetKeyboardStatus, RNTakeAudioAndSendToUser, RNTakePictureAndSendToUser,
+  RNGetKeyboardStatus,
+  RNTakeAudioAndSendToUser,
+  RNTakePictureAndSendToUser,
   RNTakeVideoAndSendToUser,
   RNToast,
-  RNViewImage
+  RNViewImage,
 } from '../../lib/js/reactNative';
-Vue.directive('long-press', {
+window.Vue.directive('long-press', {
   bind(el, binding) {
     if (typeof binding.value !== 'function') {
       console.warn(`Expect a function, got ${typeof binding.value}`);
@@ -50,14 +55,14 @@ Vue.directive('long-press', {
     el.addEventListener('mouseout', cancel);
     el.addEventListener('touchend', cancel);
     el.addEventListener('touchcancel', cancel);
-  }
+  },
 });
 
-window.app = new Vue({
+window.app = new window.Vue({
   el: '#app',
   data: {
     // socketID
-    socketId: Date.now() + '' + Math.round(Math.random()*1000),
+    socketId: Date.now() + '' + Math.round(Math.random() * 1000),
     // 消息类型，UTU, STU, STE
     type: data.type,
     // 消息内容列表
@@ -87,38 +92,38 @@ window.app = new Vue({
   methods: {
     longPress(url) {
       let images = [];
-      for(const m of this.messages) {
-        if(m.contentType === 'image') {
+      for (const m of this.messages) {
+        if (m.contentType === 'image') {
           images.push({
             name: m.content.filename,
-            url: m.content.fileUrl
+            url: m.content.fileUrl,
           });
         }
       }
-      const index = images.findIndex(item=>item.url===url);
-      longPressImage({images:[images[index]],index:0});
+      const index = images.findIndex((item) => item.url === url);
+      longPressImage({ images: [images[index]], index: 0 });
     },
     // 格式化时间
-    timeFormat: NKC.methods.timeFormat,
+    timeFormat: window.NKC.methods.timeFormat,
     // 获取链接
-    getUrl: NKC.methods.tools.getUrl,
+    getUrl: window.NKC.methods.tools.getUrl,
     clearWarningContent() {
-      this.warningContent = ''
+      this.warningContent = '';
     },
     toast(c) {
       c = c.error || c.message || c;
-      RNToast({content: c});
+      RNToast({ content: c });
     },
     // 滚动内容到底部
     scrollToBottom() {
       setTimeout(() => {
         const listContent = this.$refs.listContent;
         listContent.scrollTop = listContent.scrollHeight + 10000;
-      }, 200)
+      }, 200);
     },
     // 切换表情面板状态
     switchStickerPanel(f) {
-      this.showStickerPanel = f === undefined? !this.showStickerPanel: !!f;
+      this.showStickerPanel = f === undefined ? !this.showStickerPanel : !!f;
     },
     // 选择表情
     selectSticker(tmj) {
@@ -137,7 +142,7 @@ window.app = new Vue({
       }
       const emoji = '[f/' + tmj + ']';
 
-      if(index > 1) {
+      if (index > 1) {
         const str = inputText.substring(0, index);
         const str2 = str + emoji;
         this.content = inputText.replace(str, str2);
@@ -147,38 +152,37 @@ window.app = new Vue({
       setTimeout(() => {
         this.autoResize();
       }, 200);
-
     },
     // 输入框自动调整高度
     autoResize(init) {
       const textArea = this.$refs.input;
       const num = 2.8 * 12;
       textArea.style.height = num + 'px';
-      if(!init && num < textArea.scrollHeight) {
+      if (!init && num < textArea.scrollHeight) {
         textArea.style.height = textArea.scrollHeight + 'px';
       }
     },
     // 输入框保持聚焦
     keepFocus(focus) {
-      if(focus) {
+      if (focus) {
         this.$refs.input.focus();
       }
     },
     // 浏览聊天内容中的图片
     visitImages(url) {
       let urls = [];
-      for(const m of this.messages) {
-        if(m.contentType === 'image') {
+      for (const m of this.messages) {
+        if (m.contentType === 'image') {
           urls.push({
             name: m.content.filename,
-            url: m.content.fileUrl
+            url: m.content.fileUrl,
           });
         }
       }
       // urls.reverse();
-      const index = urls.map(u => u.url).indexOf(url);
-      urls.map(u => {
-        if(u.url.indexOf('http') !== 0) {
+      const index = urls.map((u) => u.url).indexOf(url);
+      urls.map((u) => {
+        if (u.url.indexOf('http') !== 0) {
           u.url = window.location.origin + u.url;
         }
       });
@@ -186,11 +190,19 @@ window.app = new Vue({
     },
     // 访问用户主页
     openUserHome(message) {
-      if(message.messageType !== 'UTU') return;
-      if(NKC.configs.uid === message.s) {
-        NKC.methods.visitUrl(NKC.methods.tools.getUrl('userHome', message.s), true);
+      if (message.messageType !== 'UTU') {
+        return;
+      }
+      if (window.NKC.configs.uid === message.s) {
+        window.NKC.methods.visitUrl(
+          window.NKC.methods.tools.getUrl('userHome', message.s),
+          true,
+        );
       } else {
-        NKC.methods.visitUrl(NKC.methods.tools.getUrl('messageUserDetail', message.s), true);
+        window.NKC.methods.visitUrl(
+          window.NKC.methods.tools.getUrl('messageUserDetail', message.s),
+          true,
+        );
       }
     },
     // 选择本地附件
@@ -202,19 +214,19 @@ window.app = new Vue({
     // 选择完本地附件
     selectedLocalFiles() {
       const fileDom = this.$refs.file;
-      for(const file of fileDom.files) {
+      for (const file of fileDom.files) {
         this.sendMessage('sendFile', file);
       }
     },
     // 发送消息
     sendMessage(type, c) {
       const self = this;
-      RNGetKeyboardStatus(data => {
+      RNGetKeyboardStatus((data) => {
         self.keepFocus(data.keyboardStatus === 'show');
       });
-      let message
+      let message;
 
-      if(['sendText', 'sendFile'].includes(type)) {
+      if (['sendText', 'sendFile'].includes(type)) {
         // 发送一条信息
         const localMessageId = `local_id_${Date.now()}`;
         message = {
@@ -223,9 +235,9 @@ window.app = new Vue({
           s: self.mUser.uid,
           r: self.tUser.uid,
           messageType: 'UTU',
-        }
+        };
         const formData = new FormData();
-        if(type === 'sendText') {
+        if (type === 'sendText') {
           message.content = c;
         } else {
           message.content = c.name;
@@ -244,93 +256,112 @@ window.app = new Vue({
 
       Promise.resolve()
         .then(() => {
-          if(!message.content) throw '请输入聊天内容';
-          if(type !== 'resend') {
+          if (!message.content) {
+            throw '请输入聊天内容';
+          }
+          if (type !== 'resend') {
             self.originMessages.push(message);
           }
-          self.content = "";
+          self.content = '';
           self.autoResize(true);
           self.scrollToBottom();
           // self.keepFocus(true);
 
-          return nkcUploadFile(`/message/user/${message.r}`, 'POST', message.formData);
+          return window.nkcUploadFile(
+            `/message/user/${message.r}`,
+            'POST',
+            message.formData,
+          );
         })
         .then((data) => {
           const index = self.originMessages.indexOf(message);
           message.status = 'sent';
-          if(index >= 0) {
+          if (index >= 0) {
             // Vue.set(self.originMessages, index, data.message2);
             self.scrollToBottom();
           }
         })
-        .catch(data => {
+        .catch((data) => {
           message.status = 'error';
           self.toast(data.error || data.message || data);
-        })
+        });
     },
     // 获取消息
     getMessage() {
-      const {firstMessageId, tUser, type} = self = this;
+      // eslint-disable-next-line no-global-assign
+      const { firstMessageId, tUser, type } = (self = this);
       let url = `/message/data?type=${type}`;
-      if(firstMessageId) {
+      if (firstMessageId) {
         url += `&firstMessageId=${firstMessageId}`;
       }
-      if(tUser.uid) {
+      if (tUser.uid) {
         url += `&uid=${tUser.uid}`;
       }
-      if(self.getMessageStatus !== 'canLoad') return;
+      if (self.getMessageStatus !== 'canLoad') {
+        return;
+      }
       self.getMessageStatus = 'loading';
       return nkcAPI(url, 'GET')
-        .then(data => {
+        .then((data) => {
           self.originMessages = self.originMessages.concat(data.messages);
-          if(data.messages.length) {
+          if (data.messages.length) {
             self.getMessageStatus = 'canLoad';
           } else {
             self.getMessageStatus = 'cantLoad';
           }
-          if(data.statusOfSendingMessage) {
-            const {canSendMessage, warningContent} = data.statusOfSendingMessage;
+          if (data.statusOfSendingMessage) {
+            const { canSendMessage, warningContent } =
+              data.statusOfSendingMessage;
             self.canSendMessage = canSendMessage;
             self.warningContent = warningContent;
           }
         })
-        .catch(data => {
+        .catch((data) => {
           self.toast(data);
           self.getMessageStatus = 'canLoad';
         });
     },
     getOriginMessageById(id) {
-      for(const m of this.originMessages) {
-        if(m._id === id) return m;
+      for (const m of this.originMessages) {
+        if (m._id === id) {
+          return m;
+        }
       }
     },
     // rn接收到新消息通知web
     insertMessage(message, localId) {
-      const {messageType, r, s} = message;
-      const {tUser, mUser, type, originMessages} = this;
+      const { messageType, r, s } = message;
+      const { tUser, mUser, type, originMessages } = this;
 
-      if(messageType !== type) return;
-      if(!mUser || (type === 'UTU' && !tUser)) return;
-      if(
+      if (messageType !== type) {
+        return;
+      }
+      if (!mUser || (type === 'UTU' && !tUser)) {
+        return;
+      }
+      if (
         type === 'UTU' &&
         (r !== mUser.uid || s !== tUser.uid) &&
         (s !== mUser.uid || r !== tUser.uid)
-      ) return;
+      ) {
+        return;
+      }
       let hasMessage = false;
-      for(let i = 0; i < originMessages.length; i++) {
+      for (let i = 0; i < originMessages.length; i++) {
         const originMessage = originMessages[i];
-        let _localId = typeof originMessage._id === 'number'? Number(localId): localId;
-        if(originMessage._id === _localId) {
+        let _localId =
+          typeof originMessage._id === 'number' ? Number(localId) : localId;
+        if (originMessage._id === _localId) {
           originMessages.splice(i, 1, message);
           hasMessage = true;
           break;
         }
       }
-      if(hasMessage === false) {
+      if (hasMessage === false) {
         this.originMessages.unshift(message);
       }
 
-      if(r === mUser.uid) {
+      if (r === mUser.uid) {
         this.markAsRead();
       }
 
@@ -341,34 +372,32 @@ window.app = new Vue({
     },
     // 撤回
     withdrawn(messageId) {
-      withdrawn(messageId)
-        .catch(self.toast);
+      withdrawn(messageId).catch(self.toast);
     },
     // 标记为已读
     markAsRead() {
-      const {type, tUser} = self = this;
+      // eslint-disable-next-line no-global-assign
+      const { type, tUser } = (self = this);
       setTimeout(() => {
         nkcAPI('/message/mark', 'PUT', {
           type,
-          uid: tUser.uid
-        })
-          .catch(self.toast)
+          uid: tUser.uid,
+        }).catch(self.toast);
       }, 1000);
-
     },
     // 调用原生拍照、录像和录音
     useCamera(type) {
       let func;
-      if(type === 'video') {
+      if (type === 'video') {
         func = RNTakeVideoAndSendToUser;
-      } else if(type === 'audio') {
+      } else if (type === 'audio') {
         func = RNTakeAudioAndSendToUser;
       } else {
         func = RNTakePictureAndSendToUser;
       }
       func({
         uid: this.tUser.uid,
-        socketId: null
+        socketId: null,
       });
     },
     // 处理好友添加申请
@@ -378,15 +407,15 @@ window.app = new Vue({
       nkcAPI('/u/' + message.s + '/friends/agree', 'POST', {
         agree,
       })
-        .then(function(data) {
+        .then(function (data) {
           message.content = data.message.content;
         })
-        .catch(self.toast)
+        .catch(self.toast);
     },
     // 播放语音
     playVoice(message) {
-      const {audio, stopPlayVoice, getOriginMessageById, playVoiceId} = this;
-      if(message.content.fileId === playVoiceId) {
+      const { audio, stopPlayVoice, getOriginMessageById, playVoiceId } = this;
+      if (message.content.fileId === playVoiceId) {
         return stopPlayVoice();
       }
       stopPlayVoice();
@@ -399,57 +428,63 @@ window.app = new Vue({
     },
     // 停止播放语音
     stopPlayVoice() {
-      const {audio} = this;
-      try{
+      const { audio } = this;
+      try {
         audio.pause();
         this.playVoiceId = null;
-      } catch(err) {}
+      } catch (err) {
+        //
+      }
     },
   },
   computed: {
     // 第一条消息的ID，用户加载消息内容列表
     firstMessageId() {
-      const {messages} = this;
-      for(const m of messages) {
-        if(m.contentType !== 'time') {
+      const { messages } = this;
+      for (const m of messages) {
+        if (m.contentType !== 'time') {
           return m._id;
         }
       }
     },
     // 处理过的消息内容列表
     messages() {
-      const {originMessages, mUser, tUser} = this;
+      const { originMessages, mUser, tUser } = this;
       const now = new Date().getTime();
       let messagesId = [];
       const messagesObj = {};
       const messages = [];
-      for(const m of originMessages) {
-        const {_id, s} = m;
+      for (const m of originMessages) {
+        const { _id, s } = m;
         const ownMessage = s === mUser.uid;
         messagesId.push(_id);
-        m.position = ownMessage? 'right': 'left';
-        m.sUser = ownMessage? mUser: tUser;
-        m.canWithdrawn = m.status === 'sent' && ownMessage && (now - new Date(m.time) < 60000);
+        m.position = ownMessage ? 'right' : 'left';
+        m.sUser = ownMessage ? mUser : tUser;
+        m.canWithdrawn =
+          m.status === 'sent' && ownMessage && now - new Date(m.time) < 60000;
 
         messagesObj[_id] = m;
       }
       messagesId = [...new Set(messagesId)];
       messagesId = messagesId.sort((a, b) => a - b);
-      for(const id of messagesId) {
+      for (const id of messagesId) {
         messages.push(messagesObj[id]);
       }
       const arr = [];
-      for(let i = 0; i < messages.length; i++) {
-        const message = messages[i]
-        const {time} = message;
-        if(i === 0) {
+      for (let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+        const { time } = message;
+        if (i === 0) {
           arr.push({
             contentType: 'time',
             content: time,
           });
         } else {
           const lastMessage = messages[i - 1];
-          if(new Date(time).getTime() - new Date(lastMessage.time).getTime() > 60000) {
+          if (
+            new Date(time).getTime() - new Date(lastMessage.time).getTime() >
+            60000
+          ) {
             arr.push({
               contentType: 'time',
               content: time,
@@ -459,43 +494,44 @@ window.app = new Vue({
         arr.push(message);
       }
       return arr;
-    }
+    },
   },
   mounted() {
     const self = this;
     const listContent = self.$refs.listContent;
     window.addEventListener('click', () => {
-      if(self.showStickerPanel) {
+      if (self.showStickerPanel) {
         self.switchStickerPanel(false);
       }
     });
     self.scrollToBottom();
-    listContent.onscroll = function() {
+    listContent.onscroll = function () {
       const scrollTop = this.scrollTop;
-      if(scrollTop > 20) return;
+      if (scrollTop > 20) {
+        return;
+      }
       listContent.scrollTo = listContent.scrollTop;
       listContent.height = listContent.scrollHeight;
-      self.getMessage()
-        .then(function() {
+      self
+        .getMessage()
+        .then(function () {
           const height = listContent.scrollHeight;
           listContent.scrollTop = height - listContent.height;
         })
-        .catch(function(data){
+        .catch(function (data) {
           self.toast(data.error || data.message || data);
-        })
-
-    }
+        });
+    };
 
     self.audio.addEventListener('ended', () => {
       self.stopPlayVoice();
     });
-  }
+  },
 });
 
 window._messageFriendApplication = (uid, type) => {
   nkcAPI(`/message/friend`, 'POST', {
     uid,
-    type
-  })
-    .catch(sweetError);
+    type,
+  }).catch(sweetError);
 };

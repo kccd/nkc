@@ -1,10 +1,12 @@
 <template lang="pug">
   div
     editor(
+      l="json"
       ref="editor"
       @content-change="editorContentChange"
       @manual-save="saveDraftManual"
       :loading="loading"
+      @ready="initDraft"
     )
     .m-t-1
       button.btn.btn-primary.m-r-05(:class="{'disabled': disablePublish}" v-if="submitting" title="提交中，请稍候")
@@ -17,13 +19,12 @@
 
 <script>
 import {nkcAPI} from "../../js/netAPI";
-import Editor from '../Editor.json.vue';
 import {sweetError} from "../../js/sweetAlert";
 import {screenTopAlert} from "../../js/topAlert";
 import { immediateDebounce } from "../../js/execution";
 import { visitUrl } from "../../js/pageSwitch";
 import {getRichJsonContentLength} from '../../js/checkData'
-import { getUrl } from "../../js/tools";
+import Editor from '../Editor.vue'
 export default {
   components: {
     'editor': Editor,
@@ -42,7 +43,6 @@ export default {
     const queryMomentId = this.id || '';
     this.isEditMoment = !!queryMomentId;
     this.momentId = queryMomentId;
-    this.initDraft();
   },
   computed: {
     disablePublish() {
@@ -50,9 +50,6 @@ export default {
     },
     wordCount() {
       return getRichJsonContentLength(this.content)
-    },
-    editMomentUrl() {
-      return getUrl('zoneMoment', this.momentId);
     },
   },
   methods: {

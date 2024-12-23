@@ -70,7 +70,6 @@
               a.column-post-forum(v-else :href="`/m/${columnPost.columnId}`") {{column.name}}
       transition(name="fade")
         .settingButtons(v-if="isShow")
-          //- .centering-wrapper
           button.btn.btn-xs.btn-default(v-if="column.topped.indexOf(columnPost._id) === -1" @click="movePost('columnTop', [ columnPost._id ])") 首页置顶
           button.btn.btn-xs.btn-default(v-else @click="movePost('unColumnTop', [ columnPost._id ])") 取消首页置顶
           button.btn.btn-xs.btn-default(v-if="category  && category._id !== 'all' && category.topped.indexOf(columnPost._id) === -1" @click="movePost('categoryTop', [ columnPost._id ])") 分类置顶
@@ -82,7 +81,6 @@
           button.btn.btn-xs.btn-success(@click="move([ columnPost._id ], columnPost.cid, columnPost.mcid)") 移动
           button.btn.btn-xs.btn-danger(@click="remove([ columnPost._id ])")  撤稿
           button.btn.btn-default.btn-xs(onclick='editColumnPosts(false)') 退出管理
-      //- paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
 </template>
 
 <style lang="less" scoped>

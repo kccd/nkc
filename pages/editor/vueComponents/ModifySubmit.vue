@@ -457,6 +457,7 @@ export default {
     // 检测json内容
     checkJsonContent(jsonString) {
       const size = this.getRichJsonContentLength(jsonString);
+      console.log('json字数：', size);
       if (size > 100000) {
         throw new Error("内容不能超过10万字");
       }
@@ -562,7 +563,11 @@ export default {
               minLength: 0,
               maxLength: 200,
             });
-            this.checkContent(submitData.c);
+            if(submitData.l==='json'){
+              this.checkJsonContent(submitData.c);
+            }else{
+              this.checkContent(submitData.c);
+            }
             return nkcAPI("/t/" + this.data?.thread?.tid, "POST", {
               post: submitData,
             });
@@ -573,7 +578,11 @@ export default {
               minLength: 0,
               maxLength: 200,
             });
-            this.checkContent(submitData.c);
+            if(submitData.l==='json'){
+              this.checkJsonContent(submitData.c);
+            }else{
+              this.checkContent(submitData.c);
+            }
             this.checkNewNotice && this.checkNoticeContent(submitData.noticeContent);
             let formData = new FormData();
             formData.append("body", JSON.stringify({ post: submitData }));
@@ -588,7 +597,11 @@ export default {
           } else if (type === "modifyThread") {
             // 修改thread
             this.checkTitle(submitData.t);
-            this.checkContent(submitData.c);
+            if(submitData.l==='json'){
+              this.checkJsonContent(submitData.c);
+            }else{
+              this.checkContent(submitData.c);
+            }
             this.checkAbstract(submitData.abstractCn, submitData.abstractEn);
             this.checkKeywords(submitData.keyWordsCn, submitData.keyWordsEn);
             this.checkAuthorInfos(submitData.authorInfos);

@@ -1,23 +1,28 @@
-import {toLogin} from "../lib/js/account";
-import {getState} from "../lib/js/state";
-import {RNSetSharePanelStatus} from "../lib/js/reactNative";
-import {shareTypes} from "../lib/js/shareTypes";
+import { toLogin } from '../lib/js/account';
+import { getState } from '../lib/js/state';
+import { RNSetSharePanelStatus } from '../lib/js/reactNative';
+import { shareTypes } from '../lib/js/shareTypes';
 import ColumnPosts from '../lib/vue/column/ColumnPosts.vue';
-import { nkcAPI } from "../lib/js/netAPI";
-import { sweetError } from "../lib/js/sweetAlert";
+import { nkcAPI } from '../lib/js/netAPI';
+import { sweetError } from '../lib/js/sweetAlert';
+import { screenTopWarning } from '../lib/js/topAlert';
 const state = getState();
 const logged = !!state.uid;
+import { getDataById } from '../lib/js/dataConversion';
+import { initNKCSource } from '../lib/js/nkcSource';
 
-var data = NKC.methods.getDataById("data");
+// var data = NKC.methods.getDataById("data");
+const data = getDataById('data');
 // 挂载所需要的vue实例对象
 let app = null;
 $(function () {
+  initNKCSource();
   const $element = document.getElementById('columnApp');
   if ($element) {
     moduleToColumn.init();
     const { column, columnPosts, category, topped, paging, user, toppedId } =
       NKC.methods.getDataById('columnAppData');
-     app = new Vue({
+    app = new Vue({
       el: '#columnApp',
       components: {
         'column-posts': ColumnPosts,
@@ -69,27 +74,65 @@ $(function () {
               sweetError(err);
             });
         },
+        movePost(type) {
+          const self = this;
+          if (!this.column) {
+            return;
+          }
+          if (['sortByPostTimeDES', 'sortByPostTimeASC'].indexOf(type) !== -1) {
+            if (
+              !confirm('按发表时间排序后，原有排序将会丢失，确定要执行此操作？')
+            ) {
+              return;
+            }
+          }
+          const urlParams = new URLSearchParams(window.location.search);
+          const c = urlParams.get('c') || '';
+          let categoryId = '';
+          let minorCategoriesId = '';
+          const { category } = this;
+          if (category) {
+            categoryId = category._id;
+            if (c.split('-').length === 2 && !isNaN(Number(c.split('-')[1]))) {
+              minorCategoriesId = Number(c.split('-')[1]);
+            }
+          }
+          nkcAPI('/m/' + this.column._id + '/post', 'POST', {
+            type: type,
+            categoryId,
+            minorCategoriesId,
+          })
+            .then(function (data) {
+              // 请求数据
+              self.getPostList();
+            })
+            .catch(function (data) {
+              screenTopWarning(data);
+            });
+        },
       },
     });
   }
 });
 var SubscribeTypes = window.SubscribeTypes;
-$(function() {
-  if(data.columnId){
+$(function () {
+  if (data.columnId) {
     RNSetSharePanelStatus(true, shareTypes.column, data.columnId);
-  }else {
-    if(data.type === 'article'){
-      RNSetSharePanelStatus(true, shareTypes.article, data.article.id);
-    }else {
-      RNSetSharePanelStatus(true, shareTypes.thread, data.article.tid);
+  } else {
+    if (data.article) {
+      if (data.type === 'article') {
+        RNSetSharePanelStatus(true, shareTypes.article, data.article.id);
+      } else {
+        RNSetSharePanelStatus(true, shareTypes.thread, data.article.tid);
+      }
     }
   }
 });
-$(function() {
-  if(!window.CommonModal) {
+$(function () {
+  if (!window.CommonModal) {
     window.CommonModal = new NKC.modules.CommonModal();
   }
-  if(!SubscribeTypes && logged) {
+  if (!SubscribeTypes && logged) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 });
@@ -97,25 +140,25 @@ var bodyBackgroundColor = data.color;
 var listBackgroundColor = data.listColor;
 var toolsBackgroundColor = data.toolColor;
 var CommonModal = window.CommonModal;
-$(function() {
-  NKC.methods.initSelectColor(function(color, id) {
-    if(id === 'columnColor') {
+$(function () {
+  NKC.methods.initSelectColor(function (color, id) {
+    if (id === 'columnColor') {
       // 专栏背景颜色
-      $("body").css({
-        "background-color": color
+      $('body').css({
+        'background-color': color,
       });
       bodyBackgroundColor = color;
-    } else if(id === 'listColor') {
+    } else if (id === 'listColor') {
       // 文章列表背景颜色
-      console.log(color)
-      $(".column-thread-list-container").css({
-        "background-color": color
+      console.log(color);
+      $('.column-thread-list-container').css({
+        'background-color': color,
       });
       listBackgroundColor = color;
-    } else if(id === 'toolColor'){
+    } else if (id === 'toolColor') {
       // 文章工具背景颜色
-      $(".column-tool-container").css({
-        "background-color": color
+      $('.column-tool-container').css({
+        'background-color': color,
       });
       toolsBackgroundColor = color;
     }
@@ -124,22 +167,24 @@ $(function() {
   var columnButton = columnSubscribe.find('.column-button');
   var columnNumber = columnSubscribe.find('.column-number');
   var columnId = columnSubscribe.attr('data-column-id');
-  columnButton.on('click', function() {
-    if(columnButton.attr('data-disabled') === 'true') return;
+  columnButton.on('click', function () {
+    if (columnButton.attr('data-disabled') === 'true') {
+      return;
+    }
     var subscribed = columnSubscribe.attr('data-subscribed') === 'true';
     var number = Number(columnSubscribe.attr('data-number'));
     columnSubscribe.attr('data-subscribed', !subscribed);
     return Promise.resolve()
-      .then(function() {
+      .then(function () {
         columnButton.attr('data-disabled', 'true');
         return SubscribeTypes.subscribeColumnPromise(columnId, !subscribed);
       })
-      .then(function() {
-        number += subscribed? -1: 1;
-        if(number <= 0) {
-          columnNumber.addClass('hidden')
+      .then(function () {
+        number += subscribed ? -1 : 1;
+        if (number <= 0) {
+          columnNumber.addClass('hidden');
         } else {
-          columnNumber.removeClass('hidden')
+          columnNumber.removeClass('hidden');
         }
         columnNumber.text(number);
         columnSubscribe.attr('data-number', number);
@@ -152,9 +197,8 @@ $(function() {
         } else {
           screenTopAlert('关注成功');
         }*/
-
       })
-      .catch(function(err) {
+      .catch(function (err) {
         columnButton.attr('data-disabled', 'false');
         sweetError(err);
       });
@@ -162,68 +206,73 @@ $(function() {
 });
 
 function showSetDom() {
-  $(".column-fast-set-body").toggle();
+  $('.column-fast-set-body').toggle();
 }
-function showShareDom(){
-  $(".column-share-body").toggle();
+function showShareDom() {
+  $('.column-share-body').toggle();
 }
 function saveSettings() {
-  nkcAPI("/m/" + data.columnId, "PUT", {
-    type: "color",
+  nkcAPI('/m/' + data.columnId, 'PUT', {
+    type: 'color',
     color: bodyBackgroundColor,
     listColor: listBackgroundColor,
-    toolColor: toolsBackgroundColor
+    toolColor: toolsBackgroundColor,
   })
-    .then(function() {
-      screenTopAlert("保存成功");
+    .then(function () {
+      screenTopAlert('保存成功');
       showSetDom();
     })
-    .catch(function(d) {
-      screenTopWarning(d)
-    })
+    .catch(function (d) {
+      screenTopWarning(d);
+    });
 }
 
 function openNewWindow(url) {
   var origin = window.location.origin;
-  var reg = new RegExp("^" + origin, "i");
-  if(reg.test(url)) {
+  var reg = new RegExp('^' + origin, 'i');
+  if (reg.test(url)) {
     openToNewLocation(url);
   } else {
-    openToNewLocation(url, "_blank");
+    openToNewLocation(url, '_blank');
   }
-
 }
 function pushToHome(id, type) {
-  var method = type === "push"? "POST": "DELETE";
-  nkcAPI("/m/" + id + "/hot", method)
-    .then(function() {
+  var method = type === 'push' ? 'POST' : 'DELETE';
+  nkcAPI('/m/' + id + '/hot', method)
+    .then(function () {
       window.location.reload();
     })
     .catch(sweetError);
 }
 function toppedColumn(id, type) {
-  var method = type === 'push'? 'POST': 'DELETE';
-  nkcAPI("/m/" + id + "/top", method)
-    .then(function() {
+  var method = type === 'push' ? 'POST' : 'DELETE';
+  nkcAPI('/m/' + id + '/top', method)
+    .then(function () {
       window.location.reload();
     })
-    .catch(sweetError)
+    .catch(sweetError);
 }
 function subscribeColumn(columnId) {
-  if(!NKC.configs.uid) return toLogin();
-  var subscriptionButton = $('[data-type="subscriptionButton"][data-column-id="'+columnId+'"]');
-  var subscriptionNumber = $('[data-type="subscriptionNumber"][data-column-id="'+columnId+'"]');
+  if (!NKC.configs.uid) {
+    return toLogin();
+  }
+  var subscriptionButton = $(
+    '[data-type="subscriptionButton"][data-column-id="' + columnId + '"]',
+  );
+  var subscriptionNumber = $(
+    '[data-type="subscriptionNumber"][data-column-id="' + columnId + '"]',
+  );
   var subscribed = subscriptionButton.attr('data-subscribed') === 'true';
   var number = Number(subscriptionNumber.attr('data-number'));
 
   return Promise.resolve()
-    .then(function() {
+    .then(function () {
       return SubscribeTypes.subscribeColumnPromise(columnId, !subscribed);
     })
-    .then(function() {
-      if(subscribed) {
+    .then(function () {
+      if (subscribed) {
         // 取消关注
-        number --;
+        number--;
         subscriptionButton
           .attr('data-subscribed', 'false')
           .removeClass('btn-default')
@@ -231,7 +280,7 @@ function subscribeColumn(columnId) {
           .text('订阅');
       } else {
         // 关注
-        number ++;
+        number++;
         subscriptionButton
           .attr('data-subscribed', 'true')
           .removeClass('btn-primary')
@@ -246,20 +295,17 @@ function subscribeColumn(columnId) {
 }
 
 function editColumnPosts(isEdit) {
-  if(isEdit){
+  if (isEdit) {
     $('#columnPug').hide();
     $('#columnApp').show();
-    if(app){
+    if (app) {
       app.showSettingButton = true;
     }
-    
-  }else{
-    if(app){
+  } else {
+    if (app) {
       app.showSettingButton = false;
     }
-    
   }
-  
 }
 Object.assign(window, {
   bodyBackgroundColor,
@@ -272,5 +318,5 @@ Object.assign(window, {
   pushToHome,
   subscribeColumn,
   toppedColumn,
-  editColumnPosts
+  editColumnPosts,
 });

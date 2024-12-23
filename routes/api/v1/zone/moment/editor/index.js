@@ -21,7 +21,11 @@ router.use('/', OnlyUser(), async (ctx, next) => {
   const moment = await momentExtenderService.getMomentById(momentId);
   if (state.uid !== moment.uid) {
     ThrowBadRequestResponseTypeError(ResponseTypes.FORBIDDEN);
-  } else if (moment.status !== momentStatus.normal) {
+  } else if (
+    ![momentStatus.normal, momentStatus.faulty, momentStatus.unknown].includes(
+      moment.status,
+    )
+  ) {
     ThrowBadRequestResponseTypeError(ResponseTypes.MOMENT_CAN_NOT_BE_EDITED);
   }
   internalData.moment = moment;

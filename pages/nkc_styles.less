@@ -954,12 +954,9 @@ font-size: 14pt;
 }
 
 .ThreadPostBody span.xbbcode-code, pre code{
-
-font-size: 12px;
-
-font-family: consolas,Monospace,monospace;
-
-line-height: 1.4;
+  font-size: 12px;
+  font-family: consolas,Monospace,monospace;
+  line-height: 1.4;
 }
 
 .ThreadPostBody pre{
@@ -3882,20 +3879,26 @@ span[data-tag="nkcsource"][data-type="video-not-found"]>span{
   width: 100%;
   height: 100%;
 }
-.article-img-content img.lazyload {
-	opacity: 0;
-}
-.article-img-content img.lazyloading{
-	opacity: 1;
-	transition: opacity 300ms;
-  background: #c7c7c7 url(/statics/loading.gif) no-repeat center;
-  background-size: 3rem;
-}
-.article-img-content img.lazyloaded{
-  z-index: 101;
-  background: rgba(0, 0, 0, 0);
-}
 
+[data-tag="nkcsource"][data-type="table"] {
+  th{
+    background-color: rgba(61, 37, 20, 0.05);
+  }
+}
+[data-tag="nkcsource"][data-type="task"] {
+  list-style-type: none;
+  padding-left: 0;
+  li{
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    label{
+      margin: 0 0.5rem 0 0;
+    }
+  }
+}
 
 /*文章中的图片 新*/
 
@@ -3905,6 +3908,7 @@ span[data-tag="nkcsource"][data-type="picture"]{
   vertical-align: text-bottom;
   max-width: 100%;
   font-size: 0;
+  margin-bottom: 0.5rem;
 }
 span[data-tag="nkcsource"][data-type="picture"]>span{
   width: 100%;
@@ -3976,6 +3980,47 @@ span[data-tag="nkcsource"][data-type="video"]>span:first-child>div{
 }
 span[data-tag="nkcsource"][data-type="video"] video{
   max-width: 100%;
+}
+
+pre[data-tag="nkcsource"][data-type="pre"] {
+  padding-top: 2.5rem;
+  border: 1px solid #d7d7d7;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  background: none;
+  position: relative;
+  &>div:first-child{
+    top: 0;
+    left: 0;
+    width: 100%;
+    position: absolute;
+    height: 2.5rem;
+    background-color: #f4f4f4;
+    padding: 0 0.5rem;
+    border-bottom: 1px solid #dbdbdb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    span {
+      font-weight: bold;
+      color: #555;
+    }
+  }
+  code{
+    padding: 0.5rem;
+    display: block;
+    white-space: pre;
+    overflow-x: auto;
+    background-color: #fff;
+    &[data-line-mode="multiple"] {
+      white-space: pre-wrap;
+      overflow-x: hidden;
+    }
+  }
+}
+[data-type="nkc-render-content"] table{
+  margin-bottom: 0.5rem;
 }
 
 /* 文章中的音频 旧*/
@@ -4065,69 +4110,6 @@ span[data-tag="nkcsource"][data-type="audio"]{
 .nkcsource-video-title {
   /*font-style: oblique;*/
 }
-
-/* 文章中的附件 旧*/
-.article-attachment{
-  display: inline-block;
-  padding: 0.5rem;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
-  border-radius: 2px;
-  border: 1px solid #d6d6d6;
-  background: #fff;
-}
-.article-attachment-icon{
-  display: table-cell;
-  vertical-align: top;
-  width: 3.3rem;
-}
-.attachment-disabled{
-  background-color: #ccc;
-  color: #919191;
-}
-.article-attachment-icon img{
-  width: 3.3rem;
-  max-width: none;
-  height: 3.3rem;
-}
-.article-attachment-content{
-  padding-left: 0.5rem;
-  vertical-align: top;
-  width: 30rem;
-  max-width: 100%;
-  display: table-cell;
-}
-.article-attachment-name:hover, .article-attachment-name:focus{
-  color: #2b90d9;
-}
-.article-attachment-name{
-  display: block;
-  height: 1.8rem;
-  font-size: 1.3rem;
-  color: #2b90d9;
-  font-weight: 700;
-  word-break: break-all;
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
-.article-attachment-info>div{
-  display: inline-block;
-  font-size: 1.15rem;
-  margin-right: 0.5rem;
-}
-.article-attachment-size{
-  color: #e85a71;
-  font-weight: 700;
-}
-.article-attachment-ext{
-  color: #e85a71;
-  font-weight: 700;
-}
-.article-attachment-reader{
-  color: #2b90d9;
-  font-weight: 700;
-}
 /* 文章中的附件 新*/
 span[data-tag="nkcsource"][data-type="attachment-disabled"]{
   display: block;
@@ -4148,6 +4130,7 @@ span[data-tag="nkcsource"][data-type="attachment"]{
   border: 1px solid #d6d6d6;
   background: #fff;
   max-width: 414px;
+  margin-bottom: 0.5rem;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-icon{
   display: table-cell;
@@ -4184,20 +4167,17 @@ span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-name{
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-info>span{
   display: inline-block;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   margin-right: 0.5rem;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-size{
   color: #e85a71;
-  font-weight: 700;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-ext{
   color: #e85a71;
-  font-weight: 700;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-reader{
   color: #2b90d9;
-  font-weight: 700;
 }
 span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-name[data-type='downloadPanel'] {
   cursor: pointer;
@@ -4444,5 +4424,11 @@ span[data-tag="nkcsource"][data-type="xsf"]>span:last-child{
   }
   &:hover::before{
     color: white !important;
+  }
+}
+
+.render-content.math-jax{
+  a.hover {
+    text-decoration: underline; /* 添加下划线 */
   }
 }

@@ -1,7 +1,16 @@
 import { strToObj, objToStr } from './dataConversion';
+import { base64ToStr } from './dataConversion';
 import { getState } from './state';
 import { getUrl } from './tools';
+import hljs from 'highlight.js';
 const isLogged = !!getState().uid;
+import { lazyLoadInit } from './lazyLoad';
+import { copyTextToClipboard } from './clipboard';
+import { logger } from './logger';
+import { screenTopAlert } from './topAlert';
+import { fixLanguage, highlightLanguagesObject } from './highlight';
+import { renderNKCDocNumber } from './nkcDocNumber';
+
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
     '.render-content img[data-global-click="viewImage"]',
@@ -54,10 +63,16 @@ export function renderingNKCVideo() {
     `[data-tag="nkcsource"][data-type="video"]`,
   );
   for (const videoContainer of videoContainers) {
+    if (videoContainer.getAttribute('data-initialized') === 'true') {
+      continue;
+    }
+    videoContainer.setAttribute('data-initialized', 'true');
     const plyrDom = videoContainer.querySelector('video.plyr-dom');
     if (plyrDom === null) {
       continue;
     }
+    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    videoContainer.setAttribute('data-unique-id', uniqueId);
     // 播放提示，为空则不显示
     const mask = videoContainer.getAttribute('data-mask');
     const rid = videoContainer.getAttribute('data-id');
@@ -97,6 +112,7 @@ export function renderingNKCVideo() {
       position: absolute;
       top: 0;
       left: 0;
+      padding: 0 1rem;
     `;
     const maskTextStyle = `
       color: #fff;
@@ -118,7 +134,6 @@ export function renderingNKCVideo() {
       padding: 0 0.5rem;
       text-decoration: none;
     `;
-    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     // 渲染游客访问限制遮罩
     if (!isLogged && !visitorAccess) {
       const maskDom = window.$(`
@@ -133,12 +148,18 @@ export function renderingNKCVideo() {
       maskContainer.appendChild(maskDom[0]);
     } else if (mask) {
       // 用户点击预览按钮时执行的函数
-      const previewButtonOnClick = `
-        var video = document.querySelector('[data-tag=\\'nkcsource\\'][data-type=\\'video\\'] video');
+      let previewButtonOnClick = '';
+      if (getState().isApp && getState().appVersionCode >= 5) {
+        // 对于直接筛入原生js指令，app可以直接使用window.ReactNativeWebView.postMessage({type,data})
+        previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
+      } else {
+        previewButtonOnClick = `
+        var video = document.querySelector('[data-tag=\\'nkcsource\\'][data-type=\\'video\\'][data-id=\\'${rid}\\'][data-unique-id=\\'${uniqueId}\\'] video');
         video.play();
         var mask = document.querySelector('[data-nkc-video-mask-id=\\'${uniqueId}\\']');
         mask.remove();
       `;
+      }
       const maskDom = window.$(`
         <div style="${maskDomStyle}" data-nkc-video-mask-id="${uniqueId}">
           <div style="${maskTextStyle}">${mask}</div>
@@ -163,6 +184,18 @@ export function renderingNKCVideo() {
       `);
       maskContainer.appendChild(maskDom[0]);
     }
+    if (!mask && getState().isApp && getState().appVersionCode >= 5) {
+      let previewButtonOnClick = '';
+      previewButtonOnClick = `RootApp.viewVideoForApp(${rid})`;
+      const maskDom = window.$(`
+        <div style="${maskDomStyle}background-color:transparent;">
+        </div>
+      `);
+      maskDom.on('click', () => {
+        window.RootApp.viewVideoForApp(rid);
+      });
+      maskContainer.appendChild(maskDom[0]);
+    }
   }
 }
 
@@ -175,6 +208,10 @@ export function renderingNKCAudio() {
     `[data-tag="nkcsource"][data-type="audio"]`,
   );
   for (const audioContainer of audioContainers) {
+    if (audioContainer.getAttribute('data-initialized') === 'true') {
+      continue;
+    }
+    audioContainer.setAttribute('data-initialized', 'true');
     const plyrDom = audioContainer.querySelector('audio.plyr-dom');
     if (plyrDom === null) {
       continue;
@@ -195,47 +232,48 @@ export function renderingNKCAudio() {
     });
     if (!isLogged && !visitorAccess) {
       const maskDomStyle = `
-      display: flex;
-      height: 100%;
-      width: 100%;
-      z-index: 101;
-      flex-direction: column;
-      background-color: rgba(0,0,0,0.85);
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-    `;
+        display: flex;
+        height: 100%;
+        width: 100%;
+        z-index: 101;
+        flex-direction: column;
+        background-color: rgba(0,0,0,0.85);
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0 1rem;
+      `;
       const maskTextStyle = `
-      color: #fff;
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
-    `;
+        color: #fff;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      `;
       const maskButtonStyle = `
-      margin-right: 0.5rem;
-      border: none;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-      font-size: 1.2rem;
-      border-radius: 2px;
-      display: inline-block;
-      color: #fff;
-      background-color: rgba(0, 179, 255, 0.7);
-      height: 2.4rem;
-      line-height: 2.4rem;
-      padding: 0 0.5rem;
-      text-decoration: none;
-    `;
+        margin-right: 0.5rem;
+        border: none;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        font-size: 1.2rem;
+        border-radius: 2px;
+        display: inline-block;
+        color: #fff;
+        background-color: rgba(0, 179, 255, 0.7);
+        height: 2.4rem;
+        line-height: 2.4rem;
+        padding: 0 0.5rem;
+        text-decoration: none;
+      `;
       const maskDom = window.$(`
-        <div style="${maskDomStyle}">
-          <div style="${maskTextStyle}">音频暂不能访问，请登录试试。</div>
-          <div>
-            <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel()'>登录</button>
-            <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel("register")'>注册</button>
-          </div>
-        </div
-        `);
+          <div style="${maskDomStyle}">
+            <div style="${maskTextStyle}">音频暂不能访问，请登录试试。</div>
+            <div>
+              <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel()'>登录</button>
+              <button style="${maskButtonStyle}" onclick='RootApp.openLoginPanel("register")'>注册</button>
+            </div>
+          </div
+          `);
       audioContainer.appendChild(maskDom[0]);
     }
   }
@@ -245,7 +283,7 @@ export function renderingNKCAudio() {
 // 基本结构来自后端：
 // nkcModules/nkcRender/nodes/picutreInline.pug
 // nkcModules/nkcRender/sources/article.js
-export function renderingNKCPicure() {
+export function renderingNKCPicture() {
   const containers = document.querySelectorAll(
     '[data-tag="nkcsource"][data-type="picture"]',
   );
@@ -273,9 +311,98 @@ export function renderingNKCPicure() {
   }
 }
 
+export function renderCodeBlock() {
+  const containers = document.querySelectorAll(
+    `pre[data-tag="nkcsource"][data-type="pre"]`,
+  );
+  containers.forEach((container) => {
+    if (container.getAttribute('data-initialized') === 'true') {
+      return;
+    }
+    container.setAttribute('data-initialized', 'true');
+    const code = container.querySelector('code');
+    if (!code) {
+      return;
+    }
+    const codeText = code.innerText;
+    const multipleLineMode = code.getAttribute('data-line-mode') === 'multiple';
+    let language = fixLanguage(
+      container.getAttribute('data-id').trim().toLowerCase(),
+    );
+    let html = '';
+    if (language === 'other') {
+      const r = hljs.highlightAuto(codeText);
+      html = r.value;
+      language = r.language;
+    } else {
+      const r = hljs.highlight(codeText, {
+        language,
+      });
+      html = r.value;
+    }
+    language = fixLanguage(language);
+    const languageName =
+      highlightLanguagesObject[language] || highlightLanguagesObject['other'];
+    code.innerHTML = html;
+    const headerDiv = document.createElement('div');
+    const span = document.createElement('span');
+    span.innerText = languageName;
+    const copyButton = document.createElement('button');
+    copyButton.setAttribute('class', 'btn btn-default btn-xs');
+    copyButton.innerText = '复制';
+    copyButton.onclick = () => {
+      copyTextToClipboard(codeText)
+        .then(() => {
+          return screenTopAlert('代码已复制到粘贴板');
+        })
+        .catch(logger.error);
+    };
+    const lineButton = document.createElement('button');
+    lineButton.setAttribute('class', 'btn btn-default btn-xs m-r-05');
+    const resetLineBreakStatus = (_multipleLineMode) => {
+      lineButton.innerText = _multipleLineMode
+        ? '关闭自动换行'
+        : '开启自动换行';
+      lineButton.onclick = () => {
+        resetLineBreakStatus(!_multipleLineMode);
+      };
+      code.setAttribute(
+        'data-line-mode',
+        _multipleLineMode ? 'multiple' : 'single',
+      );
+    };
+    resetLineBreakStatus(multipleLineMode);
+    const buttonContainer = document.createElement('div');
+    buttonContainer.appendChild(lineButton);
+    buttonContainer.appendChild(copyButton);
+    headerDiv.appendChild(span);
+    headerDiv.appendChild(buttonContainer);
+    container.prepend(headerDiv);
+  });
+}
+
+export function renderNKCURL() {
+  const elements = document.querySelectorAll('span[data-type="nkc-url"]');
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    let url = element.getAttribute('data-url') || '';
+    if (!url) {
+      continue;
+    }
+    url = base64ToStr(url);
+    element.innerText = url;
+    element.removeAttribute('data-type');
+    element.removeAttribute('data-url');
+  }
+}
+
 export function initNKCSource() {
   renderingMathJax();
   renderingNKCVideo();
   renderingNKCAudio();
-  renderingNKCPicure();
+  renderingNKCPicture();
+  lazyLoadInit();
+  renderCodeBlock();
+  renderNKCURL();
+  renderNKCDocNumber();
 }

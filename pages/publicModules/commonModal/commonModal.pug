@@ -11,6 +11,7 @@ if !isIncluded('commonModal')
           .form
             .form-group(v-for="(d, index) in data")
               h5(v-if="d.label") {{d.label}}
+              .font-size-1rem.text-danger(v-if='d.warning') {{d.warning}}
               //- 数字input
               input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
               //- 非数字input
@@ -26,7 +27,7 @@ if !isIncluded('commonModal')
                   span {{r.name}}
               .checkbox(v-if="d.dom === 'checkbox'")
                 label.m-r-05(v-for="r in d.checkboxes")
-                  input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value")
+                  input(type="checkbox" :value="r._id" name="checkboxes" v-model="d.value" :disabled="!!r.disabled")
                   span {{r.name}}
         .modal-footer
           .options-button

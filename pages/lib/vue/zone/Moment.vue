@@ -53,7 +53,8 @@
           @selectedMomentId='handleMid'
         )
         .single-moment-detail-hits.m-t-05
-          span 阅读 {{ momentData.hits }}&nbsp;·
+          span.pointer(@click="copyString(momentData.did?`D${momentData.did}`: '')") D{{momentData.did}}&nbsp;·
+          span &nbsp;阅读 {{ momentData.hits }}&nbsp;·
           span &nbsp;IP:{{ momentData.addr }}&nbsp;
     .single-moment-detail-bottom(
       v-if='selectedMomentId !== momentData.momentId || submitting'
@@ -108,7 +109,7 @@
     div(v-if='selectedMomentId === momentData.momentId && !submitting')
       .moment-editor-header
         .moment-editor-header-title.text-info 正在编辑电文：
-        button.btn.btn-default.btn-xs(@click='submitting = true') 取消
+        button.btn.btn-default.btn-xs(@click='cancelEdit') 取消
       moment-editor(
         :mid='momentData.momentId',
         @published='onPublished',
@@ -179,8 +180,9 @@
           v-if='isFold && expandContent',
           @click.self.stop='closeContent'
         ) 收起
-      .singe-moment-rich-link(v-if="momentData.mode === 'rich' && !isFold")
-        router-link(:to="momentData.url") 查看详情  
+      .singe-moment-rich-link(v-if="momentData.mode === 'rich' && !isFold" @click.stop='clickDetail(momentData.url,$event)')
+        //- router-link(:to="momentData.url") 查看详情  
+        a(:href="momentData.url") 查看详情  
       //- 图片视频
       .single-moment-files
         moment-files(:data='momentData.files')
@@ -225,7 +227,7 @@
     div(v-if='selectedMomentId === momentData.momentId && !submitting')
       .moment-editor-header
         .moment-editor-header-title.text-info 正在编辑电文：
-        button.btn.btn-default.btn-xs(@click='submitting = true') 取消
+        button.btn.btn-default.btn-xs(@click='cancelEdit') 取消
       moment-editor(
         :mid='momentData.momentId',
         @published='onPublished',
@@ -517,7 +519,7 @@
   padding-left: 5rem;
   //padding-right: 4rem;
 }
-.single-moment-rich-icon{
+.single-moment-rich-icon {
   display: inline-block;
   font-size: 10px;
   border: 1px solid #ddd;
@@ -532,8 +534,8 @@
   margin-left: 0.3rem;
   cursor: pointer;
 }
-.singe-moment-rich-link{
-  a{
+.singe-moment-rich-link {
+  a {
     color: #1d9bf0;
     cursor: pointer;
     text-decoration: none;
@@ -760,7 +762,7 @@ import { sweetError, sweetSuccess } from '../../js/sweetAlert';
 import { objToStr } from '../../js/tools';
 import FromNow from '../../../lib/vue/FromNow';
 // import MomentFiles from './MomentFiles';
-import MomentFiles from './MomentFilesNew';
+import MomentFiles from './MomentFiles';
 import MomentComments from './MomentComments';
 import MomentQuote from './MomentQuote';
 import MomentStatus from './MomentStatus';
@@ -769,9 +771,10 @@ import MomentOptionFixed from './momentOption/MomentOptionFixed';
 import { getState } from '../../js/state';
 import { toLogin } from '../../js/account';
 import MomentEditor from './MomentEditor.vue';
-import { subUsers } from '../../../lib/js/subscribe';
-import '../../../../public/external_pkgs/lazysizes/lazysizes.min.js';
+import { subUsers } from '../../js/subscribe';
 import { initNKCSource } from '../../js/nkcSource.js';
+import { lazyLoadInit } from '../../js/lazyLoad';
+import { copyTextToClipboard } from '../../js/clipboard';
 
 const state = getState();
 export default {
@@ -817,6 +820,10 @@ export default {
       setTimeout(() => {
         initNKCSource();
       }, 10);
+    } else {
+      setTimeout(() => {
+        lazyLoadInit();
+      }, 10);
     }
   },
   computed: {
@@ -827,12 +834,12 @@ export default {
       return this.type === 'details';
     },
     targetContent() {
-      if(this.inDetails) {
+      if (this.inDetails) {
         return this.momentData.content;
       } else {
         return this.momentData.plain;
       }
-    }
+    },
   },
   destroyed() {
     this.clearTimer();
@@ -840,6 +847,13 @@ export default {
   methods: {
     objToStr: objToStr,
     visitUrl,
+    copyString: (text) => {
+      copyTextToClipboard(text)
+        .then(() => {
+          screenTopAlert('文号已复制到粘贴板');
+        })
+        .catch(sweetError);
+    },
     //取消关注和关注
     userFollow(status) {
       const self = this;
@@ -887,6 +901,14 @@ export default {
         });
       } else {
         this.visitUrl(`${this.momentData.url}?type=${showType}`, true);
+      }
+    },
+    clickDetail(url, e) {
+      e.preventDefault();
+      if (state.isApp) {
+        this.visitUrl(url, true);
+      } else {
+        this.$router.push(url);
       }
     },
     initData() {
@@ -1003,18 +1025,19 @@ export default {
           // 详情页面没有ref('momentDetails')
           return;
         }
-          const momentDetailsHeight = this.$refs.momentDetails.clientHeight;
-          const momentDetailsContentHeight =
-            this.$refs.momentDetailsContent.getBoundingClientRect().height;
-          const overFold = momentDetailsContentHeight > momentDetailsHeight;
-          this.isFold = this.$refs.momentDetailsContent.innerHTML
-            ? overFold
-            : false;
+        const momentDetailsHeight = this.$refs.momentDetails.clientHeight;
+        const momentDetailsContentHeight =
+          this.$refs.momentDetailsContent.getBoundingClientRect().height;
+        const overFold = momentDetailsContentHeight > momentDetailsHeight;
+        this.isFold = this.$refs.momentDetailsContent.innerHTML
+          ? overFold
+          : false;
       });
     },
     onPublished(data) {
       const { content, submitting, files, status, tlm, addr } = data;
       this.momentData.content = content;
+      this.momentData.plain = content;
       this.momentData.status = status;
       this.submitting = submitting;
       this.momentData.files = files;
@@ -1022,20 +1045,33 @@ export default {
       this.momentData.addr = addr;
       this.$refs.momentEditor.reset();
       this.showLoadMore();
+      this.$nextTick(() => {
+        lazyLoadInit();
+      });
     },
     openContent() {
-      if(this.momentData.mode === 'rich') {
+      if (this.momentData.mode === 'rich') {
         this.visitRichContent();
       } else {
         this.expandContent = true;
       }
     },
     visitRichContent() {
-      this.$router.push(`${this.momentData.url}`);
+      if (state.isApp) {
+        this.visitUrl(this.momentData.url, true);
+      } else {
+        this.$router.push(`${this.momentData.url}`);
+      }
     },
     closeContent() {
       this.expandContent = false;
-    }
+    },
+    cancelEdit() {
+      this.submitting = true;
+      this.$nextTick(() => {
+        lazyLoadInit();
+      });
+    },
   },
 };
 </script>

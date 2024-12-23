@@ -486,10 +486,9 @@ schema.statics.copyToHistoryToEditDocument = async function (
   const currentDocument = await DocumentModel.findOne({
     uid,
     _id,
-    type: documentTypes.betaHistory,
   });
   if (!currentDocument) {
-    ThrowCommonError(400, `当前文章不存在，请刷新页面重试`);
+    ThrowCommonError(400, `当前内容数据异常，请刷新页面重试`);
   }
   // 复制当前文档数据创建历史文档
   await currentDocument.copyToHistoryDocument('edit');
@@ -521,7 +520,8 @@ schema.statics.copyBetaToHistoryBySource = async (source, sid) => {
   const DocumentModel = mongoose.model('documents');
   const betaDocument = await DocumentModel.getBetaDocumentBySource(source, sid);
   if (!betaDocument) {
-    ThrowCommonError(400, `不存在编辑版，无法保存历史`);
+    return;
+    // ThrowCommonError(400, `不存在编辑版，无法保存历史`);
   }
   await betaDocument.copyToHistoryDocument();
 };
@@ -1765,7 +1765,9 @@ schema.statics.insertSystemRecordContent = async (type, user, ctx) => {
   }
   // 获取积分策略对象
   const operation = await SettingModel.getScoreOperationsByType(type);
-  if (!operation) return;
+  if (!operation) {
+    return;
+  }
   //获取后台积分设置
   const enabledScores = await SettingModel.getEnabledScores();
   const scores = {};
@@ -1774,7 +1776,9 @@ schema.statics.insertSystemRecordContent = async (type, user, ctx) => {
     user,
     type,
   );
-  if (operation.count !== -1 && operation.count <= operationLogCount) return;
+  if (operation.count !== -1 && operation.count <= operationLogCount) {
+    return;
+  }
   for (const e of enabledScores) {
     const scoreType = e.type;
     scores[scoreType] = operation[scoreType];
@@ -1869,9 +1873,9 @@ schema.statics.disabledToDraftDocuments = async function () {
     delType: faultyStatus,
     postType: { $in: [articleSource, commentSource] },
     modifyType: false,
-      toc: {
-        $lte: Date.now() - 3 * 24 * 60 * 1000,
-      },
+    toc: {
+      $lte: Date.now() - 3 * 24 * 60 * 1000,
+    },
   };
   //查找对document的退修记录
   const onLog = await DelPostLogModel.find(match);

@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice } = require("../../../nkcModules/json");
 const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 
 module.exports = async (ctx, next) => {
@@ -120,10 +121,10 @@ module.exports = async (ctx, next) => {
           const column = await c.extendColumnPost();
           //获取当前引用的专栏
           t.type = 'article';
-          need_t.content = nkcModules.nkcRender.htmlToPlain(
-            t.document.l === 'json'
-              ? renderHTMLByJSON({ json: t.document.content })
-              : t.document.content,
+          need_t.content =  t.document.l === 'json'
+          ? getJsonStringTextSlice(t.document.content ,200)
+          : nkcModules.nkcRender.htmlToPlain(
+           t.document.content,
             200,
           );
           need_t.title = t.document.title;

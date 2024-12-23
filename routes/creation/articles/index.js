@@ -69,7 +69,7 @@ router
         hasDraft: true,
       };
       articles = await db.ArticleModel.find(m).sort({ toc: -1 }).limit(3);
-      const options = ['title'];
+      const options = ['title','l'];
       articles = await db.ArticleModel.extendDocumentsOfArticles(
         articles,
         'beta',

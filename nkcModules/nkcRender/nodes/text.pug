@@ -46,10 +46,10 @@ mixin renderText(node)
             isCode = true;
             break;  
           case 'subscript':
-            style += 'vertical-align: sub;';
+            style += 'vertical-align: sub;font-size:75%;';
             break;
           case 'superscript':
-            style += 'vertical-align: super;';
+            style += 'vertical-align: super;font-size:75%;';
             break;
           default:
             console.log(`Unknown mark type: ${mark.type}`);
@@ -72,7 +72,7 @@ mixin renderText(node)
             
       else  
         if isCode
-          code=node.text
+          code(style='white-space: pre-wrap;')=node.text
         else
           -
             const usersObj = {};
@@ -104,13 +104,13 @@ mixin renderText(node)
                 return `<span data-type="nkc-url" data-url="${Buffer.from(encodeURIComponent(c)).toString('base64')}">${arr.join('')}</span>`;
               }
             });
-            const replacedText = replacedLink.replace(/#((D|t)?\d+)/g, (match, p1) => {
-              const link = /^D(\d+)$/.test(p1)
-                ? `/document/d/${p1.replace(/^D/, '')}`
-                : `/p/${p1}?redirect=true`;
-              return `<a href="${link}" target="_blank">${match}</a>`;
-            });
-          span!=replacedText
+            //- const replacedText = replacedLink.replace(/#((D|t)?\d+)/g, (match, p1) => {
+            //-   const link = /^D(\d+)$/.test(p1)
+            //-     ? `/document/d/${p1.replace(/^D/, '')}`
+            //-     : `/p/${p1}?redirect=true`;
+            //-   return `<a href="${link}" target="_blank">${match}</a>`;
+            //- });
+          span(style='white-space: pre-wrap;')!=replacedLink
           //- span= node.text
     if isStrike
       s

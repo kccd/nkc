@@ -16,6 +16,8 @@
             button(@click="play")
               .fa.fa-play-circle
               span 预览
+      .video-mask(v-if="!showMask && showAPP " style="background-color: transparent;" @click="viewVideoForApp")
+        .video-mask-container     
       video.plyr-dom(
         ref='videoDom'
         :data-poster="file.coverUrl"
@@ -114,7 +116,8 @@
       player: null,
       isVisitor: !state.uid,
       maskRemoved: false,
-      visitorMask: "视频暂不能访问，请登录试试"
+      visitorMask: "视频暂不能访问，请登录试试",
+      showAPP: state.isApp && state.appVersionCode>=5,
     }),
     computed: {
       // 当前用户是否有权限观看视频
@@ -157,11 +160,18 @@
         this.maskRemoved = true;
       },
       play() {
-        this.hideMask();
-        this.player.play();
+        if(state.isApp && state.appVersionCode>=5){
+          window.RootApp.viewVideoForApp(this.file.rid);
+        }else{
+          this.hideMask();
+          this.player.play();
+        }
       },
       openDownloadPanel() {
         this.$refs.downloadPanel.open(this.file.rid);
+      },
+      viewVideoForApp(){
+        window.RootApp.viewVideoForApp(this.file.rid);
       }
     }
   }

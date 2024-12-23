@@ -1,5 +1,5 @@
 <template lang="pug">
-  node-view-wrapper
+  node-view-wrapper(:class="$style.container")
     .table-toolbar.p-t-05
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="toggleHeaderRow" :disabled="!isTableFocused") 标题行
       button.m-r-05.m-b-05.btn.btn-default.btn-xs(@mousedown="toggleHeaderCell" :disabled="!isTableFocused") 标题列
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {nodeViewProps, NodeViewWrapper, NodeViewContent} from "@tiptap/vue-2";
+import { nodeViewProps, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-2';
 
 export default {
   components: {
@@ -37,7 +37,7 @@ export default {
       // 遍历从当前选区位置到根节点的路径
       for (let depth = $from.depth; depth > 0; depth--) {
         const node = $from.node(depth);
-        if(node === this.node) {
+        if (node === this.node) {
           return true;
         }
       }
@@ -75,13 +75,15 @@ export default {
       this.deleteNode();
       // this.editor.chain().focus().deleteTable().run();
     },
-  }
-}
+  },
+};
 </script>
 
-<style scoped lang="less">
+<style scoped lang="less" module>
 .table-toolbar {
   user-select: none;
 }
+.container {
+  margin-bottom: 0.5rem;
+}
 </style>
-

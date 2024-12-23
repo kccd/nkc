@@ -14,11 +14,29 @@ mixin renderPictureInline(node)
       else 
         if !width || !height
           span(data-tag="nkcsource" data-type="picture" data-id=`${id}`)
-            img(data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data=`${tools.objToStr({ name: oname, url: lgUrl },)}` src=`${url}` alt=`${oname}` data-type="view" dataimg="content")
+            img(
+              data-global-click="viewImage"
+              data-global-long-press="longPressImageForRN"
+              data-global-data=`${tools.objToStr({ name: oname, url: lgUrl },)}`
+              data-src=url
+              alt=oname
+              data-type="view"
+              dataimg="content"
+              class="lazyload"
+              )
         else 
           span(data-tag="nkcsource" data-type="picture" data-id=`${id}` style=`width: ${width}px;`)
             span(style=`padding-top: ${(height * 100) / width}%`)
-              img(data-global-click="viewImage" data-global-long-press="downloadFile" data-global-data=`${tools.objToStr({ name: oname, url: lgUrl, height: height, width: width },)}` data-src=`${url}` alt=`${oname}` data-type="view" dataimg="content" class="lazyload")
+              img(
+                data-global-click="viewImage"
+                data-global-long-press="longPressImageForRN"
+                data-global-data=`${tools.objToStr({ name: oname, url: lgUrl, height: height, width: width },)}`
+                data-src=url
+                alt=oname
+                data-type="view"
+                dataimg="content"
+                class="lazyload"
+                )
   else 
     span(data-tag="nkcsource" data-type="externalImage" data-id=node.attrs.id) 外链图片已失效，请作者重新上传
 

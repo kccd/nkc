@@ -14,6 +14,6 @@ module.exports = {
     'prettier/prettier': 'error',
     semi: ['warn', 'always'],
     curly: ['error', 'all'],
-    'no-unreachable': false,
+    'no-unused-vars': 'off',
   },
 };

@@ -104,6 +104,7 @@
 </style>
 
 <script>
+import { getState } from '../../lib/js/state';
 export default {
   props: ['fund', 'inimoney', 'refund'],
   data: () => ({
@@ -256,6 +257,16 @@ export default {
         refund
       } = this;
       let newWindow = null;
+      let apiType = '';
+      if(NKC.methods.isPcBrowser()){
+        apiType='native';
+      }else{
+        if(navigator.userAgent.indexOf("MicroMessenger")>0){
+          apiType='jsApi';
+        }else{
+          apiType='H5';
+        }
+      }
       return Promise.resolve()
         .then(() => {
           if(realMoney < donation.min) {
@@ -273,7 +284,7 @@ export default {
           return nkcAPI('/fund/donation', 'POST', {
             money: realMoney,
             fee,
-            apiType: NKC.methods.isPcBrowser()? 'native': 'H5',
+            apiType,
             paymentType,
             fundId,
             anonymous,
@@ -283,7 +294,12 @@ export default {
         .then(res => {
           const {aliPaymentInfo, wechatPaymentInfo} = res;
           if(wechatPaymentInfo) {
-            NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+            // 判断是否是jsApi支付==》后端已经在数据库创建好一条支付数据，这里直接跳转到微信支付页
+            if( apiType==='jsApi'){
+              newWindow.location = wechatPaymentInfo.url;
+            }else{
+              NKC.methods.toPay('wechatPay', wechatPaymentInfo, newWindow);
+            }
           } else if(aliPaymentInfo) {
             NKC.methods.toPay('aliPay', aliPaymentInfo, newWindow);
           }

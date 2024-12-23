@@ -3,6 +3,7 @@ const shareRouter = new Router();
 const apiFn = require('../../nkcModules/apiFunction');
 const serverConfig = require('../../config/server');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const reg = new RegExp(
   `^` + serverConfig.domain.replace(/\//g, '\\/').replace(/\./g, '\\.'),
   'i',
@@ -126,8 +127,8 @@ shareRouter
       } else {
         result.title = post.t;
       }
-      result.description = nkcModules.nkcRender.htmlToPlain(
-        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+      result.description = post.l === 'json' ? getJsonStringTextSlice(post.c,100) : nkcModules.nkcRender.htmlToPlain(
+         post.c,
         100,
       );
       result.cover = post.cover || firstPost.cover;
@@ -142,10 +143,10 @@ shareRouter
         { t: 1, cover: 1, l: 1 },
       );
       result.title = firstPost.t;
-      result.description = nkcModules.nkcRender.htmlToPlain(
-        firstPost.l === 'json'
-          ? renderHTMLByJSON({ json: firstPost.c })
-          : firstPost.c,
+      result.description = firstPost.l === 'json'
+      ? getJsonStringTextSlice(firstPost.c,100)
+      : nkcModules.nkcRender.htmlToPlain(
+        firstPost.c,
         100,
       );
       result.cover = firstPost.cover;
@@ -167,10 +168,10 @@ shareRouter
       let comment = await db.CommentModel.findOnly({ _id: id });
       comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
       result.title = comment.articleDocument.title;
-      result.description = nkcModules.nkcRender.htmlToPlain(
-        comment.commentDocument.l === 'json'
-          ? renderHTMLByJSON({ json: comment.commentDocument.content })
-          : comment.commentDocument.content,
+      result.description = comment.commentDocument.l === 'json'
+      ? getJsonStringTextSlice(comment.commentDocument.content,100)
+      : nkcModules.nkcRender.htmlToPlain(
+        comment.commentDocument.content,
         100,
       );
       if (comment.cover) {
@@ -180,10 +181,10 @@ shareRouter
       let article = await db.ArticleModel.findOnly({ _id: id });
       article = (await db.ArticleModel.getArticlesInfo([article]))[0];
       result.title = article.document.title;
-      result.description = nkcModules.nkcRender.htmlToPlain(
-        article.document.l === 'json'
-          ? renderHTMLByJSON({ json: article.document.content })
-          : article.document.content,
+      result.description = article.document.l === 'json'
+      ? getJsonStringTextSlice(article.document.content ,100)
+      : nkcModules.nkcRender.htmlToPlain(
+        article.document.content,
         100,
       );
       if (article.document.cover) {

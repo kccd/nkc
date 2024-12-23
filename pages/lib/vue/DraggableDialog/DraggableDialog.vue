@@ -1,8 +1,21 @@
 <template>
-  <draggable-dialog-lg v-if="!isScreenXS" :title="title" :height="height" :width="width" @close="close" v-show="show">
+  <draggable-dialog-lg
+    v-if="!isScreenXS"
+    :title="title"
+    :height="height"
+    :width="width"
+    @close="close"
+    v-show="show"
+  >
     <slot></slot>
   </draggable-dialog-lg>
-  <draggable-dialog-xs v-else :title="title" :height="heightXS" @close="close" v-show="show">
+  <draggable-dialog-xs
+    v-else
+    :title="title"
+    :height="heightXS"
+    @close="close"
+    v-show="show"
+  >
     <slot></slot>
   </draggable-dialog-xs>
 </template>
@@ -10,8 +23,12 @@
 <script>
 import DraggableDialogXS from './DraggableDialogXS.vue';
 import DraggableDialogLG from './DraggableDialogLG.vue';
-import {getScreenSizeModel} from '../../js/screen';
-import { disableScroll, enableScroll } from "../../js/scrollBar";
+import { getScreenSizeModel } from '../../js/screen';
+import { disableScroll, enableScroll } from '../../js/scrollBar';
+import { getState } from '../../js/state';
+import { RNDisableRefresher, RNEnableRefresher } from '../../js/reactNative';
+const { isApp } = getState();
+
 export default {
   props: ['title', 'width', 'height', 'heightXS'],
   data: () => ({
@@ -28,19 +45,25 @@ export default {
     },
     open() {
       this.show = true;
-      if(this.isScreenXS) {
+      if (this.isScreenXS) {
         disableScroll();
+      }
+      if (isApp) {
+        RNDisableRefresher();
       }
     },
     close() {
       this.show = false;
-      if(this.isScreenXS) {
+      if (this.isScreenXS) {
         enableScroll();
+      }
+      if (isApp) {
+        RNEnableRefresher();
       }
     },
   },
   mounted() {
     this.initScreenSizeModel();
-  }
-}
+  },
+};
 </script>

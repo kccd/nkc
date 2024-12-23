@@ -1,5 +1,10 @@
 const Router = require('koa-router');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const {
+  getJsonStringTextSlice,
+  getJsonStringText,
+} = require('../../nkcModules/json');
+const { momentVisibleType } = require('../../settings/moment');
 const router = new Router();
 router.get('/', async (ctx, next) => {
   const time = Date.now();
@@ -183,7 +188,11 @@ router.get('/', async (ctx, next) => {
       perpage = searchColumnList;
     } else if (t === 'resource') {
       perpage = searchResourceList;
-    } else if (t === 'document_article' || t === 'document_comment') {
+    } else if (
+      t === 'document_article' ||
+      t === 'document_comment' ||
+      t === 'document_moment'
+    ) {
       perpage = searchDocumentList;
     } else {
       perpage = searchAllList;
@@ -237,6 +246,7 @@ router.get('/', async (ctx, next) => {
     const resourceId = new Set();
     const articleDocumentId = new Set();
     const commentDocumentId = new Set();
+    const momentDocumentId = new Set();
     let threadCategoriesId = [];
     const highlightObj = {};
     results.map((r) => {
@@ -255,18 +265,22 @@ router.get('/', async (ctx, next) => {
         articleDocumentId.add(r.tid);
       } else if (r.docType === 'document_comment') {
         commentDocumentId.add(r.tid);
+      } else if (r.docType === 'document_moment') {
+        momentDocumentId.add(r.tid);
       }
       if (r.highlight) {
         if (
           r.docType === 'post' ||
           r.docType === 'thread' ||
           r.docType === 'document_article' ||
-          r.docType === 'document_comment'
+          r.docType === 'document_comment' ||
+          r.docType === 'document_moment'
         ) {
           let _id = r.pid;
           if (
             r.docType === 'document_article' ||
-            r.docType === 'document_comment'
+            r.docType === 'document_comment' ||
+            r.docType === 'document_moment'
           ) {
             _id = r.tid;
           }
@@ -301,7 +315,8 @@ router.get('/', async (ctx, next) => {
           }
           if (
             (r.docType === 'document_article' ||
-              r.docType === 'document_comment') &&
+              r.docType === 'document_comment' ||
+              r.docType === 'document_moment') &&
             r.highlight.tid
           ) {
             highlightObj[_id + '_tid'] = '文号：' + r.highlight.tid;
@@ -352,11 +367,10 @@ router.get('/', async (ctx, next) => {
     });
     posts.map((post) => {
       tids.add(post.tid);
-      post.c = nkcModules.apiFunction.obtainPureText(
-        post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
-        true,
-        200,
-      );
+      post.c =
+        post.l === 'json'
+          ? getJsonStringTextSlice(post.c, 200)
+          : nkcModules.apiFunction.obtainPureText(post.c, true, 200);
       postObj[post.pid] = post;
     });
 
@@ -433,8 +447,19 @@ router.get('/', async (ctx, next) => {
       did: { $in: [...commentDocumentId] },
       status: normalStatus,
     });
+    let moments = await db.MomentModel.find({
+      did: { $in: [...momentDocumentId] },
+      status: normalStatus,
+      visibleType: momentVisibleType.everyone,
+    });
+
     articles = await db.ArticleModel.getArticlesInfo(articles);
     comments = await db.CommentModel.getCommentsInfo(comments);
+    const momentObj = await db.MomentModel.extendMomentsData(
+      moments,
+      state.uid,
+      'did',
+    );
     for (const a of articles) {
       articlesObj[a.did] = a;
     }
@@ -586,11 +611,10 @@ router.get('/', async (ctx, next) => {
             continue;
           }
         }
-        page.c = nkcModules.apiFunction.obtainPureText(
-          page.l === 'json' ? renderHTMLByJSON({ json: page.c }) : page.c,
-          true,
-          200,
-        );
+        page.c =
+          page.l === 'json'
+            ? getJsonStringText(page.c)
+            : nkcModules.apiFunction.obtainPureText(page.c, true, 200);
         r = {
           docType,
           t: highlightObj[`${tid}_t`] || page.t,
@@ -643,13 +667,13 @@ router.get('/', async (ctx, next) => {
             highlightObj[`${tid}_abstractCN`] ||
             highlightObj[`${tid}_content`] ||
             '内容：' +
-              nkcModules.apiFunction.obtainPureText(
-                document.l === 'json'
-                  ? renderHTMLByJSON({ json: document.content })
-                  : document.content,
-                true,
-                200,
-              ),
+              (document.l === 'json'
+                ? getJsonStringTextSlice(document.content, 200)
+                : nkcModules.apiFunction.obtainPureText(
+                    document.content,
+                    true,
+                    200,
+                  )),
           documentTime: document.toc,
           articleTime: article.toc,
           tid: document.did,
@@ -690,13 +714,13 @@ router.get('/', async (ctx, next) => {
             highlightObj[`${tid}_authors`] ||
             highlightObj[`${tid}_content`] ||
             '内容：' +
-              nkcModules.apiFunction.obtainPureText(
-                commentDocument.l === 'json'
-                  ? renderHTMLByJSON({ json: commentDocument.content })
-                  : commentDocument.content,
-                true,
-                200,
-              ),
+              (commentDocument.l === 'json'
+                ? getJsonStringTextSlice(commentDocument.content, 200)
+                : nkcModules.apiFunction.obtainPureText(
+                    commentDocument.content,
+                    true,
+                    200,
+                  )),
           articleTime: articleDocument.toc,
           commentTime: commentDocument.toc,
           user: commentUser,
@@ -712,6 +736,22 @@ router.get('/', async (ctx, next) => {
             username: commentUser.username,
           };
         }
+      } else if (docType === 'document_moment') {
+        const moment = momentObj[tid];
+        if (!moment) {
+          continue;
+        }
+        r = {
+          docType,
+          time: moment.toc,
+          user: userObj[moment.uid],
+          docNumber: highlightObj[`${tid}_tid`],
+          abstract:
+            highlightObj[`${tid}_content`] ||
+            '内容：' +
+              nkcModules.apiFunction.obtainPureText(moment.plain, true, 200),
+          url: moment.url,
+        };
       }
       data.results.push(r);
     }

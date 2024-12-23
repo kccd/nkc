@@ -8,9 +8,11 @@ const koaCompress = require('koa-compress');
 const koaRewrite = require('koa-rewrite');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
+const cors = require('@koa/cors');
 const { isProduction } = require('./settings/env');
 const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
+const serverConfig = require('./config/server');
 const { getUrl } = require('./nkcModules/tools');
 const staticServe = (path) => {
   return require('koa-static')(path, {
@@ -31,7 +33,6 @@ app.on('error', (err) => {
 });
 
 const {
-  rateLimit,
   stayLogin,
   init,
   initState,
@@ -53,7 +54,13 @@ const koaBodySetting = settings.upload.koaBodySetting;
 koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
 app.keys = getCookieKeys();
 app
-  .use(rateLimit.total)
+  .use(
+    cors({
+      origin: serverConfig.domain,
+      allowMethods: ['GET', 'HEAD', 'OPTIONS', 'POST'],
+      allowHeaders: ['Content-Type', 'Authorization', 'FROM'],
+    }),
+  )
   // gzip
   .use(koaCompress({ threshold: 2048 }))
   // 静态文件映射
@@ -77,13 +84,6 @@ app
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
-  // 全局 频次限制 文件
-  .use(rateLimit.totalFile)
-  .use(rateLimit.totalHtml)
-
-  .use(rateLimit.userFile)
-  .use(rateLimit.userHtml)
-
   .use(stayLogin)
   .use(cache)
   .use(permission.permission)

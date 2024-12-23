@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const draftsRouter = new Router();
 draftsRouter
   .get('/', async (ctx, next) => {
@@ -94,8 +95,8 @@ draftsRouter
           url: `/f/${forum.fid}`
         };
       } */
-      d.c = nkcModules.apiFunction.obtainPureText(
-        d.l === 'json' ? renderHTMLByJSON({ json: d.c }) : d.c,
+      d.c = d.l === 'json' ? getJsonStringTextSlice(d.c,300) : nkcModules.apiFunction.obtainPureText(
+         d.c,
         true,
         300,
       );

@@ -161,6 +161,18 @@ export function RNViewImage(urls, index) {
   });
 }
 
+export function RNViewVideo(videos, index) {
+  for (const video of videos) {
+    video.coverUrl = fixUrl(video.coverUrl);
+    for (const source of video.sources) {
+      source.url = fixUrl(source.url);
+    }
+  }
+  RNEmit('viewVideo', {
+    videos,
+    index,
+  });
+}
 /*
  * 关闭当前页面
  * @param {Object} data
@@ -428,4 +440,18 @@ export function RNSetSharePanelStatus(show = true, type, id) {
     type,
     id,
   });
+}
+/*
+ * 屏蔽下拉刷新
+ * */
+
+export function RNDisableRefresher() {
+  RNEmit('disableRefresher');
+}
+/*
+ * 解除屏蔽下拉刷新
+ * */
+
+export function RNEnableRefresher() {
+  RNEmit('enableRefresher');
 }

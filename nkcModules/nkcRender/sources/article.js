@@ -21,18 +21,40 @@ module.exports = {
     if (!width || !height) {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}">
-          <img data-global-click="viewImage" data-global-long-press="longPressImageForRN" data-global-data="${objToStr(
-            { name: oname, url: lgUrl },
-          )}" src="${url}" alt="${oname}" data-type="view" dataimg="content">
+          <img 
+            data-global-click="viewImage" 
+            data-global-long-press="longPressImageForRN" 
+            data-global-data="${objToStr({
+              name: oname,
+              url: lgUrl,
+            })}" 
+            data-src="${url}" 
+            alt="${oname}" 
+            data-type="view" 
+            dataimg="content"
+            class="lazyload"
+          >
         </span>
       `.trim();
     } else {
       return `
         <span data-tag="nkcsource" data-type="picture" data-id="${id}" style="width: ${width}px;">
           <span style="padding-top: ${(height * 100) / width}%">
-            <img data-global-click="viewImage" data-global-long-press="longPressImageForRN" data-global-data="${objToStr(
-              { name: oname, url: lgUrl, height: height, width: width },
-            )}" data-src="${url}" alt="${oname}" data-type="view" dataimg="content" class="lazyload">
+            <img 
+              data-global-click="viewImage" 
+              data-global-long-press="longPressImageForRN" 
+              data-global-data="${objToStr({
+                name: oname,
+                url: lgUrl,
+                height: height,
+                width: width,
+              })}" 
+              data-src="${url}" 
+              alt="${oname}" 
+              data-type="view" 
+              dataimg="content" 
+              class="lazyload"
+            >
           </span>
         </span>
       `.trim();
@@ -66,9 +88,7 @@ module.exports = {
         sourceHtml += `<source src="${url}" type="video/mp4" size="${height}" data-size="${dataSize}"> 你的浏览器不支持video标签，请升级。`;
         // downloadHtml += `<a href="${downloadUrl}" data-type="download" data-title="${oname}" target="_blank">${height}p(${dataSize})</a> `;
       }
-      downloadHtml = `<a data-global-click="openDownloadPanel" data-global-data="${tools.objToStr(
-        { rid: resource.rid },
-      )}">点击下载</a>`;
+      downloadHtml = `<a>点击下载</a>`;
       return `
       <span data-tag="nkcsource" data-type="video" data-id="${id}" data-visitor-access="${visitorAccess}" data-mask="${mask}">
         <span>
@@ -76,7 +96,12 @@ module.exports = {
             ${sourceHtml}
           </video>
         </span>
-        <span data-type="nkcsource-video-title" class="nkcsource-video-title" data-title="${oname}"><span>${oname}&nbsp;</span><span>${downloadHtml}</span></span>
+        <span data-type="nkcsource-video-title" class="nkcsource-video-title" data-title="${oname}">
+          <span>${oname}&nbsp;</span>
+          <span data-global-click="openDownloadPanel" data-global-data="${tools.objToStr(
+            { rid: resource.rid },
+          )}">${downloadHtml}</span>
+        </span>
       </span>
     `.trim();
     } else {
@@ -179,10 +204,27 @@ module.exports = {
     `.trim();
   },
   pre(html) {
-    return html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/gi, (content, v1, v2) => {
-      // v2 = htmlEscape(v2);
-      return `<pre${v1}>${v2}</pre>`;
-    });
+    const $ = cheerio.load(html);
+    const originCode = $('code');
+    const newCode = $('<code></code>');
+    const originPre = $('pre').eq(0);
+    const language = originPre.attr('data-id') || 'other';
+    if (originCode.length === 0) {
+      newCode.text(originPre.text());
+    } else if (originCode.length > 1) {
+      let text = '';
+      for (let i = 0; i < originCode.length; i++) {
+        text += originCode.eq(i).text();
+      }
+      newCode.text(text);
+    } else {
+      newCode.text(originCode.eq(0).text());
+    }
+    const pre = $('<pre data-tag="nkcsource" data-type="pre"></pre>');
+    pre.attr('data-id', language);
+    newCode.attr('class', `language-${language}`);
+    pre.append(newCode);
+    return pre.prop('outerHTML');
   },
   xsf(html, id, r, user = {}) {
     const { xsf = 0 } = user;

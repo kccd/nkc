@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice } = require('../../../nkcModules/json');
 const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 const {
   subscribeUserService,
@@ -97,10 +98,10 @@ module.exports = async (ctx, next) => {
     for (const article of zoneArticles) {
       data.momentsData.push({
         type: 'article',
-        content: nkcModules.nkcRender.htmlToPlain(
-          article.document.l === 'json'
-            ? renderHTMLByJSON({ json: article.document.content })
-            : article.document.content,
+        content: article.document.l === 'json'
+        ? getJsonStringTextSlice(article.document.content ,200)
+        : nkcModules.nkcRender.htmlToPlain(
+          article.document.content,
           200,
         ),
         title: article.document.title,

@@ -1,3 +1,4 @@
+import {getState} from '../../lib/js/state';
 const threadSettings = NKC.methods.getDataById("threadSettings");
 NKC.methods.initPlyrMask = function(player) {
   if(player.type === 'video') {
@@ -69,8 +70,24 @@ function getVideoPreviewMask(player) {
   maskDownloadButton.attr('data-id', rid);
   maskDownloadButton.removeClass('hidden');
   maskPlayButton.on("click", () => {
-    mask.remove();
-    player.play();
+    if (getState().isApp && getState().appVersionCode >= 5) {
+      window.RootApp.viewVideoForApp(rid);
+    } else {
+      mask.remove();
+      player.play();
+    }
+  });
+  return mask;
+}
+function getAppPreviewMask(player) {
+  const nkcSource = getNkcSource(player.elements.container);
+  // nkcSource.find(".plyr__control.plyr__control--overlaid").remove();
+  const mask = $("#plyrMask .plyr-mask-video-preview").clone(false);
+  mask.find(".plyr-mask-fix").remove();
+  mask.css("background-color", "transparent");
+  const rid = nkcSource.attr('data-id');
+  mask.on('click', () => {
+    window.RootApp.viewVideoForApp(rid);
   });
   return mask;
 }
@@ -98,6 +115,9 @@ function setVideoMask(player) {
     mask = getVideoVisitorAccessMask(player);
   } else if(threadSettings.isDisplay) {
     mask = getVideoPreviewMask(player);
+  }
+  if (!mask && getState().isApp && getState().appVersionCode >= 5) {
+    mask = getAppPreviewMask(player);
   }
   if(mask) nkcSource.find('.plyr').append(mask);
 }

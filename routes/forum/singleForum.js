@@ -18,7 +18,7 @@ const {
 const { subscribeSources } = require('../../settings/subscribe');
 const { forumListService } = require('../../services/forum/forumList.service');
 const { userForumService } = require('../../services/user/userForum.service');
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { editorRichService } = require('../../services/editor/rich.service');
 router
   .post('/', async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
@@ -58,19 +58,14 @@ router
       ctx.throw(400, `标题不能超过100个字`);
     }
     // 需要兼容json格式数据内容
-    let content = '';
-    if (l === 'json') {
-      content = customCheerio.load(renderHTMLByJSON({ json: c })).text();
-    } else {
-      content = customCheerio.load(c).text();
-    }
-    if (content.length < 2) {
+    const contentSize = editorRichService.getRichContentWordsSize(l, c);
+    if (contentSize < 2) {
       ctx.throw(400, `内容不能少于2个字`);
     }
-    if (content.length > 100000) {
+    if (contentSize > 100000) {
       ctx.throw(400, `内容不能超过10万字`);
     }
-    if (content && content.length < 500 && Number(originState) !== 0) {
+    if (contentSize < 500 && Number(originState) !== 0) {
       post.originState = '0';
     }
     await db.ThreadCategoryModel.checkCategoriesId(tcId);

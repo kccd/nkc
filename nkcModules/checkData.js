@@ -78,7 +78,7 @@ var CheckData = function () {
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
       if (node.type === 'text') {
-        totalSize += self.getLength(node.text);
+        totalSize += self.getLength((node.text || '').trim());
       } else {
         var currentNodeSize = nodesSize[node.type] || 0;
         totalSize += currentNodeSize;

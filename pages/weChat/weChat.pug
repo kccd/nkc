@@ -1,0 +1,56 @@
+extends ../bootstrap_base
+block title
+  title 微信支付
+  style.
+    body{
+      background-color: #fff;
+    }
+    .record-status-icon{
+      margin: 0 auto 1rem auto;
+      height: 5rem;
+      width: 5rem;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 5rem;
+      font-size: 2.5rem;
+      overflow: hidden;
+      color: #fff;
+    }
+    .record-status-icon.waiting{
+      background-color: #aaa;
+    }
+    .record-status-icon.success {
+      background-color: green;
+    }
+    .record-status-icon.fail{
+      background-color: red;
+    }
+    .record-status-desc{
+      text-align: center;
+      color: #000;
+      font-size: 1.6rem;
+    }
+    .record-links{
+      text-align: center;
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.col-md-offset-1(style='text-align: center;')
+        .record-status-icon(class="waiting")
+          .fa.fa-clock-o
+        .record-status-icon(class="success hidden")
+          .fa.fa-check
+        .record-status-icon(class="fail hidden")
+          .fa.fa-exclamation
+        .record-status-desc.m-b-05#tips 等待支付...
+        .record-links.m-b-1(class="hidden")
+          span(class=` ${state.uid ? '' : 'hidden' }`)
+            a(href='/account/finance/recharge') 充值中心
+            span &nbsp;&nbsp;
+            a(href=`/u/${state.uid}/profile/finance?t=all`) 我的账单
+            span &nbsp;&nbsp;
+            a(href='/shop/order') 我的订单
+      .hidden#data=objToStr({info:data.info})
+block scripts
+  +includeJS('/weChat/weChat.js')

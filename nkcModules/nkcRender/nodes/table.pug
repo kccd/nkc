@@ -1,3 +1,4 @@
-mixin renderTable(node) 
-  table.table.table-bordered.m-b-0
-    +loopRender(node.content)
+mixin renderTable(node)
+  .table-responsive(data-tag="nkcsource" data-type='table')
+    table.table.table-bordered
+      +loopRender(node.content)

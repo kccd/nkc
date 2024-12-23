@@ -16,5 +16,6 @@ mixin renderCodeBlock(node)
       return text;
     }
     const textContent = getNodesText(node?.content);
-    const la = node?.attrs?.language || 'plain';
-  pre(data-tag="nkcsource" data-type="pre" data-id=`${la}`)=textContent
+    const la = node?.attrs?.language || 'other';
+  pre(data-tag="nkcsource" data-type="pre" data-id=`${la}`)
+    code(class=`language-${la}`)=textContent

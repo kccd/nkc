@@ -1,3 +1,4 @@
+const { getJsonStringTextSlice } = require("../../../nkcModules/json");
 const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 
 module.exports = async (ctx, next) => {
@@ -70,8 +71,8 @@ module.exports = async (ctx, next) => {
       post.parentPost = parentPostsObj[post.parentPostId];
     }
     post.url = await db.PostModel.getUrl(post.pid);
-    post.c = nkcModules.apiFunction.obtainPureText(
-      post.l === 'json' ? renderHTMLByJSON({ json: post.c }) : post.c,
+    post.c =  post.l === 'json' ? getJsonStringTextSlice(post.c,200) : nkcModules.apiFunction.obtainPureText(
+      post.c,
       true,
       200,
     );

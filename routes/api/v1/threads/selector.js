@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const permissions = require('../../../../middlewares/permission');
+const { getJsonStringTextSlice } = require('../../../../nkcModules/json');
 const { renderHTMLByJSON } = require('../../../../nkcModules/nkcRender/json');
 router
   .get('/', permissions.OnlyUser(), async (ctx, next) => {
@@ -72,8 +73,8 @@ router
           toc: item.toc,
           t: item.t,
           source: postType.thread,
-          c: nkcModules.nkcRender.htmlToPlain(
-            item.l === 'json' ? renderHTMLByJSON({ json: item.c }) : item.c,
+          c: item.l === 'json' ? getJsonStringTextSlice(item.c ,200) : nkcModules.nkcRender.htmlToPlain(
+            item.c,
             200,
           ),
           url: nkcModules.tools.getUrl('thread', item.tid),
