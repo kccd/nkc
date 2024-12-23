@@ -111,6 +111,12 @@ function OnlyPermissionsAnd(operations) {
   };
 }
 
+function Public() {
+  return async (ctx, next) => {
+    await next();
+  };
+}
+
 module.exports = {
   permission,
   OnlyVisitor,
@@ -121,4 +127,5 @@ module.exports = {
   OnlyPermission,
   OnlyPermissionsAnd,
   OnlyPermissionsOr,
+  Public,
 };

@@ -33,7 +33,7 @@ app.on('error', (err) => {
 });
 
 const {
-  stayLogin,
+  auth,
   init,
   initState,
   initMethods,
@@ -82,7 +82,7 @@ app
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
-  .use(stayLogin)
+  .use(auth)
   .use(cache)
   .use(permission.permission)
   .use(logger)

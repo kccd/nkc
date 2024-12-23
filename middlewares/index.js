@@ -1,5 +1,5 @@
 module.exports = {
-  stayLogin: require('./stayLogin'),
+  auth: require('./auth'),
   init: require('./init'),
   initState: require('./initState'),
   initMethods: require('./initMethods'),
