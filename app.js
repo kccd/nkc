@@ -36,8 +36,7 @@ const {
   stayLogin,
   init,
   initState,
-  initAddress,
-  initCtxMethods,
+  initMethods,
   body,
   urlRewrite,
   permission,
@@ -77,10 +76,9 @@ app
   .use(etag())
   .use(urlRewrite)
   .use(koaRewrite('/favicon.ico', getUrl('siteIcon', 'ico')))
-  .use(initAddress)
   .use(init)
   .use(initState)
-  .use(initCtxMethods)
+  .use(initMethods)
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
