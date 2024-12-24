@@ -1,15 +1,20 @@
 const { getJsonStringText } = require("../../../nkcModules/json");
+const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
 
 module.exports = async (ctx, next) => {
+  //获取用户笔记
   const {nkcModules, data, db, query} = ctx;
   const {page = 0, t} = query;
   const {targetUser} = data;
   data.t = t;
   // 查看自己的笔记时，只需要排除自己已删除的笔记
+  const noteContentStatus = await db.NoteContentModel.getNoteContentStatus();
   const match = {
-    deleted: false,
-    type: "post",
     uid: targetUser.uid,
+    status: {
+      $ne: noteContentStatus.deleted,
+    },
+    type: "post",
   };
   let noteContent = await db.NoteContentModel.find(match).sort({toc: 1});
   noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
@@ -24,7 +29,7 @@ module.exports = async (ctx, next) => {
     notesContentObj[noteId].push(n);
     _notesId.push(noteId);
   });
-
+  
   const notes = await db.NoteModel.find({latest: true, originId: {$in: _notesId}}, {
     content: 1,
     type: 1,
@@ -33,7 +38,7 @@ module.exports = async (ctx, next) => {
     _id: 1
   });
   const postNotesObj = {};
-
+  
   notes.map(note => {
     note = note.toObject();
     const {targetId, originId} = note;
@@ -43,9 +48,9 @@ module.exports = async (ctx, next) => {
     if(!postNotesObj[targetId]) postNotesObj[targetId] = [];
     postNotesObj[targetId].push(note);
   });
-
+  
   postsId = [...postsId];
-
+  
   let posts = await db.PostModel.find({pid: {$in: postsId}}, {
     pid: 1,
     tid: 1,
@@ -56,11 +61,11 @@ module.exports = async (ctx, next) => {
     cv: 1,
     l: 1,
   });
-
+  
   const postsObj = {};
-
+  
   posts.map(post => postsObj[post.pid] = post);
-
+  
   posts = postsId.map(pid => {
     let post = postsObj[pid];
     if(post.toObject) post = post.toObject();
@@ -68,26 +73,26 @@ module.exports = async (ctx, next) => {
     return post;
   });
   const tidObj = {};
-
+  
   for(const post of posts) {
     const {tid} = post;
     post.url = await db.PostModel.getUrl(post.pid);
     if(!tidObj[tid]) tidObj[tid] = [];
     tidObj[tid].push(post);
   }
-
+  
   let threadsId = new Set(posts.map(post => post.tid));
   threadsId = [...threadsId].reverse();
   const paging = nkcModules.apiFunction.paging(page, threadsId.length);
   threadsId = threadsId.slice(paging.start, paging.start + paging.perpage);
-
+  
   let threads = await db.ThreadModel.find({tid: {$in: threadsId}});
-
+  
   const threadsObj = {};
   threads.map(t => threadsObj[t.tid] = t);
-
+  
   data.threads = [];
-
+  
   for(const tid of threadsId) {
     const t = threadsObj[tid];
     const r = {
@@ -110,12 +115,12 @@ module.exports = async (ctx, next) => {
     r.title = fp.t;
     r.cover = fp.cover;
     if (fp.l === 'json') {
-      fp.c = getJsonStringText(fp.c);
+      fp.c = getJsonStringText(fp.c );
     }
     r.abstract = nkcModules.apiFunction.obtainPureText(fp.abstractCn || fp.c, true, 200);
     data.threads.push(r)
   }
-
+  
   if(t !== "own") {
     const notesId = [];
     for(const thread of data.threads) {
@@ -132,15 +137,17 @@ module.exports = async (ctx, next) => {
     // 需要排除自己已删除的笔记和别人已删除和被屏蔽的笔记
     const ncMatch = {
       type: "post",
-      deleted: false,
       noteId: {$in: notesId},
       $or: [
         {
-          uid: targetUser.uid
+          uid: targetUser.uid,
+          status: {
+            $ne: noteContentStatus.deleted,
+          }
         },
         {
           uid: {$ne: targetUser.uid},
-          disabled: false
+          status: noteContentStatus.normal,
         }
       ]
     };
@@ -170,4 +177,4 @@ module.exports = async (ctx, next) => {
   }
   data.paging = paging;
   await next();
-};
+}

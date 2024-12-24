@@ -3,8 +3,9 @@ const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const draftsRouter = new Router();
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 draftsRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { user } = data;
     const { page = 0, id } = query;
@@ -95,17 +96,16 @@ draftsRouter
           url: `/f/${forum.fid}`
         };
       } */
-      d.c = d.l === 'json' ? getJsonStringTextSlice(d.c,300) : nkcModules.apiFunction.obtainPureText(
-         d.c,
-        true,
-        300,
-      );
+      d.c =
+        d.l === 'json'
+          ? getJsonStringTextSlice(d.c, 300)
+          : nkcModules.apiFunction.obtainPureText(d.c, true, 300);
       data.drafts.push(d);
     }
     ctx.template = 'user/drafts/drafts.pug';
     await next();
   })
-  .del('/:did', async (ctx, next) => {
+  .del('/:did', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data, params } = ctx;
     const { user } = data;
     let { did } = params;
@@ -124,7 +124,7 @@ draftsRouter
   })
   // 保存草稿
   // 注意草稿的查询由did最新的修改的beta版本为基准。
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
     const draftTypes = await db.DraftModel.getType();
@@ -259,8 +259,12 @@ draftsRouter
         data.userGrade,
         data.user,
       );
-      if (targetPost.disabled) ctx.throw(403, '无法引用已经被禁用的回复');
-      if (!targetPost.reviewed) ctx.throw(403, '回复未通过审核，暂无法引用');
+      if (targetPost.disabled) {
+        ctx.throw(403, '无法引用已经被禁用的回复');
+      }
+      if (!targetPost.reviewed) {
+        ctx.throw(403, '回复未通过审核，暂无法引用');
+      }
     }
     // newThread==>通过draftId查草稿
     // newPost，newComment，modify...==》（理想下只有一个系列did草稿）通过desType和desTypeId 查草稿

@@ -1,9 +1,9 @@
 const Router = require('koa-router');
 const router = new Router();
 const { smsInterval } = require('../../settings/sms');
-
+const { OnlyUser, OnlyUnbannedUser } = require('../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     if (!user) {
@@ -21,7 +21,7 @@ router
     ctx.template = 'user/phoneVerify/phoneVerify.pug';
     return next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUser(), async (ctx, next) => {
     const { data, body, db } = ctx;
     const { user } = data;
     const { code } = body;
@@ -40,7 +40,7 @@ router
     await db.UsersPersonalModel.modifyVerifyPhoneNumberTime(user.uid);
     return next();
   })
-  .post('/sendSmsCode', async (ctx, next) => {
+  .post('/sendSmsCode', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, data, db } = ctx;
     const { user } = data;
     if (!user) {

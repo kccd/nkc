@@ -1,6 +1,8 @@
 const Router = require('koa-router');
 const router = new Router();
-router.post('/', async (ctx, next) => {
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
+router.post('/', OnlyOperation(Operations.clearUserInfo), async (ctx, next) => {
   const { db, body, params } = ctx;
   const { uid } = params;
   const targetUser = await db.UserModel.findOnly({ uid });

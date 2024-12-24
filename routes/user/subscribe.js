@@ -3,9 +3,10 @@ const subscribeRouter = new Router();
 const {
   subscribeUserService,
 } = require('../../services/subscribe/subscribeUser.service');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 subscribeRouter
   // 关注该用户
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { params, body, db, data } = ctx;
     const targetUid = params.uid;
     const { user } = data;
@@ -43,7 +44,7 @@ subscribeRouter
     await next();
   })
   // 取消关注该用户
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { params, db, data } = ctx;
     const targetUid = params.uid;
     const { user } = data;

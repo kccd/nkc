@@ -1,10 +1,10 @@
 const Router = require('koa-router');
 const router = new Router();
 const VerifiedUploadModel = require('../../dataModels/VerifiedUploadModel');
-
+const { OnlyUser } = require('../../middlewares/permission');
 router
   // 认证者查看自己上传的认证材料(只有上传者本人有权限查看)
-  .get('/:vid', async (ctx, next) => {
+  .get('/:vid', OnlyUser(), async (ctx, next) => {
     const { params, data, db } = ctx;
     const { vid } = params;
     const { user } = data;

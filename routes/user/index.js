@@ -1,14 +1,9 @@
 const Router = require('koa-router');
-const billRouter = require('./bills');
-const productionRouter = require('./production');
 const bannedRouter = require('./banned');
 const draftsRouter = require('./drafts');
 const settingRouter = require('./settings');
 const transactionRouter = require('./transaction');
-// const bannerRouter = require('./banner');
 const clearRouter = require('./clear');
-const subRouter = require('./sub');
-// const profileRouter = require("./profile");
 const transferRouter = require('./transfer');
 const myProblemsRouter = require('./myProblems');
 const destroyRouter = require('./destroy');
@@ -26,20 +21,14 @@ const phoneVerifyRouter = require('./phoneVerify');
 const altRouter = require('./alt');
 // 访问身份认证上传的材料
 const verifiedAssets = require('./verifiedAssets');
-//获取用户个人主页信息
-const userHomeInfoRouter = require('./userHomeInfo');
 //获取用户卡片
 const userHomeCardRouter = require('./userHomeCard');
-//获取用户链接
-const navLinksRouter = require('./navLinks');
-// 请求内容
-const contentRouter = require('./content');
-const profileRouter = require('./p/index');
+const profileRouter = require('./profile/index');
 const subscribeRouter = require('./subscribe');
 const userPanelRouter = require('./userPanel');
-
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 userRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { username, uid } = query;
     const targetUsers = [];
@@ -64,7 +53,7 @@ userRouter
     }
     await next();
   })
-  .use('/:uid', async (ctx, next) => {
+  .use('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, state } = ctx;
     data.targetUser = await db.UserModel.findOne({ uid: params.uid });
     if (!data.targetUser) {
@@ -80,7 +69,7 @@ userRouter
     await data.targetUser.extendColumnAndZoneThreadCount();
     await next();
   })
-  .use('/:uid', async (ctx, next) => {
+  .use('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, state, data } = ctx;
     if (!state.uid || state.uid !== data.targetUser.uid) {
       await db.UserModel.checkAccessControlPermissionWithThrowError({
@@ -93,7 +82,7 @@ userRouter
     ctx.template = 'vueRoot/index.pug';
     await next();
   })
-  .get('/:uid', async (ctx, next) => {
+  .get('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data, state } = ctx;
     if (data.targetUser && state.uid && data.targetUser.uid !== state.uid) {
       await db.UsersGeneralModel.updateUserAccessLogs(
@@ -103,7 +92,7 @@ userRouter
     }
     await next();
   })
-  .get('/:uid', async (ctx, next) => {
+  .get('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     //访问用户个人主页
     //获取用户个人主页信息
     const { params, state, db, data, query, nkcModules } = ctx;
@@ -227,11 +216,6 @@ userRouter
     }
     await next();
   })
-  .post('/:uid/pop', async (ctx, next) => {
-    const uid = ctx.params.uid;
-    ctx.data.message = `推送/取消热门 用户: ${uid}`;
-    await next();
-  })
   .use(
     '/:uid/transaction',
     transactionRouter.routes(),
@@ -242,24 +226,16 @@ userRouter
     subscribeRouter.routes(),
     subscribeRouter.allowedMethods(),
   )
-  .use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
   // .use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
   .use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
   .use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
   .use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())
-  .use('/:uid/sub', subRouter.routes(), subRouter.allowedMethods())
   .use('/:uid/clear', clearRouter.routes(), clearRouter.allowedMethods())
   .use(
     '/:uid/transfer',
     transferRouter.routes(),
     transferRouter.allowedMethods(),
   )
-  .use(
-    '/:uid/production',
-    productionRouter.routes(),
-    productionRouter.allowedMethods(),
-  )
-  //.use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
   .use('/:uid/destroy', destroyRouter.routes(), destroyRouter.allowedMethods())
   .use(
     '/:uid/myProblems',
@@ -286,21 +262,10 @@ userRouter
     verifiedAssets.allowedMethods(),
   )
   .use(
-    '/:uid/userHome',
-    userHomeInfoRouter.routes(),
-    userHomeInfoRouter.allowedMethods(),
-  )
-  .use(
     '/:uid/userHomeCard',
     userHomeCardRouter.routes(),
     userHomeCardRouter.allowedMethods(),
   )
-  .use(
-    '/:uid/navLinks',
-    navLinksRouter.routes(),
-    navLinksRouter.allowedMethods(),
-  )
-  .use('/:uid/content', contentRouter.routes(), contentRouter.allowedMethods())
   .use('/:uid/profile', profileRouter.routes(), profileRouter.allowedMethods())
   .use(
     '/:uid/userPanel',

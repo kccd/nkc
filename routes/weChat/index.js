@@ -4,9 +4,10 @@ const wechatPayConfigs = require('../../config/wechatPay.json');
 const { getPrivateKey } = require('../../nkcModules/wechatPay/utils');
 const crypto = require('crypto');
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+const { Public } = require('../../middlewares/permission');
+router.get('/', Public(), async (ctx, next) => {
   //此页面目前仅仅针对微信内置浏览器
-  const { nkcModules, data, db, query } = ctx;
+  const { data, db, query } = ctx;
   const { code, state } = query;
   const userAgent = ctx.headers['user-agent'];
   // 检查是否在微信内置浏览器
@@ -18,23 +19,23 @@ router.get('/', async (ctx, next) => {
   }
   // 通过id查询数据库中的记录
   const weChatPayRecord = await db.WechatPayRecordModel.findOne({ _id: state });
-  if(!weChatPayRecord){
+  if (!weChatPayRecord) {
     ctx.throw(400, '查询订单失败');
   }
   // 对于description后期可以根据不同的来源进行设置
   const prepay_id = await jsApi.getJsApiPaymentPrepayID({
-    description: weChatPayRecord.description,//必填数据
-    recordId:weChatPayRecord._id,
-    money:weChatPayRecord.money,
-    clientIp:weChatPayRecord.ip,
-    attach:'{}',
+    description: weChatPayRecord.description, //必填数据
+    recordId: weChatPayRecord._id,
+    money: weChatPayRecord.money,
+    clientIp: weChatPayRecord.ip,
+    attach: '{}',
     code,
   });
   //获取到用户的openId,并使用jsApi下单，获取prepay_id后重组数据返回。
- 
+
   const nonceStr = getRandomString(`A0`, 32);
   const timeStamp = String(Math.floor(Date.now() / 1000));
-  const package = `prepay_id=${prepay_id}`;
+  const packageId = `prepay_id=${prepay_id}`;
   const payString =
     wechatPayConfigs.appId +
     '\n' +
@@ -42,7 +43,7 @@ router.get('/', async (ctx, next) => {
     '\n' +
     nonceStr +
     '\n' +
-    package +
+    packageId +
     '\n';
   // console.log('payString', payString);
 
@@ -50,15 +51,14 @@ router.get('/', async (ctx, next) => {
   sign.update(Buffer.from(payString, 'utf-8'));
   const privateKey = await getPrivateKey();
   const paySign = sign.sign(privateKey, 'base64');
-  const info = {
+  data.info = {
     appId: wechatPayConfigs.appId,
     timeStamp,
     nonceStr,
-    package,
+    package: packageId,
     signType: 'RSA',
     paySign,
   };
-  data.info = info;
   ctx.template = 'weChat/weChat.pug';
   await next();
 });

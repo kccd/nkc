@@ -1,7 +1,9 @@
 const Router = require('koa-router');
 const bannedRouter = new Router();
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 bannedRouter
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.unbannedUser), async (ctx, next) => {
     const { db, params, body } = ctx;
     const { uid } = params;
     const { reason = '' } = body;
@@ -21,7 +23,7 @@ bannedRouter
     });
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyOperation(Operations.bannedUser), async (ctx, next) => {
     const { data, params, query, db } = ctx;
     const { user } = data;
     const { reason = '' } = query;

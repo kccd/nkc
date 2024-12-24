@@ -1,6 +1,7 @@
 const router = require('koa-router')();
+const { Public } = require('../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { query, data, db } = ctx;
     data.verificationData = await db.VerificationModel.getVerificationData({
       uid: data.user ? data.user.uid : '',
@@ -10,7 +11,7 @@ router
     });
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', Public(), async (ctx, next) => {
     const { body, db, data } = ctx;
     const { verificationData } = body;
     verificationData.ip = ctx.address;

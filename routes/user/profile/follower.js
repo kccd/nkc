@@ -1,31 +1,21 @@
-const { subscribeSources } = require('../../../settings/subscribe');
+const {
+  subscribeUserService,
+} = require('../../../services/subscribe/subscribeUser.service');
 module.exports = async (ctx, next) => {
-  const { db, nkcModules, data, query } = ctx;
-  const { subUsersId } = data;
+  const { data, db, query } = ctx;
+  const { user, targetUser } = data;
   const { page = 0 } = query;
-  const { targetUser } = data;
-  const match = {
-    source: subscribeSources.user,
-    sid: targetUser.uid,
-    cancel: false,
-  };
-  const count = await db.SubscribeModel.countDocuments(match);
-  const paging = nkcModules.apiFunction.paging(page, count);
-  const subscribes = await db.SubscribeModel.find(match)
-    .sort({ toc: -1 })
-    .skip(paging.start)
-    .limit(paging.perpage);
-  data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);
-  const fansId = subscribes.map((s) => s.uid);
-  const subscribeUsers = await db.SubscribeModel.find({
-    source: subscribeSources.user,
-    cancel: false,
-    uid: targetUser.uid,
-    sid: { $in: fansId },
-  });
-  const subscribesObj = {};
-  subscribeUsers.map((s) => (subscribesObj[s.sid] = s));
-  data.subscribesObj = subscribesObj;
+  if (user) {
+    if (user.uid === targetUser.uid) {
+      await db.SubscribeModel.saveUserSubUsersId(user.uid);
+    }
+    data.userSubUid = await db.SubscribeModel.getUserSubUsersId(user.uid);
+  }
+  const { paging, users } = await subscribeUserService.getUserFollowers(
+    targetUser.uid,
+    page,
+  );
   data.paging = paging;
+  data.users = users;
   await next();
 };
