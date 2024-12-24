@@ -1874,7 +1874,7 @@ schema.statics.disabledToDraftDocuments = async function () {
     postType: { $in: [articleSource, commentSource] },
     modifyType: false,
     toc: {
-      $lte: Date.now() - 3 * 24 * 60 * 1000,
+      $lte: Date.now() - 3 * 24 * 60 * 60 * 1000,
     },
   };
   //查找对document的退修记录
@@ -1898,7 +1898,7 @@ schema.statics.disabledToDraftDocuments = async function () {
       const delLog = await DelPostLogModel({
         delUserId: document.uid,
         delPostTitle: document ? document.title : '',
-        reason: '退休超时未处理',
+        reason: '退修超时未处理',
         postType: document.source,
         threadId: document.sid,
         postId: document._id,
