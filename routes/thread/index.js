@@ -7,7 +7,6 @@ const toppedRouter = require('./topped');
 const blockRouter = require('./block');
 const closeRouter = require('./close');
 const Path = require('path');
-const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const tools = require('../../nkcModules/tools');
 const {
   collectionService,
@@ -15,9 +14,9 @@ const {
 const { Operations } = require('../../settings/operations');
 const { ObjectId } = require('mongodb');
 const { editorRichService } = require('../../services/editor/rich.service');
-
+const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 threadRouter
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
     await db.ForumModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -27,7 +26,7 @@ threadRouter
     });
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { user } = data;
     const { from, keywords, self, type, title, pid, applicationFormId } = query;
@@ -225,18 +224,18 @@ threadRouter
     }
     await next();
   })
-  .use('/:tid', async (ctx, next) => {
+  .use('/:tid', Public(), async (ctx, next) => {
     const { internalData, db, params } = ctx;
     internalData.thread = await db.ThreadModel.findOnly({ tid: params.tid });
     await next();
   })
-  .get('/:tid', async (ctx, next) => {
+  .get('/:tid', Public(), async (ctx, next) => {
     // 设置 referer 策略
     // 解决分享文章时附件链接跨域无法读取referer中token的问题
     ctx.set('Referrer-Policy', 'unsafe-url');
     await next();
   })
-  .get('/:tid', async (ctx, next) => {
+  .get('/:tid', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules, state, internalData } = ctx;
     const { token } = query;
     const { page = 0, pid, last_page, highlight, step, t, e = false } = query;
@@ -1266,7 +1265,7 @@ threadRouter
     ctx.remoteTemplate = 'thread/index.pug';
     await next();
   })
-  .get('/:tid', async (ctx, next) => {
+  .get('/:tid', Public(), async (ctx, next) => {
     const { data, db, state } = ctx;
     const { thread } = data;
     if (thread && thread.tid && state.uid) {
@@ -1274,7 +1273,7 @@ threadRouter
     }
     await next();
   })
-  .post('/:tid', async (ctx, next) => {
+  .post('/:tid', OnlyUnbannedUser(), async (ctx, next) => {
     // 社区文章发表评论
     const { data, nkcModules, params, db, body, state, address: ip } = ctx;
 
@@ -1607,7 +1606,7 @@ threadRouter
     }
     await next();
   })
-  .put('/:tid/post-order', async (ctx, next) => {
+  .put('/:tid/post-order', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, state, params } = ctx;
     const { postIdsOrder = [], type } = body;
     const { tid } = params;

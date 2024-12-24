@@ -1,10 +1,9 @@
-const twemoji = require('twemoji');
 const router = require('koa-router')();
 const statics = require('../../settings/statics');
 const fs = require('fs').promises;
-
+const { OnlyUnbannedUser, Public } = require('../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, state, data, db, nkcModules } = ctx;
     const { user } = data;
     const { t, page, perpage } = query;
@@ -62,7 +61,7 @@ router
     }
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, data } = ctx;
     const { type, stickersId } = body;
     if (type === 'delete') {
@@ -130,7 +129,7 @@ router
     }
     await next();
   })
-  .get('/:rid', async (ctx, next) => {
+  .get('/:rid', Public(), async (ctx, next) => {
     const { params, db, query, data } = ctx;
     const { rid } = params;
     const { t } = query;
