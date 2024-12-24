@@ -1,63 +1,70 @@
 <template lang="pug">
-  div
-    MomentVisible(ref="momentVisible")
-    .moment-options(v-show="show")
-      .post-options-panel(v-if='loading')
-        .loading 加载中...
-      .post-options-panel(v-else)
-        a.option(v-if="moment.url" @click="toMoment(moment.url)" target="_blank")
-          .fa.fa-newspaper-o
-          span 查看详情
-        a.option(v-if="options.delete" @click="deleteMoment")
-          .fa.fa-trash
-          span 删除
-        a.option(v-if="options.disable" @click="disableMoment")
-          .fa.fa-ban
-          span 屏蔽
-        a.option(v-if="options.recovery" @click="recoveryMoment")
-          .fa.fa-unlock
-          span 解除屏蔽
-        .option(v-if="options.reviewed === 'unknown'" @click="passReview(stableDocument._id)")
-          .fa.fa-check-circle-o
-          span 通过审核
-        .option(v-if='options.violation !== null' @click='viewViolationRecord')
-          .fa.fa-newspaper-o
-          span 违规记录
-        .option(v-if="options.complaint" @click="complaint")
-          .fa.fa-minus-circle
-          span 投诉或举报
-        .option(v-if="options.visibleMoment" @click="visibleMoment")
-          .fa.fa-eye
-          span 可见状态
-        .option(v-if="options.editorMoment" @click="editorMoment")
-          .fa.fa-edit
-          span 编辑
-        .option(v-if="options.visitHistory" @click="visitHistory")
-          .fa.fa-history
-          span 历史
-        .option(v-if='options.ipInfo' @click='displayIpInfo')
-          .fa.fa-map-marker
-          span 查看IP
-        .option(v-if='options.blacklist !== null' @click='userBlacklist')
-          .fa.fa-ban
-          span(v-if='options.blacklist === false') 加入黑名单
-          span(v-else) 移除黑名单
-        //.option(v-if='options.ipInfo !== null' @click='displayIpInfo')
-        //  .fa.fa-map-marker
-        //  span 查看IP
-        //- 分享按钮
-        .option(
-          data-global-click='showSharePanel'
-          :data-global-data="objToStr({type: 'moment', id: moment.momentCommentId? moment.momentCommentId: moment.momentId})"
-          title='分享'
-        )
-          .fa.fa-share-square-o
-          span 分享
-        .option(@click="copyDid")
-          .fa.fa-key
-          span 复制文号
-        .option.time
-          span {{timeFormat(toc)}}
+div
+  MomentVisible(ref='momentVisible')
+  .moment-options(v-show='show')
+    .post-options-panel(v-if='loading')
+      .loading 加载中...
+    .post-options-panel(v-else)
+      a.option(
+        v-if='moment.url',
+        @click='toMoment(moment.url)',
+        target='_blank'
+      )
+        .fa.fa-newspaper-o
+        span 查看详情
+      a.option(v-if='options.delete', @click='deleteMoment')
+        .fa.fa-trash
+        span 删除
+      a.option(v-if='options.disable', @click='disableMoment')
+        .fa.fa-ban
+        span 屏蔽
+      a.option(v-if='options.recovery', @click='recoveryMoment')
+        .fa.fa-unlock
+        span 解除屏蔽
+      .option(
+        v-if='options.reviewed === "unknown"',
+        @click='passReview(stableDocument._id)'
+      )
+        .fa.fa-check-circle-o
+        span 通过审核
+      .option(v-if='options.violation !== null', @click='viewViolationRecord')
+        .fa.fa-newspaper-o
+        span 违规记录
+      .option(v-if='options.complaint', @click='complaint')
+        .fa.fa-minus-circle
+        span 投诉或举报
+      .option(v-if='options.visibleMoment', @click='visibleMoment')
+        .fa.fa-eye
+        span 可见状态
+      .option(v-if='options.editorMoment', @click='editorMoment')
+        .fa.fa-edit
+        span 编辑
+      .option(v-if='options.visitHistory', @click='visitHistory')
+        .fa.fa-history
+        span 历史
+      .option(v-if='options.ipInfo', @click='displayIpInfo')
+        .fa.fa-map-marker
+        span 查看IP
+      .option(v-if='options.blacklist !== null', @click='userBlacklist')
+        .fa.fa-ban
+        span(v-if='options.blacklist === false') 加入黑名单
+        span(v-else) 移除黑名单
+      //.option(v-if='options.ipInfo !== null' @click='displayIpInfo')
+      //  .fa.fa-map-marker
+      //  span 查看IP
+      //- 分享按钮
+      .option(
+        data-global-click='showSharePanel',
+        :data-global-data='objToStr({ type: "moment", id: moment.momentCommentId ? moment.momentCommentId : moment.momentId })',
+        title='分享'
+      )
+        .fa.fa-share-square-o
+        span 分享
+      .option(@click='copyDid')
+        .fa.fa-key
+        span 复制文号
+      .option.time
+        span {{ timeFormat(toc) }}
 </template>
 <style lang="less" scoped>
 @import '../../../../publicModules/base';
@@ -437,7 +444,10 @@ export default {
           : this.moment.momentId;
         this.$emit('selectedMomentId', mid);
       } else {
-        visitUrl(`/z/editor/rich?id=${this.moment.momentId}`, true);
+        visitUrl(
+          `/z/editor/rich?id=${this.moment.momentId}&did=${this.moment.did}`,
+          true,
+        );
       }
     },
     // 访问历史

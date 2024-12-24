@@ -1,172 +1,177 @@
 <template lang="pug">
-  .tiptap-editor-container
-    link-editor(ref='linkEditor')
-    .tiptap-editor-toolBar(v-if='editor' :style="{ top:isApp ? '0rem' : '4rem' }")
-      .tiptap-editor-toolBar-icon-group
-        div(@click='editor.chain().focus().undo().run()' title="撤销 Ctrl + Z")
-          <return theme="filled" :size="iconFontSize" />
-        div(@click='editor.chain().focus().redo().run()' title="重做 Ctrl + Shift + Z")
-          <go-on theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleBold().run()',
-          :class='editorIsActive("bold")',
-          title='粗体 Ctrl + B'
+.tiptap-editor-container
+  link-editor(ref='linkEditor')
+  .tiptap-editor-toolBar(
+    v-if='editor',
+    :style='{ top: isApp ? "0rem" : "4rem" }'
+  )
+    .tiptap-editor-toolBar-icon-group
+      div(@click='editor.chain().focus().undo().run()', title='撤销 Ctrl + Z')
+        <return theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().redo().run()',
+        title='重做 Ctrl + Shift + Z'
+      )
+        <go-on theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleBold().run()',
+        :class='editorIsActive("bold")',
+        title='粗体 Ctrl + B'
+      )
+        <text-bold theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleItalic().run()',
+        :class='editorIsActive("italic")',
+        title='斜体 Ctrl + I'
+      )
+        <text-italic theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleUnderline().run()',
+        :class='editorIsActive("underline")',
+        title='下划线 Ctrl + U'
+      )
+        <text-underline theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleStrike().run()',
+        :class='editorIsActive("strike")',
+        title='删除线 Ctrl + Shift + S'
+      )
+        <strikethrough theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().clearNodes().unsetAllMarks().run()',
+        title='清除格式'
+      )
+        <clear-format theme="outline" :size="iconFontSize" />
+      select(
+        style='width: 4.5rem',
+        :value='getFontFamily()',
+        @click='setFontFamily',
+        @blur='isFontFamilySelectOpen = false'
+      )
+        option(
+          v-for='font in fontFamilies',
+          :value='font[0]',
+          :style='`font-family: ${font[0]}`'
+        ) {{ font[1] }}
+      select(
+        :value='getHeadline()',
+        @click='setHeadline',
+        @blur='isHeadlineSelectOpen = false'
+      )
+        option(value='0') 正文
+        option(value='1') 标题1
+        option(value='2') 标题2
+        option(value='3') 标题3
+        option(value='4') 标题4
+        option(value='5') 标题5
+        option(value='6') 标题6
+      select.m-r-05(
+        :value='getFontSize()',
+        @click='setFontSize',
+        @blur='isFontSizeSelectOpen = false'
+      )
+        option(
+          v-for='size in nkcFontSizeOptions.sizes',
+          :key='size',
+          :value='size'
+        ) {{ size }}
+      .m-r-05(data-type='custom')
+        text-color-icon(
+          title='文字颜色',
+          @select='selectedTextColor',
+          category='color'
         )
-          <text-bold theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleItalic().run()',
-          :class='editorIsActive("italic")',
-          title='斜体 Ctrl + I'
+      .m-r-05(data-type='custom')
+        text-color-icon(
+          title='背景颜色',
+          @select='selectedBGColor',
+          category='backgroundColor'
         )
-          <text-italic theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleUnderline().run()',
-          :class='editorIsActive("underline")',
-          title='下划线 Ctrl + U'
-        )
-          <text-underline theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleStrike().run()',
-          :class='editorIsActive("strike")',
-          title='删除线 Ctrl + Shift + S'
-        )
-          <strikethrough theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().clearNodes().unsetAllMarks().run()',
-          title='清除格式'
-        )
-          <clear-format theme="outline" :size="iconFontSize" />
-        select(
-          style='width: 4.5rem;'
-          :value='getFontFamily()',
-          @click='setFontFamily',
-          @blur='isFontFamilySelectOpen = false'
-        )
-          option(
-            v-for='font in fontFamilies'
-            :value='font[0]'
-            :style="`font-family: ${font[0]}`"
-          ) {{font[1]}}
-        select(
-          :value='getHeadline()',
-          @click='setHeadline',
-          @blur='isHeadlineSelectOpen = false'
-        )
-          option(value='0') 正文
-          option(value='1') 标题1
-          option(value='2') 标题2
-          option(value='3') 标题3
-          option(value='4') 标题4
-          option(value='5') 标题5
-          option(value='6') 标题6
-        select.m-r-05(
-          :value='getFontSize()',
-          @click='setFontSize',
-          @blur='isFontSizeSelectOpen = false'
-        )
-          option(
-            v-for='size in nkcFontSizeOptions.sizes',
-            :key='size',
-            :value='size'
-          ) {{ size }}
-        .m-r-05(data-type='custom')
-          text-color-icon(
-            title='文字颜色',
-            @select='selectedTextColor',
-            category='color'
-          )
-        .m-r-05(data-type='custom')
-          text-color-icon(
-            title='背景颜色',
-            @select='selectedBGColor',
-            category='backgroundColor'
-          )
-        div(
-          @click='setLink',
-          :class='{ "is-active": editor.isActive("link") }',
-          title='插入链接'
-        )
-          <link-one theme="filled" :size="iconFontSize" />
-        div(@click='editor.chain().focus().unsetLink().run()', title='取消链接')
-          <unlink theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleOrderedList().run()',
-          :class='editorIsActive("orderedList")',
-          title='有序列表'
-        )
-          <list-numbers theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleBulletList().run()',
-          :class='editorIsActive("bulletList")',
-          title='无序列表'
-        )
-          <list-two theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleBlockquote().run()',
-          :class='editorIsActive("blockquote")',
-          title='引用'
-        )
-          <quote theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().toggleCode().run()',
-          :class='{ "is-active": editor.isActive("code") }',
-          title='代码'
-        )
-          <code-one theme="filled" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().setTextAlign("left").run()',
-          title='左对齐',
-          :class='editorIsActive({ textAlign: "left" })'
-        )
-          <align-text-left theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().setTextAlign("center").run()',
-          title='居中',
-          :class='editorIsActive({ textAlign: "center" })'
-        )
-          <align-text-center theme="outline" :size="iconFontSize" />
-        div(
-          @click='editor.chain().focus().setTextAlign("right").run()',
-          title='右对齐',
-          :class='editorIsActive({ textAlign: "right" })'
-        )
-          <align-text-right theme="outline" :size="iconFontSize" />
-        div(
-          @click='setTextIndent'
-          title='首行缩进',
-          :class='editorIsActive({ textIndent: 2 })'
-        )
-          <indent-left theme="outline" :size="iconFontSize" />
-        div.tiptap-editor-subscript(
-          @click='editor.chain().focus().toggleSubscript().run()',
-          :class='{ "is-active": editor.isActive("subscript") }'
-        )
-          <i class="fa fa-subscript" />
-        div.tiptap-editor-subscript(
-          @click='editor.chain().focus().toggleSuperscript().run()',
-          :class='{ "is-active": editor.isActive("superscript") }'
-        )
-          <i class="fa fa-superscript" />
-        div(
-          @click="appMenuClick('resource')"
-          title="插入资源"
-        )
-          new-picture(theme="outline" :size="iconFontSize")
-        div(data-type='custom')
-          app-menu(ref='appMenu', @select='appMenuClick')
+      div(
+        @click='setLink',
+        :class='{ "is-active": editor.isActive("link") }',
+        title='插入链接'
+      )
+        <link-one theme="filled" :size="iconFontSize" />
+      div(@click='editor.chain().focus().unsetLink().run()', title='取消链接')
+        <unlink theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleOrderedList().run()',
+        :class='editorIsActive("orderedList")',
+        title='有序列表'
+      )
+        <list-numbers theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleBulletList().run()',
+        :class='editorIsActive("bulletList")',
+        title='无序列表'
+      )
+        <list-two theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleBlockquote().run()',
+        :class='editorIsActive("blockquote")',
+        title='引用'
+      )
+        <quote theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().toggleCode().run()',
+        :class='{ "is-active": editor.isActive("code") }',
+        title='代码'
+      )
+        <code-one theme="filled" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().setTextAlign("left").run()',
+        title='左对齐',
+        :class='editorIsActive({ textAlign: "left" })'
+      )
+        <align-text-left theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().setTextAlign("center").run()',
+        title='居中',
+        :class='editorIsActive({ textAlign: "center" })'
+      )
+        <align-text-center theme="outline" :size="iconFontSize" />
+      div(
+        @click='editor.chain().focus().setTextAlign("right").run()',
+        title='右对齐',
+        :class='editorIsActive({ textAlign: "right" })'
+      )
+        <align-text-right theme="outline" :size="iconFontSize" />
+      div(
+        @click='setTextIndent',
+        title='首行缩进',
+        :class='editorIsActive({ textIndent: 2 })'
+      )
+        <indent-left theme="outline" :size="iconFontSize" />
+      .tiptap-editor-subscript(
+        @click='editor.chain().focus().toggleSubscript().run()',
+        :class='{ "is-active": editor.isActive("subscript") }'
+      )
+        <i class="fa fa-subscript" />
+      .tiptap-editor-subscript(
+        @click='editor.chain().focus().toggleSuperscript().run()',
+        :class='{ "is-active": editor.isActive("superscript") }'
+      )
+        <i class="fa fa-superscript" />
+      div(@click='appMenuClick("resource")', title='插入资源')
+        new-picture(theme='outline', :size='iconFontSize')
+      div(data-type='custom')
+        app-menu(ref='appMenu', @select='appMenuClick')
 
-    .tiptap-editor-content(@click.stop="editor.commands.focus()")
-      editor-content(:editor='editor' ref="tiptapEditorContent")
-    .word-count
-      span(:style="currentTextLength>initConfig.maxWordCount?'color:#ff6262;':''") {{`${currentTextLength}`}}
-      span {{`/${initConfig.maxWordCount}`}}
-    //-.mask.m-b-1(v-show="!!loading")
-      loading
-    resource-selector(ref='resourceSelector')
-    table-editor(ref='tableEditor')
-    sticker-selector(ref='stickerSelector')
-    draft-selector(ref='draftSelector')
-    math-selector(ref='mathSelector')
+  .tiptap-editor-content(@click.stop='editor.commands.focus()')
+    editor-content(:editor='editor', ref='tiptapEditorContent')
+  .word-count
+    span(
+      :style='currentTextLength > initConfig.maxWordCount ? "color:#ff6262;" : ""'
+    ) {{ `${currentTextLength}` }}
+    span {{ `/${initConfig.maxWordCount}` }}
+  //-.mask.m-b-1(v-show="!!loading")
+    loading
+  resource-selector(ref='resourceSelector')
+  table-editor(ref='tableEditor')
+  sticker-selector(ref='stickerSelector')
+  draft-selector(ref='draftSelector')
+  math-selector(ref='mathSelector')
 </template>
 
 <script>
@@ -418,7 +423,7 @@ export default {
     }, 1000),
     // 获取文本长度
     getTextLength() {
-      return getRichJsonContentLength(this.getJSON());
+      return Math.ceil(getRichJsonContentLength(this.getJSON()) / 2);
     },
     // 设置JSON字符串数据
     setContent(jsonString) {

@@ -349,7 +349,7 @@ export function renderCodeBlock() {
     span.innerText = languageName;
     const copyButton = document.createElement('button');
     copyButton.setAttribute('class', 'btn btn-default btn-xs');
-    copyButton.innerText = 'Copy';
+    copyButton.innerText = '复制';
     copyButton.onclick = () => {
       copyTextToClipboard(codeText)
         .then(() => {

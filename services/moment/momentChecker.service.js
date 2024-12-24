@@ -8,6 +8,7 @@ const {
   momentStatus: momentStatusSettings,
   momentVisibleType: momentVisibleTypeSettings,
 } = require('../../settings/moment');
+const { editorRichService } = require('../editor/rich.service');
 class MomentCheckerService {
   async checkMomentPermission(readerUid, moment, hasReviewPermission) {
     const {
@@ -69,7 +70,10 @@ class MomentCheckerService {
   }
 
   checkMomentRichJSONLength(jsonString) {
-    const length = getRichJsonContentLength(jsonString);
+    const length = editorRichService.getRichContentWordsSize(
+      'json',
+      jsonString,
+    );
     if (length > 100000 || jsonString.length > 1000000) {
       ThrowCommonError(400, '内容长度超过限制');
     }

@@ -1,4 +1,5 @@
 // 获取所有文本节点
+import { getUrl } from './tools';
 function getAllTextNodes(element) {
   const textNodes = [];
 
@@ -21,27 +22,30 @@ function getAllTextNodes(element) {
   traverse(element);
   return textNodes;
 }
+
 export function renderNKCDocNumber() {
   document
     .querySelectorAll('.render-content.math-jax')
     .forEach((renderContent) => {
+      const checkerRegex = /#((D|t)?\d+)/;
+      const renderContentText = renderContent.textContent;
+      if (!checkerRegex.test(renderContentText)) {
+        return;
+      }
       const textNodes = getAllTextNodes(renderContent); // 获取所有文本节点
       let tempArray = [];
-      const regex = /#((D|t)?\d+)/g;
 
       // 拼接所有文本节点的内容
       const textString = textNodes.map((node) => node.textContent).join('');
       let match;
+      const regex = /#((D|t)?\d+)/g;
       while ((match = regex.exec(textString)) !== null) {
         const start = match.index; // 匹配字符的起始位置
         const end = start + match[0].length; // 匹配字符的结束位置
         const p1 = match[1];
         const link = /^D(\d+)$/.test(p1)
-          ? NKC.methods.tools.getUrl('documentNumber', p1.replace(/^D/, ''))
-          : NKC.methods.tools.getUrl('threadNumber', p1);
-        // const link = /^D(\d+)$/.test(p1)
-        //   ? `/document/d/${p1.replace(/^D/, '')}`
-        //   : `/p/${p1}?redirect=true`;
+          ? getUrl('documentNumber', p1.replace(/^D/, ''))
+          : getUrl('threadNumber', p1);
         tempArray.push({
           start,
           end,
@@ -51,7 +55,6 @@ export function renderNKCDocNumber() {
         });
       }
 
-      // console.log(tempArray);
       let $index = 0;
 
       textNodes.forEach((textNode, index) => {
@@ -114,7 +117,7 @@ export function renderNKCDocNumber() {
         }
 
         // 创建新的 span 元素并替换原文本节点
-        if (replacedText) {
+        if (replacedText && lastIndex > 0) {
           const spanElement = document.createElement('span');
           spanElement.innerHTML = replacedText;
           textNode.parentNode.replaceChild(spanElement, textNode);
