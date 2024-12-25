@@ -55,6 +55,7 @@ export default {
   border-radius: 5px;
   margin-bottom: 0.5rem;
   .nkc-xsf-limit-header {
+    user-select: none;
     background-color: #ff8888;
     color: #fff;
     display: flex;
