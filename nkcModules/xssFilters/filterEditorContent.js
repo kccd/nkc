@@ -88,6 +88,8 @@ defaultWL.a = [
   'data-id',
   'data-url',
   'data-title',
+  'data-global-click',
+  'data-global-data',
 ];
 defaultWL.pre = ['class', 'data-tag', 'data-type', 'data-id'];
 defaultWL.em = [
