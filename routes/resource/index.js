@@ -5,6 +5,12 @@ const payRouter = require('./pay');
 const detailRouter = require('./detail');
 const coverRouter = require('./cover');
 const { ThrottleGroup } = require('stream-throttle');
+const {
+  Public,
+  OnlyUnbannedUser,
+  OnlyOperation,
+} = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 
 // 存放用户设置
 const downloadGroups = {};
@@ -17,7 +23,7 @@ const downloadGroups = {};
 */
 
 resourceRouter
-  .use('/:rid', async (ctx, next) => {
+  .use('/:rid', Public(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { rid } = params;
     data.resource = await db.ResourceModel.findOnly({ rid, type: 'resource' });
@@ -29,7 +35,7 @@ resourceRouter
     }
     await next();
   })
-  .get('/:rid', async (ctx, next) => {
+  .get('/:rid', Public(), async (ctx, next) => {
     const { state, query, data, db, settings, nkcModules } = ctx;
     // 分享的 post 时，浏览器会将 token、pid 添加到 资源链接后
     const { t, d, w } = query;
@@ -192,7 +198,7 @@ resourceRouter
     }
     await next();
   })
-  .use('/:rid', async (ctx, next) => {
+  .use('/:rid', Public(), async (ctx, next) => {
     const { db, data, settings } = ctx;
     // 游客限制
     const { user, resource } = data;
@@ -208,7 +214,7 @@ resourceRouter
     }
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     //用户上传文件
     const { db, data, nkcModules, state } = ctx;
     const { user } = data;
@@ -284,28 +290,32 @@ resourceRouter
     });
     await next();
   })
-  .put('/:rid', async (ctx, next) => {
-    const { data, body } = ctx;
-    const { resource } = data;
-    const { disabled } = body;
-    if (resource.disabled) {
-      if (disabled) {
-        ctx.throw(400, `资源已被屏蔽`);
+  .put(
+    '/:rid',
+    OnlyOperation(Operations.disableResource),
+    async (ctx, next) => {
+      const { data, body } = ctx;
+      const { resource } = data;
+      const { disabled } = body;
+      if (resource.disabled) {
+        if (disabled) {
+          ctx.throw(400, `资源已被屏蔽`);
+        }
+      } else {
+        if (!disabled) {
+          ctx.throw(400, `资源未被屏蔽`);
+        }
       }
-    } else {
-      if (!disabled) {
-        ctx.throw(400, `资源未被屏蔽`);
-      }
-    }
-    resource.disabled = !!disabled;
-    await resource.updateOne({
-      $set: {
-        disabled: resource.disabled,
-      },
-    });
-    await next();
-  })
-  .post('/:rid/del', async (ctx, next) => {
+      resource.disabled = !!disabled;
+      await resource.updateOne({
+        $set: {
+          disabled: resource.disabled,
+        },
+      });
+      await next();
+    },
+  )
+  .post('/:rid/del', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body } = ctx;
     const { type, resources } = body;
     let del = type === 'delete';

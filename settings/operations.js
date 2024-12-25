@@ -7,6 +7,11 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  getResourceCover: 'getResourceCover',
+  resourceDetail: 'resourceDetail',
+  getResourceInfo: 'getResourceInfo',
+  buyResource: 'buyResource',
+  modifyResources: 'modifyResources',
   resourceCategory: 'resourceCategory',
   uploadResources: 'uploadResources',
   getResources: 'getResources',
@@ -263,11 +268,6 @@ const DynamicOperations = {
   uploadActivityPoster: 'uploadActivityPoster',
   getShopLogo: 'getShopLogo',
   uploadShopLogo: 'uploadShopLogo',
-  modifyResources: 'modifyResources',
-  getResourceInfo: 'getResourceInfo',
-  buyResource: 'buyResource',
-  resourceDetail: 'resourceDetail',
-  getResourceCover: 'getResourceCover',
   getMediums: 'getMediums',
   getOrigins: 'getOrigins',
   getDefaultImage: 'getDefaultImage',
@@ -802,6 +802,7 @@ const DynamicOperations = {
   rollbackZoneMomentHistory: 'rollbackZoneMomentHistory',
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
   collectionPost: 'collectionPost',
+  disableResource: 'disabledResource',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

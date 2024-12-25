@@ -1,6 +1,7 @@
 const router = require('koa-router')();
+const { Public } = require('../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, data, params } = ctx;
     const { rid } = params;
     const resource = await db.ResourceModel.findOne({ rid });
@@ -11,7 +12,7 @@ router
     data.resource = resource;
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, data } = ctx;
     const videoPlayerData = await data.resource.extendVideoPlayerData();
     let resource = data.resource.toObject();
