@@ -1,5 +1,6 @@
 const router = require('koa-router')();
-router.get('/web/viewer', async (ctx, next) => {
+const { Public } = require('../../middlewares/permission');
+router.get('/web/viewer', Public(), async (ctx, next) => {
   const { db, query } = ctx;
   let { file } = query;
   let rid = '';
