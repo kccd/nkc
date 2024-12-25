@@ -1,15 +1,14 @@
 const Router = require('koa-router');
 const shareRouter = new Router();
-const apiFn = require('../../nkcModules/apiFunction');
 const serverConfig = require('../../config/server');
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const reg = new RegExp(
   `^` + serverConfig.domain.replace(/\//g, '\\/').replace(/\./g, '\\.'),
   'i',
 );
+const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 shareRouter
-  .get('/:token', async (ctx) => {
+  .get('/:token', Public(), async (ctx) => {
     const { params, db, data, nkcModules } = ctx;
     const { token } = params;
     const { user } = data;
@@ -104,7 +103,7 @@ shareRouter
     await lock.unlock();
     return ctx.redirect(shareUrl);
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, db, data, nkcModules } = ctx;
     let { type, id } = query;
     const { user } = data;
@@ -127,10 +126,10 @@ shareRouter
       } else {
         result.title = post.t;
       }
-      result.description = post.l === 'json' ? getJsonStringTextSlice(post.c,100) : nkcModules.nkcRender.htmlToPlain(
-         post.c,
-        100,
-      );
+      result.description =
+        post.l === 'json'
+          ? getJsonStringTextSlice(post.c, 100)
+          : nkcModules.nkcRender.htmlToPlain(post.c, 100);
       result.cover = post.cover || firstPost.cover;
       if (result.cover) {
         result.cover = nkcModules.tools.getUrl('postCover', result.cover);
@@ -143,12 +142,10 @@ shareRouter
         { t: 1, cover: 1, l: 1 },
       );
       result.title = firstPost.t;
-      result.description = firstPost.l === 'json'
-      ? getJsonStringTextSlice(firstPost.c,100)
-      : nkcModules.nkcRender.htmlToPlain(
-        firstPost.c,
-        100,
-      );
+      result.description =
+        firstPost.l === 'json'
+          ? getJsonStringTextSlice(firstPost.c, 100)
+          : nkcModules.nkcRender.htmlToPlain(firstPost.c, 100);
       result.cover = firstPost.cover;
       if (result.cover) {
         result.cover = nkcModules.tools.getUrl('postCover', result.cover);
@@ -168,12 +165,13 @@ shareRouter
       let comment = await db.CommentModel.findOnly({ _id: id });
       comment = (await db.CommentModel.getCommentsInfo([comment]))[0];
       result.title = comment.articleDocument.title;
-      result.description = comment.commentDocument.l === 'json'
-      ? getJsonStringTextSlice(comment.commentDocument.content,100)
-      : nkcModules.nkcRender.htmlToPlain(
-        comment.commentDocument.content,
-        100,
-      );
+      result.description =
+        comment.commentDocument.l === 'json'
+          ? getJsonStringTextSlice(comment.commentDocument.content, 100)
+          : nkcModules.nkcRender.htmlToPlain(
+              comment.commentDocument.content,
+              100,
+            );
       if (comment.cover) {
         result.cover = nkcModules.tools.getUrl('postCover', comment.cover);
       }
@@ -181,12 +179,10 @@ shareRouter
       let article = await db.ArticleModel.findOnly({ _id: id });
       article = (await db.ArticleModel.getArticlesInfo([article]))[0];
       result.title = article.document.title;
-      result.description = article.document.l === 'json'
-      ? getJsonStringTextSlice(article.document.content ,100)
-      : nkcModules.nkcRender.htmlToPlain(
-        article.document.content,
-        100,
-      );
+      result.description =
+        article.document.l === 'json'
+          ? getJsonStringTextSlice(article.document.content, 100)
+          : nkcModules.nkcRender.htmlToPlain(article.document.content, 100);
       if (article.document.cover) {
         result.cover = nkcModules.tools.getUrl(
           'postCover',
@@ -272,7 +268,7 @@ shareRouter
     await lock.unlock();
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, db, nkcModules, state } = ctx;
     let { type, id, targetId } = body;
     id = id || targetId;
