@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const { subscribeSources } = require('../../../settings/subscribe');
 const homeRouter = new Router();
-homeRouter.get('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+homeRouter.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, db, params } = ctx;
   const { user } = data;
   let statistics = {};

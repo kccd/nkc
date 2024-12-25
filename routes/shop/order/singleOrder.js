@@ -1,8 +1,9 @@
 const Router = require('koa-router');
 const router = new Router();
 const refundRouter = require('./refund');
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, params, db } = ctx;
     data.order = await db.ShopOrdersModel.findOne({ orderId: params.orderId });
     if (!data.order) {
@@ -14,7 +15,7 @@ router
     await next();
   })
   // 查看物流
-  .get('/logistics', async (ctx, next) => {
+  .get('/logistics', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, body, nkcModules } = ctx;
     const { user } = data;
     const { orderId } = params;
@@ -47,7 +48,7 @@ router
     await next();
   })
   // 确认收货
-  .put('/receipt', async (ctx, next) => {
+  .put('/receipt', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, body } = ctx;
     const { user } = data;
     const { orderId } = params;
@@ -59,7 +60,7 @@ router
     await next();
   })
   // 查看订单详情
-  .get('/detail', async (ctx, next) => {
+  .get('/detail', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, query, nkcModules } = ctx;
     const { orderId } = params;
     const { user } = data;
@@ -100,7 +101,7 @@ router
     ctx.template = 'shop/order/detail.pug';
     await next();
   })
-  .put('/delivery', async (ctx, next) => {
+  .put('/delivery', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, db, body, nkcModules, data } = ctx;
     const { checkString } = nkcModules.checkData;
     if (state.uid !== data.order.buyUid) {

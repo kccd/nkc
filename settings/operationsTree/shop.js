@@ -17,7 +17,7 @@ module.exports = {
     },
   },
   manage: {
-    GET: Operations.visitManageRouter,
+    GET: Operations.visitManageHome,
     // 订单管理
     order: {
       GET: Operations.visitShopOrderIndex,
@@ -34,6 +34,9 @@ module.exports = {
     },
     home: {
       GET: Operations.visitManageHome,
+    },
+    goods: {
+      GET: Operations.visitStoreGoodsList,
     },
     PARAMETER: {
       GET: Operations.visitManageIndex,
@@ -92,7 +95,6 @@ module.exports = {
         },
       },
       order: {
-        GET: Operations.visitShopOrderIndex,
         sendGoods: {
           PUT: Operations.sendGoods,
         },
@@ -208,9 +210,6 @@ module.exports = {
   pay: {
     GET: Operations.visitShopPay,
     POST: Operations.kcbPay,
-    alipay: {
-      POST: Operations.getAlipayUrl,
-    },
   },
   refund: {
     POST: Operations.userApplyRefund,
