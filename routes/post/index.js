@@ -27,6 +27,7 @@ const noticeRouter = require('./notice');
 const noticesRouter = require('./notices');
 const { checkString } = require('../../nkcModules/checkData');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const { editorRichService } = require('../../services/editor/rich.service');
 
 router
   .use('/', async (ctx, next) => {
@@ -452,23 +453,23 @@ router
       }
     }
 
-    const content =
-      l === 'json'
-        ? customCheerio.load(renderHTMLByJSON({ json: c })).text()
-        : customCheerio.load(c).text();
+    const contentSize = editorRichService.getRichContentWordsSize(
+      post.l,
+      post.c,
+    );
 
-    if (content.length < 2) {
+    if (contentSize < 2) {
       ctx.throw(400, `内容不能少于2个字`);
     }
     // 字数限制
     if (targetPost.parentPostId) {
       // 作为评论 不能超过200字
-      if (content.length > 200) {
+      if (contentSize > 200) {
         ctx.throw(400, `内容不能超过200字`);
       }
     } else {
       // 作为文章、回复 不能超过10万字
-      if (content.length > 100000) {
+      if (contentSize > 100000) {
         ctx.throw(400, `内容不能超过10万字`);
       }
     }

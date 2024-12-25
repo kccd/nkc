@@ -38,7 +38,7 @@ module.exports = {
     POST: Operations.uploadResources,
     PARAMETER: {
       GET: Operations.getResources,
-      PUT: Operations.modifyResources,
+      PUT: Operations.disableResource,
       info: {
         GET: Operations.getResourceInfo,
       },

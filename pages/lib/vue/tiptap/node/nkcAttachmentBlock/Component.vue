@@ -78,6 +78,7 @@ export default {
 
 <style scoped lang="less">
 .file-view-wrapper {
+  user-select: none;
   padding: 1rem 0;
   // text-align: center;
   .file-box {

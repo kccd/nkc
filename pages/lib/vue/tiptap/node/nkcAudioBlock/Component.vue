@@ -69,6 +69,7 @@ export default {
   margin-bottom: 0.5rem;
   text-align: center;
   max-width: 414px;
+  user-select: none;
   .audio-box {
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
     border-radius: 2px;

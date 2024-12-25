@@ -804,6 +804,7 @@ const DynamicOperations = {
   rollbackZoneMomentHistory: 'rollbackZoneMomentHistory',
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
   collectionPost: 'collectionPost',
+  disableResource: 'disableResource',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

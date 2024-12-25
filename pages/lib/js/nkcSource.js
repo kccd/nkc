@@ -1,7 +1,7 @@
 import { strToObj, objToStr } from './dataConversion';
 import { base64ToStr } from './dataConversion';
 import { getState } from './state';
-import { getUrl } from './tools';
+import { getSize, getUrl } from './tools';
 import hljs from 'highlight.js';
 const isLogged = !!getState().uid;
 import { lazyLoadInit } from './lazyLoad';
@@ -10,6 +10,7 @@ import { logger } from './logger';
 import { screenTopAlert } from './topAlert';
 import { fixLanguage, highlightLanguagesObject } from './highlight';
 import { renderNKCDocNumber } from './nkcDocNumber';
+import { RNUpdateMusicListAndPlay } from './reactNative';
 
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -212,24 +213,130 @@ export function renderingNKCAudio() {
       continue;
     }
     audioContainer.setAttribute('data-initialized', 'true');
-    const plyrDom = audioContainer.querySelector('audio.plyr-dom');
-    if (plyrDom === null) {
-      continue;
+    if (getState().isApp) {
+      const rid = audioContainer.getAttribute('data-id');
+      const audioTitle = audioContainer.querySelector(
+        'span.nkcsource-audio-title',
+      );
+      const title = audioTitle.textContent;
+      audioTitle.remove();
+      let size = audioContainer.querySelector('audio[data-size]');
+      if (size.length !== 0) {
+        size = Number(size.getAttribute('data-size'));
+      } else {
+        size = 0;
+      }
+      size = getSize(size);
+      // 获取音频源 URL
+      const sourceElement = audioContainer.querySelector('source');
+      const url = sourceElement ? sourceElement.getAttribute('src') : '';
+      // 创建 DOM 元素
+      const appAudio = document.createElement('div');
+      appAudio.className = 'app-audio';
+
+      const playIcon = document.createElement('div');
+      playIcon.className = 'fa fa-play app-audio-icon';
+      playIcon.onclick = function () {
+        // 选择所有符合条件的 span 元素
+        const elements = document.querySelectorAll(
+          'span[data-tag="nkcsource"][data-type="audio"]',
+        );
+        let audiosId = [];
+        let audiosTitle = [];
+        let urls = [];
+
+        // 遍历所有元素
+        elements.forEach(function (e) {
+          const rid = e.getAttribute('data-id');
+          const titleElement = e.querySelector('.app-audio-title');
+          var url = titleElement ? titleElement.getAttribute('data-url') : '';
+
+          var title = titleElement ? titleElement.textContent : '';
+
+          // 检查是否已经存在 rid，避免重复
+          if (!audiosId.includes(rid)) {
+            audiosId.push(rid);
+            audiosTitle.push(title);
+            urls.push(url);
+          }
+        });
+
+        // 找到 targetRid 的索引
+        var index = audiosId.indexOf(rid);
+        if (index > 0) {
+          var _audiosId = audiosId.splice(0, index);
+          var _audiosTitle = audiosTitle.splice(0, index);
+          var _urls = urls.splice(0, index);
+
+          audiosId = audiosId.concat(_audiosId);
+          audiosTitle = audiosTitle.concat(_audiosTitle);
+          urls = urls.concat(_urls);
+        }
+
+        // 创建音乐列表
+        const list = [];
+        for (let i = 0; i < audiosId.length; i++) {
+          let url = urls[i];
+          if (!url.startsWith('http') && !url.startsWith('https')) {
+            url = window.location.origin + url; // 确保 URL 是完整的
+          }
+          list.push({
+            url: url,
+            name: audiosTitle[i],
+            from: window.location.href,
+          });
+        }
+        // 更新音乐列表并播放
+        RNUpdateMusicListAndPlay(list);
+      };
+
+      const appAudioContainer = document.createElement('div');
+      appAudioContainer.className = 'app-audio-container';
+
+      const appAudioTitle = document.createElement('a');
+      appAudioTitle.className = 'app-audio-title';
+      appAudioTitle.setAttribute('data-url', url);
+      appAudioTitle.setAttribute('data-global-click', 'openDownloadPanel');
+      appAudioTitle.setAttribute('data-global-data', objToStr({ rid }));
+      appAudioTitle.textContent = title;
+      var appAudioInfo = document.createElement('div');
+      appAudioInfo.className = 'app-audio-info';
+      var sizeSpan = document.createElement('span');
+      sizeSpan.className = 'm-r-05';
+      sizeSpan.textContent = size;
+      var downloadLink = document.createElement('a');
+      downloadLink.setAttribute('data-global-click', 'openDownloadPanel');
+      downloadLink.setAttribute('data-global-data', objToStr({ rid }));
+      downloadLink.textContent = '下载';
+      // 组装 DOM 结构
+      appAudioInfo.appendChild(sizeSpan);
+      appAudioInfo.appendChild(downloadLink);
+      appAudioContainer.appendChild(appAudioTitle);
+      appAudioContainer.appendChild(appAudioInfo);
+      appAudio.appendChild(playIcon);
+      appAudio.appendChild(appAudioContainer);
+      // 清空 audio 元素并添加新内容
+      audioContainer.replaceChildren(appAudio);
+    } else {
+      const plyrDom = audioContainer.querySelector('audio.plyr-dom');
+      if (plyrDom === null) {
+        continue;
+      }
+      new window.Plyr(plyrDom, {
+        controls: [
+          'play-large',
+          'play',
+          'progress',
+          'current-time',
+          'mute',
+          'volume',
+        ],
+        autopause: true,
+      });
     }
     // 是否允许游客观看视频
     const visitorAccess =
       audioContainer.getAttribute('data-visitor-access') === 'true';
-    new window.Plyr(plyrDom, {
-      controls: [
-        'play-large',
-        'play',
-        'progress',
-        'current-time',
-        'mute',
-        'volume',
-      ],
-      autopause: true,
-    });
     if (!isLogged && !visitorAccess) {
       const maskDomStyle = `
         display: flex;

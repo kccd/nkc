@@ -48,6 +48,7 @@ export default {
 
 <style scoped lang="less">
 .node-view-wrapper {
+  user-select: none;
   margin: 1rem 0;
   .video-player {
     border-radius: 5px;
