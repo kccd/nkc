@@ -2,15 +2,23 @@ const Router = require('koa-router');
 const sendMessageRouter = new Router();
 const {
   registerExamService,
-} = require('../../services/register/registerExam.service');
+} = require('../services/register/registerExam.service');
+const {
+  Public,
+  OnlyVisitor,
+  OnlyUnbannedUser,
+  OnlyUser,
+  OnlyOperation,
+} = require('../middlewares/permission');
+const { Operations } = require('../settings/operations');
 sendMessageRouter
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     if (ctx.data.user) {
       await ctx.data.user.extendAuthLevel();
     }
     await next();
   })
-  .post('/login', async (ctx, next) => {
+  .post('/login', OnlyVisitor(), async (ctx, next) => {
     const { db, body } = ctx;
     const { nationCode, mobile, verifySecret } = body;
     if (!nationCode) {
@@ -50,7 +58,7 @@ sendMessageRouter
     await sendMessage(smsCodeObj);
     await next();
   })
-  .post('/register', async (ctx, next) => {
+  .post('/register', OnlyVisitor(), async (ctx, next) => {
     // 手机号码注册
     const { db, body } = ctx;
     const { nationCode, mobile, verifySecret, registerCode } = body;
@@ -96,7 +104,7 @@ sendMessageRouter
     await sendMessage(smsCodeObj);
     await next();
   })
-  .post('/getback', async (ctx, next) => {
+  .post('/getback', OnlyVisitor(), async (ctx, next) => {
     // 找回密码
     const { db, body } = ctx;
     const { username, mobile } = body;
@@ -153,7 +161,7 @@ sendMessageRouter
     await sendMessage(smsCodeObj);
     await next();
   })
-  .post('/bindMobile', async (ctx, next) => {
+  .post('/bindMobile', OnlyUnbannedUser(), async (ctx, next) => {
     // 绑定手机号码
     const { data, db, body } = ctx;
     const { user } = data;
@@ -207,7 +215,7 @@ sendMessageRouter
     );
     await next();
   })
-  .post('/changeMobile', async (ctx, next) => {
+  .post('/changeMobile', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body } = ctx;
     const { user } = data;
     const { operation } = body;
@@ -278,7 +286,7 @@ sendMessageRouter
     );
     await next();
   })
-  .post('/withdraw', async (ctx, next) => {
+  .post('/withdraw', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, db, data } = ctx;
     const { user } = data;
     if (user.authLevel < 1) {
@@ -301,7 +309,7 @@ sendMessageRouter
     await nkcModules.sendMessage(smsCodeObj);
     await next();
   })
-  .post('/destroy', async (ctx, next) => {
+  .post('/destroy', OnlyUser(), async (ctx, next) => {
     const { nkcModules, db, data } = ctx;
     const { user } = data;
     if (user.authLevel < 1) {
@@ -324,7 +332,7 @@ sendMessageRouter
     await nkcModules.sendMessage(smsCodeObj);
     await next();
   })
-  .post('/unbindMobile', async (ctx, next) => {
+  .post('/unbindMobile', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, db, data } = ctx;
     const { user } = data;
     if (user.authLevel < 1) {
@@ -347,24 +355,28 @@ sendMessageRouter
     await nkcModules.sendMessage(smsCodeObj);
     await next();
   })
-  .post('/common', async (ctx, next) => {
-    const { nkcModules, db, body } = ctx;
-    const { number, nationCode, type } = body;
-    if (!['changeUnusedPhoneNumber'].includes(type)) {
-      ctx.throw(400, 'type error');
-    }
-    const smsCodeObj = {
-      nationCode,
-      mobile: number,
-      type,
-      ip: ctx.address,
-    };
-    await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
-    smsCodeObj.code = nkcModules.apiFunction.random(6);
-    smsCodeObj.description = '修改手机号';
-    const smsCode = db.SmsCodeModel(smsCodeObj);
-    await smsCode.save();
-    await nkcModules.sendMessage(smsCodeObj);
-    await next();
-  });
+  .post(
+    '/common',
+    OnlyOperation(Operations.sendPhoneMessage),
+    async (ctx, next) => {
+      const { nkcModules, db, body } = ctx;
+      const { number, nationCode, type } = body;
+      if (!['changeUnusedPhoneNumber'].includes(type)) {
+        ctx.throw(400, 'type error');
+      }
+      const smsCodeObj = {
+        nationCode,
+        mobile: number,
+        type,
+        ip: ctx.address,
+      };
+      await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+      smsCodeObj.code = nkcModules.apiFunction.random(6);
+      smsCodeObj.description = '修改手机号';
+      const smsCode = db.SmsCodeModel(smsCodeObj);
+      await smsCode.save();
+      await nkcModules.sendMessage(smsCodeObj);
+      await next();
+    },
+  );
 module.exports = sendMessageRouter;

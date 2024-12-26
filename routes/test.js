@@ -1,39 +1,42 @@
 const testRouter = require('koa-router')();
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
-let jsonContentTemplate = require('../../pages/lib/vue/tiptap/jsonContentTemplate.json');
+const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
+let jsonContentTemplate = require('../pages/lib/vue/tiptap/jsonContentTemplate.json');
+const { OnlyOperation } = require('../middlewares/permission');
+const { Operations } = require('../settings/operations');
 testRouter
-  .get('/', async (ctx, next) => {
-    ctx.template = "test/test.pug";
-    /*const result = await ctx.db.UserModel.find({toc: {$gte: new Date('2021-01-01 00:00:00')}}).limit(10000).sort({toc: -1}).explain();
-    console.log(result)*/
-    // console.log(result.executionStats.executionTimeMillis, 'ms');
+  .get('/', OnlyOperation(Operations.test), async (ctx, next) => {
+    ctx.template = 'test/test.pug';
     await next();
   })
-  .get("/demo", async (ctx, next) => {
-    const {db, data} = ctx;
+  .get('/demo', OnlyOperation(Operations.test), async (ctx, next) => {
+    const { db, data } = ctx;
     const tools = ctx.nkcModules.tools;
-    const posts = await db.PostModel.find({type: 'thread'}).sort({toc: -1}).limit(100);
+    const posts = await db.PostModel.find({ type: 'thread' })
+      .sort({ toc: -1 })
+      .limit(100);
     data.articlesData = [];
-    for(const post of posts) {
-      const thread = await db.ThreadModel.findOne({tid: post.tid});
-      const user = await db.UserModel.findOne({uid: thread.uid});
-      const lastPost = await db.PostModel.findOne({tid: post.tid}).sort({toc: -1});
+    for (const post of posts) {
+      const thread = await db.ThreadModel.findOne({ tid: post.tid });
+      const user = await db.UserModel.findOne({ uid: thread.uid });
+      const lastPost = await db.PostModel.findOne({ tid: post.tid }).sort({
+        toc: -1,
+      });
       let reply = null;
-      if(lastPost) {
-        const lastUser = await db.UserModel.findOne({uid: lastPost.uid});
+      if (lastPost) {
+        const lastUser = await db.UserModel.findOne({ uid: lastPost.uid });
         reply = {
           user: {
             uid: lastUser.uid,
             avatarUrl: tools.getUrl('userAvatar', lastUser.avatar),
             homeUrl: tools.getUrl('userHome', lastUser.uid),
-            username: lastUser.username
+            username: lastUser.username,
           },
           content: {
             time: lastPost.toc,
             url: tools.getUrl('post', lastPost.pid),
             abstract: ctx.nkcModules.nkcRender.htmlToPlain(lastPost.c, 200),
-          }
-        }
+          },
+        };
       }
       data.articlesData.push({
         type: 'post',
@@ -49,29 +52,31 @@ testRouter
             type: 'forum',
             id: '23',
             name: '分类标题',
-            url: '/f/23'
-          }
+            url: '/f/23',
+          },
         ],
         pages: [
           {
             name: 2,
-            url: '/f/23?page=1'
+            url: '/f/23?page=1',
           },
           {
             name: '..',
           },
           {
             name: 3,
-            url: '/f/23?page=2'
+            url: '/f/23?page=2',
           },
           {
             name: 4,
-            url: '/f/23?page=2'
-          }
+            url: '/f/23?page=2',
+          },
         ],
         status: {
-          type: ['disabled', 'warning', 'danger', 'normal'][Math.round(Math.random() * 3)],
-          desc: '测试状态显示'
+          type: ['disabled', 'warning', 'danger', 'normal'][
+            Math.round(Math.random() * 3)
+          ],
+          desc: '测试状态显示',
         },
         content: {
           time: post.toc,
@@ -85,24 +90,24 @@ testRouter
           replyCount: thread.count,
         },
         reply,
-      })
+      });
     }
-    ctx.template = "test/demo.pug";
+    ctx.template = 'test/demo.pug';
     await next();
   })
-  .get('/file', async (ctx, next) => {
+  .get('/file', OnlyOperation(Operations.test), async (ctx, next) => {
     ctx.remoteFile = {
       url: 'http://192.168.11.250:10292',
       query: {
         time: new Date(`2021-11-10 00:00:00`),
-        path: 'resource/video/2021/11/29486.mp4'
+        path: 'resource/video/2021/11/29486.mp4',
       },
       isAttachment: false,
       filename: 'success.mp4',
     };
     await next();
-      })
-  .get('/json', async (ctx, next) => {
+  })
+  .get('/json', OnlyOperation(Operations.test), async (ctx, next) => {
     const targetTypes = [
       'nkc-audio-block',
       'nkc-picture-block',
@@ -131,7 +136,7 @@ testRouter
     ctx.template = 'test/jsonRender.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.test), async (ctx, next) => {
     const { json } = ctx.body;
     jsonContentTemplate = json;
     await next();

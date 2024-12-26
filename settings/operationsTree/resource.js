@@ -15,24 +15,6 @@ module.exports = {
       },
     },
   },
-  shopLogo: {
-    PARAMETER: {
-      GET: Operations.getShopLogo,
-      POST: Operations.uploadShopLogo,
-    },
-  },
-  poster: {
-    // 活动海报
-    PARAMETER: {
-      GET: Operations.getActivityPoster,
-    },
-    POST: Operations.uploadActivityPoster,
-  },
-  /*avatar_small: {// 用户头像
-		PARAMETER: {
-			GET: Operations.getUserAvatar,
-		}
-	},*/
   r: {
     // 资源
     POST: Operations.uploadResources,
@@ -56,16 +38,6 @@ module.exports = {
       },
     },
   },
-  rm: {
-    PARAMETER: {
-      GET: Operations.getMediums,
-    },
-  },
-  ro: {
-    PARAMETER: {
-      GET: Operations.getOrigins,
-    },
-  },
   appDownload: {
     // 安装包下载
     android: {
@@ -85,35 +57,10 @@ module.exports = {
       GET: Operations.getDefaultImage,
     },
   },
-  attachIcon: {
-    // 默认附件图标
-    PARAMETER: {
-      GET: Operations.getAttachmentIcon,
-    },
-  },
-  pfa: {
-    // 专栏logo
-    PARAMETER: {
-      GET: Operations.getPersonalForumAvatar,
-    },
-  },
   pfb: {
     // 专栏banner
     PARAMETER: {
       GET: Operations.getPersonalForumBanner,
-    },
-  },
-  photo: {
-    // 照片
-    POST: Operations.uploadPhoto,
-    PARAMETER: {
-      GET: Operations.getPhoto,
-      DELETE: Operations.deletePhoto,
-    },
-  },
-  photo_small: {
-    PARAMETER: {
-      GET: Operations.getSmallPhoto,
     },
   },
 };

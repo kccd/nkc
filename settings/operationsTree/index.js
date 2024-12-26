@@ -4,14 +4,11 @@ const resourceObj = require('./resource');
 const {
   avatar,
   banner,
-  shopLogo,
   poster,
   avatar_small,
   forum_avatar,
   r,
   rt,
-  rm,
-  ro,
   cover,
   frameImg,
   resources,
@@ -19,8 +16,6 @@ const {
   pfb,
   fundLogo,
   fundBanner,
-  photo,
-  photo_small,
 } = resourceObj;
 const api = require('./api');
 const mathJax = require('./mathJax');
@@ -84,6 +79,7 @@ const community = require('./community');
 const watermark = require('./watermark');
 const drawData = require('./drawData');
 const logo = require('./logo');
+const { Operations } = require('../operations');
 const book = require('./book');
 const rc = require('./rc');
 const comment = require('./comment');
@@ -97,34 +93,39 @@ const oauth = require('./oauth');
 const tc = require('./tc');
 const browser = require('./browser');
 const apps = require('./apps');
-
+const attachIcon = require('./attachIcon');
+const photo = require('./photo');
+const photo_small = require('./photo_small');
+const rm = require('./rm');
+const ro = require('./ro');
+const shopLogo = require('./shopLogo');
 const operationTree = {
   home: {
     GET: 'visitHome', // 首页
 
     // 适配dz
     'forum.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     'index.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     'read.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     read: {
       PARAMETER: {
-        GET: 'discuz',
+        GET: Operations.discuz,
         PARAMETER: {
-          GET: 'discuz',
+          GET: Operations.discuz,
           PARAMETER: {
-            GET: 'discuz',
+            GET: Operations.discuz,
           },
         },
       },
     },
     'home.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     document, // 预览文章或历史
     draft, //预览草稿或历史
@@ -143,7 +144,6 @@ const operationTree = {
     ro, // 原图 3840
 
     default: resourceObj.default,
-    attachIcon: resourceObj.attachIcon,
 
     cover, // 文章封面
 
@@ -273,6 +273,7 @@ const operationTree = {
     browser, // 浏览器版本检测
     apps, // 资源页
     wx: weChat,
+    attachIcon,
   },
 };
 module.exports = {
