@@ -3,11 +3,12 @@ const router = new Router();
 const blockRouter = require('./block');
 const nkcRender = require('../../../nkcModules/nkcRender');
 const { getUrl, getAnonymousInfo } = require('../../../nkcModules/tools');
-const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 const { getJsonStringText } = require('../../../nkcModules/json');
 const anonymousUserInfo = getAnonymousInfo();
+const { OnlyOperation } = require('../../../middlewares/permission');
+const { Operations } = require('../../../settings/operations');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.nkcManagementHome), async (ctx, next) => {
     const { db, data } = ctx;
     data.nav = 'home';
     const homeSettings = await db.SettingModel.getSettings('home');
@@ -212,7 +213,7 @@ router
     ctx.template = 'nkc/home/home.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.nkcManagementHome), async (ctx, next) => {
     const { body, data, db } = ctx;
     const { topType } = body.fields;
     const { cover } = body.files;
@@ -222,7 +223,7 @@ router
     );
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.nkcManagementHome), async (ctx, next) => {
     const { nkcModules, body, db, data } = ctx;
     const { operation } = body;
     const { checkNumber, checkString } = nkcModules.checkData;
@@ -566,20 +567,24 @@ router
     await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
-  .put('/showActivityEnter', async (ctx, next) => {
-    let { body, data, db } = ctx;
-    let { showActivityEnter } = body;
-    await db.SettingModel.updateOne(
-      { _id: 'home' },
-      {
-        $set: {
-          'c.showActivityEnter': showActivityEnter,
+  .put(
+    '/showActivityEnter',
+    OnlyOperation(Operations.showActivityEnter),
+    async (ctx, next) => {
+      let { body, data, db } = ctx;
+      let { showActivityEnter } = body;
+      await db.SettingModel.updateOne(
+        { _id: 'home' },
+        {
+          $set: {
+            'c.showActivityEnter': showActivityEnter,
+          },
         },
-      },
-    );
-    await db.SettingModel.saveSettingsToRedis('home');
-    data.showActivityEnter = showActivityEnter;
-    return next();
-  })
+      );
+      await db.SettingModel.saveSettingsToRedis('home');
+      data.showActivityEnter = showActivityEnter;
+      return next();
+    },
+  )
   .use('/block', blockRouter.routes(), blockRouter.allowedMethods());
 module.exports = router;

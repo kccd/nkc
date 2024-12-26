@@ -10,8 +10,10 @@ const applyForumRouter = require('./applyForum');
 const securityApplication = require('./securityApplication');
 const moment = require('moment');
 const documentRouter = require('./document');
+const { Operations } = require('../../settings/operations');
+const { OnlyOperation } = require('../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyOperation(Operations.nkcManagement), async (ctx, next) => {
     const { db, data, permission } = ctx;
     //获取手机号申诉待审核数量
     if (permission('nkcManagementSecurityApplication')) {
@@ -21,7 +23,7 @@ router
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.nkcManagement), async (ctx, next) => {
     const { db, query, data, nkcModules } = ctx;
     data.type = 'status';
     const { redisClient } = ctx.settings;
@@ -259,7 +261,7 @@ router
     }
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.nkcManagement), async (ctx, next) => {
     const { body, settings, nkcModules } = ctx;
     const { type } = body;
     const { redisClient } = settings;
