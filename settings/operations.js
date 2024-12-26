@@ -7,6 +7,11 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  addNote: 'addNote',
+  deleteNote: 'deleteNote',
+  modifyNote: 'modifyNote',
+  viewNote: 'viewNote',
+  OAuthAuthentication: 'OAuthAuthentication',
   discuz: 'discuz',
   getAttachmentIcon: 'getAttachmentIcon',
   logout: 'logout',
@@ -731,10 +736,6 @@ const DynamicOperations = {
   moveLibraryFolder: 'moveLibraryFolder',
   deleteLibraryFolder: 'deleteLibraryFolder',
   getLibraryLogs: 'getLibraryLogs',
-  viewNote: 'viewNote',
-  addNote: 'addNote',
-  deleteNote: 'deleteNote',
-  modifyNote: 'modifyNote',
 
   uploadTool: 'uploadTool',
   updateTool: 'updateTool',
@@ -786,7 +787,6 @@ const DynamicOperations = {
   managementMoment: 'managementMoment',
   getMomentOption: 'getMomentOption',
   getMomentIpInfo: 'getMomentIpInfo',
-  OAuthAuthentication: 'OAuthAuthentication',
   getUserArticles: 'getUserArticles',
   columnManage: 'columnManage',
   manageQuestionTags: 'manageQuestionTags',
