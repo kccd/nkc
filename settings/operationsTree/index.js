@@ -85,7 +85,6 @@ const watermark = require('./watermark');
 const drawData = require('./drawData');
 const logo = require('./logo');
 const book = require('./book');
-const pim = require('./pim');
 const rc = require('./rc');
 const comment = require('./comment');
 const zone = require('./zone');
@@ -256,7 +255,6 @@ const operationTree = {
     wm: watermark, //水印
     logo, // 网站 logo
     creation, // 用户创作中心
-    pim, // 产品管理系统
     test,
     draw: drawData, //获取手机浏览器左侧滑动框
     mathJax, // 编辑器预览公式
