@@ -1,25 +1,38 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 settingsRouter
-  .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
-    const {user} = data;
-    data.grades = await db.UsersGradeModel.find({}, {_id: 1, displayName: 1}).sort({_id: 1});
-    const {messageSettings} = await db.UsersGeneralModel.findOne({uid: user.uid}, {messageSettings: 1});
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { db, data } = ctx;
+    const { user } = data;
+    data.grades = await db.UsersGradeModel.find(
+      {},
+      { _id: 1, displayName: 1 },
+    ).sort({ _id: 1 });
+    const { messageSettings } = await db.UsersGeneralModel.findOne(
+      { uid: user.uid },
+      { messageSettings: 1 },
+    );
     data.messageSettings = messageSettings;
     await next();
   })
-  .put('/', async (ctx, next) => {
-    const {data, db, body} = ctx;
-    const {user} = data;
-    const {beep, onlyReceiveFromFriends, messageSettings, limit, allowAllMessageWhenSale} = body;
-    const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
-    if(messageSettings) {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { data, db, body } = ctx;
+    const { user } = data;
+    const {
+      beep,
+      onlyReceiveFromFriends,
+      messageSettings,
+      limit,
+      allowAllMessageWhenSale,
+    } = body;
+    const usersGeneral = await db.UsersGeneralModel.findOnly({ uid: user.uid });
+    if (messageSettings) {
       await usersGeneral.updateOne({
-        messageSettings
+        messageSettings,
       });
     } else {
-      if(
+      if (
         limit.status &&
         !limit.timeLimit &&
         !limit.digestLimit &&
@@ -27,12 +40,14 @@ settingsRouter
         !limit.volumeA &&
         !limit.volumeB &&
         Number(limit.gradeLimit) < 2
-      ) ctx.throw(400, "请至少勾选一项防骚扰设置");
+      ) {
+        ctx.throw(400, '请至少勾选一项防骚扰设置');
+      }
       await usersGeneral.updateOne({
         'messageSettings.beep': beep,
         'messageSettings.onlyReceiveFromFriends': onlyReceiveFromFriends,
-        "messageSettings.limit": limit,
-        'messageSettings.allowAllMessageWhenSale': allowAllMessageWhenSale
+        'messageSettings.limit': limit,
+        'messageSettings.allowAllMessageWhenSale': allowAllMessageWhenSale,
       });
     }
     await next();

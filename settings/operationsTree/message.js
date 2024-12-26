@@ -4,14 +4,8 @@ module.exports = {
   list: {
     GET: Operations.messageGetData,
   },
-  systemInfo: {
-    //GET: Operations.getSystemInfo
-  },
   blackList: {
     POST: Operations.messageBlackList,
-  },
-  remind: {
-    //GET: Operations.getRemind
   },
   friendsApplication: {
     GET: Operations.getFriendsApplication,
@@ -28,7 +22,6 @@ module.exports = {
   user: {
     GET: Operations.messageGetData,
     PARAMETER: {
-      //GET: Operations.getUserMessage,
       POST: Operations.sendMessageToUser,
     },
   },

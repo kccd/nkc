@@ -1,9 +1,8 @@
 const Router = require('koa-router');
 const userRouter = new Router();
-const PATH = require('path');
-
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 userRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data, query, nkcModules } = ctx;
     const { uid } = query;
     const { user } = data;
@@ -49,7 +48,7 @@ userRouter
     ).sort({ toc: -1 });
     await next();
   })
-  .get('/:uid', async (ctx, next) => {
+  .get('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, params } = ctx;
     const { uid } = params;
     const { user } = data;
@@ -90,7 +89,7 @@ userRouter
 
     await next();
   })
-  .post('/:uid', async (ctx, next) => {
+  .post('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, params, data, nkcModules } = ctx;
     const { uid } = params;
     const targetUser = await db.UserModel.findOnly({ uid });
