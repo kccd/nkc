@@ -7,6 +7,9 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  receiveAliPayPaymentInfo: 'receiveAliPayPaymentInfo',
+  postWeChatPayInfo: 'postWeChatPayInfo',
+  receiveWeChatPaymentInfo: 'receiveWeChatPaymentInfo',
   collectionPost: 'collectionPost',
   getPostComments: 'getPostComments',
   creditKcb: 'creditKcb',
@@ -743,9 +746,6 @@ const DynamicOperations = {
   addUserToBlacklist: 'addUserToBlacklist',
   removeUserFromBlacklist: 'removeUserFromBlacklist',
   getAttachment: 'getAttachment',
-  receiveWeChatPaymentInfo: 'receiveWeChatPaymentInfo',
-  postWeChatPayInfo: 'postWeChatPayInfo',
-  receiveAliPayPaymentInfo: 'receiveAliPayPaymentInfo',
   postAliPayInfo: 'postAliPayInfo',
   linkToTarget: 'linkToTarget',
   reportLinkToTarget: 'reportLinkToTarget',
@@ -758,7 +758,6 @@ const DynamicOperations = {
   publishArticle: 'publishArticle',
   publishMoment: 'publishMoment',
   publishMomentComment: 'publishMomentComment',
-  PIMPublic: 'PIMPublic',
   test: 'test',
   getLeftDrawData: 'getLeftDrawData',
   getUserDrawData: 'getUserDrawData',
