@@ -7,6 +7,7 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  visitHome: 'visitHome',
   modifyLibraryFolder: 'modifyLibraryFolder',
   libraryUpload: 'libraryUpload',
   createLibraryFolder: 'createLibraryFolder',
@@ -180,7 +181,6 @@ const FixedOperations = {
   modifySticker: 'modifySticker',
   getSticker: 'getSticker',
   getSharedStickers: 'getSharedStickers',
-  visitHome: 'visitHome',
   survey_get: 'survey_get',
   survey_post: 'survey_post',
   survey_single_get: 'survey_single_get',
