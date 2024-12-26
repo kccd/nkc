@@ -1,7 +1,7 @@
-const { OnlyUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 const router = require('koa-router')();
 router
-  .get('/', OnlyUser(), async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const {
       data,
       db,
@@ -21,7 +21,7 @@ router
     data.visibleType = visibleType;
     await next();
   })
-  .put('/', OnlyUser(), async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const {
       db,
       params: { mid },

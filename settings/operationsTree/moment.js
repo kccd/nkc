@@ -1,6 +1,5 @@
 const { Operations } = require('../operations.js');
 module.exports = {
-  GET: Operations.visitZoneSingleMoment,
   PARAMETER: {
     DELETE: Operations.deleteMoment,
     recovery: {

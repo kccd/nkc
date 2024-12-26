@@ -7,6 +7,9 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  getMomentOption: 'getMomentOption',
+  setMomentVisible: 'setMomentVisible',
+  deleteMoment: 'deleteMoment',
   addNote: 'addNote',
   deleteNote: 'deleteNote',
   modifyNote: 'modifyNote',
@@ -251,7 +254,6 @@ const FixedOperations = {
   postExamsPaper: 'postExamsPaper',
   registerExamCheck: 'registerExamCheck',
   getQuestionImage: 'getQuestionImage',
-  setMomentVisible: 'setMomentVisible',
   editorMoment: 'editorMoment',
   visitZone: 'visitZone',
   browserDetection: 'browserDetection',
@@ -783,9 +785,7 @@ const DynamicOperations = {
   collectionArticle: 'collectionArticle',
   digestArticle: 'digestArticle',
   unDigestArticle: 'unDigestArticle',
-  deleteMoment: 'deleteMoment',
   managementMoment: 'managementMoment',
-  getMomentOption: 'getMomentOption',
   getMomentIpInfo: 'getMomentIpInfo',
   getUserArticles: 'getUserArticles',
   columnManage: 'columnManage',
