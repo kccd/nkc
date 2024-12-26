@@ -1,13 +1,10 @@
 const router = require('koa-router')();
 const home = require('./home');
-const reply = require('./reply');
-const thread = require('./thread');
-const column = require('./column');
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
+const { Public } = require('../../middlewares/permission');
 router
   // 更新用户日常登录记录
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, state, nkcModules, db } = ctx;
     const { user } = data;
     if (state.uid) {
@@ -43,40 +40,14 @@ router
           });
           await user.updateUserMessage();
         }
-      } catch (err) {}
+      } catch (err) {
+        //
+      }
       await lock.unlock();
     }
     await next();
   })
-  .get('/cp', async (ctx, next) => {
-    const { query, data, db, internalData } = ctx;
-    const { t = 'home' } = query;
-    let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
-      data.userRoles,
-      data.userGrade,
-      data.user,
-    );
-    // 筛选出没有开启流控的专业
-    let forumInReduceVisits = await db.ForumModel.find(
-      { openReduceVisits: true },
-      { fid: 1 },
-    );
-    forumInReduceVisits = forumInReduceVisits.map((forum) => forum.fid);
-    fidOfCanGetThreads = fidOfCanGetThreads.filter(
-      (fid) => !forumInReduceVisits.includes(fid),
-    );
-    internalData.fidOfCanGetThreads = fidOfCanGetThreads;
-    if (t === 'reply') {
-      return reply(ctx, next);
-    } else if (t === 'thread') {
-      return thread(ctx, next);
-    } else if (t === 'column') {
-      return column(ctx, next);
-    } else {
-      return home(ctx, next);
-    }
-  })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, nkcModules, db, query, state } = ctx;
     const { pageSettings } = state;
     let { page = 0, s, t, c, d } = query;
@@ -316,12 +287,10 @@ router
           parentPost = {
             toc: originPost.toc,
             url: nkcModules.tools.getUrl('post', originPost.pid),
-            content: originPost.l === 'json'
-            ? getJsonStringTextSlice(originPost.c ,200)
-            : nkcModules.nkcRender.htmlToPlain(
-              originPost.c,
-              200,
-            ),
+            content:
+              originPost.l === 'json'
+                ? getJsonStringTextSlice(originPost.c, 200)
+                : nkcModules.nkcRender.htmlToPlain(originPost.c, 200),
             user: {
               uid: user.uid,
               avatar: user.avatar,
