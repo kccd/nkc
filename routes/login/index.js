@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const loginRouter = new Router();
+const { OnlyVisitor } = require('../../middlewares/permission');
 loginRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyVisitor(), async (ctx, next) => {
     const { query, data } = ctx;
     const { t: type } = query;
     data.referer = ctx.get('referer');
@@ -9,7 +10,7 @@ loginRouter
     ctx.template = 'login/login.v2.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyVisitor(), async (ctx, next) => {
     const address = ctx.address;
     const port = ctx.port;
     const userAgent = ctx.request.headers['user-agent'];

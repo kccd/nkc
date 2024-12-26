@@ -1,11 +1,12 @@
 const router = require('koa-router')();
 const libRouter = require('./library');
+const { Public } = require('../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     // 文库的权限判断
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     // 文件位置选择模块支持两种模式
     // 1. 根据提供的lid预加载所有上层文件夹中的子文件夹
     // 2. 根据提供的lid加载所有子文件夹
@@ -55,7 +56,7 @@ router
             { fid: { $in: accessibleForumsId }, lid: { $ne: null } },
             { lid: 1 },
           );
-          librariesId = forums.map((f) => f.lid);
+          const librariesId = forums.map((f) => f.lid);
           q._id = { $in: librariesId };
           q.closed = false;
         }

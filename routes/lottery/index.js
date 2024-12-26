@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const luckRouter = new Router();
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 luckRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, data, db } = ctx;
     const { user } = data;
     const today = nkcModules.apiFunction.today();
@@ -15,7 +16,7 @@ luckRouter
     ctx.template = 'lottery/lottery.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock(`postReward`, 6000);
     try {
@@ -98,7 +99,7 @@ luckRouter
     }
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     await db.UsersGeneralModel.updateOne(
