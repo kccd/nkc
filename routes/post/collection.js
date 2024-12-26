@@ -3,7 +3,8 @@ const router = new Router();
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
-router.post('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { body, params, db, data } = ctx;
   const { pid } = params;
   const { type, cid = [] } = body;

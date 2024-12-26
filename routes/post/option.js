@@ -3,7 +3,8 @@ const router = require('koa-router')();
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
-router.get('/', async (ctx, next) => {
+const { Public } = require('../../middlewares/permission');
+router.get('/', Public(), async (ctx, next) => {
   const { state, data, db, params } = ctx;
   const { user } = data;
   const { uid } = state;

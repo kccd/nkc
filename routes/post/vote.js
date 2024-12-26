@@ -3,8 +3,9 @@ const voteRouter = new Router();
 const {
   blacklistCheckerService,
 } = require('../../services/blacklist/blacklistChecker.service');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 voteRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, state } = ctx;
     const { pid } = params;
     const post = await db.PostModel.findOnly({ pid });
@@ -32,7 +33,7 @@ voteRouter
     await next();
     await thread.updateThreadVote();
   })
-  .post('/up', async (ctx, next) => {
+  .post('/up', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock('postVote', 6000);
     try {
@@ -114,7 +115,7 @@ voteRouter
     }
     await next();
   })
-  .post('/down', async (ctx, next) => {
+  .post('/down', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock('postVote', 6000);
     try {

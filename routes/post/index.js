@@ -2,14 +2,11 @@ const Router = require('koa-router');
 const quote = require('./quote');
 const history = require('./history');
 const credit = require('./credit');
-const recommend = require('./recommend');
 const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const warningRouter = require('./warning');
 const anonymousRouter = require('./anonymous');
 const hideRouter = require('./hide');
-const deleteRouter = require('./delete');
-const postRouter = require('./post');
 const toppedRouter = require('./topped');
 const authorRouter = require('./author');
 const resourcesRouter = require('./resources');
@@ -19,7 +16,6 @@ const commentRouter = require('./comment');
 const collectionRouter = require('./collection');
 const router = new Router();
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
-const { ObjectId } = require('mongodb');
 const {
   sensitiveDetectionService,
 } = require('../../services/sensitive/sensitiveDetection.service');
@@ -27,9 +23,9 @@ const noticeRouter = require('./notice');
 const noticesRouter = require('./notices');
 const { checkString } = require('../../nkcModules/checkData');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
-
+const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { state, data, db } = ctx;
     await db.ForumModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -39,13 +35,13 @@ router
     });
     await next();
   })
-  .get('/:pid', async (ctx, next) => {
+  .get('/:pid', Public(), async (ctx, next) => {
     // 设置 referer 策略
     // 解决分享回复时附件链接跨域无法读取referer中token的问题
     ctx.set('Referrer-Policy', 'unsafe-url');
     await next();
   })
-  .get('/:pid', async (ctx, next) => {
+  .get('/:pid', Public(), async (ctx, next) => {
     const { nkcModules, data, db, query, state } = ctx;
     const { token, page = 0, highlight, redirect } = query;
     const { pid } = ctx.params;
@@ -246,150 +242,6 @@ router
       );
     }
 
-    /*const from = ctx.get("FROM");
-
-    // 修改post时间限制
-    data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
-    // 获取评论
-    const q = {};
-    // 判断是否有权限查看未审核的post
-    if(data.user) {
-      if(!isModerator) {
-        q.$and = [
-          {
-            $or: [
-              {
-                reviewed: true
-              },
-              {
-                reviewed: false,
-                uid: data.user.uid
-              }
-            ]
-          },
-          {
-            $or: [
-              {
-                disabled: false,
-                toDraft: {$ne: true},
-              },
-              {
-                toDraft: true,
-                uid: data.user.uid
-              }
-            ]
-          }
-        ];
-      }
-    } else {
-      q.reviewed = true;
-      q.disabled = false;
-      q.toDraft = null;
-    }*/
-    // const {threadPostCommentList} = ctx.state.pageSettings;
-    // const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: data.post.tid}, {postId: 1, reason: 1});
-    // const toDraftPostsId = toDraftPosts.map(post => post.postId);
-    /*// 文章页 获取评论 树状
-    if(from === "nkcAPI") {
-      q.parentPostId = pid;
-      const count = await db.PostModel.countDocuments(q);
-      let paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
-      if(paging.page >= paging.pageCount) {
-        if(paging.pageCount > 0) paging.page = paging.pageCount - 1;
-        else paging.page = 0;
-        paging = nkcModules.apiFunction.paging(paging.page, count, threadPostCommentList);
-      }
-      let parentPosts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      const pids = new Set();
-      parentPosts.map(p => {
-        pids.add(p.pid);
-      });
-      delete q.parentPostId;
-      q.parentPostsId = {$in: [...pids]};
-      let posts = await db.PostModel.find(q).sort({toc: 1});
-      posts = posts.concat(parentPosts);
-      posts = await db.PostModel.extendPosts(posts, extendPostOptions);
-      const postsObj = {};
-      posts = posts.map(post => {
-        const index = toDraftPostsId.indexOf(post.pid);
-        if(index !== -1) {
-          post.todraft = true;
-          post.reason = toDraftPosts[index].reason;
-        }
-        post.posts = [];
-        post.parentPost = "";
-        postsObj[post.pid] = post;
-        return post;
-      });
-      const topPosts = [];
-      for(const post of posts) {
-        post.url = await db.PostModel.getUrl(post);
-        if(post.parentPostId === pid) {
-          post.parentPost = {
-            user: data.post.user,
-            pid: data.post.pid,
-            uid: data.post.uid,
-            tid: data.post.tid,
-            anonymous: data.post.anonymous
-          };
-          topPosts.push(post);
-          continue;
-        }
-        let parent;
-        if(post.parentPostsId.length >= 5) {
-          // 限制层数 3
-          parent = postsObj[post.parentPostsId[4]];
-        } else {
-          parent = postsObj[post.parentPostId];
-        }
-        if(parent) {
-          post.parentPost = {
-            user: parent.user,
-            pid: parent.pid,
-            uid: parent.uid,
-            tid: parent.tid
-          };
-          parent.posts.push(post);
-        }
-      }
-      data.posts = topPosts;
-      data.paging = paging;
-      const template = Path.resolve("./pages/thread/comments.pug");
-      data.html = nkcModules.render(template, data, ctx.state);
-      data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post');
-    } else {
-      q.parentPostsId = pid;
-      // 回复详情页 获取评论 平面
-      const count = await db.PostModel.countDocuments(q);
-      const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
-      let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      posts = await db.PostModel.extendPosts(posts, extendPostOptions);
-      const parentPostsId = new Set();
-      await Promise.all(posts.map(async post => {
-        post.url = await db.PostModel.getUrl(post);
-        const index = toDraftPostsId.indexOf(post.pid);
-        if(index !== -1) {
-          post.reason = toDraftPosts[index].reason;
-        }
-        parentPostsId.add(post.parentPostId);
-      }));
-      // 拓展上级post
-      let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
-      const postsObj = {};
-      parentPosts = await db.PostModel.extendPosts(parentPosts, extendPostOptions);
-      parentPosts.map(p => {
-        /!*const index = toDraftPostsId.indexOf(post.pid);
-        if(index !== -1) {
-          post.reason = toDraftPosts[index].reason;
-        }*!/
-        postsObj[p.pid] = p;
-      });
-      posts.map(post => {
-        post.parentPost = postsObj[post.parentPostId];
-      });
-      data.posts = posts;
-      data.paging = paging;
-    }*/
     if (ctx.permission('viewNote')) {
       data.notes = await db.NoteModel.getNotesByPosts([
         {
@@ -400,7 +252,7 @@ router
     }
     await next();
   })
-  .put('/:pid', async (ctx, next) => {
+  .put('/:pid', OnlyUnbannedUser(), async (ctx, next) => {
     let body,
       files = {};
     if (ctx.body.fields) {
@@ -775,7 +627,6 @@ router
   .use('/:pid/hide', hideRouter.routes(), hideRouter.allowedMethods())
   .use('/:pid/history', history.routes(), history.allowedMethods())
   .use('/:pid/digest', digestRouter.routes(), digestRouter.allowedMethods())
-  .use('/:pid/recommend', recommend.routes(), recommend.allowedMethods())
   .use('/:pid/credit', credit.routes(), credit.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
@@ -797,7 +648,6 @@ router
     collectionRouter.routes(),
     collectionRouter.allowedMethods(),
   )
-  .use('/:pid/post', postRouter.routes(), postRouter.allowedMethods())
   .use('/:pid/option', optionRouter.routes(), optionRouter.allowedMethods())
   .use(
     '/:pid/comments',
@@ -805,7 +655,6 @@ router
     commentsRouter.allowedMethods(),
   )
   .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
-  .use('/:pid/delete', deleteRouter.routes(), deleteRouter.allowedMethods())
   .use('/:pid/notice', noticeRouter.routes(), noticeRouter.allowedMethods())
   .use('/:pid/notices', noticesRouter.routes(), noticesRouter.allowedMethods());
 
