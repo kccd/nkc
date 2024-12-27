@@ -256,6 +256,7 @@ class SinglePostModule {
             data.error || data.message || data
           }</div>`,
         );
+        container.attr('data-hide', 'false');
         container.html(errorDom);
       });
   }

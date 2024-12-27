@@ -5,6 +5,7 @@ const fluentuiEmojiUnicode = [];
 const fluentuiEmoji_unicode_emoji = {};
 const fluentuiEmoji_char_emoji = {};
 
+const fluentEmojiRegex = buildEmojiRegex(fluentuiEmoji);
 for (const group of fluentuiEmoji) {
   for (const emoji of group.emoji) {
     fluentuiEmojiUnicode.push(emoji.unicode);
@@ -33,9 +34,27 @@ function getEmojiCharByUnicode(unicode) {
   return emoji.glyph;
 }
 
+function buildEmojiRegex() {
+  const glyphs = fluentuiEmoji.flatMap((set) => set.emoji.map((e) => e.glyph));
+
+  const escapedGlyphs = glyphs.map((g) =>
+    g.replace(/([.*+?^${}()|[\]\\])/g, '\\$1'),
+  );
+  const emojiPattern = escapedGlyphs.map((g) => `^${g}$`).join('|');
+  return new RegExp(`${emojiPattern}`);
+}
+
+// 检查 emoji 是否存在
+function checkEmojiChartInJson(emoji) {
+  // 使用正则表达式判断
+  const test = fluentEmojiRegex.test(emoji);
+  return test;
+}
+
 module.exports = {
   fluentuiEmojiUnicode,
   fluentuiEmoji,
   replaceEmojiWithImgTags,
   getEmojiCharByUnicode,
+  checkEmojiChartInJson,
 };
