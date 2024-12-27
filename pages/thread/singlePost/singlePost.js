@@ -126,7 +126,9 @@ class SinglePostModule {
   }
   // 获取回复最外层dom
   getPostContainer(pid) {
-    return $(`.single-post-container[data-pid="${pid}"]`);
+    return $(
+      `.single-post-container[data-pid="${pid}"]:has(.single-post-comment-container)`,
+    );
   }
   // 获取评论框最外层dom
   getCommentContainer(pid) {
