@@ -6,4 +6,5 @@ if !isIncluded('userGrade')
       vertical-align: middle;
     }
   mixin userGrade(gradeId, gradeName, iconUrl)
-    img.mixin-user-grade(src=iconUrl title=gradeName)
+    if iconUrl
+      img.mixin-user-grade(src=iconUrl title=gradeName)
