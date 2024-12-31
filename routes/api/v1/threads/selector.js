@@ -3,7 +3,7 @@ const permissions = require('../../../../middlewares/permission');
 const { getJsonStringTextSlice } = require('../../../../nkcModules/json');
 const { renderHTMLByJSON } = require('../../../../nkcModules/nkcRender/json');
 router
-  .get('/', permissions.OnlyUser(), async (ctx, next) => {
+  .get('/', permissions.OnlyUnbannedUser(), async (ctx, next) => {
     //获取当前登录用户的独立文章信息
     const { db, data, query, nkcModules } = ctx;
     const { user } = data;
@@ -73,10 +73,10 @@ router
           toc: item.toc,
           t: item.t,
           source: postType.thread,
-          c: item.l === 'json' ? getJsonStringTextSlice(item.c ,200) : nkcModules.nkcRender.htmlToPlain(
-            item.c,
-            200,
-          ),
+          c:
+            item.l === 'json'
+              ? getJsonStringTextSlice(item.c, 200)
+              : nkcModules.nkcRender.htmlToPlain(item.c, 200),
           url: nkcModules.tools.getUrl('thread', item.tid),
         });
       }
@@ -87,7 +87,7 @@ router
     };
     await next();
   })
-  .get('/search', permissions.OnlyUser(), async (ctx, next) => {
+  .get('/search', permissions.OnlyUnbannedUser(), async (ctx, next) => {
     //搜索当前登录用户的文章信息
     const { db, data, query, nkcModules } = ctx;
     const { user } = data;

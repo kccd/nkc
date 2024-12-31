@@ -1,6 +1,8 @@
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+
 const router = require('koa-router')();
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { user } = data;
     const { tid } = params;
@@ -17,7 +19,7 @@ router
     data.subscribeType = type;
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data, body, tools } = ctx;
     const { contentLength } = tools.checkString;
     const { subscribeType, user } = data;
@@ -105,7 +107,7 @@ router
     }
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { subscribeType, user } = data;
     const childTypesCount = await db.SubscribeTypeModel.countDocuments({

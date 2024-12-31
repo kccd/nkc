@@ -9,14 +9,16 @@ const {
 const {
   momentExtenderService,
 } = require('../../../../../../services/moment/momentExtender.service');
-const { OnlyUser } = require('../../../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+} = require('../../../../../../middlewares/permission');
 const { momentStatus } = require('../../../../../../settings/moment');
 const {
   getRichJsonContentLength,
 } = require('../../../../../../nkcModules/checkData');
 const router = new Router();
 router
-  .get('/', OnlyUser(), async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, db, state, data } = ctx;
     const documentId = parseInt(query.documentId);
     const momentId = query.momentId;
@@ -87,7 +89,7 @@ router
     };
     await next();
   })
-  .post('/rollback', OnlyUser(), async (ctx, next) => {
+  .post('/rollback', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, body, db } = ctx;
     const { momentId, documentId } = body;
     const moment = await momentExtenderService.getMomentById(momentId);

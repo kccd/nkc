@@ -1,8 +1,10 @@
 const Router = require('koa-router');
+const { Public, OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 const router = new Router();
 
 router
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { params, db } = ctx;
     const { tid } = params;
     const { toc, ttoc, tlm } = await db.ThreadModel.findOnly(
@@ -30,7 +32,7 @@ router
 
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.modifyThreadOrder), async (ctx, next) => {
     const { body, db, params } = ctx;
     const { tid } = params;
     const { ttoc, tlm } = body;

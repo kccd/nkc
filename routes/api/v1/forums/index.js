@@ -1,7 +1,8 @@
 const Router = require('koa-router');
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
 const router = new Router();
 
-router.get('/tree', async (ctx, next) => {
+router.get('/tree', OnlyUnbannedUser(), async (ctx, next) => {
   const { db, data } = ctx;
 
   const forumsTree = await db.ForumModel.getForumsTree(

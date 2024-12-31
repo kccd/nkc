@@ -3,8 +3,9 @@ const { paperService } = require('../../../../services/exam/paper.service');
 const {
   categoryService,
 } = require('../../../../services/exam/category.service');
+const { Public } = require('../../../../middlewares/permission');
 router
-  .get('/register', async (ctx, next) => {
+  .get('/register', Public(), async (ctx, next) => {
     const { db } = ctx;
     const {
       c: { registerExamination },
@@ -14,7 +15,7 @@ router
     };
     await next();
   })
-  .get('/paper/:pid', async (ctx, next) => {
+  .get('/paper/:pid', Public(), async (ctx, next) => {
     //获取开卷考试的题目数据
     const {
       params: { pid },
@@ -83,7 +84,7 @@ router
     };
     await next();
   })
-  .post('/result/:pid', async (ctx, next) => {
+  .post('/result/:pid', Public(), async (ctx, next) => {
     const {
       body,
       params: { pid },
@@ -171,7 +172,7 @@ router
     }
     await next();
   })
-  .post('/final-result/:pid', async (ctx, next) => {
+  .post('/final-result/:pid', Public(), async (ctx, next) => {
     const {
       params: { pid },
       db,

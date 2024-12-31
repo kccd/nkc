@@ -1,5 +1,7 @@
 const Router = require('koa-router');
-const { OnlyUser } = require('../../../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+} = require('../../../../../../middlewares/permission');
 const {
   momentExtenderService,
 } = require('../../../../../../services/moment/momentExtender.service');
@@ -13,7 +15,7 @@ const historyRouter = require('./history');
 const router = new Router();
 
 router
-  .get('/', OnlyUser(), async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { state } = ctx;
     const moment =
       await momentExtenderService.getUnPublishedMomentRichDataByUid(state.uid);
@@ -28,7 +30,7 @@ router
     }
     await next();
   })
-  .put('/', OnlyUser(), async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, state } = ctx;
     const { content } = body;
     let moment = await momentExtenderService.getUnPublishedMomentByUid(
@@ -62,7 +64,7 @@ router
     // 暂存草稿
     await next();
   })
-  .post('/', OnlyUser(), async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, body } = ctx;
     const { content } = body;
     const moment = await momentExtenderService.getUnPublishedMomentByUid(

@@ -3,9 +3,10 @@ const {
   registerExamService,
 } = require('../../../../services/register/registerExam.service');
 const { getRegisterExamCheckLock } = require('../../../../nkcModules/redLock');
+const { Public } = require('../../../../middlewares/permission');
 
 const router = new Router();
-router.get('/exam', async (ctx, next) => {
+router.get('/exam', Public(), async (ctx, next) => {
   const { query, address } = ctx;
   const lock = await getRegisterExamCheckLock(address);
   try {

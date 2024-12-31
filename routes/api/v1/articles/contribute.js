@@ -1,9 +1,10 @@
 const router = require('koa-router')();
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
 const {
   ThrowForbiddenResponseTypeError,
 } = require('../../../../nkcModules/error');
 const { ResponseTypes } = require('../../../../settings/response');
-router.post('/', async (ctx, next) => {
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   //获取当前登录用户的独立文章信息
   const { db, data, body } = ctx;
   let { type, columns = [], articlesId, passed = '' } = body;

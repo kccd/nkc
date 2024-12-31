@@ -2,9 +2,9 @@ const router = require('koa-router')();
 const {
   userMemoService,
 } = require('../../../../services/user/userMemo.service');
-const { OnlyUser } = require('../../../../middlewares/permission');
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
 router
-  .get('/memo', OnlyUser(), async (ctx, next) => {
+  .get('/memo', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, query } = ctx;
     const { uid } = query;
     const memo = await userMemoService.getUserMemo({
@@ -16,7 +16,7 @@ router
     };
     await next();
   })
-  .put('/memo', OnlyUser(), async (ctx, next) => {
+  .put('/memo', OnlyUnbannedUser(), async (ctx, next) => {
     const { body, state } = ctx;
     const { uid, nickname = '', desc = '' } = body;
     await userMemoService.checkNicknameFormat(nickname);
