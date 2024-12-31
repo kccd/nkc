@@ -59,6 +59,9 @@ var Tools = function () {
       case 'cover': {
         return '/nr/cover/' + id + t;
       }
+      case 'loginQRAuth': {
+        return '/login/qr/' + id;
+      }
       case 'anonymousUserAvatar': {
         return '/default/default_anonymous_user_avatar.jpg';
       }
@@ -175,6 +178,9 @@ var Tools = function () {
       case 'siteFile': {
         return '/statics/site/' + id;
       }
+      case 'logo': {
+        return '/logo/' + id;
+      }
       case 'browserLogo': {
         return '/statics/browser-logo/' + id;
       }
@@ -262,11 +268,17 @@ var Tools = function () {
       case 'zoneMomentHistory': {
         return '/z/m/' + id + '/history';
       }
+      case 'protocol': {
+        return '/protocol?type=' + id;
+      }
       case 'columnThread': {
         return '/m/' + id + '/a/' + size;
       }
       case 'downloadApp': {
         return '/app/' + id + '/' + size;
+      }
+      case 'appHome': {
+        return '/app';
       }
       case 'draftHistory': {
         return '/draft/history?source=' + id + '&desTypeId=' + size;

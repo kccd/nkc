@@ -1,6 +1,11 @@
 const Router = require('koa-router');
 const loginRouter = new Router();
-const { OnlyVisitor } = require('../../middlewares/permission');
+const {
+  OnlyVisitor,
+  OnlyUnbannedUser,
+} = require('../../middlewares/permission');
+const { qrRecordService } = require('../../services/qrRecord/qrRecord.service');
+const { getUrl } = require('../../nkcModules/tools');
 loginRouter
   .get('/', OnlyVisitor(), async (ctx, next) => {
     const { query, data } = ctx;
@@ -76,6 +81,7 @@ loginRouter
       user = users[0];
       userPersonal = await db.UsersPersonalModel.findOne({ uid: user.uid });
     } else if (loginType === 'mobile') {
+      ctx.throw(403, '暂不允许手机号+密码登录');
       // 手机号+密码
 
       if (!nationCode) {
@@ -227,6 +233,92 @@ loginRouter
       user,
     };
 
+    await next();
+  })
+  .get('/qr', OnlyVisitor(), async (ctx, next) => {
+    const { address, port } = ctx;
+    const record = await qrRecordService.createQRRecord({
+      ip: address,
+      port: port,
+    });
+    ctx.apiData = {
+      url: getUrl('loginQRAuth', record._id),
+      qrRecordId: record._id,
+    };
+    await next();
+  })
+  .get('/qr/:id', OnlyUnbannedUser(), async (ctx, next) => {
+    const { address, port, state } = ctx;
+    const { id: qrRecordId } = ctx.params;
+    await qrRecordService.scanQR({
+      ip: address,
+      port: port,
+      qrRecordId,
+      uid: state.uid,
+    });
+    ctx.data.qrRecordId = qrRecordId;
+    ctx.remoteTemplate = 'login/qr.pug';
+    await next();
+  })
+  .post('/qr/:id', OnlyUnbannedUser(), async (ctx, next) => {
+    const { address, state } = ctx;
+    const { id: qrRecordId } = ctx.params;
+    await qrRecordService.agreeQR({
+      qrRecordId,
+      ip: address,
+      uid: state.uid,
+    });
+    await next();
+  })
+  .get('/qr/:id/try', OnlyVisitor(), async (ctx, next) => {
+    const { db, address, port } = ctx;
+    const { id: qrRecordId } = ctx.params;
+    const { status, uid } = await qrRecordService.verifyQRRecord({
+      qrRecordId,
+      ip: address,
+    });
+    if (status === qrRecordService.status.agreed) {
+      const user = await db.UserModel.findOnly({ uid });
+      await user.extendGrade();
+      const userPersonal = await db.UsersPersonalModel.findOne({
+        uid: user.uid,
+      });
+      // 检查IP地址是否突变
+      await db.UsersPersonalModel.shouldVerifyPhoneNumberOfIP(
+        address,
+        user.uid,
+      );
+      // await db.UsersPersonalModel.shouldVerifyPhoneNumberOfIP('171.95.255.27', user.uid);
+      let secretList = userPersonal.secret;
+      const userAgent = ctx.request.headers['user-agent'];
+      const loginRecordDoc = await db.LoginRecordModel.createLoginRecord({
+        uid: user.uid,
+        ip: address,
+        port,
+        userAgent,
+      });
+      secretList.push(loginRecordDoc._id);
+      if (secretList.length > 20) {
+        secretList = secretList.shift();
+      }
+      await db.UsersPersonalModel.updateOne(
+        { uid: user.uid },
+        {
+          $set: {
+            secret: secretList,
+          },
+        },
+      );
+      ctx.setCookie('userInfo', {
+        username: user.username,
+        uid: user.uid,
+        lastLogin: loginRecordDoc._id,
+      });
+    }
+    ctx.apiData = {
+      status: status,
+      uid: uid,
+    };
     await next();
   });
 module.exports = loginRouter;

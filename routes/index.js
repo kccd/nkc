@@ -110,6 +110,7 @@ const photoRouter = require('./photo');
 const pageRouter = require('./page');
 const logoutRouter = require('./logout');
 const attachIconRouter = require('./attachIcon');
+const sendMessageRouter = require('./sendMessage');
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -299,7 +300,11 @@ router.use('/rm', rmRouter.routes(), rmRouter.allowedMethods());
 router.use('/poster', posterRouter.routes(), posterRouter.allowedMethods());
 router.use('/page', pageRouter.routes(), pageRouter.allowedMethods());
 router.use('/logout', logoutRouter.routes(), logoutRouter.allowedMethods());
-
+router.use(
+  '/sendMessage',
+  sendMessageRouter.routes(),
+  sendMessageRouter.allowedMethods(),
+);
 router.use(
   '/photo_small',
   photoSmallRouter.routes(),

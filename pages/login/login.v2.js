@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import LoginCore from '../lib/vue/LoginCore.vue';
+// import LoginCore from '../lib/vue/LoginCore.vue';
+import LoginCore from '../lib/vue/LoginCore.v2.vue';
 import { getState } from '../lib/js/state';
 import { RNCloseWebview, RNLogin } from '../lib/js/reactNative';
 import { getDataById } from '../lib/js/dataConversion';

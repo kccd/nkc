@@ -7,6 +7,10 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  getLoginQRAuthUrl: 'getLoginQRAuthUrl',
+  visitLoginQRAuthPage: 'visitLoginQRAuthPage',
+  submitLoginQRAuth: 'submitLoginQRAuth',
+  checkLoginQRStatus: 'checkLoginQRStatus',
   visitHome: 'visitHome',
   modifyLibraryFolder: 'modifyLibraryFolder',
   libraryUpload: 'libraryUpload',
