@@ -8,11 +8,18 @@ const homeTopRouter = require('./homeTop');
 const creditRouter = require('./credit');
 const voteRouter = require('./vote');
 const nkcRender = require('../../nkcModules/nkcRender');
-const { OnlyUser } = require('../../middlewares/permission');
+const {
+  OnlyUser,
+  Public,
+  OnlyOperation,
+} = require('../../middlewares/permission');
 const { renderMarkdown } = require('../../nkcModules/markdown');
-const { collectionService } = require('../../services/subscribe/collection.service');
+const {
+  collectionService,
+} = require('../../services/subscribe/collection.service');
+const { Operations } = require('../../settings/operations');
 router
-  .get('/:aid', async (ctx, next) => {
+  .get('/:aid', Public(), async (ctx, next) => {
     //获取文章信息
     ctx.remoteTemplate = 'zone/article.pug';
     const { db, data, params, query, state, permission, nkcModules } = ctx;
@@ -34,9 +41,11 @@ router
     if (user) {
       let userSubscribeUsersId = [];
       userSubscribeUsersId = await db.SubscribeModel.getUserSubUsersId(
-      user.uid,
-    );
-    data.subscribeAuthor = !!(userSubscribeUsersId.includes(data.targetUser.uid));
+        user.uid,
+      );
+      data.subscribeAuthor = !!userSubscribeUsersId.includes(
+        data.targetUser.uid,
+      );
     }
     data.targetUser.description = renderMarkdown(
       nkcModules.nkcRender.replaceLink(data.targetUser.description),
@@ -234,31 +243,34 @@ router
     await article.addArticleHits();
     await next();
   })
-  .del('/:aid', async (ctx, next) => {
-    const {params, db, state, permission} = ctx;
-    const {aid} = params;
-    const {uid} = state;//登录用户uid
+  .del('/:aid', OnlyOperation(Operations.deleteArticle), async (ctx, next) => {
+    const { params, db, state, permission } = ctx;
+    const { aid } = params;
+    const { uid } = state; //登录用户uid
     const article = await db.ArticleModel.getArticleByIdAndUid(aid, state.uid);
     // 针对 "source" : "column",---在删除文章之前需要检查文章是否已经成功投稿即具有专栏下的文章。
     if (article.source === 'column') {
       const columnPosts = await db.ColumnPostModel.find({ pid: article._id });
-      if (columnPosts.length>0) {
-        ctx.throw(400, "该文章已经在专栏中，请撤稿后重试");
+      if (columnPosts.length > 0) {
+        ctx.throw(400, '该文章已经在专栏中，请撤稿后重试');
       }
     }
-    if(uid === article.uid || permission('deleteArticle')) {
-        //删除已经发布的文章的同时删除该文章的所有草稿
-        await article.deleteArticle();
+    if (uid === article.uid || permission('deleteArticle')) {
+      //删除已经发布的文章的同时删除该文章的所有草稿
+      await article.deleteArticle();
     }
     await next();
   })
   .use('/:aid/draft', draftRouter.routes(), draftRouter.allowedMethods())
   .use('/:aid/options', optionsRouter.routes(), optionsRouter.allowedMethods())
   .use('/:aid/unblock', unblockRouter.routes(), unblockRouter.allowedMethods())
-  .use('/:aid/collection', collectionRouter.routes(), collectionRouter.allowedMethods())
+  .use(
+    '/:aid/collection',
+    collectionRouter.routes(),
+    collectionRouter.allowedMethods(),
+  )
   .use('/:aid/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:aid/homeTop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
   .use('/:aid/credit', creditRouter.routes(), creditRouter.allowedMethods())
-  .use('/:aid/vote', voteRouter.routes(), voteRouter.allowedMethods())
+  .use('/:aid/vote', voteRouter.routes(), voteRouter.allowedMethods());
 module.exports = router;
-

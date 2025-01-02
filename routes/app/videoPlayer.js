@@ -1,6 +1,7 @@
 const Router = require('koa-router');
+const { Public } = require('../../middlewares/permission');
 const router = new Router();
-router.get('/', async (ctx, next) => {
+router.get('/', Public(), async (ctx, next) => {
   ctx.template = 'app/videoPlayer/videoPlayer.pug';
   await next();
 });

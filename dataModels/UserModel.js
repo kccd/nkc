@@ -2687,7 +2687,7 @@ userSchema.statics.updateNumberOfOtherUserOperation = async (uid) => {
   const numberKey = getRedisKeys(`numberOfOtherUserOperation`, uid);
   match.operationId = 'visitThread';
   const numberOfRead = await UsersBehaviorModel.countDocuments(match);
-  match.opeartionId = 'post-vote-up';
+  match.opeartionId = 'post_vote_up';
   const numberOfVoteUp = await UsersBehaviorModel.countDocuments(match);
   match.operationId = 'postToThread';
   const numberOfPost = await UsersBehaviorModel.countDocuments(match);

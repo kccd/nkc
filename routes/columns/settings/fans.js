@@ -1,17 +1,26 @@
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+} = require('../../../middlewares/permission');
 const { subscribeSources } = require('../../../settings/subscribe');
 const router = require('koa-router')();
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { db } = ctx;
     const { user, column } = ctx.data;
-    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
-    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_fans)
+    const userPermissionObject =
+      await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(
+      column.users,
+      user.uid,
+      userPermissionObject.column_settings_fans,
+    );
     if (!isPermission && column.uid !== user.uid) {
       ctx.throw(403, '权限不足');
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, data, query, nkcModules } = ctx;
     const { column } = data;
     const { page = 0 } = query;
@@ -59,7 +68,7 @@ router
     data.nav = 'fans';
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data, query } = ctx;
     const { uid } = query;
     const { column } = data;

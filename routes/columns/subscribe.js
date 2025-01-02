@@ -4,8 +4,9 @@ const { subscribeSources } = require('../../settings/subscribe');
 const {
   subscribeColumnService,
 } = require('../../services/subscribe/subscribeColumn.service');
+const { OnlyUser } = require('../../middlewares/permission');
 
-router.post('/', async (ctx, next) => {
+router.post('/', OnlyUser(), async (ctx, next) => {
   const { db, body, data } = ctx;
   let { type, cid = [] } = body;
   const { column, user } = data;

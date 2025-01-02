@@ -1,24 +1,26 @@
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+
 const router = require('koa-router')();
 router
-  .get('/user', async (ctx, next) => {
+  .get('/user', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   })
-  .get('/forum', async (ctx, next) => {
+  .get('/forum', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   })
-  .get('/column', async (ctx, next) => {
+  .get('/column', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   })
-  .get('/thread', async (ctx, next) => {
+  .get('/thread', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   })
-  .get('/fan', async (ctx, next) => {
+  .get('/fan', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   })
-  .get('/follower', async (ctx, next) => {
+  .get('/follower', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   })
-  .get('/collection', async (ctx, next) => {
+  .get('/collection', OnlyUnbannedUser(), async (ctx, next) => {
     await next();
   });
 module.exports = router;

@@ -1,6 +1,9 @@
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
+
 const router = require('koa-router')();
 router
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.homeHotColumn), async (ctx, next) => {
     const { db, data } = ctx;
     const { column } = data;
     const homeSettings = await db.SettingModel.getSettings('home');
@@ -19,7 +22,7 @@ router
     await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyOperation(Operations.homeHotColumn), async (ctx, next) => {
     const { db, data } = ctx;
     const { column } = data;
     const homeSettings = await db.SettingModel.getSettings('home');

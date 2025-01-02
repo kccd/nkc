@@ -75,7 +75,7 @@ module.exports = {
       tags: {
         GET: Operations.getQuestionTags,
         // POST: Operations.createQuestionTag,
-        POST: Operations.createQuestionTags,
+        POST: Operations.createQuestionTag,
       },
       tag: {
         PARAMETER: {

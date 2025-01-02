@@ -18,8 +18,8 @@ module.exports = {
     Operations.postToThread,
     Operations.subscribeUser,
     Operations.unSubscribeUser,
-    Operations['post-vote-up'],
-    Operations['post-vote-down'],
+    Operations.post_vote_up,
+    Operations.post_vote_down,
   ],
   timeLine: [Operations.postToForum, Operations.postToThread],
   experimental: [

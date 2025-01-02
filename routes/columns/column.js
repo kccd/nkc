@@ -18,8 +18,9 @@ const {
 const {
   columnAbbrCheckerService,
 } = require('../../services/column/columnAbbrChecker.service');
+const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, params, data, nkcModules } = ctx;
     const { _id } = params;
     const { user } = data;
@@ -75,7 +76,7 @@ router
 
     await next();
   })
-  .use(['/a', '/page'], async (ctx, next) => {
+  .use(['/a', '/page'], Public(), async (ctx, next) => {
     const { data, db } = ctx;
     const { column } = data;
     // 专栏内容公共部分数据
@@ -89,7 +90,7 @@ router
     data.timeline = await db.ColumnModel.getTimeline(column._id);
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { isModerator } = data;
     let { page = 0, c: categoriesIdString = '' } = query;
@@ -247,7 +248,7 @@ router
     data.c = categoriesIdString;
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body, tools } = ctx;
     const { contentLength } = tools.checkString;
     const { column, user } = data;
@@ -273,7 +274,7 @@ router
         toolColor,
         users = [],
       } = fields;
-      if([...JSON.parse(users)].some(item=>item.uid===user.uid)){
+      if ([...JSON.parse(users)].some((item) => item.uid === user.uid)) {
         ctx.throw(400, '请不要选择自己作为专栏管理员');
       }
       const { avatar, banner } = files;
