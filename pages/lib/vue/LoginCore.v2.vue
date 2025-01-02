@@ -4,7 +4,7 @@
     a(href='/' :class="$style.websiteName") {{websiteName}}
     div(:class="$style.websiteBrief") {{websiteBrief}}
     div(:class='$style.loginTypes' v-if="isLogin")
-      div(:class='$style.loginType' :data-active="loginType === loginTypes.qr" @click="selectLoginType(loginTypes.qr)")
+      div(v-if='!isApp' :class='$style.loginType' :data-active="loginType === loginTypes.qr" @click="selectLoginType(loginTypes.qr)")
         div
           <scan-code theme="outline" size="24" />
         div APP扫码
@@ -25,7 +25,7 @@
             option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
         .form-group
           input.form-control(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit")
-        .row
+        .row.form-group
           .col-xs-6
             input.form-control(type="text" placeholder="短信验证码" v-model.trim="code" @input="throwError('')" @keyup.enter="submit")
           .col-xs-6.text-right.p-l-0
@@ -105,7 +105,7 @@
 }
 .loginTypes {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin: auto auto 1rem auto;
   width: 25rem;
   padding: 0 0.5rem;
@@ -231,12 +231,13 @@ export default {
     verifications: Verifications,
   },
   data: () => ({
+    isApp: state.isApp,
     websiteName: state.websiteName,
     websiteBrief: state.websiteBrief,
     modes: modes,
     mode: modes.login,
     loginTypes: loginTypes,
-    loginType: loginTypes.qr,
+    loginType: loginTypes.sms,
     nationCodes: getNationCodes(),
     nationCode: '86',
     code: '',

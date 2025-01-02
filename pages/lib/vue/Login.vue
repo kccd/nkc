@@ -6,7 +6,7 @@
           .web-close(@click="close" v-if="!isApp")
             close-small-icon
           .rn-close(@click="close" v-else) 关闭
-        login-core(ref="loginCore" @logged="onLogged" @registered="onRegistered" v-if="show")
+        login-core(ref="loginCore" @logged="onLogged" @registered="onRegistered" v-if="show" :defaultLoginType="defaultLoginType")
 </template>
 
 <style lang="less" scoped>
@@ -60,6 +60,8 @@ import { visitUrl } from '../js/pageSwitch';
 import LoginCore, { modes } from './LoginCore.v2.vue';
 import { CloseSmall } from '@icon-park/vue';
 const { isApp } = getState();
+import { getDefaultLoginType, loginTypes } from '../js/login';
+import { logger } from '../js/logger';
 
 let timeout;
 
@@ -71,6 +73,11 @@ export default {
   data: () => ({
     isApp,
     show: false,
+    defaultLoginType: {
+      desktop: loginTypes.sms,
+      mobile: loginTypes.sms,
+      app: loginTypes.sms,
+    },
   }),
   mounted() {
     this.initModal();
@@ -92,9 +99,16 @@ export default {
       }
     },
     open(type = modes.login) {
-      $(this.$el).modal('show');
-      this.show = true;
-      this.$refs.loginCore.selectMode(type);
+      getDefaultLoginType()
+        .then((loginType) => {
+          this.show = true;
+          setTimeout(() => {
+            this.$refs.loginCore.selectMode(type);
+            this.$refs.loginCore.selectLoginType(loginType);
+            $(this.$el).modal('show');
+          }, 100);
+        })
+        .catch(logger.error);
     },
     login() {
       this.open(modes.login);

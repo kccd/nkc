@@ -2,25 +2,25 @@ import { getState } from './state';
 import { detailedTime } from './time';
 const { isProduction } = getState();
 class Logger {
-  print(type, ...any) {
+  print = (type, ...any) => {
     console.log(`[${detailedTime()}]`, `[${type}]`, ...any);
-  }
-  debug(...any) {
+  };
+  debug = (...any) => {
     if (isProduction) {
       return;
     }
     this.print('DEBUG', ...any);
-  }
-  info(...any) {
+  };
+  info = (...any) => {
     this.print('INFO', ...any);
-  }
-  warning(...any) {
+  };
+  warning = (...any) => {
     this.print('WARN', ...any);
-  }
-  error(...any) {
+  };
+  error = (...any) => {
     this.print('ERROR', ...any);
     console.trace();
-  }
+  };
 }
 
 export const logger = new Logger();

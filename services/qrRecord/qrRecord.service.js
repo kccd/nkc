@@ -8,7 +8,7 @@ const {
 const { isDevelopment } = require('../../settings/env');
 
 class QRRecordService {
-  validity = isDevelopment ? 60 * 60 * 1000 : 2 * 60 * 1000; //线上有效期 2 分钟，调试有效期 1 小时
+  validity = isDevelopment ? 60 * 1000 : 60 * 1000; //线上有效期 2 分钟，调试有效期 1 小时
   status = {
     waitingScan: 'waitingScan',
     waitingAgree: 'waitingAgree',
@@ -26,7 +26,10 @@ class QRRecordService {
   }
 
   async checkQRRecordTimeout(qrRecord) {
-    if (qrRecord.timeout || qrRecord.toc + this.validity < Date.now()) {
+    if (
+      qrRecord.timeout ||
+      qrRecord.toc.getTime() + this.validity < Date.now()
+    ) {
       // 过期
       await qrRecord.updateOne({
         $set: {

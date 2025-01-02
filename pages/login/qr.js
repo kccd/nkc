@@ -13,6 +13,7 @@ const app = new window.Vue({
     delay: 3, // s
     timer: 0,
     websiteName: state.websiteName,
+    QRWarning: data.QRWarning,
     status: 'unLogin', // unLogin, logging, logged
   },
   mounted() {
@@ -39,7 +40,7 @@ const app = new window.Vue({
         })
         .catch((err) => {
           this.status = 'unLogin';
-          sweetError(`登录失败：${err.message}`);
+          sweetError(`登录失败`);
         });
     },
     done() {

@@ -1,11 +1,11 @@
 extends ../bootstrap_base
 block title
-  title 登录确认
+  title 扫码登录
   +includeCSS('/login/qr.css')
 block navbar
 block content
   mixin warningInfo
-    .bg-danger.text-danger.login-qr-warning 您正在登录{{websiteName}}，请确认是您本人操作。若信息无误，请点击下方确认按钮完成登录。
+    .bg-danger.text-danger.login-qr-warning {{QRWarning}}
   .login-qr-container#app(v-cloak)
     .login-qr-header
       img(:src="logoUrl")
@@ -16,7 +16,7 @@ block content
       button.btn-block.btn-lg.btn.btn-primary(v-else-if='status === "logging"' :disabled="true") 登录中...
       button.btn-block.btn-lg.btn.btn-primary(v-else @click='done') 完成
 
-  #data.hidden=objToStr({qrRecordId: data.qrRecordId})
+  #data.hidden=objToStr({qrRecordId: data.qrRecordId, QRWarning: data.QRWarning})
 block footer
 block scripts
   +includeJS('/login/qr.js')

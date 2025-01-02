@@ -36,7 +36,49 @@ block eContent
               .m-t-1
                 label 邮箱次数限制
                 input.form-control(type="text" v-model.number="loginSettings.resetPassword.emailCountLimit")
-
+          .form-group
+            h4.col-sm-2.control-label 默认登录方式
+            .col-sm-5.form-inline
+              div.p-t-1.m-b-1
+                div
+                  label 桌面浏览器
+                .radio
+                  label.m-r-1
+                    input.m-r-05(type='radio' :value='loginTypes.qr' v-model='loginSettings.defaultLoginType.desktop')
+                    span 扫描二维码
+                  label.m-r-1
+                    input.m-r-05(type='radio' :value='loginTypes.sms' v-model='loginSettings.defaultLoginType.desktop')
+                    span 短信验证码
+                  label
+                    input.m-r-05(type='radio' :value='loginTypes.passwd' v-model='loginSettings.defaultLoginType.desktop')
+                    span 用户名密码
+              div.m-b-1
+                div
+                  label 手机浏览器
+                .radio
+                  label.m-r-1
+                    input.m-r-05(type='radio' :value='loginTypes.qr' v-model='loginSettings.defaultLoginType.mobile')
+                    span 扫描二维码
+                  label.m-r-1
+                    input.m-r-05(type='radio' :value='loginTypes.sms' v-model='loginSettings.defaultLoginType.mobile')
+                    span 短信验证码
+                  label
+                    input.m-r-05(type='radio' :value='loginTypes.passwd' v-model='loginSettings.defaultLoginType.mobile')
+                    span 用户名密码
+              div.m-b-1
+                div
+                  label APP
+                .radio
+                  label.m-r-1
+                    input.m-r-05(type='radio' :value='loginTypes.sms' v-model='loginSettings.defaultLoginType.app')
+                    span 短信验证码
+                  label
+                    input.m-r-05(type='radio' :value='loginTypes.passwd' v-model='loginSettings.defaultLoginType.app')
+                    span 用户名密码
+          .form-group
+            h4.col-sm-2.control-label 扫码登录安全提醒
+            .col-sm-10.col-md-6
+              textarea.form-control(v-model='loginSettings.QRWarning' rows=5)
           .form-group
             label.col-sm-2.control-label
             .col-sm-10

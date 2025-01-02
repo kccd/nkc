@@ -9,10 +9,12 @@ const { qrRecordService } = require('../../services/qrRecord/qrRecord.service');
 const { getUrl } = require('../../nkcModules/tools');
 loginRouter
   .get('/', OnlyVisitor(), async (ctx, next) => {
-    const { query, data } = ctx;
+    const { query, data, db } = ctx;
     const { t: type } = query;
     data.referer = ctx.get('referer');
     data.type = type || 'login';
+    const loginSettings = await db.SettingModel.getSettings('login');
+    data.defaultLoginType = loginSettings.defaultLoginType;
     ctx.template = 'login/login.v2.pug';
     await next();
   })
@@ -213,7 +215,7 @@ loginRouter
     });
     secretList.push(loginRecordDoc._id);
     if (secretList.length > 20) {
-      secretList = secretList.shift();
+      secretList.shift();
     }
     await db.UsersPersonalModel.updateOne(
       { uid: user.uid },
@@ -249,7 +251,7 @@ loginRouter
     await next();
   })
   .get('/qr/:id', OnlyUnbannedUser(), OnlyApp(), async (ctx, next) => {
-    const { address, port, state } = ctx;
+    const { address, port, state, db } = ctx;
     const { id: qrRecordId } = ctx.params;
     await qrRecordService.scanQR({
       ip: address,
@@ -257,6 +259,8 @@ loginRouter
       qrRecordId,
       uid: state.uid,
     });
+    const loginSettings = await db.SettingModel.getSettings('login');
+    ctx.data.QRWarning = loginSettings.QRWarning;
     ctx.data.qrRecordId = qrRecordId;
     ctx.remoteTemplate = 'login/qr.pug';
     await next();
@@ -289,7 +293,6 @@ loginRouter
         address,
         user.uid,
       );
-      // await db.UsersPersonalModel.shouldVerifyPhoneNumberOfIP('171.95.255.27', user.uid);
       let secretList = userPersonal.secret;
       const userAgent = ctx.request.headers['user-agent'];
       const loginRecordDoc = await db.LoginRecordModel.createLoginRecord({
@@ -300,7 +303,7 @@ loginRouter
       });
       secretList.push(loginRecordDoc._id);
       if (secretList.length > 20) {
-        secretList = secretList.shift();
+        secretList.shift();
       }
       await db.UsersPersonalModel.updateOne(
         { uid: user.uid },
