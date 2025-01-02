@@ -76,8 +76,10 @@ block eContent
                     input.m-r-05(type='radio' :value='loginTypes.passwd' v-model='loginSettings.defaultLoginType.app')
                     span 用户名密码
           .form-group
-            h4.col-sm-2.control-label 扫码登录安全提醒
+            h4.col-sm-2.control-label 扫码登录
             .col-sm-10.col-md-6
+              div.p-t-1
+                label 安全提醒(建议不超过100个字，支持换行和回车)
               textarea.form-control(v-model='loginSettings.QRWarning' rows=5)
           .form-group
             label.col-sm-2.control-label

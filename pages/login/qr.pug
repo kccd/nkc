@@ -5,7 +5,7 @@ block title
 block navbar
 block content
   mixin warningInfo
-    .bg-danger.text-danger.login-qr-warning {{QRWarning}}
+    .bg-danger.text-danger.login-qr-warning.pre-wrap {{QRWarning}}
   .login-qr-container#app(v-cloak)
     .login-qr-header
       img(:src="logoUrl")
