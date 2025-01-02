@@ -3,6 +3,7 @@ const loginRouter = new Router();
 const {
   OnlyVisitor,
   OnlyUnbannedUser,
+  OnlyApp,
 } = require('../../middlewares/permission');
 const { qrRecordService } = require('../../services/qrRecord/qrRecord.service');
 const { getUrl } = require('../../nkcModules/tools');
@@ -247,7 +248,7 @@ loginRouter
     };
     await next();
   })
-  .get('/qr/:id', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/qr/:id', OnlyUnbannedUser(), OnlyApp(), async (ctx, next) => {
     const { address, port, state } = ctx;
     const { id: qrRecordId } = ctx.params;
     await qrRecordService.scanQR({
