@@ -1,6 +1,6 @@
 const router = require('koa-router')();
 const materialRouter = require('./material');
-const materialsRouter = require('./materials');
+// const materialsRouter = require('./materials');
 const booksRouter = require('./books');
 const bookRouter = require('./book');
 const articlesRouter = require('./articles');
@@ -42,7 +42,6 @@ router
     await next();
   })
   .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use('/materials', materialsRouter.routes(), materialsRouter.allowedMethods())
   .use('/material', materialRouter.routes(), materialRouter.allowedMethods())
   .use(
     '/categories',
