@@ -410,6 +410,14 @@ export function RNSaveImage(data) {
   });
 }
 export function longPressImage(data) {
+  const { fileDomain } = getState(); // 获取 fileDomain
+  data.images.forEach((image) => {
+    if (image.url.indexOf(fileDomain) === 0) {
+      image.url = image.url.replace(fileDomain, ''); // 去掉 fileDomain 部分
+    } else if (image.url.indexOf(window.location.origin) === 0) {
+      image.url = image.url.replace(window.location.origin, ''); // 去掉 window.location.origin 部分
+    }
+  });
   RNEmit('longPressImage', {
     ...data,
   });

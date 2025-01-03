@@ -45,28 +45,6 @@ module.exports = {
       },
     },
   },
-  materials: {
-    GET: Operations.creationCenter,
-    POST: Operations.creationCenter,
-    DELETE: Operations.creationCenter,
-    PUT: Operations.creationCenter,
-    editor: {
-      POST: Operations.creationCenter,
-      GET: Operations.creationCenter,
-    },
-    document: {
-      GET: Operations.creationCenter,
-    },
-    material: {
-      POST: Operations.creationCenter,
-    },
-    del: {
-      POST: Operations.creationCenter,
-    },
-    drag: {
-      POST: Operations.creationCenter,
-    },
-  },
   books: {
     GET: Operations.creationCenter,
     editor: {
