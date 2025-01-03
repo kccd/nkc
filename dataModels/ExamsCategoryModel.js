@@ -16,6 +16,12 @@ const schema = new Schema(
       type: String,
       default: 'A',
     },
+    // 是否为入学考试
+    admission: {
+      type: Boolean,
+      default: false,
+      index: 1,
+    },
     //闭卷考试是必带uid，但是开卷考试用户并没有uid
     uid: {
       type: String,

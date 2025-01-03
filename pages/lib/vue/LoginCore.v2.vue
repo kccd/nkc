@@ -273,14 +273,39 @@ export default {
       this.error = error.error || error.message || error;
     },
     submit() {
-      switch (this.loginType) {
-        case this.loginTypes.passwd: {
-          return this.submitByPasswd();
+      if (this.mode === this.modes.login) {
+        switch (this.loginType) {
+          case this.loginTypes.passwd: {
+            return this.submitByPasswd();
+          }
+          case this.loginTypes.sms: {
+            return this.submitBySMS();
+          }
         }
-        case this.loginTypes.sms: {
-          return this.submitBySMS();
-        }
+      } else {
+        return this.register();
       }
+    },
+    register() {
+      const this_ = this;
+      const { mobile, nationCode, code, throwError } = this;
+      if (!nationCode) return throwError('请选择国际区号');
+      if (!mobile) return throwError('请输入手机号');
+      if (!code) return throwError('请输入短信验证码');
+      this.submitting = true;
+      nkcAPI('/register', 'POST', {
+        nationCode: nationCode,
+        mobile: mobile,
+        code: code,
+      })
+        .then(function () {
+          this_.succeed = true;
+          this_.$emit('registered');
+        })
+        .catch(function (data) {
+          throwError(data);
+          this_.submitting = false;
+        });
     },
     onLogged() {
       this.succeed = true;

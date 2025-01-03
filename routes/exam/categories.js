@@ -77,6 +77,7 @@ router
       time,
       disabled,
       type,
+      admission,
     } = category;
     if (!name) {
       ctx.throw(400, '考卷名不能为空');
@@ -97,7 +98,7 @@ router
       });
       rolesId = roles.map((r) => r._id);
     } else if (!from) {
-      from === [];
+      from = [];
     }
     let questionsCount = 0;
     const condition = {
@@ -133,6 +134,7 @@ router
       time,
       disabled,
       type,
+      admission: !!admission,
     });
     await c.save();
     await next();

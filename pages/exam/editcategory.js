@@ -1,7 +1,9 @@
 import { sweetError } from '../lib/js/sweetAlert';
+import { nkcAPI } from '../lib/js/netAPI';
 import { visitUrl } from '../lib/js/pageSwitch';
+import { screenTopWarning, screenTopAlert } from '../lib/js/topAlert';
 
-let app = new Vue({
+let app = new window.Vue({
   el: '#app',
   data: {
     category: {
@@ -10,6 +12,7 @@ let app = new Vue({
       description: '',
       volume: 'A',
       passScore: '',
+      admission: false,
       disabled: false,
       type: 'secret',
       from: [],
