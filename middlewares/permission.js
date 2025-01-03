@@ -57,6 +57,11 @@ function OnlyCert(roleId) {
 
 function OnlyUnbannedUser() {
   return async (ctx, next) => {
+    if (!ctx.state.uid) {
+      ThrowForbiddenResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_UN_LOGGED,
+      );
+    }
     if (ctx.data.user.certs.includes(defaultCerts.banned)) {
       ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_BANNED);
     }

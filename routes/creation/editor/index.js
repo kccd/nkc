@@ -1,24 +1,26 @@
+const { OnlyUser } = require('../../../middlewares/permission');
+
 const router = require('koa-router')();
 router
-  .get('/column', async (ctx, next) => {
+  .get('/column', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/community', async (ctx, next) => {
+  .get('/community', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/zone', async (ctx, next) => {
+  .get('/zone', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/zone/moment', async (ctx, next) => {
+  .get('/zone/moment', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/zone/article', async (ctx, next) => {
+  .get('/zone/article', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/book', async (ctx, next) => {
+  .get('/book', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/draft', async (ctx, next) => {
+  .get('/draft', OnlyUser(), async (ctx, next) => {
     await next();
   });
 module.exports = router;

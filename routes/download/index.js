@@ -1,6 +1,7 @@
 const Router = require('koa-router');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 const downloadRouter = new Router();
-downloadRouter.post('/', async (ctx, next) => {
+downloadRouter.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { tools, db, data, nkcModules } = ctx;
   const { user } = data;
   const url = ctx.body.loadsrc;

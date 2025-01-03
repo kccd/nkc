@@ -1,10 +1,11 @@
 const Router = require('koa-router');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
+const { Public } = require('../../middlewares/permission');
 const router = new Router();
 
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { data, db, internalData } = ctx;
 
     const serverSettings = await db.SettingModel.getSettings('server');
@@ -23,7 +24,7 @@ router
 
     await next();
   })
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     // 公共数据
     const { query, data } = ctx;
     const communityTypes = {
@@ -46,7 +47,7 @@ router
     await next();
   })
   // 回复
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, internalData, query, data, nkcModules } = ctx;
     if (data.t !== data.communityTypes.post) {
       return await next();
@@ -167,12 +168,10 @@ router
         parentPost = {
           toc: originPost.toc,
           url: nkcModules.tools.getUrl('post', originPost.pid),
-          content:  originPost.l === 'json'
-          ? getJsonStringTextSlice(originPost.c,200)
-          : nkcModules.nkcRender.htmlToPlain(
-           originPost.c,
-            200,
-          ),
+          content:
+            originPost.l === 'json'
+              ? getJsonStringTextSlice(originPost.c, 200)
+              : nkcModules.nkcRender.htmlToPlain(originPost.c, 200),
           user: {
             uid: user.uid,
             avatar: user.avatar,
@@ -193,7 +192,7 @@ router
     await next();
   })
   // 文章
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, internalData, query, data, nkcModules } = ctx;
     if (
       ![data.communityTypes.thread, data.communityTypes.digest].includes(data.t)

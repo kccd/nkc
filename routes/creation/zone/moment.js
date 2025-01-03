@@ -1,5 +1,7 @@
+const { OnlyUser } = require('../../../middlewares/permission');
+
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { query, db, data, state, nkcModules, permission } = ctx;
   const { user } = data;
   const { page } = query;

@@ -17,7 +17,6 @@ module.exports = {
   },
   drafts: {
     GET: Operations.creationCenter,
-    POST: Operations.creationCenter,
     editor: {
       GET: Operations.creationCenter,
       POST: Operations.creationCenter,
@@ -29,94 +28,14 @@ module.exports = {
       GET: Operations.creationCenter,
     },
   },
-  category: {
-    GET: Operations.creationCenter,
-  },
   categories: {
     GET: Operations.creationCenter,
-  },
-  material: {
-    PARAMETER: {
-      GET: Operations.creationCenter,
-      PUT: Operations.creationCenter,
-      DELETE: Operations.creationCenter,
-      editor: {
-        POST: Operations.creationCenter,
-      },
-    },
-  },
-  materials: {
-    GET: Operations.creationCenter,
-    POST: Operations.creationCenter,
-    DELETE: Operations.creationCenter,
-    PUT: Operations.creationCenter,
-    editor: {
-      POST: Operations.creationCenter,
-      GET: Operations.creationCenter,
-    },
-    document: {
-      GET: Operations.creationCenter,
-    },
-    material: {
-      POST: Operations.creationCenter,
-    },
-    del: {
-      POST: Operations.creationCenter,
-    },
-    drag: {
-      POST: Operations.creationCenter,
-    },
-  },
-  books: {
-    GET: Operations.creationCenter,
-    editor: {
-      GET: Operations.creationCenter,
-      POST: Operations.creationCenter,
-    },
-  },
-  book: {
-    PARAMETER: {
-      GET: Operations.creationCenter,
-      list: {
-        delete: {
-          POST: Operations.creationCenterDeleteList,
-        },
-        move: {
-          POST: Operations.creationCenterMoveList,
-        },
-        add: {
-          POST: Operations.creationCenterAddList,
-        },
-      },
-      member: {
-        POST: Operations.creationCenter,
-        DELETE: Operations.creationCenter,
-      },
-    },
   },
   articles: {
     GET: Operations.creationCenter,
     editor: {
       GET: Operations.creationCenter,
       POST: Operations.publishArticle,
-    },
-    column: {
-      GET: Operations.creationCenter,
-      POST: Operations.creationCenter,
-    },
-  },
-  article: {
-    PARAMETER: {
-      DELETE: Operations.creationCenter,
-      draft: {
-        DELETE: Operations.creationCenter,
-      },
-      options: {
-        GET: Operations.creationCenter,
-      },
-      unblock: {
-        POST: Operations.creationCenter,
-      },
     },
   },
   column: {
