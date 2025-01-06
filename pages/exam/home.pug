@@ -8,59 +8,40 @@ block content
     if categories.length === 0
       .text-center 无
     else
-      .table-responsive
-        table.table.table-bordered.table-condensed
-          thead
-            tr
-              th 试卷名称
-              th 难度
-              th 通过率
-          tbody
-            for category in categories
-              tr
-                th
-                  span(style='display: inline-block;')
-                    span.pointer(style='color:#337ab7;' onclick=`createPaper(${category._id})` title=category.desc)=`${category.name}`
-                th
-                  if category.volume === 'A'
-                    span 基础级
-                  else
-                    span 专业级
-                th
-                  span=`${(category.passRate * 100).toFixed(2)}%`
+      .row(style='margin-bottom: -15px;')
+        for category in categories
+          .col-xs-12.col-sm-6
+            .category-panel
+              div
+                .category-panel-header
+                  div(onclick=`createPaper(${category._id})` title='开始考试')=category.name
+                .category-panel-body
+                  div=`${category.volume==='A'? '基础级': '专业级'}`
+                  div=`${category.type === 'secret'?'闭卷': '开卷'}`
+                  div=`通过率 ${(category.passRate * 100).toFixed(2)}%`
+              .category-button-container
+                div.fa.fa-chevron-circle-right(onclick=`createPaper(${category._id})` title='开始考试')
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
         include ./nav.pug
       .col-xs-12.col-md-9.box-shadow-panel
-        .m-b-2
-          .h4.m-b-2
-            strong 闭卷考试
-          .text-info.p-a-1.bg-info.m-b-1.border-radius-3px
+        .m-b-1
+          .panel-header 考试说明
+          .text-info.p-a-1.bg-info.border-radius-3px
             .pre-content= examNotes
             h5= `每天最多进行 ${countOneDay} 次考试，考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`
-          div
-            .row
-              .col-xs-12.col-md-6
-                +listHeader('A卷')
-                +examsCategoryList(data.examsCategories.secretA)
-              .col-xs-12.col-md-6
-                +listHeader('B卷')
-                +examsCategoryList(data.examsCategories.secretB)
-        .m-b-2
-          .h4.m-b-2
-            strong 开卷考试
-          div.pre-content.text-info.p-a-1.bg-info.m-b-1.border-radius-3px= publicExamNotes
-          div
-            .row
-              .col-xs-12.col-md-6
-                +listHeader('A卷')
-                +examsCategoryList(data.examsCategories.publicA)
-              .col-xs-12.col-md-6
-                +listHeader('B卷')
-                +examsCategoryList(data.examsCategories.publicB)
+        .m-b-1
+          .panel-header 入学考试
+          +examsCategoryList(data.examsCategories.volumeAD)
+        .m-b-1
+          .panel-header A卷考试
+          +examsCategoryList(data.examsCategories.volumeA)
+        .m-b-1
+          .panel-header B卷考试
+          +examsCategoryList(data.examsCategories.volumeB)
 
-      .col-xs-12.col-md-3.box-shadow-panel
+      .col-xs-12.col-md-3.box-shadow-panel.p-l-0
         .m-b-1
           if data.hasPermissionToCreateQuestions
             a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题

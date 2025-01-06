@@ -38,7 +38,18 @@ block eContent
             h5.col-sm-7
               a(:href="`/exam/categories/editor?cid=${category._id}`" target="_blank")
                 strong {{category.name}}
-              span ({{category.volume}})
+          .form-group
+            label.col-sm-5.control-label 难度
+            h5.col-sm-7
+              strong(v-if='category.level === 1') 基础级
+              strong(v-else-if='category.level === 2') 专业级
+              strong(v-else) 未知（level={{category.level}}）
+          .form-group
+            label.col-sm-5.control-label 类型
+            h5.col-sm-7
+              strong(v-if='category.volume === "A"') A卷考试
+              strong(v-else-if='category.volume === "B"') B卷考试
+              strong(v-else) 入学考试
           .form-group
             label.col-sm-5.control-label 及格分数：
             h5.col-sm-7

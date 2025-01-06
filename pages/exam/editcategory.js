@@ -10,7 +10,8 @@ let app = new window.Vue({
       rolesId: [],
       name: '',
       description: '',
-      volume: 'A',
+      volume: 'AD',
+      level: 1,
       passScore: '',
       admission: false,
       disabled: false,
@@ -81,13 +82,15 @@ let app = new window.Vue({
         return screenTopWarning('请输入考卷名称');
       } else if (category.description === '') {
         return screenTopWarning('请输入考卷介绍');
-      } else if (['A', 'B'].indexOf(category.volume) === -1) {
+      } else if (![1, 2].includes(category.level)) {
         return screenTopWarning('请选择考卷难度');
+      } else if (['A', 'B', 'AD'].indexOf(category.volume) === -1) {
+        return screenTopWarning('请选择考卷类型');
       } else if (category.from.length === 0) {
         return screenTopWarning('请选择试题来源');
-      } else if (category.volume === 'A') {
+      } else if (category.level === 1) {
         this.checkTagCount(category, tagA);
-      } else if (category.volume === 'B') {
+      } else if (category.level === 2) {
         this.checkTagCount(category, tagB);
       } else if (
         category.passScore < 1 ||
