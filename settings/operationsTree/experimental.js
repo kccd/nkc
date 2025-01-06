@@ -175,10 +175,6 @@ module.exports = {
       PUT: Operations.modifyWebBase,
     },
     home: {
-      top: {
-        GET: Operations.visitHomeTopSettings,
-        PUT: Operations.modifyHomeTopSettings,
-      },
       notice: {
         GET: Operations.visitHomeNoticeSettings,
         PUT: Operations.modifyHomeNoticeSettings,

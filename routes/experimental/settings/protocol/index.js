@@ -2,105 +2,135 @@ const Router = require('koa-router');
 const protocolRouter = new Router();
 const nkcRender = require('../../../../nkcModules/nkcRender');
 const { renderHTMLByJSON } = require('../../../../nkcModules/nkcRender/json');
-
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 
 protocolRouter
-  .use('/', async (ctx, next) => {
-    const {data, db} = ctx;
-    data.protocols = await db.ProtocolModel.find({});
-    await next();
-  })
-  .get('/', async (ctx, next) => {
-    const {data, db, query} = ctx;
-    data.type = "add";
-    ctx.template = 'experimental/settings/protocol.pug';
-    await next();
-  })
+  .use(
+    '/',
+    OnlyOperation(Operations.visitProtocolSetting),
+    async (ctx, next) => {
+      const { data, db } = ctx;
+      data.protocols = await db.ProtocolModel.find({});
+      await next();
+    },
+  )
+  .get(
+    '/',
+    OnlyOperation(Operations.visitProtocolSetting),
+    async (ctx, next) => {
+      const { data, db, query } = ctx;
+      data.type = 'add';
+      ctx.template = 'experimental/settings/protocol.pug';
+      await next();
+    },
+  )
   // 后台查看协议
-  .get('/:type', async (ctx, next) => {
-    const {data, db, query, params} = ctx;
-    const {type} = params;
-    const {visitType} = query;
-    data.type = type;
-    data.visitType = visitType;
-    const protocol = await db.ProtocolModel.findOne({protocolTypeId: type});
-    // 渲染nkcsource
-    if (data.visitType !== 'update') {
-      protocol.protocolContent =
-        protocol.l === 'json'
-          ? renderHTMLByJSON({
-              json: protocol.protocolContent,
-              resources: await db.ResourceModel.getResourcesByReference(
-                'protocol-' + protocol.protocolTypeId,
-              ),
-              xsf: data?.user?.xsf,
-            })
-          : nkcRender.renderHTML({
-              type: 'article',
-              post: {
-                c: protocol.protocolContent,
+  .get(
+    '/:type',
+    OnlyOperation(Operations.visitProtocolType),
+    async (ctx, next) => {
+      const { data, db, query, params } = ctx;
+      const { type } = params;
+      const { visitType } = query;
+      data.type = type;
+      data.visitType = visitType;
+      const protocol = await db.ProtocolModel.findOne({ protocolTypeId: type });
+      // 渲染nkcsource
+      if (data.visitType !== 'update') {
+        protocol.protocolContent =
+          protocol.l === 'json'
+            ? renderHTMLByJSON({
+                json: protocol.protocolContent,
                 resources: await db.ResourceModel.getResourcesByReference(
                   'protocol-' + protocol.protocolTypeId,
                 ),
-              },
-              user: data.user,
-            });
-    }
-    data.protocol = protocol;
-    ctx.template = 'experimental/settings/protocol.pug';
-    await next();
-  })
+                xsf: data?.user?.xsf,
+              })
+            : nkcRender.renderHTML({
+                type: 'article',
+                post: {
+                  c: protocol.protocolContent,
+                  resources: await db.ResourceModel.getResourcesByReference(
+                    'protocol-' + protocol.protocolTypeId,
+                  ),
+                },
+                user: data.user,
+              });
+      }
+      data.protocol = protocol;
+      ctx.template = 'experimental/settings/protocol.pug';
+      await next();
+    },
+  )
   // 后台更新协议
-  .put('/:type', async (ctx, next) => {
-    const {data, db, body} = ctx;
-    let {id, protocolName, protocolTypeId, protocolTypeName, protocolContent} = body;
-    if(!protocolName) ctx.throw(400, "未填写协议名称");
-    if(!protocolTypeId) ctx.throw(400, "未填写协议类型ID");
-    if(!protocolTypeName) ctx.throw(400, "未填写协议类型名称");
-    if(!protocolContent) ctx.throw(400, "未填写协议内容");
-    const protocol = await db.ProtocolModel.findOne({protocolTypeId: id});
-    // 富文本内容中每一个source添加引用
-    if (protocol.l === 'json') {
-      await db.ResourceModel.toReferenceSourceByJson(
-        'protocol-' + protocolTypeId,
+  .put(
+    '/:type',
+    OnlyOperation(Operations.updateProtocolType),
+    async (ctx, next) => {
+      const { data, db, body } = ctx;
+      let {
+        id,
+        protocolName,
+        protocolTypeId,
+        protocolTypeName,
         protocolContent,
-      );
-    } else {
-      await db.ResourceModel.toReferenceSource(
-        'protocol-' + protocolTypeId,
-        protocolContent,
-      );
-    }
-    // await db.ResourceModel.toReferenceSource("protocol-" + protocolTypeId, protocolContent);
-    await protocol.updateOne({$set: {
-      protocolName,
-      protocolTypeId,
-      protocolTypeName,
-      protocolContent
-    }});
-    data.protocolTypeId = protocolTypeId;
-    await next();
-  })
+      } = body;
+      if (!protocolName) ctx.throw(400, '未填写协议名称');
+      if (!protocolTypeId) ctx.throw(400, '未填写协议类型ID');
+      if (!protocolTypeName) ctx.throw(400, '未填写协议类型名称');
+      if (!protocolContent) ctx.throw(400, '未填写协议内容');
+      const protocol = await db.ProtocolModel.findOne({ protocolTypeId: id });
+      // 富文本内容中每一个source添加引用
+      if (protocol.l === 'json') {
+        await db.ResourceModel.toReferenceSourceByJson(
+          'protocol-' + protocolTypeId,
+          protocolContent,
+        );
+      } else {
+        await db.ResourceModel.toReferenceSource(
+          'protocol-' + protocolTypeId,
+          protocolContent,
+        );
+      }
+      // await db.ResourceModel.toReferenceSource("protocol-" + protocolTypeId, protocolContent);
+      await protocol.updateOne({
+        $set: {
+          protocolName,
+          protocolTypeId,
+          protocolTypeName,
+          protocolContent,
+        },
+      });
+      data.protocolTypeId = protocolTypeId;
+      await next();
+    },
+  )
   // 后台删除协议
-  .post('/:type', async (ctx, next) => {
-    const {data, db, body} = ctx;
-    const {id} = body;
-    const protocol = await db.ProtocolModel.findOne({protocolTypeId: id});
-    if(!protocol) ctx.throw(400, "当前协议已被删除");
-    await protocol.deleteOne();
-    await next();
-  })
+  .post(
+    '/:type',
+    OnlyOperation(Operations.deleteProtocolType),
+    async (ctx, next) => {
+      const { data, db, body } = ctx;
+      const { id } = body;
+      const protocol = await db.ProtocolModel.findOne({ protocolTypeId: id });
+      if (!protocol) ctx.throw(400, '当前协议已被删除');
+      await protocol.deleteOne();
+      await next();
+    },
+  )
   // 后台更新协议
-  .post('/', async (ctx, next) => {
-    const {data, db, body} = ctx;
-    let {protocolName, protocolTypeId, protocolTypeName, protocolContent} = body;
-    if(!protocolName) ctx.throw(400, "未填写协议名称");
-    if(!protocolTypeId) ctx.throw(400, "未填写协议类型ID");
-    if(!protocolTypeName) ctx.throw(400, "未填写协议类型名称");
-    if(!protocolContent) ctx.throw(400, "未填写协议内容");
+  .post('/', OnlyOperation(Operations.postNewProtocol), async (ctx, next) => {
+    const { data, db, body } = ctx;
+    let { protocolName, protocolTypeId, protocolTypeName, protocolContent } =
+      body;
+    if (!protocolName) ctx.throw(400, '未填写协议名称');
+    if (!protocolTypeId) ctx.throw(400, '未填写协议类型ID');
+    if (!protocolTypeName) ctx.throw(400, '未填写协议类型名称');
+    if (!protocolContent) ctx.throw(400, '未填写协议内容');
     // 判断该类型是否已经存在
-    let protocol = await db.ProtocolModel.findOne({protocolTypeId});
-    if(protocol) ctx.throw("400", `类型为${protocolTypeId}的协议已存在`);
+    let protocol = await db.ProtocolModel.findOne({ protocolTypeId });
+    if (protocol) ctx.throw('400', `类型为${protocolTypeId}的协议已存在`);
     // 富文本内容中每一个source添加引用
     await db.ResourceModel.toReferenceSourceByJson(
       'protocol-' + protocolTypeId,
@@ -111,7 +141,7 @@ protocolRouter
       protocolName,
       protocolTypeId,
       protocolTypeName,
-      protocolContent
+      protocolContent,
     });
     await protocol.save();
     data.protocolTypeId = protocolTypeId;

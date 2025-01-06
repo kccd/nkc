@@ -4,8 +4,10 @@ const {
   articlePanelStyleTypes,
   articlePanelCoverTypes,
 } = require('../../../../settings/articlePanel');
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.visitPageSettings), async (ctx, next) => {
     const { data, db } = ctx;
     data.pageSettings = await db.SettingModel.getSettings('page');
     data.articlePanelStyleTypes = { ...articlePanelStyleTypes };
@@ -13,7 +15,7 @@ router
     ctx.template = 'experimental/settings/page/page.pug';
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.modifyPageSettings), async (ctx, next) => {
     const { db, body } = ctx;
     const { pageSettings } = body;
     let {

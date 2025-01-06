@@ -7,6 +7,13 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  visitExamPaperList: 'visitExamPaperList',
+  visitEditor: 'visitEditor',
+  getUserNavData: 'getUserNavData',
+  getUserDrawData: 'getUserDrawData',
+  getLeftDrawData: 'getLeftDrawData',
+  historyEditDraft: 'historyEditDraft',
+  viewHistoryDraft: 'viewHistoryDraft',
   editorAutoUploadImage: 'editorAutoUploadImage',
   historyEditDocument: 'historyEditDocument',
   viewHistoryDocument: 'viewHistoryDocument',
@@ -413,15 +420,10 @@ const DynamicOperations = {
   viewUserCode: 'viewUserCode', // 可查看任意用户的动态码
   viewUserArticle: 'viewUserArticle', //查看任意用户的文章
   modifyAllPostOrder: 'modifyAllPostOrder', //可以调整任意用户的文章回复顺序
-  previewDraft: 'previewDraft',
-  viewHistoryDraft: 'viewHistoryDraft',
-  historyEditDraft: 'historyEditDraft',
   getDefaultImage: 'getDefaultImage',
   getPersonalForumAvatar: 'getPersonalForumAvatar',
   getPersonalForumBanner: 'getPersonalForumBanner',
   getPhoto: 'getPhoto',
-  visitEditor: 'visitEditor',
-  visitExamPaperList: 'visitExamPaperList',
   viewQuestionRecord: 'viewQuestionRecord',
   viewPaperRecord: 'viewPaperRecord',
   addExamsCategory: 'addExamsCategory',
@@ -774,9 +776,6 @@ const DynamicOperations = {
   publishMoment: 'publishMoment',
   publishMomentComment: 'publishMomentComment',
   test: 'test',
-  getLeftDrawData: 'getLeftDrawData',
-  getUserDrawData: 'getUserDrawData',
-  getUserNavData: 'getUserNavData',
   modifyComment: 'modifyComment',
   deleteComment: 'deleteComment',
   disabledComment: 'disabledComment',

@@ -4,7 +4,8 @@ const { DynamicOperations } = require('../../settings/operations.js');
 const {
   questionTagService,
 } = require('../../services/exam/questionTag.service');
-editorRouter.get('/', async (ctx, next) => {
+const { OnlyUser } = require('../../middlewares/permission.js');
+editorRouter.get('/', OnlyUser(), async (ctx, next) => {
   const { query, data, db, state } = ctx;
   const { qid } = query;
   data.question = null;

@@ -3,10 +3,11 @@ const { paperService } = require('../../services/exam/paper.service');
 const {
   registerExamService,
 } = require('../../services/register/registerExam.service');
+const { Public, OnlyUser } = require('../../middlewares/permission');
 const paperRouter = new Router();
 
 paperRouter
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
     let { cid, from: userFrom, codeId, codeResult } = query;
@@ -189,7 +190,7 @@ paperRouter
       // return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
     }
   })
-  .get('/:_id', async (ctx, next) => {
+  .get('/:_id', OnlyUser(), async (ctx, next) => {
     //获取闭卷考试的题目数据
     const { db, data, params, query, nkcModules, state } = ctx;
     const { created } = query;
@@ -253,7 +254,7 @@ paperRouter
     ctx.template = 'exam/paper.pug';
     await next();
   })
-  .post('/:_id', async (ctx, next) => {
+  .post('/:_id', OnlyUser(), async (ctx, next) => {
     const { params, db, data, body, state } = ctx;
     const { uid } = state;
     const { _id } = params;

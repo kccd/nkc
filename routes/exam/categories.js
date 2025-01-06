@@ -1,68 +1,74 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 const router = new Router();
 router
-  .get('/editor', async (ctx, next) => {
-    ctx.template = 'exam/editCategory.pug';
-    const { data, db, query } = ctx;
-    const { cid } = query;
-    const allTag = await db.QuestionTagModel.find({}, { name: 1 }).lean();
-    if (cid) {
-      const { from, volume, ...rest } = await db.ExamsCategoryModel.findOne({
-        _id: Number(cid),
-      }).lean();
-      const newFrom = from.map((item) => {
-        const tag = allTag.find((t) => t._id === item.tag);
-        if (tag) {
-          return {
-            count: item.count,
-            _id: item.tag,
-            name: tag.name,
-            volume,
-          };
-        }
-      });
-      data.category = { ...rest, from: newFrom, volume };
-    }
-    data.roles = await db.RoleModel.find({ type: 'common' });
-    const tagQ = {
-      volume: 'A',
-      auth: true,
-      disabled: false,
-    };
-    const processTagData = async (tagQ) => {
-      const tagPipelines = [
-        {
-          $match: tagQ,
-        },
-        {
-          $unwind: '$tags',
-        },
-        {
-          $group: {
-            _id: '$tags',
-            count: { $sum: 1 },
-            volume: { $first: '$volume' }, // 通过 $first 操作获取 volume 字段的值
+  .get(
+    '/editor',
+    OnlyOperation(Operations.visitEditCategory),
+    async (ctx, next) => {
+      ctx.template = 'exam/editCategory.pug';
+      const { data, db, query } = ctx;
+      const { cid } = query;
+      const allTag = await db.QuestionTagModel.find({}, { name: 1 }).lean();
+      if (cid) {
+        const { from, volume, ...rest } = await db.ExamsCategoryModel.findOne({
+          _id: Number(cid),
+        }).lean();
+        const newFrom = from.map((item) => {
+          const tag = allTag.find((t) => t._id === item.tag);
+          if (tag) {
+            return {
+              count: item.count,
+              _id: item.tag,
+              name: tag.name,
+              volume,
+            };
+          }
+        });
+        data.category = { ...rest, from: newFrom, volume };
+      }
+      data.roles = await db.RoleModel.find({ type: 'common' });
+      const tagQ = {
+        volume: 'A',
+        auth: true,
+        disabled: false,
+      };
+      const processTagData = async (tagQ) => {
+        const tagPipelines = [
+          {
+            $match: tagQ,
           },
-        },
-      ];
-      const tagData = await db.QuestionModel.aggregate(tagPipelines);
-      tagData.forEach((item) => {
-        const matchedTag = allTag.find((tag) => tag._id === item._id);
-        if (matchedTag) {
-          item.name = matchedTag.name;
-        }
-      });
-      return tagData;
-    };
-    const tagA = await processTagData(tagQ);
-    tagQ.volume = 'B';
-    const tagB = await processTagData(tagQ);
-    data.tag = { tagA, tagB };
-    data.categories = await db.ExamsCategoryModel.find();
-    await next();
-  })
-  .post('/', async (ctx, next) => {
+          {
+            $unwind: '$tags',
+          },
+          {
+            $group: {
+              _id: '$tags',
+              count: { $sum: 1 },
+              volume: { $first: '$volume' }, // 通过 $first 操作获取 volume 字段的值
+            },
+          },
+        ];
+        const tagData = await db.QuestionModel.aggregate(tagPipelines);
+        tagData.forEach((item) => {
+          const matchedTag = allTag.find((tag) => tag._id === item._id);
+          if (matchedTag) {
+            item.name = matchedTag.name;
+          }
+        });
+        return tagData;
+      };
+      const tagA = await processTagData(tagQ);
+      tagQ.volume = 'B';
+      const tagB = await processTagData(tagQ);
+      data.tag = { tagA, tagB };
+      data.categories = await db.ExamsCategoryModel.find();
+      await next();
+    },
+  )
+  .post('/', OnlyOperation(Operations.addExamsCategory), async (ctx, next) => {
     const { data, db, body, tools } = ctx;
     const { user } = data;
     const { contentLength } = tools.checkString;
