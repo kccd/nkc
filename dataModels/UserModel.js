@@ -139,6 +139,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    volumeAD: {
+      type: Boolean,
+      default: false,
+    },
     online: {
       type: String,
       default: '',
@@ -871,7 +875,6 @@ userSchema.statics.createUser = async (option) => {
   const apiFunction = require('../nkcModules/apiFunction');
   const UserModel = mongoose.model('users');
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const SubscribeModel = mongoose.model('subscribes');
   const SettingModel = mongoose.model('settings');
   const UsersGeneraModel = mongoose.model('usersGeneral');
   const SubscribeTypeModel = mongoose.model('subscribeTypes');
@@ -896,7 +899,7 @@ userSchema.statics.createUser = async (option) => {
   userObj.certs = [];
   // 生成默认用户名，符号"-"和uid保证此用户名全局唯一
   if (!userObj.username) {
-    userObj.username = `${serverSettings.websiteCode}-${uid}`;
+    userObj.username = `kc-${uid}`;
   }
   userObj.usernameLowerCase = userObj.username.toLowerCase();
   if (userObj.password) {
@@ -3298,12 +3301,11 @@ userSchema.statics.getImproveUserInfoByMiddlewareUser = async function (user) {
   }
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const SettingModel = mongoose.model('settings');
-  const serverSettings = await SettingModel.getSettings('server');
   const { uid, username, avatar, banner, description } = user;
   const userSecuritySettings = await UsersPersonalModel.getUserSecuritySettings(
     uid,
   );
-  const reg = new RegExp(`^${serverSettings.websiteCode}-`);
+  const reg = new RegExp(`^kc-`);
   const setUsername = username && !reg.test(username);
   const needVerifyPhoneNumber =
     await UsersPersonalModel.shouldVerifyPhoneNumber(uid);

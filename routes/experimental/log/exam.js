@@ -74,6 +74,7 @@ router
           _id: 1,
           name: 1,
           volume: 1,
+          level: 1,
         },
       );
       data.paper = paper;

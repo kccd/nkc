@@ -83,6 +83,7 @@ router
       time,
       disabled,
       type,
+      level,
     } = category;
     if (!name) {
       ctx.throw(400, '考卷名不能为空');
@@ -92,8 +93,10 @@ router
       ctx.throw(400, '考卷介绍不能为空');
     } else if (contentLength(description) > 500) {
       ctx.throw(400, '考卷介绍字数不能大于500');
-    } else if (!['A', 'B'].includes(volume)) {
-      ctx.throw(400, '请选择试卷难度');
+    } else if (![1, 2].includes(level)) {
+      ctx.throw(400, '请选择考卷难度');
+    } else if (!['A', 'B', 'AD'].includes(volume)) {
+      ctx.throw(400, '请选择考卷类型');
     } else if (!rolesId) {
       rolesId = [];
     } else if (rolesId.length !== 0) {
@@ -103,11 +106,11 @@ router
       });
       rolesId = roles.map((r) => r._id);
     } else if (!from) {
-      from === [];
+      from = [];
     }
     let questionsCount = 0;
     const condition = {
-      volume,
+      volume: level === 1 ? 'A' : 'B',
       auth: true,
       disabled: false,
     };
@@ -139,6 +142,7 @@ router
       time,
       disabled,
       type,
+      level,
     });
     await c.save();
     await next();

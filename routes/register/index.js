@@ -38,16 +38,6 @@ registerRouter
       body;
     delete body.password;
 
-    const { registerExamination } = await db.SettingModel.getSettings(
-      'register',
-    );
-
-    if (registerExamination) {
-      await activationCodeService.checkActivationCodeId(activationCode);
-    }
-
-    await usernameCheckerService.checkNewUsername(username);
-    await db.UserModel.checkNewPassword(password);
     if (!nationCode) {
       ctx.throw(400, '请选择国家区号');
     }
@@ -78,12 +68,7 @@ registerRouter
     option.regIP = ctx.address;
     option.regPort = ctx.port;
     delete option.type;
-    option.username = username;
-    option.password = password;
     const user = await db.UserModel.createUser(option);
-    if (registerExamination) {
-      await activationCodeService.useActivationCode(activationCode, user.uid);
-    }
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,

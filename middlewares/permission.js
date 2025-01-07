@@ -122,6 +122,15 @@ function Public() {
   };
 }
 
+function OnlyApp() {
+  return async (ctx, next) => {
+    if (!ctx.state.isApp) {
+      ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
+    }
+    await next();
+  };
+}
+
 module.exports = {
   permission,
   OnlyVisitor,
@@ -133,4 +142,5 @@ module.exports = {
   OnlyOperationsAnd,
   OnlyOperationsOr,
   Public,
+  OnlyApp,
 };

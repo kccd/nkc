@@ -11,7 +11,7 @@ block content
       include ../publicModules/appNavbar/appNavbar
       +appNavbar
       div#app(v-cloak)
-        login-core(ref='loginCore' @logged="onLogged" @registered="onRegistered")
+        login-core(v-show='loaded' ref='loginCore' @logged="onLogged" @registered="onRegistered")
 
 block footer
 block scripts

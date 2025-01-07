@@ -22,40 +22,55 @@ block eContent
           h5.text-danger= data.info
       .col-xs-12.col-md-12
         include ../../../publicModules/paging/paging
-        table.table
-          thead
-            tr
-              th 时间
-              th 用户
-              th 科目
-              th 题目类型
-              th 状态
-              th 及格分数
-              th 得分
-              th IP
-              th 答题卡
-          tbody
-            for paper in data.papers
+        .table-responsive
+          table.table
+            thead
               tr
-                th=paper.toc.toLocaleString()
-                th
-                  if paper.user
-                    a(href=`/u/${paper.uid}` target="_blank")=paper.user.username || paper.user.uid
-                  else
-                    span=`游客`
-                th=paper.category.name
-                th=paper.category.volume
-                th
-                  if paper.passed
-                    .text-success 通过
-                  else
-                    .text-danger 未通过
-                th=paper.passScore
-                th=paper.score
-                th
-                  .pointer.text-primary(onclick=`showIpInfo("${paper.ip}")`)=paper.ip
-                th
-                  a(href=`/e/log/exam/paper/${paper._id}` target="_blank") 查看
+                th 时间
+                th 用户
+                th 科目
+                th 难度
+                th 类型
+                th 状态
+                th 及格分数
+                th 得分
+                th IP
+                th 答题卡
+            tbody
+              for paper in data.papers
+                tr
+                  th=paper.toc.toLocaleString()
+                  th
+                    if paper.user
+                      a(href=`/u/${paper.uid}` target="_blank")=paper.user.username || paper.user.uid
+                    else
+                      span=`游客`
+                  th=paper.category.name
+                  th
+                    if paper.category.level === 1
+                      span 基础级
+                    else if paper.category.level === 2
+                      span 专业级
+                    else
+                      span=`未知（level=${paper.category.level}）`
+                  th
+                    if paper.category.volume === 'A'
+                      span A卷
+                    else if paper.category.volume === 'B'
+                      span B卷
+                    else
+                      span 入学
+                  th
+                    if paper.passed
+                      .text-success 通过
+                    else
+                      .text-danger 未通过
+                  th=paper.passScore
+                  th=paper.score
+                  th
+                    .pointer.text-primary(onclick=`showIpInfo("${paper.ip}")`)=paper.ip
+                  th
+                    a(href=`/e/log/exam/paper/${paper._id}` target="_blank") 查看
         include ../../../publicModules/paging/paging_input
 block scripts
   +includeJS("/experimental/log/exam/paperList.js")

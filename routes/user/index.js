@@ -26,9 +26,9 @@ const userHomeCardRouter = require('./userHomeCard');
 const profileRouter = require('./profile/index');
 const subscribeRouter = require('./subscribe');
 const userPanelRouter = require('./userPanel');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { Public } = require('../../middlewares/permission');
 userRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { username, uid } = query;
     const targetUsers = [];
@@ -53,7 +53,7 @@ userRouter
     }
     await next();
   })
-  .use('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/:uid', Public(), async (ctx, next) => {
     const { data, db, params, state } = ctx;
     data.targetUser = await db.UserModel.findOne({ uid: params.uid });
     if (!data.targetUser) {
@@ -69,7 +69,7 @@ userRouter
     await data.targetUser.extendColumnAndZoneThreadCount();
     await next();
   })
-  .use('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/:uid', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
     if (!state.uid || state.uid !== data.targetUser.uid) {
       await db.UserModel.checkAccessControlPermissionWithThrowError({
@@ -82,7 +82,7 @@ userRouter
     ctx.template = 'vueRoot/index.pug';
     await next();
   })
-  .get('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/:uid', Public(), async (ctx, next) => {
     const { db, data, state } = ctx;
     if (data.targetUser && state.uid && data.targetUser.uid !== state.uid) {
       await db.UsersGeneralModel.updateUserAccessLogs(
@@ -92,7 +92,7 @@ userRouter
     }
     await next();
   })
-  .get('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/:uid', Public(), async (ctx, next) => {
     //访问用户个人主页
     //获取用户个人主页信息
     const { params, state, db, data, query, nkcModules } = ctx;

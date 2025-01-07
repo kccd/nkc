@@ -60,7 +60,7 @@ export default {
     moments: Moments,
     bubble: Bubble,
     'moment-editor': MomentEditorVue,
-    "paging": PagingVue,
+    paging: PagingVue,
     'articles-panel': ArticlesPanel,
   },
   // props: ['data', 'focus', 'permissions', 'mode', 'type'],
@@ -82,7 +82,18 @@ export default {
     uid,
   }),
   created() {
-    const { momentsData, permissions, subUid, tab, zoneTab, type, paging, zoneTypes, articlesPanelData, latestZoneArticlePanelStyle } = this.$store.state;
+    const {
+      momentsData,
+      permissions,
+      subUid,
+      tab,
+      zoneTab,
+      type,
+      paging,
+      zoneTypes,
+      articlesPanelData,
+      latestZoneArticlePanelStyle,
+    } = this.$store.state;
     if (!momentsData && !articlesPanelData) {
       this.getListV2();
     } else {
@@ -98,8 +109,6 @@ export default {
       this.articlesPanelData = articlesPanelData;
       this.latestZoneArticlePanelStyle = latestZoneArticlePanelStyle;
     }
-
-
   },
   mounted() {
     if (uid) {
@@ -107,7 +116,7 @@ export default {
     }
 
     const self = this;
-    const { savePosition } = self.$store.state
+    const { savePosition } = self.$store.state;
     this.$nextTick(() => {
       setTimeout(() => {
         window.scrollTo({
@@ -115,10 +124,8 @@ export default {
           // left: this.$store.state.savePosition.x,
           behavior: 'instant',
         });
-      },150)
-
+      }, 150);
     });
-
   },
   // watch: {
   //   type(newVal) {
@@ -136,17 +143,17 @@ export default {
       return this.avatars.length > 0;
     },
     pageButtons() {
-      return this.paging && this.paging.buttonValue ? this.paging.buttonValue : [];
+      return this.paging && this.paging.buttonValue
+        ? this.paging.buttonValue
+        : [];
     },
   },
-  destroyed() { },
+  destroyed() {},
   methods: {
     refresh() {
       this.avatars = [];
       localStorage.setItem('zoneTab', 'a');
-      visitUrl(
-        `${window.location.pathname}?t=m-a`,
-      );
+      visitUrl(`${window.location.pathname}?t=m-a`);
     },
     scroll() {
       this.refresh();
@@ -192,20 +199,20 @@ export default {
       const { mid, type } = e;
       const { isApp } = getState();
       if (isApp) {
-        visitUrl(`/z/m/${mid}?type=${type}`,true);
+        visitUrl(`/z/m/${mid}?type=${type}`, true);
       } else {
         this.$router.push({
           name: 'MomentDetail',
           params: {
             mid,
           },
-          query: type ? { type } : {}
+          query: type ? { type } : {},
         });
       }
     },
     getList(type, tab, page = 0) {
       if (tab === 's' && !uid) {
-        return window.RootApp.openLoginPanel('login')
+        return window.RootApp.openLoginPanel('login');
       }
       localStorage.setItem('zoneTab', `${tab}`);
       const self = this;
@@ -243,7 +250,10 @@ export default {
             self.subUid = res.subUid;
             self.$store.commit('setArticlesPanelData', res.articlesPanelData);
             self.$store.commit('setPaging', res.paging);
-            self.$store.commit('setLatestZoneArticlePanelStyle', res.latestZoneArticlePanelStyle);
+            self.$store.commit(
+              'setLatestZoneArticlePanelStyle',
+              res.latestZoneArticlePanelStyle,
+            );
             self.$store.commit('setTab', res.tab);
             self.$store.commit('setType', res.type);
             self.$store.commit('setPermissions', res.permissions);
@@ -261,12 +271,12 @@ export default {
         });
     },
     getListV2() {
-      const {t} = this.$route.query;
+      const { t } = this.$route.query;
       const type = t ? this.$route.query.t.split('-')[0] : 'm';
       const tab = t ? this.$route.query.t.split('-')[1] : 'a';
       const page = this.$route.query ? this.$route.query.page : 0;
       if (tab === 's' && !uid) {
-        return window.RootApp.openLoginPanel('login')
+        return window.RootApp.openLoginPanel('login');
       }
       localStorage.setItem('zoneTab', `${tab}`);
       const self = this;
@@ -304,7 +314,10 @@ export default {
             self.subUid = res.subUid;
             self.$store.commit('setArticlesPanelData', res.articlesPanelData);
             self.$store.commit('setPaging', res.paging);
-            self.$store.commit('setLatestZoneArticlePanelStyle', res.latestZoneArticlePanelStyle);
+            self.$store.commit(
+              'setLatestZoneArticlePanelStyle',
+              res.latestZoneArticlePanelStyle,
+            );
             self.$store.commit('setTab', res.tab);
             self.$store.commit('setType', res.type);
             self.$store.commit('setPermissions', res.permissions);
@@ -322,10 +335,7 @@ export default {
         });
     },
     published() {
-      visitUrl(
-        `/z?t=m-${localStorage.getItem('zoneTab') || 'a'
-        }`,
-      );
+      visitUrl(`/z?t=m-${localStorage.getItem('zoneTab') || 'a'}`);
     },
     //点击分页
     clickButton(num) {
@@ -335,7 +345,7 @@ export default {
       // const { type, tab, page } = this;
       const newQuery = {
         t: `${type}-${tab}`,
-        page: page
+        page: page,
       };
       this.$router.replace({ path: '/z', query: newQuery });
     },

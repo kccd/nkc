@@ -1,3 +1,4 @@
+<!--废弃 请使用LoginCore.v2.vue-->
 <template lang="pug">
   .login-core-container
     verifications(ref="verifications")

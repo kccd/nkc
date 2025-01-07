@@ -18,7 +18,7 @@ paperRouter
     const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
     const examCategoryTypes =
       await db.ExamsCategoryModel.getExamCategoryTypes();
-    const { passScore, time, from, volume, type } = category;
+    const { passScore, time, from, type, level } = category;
     const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');
@@ -127,7 +127,7 @@ paperRouter
     }
     // 加载不同考卷的题目
     const condition = {
-      volume,
+      volume: level === 1 ? 'A' : 'B',
       auth: true,
       disabled: false,
     };
@@ -323,17 +323,23 @@ paperRouter
     q.tlm = time;
 
     if (q.passed) {
-      const userObj = {};
+      const userObj = {
+        $addToSet: {
+          certs: {
+            $each: category.rolesId,
+          },
+        },
+      };
+      // 如果通过了入门考试，则更新用户volumeAD状态
+      // 如果通过了普通考试，则根据试卷难度更新用户volumeA或volumeB状态
       userObj[`volume${category.volume}`] = true;
-      if (category.volume === 'B') {
+      if (userObj.volumeB) {
         userObj.volumeA = true;
       }
-      await db.UserModel.updateOne({ uid }, userObj);
-      for (const id of category.rolesId) {
-        if (id) {
-          await db.UserModel.updateOne({ uid }, { $addToSet: { certs: id } });
-        }
+      if (userObj.volumeA) {
+        userObj.volumeAD = true;
       }
+      await db.UserModel.updateOne({ uid }, userObj);
     }
     await db.ExamsPaperModel.updateOne({ _id: Number(_id), uid }, q);
     data.passed = q.passed;

@@ -11,10 +11,15 @@ const schema = new Schema(
       default: false,
       index: 1,
     },
+    level: {
+      type: Number,
+      default: 1, // 1: 基础级， 2: 专业级
+    },
+    // 表示试卷是A卷还是B卷还是入学考试
+    // 这跟QuestionModel上的volume有所不同，QuestionModel上的volume相当于level，表示试题的难度
     volume: {
-      // 试卷难度
       type: String,
-      default: 'A',
+      default: 'A', // A: A卷考试, B: B卷考试, AD: 入学考试
     },
     //闭卷考试是必带uid，但是开卷考试用户并没有uid
     uid: {

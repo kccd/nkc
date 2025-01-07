@@ -78,10 +78,9 @@ examRouter
       passRateObj[r.cid] = Math.round(r.passRate * 10000) / 10000;
     }
     const examsCategories = {
-      secretA: [],
-      secretB: [],
-      publicA: [],
-      publicB: [],
+      volumeA: [],
+      volumeB: [],
+      volumeAD: [],
     };
     for (const category of categories) {
       const targetCategory = {
@@ -92,18 +91,12 @@ examRouter
         type: category.type,
         volume: category.volume,
       };
-      if (category.type === categoryTypes.secret) {
-        if (category.volume === 'A') {
-          examsCategories.secretA.push(targetCategory);
-        } else {
-          examsCategories.secretB.push(targetCategory);
-        }
+      if (category.volume === 'AD') {
+        examsCategories.volumeAD.push(targetCategory);
+      } else if (category.volume === 'A') {
+        examsCategories.volumeA.push(targetCategory);
       } else {
-        if (category.volume === 'A') {
-          examsCategories.publicA.push(targetCategory);
-        } else {
-          examsCategories.publicB.push(targetCategory);
-        }
+        examsCategories.volumeB.push(targetCategory);
       }
     }
     const papers = await db.ExamsPaperModel.find({

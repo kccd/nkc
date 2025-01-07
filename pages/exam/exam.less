@@ -174,3 +174,42 @@
 .pre-content {
   white-space: pre-wrap;
 }
+.category-panel{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  .category-panel-header{
+    display: flex;
+    justify-content: space-between;
+    &>div:first-child{
+      color:#337ab7;
+      font-size: 1.4rem;
+      margin-bottom: 0.3rem;
+      cursor: pointer;
+      &:hover{
+        text-decoration: underline;
+      }
+    }
+  }
+  .category-panel-body{
+    display: flex;
+    div{
+      margin-right: 0.5rem;
+    }
+  }
+  .category-button-container{
+    height: 3rem;
+    width: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    color: #868686;
+    cursor: pointer;
+    &:hover{
+      opacity: 0.8;
+    }
+  }
+}

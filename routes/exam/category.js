@@ -10,7 +10,7 @@ categoryRouter.put(
     const { data, db, body, tools, params } = ctx;
     const { _id } = params;
     const categoryDB = await db.ExamsCategoryModel.findOnly({ _id });
-    const { volume } = categoryDB;
+    const { level } = categoryDB;
     const { user } = data;
     const { contentLength } = tools.checkString;
     const { category } = body;
@@ -43,7 +43,7 @@ categoryRouter.put(
     }
 
     const condition = {
-      volume,
+      volume: level === 1 ? 'A' : 'B',
       auth: true,
       disabled: false,
     };

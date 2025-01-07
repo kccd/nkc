@@ -6,113 +6,130 @@
           .web-close(@click="close" v-if="!isApp")
             close-small-icon
           .rn-close(@click="close" v-else) 关闭
-        login-core(ref="loginCore" @logged="onLogged" @registered="onRegistered")
+        login-core(ref="loginCore" @logged="onLogged" @registered="onRegistered" v-if="show" :defaultLoginType="defaultLoginType")
 </template>
 
 <style lang="less" scoped>
-  .module-login{
-    z-index: 2000;
+.module-login {
+  z-index: 2000;
+}
+@media (min-width: 768px) {
+  .modal-dialog {
+    width: 370px;
   }
-  @media (min-width: 768px){
-    .modal-dialog{
-      width: 370px;
-    }
-  }
-  .module-login-app{
-    position: relative;
-  }
-  .modal-content{
-    border-radius: 3px;
-    box-shadow: none;
-  }
-  .login-header{
-    @headerHeight: 4rem;
+}
+.module-login-app {
+  position: relative;
+}
+.modal-content {
+  border-radius: 3px;
+  box-shadow: none;
+}
+.login-header {
+  @headerHeight: 4rem;
+  height: @headerHeight;
+  .web-close {
+    position: absolute;
     height: @headerHeight;
-    .web-close{
-      position: absolute;
-      height: @headerHeight;
-      width: @headerHeight;
-      right: 0;
-      top: 0;
-      padding-top: 0.5rem;
-      text-align: center;
-      line-height: @headerHeight;
-      color: #999;
-      cursor: pointer;
-      font-size: 2rem;
-      &:hover{
-        color: #333;
-      }
-    }
-    .rn-close{
-      text-align: right;
-      font-size: 1.3rem;
-      height: @headerHeight;
-      color: #555;
+    width: @headerHeight;
+    right: 0;
+    top: 0;
+    padding-top: 0.5rem;
+    text-align: center;
+    line-height: @headerHeight;
+    color: #999;
+    cursor: pointer;
+    font-size: 2rem;
+    &:hover {
+      color: #333;
     }
   }
+  .rn-close {
+    text-align: right;
+    font-size: 1.3rem;
+    height: @headerHeight;
+    color: #555;
+  }
+}
 </style>
 
 <script>
-  import {getState} from '../js/state';
-  import {
-    RNCloseWebview, RNLogin
-  } from "../js/reactNative";
-  import {visitUrl} from "../js/pageSwitch";
-  import LoginCore, {LoginType} from './LoginCore.vue'
-  import {CloseSmall} from '@icon-park/vue'
-  const {
+import { getState } from '../js/state';
+import { RNCloseWebview, RNLogin } from '../js/reactNative';
+import { visitUrl } from '../js/pageSwitch';
+import LoginCore, { modes } from './LoginCore.v2.vue';
+import { CloseSmall } from '@icon-park/vue';
+const { isApp } = getState();
+import { getDefaultLoginType, loginTypes } from '../js/login';
+import { logger } from '../js/logger';
+
+let timeout;
+
+export default {
+  components: {
+    'login-core': LoginCore,
+    'close-small-icon': CloseSmall,
+  },
+  data: () => ({
     isApp,
-  } = getState();
-
-  let timeout;
-
-  export default {
-    components: {
-      'login-core': LoginCore,
-      'close-small-icon': CloseSmall,
+    show: false,
+    defaultLoginType: {
+      desktop: loginTypes.sms,
+      mobile: loginTypes.sms,
+      app: loginTypes.sms,
     },
-    data: () => ({
-      isApp,
-    }),
-    mounted() {
-      this.initModal();
+  }),
+  mounted() {
+    this.initModal();
+  },
+  methods: {
+    initModal() {
+      $(this.$el).modal({
+        show: false,
+        backdrop: 'static',
+      });
+      this.show = false;
     },
-    methods: {
-      initModal() {
-        $(this.$el).modal({
-          show: false,
-          backdrop: "static"
-        });
-      },
-      close() {
-        if(isApp) {
-          RNCloseWebview();
-        } else {
-          $(this.$el).modal("hide");
-        }
-      },
-      open(type = LoginType.SignIn) {
-        this.$refs.loginCore.selectType(type);
-        $(this.$el).modal("show");
-      },
-      onLogged() {
-        if(this.isApp) {
-          RNLogin();
-        } else {
-          window.location.reload();
-        }
-      },
-      onRegistered() {
-        if(this.isApp) {
-          RNLogin();
-        } else {
-          visitUrl("/register/subscribe");
-        }
+    close() {
+      if (isApp) {
+        RNCloseWebview();
+      } else {
+        $(this.$el).modal('hide');
+        this.show = false;
       }
-    }
-  };
-
-  export {LoginType};
-
+    },
+    open(type = modes.login) {
+      getDefaultLoginType()
+        .then((loginType) => {
+          this.show = true;
+          setTimeout(() => {
+            this.$refs.loginCore.selectMode(type);
+            this.$refs.loginCore.selectLoginType(loginType);
+            $(this.$el).modal('show');
+          }, 100);
+        })
+        .catch(logger.error);
+    },
+    login() {
+      this.open(modes.login);
+    },
+    register() {
+      this.open(modes.register);
+    },
+    onLogged() {
+      if (this.isApp) {
+        RNLogin();
+      } else {
+        window.location.reload();
+      }
+    },
+    onRegistered() {
+      if (this.isApp) {
+        RNLogin();
+      } else {
+        visitUrl('/register/subscribe');
+      }
+    },
+  },
+};
 </script>

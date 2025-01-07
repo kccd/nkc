@@ -176,11 +176,19 @@ router
     const {
       params: { pid },
       db,
+      state,
     } = ctx;
+    const { uid } = state;
+    const paper = await db.ExamsPaperModel.findOnly({
+      _id: pid,
+      uid,
+    });
+    const { record, from, cid } = paper;
+    const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
+    if (category.disabled) {
+      ctx.throw(403, '该科目下的考试已被屏蔽');
+    }
     const hasFinish = await paperService.checkIsFinishPaper(pid);
-    const paper = await db.ExamsPaperModel.findOnly({ _id: pid });
-    const { record, from } = paper;
-    const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (hasFinish !== -1) {
       ctx.throw('该用户还未完成试卷');
     } else {
@@ -196,22 +204,27 @@ router
         },
       );
 
-      if (from === register) {
-        const activationCode = await paperService.createActivationCodeByPaperId(
-          pid,
-        );
-        ctx.apiData = {
-          redirectUrl: `/login?t=register`,
-          activationCode: activationCode._id,
-          from,
-        };
-      } else if (from === exam) {
-        ctx.apiData = {
-          redirectUrl: `/exam`,
-          activationCode: '',
-          from,
-        };
+      const userObj = {
+        $addToSet: {
+          certs: {
+            $each: category.rolesId,
+          },
+        },
+      };
+      userObj[`volume${category.volume}`] = true;
+      if (userObj.volumeB) {
+        userObj.volumeA = true;
       }
+      if (userObj.volumeA) {
+        userObj.volumeAD = true;
+      }
+      await db.UserModel.updateOne({ uid }, userObj);
+
+      ctx.apiData = {
+        redirectUrl: `/exam`,
+        activationCode: '',
+        from,
+      };
     }
     await next();
   });

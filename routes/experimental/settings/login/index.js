@@ -19,7 +19,7 @@ router
     async (ctx, next) => {
       const { db, body, nkcModules } = ctx;
       const { checkNumber } = nkcModules.checkData;
-      const { login, resetPassword } = body;
+      const { login, resetPassword, defaultLoginType, QRWarning } = body;
       checkNumber(login.ipCountLimit, {
         name: '登录IP次数限制',
         min: 0,
@@ -54,6 +54,8 @@ router
           $set: {
             'c.login': login,
             'c.resetPassword': resetPassword,
+            'c.defaultLoginType': defaultLoginType,
+            'c.QRWarning': QRWarning,
           },
         },
       );
