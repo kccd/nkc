@@ -24,7 +24,7 @@ router
       });
       data.category = { ...rest, from: newFrom, volume };
     }
-    data.roles = await db.RoleModel.find({ type: 'common' });
+    data.roles = await db.RoleModel.find({ auto: true }).sort({ toc: -1 });
     const tagQ = {
       volume: 'A',
       auth: true,
@@ -96,7 +96,7 @@ router
     } else if (rolesId.length !== 0) {
       const roles = await db.RoleModel.find({
         _id: { $in: rolesId },
-        defaultRole: false,
+        auto: true,
       });
       rolesId = roles.map((r) => r._id);
     } else if (!from) {

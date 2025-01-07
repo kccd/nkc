@@ -30,17 +30,14 @@ block eContent
             .col-sm-10
               textarea.form-control(v-model='role.description' placeholder='请输入证书简介，200个字节以内' rows=4)
           .form-group
-            label.col-sm-2.control-label 证书类型
+            label.col-sm-2.control-label 颁发方式
             .col-sm-10
-              if data.role.type !== 'system'
-                <label class="radio-inline">
-                  <input type="radio" value="common" v-model='role.type'> 普通
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" value="management" v-model='role.type'> 管理类
-                </label>
-              else
-                h5 系统类
+              <label class="radio-inline">
+              <input type="radio" :value="false" v-model='role.auto'> 手动
+              </label>
+              <label class="radio-inline">
+              <input type="radio" :value="true" v-model='role.auto'> 手动+自动
+              </label>
           .form-group
             label.col-sm-2.control-label 在名片显示
             .col-sm-10
@@ -68,7 +65,7 @@ block eContent
               input.form-control(type='number' v-model.number='role.modifyPostTimeLimit')
               h5.text-danger -1表示无限制（0.5：只能修改0.5小时以内发表的post）
 
-          .form-group(v-if='role.type !== "system"')
+          .form-group(v-if='!role.defaultRole')
             label.col-sm-2.control-label
             .col-sm-10.text-right
               button.btn.btn-danger(@click='removeRole') 删除证书

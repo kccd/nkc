@@ -73,7 +73,7 @@ router
       color,
       hasIcon,
       operationsId,
-      type,
+      auto,
       modifyPostTimeLimit,
       hidden,
     } = role;
@@ -88,9 +88,6 @@ router
     }
     if (contentLength(description) > 100) {
       ctx.throw(400, '证书简介不能超过200字节');
-    }
-    if (!['common', 'management', 'system'].includes(type)) {
-      ctx.throw(400, '请选择证书类型');
     }
     if (roleDB.type === 'system' && type !== 'system') {
       ctx.throw(400, '系统类证书无法更改证书类型');
@@ -110,7 +107,7 @@ router
       description,
       color,
       modifyPostTimeLimit,
-      type,
+      auto: !!auto,
       hidden: !!hidden,
     };
     if (role._id !== 'dev') {

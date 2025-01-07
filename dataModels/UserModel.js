@@ -263,6 +263,14 @@ userSchema
   .set(function (registerType) {
     this._registerType = registerType;
   });
+userSchema
+  .virtual('paperAD')
+  .get(function () {
+    return this._paperAD;
+  })
+  .set(function (paperAD) {
+    this._paperAD = paperAD;
+  });
 
 userSchema
   .virtual('paperA')
@@ -538,20 +546,27 @@ userSchema.statics.extendUsersSecretInfo = async (users) => {
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const ExamsCategoryModel = mongoose.model('examsCategories');
   const ExamsPaperModel = mongoose.model('examsPapers');
-  const proExamsCategories = await ExamsCategoryModel.find({ volume: 'B' });
-  const proExamsCategoriesObj = {},
-    proExamsCategoriesId = [];
-  for (const p of proExamsCategories) {
-    proExamsCategoriesId.push(p._id);
-    proExamsCategoriesObj[p._id] = p;
+  const examsCategories = await ExamsCategoryModel.find({});
+  const proExamsCategoriesObj = {};
+  const proExamsCategoriesId = [];
+  const pubExamsCategoriesObj = {};
+  const pubExamsCategoriesId = [];
+  const admissionExamsCategoriesObj = {};
+  const admissionExamsCategoriesId = [];
+
+  for (const category of examsCategories) {
+    if (category.volume === 'A') {
+      pubExamsCategoriesId.push(category._id);
+      pubExamsCategoriesObj[category._id] = category;
+    } else if (category.volume === 'B') {
+      proExamsCategoriesId.push(category._id);
+      proExamsCategoriesObj[category._id] = category;
+    } else if (category.volume === 'AD') {
+      admissionExamsCategoriesId.push(category._id);
+      admissionExamsCategoriesObj[category._id] = category;
+    }
   }
-  const pubExamsCategories = await ExamsCategoryModel.find({ volume: 'A' });
-  const pubExamsCategoriesObj = {},
-    pubExamsCategoriesId = [];
-  for (const p of pubExamsCategories) {
-    pubExamsCategoriesId.push(p._id);
-    pubExamsCategoriesObj[p._id] = p;
-  }
+
   const usersId = [],
     usersObj = {};
   for (const user of users) {
@@ -614,6 +629,16 @@ userSchema.statics.extendUsersSecretInfo = async (users) => {
       }).sort({ toc: 1 });
       if (paperB) {
         user.paperB = proExamsCategoriesObj[paperB.cid];
+      }
+    }
+    if (user.volumeAD) {
+      const paperAD = await ExamsPaperModel.findOne({
+        uid: user.uid,
+        passed: true,
+        cid: { $in: admissionExamsCategoriesId },
+      }).sort({ toc: 1 });
+      if (paperAD) {
+        user.paperAD = admissionExamsCategoriesObj[paperAD.cid];
       }
     }
     results.push(user);
