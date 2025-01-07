@@ -7,6 +7,11 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  modifyPasswordByMobile: 'modifyPasswordByMobile',
+  visitFindPasswordByMobile: 'visitFindPasswordByMobile',
+  modifyPasswordByEmail: 'modifyPasswordByEmail',
+  findPasswordSendVerifyEmail: 'findPasswordSendVerifyEmail',
+  visitFindPasswordByEmail: 'visitFindPasswordByEmail',
   visitExamPaperList: 'visitExamPaperList',
   visitEditor: 'visitEditor',
   getUserNavData: 'getUserNavData',
@@ -733,12 +738,7 @@ const DynamicOperations = {
   visitUserTransaction: 'visitUserTransaction',
   violationRecord: 'violationRecord',
   getUserOtherAccount: 'getUserOtherAccount',
-  visitFindPasswordByMobile: 'visitFindPasswordByMobile',
   findPasswordVerifyMobile: 'findPasswordVerifyMobile',
-  modifyPasswordByMobile: 'modifyPasswordByMobile',
-  visitFindPasswordByEmail: 'visitFindPasswordByEmail',
-  findPasswordSendVerifyEmail: 'findPasswordSendVerifyEmail',
-  modifyPasswordByEmail: 'modifyPasswordByEmail',
   findPasswordVerifyEmail: 'findPasswordVerifyEmail',
   APPgetScoreChange: 'APPgetScoreChange',
   blockCurrentActivity: 'blockCurrentActivity',
