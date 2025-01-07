@@ -52,7 +52,7 @@
               th
                 a(:href="item.url" target="_blank" v-if="item.url" ) 查看详情
                 span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')}}
-        table.table.table-bordered(v-else)
+        table.table.table-bordered.table-striped(v-else)
           thead
             tr
               th 时间
