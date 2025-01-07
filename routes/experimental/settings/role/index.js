@@ -1,13 +1,15 @@
 const Router = require('koa-router');
 const singleRouter = require('./singleRole');
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 const roleRouter = new Router();
 roleRouter
-  .use('/', async (ctx, next) => {
+  .use('/',OnlyOperation(Operations.visitRoleSettings),  async (ctx, next) => {
     const { data, db } = ctx;
     data.roles = await db.RoleModel.find().sort({ toc: 1 });
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/',OnlyOperation(Operations.visitRoleSettings), async (ctx, next) => {
     const { data, db } = ctx;
     const { roles } = data;
     data.roles = await Promise.all(
@@ -32,7 +34,7 @@ roleRouter
     ctx.template = 'experimental/settings/role/roles.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.addRole), async (ctx, next) => {
     const { tools, db, body, redis } = ctx;
     const { contentLength } = tools.checkString;
     const { _id, displayName, description, auto } = body.role;

@@ -1,11 +1,11 @@
 const router = require('koa-router')();
-const materialRouter = require('./material');
-const materialsRouter = require('./materials');
-const booksRouter = require('./books');
-const bookRouter = require('./book');
+// const materialRouter = require('./material');
+// const materialsRouter = require('./materials');
+// const booksRouter = require('./books');
+// const bookRouter = require('./book');
 const articlesRouter = require('./articles');
 const categoriesRouter = require('./categories');
-const categoryRouter = require('./category');
+// const categoryRouter = require('./category');
 const draftsRouter = require('./drafts');
 const draftRouter = require('./draft');
 const communityRouter = require('./community');
@@ -15,8 +15,9 @@ const zoneRouter = require('./zone');
 const collectionRouter = require('./collections');
 const homeRouter = require('./home');
 const blackListRouter = require('./blackList');
+const { OnlyUser } = require('../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, state, db } = ctx;
     if (ctx.query.t) {
       ctx.template = 'vueRoot/index.pug';
@@ -38,20 +39,15 @@ router
     ctx.state.navbar = 'full';
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     await next();
   })
   .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use('/materials', materialsRouter.routes(), materialsRouter.allowedMethods())
-  .use('/material', materialRouter.routes(), materialRouter.allowedMethods())
   .use(
     '/categories',
     categoriesRouter.routes(),
     categoriesRouter.allowedMethods(),
   )
-  .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
-  .use('/books', booksRouter.routes(), booksRouter.allowedMethods())
-  .use('/book', bookRouter.routes(), bookRouter.allowedMethods())
   .use('/articles', articlesRouter.routes(), articlesRouter.allowedMethods())
   .use('/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
   .use('/draft', draftRouter.routes(), draftRouter.allowedMethods())

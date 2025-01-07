@@ -1,31 +1,42 @@
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
+
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
-    const { data, db } = ctx;
-    data.editorSettings = await db.SettingModel.getSettings('editor');
-    ctx.template = 'experimental/settings/editor/editor.pug';
-    await next();
-  })
-  .put('/', async (ctx, next) => {
-    const { body, db } = ctx;
-    const { checkString } = ctx.nkcModules.checkData;
-    const { editorSettings } = body;
-    checkString(editorSettings.notes, {
-      name: '温馨提示',
-      minLength: 1,
-      maxLength: 10000,
-    });
-    await db.SettingModel.updateOne(
-      { _id: 'editor' },
-      {
-        $set: {
-          'c.notes': editorSettings.notes,
-          'c.onEditNotes': editorSettings.onEditNotes,
-          'c.notices': editorSettings.notices,
+  .get(
+    '/',
+    OnlyOperation(Operations.experimentalEditorSettings),
+    async (ctx, next) => {
+      const { data, db } = ctx;
+      data.editorSettings = await db.SettingModel.getSettings('editor');
+      ctx.template = 'experimental/settings/editor/editor.pug';
+      await next();
+    },
+  )
+  .put(
+    '/',
+    OnlyOperation(Operations.experimentalEditorSettings),
+    async (ctx, next) => {
+      const { body, db } = ctx;
+      const { checkString } = ctx.nkcModules.checkData;
+      const { editorSettings } = body;
+      checkString(editorSettings.notes, {
+        name: '温馨提示',
+        minLength: 1,
+        maxLength: 10000,
+      });
+      await db.SettingModel.updateOne(
+        { _id: 'editor' },
+        {
+          $set: {
+            'c.notes': editorSettings.notes,
+            'c.onEditNotes': editorSettings.onEditNotes,
+            'c.notices': editorSettings.notices,
+          },
         },
-      },
-    );
-    await db.SettingModel.saveSettingsToRedis('editor');
-    await next();
-  });
+      );
+      await db.SettingModel.saveSettingsToRedis('editor');
+      await next();
+    },
+  );
 module.exports = router;

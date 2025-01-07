@@ -1,9 +1,11 @@
 const Router = require('koa-router');
 const authDetailRouter = require('./[uid]');
+const { OnlyOperation } = require('../../../middlewares/permission');
+const { Operations } = require('../../../settings/operations');
 const authRouter = new Router();
 
 authRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.visitAuthList), async (ctx, next) => {
     const { data, db, query, params } = ctx;
     const { c = '' } = query;
     //  中英文逗号都能分割

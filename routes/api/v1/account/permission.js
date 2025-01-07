@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
 const router = new Router();
 
 const operationRelationType = {
@@ -6,7 +7,7 @@ const operationRelationType = {
   or: 'or',
 };
 
-router.get('/', async (ctx, next) => {
+router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { query } = ctx;
   const { type = operationRelationType.and, operations = '' } = query;
   const operationsId = operations.split(',').filter((operation) => !!operation);

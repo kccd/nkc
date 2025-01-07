@@ -1,7 +1,9 @@
+const { Public, OnlyUser } = require('../../middlewares/permission');
+
 const router = require('koa-router')();
 router
   // 小屏左侧抽屉
-  .get('/leftDraw', async (ctx, next) => {
+  .get('/leftDraw', Public(), async (ctx, next) => {
     const { data, state, db } = ctx;
     const homeSettings = await db.SettingModel.getSettings('home');
     // 是否启用了基金
@@ -20,7 +22,7 @@ router
     await next();
   })
   // 小屏右侧抽屉
-  .get('/userDraw', async (ctx, next) => {
+  .get('/userDraw', OnlyUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
     const { uid, username, avatar } = user;
@@ -53,7 +55,7 @@ router
     await next();
   })
   // 宽屏右侧用户卡片
-  .get('/userNav', async (ctx, next) => {
+  .get('/userNav', OnlyUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
     const {

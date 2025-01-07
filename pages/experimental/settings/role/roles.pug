@@ -46,7 +46,7 @@ block eContent
               tr
                 th ID
                 th 名称
-                th 颁发
+                th 颁发方式
                 th 用户数
                 th 其他
             tbody
@@ -54,7 +54,7 @@ block eContent
                 tr
                   th=role._id
                   th=`${role.defaultRole? '【默认证书】': ''}${role.displayName}`
-                  th=role.auto? '手动, 自动': "手动"
+                  th=role.auto? '手动+自动': "手动"
                   th=role.userCount
                   th
                     a.m-r-1(href=`/e/settings/role/${role._id}`) 编辑

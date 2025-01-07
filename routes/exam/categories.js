@@ -1,8 +1,10 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 const router = new Router();
 router
-  .get('/editor', async (ctx, next) => {
+  .get('/editor',OnlyOperation(Operations.visitEditCategory), async (ctx, next) => {
     ctx.template = 'exam/editCategory.pug';
     const { data, db, query } = ctx;
     const { cid } = query;
@@ -62,7 +64,7 @@ router
     data.categories = await db.ExamsCategoryModel.find();
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/',OnlyOperation(Operations.addExamsCategory), async (ctx, next) => {
     const { data, db, body, tools } = ctx;
     const { user } = data;
     const { contentLength } = tools.checkString;

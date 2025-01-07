@@ -1,9 +1,14 @@
 const router = require('koa-router')();
 const {
+  OnlyOperation,
+  OnlyUnbannedUser,
+} = require('../../middlewares/permission');
+const {
   blacklistCheckerService,
 } = require('../../services/blacklist/blacklistChecker.service');
+const { Operations } = require('../../settings/operations');
 router
-  .post('/xsf', async (ctx, next) => {
+  .post('/xsf', OnlyOperation(Operations.creditXsf), async (ctx, next) => {
     const { db, data, params, permission, body } = ctx;
     const { aid } = params;
     const { user } = data;
@@ -78,46 +83,50 @@ router
     await ctx.nkcModules.socket.sendMessageToUser(message._id);
     await next();
   })
-  .del('/xsf/:recordId', async (ctx, next) => {
-    //撤销学术分
-    const { data, db, params, query, permission } = ctx;
-    const { reason } = query;
-    const { user } = data;
-    const { aid, recordId } = params;
-    if (!permission('cancelXsf')) {
-      cxt.throw(403, '权限不足');
-    }
-    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
-    const record = await db.XsfsRecordModel.findOnly({
-      _id: recordId,
-      pid: aid,
-      type: xsfsRecordTypes.article,
-    });
-    const article = await db.ArticleModel.findOnly({ _id: aid });
-    const targetUser = await db.UserModel.findOnly({ uid: article.uid });
-    if (reason.length < 2) {
-      ctx.throw(400, '撤销原因写的太少啦~');
-    }
-    const oldXsf = targetUser.xsf;
-    targetUser.xsf -= record.num;
-    await targetUser.save();
-    try {
-      await record.updateOne({
-        reason,
-        tlm: Date.now(),
-        lmOperatorId: user.uid,
-        canceled: true,
-        lmOperatorIp: ctx.address,
-        lmOperatorPort: ctx.port,
+  .del(
+    '/xsf/:recordId',
+    OnlyOperation(Operations.cancelXsf),
+    async (ctx, next) => {
+      //撤销学术分
+      const { data, db, params, query, permission } = ctx;
+      const { reason } = query;
+      const { user } = data;
+      const { aid, recordId } = params;
+      if (!permission('cancelXsf')) {
+        cxt.throw(403, '权限不足');
+      }
+      const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
+      const record = await db.XsfsRecordModel.findOnly({
+        _id: recordId,
+        pid: aid,
+        type: xsfsRecordTypes.article,
       });
-    } catch (err) {
-      targetUser.xsf = oldXsf;
+      const article = await db.ArticleModel.findOnly({ _id: aid });
+      const targetUser = await db.UserModel.findOnly({ uid: article.uid });
+      if (reason.length < 2) {
+        ctx.throw(400, '撤销原因写的太少啦~');
+      }
+      const oldXsf = targetUser.xsf;
+      targetUser.xsf -= record.num;
       await targetUser.save();
-      throw err;
-    }
-    await next();
-  })
-  .post('/kcb', async (ctx, next) => {
+      try {
+        await record.updateOne({
+          reason,
+          tlm: Date.now(),
+          lmOperatorId: user.uid,
+          canceled: true,
+          lmOperatorIp: ctx.address,
+          lmOperatorPort: ctx.port,
+        });
+      } catch (err) {
+        targetUser.xsf = oldXsf;
+        await targetUser.save();
+        throw err;
+      }
+      await next();
+    },
+  )
+  .post('/kcb', OnlyUnbannedUser(), async (ctx, next) => {
     //鼓励评论用户
     const { db, data, params, permission, body, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock('creditKCB', 6000);
@@ -130,9 +139,9 @@ router
         article.uid,
       );
       let { num, description } = body;
-      if (!permission('creditKcb')) {
-        ctx.throw(403, '权限不足');
-      }
+      // if (!permission('creditKcb')) {
+      //   ctx.throw(403, '权限不足');
+      // }
       const fromUser = user;
       const creditScore = await db.SettingModel.getScoreByOperationType(
         'creditScore',
@@ -205,24 +214,28 @@ router
     }
     await next();
   })
-  .put('/kcb/:recordId', async (ctx, next) => {
-    //屏蔽鼓励信息
-    const { db, body, params } = ctx;
-    const { recordId, aid } = params;
-    const { hide } = body;
-    await db.KcbsRecordModel.updateOne(
-      {
-        _id: recordId,
-        articleId: aid,
-        type: 'creditKcb',
-      },
-      {
-        $set: {
-          hideDescription: !!hide,
+  .put(
+    '/kcb/:recordId',
+    OnlyOperation(Operations.modifyKcbRecordReason),
+    async (ctx, next) => {
+      //屏蔽鼓励信息
+      const { db, body, params } = ctx;
+      const { recordId, aid } = params;
+      const { hide } = body;
+      await db.KcbsRecordModel.updateOne(
+        {
+          _id: recordId,
+          articleId: aid,
+          type: 'creditKcb',
         },
-      },
-    );
-    await next();
-  });
+        {
+          $set: {
+            hideDescription: !!hide,
+          },
+        },
+      );
+      await next();
+    },
+  );
 
 module.exports = router;

@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
+const { Public } = require('../../middlewares/permission');
 const publicRouter = new Router();
-publicRouter.get('/public-paper/:pid', async (ctx, next) => {
+publicRouter.get('/public-paper/:pid', Public(), async (ctx, next) => {
   const {
     params: { pid },
     data,

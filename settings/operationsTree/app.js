@@ -31,7 +31,6 @@ module.exports = {
       GET: Operations.appVisitProfile,
     },
     sub: {
-      GET: Operations.appVisitProfile,
       user: {
         GET: Operations.appVisitProfile,
       },

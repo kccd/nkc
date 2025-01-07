@@ -1,7 +1,9 @@
 const Router = require('koa-router');
+const { Public, OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 const router = new Router();
 router
-  .get('/:_id/image', async (ctx, next) => {
+  .get('/:_id/image', Public(), async (ctx, next) => {
     const { params, db, settings } = ctx;
     const { _id } = params;
     const question = await db.QuestionModel.findOnly({ _id });
@@ -11,7 +13,7 @@ router
     ctx.type = 'jpg';
     await next();
   })
-  .del('/:_id', async (ctx, next) => {
+  .del('/:_id', OnlyOperation(Operations.removeQuestion), async (ctx, next) => {
     const { params, db, data } = ctx;
     const { user } = data;
     const { _id } = params;
@@ -25,44 +27,56 @@ router
     await question.deleteOne();
     await next();
   })
-  .post('/:_id/disabled', async (ctx, next) => {
-    const { db, params, body, tools } = ctx;
-    const { contentLength } = tools.checkString;
-    const { _id } = params;
-    const { reason } = body;
-    if (!reason) {
-      ctx.throw(400, '原因不能为空');
-    }
-    if (contentLength(reason) > 500) {
-      ctx.throw(400, '原因字数不能超过500');
-    }
-    const question = await db.QuestionModel.findOnly({ _id });
-    await question.updateOne({ disabled: true, reason });
-    await next();
-  })
-  .del('/:_id/disabled', async (ctx, next) => {
-    const { db, params } = ctx;
-    const { _id } = params;
-    const question = await db.QuestionModel.findOnly({ _id });
-    await question.updateOne({ disabled: false });
-    await next();
-  })
-  .put('/:_id/auth', async (ctx, next) => {
-    const { db, body, params } = ctx;
-    const { _id } = params;
-    const { auth } = body;
-    if (auth === null) {
-      await db.QuestionModel.updateOne(
-        {
-          _id,
-        },
-        {
-          $set: {
-            auth: null,
+  .post(
+    '/:_id/disabled',
+    OnlyOperation(Operations.disabledQuestion),
+    async (ctx, next) => {
+      const { db, params, body, tools } = ctx;
+      const { contentLength } = tools.checkString;
+      const { _id } = params;
+      const { reason } = body;
+      if (!reason) {
+        ctx.throw(400, '原因不能为空');
+      }
+      if (contentLength(reason) > 500) {
+        ctx.throw(400, '原因字数不能超过500');
+      }
+      const question = await db.QuestionModel.findOnly({ _id });
+      await question.updateOne({ disabled: true, reason });
+      await next();
+    },
+  )
+  .del(
+    '/:_id/disabled',
+    OnlyOperation(Operations.enabledQuestion),
+    async (ctx, next) => {
+      const { db, params } = ctx;
+      const { _id } = params;
+      const question = await db.QuestionModel.findOnly({ _id });
+      await question.updateOne({ disabled: false });
+      await next();
+    },
+  )
+  .put(
+    '/:_id/auth',
+    OnlyOperation(Operations.modifyQuestionAuthStatus),
+    async (ctx, next) => {
+      const { db, body, params } = ctx;
+      const { _id } = params;
+      const { auth } = body;
+      if (auth === null) {
+        await db.QuestionModel.updateOne(
+          {
+            _id,
           },
-        },
-      );
-    }
-    await next();
-  });
+          {
+            $set: {
+              auth: null,
+            },
+          },
+        );
+      }
+      await next();
+    },
+  );
 module.exports = router;

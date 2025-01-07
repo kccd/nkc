@@ -1,5 +1,7 @@
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { db, data, nkcModules } = ctx;
   const homeSettings = await db.SettingModel.getSettings('home');
   const fundSettings = await db.SettingModel.getSettings('fund');

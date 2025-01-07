@@ -10,8 +10,9 @@ const recordRouter = require('./record');
 const questionsRouter = require('./questions');
 const publicRouter = require('./public');
 const { questionService } = require('../../services/exam/question.service');
+const { Public, OnlyUser } = require('../../middlewares/permission');
 examRouter
-  .use(async (ctx, next) => {
+  .use(Public(), async (ctx, next) => {
     const { db, data } = ctx;
     const papers = await db.ExamsPaperModel.find({
       submitted: false,
@@ -41,7 +42,7 @@ examRouter
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, state } = ctx;
     ctx.template = 'exam/home.pug';
     const categoryTypes = await db.ExamsCategoryModel.getExamCategoryTypes();

@@ -1,7 +1,8 @@
-const { subscribeSources } = require("../../../settings/subscribe");
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const { subscribeSources } = require('../../../settings/subscribe');
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, data, query, db, nkcModules } = ctx;
     const { user } = data;
     const { t, page, c } = query;
@@ -63,7 +64,7 @@ router
     data.paging = paging;
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, data } = ctx;
     const { type, subscribesId, typesId } = body;
     if (type === 'modifyType') {

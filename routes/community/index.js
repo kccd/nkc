@@ -10,10 +10,11 @@ const { userForumService } = require('../../services/user/userForum.service');
 const newRouter = require('./new');
 const subRouter = require('./sub');
 const { forumListService } = require('../../services/forum/forumList.service');
+const { Public } = require('../../middlewares/permission');
 const communityTab = { new: 'new', subscribe: 'subscribe', home: 'home' };
 router
   // 访问控制，判断后台是否禁用了社区的访问
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { state, db, data } = ctx;
     await db.ForumModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -24,7 +25,7 @@ router
     await next();
   })
   // 论坛各页面右侧统一数据
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, data, internalData } = ctx;
     const { user } = data;
     const toolSettings = await db.SettingModel.getSettings('tools');
@@ -95,7 +96,7 @@ router
     await next();
   })
   // 论坛首页
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, data, internalData } = ctx;
     const { fidOfCanGetThreads } = internalData;
     const { user } = data;
@@ -177,7 +178,7 @@ router
     );
     await next();
   })
-  .use(['/new', '/sub'], async (ctx, next) => {
+  .use(['/new', '/sub'], Public(), async (ctx, next) => {
     const { data, state } = ctx;
     if (state.uid) {
       data.visitedForums = await forumListService.getUserVisitedForums(

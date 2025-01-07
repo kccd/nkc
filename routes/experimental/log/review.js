@@ -1,89 +1,101 @@
-const Router = require("koa-router");
+const Router = require('koa-router');
+const { OnlyOperation } = require('../../../middlewares/permission');
+const { Operations } = require('../../../settings/operations');
 const router = new Router();
-router
-  .get("/", async (ctx, next) => {
-    const {nkcModules, data, db, query} = ctx;
-    const {page=0} = query;
+router.get(
+  '/',
+  OnlyOperation(Operations.experimentalReviewLog),
+  async (ctx, next) => {
+    const { nkcModules, data, db, query } = ctx;
+    const { page = 0 } = query;
     const count = await db.ReviewModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     const documentSources = await db.DocumentModel.getDocumentSources();
     const reviewSources = await db.ReviewModel.getDocumentSources();
-    const reviews = await db.ReviewModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const reviews = await db.ReviewModel.find()
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
     const uids = new Set();
     const pids = new Set();
     const tids = new Set();
     const documentsId = new Set();
     const notesId = new Set();
 
-    reviews.map(r => {
+    reviews.map((r) => {
       uids.add(r.uid);
       uids.add(r.handlerId);
-      if(r.source === reviewSources.post) {
+      if (r.source === reviewSources.post) {
         pids.add(r.sid);
-      } else if(r.source === reviewSources.document) {
+      } else if (r.source === reviewSources.document) {
         documentsId.add(r.sid);
-      } else if(r.source === reviewSources.note) {
+      } else if (r.source === reviewSources.note) {
         notesId.add(r.sid);
       }
     });
-    const users = await db.UserModel.find({uid: {$in: [...uids]}});
-    const posts = await db.PostModel.find({pid: {$in: [...pids]}});
+    const users = await db.UserModel.find({ uid: { $in: [...uids] } });
+    const posts = await db.PostModel.find({ pid: { $in: [...pids] } });
     const documents = await db.DocumentModel.find({
       _id: {
-        $in: [...documentsId]
-      }
+        $in: [...documentsId],
+      },
     });
-    const noteContents = await db.NoteContentModel.find({_id: {$in: [...notesId]}}, {noteId: 1, _id: 1});
+    const noteContents = await db.NoteContentModel.find(
+      { _id: { $in: [...notesId] } },
+      { noteId: 1, _id: 1 },
+    );
     const noteIdForNoteContentIdObj = {};
-    for(const noteContent of noteContents) {
+    for (const noteContent of noteContents) {
       noteIdForNoteContentIdObj[noteContent._id] = noteContent.noteId;
     }
-    const documentsUrl = await db.DocumentModel.getDocumentsUrlByDocumentsId([...documentsId]);
+    const documentsUrl = await db.DocumentModel.getDocumentsUrlByDocumentsId([
+      ...documentsId,
+    ]);
     const usersObj = {};
     const postsObj = {};
     const threadsObj = {};
     const documentsObj = {};
-    documents.map(document => {
+    documents.map((document) => {
       documentsObj[document._id] = document;
     });
-    users.map(user => {
+    users.map((user) => {
       usersObj[user.uid] = user;
     });
-    posts.map(post => {
+    posts.map((post) => {
       postsObj[post.pid] = post;
       tids.add(post.tid);
     });
-    let threads = await db.ThreadModel.find({tid: {$in: [...tids]}});
+    let threads = await db.ThreadModel.find({ tid: { $in: [...tids] } });
     threads = await db.ThreadModel.extendThreads(threads, {
       category: false,
       lastPost: false,
       lastPostUser: false,
       firstPostResource: false,
-      forum: false
+      forum: false,
     });
-    threads.map(thread => {
+    threads.map((thread) => {
       threadsObj[thread.tid] = thread;
     });
     data.reviews = [];
-    for(let review of reviews) {
-      const {uid, handlerId, pid, source, sid} = review;
+    for (let review of reviews) {
+      const { uid, handlerId, pid, source, sid } = review;
       review = review.toObject();
 
       review.time = nkcModules.tools.timeFormat(review.toc);
 
       review.typeInfo = '未知';
-      if(source === reviewSources.post) {
+      if (source === reviewSources.post) {
         const post = postsObj[sid];
-        if(!post) continue;
-        if(post.type === 'thread') {
+        if (!post) continue;
+        if (post.type === 'thread') {
           review.typeInfo = '社区文章';
         } else {
           review.typeInfo = '社区回复/评论';
         }
         review.link = await db.PostModel.getUrl(sid);
-      } else if(source === reviewSources.document) {
+      } else if (source === reviewSources.document) {
         const document = documentsObj[sid];
-        switch(document.source) {
+        switch (document.source) {
           case documentSources.article: {
             review.typeInfo = '独立文章';
             break;
@@ -96,44 +108,45 @@ router
             review.typeInfo = '独立文章评论';
             break;
           }
-          default: break;
+          default:
+            break;
         }
         review.link = documentsUrl[document._id];
-      } else if(source === reviewSources.note) {
+      } else if (source === reviewSources.note) {
         review.typeInfo = '笔记';
         const noteId = noteIdForNoteContentIdObj[sid];
-        review.link = nkcModules.tools.getUrl("noteContent", noteId, sid);
+        review.link = nkcModules.tools.getUrl('noteContent', noteId, sid);
       }
 
-      if(review.uid) {
+      if (review.uid) {
         const user = usersObj[uid];
         review.user = {
           username: user.username,
-          uid: user.uid
+          uid: user.uid,
         };
       }
 
-      if(review.handlerId) {
+      if (review.handlerId) {
         const handler = usersObj[handlerId];
         review.handler = {
           username: handler.username,
-          uid: handler.uid
+          uid: handler.uid,
         };
       }
 
-      if(review.source === reviewSources.post) {
+      if (review.source === reviewSources.post) {
         const post = postsObj[pid];
-        if(!post) continue;
+        if (!post) continue;
         const thread = threadsObj[post.tid];
-        if(!thread) continue;
-        if(post.type === 'thread') {
+        if (!thread) continue;
+        if (post.type === 'thread') {
           review.thread = {
             tid: thread.tid,
             toc: thread.toc,
             firstPost: {
               t: thread.firstPost.t,
-              c: thread.firstPost.c
-            }
+              c: thread.firstPost.c,
+            },
           };
         } else {
           review.post = {
@@ -141,18 +154,18 @@ router
             t: post.t,
             c: post.c,
             toc: post.toc,
-            tid: post.tid
+            tid: post.tid,
           };
         }
       }
-
 
       // review.link = `/t/${thread.tid}?page=${step.page}&highlight=${pid}#${pid}`;
 
       data.reviews.push(review);
     }
     data.paging = paging;
-    ctx.template = "experimental/log/review.pug";
+    ctx.template = 'experimental/log/review.pug';
     await next();
-  });
+  },
+);
 module.exports = router;

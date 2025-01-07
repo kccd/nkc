@@ -6,7 +6,5 @@ const noticeRouter = require('./notice');
 const listRouter = require('./list');
 homeRouter
   .use('/list', listRouter.routes(), listRouter.allowedMethods())
-	.use('/notice', noticeRouter.routes(), noticeRouter.allowedMethods())
-	.use('/logo', logoRouter.routes(), topRouter.allowedMethods())
-	.use('/top', topRouter.routes(), topRouter.allowedMethods());
+  .use('/notice', noticeRouter.routes(), noticeRouter.allowedMethods());
 module.exports = homeRouter;

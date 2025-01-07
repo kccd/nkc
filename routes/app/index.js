@@ -9,9 +9,10 @@ const upgradeRouter = require('./upgrade');
 const accountRouter = require('./account');
 const ProfileRouter = require('./profile');
 const videoPlayerRouter = require('./videoPlayer');
+const { Public } = require('../../middlewares/permission');
 const { androidSavePath, iosSavePath } = upload;
 appRouter
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, data } = ctx;
     data.stable = await db.AppVersionModel.findOne({
       appPlatForm: 'android',
@@ -21,7 +22,7 @@ appRouter
     ctx.template = 'app/index.pug';
     await next();
   })
-  .get('/android/:hash', async (ctx, next) => {
+  .get('/android/:hash', Public(), async (ctx, next) => {
     const { fs, db, params } = ctx;
     const { hash } = params;
     const q = {
@@ -46,7 +47,7 @@ appRouter
     ctx.filePath = path;
     await next();
   })
-  .get('/ios/:hash', async (ctx, next) => {
+  .get('/ios/:hash', Public(), async (ctx, next) => {
     const { fs, db, params } = ctx;
     const { hash } = params;
     const q = {
@@ -71,7 +72,7 @@ appRouter
     ctx.filePath = url;
     await next();
   })
-  .get('/location', async (ctx, next) => {
+  .get('/location', Public(), async (ctx, next) => {
     const { data, nkcModules } = ctx;
     data.location = nkcModules.location;
     await next();

@@ -1,5 +1,7 @@
+const { Public } = require('../../../../middlewares/permission');
+
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+router.get('/', Public(), async (ctx, next) => {
   const { data, state, nkcModules } = ctx;
   const accountInfo = {
     logged: false,

@@ -6,10 +6,10 @@ const {
 } = require('../../../../nkcModules/error');
 const { ResponseTypes } = require('../../../../settings/response');
 const router = require('koa-router')();
-const { OnlyUser } = require('../../../../middlewares/permission');
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
 const { DynamicOperations } = require('../../../../settings/operations.js');
 
-router.put('/', OnlyUser(), async (ctx, next) => {
+router.put('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { body, params, state } = ctx;
   const { fields, files } = body;
   const { questionId } = params;
