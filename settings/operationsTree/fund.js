@@ -1,9 +1,6 @@
 const { Operations } = require('../operations.js');
 module.exports = {
   GET: Operations.visitFundHome,
-  add: {
-    GET: Operations.visitAddFund,
-  },
   info: {
     GET: Operations.visitFundInfo,
   },
@@ -31,7 +28,6 @@ module.exports = {
     GET: Operations.visitFundObjectList,
     POST: Operations.addFund,
     PARAMETER: {
-      DELETE: Operations.deleteFundObject,
       GET: Operations.visitFundObjectHome,
       settings: {
         GET: Operations.singleFundSettings,
@@ -49,18 +45,9 @@ module.exports = {
   donation: {
     GET: Operations.fundDonation,
     POST: Operations.fundDonation,
-    return: {
-      GET: Operations.fundDonation,
-    },
-    verify: {
-      POST: Operations.fundDonation,
-    },
   },
   history: {
     GET: Operations.visitHistoryFundList,
-    PARAMETER: {
-      GET: Operations.visitHistoryFund,
-    },
   },
   disabled: {
     GET: Operations.visitDisabledFundList,
@@ -75,7 +62,6 @@ module.exports = {
     PARAMETER: {
       GET: Operations.visitFundApplicationForm,
       POST: Operations.restoreFundApplicationForm,
-      PUT: Operations.modifyApplicationForm,
       DELETE: Operations.deleteApplicationForm,
       report: {
         GET: Operations.visitFundApplicationReport,
@@ -138,12 +124,6 @@ module.exports = {
           POST: Operations.refundFundApplicationForm,
         },
       },
-      /*comment: {
-				POST: Operations.addFundApplicationComment,
-				PARAMETER: {
-					DELETE: Operations.deleteFundApplicationComment
-				}
-			},*/
       member: {
         PUT: Operations.modifyFundApplicationMember,
       },

@@ -1,9 +1,16 @@
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
+
 const router = require('koa-router')();
-router.post('/', async (ctx, next) => {
-  const { data, state } = ctx;
-  const { applicationForm } = data;
-  await applicationForm.fund.checkFundRole(state.uid, 'admin');
-  await applicationForm.setUselessAsTimeout(state.uid);
-  await next();
-});
+router.post(
+  '/',
+  OnlyOperation(Operations.timeoutFundApplicationForm),
+  async (ctx, next) => {
+    const { data, state } = ctx;
+    const { applicationForm } = data;
+    await applicationForm.fund.checkFundRole(state.uid, 'admin');
+    await applicationForm.setUselessAsTimeout(state.uid);
+    await next();
+  },
+);
 module.exports = router;

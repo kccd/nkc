@@ -1,7 +1,8 @@
 const Router = require('koa-router');
 const meRouter = new Router();
 const apiFn = require('../../nkcModules/apiFunction');
-meRouter.get('/', async (ctx, next) => {
+const { OnlyUser } = require('../../middlewares/permission');
+meRouter.get('/', OnlyUser(), async (ctx, next) => {
   const { data, db, query } = ctx;
   const { user } = data;
   const { type = 'created', page = 0 } = query;

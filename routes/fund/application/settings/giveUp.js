@@ -5,8 +5,9 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
 const router = require('koa-router')();
-router.post('/', async (ctx, next) => {
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, body, nkcModules, state } = ctx;
   const { reason } = body;
   const { applicationForm } = data;

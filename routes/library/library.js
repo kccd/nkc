@@ -1,8 +1,8 @@
 const router = require('koa-router')();
 const listRouter = require('./list');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, Public } = require('../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, params, data } = ctx;
     const { lid } = params;
     const library = await db.LibraryModel.findOne({ _id: lid });
@@ -33,7 +33,7 @@ router
     data.library = library;
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     // 文件夹下的文件及文件夹信息
     const { data, query, db } = ctx;
     const { folder, file, nav, path, info, permission } = query;
