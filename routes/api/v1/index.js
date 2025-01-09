@@ -12,6 +12,7 @@ const examRouter = require('./exam');
 const forumsRouter = require('./forums');
 const registerRouter = require('./register');
 const zoneRouter = require('./zone');
+const settingsRouter = require('./settings');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
@@ -24,5 +25,6 @@ router
   .use('/exam', examRouter.routes(), examRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/thread/:tid', threadRouter.routes(), threadRouter.allowedMethods())
+  .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 module.exports = router;

@@ -170,5 +170,12 @@ module.exports = {
         },
       },
     },
+    settings: {
+      publish: {
+        permission: {
+          GET: Operations.getPublishPermission,
+        },
+      },
+    },
   },
 };
