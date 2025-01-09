@@ -29,6 +29,7 @@ subscribeRouter
     await subscribeUserService.checkSubscribeUser(user.uid, targetUid);
     await subscribeUserService.subscribeUser(user.uid, targetUid, cid);
     await db.SubscribeModel.saveUserSubUsersId(user.uid);
+    await db.SubscribeModel.saveUserFansId(targetUid);
     await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({ uid: targetUid });
     await db.KcbsRecordModel.insertSystemRecord(
@@ -56,6 +57,7 @@ subscribeRouter
       targetUid,
     );
     await db.SubscribeModel.saveUserSubUsersId(user.uid);
+    await db.SubscribeModel.saveUserFansId(targetUid);
     await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({ uid: targetUid });
     await db.KcbsRecordModel.insertSystemRecord(
