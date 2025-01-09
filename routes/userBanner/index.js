@@ -1,8 +1,9 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const tools = require('../../nkcModules/tools');
 router
-  .post('/:uid', OnlyUser(), async (ctx, next) => {
+  .post('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, params, body, db } = ctx;
     const { uid } = params;
     const { user } = data;
@@ -15,9 +16,12 @@ router
     }
     const attachment = await db.AttachmentModel.saveUserBanner(uid, file);
     user.banner = attachment._id;
+    ctx.apiData = {
+      url: tools.getUrl('userBanner', attachment._id),
+    };
     await next();
   })
-  .post('/:uid/homeBanner', OnlyUser(), async (ctx, next) => {
+  .post('/:uid/homeBanner', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, params, body, db } = ctx;
     const { uid } = params;
     const { user } = data;
@@ -30,6 +34,9 @@ router
     }
     const attachment = await db.AttachmentModel.saveUserHomeBanner(uid, file);
     user.userBanner = attachment._id;
+    ctx.apiData = {
+      url: tools.getUrl('userHomeBanner', attachment._id),
+    };
     await next();
   });
 

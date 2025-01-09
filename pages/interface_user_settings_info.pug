@@ -33,25 +33,25 @@ block content
                 label.col-sm-2.control-label 用户背景：
                 .col-sm-10
                   .user-settings-img-banner
-                    img#userBanner(
-                      src=bannerUrl
-                      style='width: 100%;'
-                      data-global-click='viewImage'
-                      data-global-data=objToStr({name: 'banner', url: bannerUrl})
-                      )
+                    div
+                      img#userBanner(
+                        src=bannerUrl
+                        data-global-click='viewImage'
+                        data-global-data=objToStr({name: 'banner', url: bannerUrl})
+                        )
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectBanner()') 选择图片
                       h5.upload-info-banner
               .form-group
                 label.col-sm-2.control-label 主页背景：
                 .col-sm-10
-                  .user-settings-img-banner
-                    img#userBackBanner(
-                      src=homeBannerUrl
-                      style='width: 100%;'
-                      data-global-click='viewImage'
-                      data-global-data=objToStr({name: 'homeBanner', url: homeBannerUrl})
-                      )
+                  .user-settings-img-home-banner
+                    div
+                      img#userBackBanner(
+                        src=homeBannerUrl
+                        data-global-click='viewImage'
+                        data-global-data=objToStr({name: 'homeBanner', url: homeBannerUrl})
+                        )
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectBackBanner()') 选择图片
                       h5.upload-info-home-banner
