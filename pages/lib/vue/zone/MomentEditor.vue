@@ -2,6 +2,8 @@
   .moment-editor
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.moment")
     .content-body
       .textarea-editor-container
         editor-core(ref="editorCore" @content-change="onEditorContentChange" @click-ctrl-enter="onClickEnter")
@@ -293,6 +295,8 @@ import { nkcAPI } from '../../js/netAPI';
 import EmojiSelector from '../EmojiSelector';
 import EditorCore from './EditorCore.plain.vue';
 import { visitUrl } from '../../js/pageSwitch';
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
+import { publishPermissionTypes } from '../../js/publish';
 import {
   Home as HomeIcon,
   AddPicture,
@@ -317,8 +321,10 @@ export default {
     'video-two': VideoTwo,
     'winking-face': WinkingFace,
     'newspaper-folding': NewspaperFolding,
+    'publish-permission-checker': PublishPermissionChecker,
   },
   data: () => ({
+    publishPermissionTypes,
     submitting: false,
     textareaHeight: '0',
     maxContentLength: 1000,

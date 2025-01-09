@@ -51,7 +51,7 @@ const visitRouter = require('./visit');
 const ipRouter = require('./ip');
 const fundRouter = require('./fund');
 const complaintRouter = require('./complaint');
-const documentPostRouter = require('./documentPost');
+const publishRouter = require('./publish');
 const oauth = require('./oauth');
 const noteRouter = require('./note');
 settingRouter
@@ -130,11 +130,7 @@ settingRouter
     threadCategoryRouter.routes(),
     threadCategoryRouter.allowedMethods(),
   )
-  .use(
-    '/documentPost',
-    documentPostRouter.routes(),
-    documentPostRouter.allowedMethods(),
-  )
+  .use('/publish', publishRouter.routes(), publishRouter.allowedMethods())
   .use('/oauth', oauth.routes(), oauth.allowedMethods())
   .use('/note', noteRouter.routes(), noteRouter.allowedMethods());
 module.exports = settingRouter;

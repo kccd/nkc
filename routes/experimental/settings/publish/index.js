@@ -1,21 +1,23 @@
 const { OnlyOperation } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations');
-
+const { settingIds } = require('../../../../settings/serverSettings');
 const router = require('koa-router')();
 router
   .get(
     '/',
-    OnlyOperation(Operations.experimentalDocumentPostSettings),
+    OnlyOperation(Operations.experimentalPublishSettings),
     async (ctx, next) => {
       const { db, data, state } = ctx;
-      data.documentPostSettings = await db.SettingModel.getSettings(
-        'documentPost',
+      data.publishSettings = await db.SettingModel.getSettings(
+        settingIds.publish,
       );
       const sources = await db.DocumentModel.getDocumentSources();
+      sources.thread = 'thread';
+      sources.post = 'post';
       data.sources = [];
       for (const sourceName in sources) {
         const sourceValue = sources[sourceName];
-        const name = state.lang('documentSources', sourceValue);
+        const name = state.lang('publishSources', sourceValue);
         data.sources.push({
           name,
           type: sourceValue,
@@ -31,36 +33,44 @@ router
           name,
         });
       }
-      ctx.template = 'experimental/settings/documentPost/documentPost.pug';
+      ctx.template = 'experimental/settings/publish/publish.pug';
       await next();
     },
   )
   .put(
     '/',
-    OnlyOperation(Operations.experimentalDocumentPostSettings),
+    OnlyOperation(Operations.experimentalPublishSettings),
     async (ctx, next) => {
       const { db, body, nkcModules, state } = ctx;
-      const { documentPostSettings } = body;
+      const { publishSettings } = body;
       const { checkNumber } = nkcModules.checkData;
       const sources = await db.DocumentModel.getDocumentSources();
       const sourcesType = Object.values(sources);
       const sourcesObj = {};
       for (const s of sourcesType) {
-        sourcesObj[s] = state.lang('documentSources', s);
+        sourcesObj[s] = state.lang('publishSources', s);
       }
-      for (const sourceType in documentPostSettings) {
+      for (const sourceType in publishSettings) {
         const sourceName = sourcesObj[sourceType];
-        const { postPermission, postReview } = documentPostSettings[sourceType];
+        const { postPermission, postReview } = publishSettings[sourceType];
         if (![0, 1, 2, 3].includes(postPermission.authLevelMin)) {
           ctx.throw(
             400,
             `最小认证等级错误 authLevelMin=${postPermission.authLevelMin}`,
           );
         }
+        postPermission.examVolumeAD = !!postPermission.examVolumeAD;
         postPermission.examVolumeA = !!postPermission.examVolumeA;
         postPermission.examVolumeB = !!postPermission.examVolumeB;
+        if (
+          !postPermission.examVolumeAD &&
+          !postPermission.examVolumeA &&
+          !postPermission.examVolumeB
+        ) {
+          ctx.throw(400, `${sourceName} - 请至少勾选一种考试`);
+        }
         checkNumber(postPermission.examNotPass.count, {
-          name: `${sourceName} - 未考试时发表条数`,
+          name: `${sourceName} - 未考试用户发表条数限制`,
           min: 1,
         });
         postPermission.examNotPass = {
@@ -87,11 +97,12 @@ router
         };
         let _intervalLimit = [];
         for (const item of postPermission.intervalLimit) {
-          if (!item.id)
+          if (!item.id) {
             ctx.throw(
               400,
               `${sourceName} - 发表间隔限制中存在未选择角色的配置`,
             );
+          }
           checkNumber(item.interval, {
             name: `${sourceName} - ${item.id} - 发表间隔`,
             min: 0,
@@ -106,11 +117,12 @@ router
         postPermission.intervalLimit = _intervalLimit;
         let _countLimit = [];
         for (const item of postPermission.countLimit) {
-          if (!item.id)
+          if (!item.id) {
             ctx.throw(
               400,
               `${sourceName} - 发表条数限制中存在未选择角色的配置`,
             );
+          }
           checkNumber(item.count, {
             name: `${sourceName} - ${item.id} - 发表条数`,
             min: 0,
@@ -141,11 +153,12 @@ router
         };
         const _blacklist = [];
         for (const item of postReview.blacklist) {
-          if (!item.id)
+          if (!item.id) {
             ctx.throw(
               400,
               `${sourceName} - 审核条数设置中存在未选择角色的配置`,
             );
+          }
           checkNumber(item.count, {
             name: `${sourceName} - ${item.id} - 审核条数`,
             min: 0,
@@ -159,14 +172,14 @@ router
         postReview.blacklist = _blacklist;
       }
       await db.SettingModel.updateOne(
-        { _id: 'documentPost' },
+        { _id: settingIds.publish },
         {
           $set: {
-            c: documentPostSettings,
+            c: publishSettings,
           },
         },
       );
-      await db.SettingModel.saveSettingsToRedis('documentPost');
+      await db.SettingModel.saveSettingsToRedis(settingIds.publish);
       await next();
     },
   );

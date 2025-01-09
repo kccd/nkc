@@ -52,6 +52,8 @@
         moment-files(:data="commentData.files")
       .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
       .moment-comment-reply-editor(v-if="replyEditorStatus")
+        .permission-checker
+          publish-permission-checker(:type="publishPermissionTypes.moment")
         .m-b-05
           editor-core(
             ref="editorCore"
@@ -119,6 +121,8 @@ import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';
 import { immediateDebounce } from '../../js/execution';
 import { lazyLoadInit } from '../../js/lazyLoad';
+import { publishPermissionTypes } from '../../js/publish';
+import PublishPermissionCheck from '../PublishPermissionCheck.vue';
 const state = getState();
 const iconFill = {
   normal: '#555',
@@ -157,8 +161,10 @@ export default {
     'emoji-selector': EmojiSelector,
     'moment-files': MomentFiles,
     'resource-selector': ResourceSelector,
+    'publish-permission-checker': PublishPermissionCheck,
   },
   data: () => ({
+    publishPermissionTypes,
     logged: !!state.uid,
     replyEditorStatus: false,
     replyContent: '',

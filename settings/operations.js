@@ -7,6 +7,7 @@
 
 // 固定的、无需在后台证书权限处配置的操作，不会经过全局权限判断
 const FixedOperations = {
+  getPublishPermission: 'getPublishPermission',
   visitFundBlacklist: 'visitFundBlacklist',
   visitHistoryFundList: 'visitHistoryFundList',
   fundApplicationFormRefund: 'fundApplicationFormRefund',
@@ -351,7 +352,6 @@ const FixedOperations = {
   modifyUserBanner: 'modifyUserBanner',
   getUserAvatar: 'getUserAvatar',
   uploadUserAvatar: 'uploadUserAvatar',
-  auditorVisitVerifiedUpload: 'auditorVisitVerifiedUpload',
   visitUserCard: 'visitUserCard',
   getUserHomeInfo: 'getUserHomeInfo',
   getUserHomeCard: 'getUserHomeCard',
@@ -436,6 +436,7 @@ const FixedOperations = {
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
 const DynamicOperations = {
+  auditorVisitVerifiedUpload: 'auditorVisitVerifiedUpload',
   sendPhoneMessage: 'sendPhoneMessage',
   modifyOtherPosts: 'modifyOtherPosts',
   modifyOtherArticles: 'modifyOtherArticles',
@@ -584,7 +585,7 @@ const DynamicOperations = {
   experimentalShareSettings: 'experimentalShareSettings',
   visitEPostSettings: 'visitEPostSettings',
   modifyEPostSettings: 'modifyEPostSettings',
-  experimentalDocumentPostSettings: 'experimentalDocumentPostSettings',
+  experimentalPublishSettings: 'experimentalPublishSettings',
   experimentalSubSettings: 'experimentalSubSettings',
   experimentalRegisterSettings: 'experimentalRegisterSettings',
   experimentalSafeSettings: 'experimentalSafeSettings',

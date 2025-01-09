@@ -5,6 +5,7 @@ const settingIds = {
   complaint: 'complaint',
   counters: 'counters',
   documentPost: 'documentPost',
+  publish: 'publish',
   download: 'download',
   editor: 'editor',
   email: 'email',
@@ -45,6 +46,15 @@ const settingIds = {
   xsf: 'xsf',
 };
 
+const publishPermissionTypes = {
+  thread: 'thread',
+  post: 'post',
+  article: 'article',
+  draft: 'draft',
+  comment: 'comment',
+  moment: 'moment',
+};
 module.exports = {
   settingIds,
+  publishPermissionTypes,
 };

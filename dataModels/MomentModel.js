@@ -830,6 +830,10 @@ schema.methods.checkBeforePublishing = async function () {
   const {
     momentCheckerService,
   } = require('../services/moment/momentChecker.service');
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const betaDocument = await DocumentModel.getBetaDocumentBySource(
     momentSource,
     this._id,
@@ -838,7 +842,10 @@ schema.methods.checkBeforePublishing = async function () {
     ThrowCommonError(500, `动态数据错误 momentId=${this._id}`);
   }
   // 检测发表权限
-  await DocumentModel.checkGlobalPostPermission(this.uid, momentSource);
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.moment,
+    this.uid,
+  );
   if (!this.quoteType || !this.quoteId) {
     const { getLength } = require('../nkcModules/checkData');
     if (this.mode === momentModes.plain) {
@@ -1191,6 +1198,10 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
   const { uid, content, parent, ip, port, resourcesId } = props;
   const MomentModel = mongoose.model('moments');
   const DocumentModel = mongoose.model('documents');
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const parentComment = await MomentModel.findOne(
     { _id: parent },
     { parent: 1, parents: 1, uid: 1 },
@@ -1202,8 +1213,10 @@ schema.statics.createMomentCommentChildAndPublish = async (props) => {
     { _id: parentComment.parents[0] },
     { uid: 1 },
   );
-  const documentSource = await DocumentModel.getDocumentSources();
-  await DocumentModel.checkGlobalPostPermission(uid, documentSource.moment);
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.moment,
+    this.uid,
+  );
   const time = new Date();
   const moment = await MomentModel.createCommentChild({
     ip,

@@ -277,9 +277,9 @@ module.exports = {
       GET: Operations.visitEPostSettings,
       PUT: Operations.modifyEPostSettings,
     },
-    documentPost: {
-      GET: Operations.experimentalDocumentPostSettings,
-      PUT: Operations.experimentalDocumentPostSettings,
+    publish: {
+      GET: Operations.experimentalPublishSettings,
+      PUT: Operations.experimentalPublishSettings,
     },
     sub: {
       GET: Operations.experimentalSubSettings,
