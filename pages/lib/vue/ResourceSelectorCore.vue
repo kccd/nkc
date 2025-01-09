@@ -168,271 +168,268 @@
 
 </template>
 <style lang="less" scoped>
-  @import "../../publicModules/base";
-  .resource-category-container {
-    user-select: none;
-    .resource-container-header {
-      .resource-uses {
+@import '../../publicModules/base';
+.resource-category-container {
+  user-select: none;
+  .resource-container-header {
+    .resource-uses {
+      display: inline-block;
+      padding-right: 1rem;
+      border-right: 1px #ccc solid;
+      margin-right: 1rem;
+      .resource-used {
         display: inline-block;
-        padding-right: 1rem;
-        border-right: 1px #ccc solid;
-        margin-right: 1rem;
-        .resource-used {
-          display: inline-block;
-          padding: 0.2rem;
-          border: 1px #ccc solid;
-          border-radius: 3px;
-          margin: 0 0.2rem;
-          //background: #9baec8;
-          color: #fff;
-          cursor: pointer;
-          &:nth-of-type(1){
-            margin-left: 0;
-          }
-          &:hover {
-            //background: #2b90d9;
-          }
+        padding: 0.2rem;
+        border: 1px #ccc solid;
+        border-radius: 3px;
+        margin: 0 0.2rem;
+        //background: #9baec8;
+        color: #fff;
+        cursor: pointer;
+        &:nth-of-type(1) {
+          margin-left: 0;
         }
-        .active {
+        &:hover {
           //background: #2b90d9;
         }
       }
-      .categoryName {
-        padding: 0 1rem 0 0;
-        display: inline-block;
-        position: relative;
-        &:hover {
-          color: @primary;
-        }
-        .resources-count {
-        }
-      }
-      .resource-categories {
-        display: inline-block;
-        padding: 0.2rem 0.2rem 0.2rem 0;
-        cursor: pointer;
-        //margin-right: 0.4rem;
-        .fa {
-          line-height: 50%;
-          display: inline-block;
-          margin-left: 0.3rem;
-          &:hover {
-            color: orange;
-          }
-        }
-      }
-      .add-button {
-        color: #fff;
-        background: #337ab7;
-        &:hover {
-          background: #286090;
-        }
-      }
       .active {
-        color: #2b90d9;
+        //background: #2b90d9;
       }
     }
-    .resource-category-content {
-      .resource-category-header {
-        text-align: right;
-        overflow: hidden;
-        .selected-resources {
-          float: left;
-        }
-        .resource-upload {
+    .categoryName {
+      padding: 0 1rem 0 0;
+      display: inline-block;
+      position: relative;
+      &:hover {
+        color: @primary;
+      }
+      .resources-count {
+      }
+    }
+    .resource-categories {
+      display: inline-block;
+      padding: 0.2rem 0.2rem 0.2rem 0;
+      cursor: pointer;
+      //margin-right: 0.4rem;
+      .fa {
+        line-height: 50%;
+        display: inline-block;
+        margin-left: 0.3rem;
+        &:hover {
+          color: orange;
         }
       }
+    }
+    .add-button {
+      color: #fff;
+      background: #337ab7;
+      &:hover {
+        background: #286090;
+      }
+    }
+    .active {
+      color: #2b90d9;
+    }
+  }
+  .resource-category-content {
+    .resource-category-header {
+      text-align: right;
+      overflow: hidden;
       .selected-resources {
-        max-height: 4.8rem;
-        overflow: hidden;
-        .resource-types {
-          text-align: left;
-          .resource-type {
-            height: 2rem;
-            font-size: 1.2rem;
-            line-height: 2rem;
-            padding: 0 1rem 0 0;
-            border-radius: 3px;
-            display: inline-block;
-            cursor: pointer;
-            //font-weight: 700;
-            color: #555;
-            transition: background-color 100ms, color 100ms;
-            &:hover {
-              color: #2b90d9;
-            }
-          }
-          .active {
+        float: left;
+      }
+      .resource-upload {
+      }
+    }
+    .selected-resources {
+      max-height: 4.8rem;
+      overflow: hidden;
+      .resource-types {
+        text-align: left;
+        .resource-type {
+          height: 2rem;
+          font-size: 1.2rem;
+          line-height: 2rem;
+          padding: 0 1rem 0 0;
+          border-radius: 3px;
+          display: inline-block;
+          cursor: pointer;
+          //font-weight: 700;
+          color: #555;
+          transition: background-color 100ms, color 100ms;
+          &:hover {
             color: #2b90d9;
           }
         }
-      }
-      .resources-paging{
-        height: 3rem;
-        overflow: hidden;
-        padding-top: 0.5rem;
-      }
-      .resources-body {
-        font-size: 0;
-        position: relative;
-        min-height: 18rem;
-        .resources-loading {
-          width: 100%;
-          height: 100%;
-          //font-size: 1.2rem;
-          //text-align: center;
-          .loading-text {
-          }
-        }
-        .resource-info {
-          font-size: 1.2rem;
-          font-weight: 700;
-          text-align: center;
-          .resource-picture {
-            .remove-file {
-
-            }
-          }
-          .upload {
-
-          }
-        }
-        .resource {
-          .resource-upload-body {
-
-          }
+        .active {
+          color: #2b90d9;
         }
       }
-      .resource-name {}
+    }
+    .resources-paging {
+      height: 3rem;
+      overflow: hidden;
+      padding-top: 0.5rem;
+    }
+    .resources-body {
+      font-size: 0;
+      position: relative;
+      min-height: 18rem;
+      .resources-loading {
+        width: 100%;
+        height: 100%;
+        //font-size: 1.2rem;
+        //text-align: center;
+        .loading-text {
+        }
+      }
+      .resource-info {
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-align: center;
+        .resource-picture {
+          .remove-file {
+          }
+        }
+        .upload {
+        }
+      }
+      .resource {
+        .resource-upload-body {
+        }
+      }
+    }
+    .resource-name {
     }
   }
-  img.image{
-    max-width: 100%;
-    height: 30rem;
-  }
-  .module-sr-footer{
-    text-align: right;
-    height: 3rem;
-    margin-top: 0.5rem;
-  }
-  .module-sr-header{
-    height: 3rem;
-    line-height: 3rem;
-    background-color: #f6f6f6;
-  }
-  .module-sr-title{
-    cursor: move;
-    //font-weight: 700;
-    margin-left: 1rem;
-  }
-  .module-sr-header .fa{
-    cursor: pointer;
-    color: #aaa;
-    width: 3rem;
+}
+img.image {
+  max-width: 100%;
+  height: 30rem;
+}
+.module-sr-footer {
+  text-align: right;
+  height: 3rem;
+  margin-top: 0.5rem;
+}
+.module-sr-header {
+  height: 3rem;
+  line-height: 3rem;
+  background-color: #f6f6f6;
+}
+.module-sr-title {
+  cursor: move;
+  //font-weight: 700;
+  margin-left: 1rem;
+}
+.module-sr-header .fa {
+  cursor: pointer;
+  color: #aaa;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+}
+.module-sr-header .fa:hover,
+.module-sr-header .fa:active {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #777;
+}
+.module-sr-content {
+  padding: 1rem;
+}
+.selected-resources {
+}
+
+.resource-type {
+}
+.resource-type:hover,
+.resource-type.active {
+  /*background-color: #2b90d9;*/
+  color: #2b90d9;
+}
+.resource-picture {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+.resource-picture.icon {
+  background-size: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.resource-picture.upload {
+  background-color: #eee;
+  font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+  padding-top: 50%;
+  text-align: center;
+}
+.uploadSelect {
+  padding-top: 25% !important;
+}
+.resource-picture.upload .remove-file {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #aaa;
+  text-align: center;
+}
+.resource-upload-body {
+  height: 100%;
+  width: 100%;
+}
+.upload-list {
+  overflow-y: scroll;
+  margin: 0.5rem 0;
+}
+
+.resource-padding-container {
+  width: 19.5%;
+  padding-top: 14.6%;
+  margin-right: 0.5%;
+  margin-bottom: 0.5%;
+  display: inline-block;
+
+  position: relative;
+  .resource {
     position: absolute;
     top: 0;
-    right: 0;
-    height: 3rem;
-    line-height: 3rem;
-    text-align: center;
-  }
-  .module-sr-header .fa:hover, .module-sr-header .fa:active{
-    background-color: rgba(0,0,0,0.08);
-    color: #777;
-  }
-  .module-sr-content{
-    padding: 1rem;
-  }
-  .selected-resources{
-
-  }
-
-  .resource-type{
-
-  }
-  .resource-type:hover, .resource-type.active{
-    /*background-color: #2b90d9;*/
-    color: #2b90d9;
-  }
-   .resource-picture{
-    height: 100%;
+    left: 0;
     width: 100%;
-    background-size: cover;
-  }
-   .resource-picture.icon{
-    background-size: 50%;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  .resource-picture.upload{
-    background-color: #eee;
-    font-size: 1rem;
-    position: relative;
-    overflow: hidden;
-    padding-top: 50%;
-    text-align: center;
-  }
-  .uploadSelect {
-    padding-top: 25%!important;
-  }
-  .resource-picture.upload .remove-file{
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 1.5rem;
-    width: 1.5rem;
-    line-height: 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    color: #aaa;
-    text-align: center;
-  }
-  .resource-upload-body{
     height: 100%;
-    width: 100%;
   }
-  .upload-list{
-    overflow-y: scroll;
-    margin: 0.5rem 0;
-  }
+}
 
+.resource-padding-container.resource-select {
+  width: 24.5%;
+  padding-top: 18.4%;
+}
+
+@media (max-width: 768px) {
   .resource-padding-container {
-    width: 19.5%;
-    padding-top: 14.6%;
-    margin-right: 0.5%;
-    margin-bottom: 0.5%;
-    display: inline-block;
-
-    position: relative;
-    .resource{
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  .resource-padding-container.resource-select{
     width: 24.5%;
     padding-top: 18.4%;
   }
+}
 
-
-  @media(max-width: 768px) {
-    .resource-padding-container{
-      width: 24.5%;
-      padding-top: 18.4%;
-    }
+@media (max-width: 400px) {
+  .resource-padding-container {
+    width: 32.5%;
+    padding-top: 24.3%;
   }
-
-  @media(max-width: 400px) {
-    .resource-padding-container{
-      width: 32.5%;
-      padding-top: 24.3%;
-    }
-  }
-  /*
+}
+/*
   .resource{
     margin: 0 1% 1% 0;
     position: relative;
@@ -447,232 +444,231 @@
      width: 25%;
      height: 13.7rem;
   }*/
-  .selected-resource-header{
-    margin-bottom: 0.5rem;
+.selected-resource-header {
+  margin-bottom: 0.5rem;
+}
+.resource > div {
+}
+.resource-name {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  height: 1.6rem;
+  color: #fff;
+  line-height: 1.6rem;
+  text-align: center;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.resource-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: #fff;
+  text-align: right;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.resource-mask.active {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.resource-mask.active .fa {
+  color: #00ff04;
+}
+.resource-index {
+  position: absolute;
+  margin: auto;
+  color: #fff;
+  z-index: 1000;
+  font-size: 1.25rem;
+  top: 0;
+  font-weight: 700;
+  left: 0.3rem;
+}
+.resource-link {
+  height: 100%;
+  width: 100%;
+}
+.resource-info {
+}
+.file-lists {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.file-li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  word-break: break-all;
+  min-height: 4rem;
+  color: #fff;
+  border-radius: 3px;
+  background-color: #575757;
+}
+.file-li.active {
+  background-color: #47c449;
+}
+.file-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-top: 0.6rem;
+}
+.file-size {
+  font-size: 1rem;
+}
+.file-btn {
+  height: 4rem;
+  top: 0;
+  right: 0;
+  vertical-align: top;
+  font-size: 1rem;
+  width: 7rem;
+  line-height: 4rem;
+  text-align: center;
+  position: absolute;
+}
+.file-info {
+  overflow: hidden;
+  margin-right: 7rem;
+  padding-left: 1rem;
+}
+.file-hidden {
+  /*width: 10000px;*/
+}
+.file-btn > .fa {
+  cursor: pointer;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid #777;
+  color: #eee;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 2.4rem;
+  margin-right: 0.5rem;
+}
+.file-btn .fa.fa-remove:hover {
+  border-color: #aaa;
+}
+.file-btn .fa.fa-arrow-up:hover {
+  border-color: #aaa;
+}
+.file-btn .fa.upload-progress {
+  border: none;
+  width: 6.5rem;
+}
+.file-progress {
+  position: absolute;
+  height: 3px;
+  width: 0;
+  transition: width 200ms;
+  bottom: 0;
+  background-color: #57cd59;
+  border-radius: 2px;
+}
+.upload-success {
+  border-color: #e6e6e6 !important;
+}
+.file-error {
+  color: #ff6c6a;
+  margin-left: 1rem;
+  font-size: 1rem;
+}
+.resource-options {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.resource-options .resource-do {
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.4rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  .fa:hover {
+    color: #0e90d2;
   }
-   .resource>div{
-  }
-   .resource-name{
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    overflow: hidden;
-    word-break: break-all;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    height: 1.6rem;
-    color: #fff;
-    line-height: 1.6rem;
-    text-align: center;
-    font-size: 1rem;
-    background-color: rgba(0,0,0,0.2);
-  }
-   .resource-mask{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    font-size: 1.4rem;
-    color: #fff;
-    text-align: right;
-    top: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.1);
-  }
-   .resource-mask.active{
-    background-color: rgba(0,0,0,0.6);
-  }
-   .resource-mask.active .fa{
-    color: #00ff04;
-  }
-   .resource-index{
-    position: absolute;
-    margin: auto;
-    color: #fff;
-    z-index: 1000;
-    font-size: 1.25rem;
-    top: 0;
-    font-weight: 700;
-    left: 0.3rem;
-  }
-  .resource-link{
-    height: 100%;
-    width: 100%;
-  }
-  .resource-info{
+}
+.resource .fa {
+  margin: 5px 5px 0 0;
+}
+.resource-options .fa.fa-edit {
+}
+.edit-picture-body {
+  margin: 1rem;
+}
+.resource-options .fa.active {
+  color: #00ff04;
+}
+.paste-content {
+  display: inline-block;
+  width: 20rem;
+  height: 2.5rem;
+  line-height: 2.3rem;
+  margin-left: 1rem;
+  text-align: center;
+  border: 2px dotted #9baec8;
+  background-color: #d9e1e8;
+  vertical-align: top;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 0.2rem;
+}
 
-  }
-  .file-lists{
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  .file-li{
-    position: relative;
-    margin-bottom: 0.5rem;
-    word-break: break-all;
-    min-height: 4rem;
-    color: #fff;
-    border-radius: 3px;
-    background-color: #575757;
-  }
-  .file-li.active{
-    background-color: #47c449;
-  }
-  .file-name{
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    padding-top: 0.6rem;
-  }
-  .file-size{
-    font-size: 1rem;
-  }
-  .file-btn{
-    height: 4rem;
-    top: 0;
-    right: 0;
-    vertical-align: top;
-    font-size: 1rem;
-    width: 7rem;
-    line-height: 4rem;
-    text-align: center;
-    position: absolute;
-  }
-  .file-info{
-    overflow: hidden;
-    margin-right: 7rem;
-    padding-left: 1rem;
-  }
-  .file-hidden{
-    /*width: 10000px;*/
-  }
-  .file-btn>.fa{
-    cursor: pointer;
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 2px solid #777;
-    color: #eee;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 2.4rem;
-    margin-right: 0.5rem;
-  }
-  .file-btn .fa.fa-remove:hover{
-    border-color: #aaa;
-  }
-  .file-btn .fa.fa-arrow-up:hover{
-    border-color: #aaa;
-  }
-  .file-btn .fa.upload-progress{
-    border:none;
-    width: 6.5rem;
-  }
-  .file-progress{
-    position: absolute;
-    height: 3px;
-    width: 0;
-    transition: width 200ms;
-    bottom: 0;
-    background-color: #57cd59;
-    border-radius: 2px;
-  }
-  .upload-success{
-    border-color: #e6e6e6!important;
-  }
-  .file-error {
-    color: #ff6c6a;
-    margin-left: 1rem;
-    font-size: 1rem;
-  }
-   .resource-options{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-  }
-   .resource-options .resource-do{
-    color: #fff;
-    cursor: pointer;
-    font-size: 1.4rem;
-    position: absolute;
-    top: 0;
-    right: 0;
-     .fa:hover {
-       color: #0e90d2;
-     }
-  }
-   .resource .fa {
-     margin: 5px 5px 0 0;
-   }
-   .resource-options .fa.fa-edit{
-  }
-  .edit-picture-body{
-    margin: 1rem;
-  }
-   .resource-options .fa.active{
-    color: #00ff04;
-  }
-   .paste-content{
-    display: inline-block;
-    width: 20rem;
-    height: 2.5rem;
-    line-height: 2.3rem;
-    margin-left: 1rem;
-    text-align: center;
-    border: 2px dotted #9baec8;
-    background-color: #d9e1e8;
-    vertical-align: top;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 0.2rem;
-  }
+.resource-in-process {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  height: 2rem;
+  width: 100%;
+  color: #545454;
+  text-align: center;
+  font-size: 1.1rem;
+}
 
-  .resource-in-process{
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    height: 2rem;
-    width: 100%;
-    color: #545454;
-    text-align: center;
-    font-size: 1.1rem;
-  }
+.resource-in-process-bg {
+  background-color: #a6a6a6;
+}
 
-  .resource-in-process-bg{
-    background-color: #a6a6a6;
-  }
+.resource-picture.media-picture {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: black;
+}
 
-  .resource-picture.media-picture {
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-color: black;
-  }
-
-  .size-limit{
-    margin-left: 0.5rem;
-    font-size: 1rem;
-  }
-  .size-limit .fa{
-    color: #555;
-  }
-  .loading-container{
-    font-size: 1.2rem;
-    padding-top: 20%;
-    text-align: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
-  /*.resources-list-placeholder{
+.size-limit {
+  margin-left: 0.5rem;
+  font-size: 1rem;
+}
+.size-limit .fa {
+  color: #555;
+}
+.loading-container {
+  font-size: 1.2rem;
+  padding-top: 20%;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+/*.resources-list-placeholder{
     min-height: 40rem;
     padding-top: 15rem;
   }
@@ -686,45 +682,45 @@
 <script>
 import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
-import {getFileMD5, blobToFile} from "../js/file";
-import {getSize, timeFormat, getUrl} from "../js/tools";
-import {debounce} from '../js/execution';
-import {visitUrl} from "../js/pageSwitch";
-import {nkcAPI, nkcUploadFile} from "../js/netAPI";
-import {getState} from '../js/state';
-import {screenTopWarning} from '../js/topAlert';
-import {getSocket} from '../js/socket';
-import ImageViewer from "./ImageViewer";
-import ResourceInfo from "./ResourceInfo";
-import CommonModal from "./CommonModal";
-import SelectCategory from "./SelectCategory";
-import {openImageViewer} from "../js/imageViewer";
+import { getFileMD5, blobToFile } from '../js/file';
+import { getSize, timeFormat, getUrl } from '../js/tools';
+import { debounce } from '../js/execution';
+import { visitUrl } from '../js/pageSwitch';
+import { nkcAPI, nkcUploadFile } from '../js/netAPI';
+import { getState } from '../js/state';
+import { screenTopWarning } from '../js/topAlert';
+import { getSocket } from '../js/socket';
+import ImageViewer from './ImageViewer';
+import ResourceInfo from './ResourceInfo';
+import CommonModal from './CommonModal';
+import SelectCategory from './SelectCategory';
+import { openImageViewer } from '../js/imageViewer';
 
-const {isApp, fileDomain} = getState();
+const { isApp, fileDomain } = getState();
 const isReactNative = isApp && getState().platform === 'reactNative';
 import {
   RNTakePictureAndUpload,
   RNTakeAudioAndUpload,
-  RNTakeVideoAndUpload
+  RNTakeVideoAndUpload,
 } from '../js/reactNative';
 const socket = getSocket();
 export default {
   props: ['watch-type'],
   data: () => ({
     getResourcesDebounce: '',
-    categoryLoading: true,//分组loading
+    categoryLoading: true, //分组loading
     resourceType: 'all',
-    resourceCategories: 'all',//用户自定义分组存储id
+    resourceCategories: 'all', //用户自定义分组存储id
     resources: [],
     paging: {},
     files: [],
     categories: [],
     category: 'all',
     isApp,
-    uid: "",
-    user: "",
-    pageType: "list", // list: 资源列表, uploader: 上传
-    pageNumber: "",
+    uid: '',
+    user: '',
+    pageType: 'list', // list: 资源列表, uploader: 上传
+    pageNumber: '',
     allowedExt: ['all', 'audio', 'video', 'attachment', 'picture'],
     countLimit: 100,
     selectedResources: [],
@@ -740,15 +736,15 @@ export default {
 
     socketEventListener: null,
     count: {
-      allCount: 0,//全部资源数量
-      ungroupedCount: 0,//未分组资源数量
-      trashCount: 0,//回收站资源数量
+      allCount: 0, //全部资源数量
+      ungroupedCount: 0, //未分组资源数量
+      trashCount: 0, //回收站资源数量
     },
-    imgInfo:{},
-    reduction:[0,180,-180],
-    minContainerHeight:500,
-    socketEventListenerDebounce: "",
-    debounce: ""
+    imgInfo: {},
+    reduction: [0, 180, -180],
+    minContainerHeight: 500,
+    socketEventListenerDebounce: '',
+    debounce: '',
   }),
   components: {
     'image-viewer': ImageViewer,
@@ -756,12 +752,12 @@ export default {
     'common-modal': CommonModal,
     'select-category': SelectCategory,
   },
-  created(){
+  created() {
     this.debounce = debounce;
-    this.getResourcesDebounce = debounce(this.getResources, 500)
+    this.getResourcesDebounce = debounce(this.getResources, 500);
   },
   mounted() {
-    if(this.watchType === 'category') {
+    if (this.watchType === 'category') {
       this.getResourcesDebounce(0);
     }
     this.initSocketEvent();
@@ -774,126 +770,137 @@ export default {
     this.disableDragUploadEvent();
   },
   computed: {
-    quota() {
-      return this.watchType === 'category'? 18: 16
+    allTypes() {
+      if (this.allowedExt.includes('all')) {
+        return ['audio', 'video', 'attachment', 'picture'];
+      } else {
+        return ['audio', 'video', 'attachment', 'picture'].filter((item) =>
+          this.allowedExt.includes(item),
+        );
+      }
     },
-    fileSizeLimit: function() {
+    quota() {
+      return this.watchType === 'category' ? 18 : 16;
+    },
+    fileSizeLimit: function () {
       var sizeLimit = this.sizeLimit;
-      if(!sizeLimit) return '';
+      if (!sizeLimit) return '';
       var arr = [];
       arr = arr.concat(sizeLimit.others);
       arr.push({
         ext: '其他',
-        size: sizeLimit.default
+        size: sizeLimit.default,
       });
-      var str = '文件大小限制\n', sweetStr = '';
-      for(var i = 0; i < arr.length; i++) {
+      var str = '文件大小限制\n',
+        sweetStr = '';
+      for (var i = 0; i < arr.length; i++) {
         var a = arr[i];
-        if(i > 0) str += '\n';
+        if (i > 0) str += '\n';
         str += a.ext.toUpperCase() + '：' + getSize(a.size * 1024, 1);
       }
       return str;
     },
-    show: function() {
-      var obj = {};
-      var allowedExt = this.allowedExt;
-      if(allowedExt.indexOf("audio") !== -1) {
+    show: function () {
+      const obj = {};
+      const allTypes = this.allTypes;
+      if (allTypes.includes('audio')) {
         obj.audio = true;
       }
-      if(allowedExt.indexOf("video") !== -1) {
+      if (allTypes.includes('video')) {
         obj.video = true;
       }
-      if(allowedExt.indexOf("picture") !== -1) {
-        obj.picture = true;
-      }
-      if(allowedExt.indexOf("attachment") !== -1) {
+      if (allTypes.includes('attachment')) {
         obj.attachment = true;
       }
-      if(
-        allowedExt.indexOf("all") !== -1 ||
-        (obj.audio && obj.video && obj.picture && obj.attachment)
-      ) {
+      if (allTypes.includes('picture')) {
+        obj.picture = true;
+      }
+      if (allTypes.length > 1) {
         obj.all = true;
       }
-      return obj
+      return obj;
     },
-    windowWidth: function() {
+    windowWidth: function () {
       return $(window).width();
     },
-    windowHeight: function() {
+    windowHeight: function () {
       return $(window).height();
     },
-    screenType: function() {
-      return this.windowWidth < 700? "sm": "md";
+    screenType: function () {
+      return this.windowWidth < 700 ? 'sm' : 'md';
     },
-    selectedResourcesId: function() {
+    selectedResourcesId: function () {
       var arr = [];
       var selectedResources = this.selectedResources;
-      for(var i = 0; i < selectedResources.length; i++) {
+      for (var i = 0; i < selectedResources.length; i++) {
         var r = selectedResources[i];
-        if(arr.indexOf(r.rid) === -1) {
+        if (arr.indexOf(r.rid) === -1) {
           arr.push(r.rid);
         }
       }
       return arr;
-    }
+    },
   },
   methods: {
     timeFormat: timeFormat,
     getUrl: getUrl,
     initCropper() {
-      if(this.cropper) return;
+      if (this.cropper) return;
       this.cropper = new Cropper(this.$refs.imageElement, {
         viewMode: 0,
-        minContainerHeight:this.minContainerHeight,
+        minContainerHeight: this.minContainerHeight,
         // aspectRatio: 1,
-        crop:(e)=>{
-          if(this.$refs.imageElement.height > this.$refs.imageElement.width){
-            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
-            this.imgInfo.max = 'height'
-            this.imgInfo.value = this.$refs.imageElement.height
-          }else{
-            this.imgInfo.radio = this.$refs.imageElement.width / this.$refs.imageElement.height
-            this.imgInfo.max = 'width'
-            this.imgInfo.value = this.$refs.imageElement.width
+        crop: (e) => {
+          if (this.$refs.imageElement.height > this.$refs.imageElement.width) {
+            this.imgInfo.radio =
+              this.$refs.imageElement.width / this.$refs.imageElement.height;
+            this.imgInfo.max = 'height';
+            this.imgInfo.value = this.$refs.imageElement.height;
+          } else {
+            this.imgInfo.radio =
+              this.$refs.imageElement.width / this.$refs.imageElement.height;
+            this.imgInfo.max = 'width';
+            this.imgInfo.value = this.$refs.imageElement.width;
           }
           //- 如果宽大于高  旋转后 w 408（容器h）
           //- 如果高大于宽  旋转后 h 408（容器h）
           // 对比旋转前的 高 和 宽 小了多少
           // 然后 根据比率 来缩小 scale
-          this.rotateValue = e.detail.rotate
-        }
+          this.rotateValue = e.detail.rotate;
+        },
       });
     },
     destroyCropper() {
-      if(!this.cropper || !this.cropper.destroy) return;
+      if (!this.cropper || !this.cropper.destroy) return;
       this.cropper.destroy();
       this.cropper = null;
     },
-    destroyDraggable() {
-    },
+    destroyDraggable() {},
     showErrorInfo(r) {
       sweetInfo(r.errorInfo);
     },
     // 注册事件，当上传的文件处理成功后更新列表
     initSocketEvent() {
       const self = this;
-      this.socketEventListener = function(data) {
-        if(data.state === "fileProcessFailed") {
+      this.socketEventListener = function (data) {
+        if (data.state === 'fileProcessFailed') {
           sweetError(`文件处理失败\n${data.err}`);
         }
         self.getResources(0, data.requestType);
-      }
-      this.socketEventListenerDebounce = this.debounce(this.socketEventListener, 500);
-      if(!socket) return;
+      };
+      this.socketEventListenerDebounce = this.debounce(
+        this.socketEventListener,
+        500,
+      );
+      if (!socket) return;
       // 统一用一个防抖函数，最大程度的减少相同请求
-      socket.on("fileTransformProcess", this.socketEventListenerDebounce );
-      socket.on('resources',this.socketEventListenerDebounce );
+      socket.on('fileTransformProcess', this.socketEventListenerDebounce);
+      socket.on('resources', this.socketEventListenerDebounce);
       socket.on('group', this.socketEventListenerDebounce);
     },
     // 销毁注册的 socket 事件
     removeSocketEvent() {
-      if(!this.socketEventListener) return;
+      if (!this.socketEventListener) return;
       // 销毁事件
       socket.off('fileTransformProcess', this.socketEventListenerDebounce);
       socket.off('resources', this.socketEventListenerDebounce);
@@ -901,137 +908,146 @@ export default {
     },
     initDragUploadEvent() {
       const $dragDom = $(this.$refs.pasteContent);
-      let originText = "";
+      let originText = '';
       const self = this;
       $dragDom.on({
-        dragenter: function(e) {
+        dragenter: function (e) {
           e.stopPropagation();
           e.preventDefault();
           originText = $dragDom.text();
-          $dragDom.text("松开鼠标上传文件")
+          $dragDom.text('松开鼠标上传文件');
         },
-        dragleave: function(e) {
+        dragleave: function (e) {
           e.stopPropagation();
           e.preventDefault();
           $dragDom.text(originText);
         },
-        dragover: function(e) {
+        dragover: function (e) {
           e.stopPropagation();
           e.preventDefault();
         },
-        drop: function(e) {
+        drop: function (e) {
           e.preventDefault();
           e.stopPropagation();
           $dragDom.text(originText);
           var files = [].slice.call(e.originalEvent.dataTransfer.files);
-          if(!files.length) return;
+          if (!files.length) return;
           self.uploadSelectFile(files);
-        }
+        },
       });
     },
     disableDragUploadEvent() {
       $(this.$refs.pasteContent).draggable('disable');
     },
-    checkFileSize: function(filename, size) {
+    checkFileSize: function (filename, size) {
       var sizeLimit = this.sizeLimit;
-      if(!sizeLimit) return;
+      if (!sizeLimit) return;
       var ext = filename.split('.');
       ext = ext.pop().toLowerCase();
       var limit;
-      for(var i = 0; i < sizeLimit.others.length; i++) {
+      for (var i = 0; i < sizeLimit.others.length; i++) {
         var s = sizeLimit.others[i];
-        if(s.ext.toLowerCase() === ext) {
+        if (s.ext.toLowerCase() === ext) {
           limit = s;
           break;
         }
       }
-      if(!limit) limit = {
-        ext: ext,
-        size: sizeLimit.default
-      };
+      if (!limit)
+        limit = {
+          ext: ext,
+          size: sizeLimit.default,
+        };
       var _limitSize = limit.size * 1024;
-      if(size > _limitSize) throw ext.toUpperCase() + '文件大小不能超过' + getSize(_limitSize, 1);
+      if (size > _limitSize)
+        throw ext.toUpperCase() + '文件大小不能超过' + getSize(_limitSize, 1);
     },
-    showFileSizeLimit: function() {
-      asyncSweetCustom(this.fileSizeLimit.replace(/\n/ig, '<br>'));
+    showFileSizeLimit: function () {
+      asyncSweetCustom(this.fileSizeLimit.replace(/\n/gi, '<br>'));
     },
-    cancelCropPicture: function() {
+    cancelCropPicture: function () {
       this.destroyCropper();
-      this.changePageType("list");
+      this.changePageType('list');
     },
-    rotateZoom(originValue, nextValue){
-      if(this.reduction.includes(this.rotateValue)){
+    rotateZoom(originValue, nextValue) {
+      if (this.reduction.includes(this.rotateValue)) {
         this.cropper.scale(1);
-      }else{
+      } else {
         const scaleRadio = originValue / nextValue;
         this.cropper.scale(scaleRadio);
       }
     },
-    rotate: function(type) {
+    rotate: function (type) {
       const self = this;
-      if(type === "left") {
+      if (type === 'left') {
         self.cropper.rotate(-90);
       } else {
         self.cropper.rotate(90);
       }
       // crop执行 > 再执行的下面的代码
-      const contaiorWidth = parseInt(document.querySelector('.cropper-container').style.width)
+      const contaiorWidth = parseInt(
+        document.querySelector('.cropper-container').style.width,
+      );
       const imgWidthInCanvas = self.minContainerHeight * self.imgInfo.radio;
       //- const imgHeightInCanvas = contaiorWidth / self.imgInfo.radio;
-      if(self.imgInfo.max === 'width'){
+      if (self.imgInfo.max === 'width') {
         // 宽占满
-        if(contaiorWidth <= imgWidthInCanvas){
-          const nextImgWidthInCanvas = (self.minContainerHeight / contaiorWidth) * (contaiorWidth / self.imgInfo.radio)
-          if(nextImgWidthInCanvas > contaiorWidth){
-            this.rotateZoom(contaiorWidth, self.minContainerHeight)
-          }else{
-            this.rotateZoom(self.minContainerHeight, contaiorWidth)
+        if (contaiorWidth <= imgWidthInCanvas) {
+          const nextImgWidthInCanvas =
+            (self.minContainerHeight / contaiorWidth) *
+            (contaiorWidth / self.imgInfo.radio);
+          if (nextImgWidthInCanvas > contaiorWidth) {
+            this.rotateZoom(contaiorWidth, self.minContainerHeight);
+          } else {
+            this.rotateZoom(self.minContainerHeight, contaiorWidth);
           }
           //- this.rotateZoom(self.minContainerHeight, contaiorWidth)
           // 高占满
-        }else{
+        } else {
           // 如果旋转后宽度超出容器宽 最后以容器宽度进行显示
           // imgWidthInCanvas 旋转前图片宽度
           // self.minContainerHeight 旋转后图片宽度变为容器高度
           // 乘以得出的缩放比率 旋转前图片高度  就是 旋转后的图片在容器中的宽度
-          const nextImgWidthInCanvas = (imgWidthInCanvas / self.minContainerHeight) * self.minContainerHeight
+          const nextImgWidthInCanvas =
+            (imgWidthInCanvas / self.minContainerHeight) *
+            self.minContainerHeight;
           // 如果下张图片宽大于容器宽，那么以容器宽显示图片
-          if(nextImgWidthInCanvas > contaiorWidth){
-            this.rotateZoom(imgWidthInCanvas, self.minContainerHeight)
-          }else{
-            this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
+          if (nextImgWidthInCanvas > contaiorWidth) {
+            this.rotateZoom(imgWidthInCanvas, self.minContainerHeight);
+          } else {
+            this.rotateZoom(self.minContainerHeight, imgWidthInCanvas);
           }
         }
-      }else if(self.imgInfo.max === 'height'){
+      } else if (self.imgInfo.max === 'height') {
         // 宽占满   高>宽 那么什么情况下 宽会占满 （只有容器高度大于容器宽度会出现）好像没有此种情况？？
-        if(contaiorWidth <= imgWidthInCanvas){
-          this.rotateZoom(self.minContainerHeight, contaiorWidth)
+        if (contaiorWidth <= imgWidthInCanvas) {
+          this.rotateZoom(self.minContainerHeight, contaiorWidth);
           // 高占满
-        }else{
+        } else {
           // 当图片宽高很接近时 如果让图片高度直接变为容器宽，那么图片高度将会超出容器
           // contaiorWidth 下次图片宽度
           // self.minContainerHeight 当前图片高度
           // nextImgHeightInCanvas 计算出的下次图片高度
-          const nextImgHeightInCanvas = (contaiorWidth / self.minContainerHeight) * (imgWidthInCanvas)
+          const nextImgHeightInCanvas =
+            (contaiorWidth / self.minContainerHeight) * imgWidthInCanvas;
           //- 如果旋转后的高 大于容器高 那么以容器高来显示图片
-          if(nextImgHeightInCanvas > self.minContainerHeight){
-            this.rotateZoom(self.minContainerHeight, imgWidthInCanvas)
-          }else{
-            this.rotateZoom(contaiorWidth, self.minContainerHeight)
+          if (nextImgHeightInCanvas > self.minContainerHeight) {
+            this.rotateZoom(self.minContainerHeight, imgWidthInCanvas);
+          } else {
+            this.rotateZoom(contaiorWidth, self.minContainerHeight);
           }
           // 这个适用于 山峰图 高宽比率相差较小
           //- this.rotateZoom(self.minContainerHeight, self.minContainerHeight * self.imgInfo.radio)
         }
       }
     },
-    editImage: function(r) {
+    editImage: function (r) {
       const self = this;
       this.croppingPicture = false;
-      this.changePageType("editPicture");
+      this.changePageType('editPicture');
       setTimeout(() => {
         self.initCropper();
         let src = '';
-        if(r.originId) {
+        if (r.originId) {
           src = getUrl('resourceOrigin', r.originId);
         } else {
           src = getUrl('resource', r.rid);
@@ -1039,90 +1055,95 @@ export default {
         self.cropper.replace(src);
       });
     },
-    cropPicture: function() {
+    cropPicture: function () {
       const self = this;
       self.croppingPicture = true;
-      setTimeout(function() {
-        try{
-          self.cropper.getCroppedCanvas().toBlob(function(blob) {
-            var file = blobToFile(blob, Date.now() + ".png");
+      setTimeout(function () {
+        try {
+          self.cropper.getCroppedCanvas().toBlob(function (blob) {
+            var file = blobToFile(blob, Date.now() + '.png');
             self.uploadSelectFile(file);
-            self.changePageType("list");
+            self.changePageType('list');
             self.destroyCropper();
-          }, "image/jpeg");
-        } catch(err) {
+          }, 'image/jpeg');
+        } catch (err) {
           console.log(err);
           self.croppingPicture = false;
           sweetError(err);
         }
       }, 10);
     },
-    readyPaste: function() {
+    readyPaste: function () {
       var self = this;
       var dom = $(window);
-      dom.off("paste");
-      dom.one("paste", function(e) {
-        var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
+      dom.off('paste');
+      dom.one('paste', function (e) {
+        var clipboardData =
+          e.clipboardData ||
+          (e.originalEvent && e.originalEvent.clipboardData) ||
+          {};
         var files = clipboardData.items || [];
         var _files = [];
-        for(var i = 0; i < files.length; i ++) {
+        for (var i = 0; i < files.length; i++) {
           var file = files[i].getAsFile();
-          if(!file) continue;
+          if (!file) continue;
           _files.push(file);
         }
-        if(!_files.length) return;
+        if (!_files.length) return;
         self.uploadSelectFile(_files);
       });
     },
-    close: function() {
+    close: function () {
       this.destroyCropper();
       const self = this;
-      setTimeout(function() {
+      setTimeout(function () {
         self.selectedResources = [];
-        self.resourceType = "all";
-        self.category = "all";
+        self.resourceType = 'all';
+        self.category = 'all';
       }, 500);
     },
-    open: function(callback, options = {}) {
+    open: function (callback, options = {}) {
       this.watchType = 'select';
       this.destroyCropper();
       const {
         countLimit = 50,
         allowedExt = ['all', 'audio', 'video', 'attachment', 'picture'],
         pageType = 'list',
-        fastSelect = false
+        fastSelect = false,
       } = options;
-      const resourceType = options.resourceType || allowedExt[0];
 
       this.callback = callback;
       this.countLimit = countLimit;
       this.allowedExt = allowedExt;
-      this.resourceType = resourceType;
+      if (!options.resourceType) {
+        if (this.allTypes.length > 1) {
+          this.resourceType = 'all';
+        } else {
+          this.resourceType = this.allTypes[0];
+        }
+      }
       this.pageType = pageType;
       this.fastSelect = fastSelect;
       this.getResourcesDebounce(0);
     },
-    selectCategory: function(c) {
+    selectCategory: function (c) {
       this.category = c;
       this.getResourcesDebounce(0);
     },
-    getResources: function(skip = 0, reqType = 'all') {
-      let {
-        quota,
-        resourceType,
-        category,
-        resourceCategories
-      } = this;
+    getResources: function (skip = 0, reqType = 'all') {
+      let { quota, resourceType, category, resourceCategories, allTypes } =
+        this;
       // quota 每页数据量 skip 第几页 resource Type '全部 已上传 未上传' category 资源类型
-      const url = `/me/media?quota=${quota}&skip=${skip}&type=${resourceType}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}&reqType=${reqType}`;
+      const type = resourceType === 'all' ? allTypes.join('-') : resourceType;
+      const url = `/me/media?quota=${quota}&skip=${skip}&type=${type}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}&reqType=${reqType}`;
       const self = this;
-      nkcAPI(url, "GET")
-        .then(function(data) {
-          if (reqType === "resources" ) {
+      nkcAPI(url, 'GET')
+        .then(function (data) {
+          if (reqType === 'resources') {
             self.resources = data.resources;
-          }else if (reqType === "group") {
+          } else if (reqType === 'group') {
             self.categories = data.categories;
-          }else {
+          } else {
             self.categories = data.categories;
             self.sizeLimit = data.sizeLimit;
             self.paging = data.paging;
@@ -1132,106 +1153,113 @@ export default {
             self.loading = false;
             self.categoryLoading = false;
           }
-          if(self.watchType === 'select') {
-            if(self.callback) {
+          if (self.watchType === 'select') {
+            if (self.callback) {
               self.callback();
             }
           }
         })
-        .catch(function(data) {
+        .catch(function (data) {
           self.loading = false;
           sweetError(data);
         });
     },
-    changePage: function(type) {
+    changePage: function (type) {
       var paging = this.paging;
-      if(paging.buttonValue.length <= 1) return;
-      if(type === "last" && paging.page === 0) return;
-      if(type === "next" && paging.page + 1 === paging.pageCount) return;
-      var count = type === "last"? -1: 1;
+      if (paging.buttonValue.length <= 1) return;
+      if (type === 'last' && paging.page === 0) return;
+      if (type === 'next' && paging.page + 1 === paging.pageCount) return;
+      var count = type === 'last' ? -1 : 1;
       this.getResourcesDebounce(paging.page + count);
     },
-    clickInput: function() {
-      if(this.files.length >= 20) sweetInfo("最多仅允许20个文件同时上传，请稍后再试。");
+    clickInput: function () {
+      if (this.files.length >= 20)
+        sweetInfo('最多仅允许20个文件同时上传，请稍后再试。');
       var input = this.$refs.inputElement;
-      if(input) input.click();
+      if (input) input.click();
     },
-    removeFile: function(index) {
+    removeFile: function (index) {
       this.files.splice(index, 1);
     },
-    startUpload: function(f) {
-      f.error = "";
-      this.selectCategory("upload");
+    startUpload: function (f) {
+      f.error = '';
+      this.selectCategory('upload');
       const self = this;
       return Promise.resolve()
-        .then(function() {
+        .then(function () {
           self.checkFileSize(f.data.name, f.data.size);
-          if(f.status === "uploading") throw "文件正在上传...";
-          if(f.status === "uploaded") throw "文件已上传成功！";
-          f.status = "uploading";
+          if (f.status === 'uploading') throw '文件正在上传...';
+          if (f.status === 'uploaded') throw '文件已上传成功！';
+          f.status = 'uploading';
           // 获取文件md5
           return getFileMD5(f.data);
         })
-        .then(function(md5) {
+        .then(function (md5) {
           // 将md5发送到后端检测文件是否已上传
           return nkcAPI('/rs/md5', 'POST', {
             md5,
-            filename: f.name
+            filename: f.name,
           });
         })
-        .then(function(data) {
-          if(!data.uploaded) {
+        .then(function (data) {
+          if (!data.uploaded) {
             // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
             var formData = new FormData();
-            formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
+            formData.append('file', f.data, f.data.name || Date.now() + '.png');
             formData.append('cid', self.resourceCategories);
             formData.append('toc', f.toc);
             let url = '/r';
             /*if(fileDomain) {
               url = fileDomain + url;
             }*/
-            return nkcUploadFile(url, "POST", formData, function(e, progress) {
-              f.progress = progress;
-            }, 60 * 60 * 1000);
+            return nkcUploadFile(
+              url,
+              'POST',
+              formData,
+              function (e, progress) {
+                f.progress = progress;
+              },
+              60 * 60 * 1000,
+            );
           }
         })
-        .then(function() {
-          f.status = "uploaded";
+        .then(function () {
+          f.status = 'uploaded';
           var index = self.files.indexOf(f);
           self.files.splice(index, 1);
         })
-        .catch(function(data) {
-          f.status = "unUpload";
+        .catch(function (data) {
+          f.status = 'unUpload';
           f.progress = 0;
           f.error = data.error || data;
           screenTopWarning(data.error || data);
-        })
+        });
     },
-    newFile: function(file) {
+    newFile: function (file) {
       let toc = Date.now();
-      if(this.tempToc && this.tempToc >= toc){
+      if (this.tempToc && this.tempToc >= toc) {
         toc = this.tempToc + 1;
       }
       this.tempToc = toc;
       return {
         name: file.name,
-        ext: file.type.slice(0, 5) === "image"?"picture": "file",
+        ext: file.type.slice(0, 5) === 'image' ? 'picture' : 'file',
         size: getSize(file.size, 1),
         data: file,
-        error: /*file.size >  200*1024*1024?"文件大小不能超过200MB":*/ "",
+        error: /*file.size >  200*1024*1024?"文件大小不能超过200MB":*/ '',
         progress: 0,
-        status: "unUpload",
-        toc: toc
-      }
+        status: 'unUpload',
+        toc: toc,
+      };
     },
-    uploadSelectFile: function(f) {
+    uploadSelectFile: function (f) {
       var self = this;
-      if(f.constructor === Array) {
+      if (f.constructor === Array) {
         //上传多个文件
         // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
-        f.forEach(function(file) {
-          if(!file.name && file.type.indexOf('image') !== -1) {
-            file.name = Date.now() + Math.round(Math.random()*1000) + '.png';
+        f.forEach(function (file) {
+          if (!file.name && file.type.indexOf('image') !== -1) {
+            file.name = Date.now() + Math.round(Math.random() * 1000) + '.png';
           }
           self.files.push(self.newFile(file));
         });
@@ -1242,16 +1270,15 @@ export default {
       }
       // return console.log(self.files);
       // var promise = this.startUpload(f);
-      return self.uploadFileSeries()
-        .then(function() {
-          console.log("【全部上传完成】");
-          if(self.category === "upload" && !self.files.length) {
-            setTimeout(function() {
-              self.category = "all";
-              self.getResourcesDebounce(0);
-            }, 1000)
-          }
-        })
+      return self.uploadFileSeries().then(function () {
+        console.log('【全部上传完成】');
+        if (self.category === 'upload' && !self.files.length) {
+          setTimeout(function () {
+            self.category = 'all';
+            self.getResourcesDebounce(0);
+          }, 1000);
+        }
+      });
     },
     uploadFileSeries() {
       const self = this;
@@ -1264,14 +1291,17 @@ export default {
       // }
       // // var file = self.files[0];
       // if(!file) return Promise.resolve();
-      const readyFiles = [...self.files].filter(file => file.status === "unUpload" && !file.error);
+      const readyFiles = [...self.files].filter(
+        (file) => file.status === 'unUpload' && !file.error,
+      );
       if (readyFiles.length === 0) return Promise.resolve();
-      const filePromises = readyFiles.map(file => {
-        return self.startUpload(file)
-          .then(new Promise(function (resolve, _) {
-            console.log("【上传成功】", file.name);
+      const filePromises = readyFiles.map((file) => {
+        return self.startUpload(file).then(
+          new Promise(function (resolve, _) {
+            console.log('【上传成功】', file.name);
             setTimeout(resolve, 1000);
-          }));
+          }),
+        );
       });
       // return self.startUpload(file)
       //   .then(new Promise(function(resolve, _) {
@@ -1281,96 +1311,98 @@ export default {
       //   .then(function() {
       //     return self.uploadFileSeries();
       //   })
-      return Promise.allSettled(filePromises)
-        .then(() => {
-          return self.uploadFileSeries();
-        });
+      return Promise.allSettled(filePromises).then(() => {
+        return self.uploadFileSeries();
+      });
     },
     // 用户已选择待上传的文件
-    selectedFiles: function() {
+    selectedFiles: function () {
       var self = this;
       var input = this.$refs.inputElement;
       // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
       var files = [].slice.call(input.files);
-      input.value = "";
-      if(files.length <= 0) return;
+      input.value = '';
+      if (files.length <= 0) return;
       self.uploadSelectFile(files);
     },
-    changePageType: function(pageType) {
+    changePageType: function (pageType) {
       const self = this;
       self.pageType = pageType;
-      if(pageType === "list") {
+      if (pageType === 'list') {
         self.crash();
       }
     },
-    crash: function() {
+    crash: function () {
       var paging = this.paging;
       this.getResourcesDebounce(paging.page);
     },
-    done: function() {
-
-      if(!this.callback) return;
+    done: function () {
+      if (!this.callback) return;
       var selectedResources = this.selectedResources;
       var selectedResourcesId = this.selectedResourcesId;
       this.callback({
         resources: selectedResources,
-        resourcesId: selectedResourcesId
+        resourcesId: selectedResourcesId,
       });
       this.close();
     },
-    fastSelectPage: function() {
+    fastSelectPage: function () {
       var pageNumber = this.pageNumber - 1;
       var paging = this.paging;
-      if(!paging || !paging.buttonValue.length) return;
+      if (!paging || !paging.buttonValue.length) return;
       var lastNumber = paging.buttonValue[paging.buttonValue.length - 1].num;
-      if(pageNumber < 0 || lastNumber < pageNumber) return sweetInfo("输入的页数超出范围");
+      if (pageNumber < 0 || lastNumber < pageNumber)
+        return sweetInfo('输入的页数超出范围');
       this.getResourcesDebounce(pageNumber);
     },
-    getIndex: function(arr, r) {
+    getIndex: function (arr, r) {
       var index = -1;
-      for(var i = 0; i < arr.length; i++) {
-        if(arr[i].rid === r.rid) {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].rid === r.rid) {
           index = i;
           break;
         }
       }
       return index;
     },
-    visitUrl: function(url) {
+    visitUrl: function (url) {
       visitUrl(url, true);
     },
-    removeSelectedResource: function(index) {
+    removeSelectedResource: function (index) {
       this.selectedResources.splice(index, 1);
     },
-    fastSelectResource: function(r) {
-      if(this.fastSelect) {
-        if(this.callback) this.callback(r);
+    fastSelectResource: function (r) {
+      if (this.fastSelect) {
+        if (this.callback) this.callback(r);
       } else {
         this.selectResource(r);
       }
     },
 
     //选中资源文件
-    selectResource: function(r) {
+    selectResource: function (r) {
       const self = this;
-      if(self.watchType === 'select') {
+      if (self.watchType === 'select') {
         var index = self.getIndex(self.selectedResources, r);
-        if(index !== -1) {
+        if (index !== -1) {
           self.selectedResources.splice(index, 1);
         } else {
-          if(self.selectedResources.length >= self.countLimit) return;
+          if (self.selectedResources.length >= self.countLimit) return;
           self.selectedResources.push(r);
         }
       } else if (self.watchType === 'category') {
-        if(self.selectedResources.length) {
+        if (self.selectedResources.length) {
           self.checkbox(r);
-        } else if(r.state === 'usable') {
-          if(r.mediaType === "mediaPicture") {
+        } else if (r.state === 'usable') {
+          if (r.mediaType === 'mediaPicture') {
             self.openImages(r.rid);
-          } else if (r.mediaType === "mediaVideo" || r.mediaType === "mediaAudio" ) {
+          } else if (
+            r.mediaType === 'mediaVideo' ||
+            r.mediaType === 'mediaAudio'
+          ) {
             window.open(`/r/${r.rid}`);
-          } else if(r.mediaType === "mediaAttachment") {
-            self.$refs.resourceInfo.open({rid: r.rid});
+          } else if (r.mediaType === 'mediaAttachment') {
+            self.$refs.resourceInfo.open({ rid: r.rid });
           }
         }
       }
@@ -1378,15 +1410,15 @@ export default {
     openImages(rid) {
       const images = [];
       let index = 0;
-      for(const r of this.resources) {
-        if(r.mediaType !== 'mediaPicture' || r.state !== 'usable') continue;
+      for (const r of this.resources) {
+        if (r.mediaType !== 'mediaPicture' || r.state !== 'usable') continue;
         images.push({
           url: getUrl('resource', r.rid, 'lg'),
           name: r.oname,
         });
-        if(r.rid === rid) index = images.length - 1;
+        if (r.rid === rid) index = images.length - 1;
       }
-      if(images.length === 0) return;
+      if (images.length === 0) return;
       if (isReactNative) {
         openImageViewer(images, index);
       } else {
@@ -1398,23 +1430,23 @@ export default {
       }
       // openImageViewer(images, index);
     },
-    selectResourceType: function(t) {
+    selectResourceType: function (t) {
       this.resourceType = t;
       this.getResourcesDebounce(0);
     },
-    takePicture: function() {
+    takePicture: function () {
       const self = this;
       RNTakePictureAndUpload({}, () => {
         self.crash();
       });
     },
-    takeVideo: function() {
+    takeVideo: function () {
       const self = this;
       RNTakeVideoAndUpload({}, () => {
         self.crash();
       });
     },
-    recordAudio: function() {
+    recordAudio: function () {
       const self = this;
       RNTakeAudioAndUpload({}, () => {
         self.crash();
@@ -1423,13 +1455,13 @@ export default {
     //移动到回收站和恢复资源
     delResource: debounce(function (r, type) {
       const self = this;
-      if(this.watchType !== 'category') return;
+      if (this.watchType !== 'category') return;
       const resources = [];
-      if(r) {
+      if (r) {
         resources.push(r.rid);
-      } else{
-        for(const r of self.selectedResources) {
-          if(!r) return;
+      } else {
+        for (const r of self.selectedResources) {
+          if (!r) return;
           resources.push(r.rid);
         }
       }
@@ -1443,18 +1475,18 @@ export default {
               self.selectedResources = [];
               self.getResourcesDebounce(0);
             })
-            .catch(err => {
+            .catch((err) => {
               sweetError(err);
-            })
+            });
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
-        })
+        });
     }, 300),
     //点击用户自定义分组 重复点击去除同一id
     selectUserCategory(_id) {
-      if(!_id) return;
-      if(_id === 'all') {
+      if (!_id) return;
+      if (_id === 'all') {
         this.category = 'all';
         this.resourceType = 'all';
       }
@@ -1465,68 +1497,71 @@ export default {
     getCategories: debounce(function () {
       const self = this;
       nkcAPI(`/rc`, 'GET', {})
-      .then(res => {
-        self.categories = res.categories;
-        self.categoryLoading = false;
-      })
-      .catch(err => {
-        console.log(err);
-        sweetError(err);
-      })
+        .then((res) => {
+          self.categories = res.categories;
+          self.categoryLoading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          sweetError(err);
+        });
     }, 300),
     //创建， 编辑， 删除用户自定义分组
-    editResourceCategory: debounce(function(c, type,callback) {
+    editResourceCategory: debounce(function (c, type, callback) {
       const self = this;
-      if(type === 'delete') {
+      if (type === 'delete') {
         return sweetQuestion(`确定要执行当前操作？`)
           .then(() => {
             nkcAPI('/rc', 'post', {
-              _id: c?c._id:'',
+              _id: c ? c._id : '',
               type,
             })
               .then(() => {
                 sweetSuccess('操作成功');
-                if(callback) callback();
+                if (callback) callback();
                 self.getCategories();
               })
-              .catch(err => {
+              .catch((err) => {
                 console.log(err);
                 sweetError(err);
-              })
+              });
           })
-          .catch(err => {
+          .catch((err) => {
             sweetError(err);
-          })
+          });
       }
-      return self.$refs.categoryModal.open(function (data) {
-        if(!data) return sweetError('参数错误');
-        const name = data[0].value;
-        return nkcAPI('/rc', 'POST', {
-          name,
-          type,
-          _id: c?c._id:''
-        })
-        .then(() => {
-          self.categoryLoading = true;
-          sweetSuccess('操作成功');
-          if(callback) callback();
-          self.getCategories();
-          self.$refs.categoryModal.close();
-        })
-        .catch(err => {
-          sweetError(err);
-        })
-       }, {
-        title: '新建分组',
-        data: [
-          {
-            label: '请输入分组名',
-            dom: 'input',
-            value: c?c.name:'',
-            max: '10'
-          },
-        ]
-      });
+      return self.$refs.categoryModal.open(
+        function (data) {
+          if (!data) return sweetError('参数错误');
+          const name = data[0].value;
+          return nkcAPI('/rc', 'POST', {
+            name,
+            type,
+            _id: c ? c._id : '',
+          })
+            .then(() => {
+              self.categoryLoading = true;
+              sweetSuccess('操作成功');
+              if (callback) callback();
+              self.getCategories();
+              self.$refs.categoryModal.close();
+            })
+            .catch((err) => {
+              sweetError(err);
+            });
+        },
+        {
+          title: '新建分组',
+          data: [
+            {
+              label: '请输入分组名',
+              dom: 'input',
+              value: c ? c.name : '',
+              max: '10',
+            },
+          ],
+        },
+      );
     }, 300),
     //编辑按钮
     editCategory() {
@@ -1538,10 +1573,10 @@ export default {
     //资源管理多选
     checkbox(r) {
       let index = this.getIndex(this.selectedResources, r);
-      if(index !== -1) {
+      if (index !== -1) {
         this.selectedResources.splice(index, 1);
       } else {
-        if(this.selectedResources.length >= this.countLimit) return;
+        if (this.selectedResources.length >= this.countLimit) return;
         this.selectedResources.push(r);
       }
     },
@@ -1549,38 +1584,42 @@ export default {
     moveToCategory: debounce(function () {
       const self = this;
       let resources = [];
-      for(const r of self.selectedResources) {
-        if(!r) return;
+      for (const r of self.selectedResources) {
+        if (!r) return;
         resources.push(r.rid);
       }
-      self.$refs.selectCategory.open(function (cid){
-        if(cid === self.resourceCategories) return sweetError('资源已存在当前分组');
-        nkcAPI(`/rc/move`, 'POST', {
-          resources,
-          cid
-        })
-        .then(res => {
-          sweetSuccess('操作成功');
-          self.resourceCategories = cid;
-          self.selectedResources = [];
-          self.getResourcesDebounce(0);
-          self.$refs.selectCategory.close();
-        })
-        .catch(err => {
-          sweetError(err);
-        })
-      },{
-        categories: self.categories,
-      });
+      self.$refs.selectCategory.open(
+        function (cid) {
+          if (cid === self.resourceCategories)
+            return sweetError('资源已存在当前分组');
+          nkcAPI(`/rc/move`, 'POST', {
+            resources,
+            cid,
+          })
+            .then((res) => {
+              sweetSuccess('操作成功');
+              self.resourceCategories = cid;
+              self.selectedResources = [];
+              self.getResourcesDebounce(0);
+              self.$refs.selectCategory.close();
+            })
+            .catch((err) => {
+              sweetError(err);
+            });
+        },
+        {
+          categories: self.categories,
+        },
+      );
     }, 300),
     //全选文件
     selectAllResources() {
-      if(this.selectedResources.length === this.resources.length) {
+      if (this.selectedResources.length === this.resources.length) {
         this.selectedResources = [];
       } else {
         this.selectedResources = [].concat(this.resources);
       }
-    }
+    },
   },
-}
+};
 </script>
