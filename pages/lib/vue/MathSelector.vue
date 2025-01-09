@@ -17,7 +17,7 @@
       >
         <div class="text-info bg-info p-a-05">
           <span class="fa fa-lightbulb-o m-r-05"></span>
-          您还可以在正文中直接输入 LaTeX 公式：行内公式用 $...$，独立公式用
+          您还可以在正文中直接输入 LaTeX 公式：行内公式用 $...$，独行公式用
           $$...$$。
         </div>
         <div>输入公式：</div>
