@@ -33,7 +33,6 @@ module.exports = {
     Operations.modifyFundBill,
     Operations.deleteFundBill,
     Operations.addFund,
-    Operations.deleteFundObject,
     Operations.disableHistories,
     Operations.toppedThread,
     Operations.deleteRole,

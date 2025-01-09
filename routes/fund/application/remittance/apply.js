@@ -6,8 +6,12 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+} = require('../../../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { state, data } = ctx;
     const { applicationForm } = data;
     if (state.uid !== applicationForm.uid) {
@@ -18,7 +22,7 @@ router
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data } = ctx;
     data.reportAudit = (
       await data.applicationForm.getLastAuditComment()
@@ -26,7 +30,7 @@ router
     ctx.template = 'fund/remittance/apply.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body } = ctx;
     const { applicationForm } = data;
     const { account, fund, timeToPassed, reportNeedThreads } = applicationForm;

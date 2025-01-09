@@ -7,7 +7,8 @@ const {
 const {
   fundOperationService,
 } = require('../../../services/fund/FundOperation.service');
-voteRouter.post('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+voteRouter.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, body, db } = ctx;
   const { type, c } = body;
   const { user, applicationForm } = data;

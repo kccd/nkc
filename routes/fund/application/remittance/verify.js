@@ -6,7 +6,8 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
-router.put('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+router.put('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, body, db } = ctx;
   const { number } = body;
   if (number === undefined) {

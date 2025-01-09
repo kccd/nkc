@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const imageRouter = new Router();
-imageRouter.get('/', async (ctx, next) => {
+const { OnlyUser } = require('../../middlewares/permission');
+imageRouter.get('/', OnlyUser(), async (ctx, next) => {
   const { data, db, params, settings } = ctx;
   const { uid } = params;
   const { user } = data;

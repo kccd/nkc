@@ -2,8 +2,10 @@ const Router = require('koa-router');
 const singleForumRouter = require('./singleForum');
 const forumRouter = new Router();
 
+const { Public, OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 forumRouter
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
     await db.ForumModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -13,7 +15,7 @@ forumRouter
     });
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, query, db, nkcModules } = ctx;
     const { user } = data;
     const { t = 'map', f = 'writable' } = query;
@@ -114,7 +116,7 @@ forumRouter
     }
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.addForum), async (ctx, next) => {
     const { data, db, redis, body } = ctx;
     const { displayName, type } = body;
     const newForum = await db.ForumModel.createForum(displayName, type);

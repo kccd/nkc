@@ -8,8 +8,12 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+} = require('../../../../middlewares/permission');
 completeRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data } = ctx;
     const { applicationForm } = data;
     const { useless, disabled } = applicationForm;
@@ -21,7 +25,7 @@ completeRouter
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user, applicationForm } = data;
     const { status, remittance } = applicationForm;
@@ -56,7 +60,7 @@ completeRouter
     ctx.template = 'fund/complete/complete.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body, nkcModules } = ctx;
     const { checkString, checkNumber } = nkcModules.checkData;
     const { applicationForm, user } = data;

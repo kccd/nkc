@@ -8,9 +8,15 @@ const {
   fundOperationTypes,
 } = require('../../../../settings/fundOperation');
 const auditRouter = require('./audit');
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+  OnlyOperation,
+} = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 const reportRouter = new Router();
 reportRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { applicationForm } = ctx.data;
     if (applicationForm.disabled) {
       ctx.throw(400, '申请表已被屏蔽');
@@ -23,7 +29,7 @@ reportRouter
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, state } = ctx;
     const { applicationForm, fund } = data;
     if (state.uid !== applicationForm.uid) {
@@ -36,7 +42,7 @@ reportRouter
     ctx.template = 'fund/report/report.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, state } = ctx;
     const { applicationForm } = data;
     const { c } = body;
@@ -62,28 +68,34 @@ reportRouter
     await next();
   })
 
-  .put('/:reportId', async (ctx, next) => {
-    const { data, db, body, params } = ctx;
-    const { applicationForm, user } = data;
-    const { disabled } = body;
-    const { reportId } = params;
-    if (!(await applicationForm.fund.ensureOperatorPermission('admin', user))) {
-      ctx.throw(403, '抱歉！您不是该基金项目的管理员，无法完成此操作。');
-    }
+  .put(
+    '/:reportId',
+    OnlyOperation(Operations.deleteFundApplicationReport),
+    async (ctx, next) => {
+      const { data, db, body, params } = ctx;
+      const { applicationForm, user } = data;
+      const { disabled } = body;
+      const { reportId } = params;
+      if (
+        !(await applicationForm.fund.ensureOperatorPermission('admin', user))
+      ) {
+        ctx.throw(403, '抱歉！您不是该基金项目的管理员，无法完成此操作。');
+      }
 
-    await db.FundOperationModel.updateOne(
-      {
-        _id: new mongoose.Types.ObjectId(reportId),
-      },
-      {
-        $set: {
-          status: disabled
-            ? fundOperationStatus.disabled
-            : fundOperationStatus.normal,
+      await db.FundOperationModel.updateOne(
+        {
+          _id: new mongoose.Types.ObjectId(reportId),
         },
-      },
-    );
-    await next();
-  })
+        {
+          $set: {
+            status: disabled
+              ? fundOperationStatus.disabled
+              : fundOperationStatus.normal,
+          },
+        },
+      );
+      await next();
+    },
+  )
   .use('/audit', auditRouter.routes(), auditRouter.allowedMethods());
 module.exports = reportRouter;
