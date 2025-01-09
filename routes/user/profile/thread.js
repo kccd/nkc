@@ -71,7 +71,11 @@ module.exports = async (ctx, next) => {
   });
   const haveReviewPermission = ctx.permission('review');
   const results = [];
-  const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
+  let modifyPostTimeLimit = 0;
+  if(user){
+    modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
+  }
+  // const modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimitMS(user.uid);
   for (const thread of threads) {
     if(
       !ctx.permission("getPostAuthor") &&
@@ -105,7 +109,7 @@ module.exports = async (ctx, next) => {
     // 编辑
     if(
       // 回复或不是基金的文章
-      (!isThread || thread.type !== 'fund') &&
+      (!isThread || thread.type !== 'fund') && user &&
       (post.uid === user.uid || ctx.permission('modifyOtherPosts'))
     ) {
       if(modifyPostTimeLimit >= (Date.now() - new Date(post.toc).getTime())) {
@@ -146,6 +150,10 @@ module.exports = async (ctx, next) => {
   }
   data.paging = paging;
   data.posts = results;
-  data.permissions.type = 'thread';
+  if(user && user.uid===targetUser.uid){
+    // 可以显示管理推送到专栏显示的按钮
+    data.permissions.type = 'thread';
+  }
+  
   await next();
 }

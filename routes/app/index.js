@@ -9,7 +9,7 @@ const upgradeRouter = require('./upgrade');
 const accountRouter = require('./account');
 const ProfileRouter = require('./profile');
 const videoPlayerRouter = require('./videoPlayer');
-const { Public } = require('../../middlewares/permission');
+const { Public, OnlyUser } = require('../../middlewares/permission');
 const { androidSavePath, iosSavePath } = upload;
 appRouter
   .get('/', Public(), async (ctx, next) => {
@@ -72,7 +72,7 @@ appRouter
     ctx.filePath = url;
     await next();
   })
-  .get('/location', Public(), async (ctx, next) => {
+  .get('/location', OnlyUser(), async (ctx, next) => {
     const { data, nkcModules } = ctx;
     data.location = nkcModules.location;
     await next();
