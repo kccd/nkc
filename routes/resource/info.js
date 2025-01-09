@@ -13,7 +13,6 @@ router
   })
   .get('/', async (ctx, next) => {
     const { db, data } = ctx;
-    const videoPlayerData = await data.resource.extendVideoPlayerData();
     let resource = data.resource.toObject();
     resource.user = await db.UserModel.findOne({ uid: resource.uid });
     data.resource = resource;
@@ -27,7 +26,9 @@ router
     for (let l of libraries) {
       data.path.push(await l.getPath());
     }
-    data.videoPlayerData = videoPlayerData;
+    if (data.resource.mediaType === 'mediaVideo') {
+      data.videoPlayerData = await data.resource.extendVideoPlayerData();
+    }
     await next();
   });
 module.exports = router;

@@ -74,10 +74,10 @@
           .time {{format('YYYY/MM/DD', f.tlm)}}
           .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}
         //-.list-description {{f.description || "暂无简介"}}
-        .list-options(@click.stop)
+        .list-options
           .list-options-link(
             title="举报"
-            @click="complain(f._id)"
+            @click.stop="complain(f._id)"
           )
             .fa.fa-minus-circle
           span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")
@@ -85,28 +85,32 @@
             .list-options-link(
               v-if="f.ext === 'pdf'"
               title="预览"
-              @click="visitUrl(getUrl('previewPDF', f.rid), true)"
+              @click.stop="visitUrl(getUrl('previewPDF', f.rid), true)"
             )
               .fa.fa-eye
             .list-options-link(
               v-if="(per('deleteFile') && f.type === 'file') || (per('deleteFolder') && f.type === 'folder')"
               title="删除"
-              @click="deleteFolder(f._id)"
+              @click.stop="deleteFolder(f._id)"
             )
               .fa.fa-trash
             .list-options-link(
               v-if="(per('moveFile') && f.type === 'file') || (per('moveFolder') && f.type === 'folder')"
               title="移动"
-              @click="moveFolder(f._id)"
+              @click.stop="moveFolder(f._id)"
             )
               .fa.fa-arrows
             .list-options-link(
               v-if="(per('modifyFile') && f.type === 'file') || (per('modifyFolder') && f.type === 'folder')"
               title="编辑"
-              @click="editFolder(f)"
+              @click.stop="editFolder(f)"
             )
               .fa.fa-edit
-          .list-options-link(v-if="f.type === 'file'" :onclick="'NKC.instance.downloadPanel.open(\"'+f.rid+'\")'"  :title="'点击下载（共被下载' + f.resource.hits + '次）'")
+          .list-options-link(
+            v-if="f.type === 'file'"
+            @click.stop='openDownloadPanel(f.rid)'
+            :title="'点击下载（共被下载' + f.resource.hits + '次）'"
+            )
             .fa.fa-cloud-download
 
           //-.folder-info.fa.fa-ellipsis-v
