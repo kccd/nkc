@@ -15,7 +15,7 @@ router
     const { db, data } = ctx;
     let resource = data.resource.toObject();
     resource.user = await db.UserModel.findOne({ uid: resource.uid });
-    data.resource = resource;
+    
     data.hasPermission = ctx.permission('modifyResources');
     const libraries = await db.LibraryModel.find({
       rid: resource.rid,
@@ -29,6 +29,7 @@ router
     if (data.resource.mediaType === 'mediaVideo') {
       data.videoPlayerData = await data.resource.extendVideoPlayerData();
     }
+    data.resource = resource;
     await next();
   });
 module.exports = router;
