@@ -12,7 +12,7 @@
             span.user-grade(:style="'color:' + user.userInfo.gradeColor")
               span {{user.userInfo.gradeName}}
               img.grade-icon(:src="user.userInfo.gradeIcon" :title="user.userInfo.gradeName")
-          .user-nav-certs {{user.userInfo.certsName}}
+          .user-nav-certs(:title="user.userInfo.certsName") {{user.userInfo.certsName}}
         .user-nav-count
           user-score(:scores="user.userInfo.scores" :xsf="user.userInfo.xsf" :sicon="true" :xsficon="user.xsfIcon")
       .user-nav-links
@@ -60,35 +60,42 @@
 </template>
 
 <script>
-import UserScoresVue from "../../lib/vue/publicVue/userDraw/UserScoresVue";
-import { toChat } from "../../lib/js/chat";
+import UserScoresVue from '../../lib/vue/publicVue/userDraw/UserScoresVue';
+import { toChat } from '../../lib/js/chat';
 
 export default {
-  props: ['user','unreadMessageCount'],
+  props: ['user', 'unreadMessageCount'],
   data: () => ({
     showColumnLink: true,
   }),
   mounted() {
     //判断当专栏开启时退出登录不占一行
-    if(this.user.userInfo.columnId) {
+    if (this.user.userInfo.columnId) {
       this.showColumnLink = true;
-    } else if (!this.user.userInfo.columnId && (this.user.uid && this.user.columnPermission)) {
+    } else if (
+      !this.user.userInfo.columnId &&
+      this.user.uid &&
+      this.user.columnPermission
+    ) {
       this.showColumnLink = true;
-    } else if(!this.user.userInfo.columnId && (!this.user.uid || !this.user.columnPermission)) {
+    } else if (
+      !this.user.userInfo.columnId &&
+      (!this.user.uid || !this.user.columnPermission)
+    ) {
       this.showColumnLink = false;
     }
   },
   components: {
-    "user-score": UserScoresVue,
+    'user-score': UserScoresVue,
   },
   methods: {
     toChat,
   },
-
-}
+};
 </script>
 
 <style lang="less" scoped>
+@import '../base';
 .user-nav-container {
   .user-nav-banner {
     height: 11rem;
@@ -129,79 +136,81 @@ export default {
           box-sizing: border-box;
           border: 3px solid #fff;
         }
-  }
-  .user-nav-name {
-    color: #282c37;
-    font-weight: 700;
-    font-size: 1.4rem;
-    height: 2rem;
-    line-height: 2.5rem;
-    overflow: hidden;
-    padding: 0 1rem;
-    display: -webkit-box;
-    word-break: break-all;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-  }
-  .user-score {
-    line-height: normal;
-    .user-nav-level {
-      display: inline-block;
-      height: 1.5rem;
-      line-height: 1.5rem;
-      font-size: 1rem;
-      .user-grade {
-        padding: 2px 5px;
-        color: #ffffff;
-        border-radius: 2px;
-        .grade-icon {
-          height: 12px;
-          margin-top: -3px;
-          margin-left: 4px;
+      }
+      .user-nav-name {
+        color: #282c37;
+        font-weight: 700;
+        font-size: 1.4rem;
+        height: 2rem;
+        line-height: 2.5rem;
+        overflow: hidden;
+        padding: 0 1rem;
+        display: -webkit-box;
+        word-break: break-all;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+      }
+      .user-score {
+        margin: 0 1rem;
+        .hideText(@line: 1);
+        line-height: normal;
+        .user-nav-level {
+          display: inline-block;
+          height: 1.5rem;
+          line-height: 1.5rem;
+          font-size: 1rem;
+          .user-grade {
+            padding: 2px 5px;
+            color: #ffffff;
+            border-radius: 2px;
+            .grade-icon {
+              height: 12px;
+              margin-top: -3px;
+              margin-left: 4px;
+            }
+          }
+        }
+        .user-nav-certs {
+          display: inline;
+          height: 1.5rem;
+          line-height: 1.5rem;
+          color: #e85a71;
+          font-size: 1rem;
+        }
+      }
+      .user-nav-count {
+        height: 2rem;
+        line-height: 1rem;
+        margin-top: 0;
+        padding: 0 0.5rem;
+        overflow: hidden;
+        text-align: center;
+        .nkc-score {
+          display: inline-block;
+          margin-right: 0.5rem;
         }
       }
     }
-    .user-nav-certs {
-      display: inline-block;
-      height: 1.5rem;
-      line-height: 1.5rem;
-      color: #e85a71;
-      font-size: 1rem;
-    }
-  }
-  .user-nav-count {
-    height: 2rem;
-    line-height: 1rem;
-    margin-top: 0;
-    padding: 0 0.5rem;
-    overflow: hidden;
-    text-align: center;
-    .nkc-score {
-      display: inline-block;
-      margin-right: 0.5rem;
-    }
-  }
-}
-.user-nav-links {
-  border-top: 1px solid #eee;
-  padding: 1rem;
-  .nav-user-link {
-    text-decoration: none;
-    color: #282c37;
-    height: 3rem;
-    line-height: 3rem;
-    text-align: center;
-    padding: 0;
-    border-radius: 4px;
-    cursor: pointer;
-    position: relative;
-    transition: background-color 100ms;
-    .fa {
-      margin-right: 0.3rem;
-      color: #555;
+    .user-nav-links {
+      border-top: 1px solid #eee;
+      padding: 1rem;
+      .nav-user-link {
+        text-decoration: none;
+        color: #282c37;
+        height: 3rem;
+        line-height: 3rem;
+        text-align: center;
+        padding: 0;
+        border-radius: 4px;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 100ms;
+        .fa {
+          margin-right: 0.3rem;
+          color: #555;
+        }
+      }
     }
   }
 }
-  }
-    }
 </style>

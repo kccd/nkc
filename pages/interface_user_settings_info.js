@@ -107,12 +107,7 @@ function selectBanner() {
         'POST',
       )
         .then(function (data) {
-          $('#userBanner').attr(
-            'src',
-            NKC.methods.tools.getUrl('userBanner', data.user.banner) +
-              '&time=' +
-              Date.now(),
-          );
+          $('#userBanner').attr('src', data.data.url);
           emitEventToUpdateLocalUser(data);
           selectImage.close();
         })
@@ -146,12 +141,7 @@ function selectBackBanner() {
         'POST',
       )
         .then(function (data) {
-          $('#userBackBanner').attr(
-            'src',
-            NKC.methods.tools.getUrl('userHomeBanner', data.user.homeBanner) +
-              '&time=' +
-              Date.now(),
-          );
+          $('#userBackBanner').attr('src', data.data.url);
           emitEventToUpdateLocalUser(data);
           selectImage.close();
         })
@@ -214,7 +204,7 @@ var app = new Vue({
   },
 });
 
-function emitEventToUpdateLocalUser(data) {
+function emitEventToUpdateLocalUser() {
   if (isApp) {
     RNUpdateLocalUser();
   }
