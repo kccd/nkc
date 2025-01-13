@@ -209,7 +209,7 @@ router
     }
     await next();
   })
-  .get('/:_id', Public(), async (ctx, next) => {
+  .get('/:_id', OnlyUser(), async (ctx, next) => {
     //获取文章评论跳转到文章并定位到评论
     const { data, db, params, permission, query, nkcModules } = ctx;
     const { _id } = params;

@@ -31,5 +31,10 @@ block fundContent
                 h5=`申请方式：${a.from==='personal'?'个人': '团队'}`
                 h5=``
                 h5=`项目名称：${a.project && a.project.t?a.project.t:'暂未填写'}`
-                h5=`项目内容：${a.project && a.project.c?a.project.c:'暂未填写'}`
+                //- h5=`项目内容：${a.project && a.project.c?a.project.c:'暂未填写'}`
+                if !a.project || !a.project.c
+                   h5=`项目内容：暂未填写`
+                else 
+                   h5=`项目内容：`
+                   div!=a.projectPost.c
             include ../publicModules/paging/paging_input

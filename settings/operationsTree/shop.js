@@ -40,9 +40,9 @@ module.exports = {
     },
     PARAMETER: {
       GET: Operations.visitManageIndex,
-      home: {
-        GET: Operations.visitManageHome,
-      },
+      // home: {
+      //   GET: Operations.visitManageHome,
+      // },
       info: {
         GET: Operations.visitStoreInfoIndex,
         POST: Operations.modifyStoreInfo,

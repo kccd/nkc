@@ -103,7 +103,7 @@ shareRouter
     await lock.unlock();
     return ctx.redirect(shareUrl);
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { query, db, data, nkcModules } = ctx;
     let { type, id } = query;
     const { user } = data;
@@ -268,7 +268,7 @@ shareRouter
     await lock.unlock();
     await next();
   })
-  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .post('/', Public(), async (ctx, next) => {
     const { data, body, db, nkcModules, state } = ctx;
     let { type, id, targetId } = body;
     id = id || targetId;

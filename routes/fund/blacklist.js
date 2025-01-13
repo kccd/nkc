@@ -47,6 +47,9 @@ router
         applicationForm,
       });
     }
+    if (ctx.permission(Operations.fundBlacklistPost)) {
+      data.removeFundListPermission = true;
+    }
     data.paging = paging;
     ctx.template = 'fund/blacklist/blacklist.pug';
     await next();

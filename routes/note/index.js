@@ -1,7 +1,11 @@
 const router = require('koa-router')();
-const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
+const {
+  Public,
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../middlewares/permission');
 router
-  .get('/', Public(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, query, nkcModules } = ctx;
     const { content, offset, length, type, targetId } = query;
     nkcModules.checkData.checkString(content, {
@@ -22,7 +26,7 @@ router
     ctx.template = 'note/note.pug';
     await next();
   })
-  .use('/:_id', Public(), async (ctx, next) => {
+  .use('/:_id', OnlyUser(), async (ctx, next) => {
     const { params, db, data } = ctx;
     const { _id } = params;
     const note = await db.NoteModel.findOne({
@@ -34,7 +38,7 @@ router
     data.note = note;
     await next();
   })
-  .get('/:_id', Public(), async (ctx, next) => {
+  .get('/:_id', OnlyUser(), async (ctx, next) => {
     const {
       data,
       db,

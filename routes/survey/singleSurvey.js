@@ -131,7 +131,7 @@ router
 
     await next();
   })
-  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .post('/', Public(), async (ctx, next) => {
     const { db, data, body, nkcModules } = ctx;
     const { checkString, checkNumber } = nkcModules.checkData;
     const { survey, user } = data;

@@ -110,6 +110,9 @@ applicationRouter
     if (applicationForm.disabled) {
       ctx.throw(403, '抱歉！该申请表已被屏蔽。');
     }
+    if (user.uid !== applicationForm.uid) {
+      ctx.throw(403, '权限不足');
+    }
     const { submitted, usersSupport, projectPassed, adminSupport, remittance } =
       applicationForm.status;
     const { type, c } = query;
@@ -120,9 +123,9 @@ applicationRouter
       if (!c) {
         ctx.throw(400, '请输入放弃的原因。');
       }
-      if (user.uid !== applicationForm.uid) {
-        ctx.throw(403, '权限不足');
-      }
+      // if (user.uid !== applicationForm.uid) {
+      //   ctx.throw(403, '权限不足');
+      // }
       if (applicationForm.adminSupport) {
         ctx.throw(
           403,

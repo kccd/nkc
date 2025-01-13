@@ -21,6 +21,7 @@ router.get(
       applicationForm.map(async (a) => {
         await a.extendApplicant();
         await a.extendProject();
+        await a.extendProjectPost();
         await a.extendFund();
       }),
     );

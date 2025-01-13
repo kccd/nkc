@@ -190,7 +190,7 @@ paperRouter
       // return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
     }
   })
-  .get('/:_id', OnlyUser(), async (ctx, next) => {
+  .get('/:_id', Public(), async (ctx, next) => {
     //获取闭卷考试的题目数据
     const { db, data, params, query, nkcModules, state } = ctx;
     const { created } = query;
@@ -254,7 +254,7 @@ paperRouter
     ctx.template = 'exam/paper.pug';
     await next();
   })
-  .post('/:_id', OnlyUser(), async (ctx, next) => {
+  .post('/:_id', Public(), async (ctx, next) => {
     const { params, db, data, body, state } = ctx;
     const { uid } = state;
     const { _id } = params;

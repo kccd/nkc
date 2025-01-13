@@ -130,10 +130,10 @@ module.exports = {
       vote: {
         POST: Operations.submitFundApplicationVote,
       },
-      audit: {
-        GET: Operations.visitFundApplicationAudit,
-        POST: Operations.submitFundApplicationAudit,
-      },
+      // audit: {
+      //   GET: Operations.visitFundApplicationAudit,
+      //   POST: Operations.submitFundApplicationAudit,
+      // },
       complete: {
         GET: Operations.visitFundApplicationComplete,
         POST: Operations.submitFundApplicationComplete,
