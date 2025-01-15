@@ -120,9 +120,12 @@ export default {
       })
       .catch(err => {
         sweetError(err);
+      }).finally(()=>{
+        self.show = true;
+        self.loading = false;
       })
-      self.show = true;
-      self.loading = false;
+      // self.show = true;
+      // self.loading = false;
     },
     //关闭评论编辑器
     close() {
