@@ -12,6 +12,7 @@ const {
 const {
   OnlyUser,
   OnlyOperation,
+  OnlyUnbannedUser,
 } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations');
 remittanceRouter
@@ -32,104 +33,97 @@ remittanceRouter
     }
     await next();
   })
-  .get(
-    '/',
-    OnlyOperation(Operations.visitFundApplicationRemittance),
-    async (ctx, next) => {
-      const { db, data } = ctx;
-      const { user, applicationForm } = data;
-      const { remittance, fund } = applicationForm;
-      await fund.checkFundRole(user.uid, 'financialStaff');
-      data.isAdmin = await fund.isFundRole(user.uid, 'admin');
-      const usersId = [];
-      for (const r of remittance) {
-        if (!r.uid) {
-          continue;
-        }
-        usersId.push(r.uid);
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { db, data } = ctx;
+    const { user, applicationForm } = data;
+    const { remittance, fund } = applicationForm;
+    await fund.checkFundRole(user.uid, 'financialStaff');
+    data.isAdmin = await fund.isFundRole(user.uid, 'admin');
+    const usersId = [];
+    for (const r of remittance) {
+      if (!r.uid) {
+        continue;
       }
-      const users = await db.UserModel.find(
-        { uid: { $in: usersId } },
-        { uid: 1, avatar: 1, username: 1 },
-      );
-      const usersObj = {};
-      users.map((u) => (usersObj[u.uid] = u));
-      for (const r of remittance) {
-        if (r.uid) {
-          r.user = usersObj[r.uid];
-        }
+      usersId.push(r.uid);
+    }
+    const users = await db.UserModel.find(
+      { uid: { $in: usersId } },
+      { uid: 1, avatar: 1, username: 1 },
+    );
+    const usersObj = {};
+    users.map((u) => (usersObj[u.uid] = u));
+    for (const r of remittance) {
+      if (r.uid) {
+        r.user = usersObj[r.uid];
       }
-      ctx.template = 'fund/remittance/audit.pug';
-      await next();
-    },
-  )
-  .post(
-    '/',
-    OnlyOperation(Operations.submitFundApplicationRemittance),
-    async (ctx, next) => {
-      const { data, body, db } = ctx;
-      const { applicationForm, user } = data;
-      const { number } = body;
-      const { fund, remittance } = applicationForm;
-      await fund.checkFundRole(user.uid, 'financialStaff');
-      try {
-        if (applicationForm.account.paymentType === 'alipay') {
-          await applicationForm.transfer({
-            number,
-            operatorId: applicationForm.uid,
-            clientIp: ctx.address,
-            clientPort: ctx.port,
-          });
-        }
-        await fundOperationService.createFundOperation({
-          uid: applicationForm.uid,
-          formId: applicationForm._id,
-          type: fundOperationTypes.disbursementSuccess,
-          status: fundOperationStatus.normal,
-          installment: number + 1,
+    }
+    ctx.template = 'fund/remittance/audit.pug';
+    await next();
+  })
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { data, body, db } = ctx;
+    const { applicationForm, user } = data;
+    const { number } = body;
+    const { fund, remittance } = applicationForm;
+    await fund.checkFundRole(user.uid, 'financialStaff');
+    try {
+      if (applicationForm.account.paymentType === 'alipay') {
+        await applicationForm.transfer({
+          number,
+          operatorId: applicationForm.uid,
+          clientIp: ctx.address,
+          clientPort: ctx.port,
         });
-        /*await applicationForm.createReport(
+      }
+      await fundOperationService.createFundOperation({
+        uid: applicationForm.uid,
+        formId: applicationForm._id,
+        type: fundOperationTypes.disbursementSuccess,
+        status: fundOperationStatus.normal,
+        installment: number + 1,
+      });
+      /*await applicationForm.createReport(
         'system',
         `第 ${number + 1} 期拨款成功`,
         applicationForm.uid,
         true,
       );*/
-      } catch (err) {
-        await fundOperationService.createFundOperation({
-          uid: applicationForm.uid,
-          formId: applicationForm._id,
-          type: fundOperationTypes.disbursementFailed,
-          status: fundOperationStatus.normal,
-          installment: number + 1,
-          desc: err.message || err.toString(),
-        });
-        /*await applicationForm.createReport(
+    } catch (err) {
+      await fundOperationService.createFundOperation({
+        uid: applicationForm.uid,
+        formId: applicationForm._id,
+        type: fundOperationTypes.disbursementFailed,
+        status: fundOperationStatus.normal,
+        installment: number + 1,
+        desc: err.message || err.toString(),
+      });
+      /*await applicationForm.createReport(
         'system',
         `第 ${number + 1} 期拨款失败: ${err.message || err.toString()}`,
         applicationForm.uid,
         false,
       );*/
-        throw err;
-      }
+      throw err;
+    }
 
-      const r = remittance[number];
+    const r = remittance[number];
 
-      r.status = true;
-      r.uid = user.uid;
-      r.time = new Date();
-      r.apply = false;
+    r.status = true;
+    r.uid = user.uid;
+    r.time = new Date();
+    r.apply = false;
 
-      await applicationForm.updateOne({
-        $set: {
-          'status.remittance': true,
-          submittedReport: false,
-          remittance: remittance,
-        },
-      });
+    await applicationForm.updateOne({
+      $set: {
+        'status.remittance': true,
+        submittedReport: false,
+        remittance: remittance,
+      },
+    });
 
-      await db.MessageModel.sendFundMessage(applicationForm._id, 'applicant');
+    await db.MessageModel.sendFundMessage(applicationForm._id, 'applicant');
 
-      /*for(let i = 0; i < remittance.length; i++) {
+    /*for(let i = 0; i < remittance.length; i++) {
 			const r = remittance[i];
 			if(i < number && !r.status) ctx.throw(400, '请依次拨款！');
 			if(i === number) {
@@ -228,9 +222,8 @@ remittanceRouter
 		await applicationForm.updateOne(obj);
     await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");*/
 
-      await next();
-    },
-  )
+    await next();
+  })
 
   .use('/apply', applyRouter.routes(), applyRouter.allowedMethods())
   .use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods());

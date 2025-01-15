@@ -68,34 +68,28 @@ reportRouter
     await next();
   })
 
-  .put(
-    '/:reportId',
-    OnlyOperation(Operations.deleteFundApplicationReport),
-    async (ctx, next) => {
-      const { data, db, body, params } = ctx;
-      const { applicationForm, user } = data;
-      const { disabled } = body;
-      const { reportId } = params;
-      if (
-        !(await applicationForm.fund.ensureOperatorPermission('admin', user))
-      ) {
-        ctx.throw(403, '抱歉！您不是该基金项目的管理员，无法完成此操作。');
-      }
+  .put('/:reportId', OnlyUnbannedUser(), async (ctx, next) => {
+    const { data, db, body, params } = ctx;
+    const { applicationForm, user } = data;
+    const { disabled } = body;
+    const { reportId } = params;
+    if (!(await applicationForm.fund.ensureOperatorPermission('admin', user))) {
+      ctx.throw(403, '抱歉！您不是该基金项目的管理员，无法完成此操作。');
+    }
 
-      await db.FundOperationModel.updateOne(
-        {
-          _id: new mongoose.Types.ObjectId(reportId),
+    await db.FundOperationModel.updateOne(
+      {
+        _id: new mongoose.Types.ObjectId(reportId),
+      },
+      {
+        $set: {
+          status: disabled
+            ? fundOperationStatus.disabled
+            : fundOperationStatus.normal,
         },
-        {
-          $set: {
-            status: disabled
-              ? fundOperationStatus.disabled
-              : fundOperationStatus.normal,
-          },
-        },
-      );
-      await next();
-    },
-  )
+      },
+    );
+    await next();
+  })
   .use('/audit', auditRouter.routes(), auditRouter.allowedMethods());
 module.exports = reportRouter;
