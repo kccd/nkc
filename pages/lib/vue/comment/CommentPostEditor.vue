@@ -6,6 +6,8 @@
         span 加载中...
     .single-comment-editor-container(v-else)
       .single-comment-prompt 请避免因为你的修改而导致他人的发言文不对题，请确保输入内容合法、友善。
+      .permission-checker
+        publish-permission-checker(:type="publishPermissionTypes.comment")
       .single-comment-editor
         editor(:configs="editorConfigs" :ref="`commentEditor_${cid}`" @ready="removeEvent" :plugs="editorPlugs" @content-change="editorContentChange" :l="comment ? comment.l : '' ")
       .single-comment-button(:data-tyep="this.cid")
@@ -55,6 +57,8 @@ import {getPostEditorConfigs} from "../../js/editor";
 import {nkcAPI} from "../../js/netAPI";
 import {debounce} from "../../js/execution";
 import Editor from "../Editor";
+import { publishPermissionTypes } from "../../js/publish";
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
 export default {
   props: ['cid', 'aid'],
   data: () => ({
@@ -78,9 +82,11 @@ export default {
     protocol: true,
     commentContent: '',
     setTimeout: null,
+    publishPermissionTypes,
   }),
   components: {
     'editor': Editor,
+    'publish-permission-checker': PublishPermissionChecker,
   },
   mounted() {
   },

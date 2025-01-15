@@ -2473,17 +2473,25 @@ forumSchema.statics.checkGlobalPostAndForumWritePermission = async(
     uid,
     fid,
 ) => {
+    const {
+        publishPermissionService,
+      } = require('../services/publish/publishPermission.service');
+    const { publishPermissionTypes } = require('../settings/serverSettings');
     const UserModel = mongoose.model('users');
     const ForumModel = mongoose.model('forums');
     const { getHTMLText } = require('../nkcModules/html');
     const type = 'thread';
-    const { permit, warning } = await UserModel.getUserGlobalPostPermissionStatus(
+    await publishPermissionService.checkPublishPermission(
+        publishPermissionTypes.thread,
         uid,
-        type,
-    );
-    if (!permit) {
-        ThrowCommonError(403, getHTMLText(warning.join('\n')));
-    }
+      );
+    // const { permit, warning } = await UserModel.getUserGlobalPostPermissionStatus(
+    //     uid,
+    //     type,
+    // );
+    // if (!permit) {
+    //     ThrowCommonError(403, getHTMLText(warning.join('\n')));
+    // }
     await ForumModel.checkWritePermission(uid, fid);
 };
 
@@ -2671,13 +2679,21 @@ forumSchema.statics.checkGlobalPostAndForumWritePostPermission = async(
 ) => {
     const ForumModel = mongoose.model('forums');
     const UserModel = mongoose.model('users');
-    const { warning, permit } = await UserModel.getUserGlobalPostPermissionStatus(
+    const {
+        publishPermissionService,
+      } = require('../services/publish/publishPermission.service');
+    const { publishPermissionTypes } = require('../settings/serverSettings');
+    await publishPermissionService.checkPublishPermission(
+        publishPermissionTypes.post,
         uid,
-        'post',
-    );
-    if (!permit) {
-        ThrowCommonError(403, getHTMLText(warning.join('\n')));
-    }
+      );
+    // const { warning, permit } = await UserModel.getUserGlobalPostPermissionStatus(
+    //     uid,
+    //     'post',
+    // );
+    // if (!permit) {
+    //     ThrowCommonError(403, getHTMLText(warning.join('\n')));
+    // }
     await ForumModel.checkWritePostPermission(uid, fid);
 };
 

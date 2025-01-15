@@ -545,7 +545,7 @@ router
     }
 
     // 如果符合送审条件，自动内容送审
-    const needReview = await db.ReviewModel.autoPushToReview(singlePost);
+    const needReview = await db.ReviewModel.getReviewStatusAndCreateLog(singlePost);
     if (needReview) {
       await singlePost.updateOne({
         reviewed: false,

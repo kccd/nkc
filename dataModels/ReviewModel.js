@@ -1,4 +1,6 @@
+const throwError = require("../nkcModules/throwError");
 const mongoose = require("../settings/database");
+const { settingIds } = require("../settings/serverSettings");
 const Mint = require('mint-filter').default
 const Schema = mongoose.Schema;
 
@@ -548,6 +550,263 @@ schema.statics.autoPushToReview = async function(post) {
 
   return needReview;
 }
+schema.statics.getReviewStatusAndCreateLog = async function (post) {
+  const { type, uid, pid, tid } = post;
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const publishSettings = await SettingModel.getSettings(settingIds.publish);
+  const reviewSettings = await SettingModel.getSettings('review');
+  const { postReview } = publishSettings[type];
+  const review = reviewSettings[type];
+
+  const ReviewModel = mongoose.model('reviews');
+  // const ThreadModel = mongoose.model('threads');
+  // const PostModel = mongoose.model('posts');
+  const ForumModel = mongoose.model('forums');
+  // const recycleId = await SettingModel.getRecycleId();
+
+  const user = await UserModel.findOne({ uid });
+  if (!user) throwError(500, '在判断内容是否需要审核的时候，发现未知的uid');
+  const { reviewedCount } = await UsersGeneralModel.findOnly(
+    { uid },
+    { reviewedCount: 1 },
+  );
+  let needReviewObj = await (async () => {
+    const { nationCode } = await UsersPersonalModel.getUserPhoneNumber(uid);
+    const { foreign, notPassVolumeA, notPassVolumeAD, whitelist, blacklist } =
+      postReview;
+
+    const roles = await user.extendRoles();
+    const grade = await user.extendGrade();
+    const roleList = roles.map((r) => `role-${r._id}`);
+    roleList.push(`grade-${grade._id}`);
+    // 白名单
+    for (const r of roleList) {
+      if (whitelist.includes(r)) {
+        return {
+          needReview: false,
+        };
+      }
+    }
+    // 海外手机号注册用户
+    if (
+      nationCode !== foreign.nationCode &&
+      (foreign.type === 'all' ||
+        (foreign.type === 'count' && reviewedCount[source] < foreign.count))
+    ) {
+      return {
+        needReview: true,
+        type: 'foreign',
+        reason: '海外手机号用户，审核通过的文章数量不足',
+      };
+    }
+
+    // 未通过AD卷(入学)考试
+    if (
+      !user.volumeAD &&
+      (notPassVolumeAD.type === 'all' ||
+        (notPassVolumeAD.type === 'count' &&
+          reviewedCount[source] < notPassVolumeAD.count))
+    ) {
+      return {
+        needReview: true,
+        type: 'notPassedAD',
+        reason: '用户没有通过入学考试，审核通过的文章数量不足',
+      };
+    }
+
+    // 未通过 A 卷考试
+    if (
+      !user.volumeA &&
+      (notPassVolumeA.type === 'all' ||
+        (notPassVolumeA.type === 'count' &&
+          reviewedCount[source] < notPassVolumeA.count))
+    ) {
+      return {
+        needReview: true,
+        type: 'notPassedA',
+        reason: '用户没有通过A卷考试，审核通过的文章数量不足',
+      };
+    }
+
+    // 黑名单
+    for (const bl of blacklist) {
+      if (!roleList.includes(bl.id) || bl.type === 'none') {
+        continue;
+      }
+      if (
+        bl.type === 'all' ||
+        (bl.type === 'count' && reviewedCount[source] < bl.count)
+      ) {
+        return {
+          needReview: true,
+          type: 'grade',
+          reason: '因用户等级限制，审核通过的文章数量不足',
+        };
+      }
+    }
+
+    // 专业审核设置了敏感词
+    const fid = post.mainForumsId[0];
+    const forum = await ForumModel.findOne({ fid });
+    const currentPostType = post.type;
+    const forumReviewSettings = forum.reviewSettings;
+    const forumKeywordSettings = forumReviewSettings.keyword;
+    if (
+      (forumKeywordSettings.range === 'only_thread' &&
+        currentPostType === 'thread') ||
+      (forumKeywordSettings.range === 'only_reply' &&
+        currentPostType === 'post') ||
+      forumKeywordSettings.range === 'all'
+    ) {
+      let useKeywordGroups = [];
+      if (currentPostType === 'thread') {
+        useKeywordGroups = forumKeywordSettings.rule.thread.useGroups;
+      }
+      if (currentPostType === 'post') {
+        useKeywordGroups = forumKeywordSettings.rule.reply.useGroups;
+      }
+      const { wordGroup } = reviewSettings.keyword;
+      useKeywordGroups = wordGroup.filter((g) =>
+        useKeywordGroups.includes(g.id),
+      );
+      const matchedKeywords = await ReviewModel.matchKeywords(
+        post.t + post.c,
+        useKeywordGroups,
+      );
+      if (matchedKeywords.length > 0) {
+        return {
+          needReview: true,
+          type: 'includesKeyword',
+          reason: `内容中包含敏感词 ${matchedKeywords.join('、')}`,
+        };
+      }
+    }
+    //专业审核设置了送审规则（按角色和等级的关系送审）
+    const forumContentSettings = forumReviewSettings.content;
+    if (
+      (forumContentSettings.range === 'only_thread' &&
+        currentPostType === 'thread') ||
+      (forumContentSettings.range === 'only_reply' &&
+        currentPostType === 'post') ||
+      forumContentSettings.range === 'all'
+    ) {
+      let roleList = [],
+        gradeList = [],
+        relationship = 'or';
+      if (currentPostType === 'thread') {
+        if (forumContentSettings.rule.thread.anyone) {
+          return {
+            needReview: true,
+            type: 'forumSettingReview',
+            reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+          };
+        }
+        roleList = forumContentSettings.rule.thread.roles;
+        gradeList = forumContentSettings.rule.thread.grades;
+        relationship = forumContentSettings.rule.thread.relationship;
+      }
+      if (currentPostType === 'post') {
+        if (forumContentSettings.rule.reply.anyone) {
+          return {
+            needReview: true,
+            type: 'forumSettingReview',
+            reason: `此专业(fid:${fid}, name:${forum.displayName})设置了文章一律送审`,
+          };
+        }
+        roleList = forumContentSettings.rule.reply.roles;
+        gradeList = forumContentSettings.rule.reply.grades;
+        relationship = forumContentSettings.rule.reply.relationship;
+      }
+
+      await user.extendRoles();
+      await user.extendGrade();
+      const userCerts = user.roles.map((role) => role._id);
+      const userGrade = user.grade._id;
+      if (relationship === 'and') {
+        if (
+          includesArrayElement(userCerts, roleList) &&
+          gradeList.includes(userGrade)
+        ) {
+          return {
+            needReview: true,
+            type: 'forumSettingReview',
+            reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
+          };
+        }
+      } else if (relationship === 'or') {
+        if (
+          includesArrayElement(userCerts, roleList) ||
+          gradeList.includes(userGrade)
+        ) {
+          return {
+            needReview: true,
+            type: 'forumSettingReview',
+            reason: `此内容的发布者(uid:${user.uid})，满足角色和等级关系而被送审`,
+          };
+        }
+      }
+    }
+
+    return {
+      needReview: false,
+    };
+  })();
+  if (!needReviewObj.needReview) {
+    //获取用户是否验证手机号
+    if (await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
+      // const authSettings = await SettingModel.getSettings('auth');
+      // if (authSettings.verifyPhoneNumber.type === 'reviewPost') {
+      needReviewObj = {
+        needReview: true,
+        type: 'unverifiedPhone',
+        reason: '用户未验证手机号',
+      };
+      // }
+    }
+  }
+  if (!needReviewObj.needReview) {
+    //获取敏感词关键字
+    const { keywordGroupId } = postReview;
+    const {
+      c = '',
+      t = '',
+      abstractCn = '',
+      abstractEn = '',
+      keyWordsCn = [],
+      keyWordsEn = [],
+    } = post;
+    const Content =
+      c + t + abstractCn + abstractEn + keyWordsCn.concat(keyWordsEn).join(' ');
+    const matchedKeywords = await ReviewModel.matchKeywordsByGroupsId(
+      Content,
+      keywordGroupId,
+    );
+    if (matchedKeywords.length > 0) {
+      return {
+        needReview: true,
+        type: 'includesKeyword',
+        reason: `内容中包含敏感词 ${matchedKeywords.join('、')}`,
+      };
+    }
+  }
+  let { needReview, reason, type: reviewType } = needReviewObj;
+
+  //如果需要审核，就生成审核记录
+  if (needReview) {
+    await ReviewModel.newReview({
+      type: reviewType,
+      sid: post.pid,
+      uid: post.uid,
+      reason,
+      handlerId: user.uid,
+      source: source.post,
+    });
+  }
+  return needReview;
+};
 /*
 * 更新审核记录的处理人uid
 * */

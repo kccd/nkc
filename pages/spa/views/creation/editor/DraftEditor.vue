@@ -12,6 +12,8 @@
             input.form-control.form-title(type="text" v-model="document.title" placeholder="请输入标题" maxlength='100' @input="contentChange")
           .form-group(v-if="ready")
             editor(:configs="editorConfigs" ref="draftEditor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="insertContent" :l="document.l")
+      .permission-checker
+        publish-permission-checker(:type="publishPermissionTypes.draft")
       .m-b-1
         button.btn.btn-primary.m-r-05(@click="submit" :disabled="!draftId") 提交
         button.btn.btn-default.m-r-05(@click="manuallySaveAsHistory" :disabled="!draftId") 保存
@@ -83,6 +85,8 @@ import InfoBlock from '../../../components/InfoBlock';
 import Editor from '../../../../lib/vue/Editor.vue';
 import { getDocumentEditorConfigs } from '../../../../lib/js/editor';
 import { debounce } from '../../../../lib/js/execution';
+import { publishPermissionTypes } from '../../../../lib/js/publish';
+import PublishPermissionChecker from '../../../../lib/vue/PublishPermissionCheck.vue';
 
 export default {
   data: function (){
@@ -115,7 +119,8 @@ export default {
         create: 'create',
         save: 'save',
         autoSave: 'autoSave'
-      }
+      },
+      publishPermissionTypes,
     }
   },
   mounted() {
@@ -145,6 +150,7 @@ export default {
   components: {
     'info-block': InfoBlock,
     'editor': Editor,
+    'publish-permission-checker': PublishPermissionChecker,
   },
   watch: {
   },

@@ -10,6 +10,8 @@ import { debounce } from '../lib/js/execution';
 import { visitUrlReplace } from '../lib/js/pageSwitch';
 import ThreadOrderModifier from '../lib/vue/ThreadOrderModifier.vue';
 import Vue from 'vue';
+import { publishPermissionTypes } from '../lib/js/publish';
+import PublishPermissionChecker from '../lib/vue/PublishPermissionCheck.vue';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -22,6 +24,21 @@ const commonModel = new NKC.modules.CommonModal();
 
 window.Attachments = undefined;
 window.quotePostApp = undefined;
+// 挂载发表权限状态组件
+$(function () {
+  const container = $('#permissionChecker');
+  if (container.length > 0) {
+    new Vue({
+      el: '#permissionChecker',
+      data: {
+        publishPermissionTypes,
+      },
+      components: {
+        'publish-permission-checker': PublishPermissionChecker,
+      },
+    });
+  }
+});
 $(document).ready(function () {
   initNKCSource();
   new Promise(function (resolve, reject) {

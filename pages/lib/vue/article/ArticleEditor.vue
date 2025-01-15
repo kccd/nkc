@@ -56,6 +56,8 @@
       .checkbox 
         .editor-auto-save
           .fa.fa-exclamation-circle &nbsp; 文章发布后对所有人可见。
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.article")
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId || !checkProtocol") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId || lockPost") 保存
@@ -210,11 +212,14 @@ import {immediateDebounce} from "../../js/execution";
 import EditorCategories from "../publicVue/moveThreadOrArticle/EditorCategories";
 import SelectColumn from "../../../editor/vueComponents/SelectColumn"
 import { sweetError } from "../../js/sweetAlert";
+import { publishPermissionTypes } from '../../js/publish';
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
 
 
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
+    publishPermissionTypes,
     ready: false,
     articleId: null,
     // articleCategories:[],//全部的独立文章分类
@@ -257,6 +262,7 @@ export default {
     }
   }),
   components: {
+    'publish-permission-checker': PublishPermissionChecker,
     "document-editor": DocumentEditor,
     'select-column-categories': selectColumnCategories,
     'editor-categories': EditorCategories,

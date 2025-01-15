@@ -81,11 +81,11 @@ router.get('/', Public(), async (ctx, next) => {
   };
   posts = await db.PostModel.extendPosts(posts, extendPostOptions);
   const comments = await db.PostModel.filterCommentsInfo(posts);
-  data.postPermission = await db.UserModel.getPostPermission(
-    state.uid,
-    'post',
-    post.mainForumsId,
-  );
+  // data.postPermission = await db.UserModel.getPostPermission(
+  //   state.uid,
+  //   'post',
+  //   post.mainForumsId,
+  // );
   data.tid = post.tid;
   data.pid = post.pid;
   data.paging = paging;

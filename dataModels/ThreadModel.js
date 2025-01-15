@@ -1402,6 +1402,7 @@ threadSchema.statics.publishArticle = async (options) => {
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  const ReviewModel = mongoose.model('reviews');
   const { uid, fids, cids, ip, title, content, abstractCn, type, keyWordsCn } =
     options;
   if (!uid) {
@@ -1436,7 +1437,8 @@ threadSchema.statics.publishArticle = async (options) => {
   // // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
   // const needReview = await UserModel.contentNeedReview(thread.uid, "thread");
   // 自动送审
-  const needReview = await db.ReviewModel.autoPushToReview(_post);
+  // const needReview = await db.ReviewModel.autoPushToReview(_post);
+  const needReview = await ReviewModel.getReviewStatusAndCreateLog(post);
   if (!needReview) {
     await PostModel.updateOne({ pid: post.pid }, { $set: { reviewed: true } });
     await ThreadModel.updateOne(
@@ -2384,7 +2386,7 @@ threadSchema.statics.postNewThread = async (options) => {
   //     await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
   //   || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   // 自动送审
-  const needReview = await ReviewModel.autoPushToReview(_post);
+  const needReview = await ReviewModel.getReviewStatusAndCreateLog(_post);
   if (!needReview) {
     _post.reviewed = true;
     thread.reviewed = true;

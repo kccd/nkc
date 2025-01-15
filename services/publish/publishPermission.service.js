@@ -330,7 +330,7 @@ class PublishPermissionService {
   async checkPublishPermission(type, uid) {
     const { tasks, timeLimit, countLimit, permission } =
       await this.getPublishPermissionStatus(type, uid);
-    const { username, avatar, exam, authLevel } = tasks;
+    const { username, avatar, exam, authLevel, verifyPhoneNumber } = tasks;
     const te = (text) => {
       ThrowCommonError(403, `权限不足，因为您还${text}`);
     };
@@ -346,6 +346,12 @@ class PublishPermissionService {
     if (exam && !exam.completed) {
       if (!permission.examNotPass.status) {
         te(`未${exam.name}`);
+      }
+    }
+    if (verifyPhoneNumber && !verifyPhoneNumber.completed) {
+      const authSettings = await SettingModel.getSettings('auth');
+      if (authSettings.verifyPhoneNumber.type === 'disablePublish') {
+        te(`未${verifyPhoneNumber.name}`);
       }
     }
     if (countLimit.limited) {

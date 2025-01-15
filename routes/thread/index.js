@@ -951,11 +951,11 @@ threadRouter
     // 帖子设置
     const threadSettings = await db.SettingModel.getSettings('thread');
     // 发表权限
-    const postPermission = await db.UserModel.getPostPermission(
-      state.uid,
-      'post',
-      thread.mainForumsId,
-    );
+    // const postPermission = await db.UserModel.getPostPermission(
+    //   state.uid,
+    //   'post',
+    //   thread.mainForumsId,
+    // );
 
     // 回复遮罩设置
     const hidePostSettings = await db.SettingModel.getSettings('hidePost');
@@ -1210,7 +1210,7 @@ threadRouter
     data.blacklistInfo = blacklistInfo;
     data.sameLevelForums = sameLevelForums;
     data.threadSettings = threadSettings;
-    data.postPermission = postPermission;
+    // data.postPermission = postPermission;
     data.authorAvatarUrl = authorAvatarUrl;
     data.authorRegisterInfo = authorRegisterInfo;
     data.userSubscribeUsersId = userSubscribeUsersId;
@@ -1399,7 +1399,7 @@ threadRouter
     //   await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
     //   || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
     // 自动送审
-    const needReview = await db.ReviewModel.autoPushToReview(_post);
+    const needReview = await db.ReviewModel.getReviewStatusAndCreateLog(_post);
     if (!needReview) {
       await db.PostModel.updateOne(
         { pid: _post.pid },

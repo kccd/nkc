@@ -4,16 +4,25 @@
     span 正在编辑电文：
     router-link(:to='editMomentUrl', target='_blank') D{{ did }}
   .m-b-1(v-else) 正在编写新电文：
+  .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.moment")
   moment-rich-editor(:id='queryMomentId')
 </template>
 
 <script>
 import MomentRichEditor from '../MomentRichEditor.vue';
 import { getUrl } from '../../../js/tools';
+import { publishPermissionTypes } from '../../../js/publish';
+import PublishPermissionChecker from '../../PublishPermissionCheck.vue';
+
 export default {
   components: {
     'moment-rich-editor': MomentRichEditor,
+    'publish-permission-checker': PublishPermissionChecker,
   },
+  data: () => ({
+    publishPermissionTypes,
+  }),
   computed: {
     editMomentUrl() {
       return getUrl('zoneMoment', this.queryMomentId);

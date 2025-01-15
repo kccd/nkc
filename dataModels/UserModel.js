@@ -3085,13 +3085,42 @@ userSchema.statics.getUserGlobalPostPermissionStatus = async (uid, type) => {
  * @author pengxiguaa 20200-12-18
  * */
 userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const UserModel = mongoose.model('users');
   const ForumModel = mongoose.model('forums');
+  // uid 可能没有
+  // 这里只能获取状态而不能直接报错
+  // let permit = false,
+  //   warning = [],
+  //   permissionStatus = null;
+
   let { permit, warning } = await UserModel.getUserGlobalPostPermissionStatus(
     uid,
     type,
   );
 
+  // if (type === 'thread') {
+  //   permissionStatus =
+  //     await publishPermissionService.getPublishPermissionStatus(
+  //       publishPermissionTypes.thread,
+  //       uid,
+  //     );
+  // } else {
+  //   permissionStatus =
+  //     await publishPermissionService.getPublishPermissionStatus(
+  //       publishPermissionTypes.post,
+  //       uid,
+  //     );
+  // }
+  // const { tasks, countLimit, timeLimit, examCountWarning } = permissionStatus;
+  // permit =
+  //   Object.values(tasks).every((task) => !(task && !task.completed)) &&
+  //   !countLimit.limited &&
+  //   timeLimit.till < Date.now() &&
+  //   !examCountWarning.show;
   if (fids.length > 0) {
     try {
       if (type === 'thread') {

@@ -26,6 +26,8 @@
           input(type="checkbox" value="true" v-model="checkProtocol")
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.comment")
     .m-b-05
       button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="disabledPublish" v-if="!publishing") 发布
       button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="disabledPublish" v-if="publishing") 发布中...
@@ -76,6 +78,8 @@
   import {getCommentEditorConfigs} from '../../js/editor';
   import {debounce} from "../../js/execution";
   import {nkcAPI} from "../../js/netAPI";
+  import { publishPermissionTypes } from '../../js/publish';
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
   export default {
     props: ['source', 'aid', 'comment', 'column-info', 'to-column', 'added'],
     data: () => ({
@@ -93,10 +97,12 @@
       commentId: null,
       l:'',
       loading: true,
+      publishPermissionTypes,
     }),
     components: {
       'editor': Editor,
-      'column': Column
+      'column': Column,
+      'publish-permission-checker': PublishPermissionChecker,
     },
     computed: {
       disabledPublish(){

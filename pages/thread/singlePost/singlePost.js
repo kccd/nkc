@@ -3,6 +3,8 @@ import Editor from '../../lib/vue/Editor';
 import { toLogin } from '../../lib/js/account';
 import { lazyLoadInit } from '../../lib/js/lazyLoad';
 import { initNKCSource } from '../../lib/js/nkcSource';
+import { publishPermissionTypes } from '../../lib/js/publish';
+import PublishPermissionChecker from '../../lib/vue/PublishPermissionCheck.vue';
 
 const NKC = window.NKC;
 var _id;
@@ -358,16 +360,19 @@ class SinglePostModule {
       const editorContainer = $(
         `<div class="single-comment-editor-container"></div>`,
       );
-      const warningDom = $(`<div class="single-comment-warning"></div>`);
-      warningDom.html(this.postPermission.warning);
-      editorContainer.append(warningDom);
+      // const warningDom = $(`<div class="single-comment-warning"></div>`);
+      // warningDom.html(this.postPermission.warning);
+      // editorContainer.append(warningDom);
       let editorDom, app;
-      if (this.postPermission.permit) {
+      // if (this.postPermission.permit) {
         editorDom = $(
           `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="waiting" :l="l" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
           `<div class="single-comment-prompt m-b-05">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
+        );
+        const permissionDom = $(
+          `<div class="permission-checker" id="permissionChecker_${pid}"><publish-permission-checker :type="publishPermissionTypes.post" /></div>`,
         );
         const buttonDom = $(
           `<div class="single-comment-button" data-type="${pid}"></div>`,
@@ -410,8 +415,8 @@ class SinglePostModule {
             ),
           );
 
-        editorContainer.append(promptDom).append(editorDom).append(buttonDom);
-      }
+        editorContainer.append(promptDom).append(editorDom).append(permissionDom).append(buttonDom);
+      // }
 
       if (position === 'top') {
         singleCommentBottom.prepend(editorContainer);
@@ -495,6 +500,15 @@ class SinglePostModule {
           },
         });
         app = singleEditor.getRef();
+        new Vue({
+          el: `#permissionChecker_${pid}`,
+          data: {
+            publishPermissionTypes
+          },
+          components: {
+            'publish-permission-checker': PublishPermissionChecker,
+          },
+        });
         // app = UE.getEditor(editorDom.attr('id'), NKC.configs.ueditor.commentConfigs);
       }
 

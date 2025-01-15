@@ -498,19 +498,19 @@ router
     }
 
     // 编辑器上边有关权限的提示
-    if (data.type === 'newPost') {
-      data.postPermission = await db.UserModel.getPostPermission(
-        state.uid,
-        'post',
-        selectedForumsId,
-      );
-    } else if (data.type === 'newThread') {
-      data.postPermission = await db.UserModel.getPostPermission(
-        state.uid,
-        'thread',
-        [],
-      );
-    }
+    // if (data.type === 'newPost') {
+    //   data.postPermission = await db.UserModel.getPostPermission(
+    //     state.uid,
+    //     'post',
+    //     selectedForumsId,
+    //   );
+    // } else if (data.type === 'newThread') {
+    //   data.postPermission = await db.UserModel.getPostPermission(
+    //     state.uid,
+    //     'thread',
+    //     [],
+    //   );
+    // }
 
     data.post = data.post || {};
     state.editorSettings = await db.SettingModel.getSettings('editor');

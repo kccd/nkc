@@ -36,6 +36,8 @@
     .checkbox
       .editor-auto-save(v-if="autoSaveInfo")
         .fa.fa-check-circle &nbsp;{{ autoSaveInfo }}
+    .permission-checker
+      publish-permission-checker(:type="['newPost','modifyPost','modifyComment','newComment'].includes(type)? publishPermissionTypes.post : publishPermissionTypes.thread")
     .btn-area
       button.btn.btn-theme(
         @click="readyData",
@@ -50,6 +52,8 @@ import { nkcAPI, nkcUploadFile } from "../../lib/js/netAPI";
 import { sweetError } from "../../lib/js/sweetAlert.js";
 import { timeFormat, addUrlParam, getUrl ,delUrlParam } from "../../lib/js/tools";
 import {debounce} from '../../lib/js/execution';
+import { publishPermissionTypes } from "../../lib/js/publish.js";
+import PublishPermissionChecker from '../../lib/vue/PublishPermissionCheck.vue';
 // import 'url-search-params-polyfill';
 // import { screenTopWarning } from "../../lib/js/topAlert";
 // import {getRequest, timeFormat, addUrlParam} from "../../lib/js/tools";
@@ -102,7 +106,11 @@ export default {
     submitStatus: false,
     //用户输入的新版本公告
     noticeContent: "",
+    publishPermissionTypes,
   }),
+  components: {
+    'publish-permission-checker': PublishPermissionChecker,
+  },
   watch: {
     data : {
       immediate: true,

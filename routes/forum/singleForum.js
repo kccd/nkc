@@ -606,15 +606,15 @@ router
       },
       user: data.user,
     });
-    const { permit, warning } = await db.UserModel.getPostPermission(
-      state.uid,
-      'thread',
-      [fid],
-    );
-    data.noPermissionReason = '';
-    if (!permit) {
-      data.noPermissionReason = warning.join('<br/>');
-    }
+    // const { permit, warning } = await db.UserModel.getPostPermission(
+    //   state.uid,
+    //   'thread',
+    //   [fid],
+    // );
+    // data.noPermissionReason = '';
+    // if (!permit) {
+    //   data.noPermissionReason = warning.join('<br/>');
+    // }
 
     ctx.template = 'forum/forum.pug';
     await next();

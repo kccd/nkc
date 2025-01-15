@@ -1466,7 +1466,9 @@ schema.methods.getVerifyPhoneNumberReviewStatus = async function () {
 schema.methods.getKeywordsReviewStatus = async function () {
   const SettingModel = mongoose.model('settings');
   const ReviewModel = mongoose.model('reviews');
-  const documentPostSettings = await SettingModel.getSettings('documentPost');
+  const documentPostSettings = await SettingModel.getSettings(
+    settingIds.publish,
+  );
   const { keywordGroupId } = documentPostSettings[this.source].postReview;
   const { content = '', title = '', abstract = '', abstractEN = '' } = this;
   const keywords = this.keywords || [];
