@@ -12,6 +12,7 @@ const {
   OnlyUser,
   Public,
   OnlyOperation,
+  OnlyUnbannedUser,
 } = require('../../middlewares/permission');
 const { renderMarkdown } = require('../../nkcModules/markdown');
 const {
@@ -243,7 +244,7 @@ router
     await article.addArticleHits();
     await next();
   })
-  .del('/:aid', OnlyOperation(Operations.deleteArticle), async (ctx, next) => {
+  .del('/:aid', OnlyUnbannedUser(), async (ctx, next) => {
     const { params, db, state, permission } = ctx;
     const { aid } = params;
     const { uid } = state; //登录用户uid
@@ -255,7 +256,7 @@ router
         ctx.throw(400, '该文章已经在专栏中，请撤稿后重试');
       }
     }
-    if (uid === article.uid || permission('deleteArticle')) {
+    if (uid === article.uid) {
       //删除已经发布的文章的同时删除该文章的所有草稿
       await article.deleteArticle();
     }

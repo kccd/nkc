@@ -4,13 +4,13 @@ import {
   sweetError,
   sweetQuestion,
 } from '../../lib/js/sweetAlert';
+import { deleteQuestion } from '../../lib/js/exam';
 import { HttpMethods, nkcAPI } from '../../lib/js/netAPI';
 import { getDataById } from '../../lib/js/dataConversion';
 import QuestionTagSelector from '../../lib/vue/QuestionTagSelector.vue';
 import Vue from 'vue';
 import { reloadPage } from '../../lib/js/pageSwitch';
 const data = getDataById('data');
-
 new Vue({
   el: '#app',
   data: {
@@ -113,16 +113,6 @@ function auth(qid, type) {
     })
     .catch(sweetError);
 }
-function deleteQuestion(qid) {
-  sweetQuestion('当前操作无法撤销，确定要删除试题吗？')
-    .then(() => {
-      return nkcAPI('/exam/question/' + qid, HttpMethods.DELETE, {});
-    })
-    .then(function () {
-      window.location.reload();
-    })
-    .catch(sweetError);
-}
 
 /*
  * 修改题库试题的状态
@@ -146,6 +136,6 @@ Object.assign(window, {
   disabledQuestion,
   enabledQuestion,
   auth,
-  deleteQuestion,
+  deleteQuestion: deleteQuestion,
   modifyQuestionStatus,
 });

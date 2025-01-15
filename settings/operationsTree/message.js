@@ -4,9 +4,6 @@ module.exports = {
   list: {
     GET: Operations.messageGetData,
   },
-  blackList: {
-    POST: Operations.messageBlackList,
-  },
   friendsApplication: {
     GET: Operations.getFriendsApplication,
   },

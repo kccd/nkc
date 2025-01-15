@@ -1,5 +1,9 @@
 const Router = require('koa-router');
-const { Public, OnlyOperation } = require('../../middlewares/permission');
+const {
+  Public,
+  OnlyOperation,
+  OnlyUnbannedUser,
+} = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
 const router = new Router();
 router
@@ -13,7 +17,7 @@ router
     ctx.type = 'jpg';
     await next();
   })
-  .del('/:_id', OnlyOperation(Operations.removeQuestion), async (ctx, next) => {
+  .del('/:_id', OnlyUnbannedUser(), async (ctx, next) => {
     const { params, db, data } = ctx;
     const { user } = data;
     const { _id } = params;

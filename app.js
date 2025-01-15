@@ -84,7 +84,7 @@ app
   .use(IPLimit)
   .use(auth)
   .use(cache)
-  .use(permission.permission)
+  // .use(permission.permission)
   .use(logger)
   .use(mainRouter.routes())
   .use(apiData)

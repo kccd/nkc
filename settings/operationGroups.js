@@ -54,7 +54,6 @@ module.exports = {
     Operations.getActivityPoster,
     Operations.getResources,
     Operations.getMediums,
-    Operations.getDefaultImage,
     Operations.getOrigins,
     Operations.getSiteSpecific,
     Operations.getAttachmentIcon,

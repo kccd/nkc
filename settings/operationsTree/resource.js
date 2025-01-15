@@ -38,29 +38,4 @@ module.exports = {
       },
     },
   },
-  appDownload: {
-    // 安装包下载
-    android: {
-      PARAMETER: {
-        GET: Operations.getAndroidPackage,
-      },
-    },
-    ios: {
-      PARAMETER: {
-        GET: Operations.getIosPackage,
-      },
-    },
-  },
-  default: {
-    // 默认图片
-    PARAMETER: {
-      GET: Operations.getDefaultImage,
-    },
-  },
-  pfb: {
-    // 专栏banner
-    PARAMETER: {
-      GET: Operations.getPersonalForumBanner,
-    },
-  },
 };

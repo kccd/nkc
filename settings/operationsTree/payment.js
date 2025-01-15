@@ -9,7 +9,7 @@ module.exports = {
   alipay: {
     POST: Operations.receiveAliPayPaymentInfo,
     PARAMETER: {
-      GET: Operations.postAliPayInfo,
+      GET: Operations.getAlipayInfo,
     },
   },
 };

@@ -56,7 +56,6 @@ const lottery = require('./lottery');
 const shop = require('./shop');
 const account = require('./account');
 const complaint = require('./complaint');
-const imageEdit = require('./imageEdit');
 const rs = require('./resources');
 const protocol = require('./protocol');
 const review = require('./review');
@@ -218,8 +217,6 @@ const operationTree = {
     lottery, // 抽奖页
 
     shop, //商城
-
-    imageEdit, // 编辑图片
 
     protocol, // 论坛协议
 

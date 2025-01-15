@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
 const { questionService } = require('../../services/exam/question.service');
-const { OnlyOperation } = require('../../middlewares/permission');
+const { OnlyOperation, OnlyUser } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
 router
   .get(
@@ -28,58 +28,54 @@ router
       await next();
     },
   )
-  .get(
-    '/paper',
-    OnlyOperation(Operations.viewPaperRecord),
-    async (ctx, next) => {
-      const { data, query, db, nkcModules } = ctx;
-      const { page = 0, t, sortby, cat } = query;
-      data.t = t;
-      data.sortby = sortby;
-      data.cat = cat;
-      const q = {};
-      if (t === 'self') {
-        q.uid = data.user.uid;
-      } else {
-        if (!ctx.permission('viewAllPaperRecords')) {
-          ctx.throw(403, '权限不足');
-        }
-        if (sortby && cat) {
-          if (sortby === 'username') {
-            const targetUser = await db.UserModel.findOne({
-              usernameLowerCase: cat.toLowerCase(),
-            });
-            if (!targetUser) {
-              ctx.throw(400, `用户不存在`);
-            }
-            q.uid = targetUser.uid;
-          } else if (sortby === 'uid') {
-            const targetUser = await db.UserModel.findOne({ uid: cat });
-            if (!targetUser) {
-              ctx.throw(400, `用户不存在`);
-            }
-            q.uid = targetUser.uid;
-          }
-        }
-        q.$or = [
-          {
-            submitted: true,
-          },
-          {
-            timeOut: true,
-          },
-        ];
+  .get('/paper', OnlyUser(), async (ctx, next) => {
+    const { data, query, db, nkcModules } = ctx;
+    const { page = 0, t, sortby, cat } = query;
+    data.t = t;
+    data.sortby = sortby;
+    data.cat = cat;
+    const q = {};
+    if (t === 'self') {
+      q.uid = data.user.uid;
+    } else {
+      if (!ctx.permission('viewAllPaperRecords')) {
+        ctx.throw(403, '权限不足');
       }
-      const count = await db.ExamsPaperModel.countDocuments(q);
-      const paging = nkcModules.apiFunction.paging(page, count);
-      const papers = await db.ExamsPaperModel.find(q)
-        .sort({ toc: -1 })
-        .skip(paging.start)
-        .limit(paging.perpage);
-      data.papers = await db.ExamsPaperModel.extendPapers(papers);
-      data.paging = paging;
-      ctx.template = 'exam/record/paper.pug';
-      await next();
-    },
-  );
+      if (sortby && cat) {
+        if (sortby === 'username') {
+          const targetUser = await db.UserModel.findOne({
+            usernameLowerCase: cat.toLowerCase(),
+          });
+          if (!targetUser) {
+            ctx.throw(400, `用户不存在`);
+          }
+          q.uid = targetUser.uid;
+        } else if (sortby === 'uid') {
+          const targetUser = await db.UserModel.findOne({ uid: cat });
+          if (!targetUser) {
+            ctx.throw(400, `用户不存在`);
+          }
+          q.uid = targetUser.uid;
+        }
+      }
+      q.$or = [
+        {
+          submitted: true,
+        },
+        {
+          timeOut: true,
+        },
+      ];
+    }
+    const count = await db.ExamsPaperModel.countDocuments(q);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    const papers = await db.ExamsPaperModel.find(q)
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
+    data.papers = await db.ExamsPaperModel.extendPapers(papers);
+    data.paging = paging;
+    ctx.template = 'exam/record/paper.pug';
+    await next();
+  });
 module.exports = router;

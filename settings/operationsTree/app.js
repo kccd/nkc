@@ -54,11 +54,6 @@ module.exports = {
       },
     },
   },
-  scoreChange: {
-    PARAMETER: {
-      GET: Operations.APPgetScoreChange,
-    },
-  },
   android: {
     PARAMETER: {
       GET: Operations.downloadApp,

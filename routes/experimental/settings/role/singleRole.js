@@ -93,9 +93,6 @@ router
     if (contentLength(description) > 100) {
       ctx.throw(400, '证书简介不能超过200字节');
     }
-    if (roleDB.type === 'system' && type !== 'system') {
-      ctx.throw(400, '系统类证书无法更改证书类型');
-    }
     if (!color) {
       ctx.throw(400, '颜色不能为空');
     }
