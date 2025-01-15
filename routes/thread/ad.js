@@ -42,7 +42,7 @@ homeTopRouter
     ctx.template = 'thread/ad/ad.pug';
     await next();
   })
-  .post('/', Operations.homeAd, async (ctx, next) => {
+  .post('/', OnlyOperation(Operations.homeAd), async (ctx, next) => {
     const { params, db, body, nkcModules } = ctx;
     const { tid } = params;
     const homeSettings = await db.SettingModel.getSettings('home');
@@ -94,7 +94,7 @@ homeTopRouter
     await db.SettingModel.saveSettingsToRedis('home');
     await next();
   })
-  .del('/', Operations.homeAd, async (ctx, next) => {
+  .del('/', OnlyOperation(Operations.homeAd), async (ctx, next) => {
     const { params, db } = ctx;
     const { tid } = params;
     const homeSettings = await db.SettingModel.getSettings('home');

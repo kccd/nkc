@@ -210,7 +210,9 @@ router
       // 从草稿箱来
       // let { id, o, _id } = query;
       let { id, o, draftDid } = query;
-      if (!draftDid) ctx.throw(400, '参数异常');
+      if (!draftDid) {
+        ctx.throw(400, '参数异常');
+      }
       // 社区的草稿只能使用_id 才能具体查找到一篇文章
       let draft;
       // if (_id) {
