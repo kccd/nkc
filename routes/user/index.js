@@ -26,9 +26,9 @@ const userHomeCardRouter = require('./userHomeCard');
 const profileRouter = require('./profile/index');
 const subscribeRouter = require('./subscribe');
 const userPanelRouter = require('./userPanel');
-const { Public } = require('../../middlewares/permission');
+const { Public, OnlyUser } = require('../../middlewares/permission');
 userRouter
-  .get('/', Public(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { username, uid } = query;
     const targetUsers = [];

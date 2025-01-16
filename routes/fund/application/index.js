@@ -201,23 +201,19 @@ applicationRouter
     await applicationForm.save();
     await next();
   })
-  .post(
-    '/:_id',
-    OnlyOperation(Operations.restoreFundApplicationForm),
-    async (ctx, next) => {
-      const { data, body } = ctx;
-      const { operation } = body;
-      const { applicationForm } = data;
-      const { fund } = applicationForm;
-      if (!(await fund.ensureOperatorPermission('admin', data.user))) {
-        ctx.throw(403, '权限不足');
-      }
-      if (operation === 'restore' && applicationForm.useless === 'giveUp') {
-        await applicationForm.updateOne({ useless: null });
-      }
-      await next();
-    },
-  )
+  .post('/:_id', OnlyUnbannedUser(), async (ctx, next) => {
+    const { data, body } = ctx;
+    const { operation } = body;
+    const { applicationForm } = data;
+    const { fund } = applicationForm;
+    if (!(await fund.ensureOperatorPermission('admin', data.user))) {
+      ctx.throw(403, '权限不足');
+    }
+    if (operation === 'restore' && applicationForm.useless === 'giveUp') {
+      await applicationForm.updateOne({ useless: null });
+    }
+    await next();
+  })
   // .use('/:_id/audit', auditRouter.routes(), auditRouter.allowedMethods())
   .use(
     '/:_id/remittance',
