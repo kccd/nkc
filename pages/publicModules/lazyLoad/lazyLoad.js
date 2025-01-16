@@ -3,7 +3,7 @@ window._lazyLoadInstance = new window.LazyLoad({
   callback_enter: function (element) {
     element.classList.add('lazyloading');
   },
-  callback_load: function (element) {
+  callback_loaded: function (element) {
     element.classList.remove('lazyloading');
     element.classList.remove('lazyload');
     element.classList.add('lazyloaded');
