@@ -330,15 +330,7 @@ paperRouter
           },
         },
       };
-      // 如果通过了入门考试，则更新用户volumeAD状态
-      // 如果通过了普通考试，则根据试卷难度更新用户volumeA或volumeB状态
       userObj[`volume${category.volume}`] = true;
-      if (userObj.volumeB) {
-        userObj.volumeA = true;
-      }
-      if (userObj.volumeA) {
-        userObj.volumeAD = true;
-      }
       await db.UserModel.updateOne({ uid }, userObj);
     }
     await db.ExamsPaperModel.updateOne({ _id: Number(_id), uid }, q);

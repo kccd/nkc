@@ -212,12 +212,6 @@ router
         },
       };
       userObj[`volume${category.volume}`] = true;
-      if (userObj.volumeB) {
-        userObj.volumeA = true;
-      }
-      if (userObj.volumeA) {
-        userObj.volumeAD = true;
-      }
       await db.UserModel.updateOne({ uid }, userObj);
 
       ctx.apiData = {
