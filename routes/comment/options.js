@@ -76,7 +76,7 @@ module.exports = async (ctx, next) => {
           : null;
       //投诉权限
       if (uid !== comment.uid) {
-        optionStatus.complaint = permission('complaintPost') ? true : null;
+        optionStatus.complaint = true;
       }
       //查看IP
       optionStatus.ipInfo = ctx.permission('ipinfo') ? document.ip : null;

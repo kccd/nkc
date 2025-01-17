@@ -852,6 +852,10 @@ function updatePostSort() {
 }
 // 点击引用
 function quotePost(pid) {
+  if (!NKC.configs.uid) {
+    window.RootApp.openLoginPanel();
+    return;
+  }
   if (!window.quotePostApp) {
     window.quotePostApp = new Vue({
       el: '#quoteContent',

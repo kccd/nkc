@@ -224,15 +224,24 @@ class SinglePostModule {
           container.append(pagesDom.clone(true));
           container.attr('data-opened', 'true');
         }
-        const editorApp = self.getEditorApp(pid, container, {
-          cancelEvent: 'switchPostComment',
-          keepOpened: true,
-          position: 'bottom',
-        });
+        let editorApp = null
         this.cWriteInfo = data.cWriteInfo;
         if (!data.cWriteInfo) {
-          editorApp.show = true;
-          editorApp.container.show();
+          if (NKC.configs.uid) {
+            editorApp = self.getEditorApp(pid, container, {
+              cancelEvent: 'switchPostComment',
+              keepOpened: true,
+              position: 'bottom',
+            });
+            editorApp.show = true;
+            editorApp.container.show();
+          } else {
+            container.append(
+              $(
+                `<div class="text-danger single-post-comment-error">${`游客没有发表内容的权限。想参与大家的讨论？现在就 <a href="/login" target="_blank">登录</a> 或 <a href="/register" target="_blank">注册</a>。`}</div>`,
+              ),
+            );
+          }
         } else {
           container.append(
             $(
@@ -311,6 +320,10 @@ class SinglePostModule {
   }
   // 显示、隐藏评论
   switchPostComment(pid, fixPosition, page) {
+    if (!NKC.configs.uid) {
+      window.RootApp.openLoginPanel();
+      return;
+    }
     // 游客没有window.UE
     // if(!window.UE) return screenTopWarning(`别着急，页面还在加载中...`);
     const container = this.getCommentContainer(pid);

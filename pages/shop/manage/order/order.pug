@@ -73,7 +73,7 @@ block shopContent
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
                     a.value.m-r-1.hidden-md.hidden-lg(target="_blank" href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})`)
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
-                    if order.orderStatus !== "unCost" && permission("transferKcbToUser")
+                    if order.orderStatus !== "unCost"
                       button.order-button(onclick=`transfer('${order.buyUid}')`) 转账
                 for param,key in order.params
                   tr(data-order-id=order.orderId data-order-param-id=param.costId)

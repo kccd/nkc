@@ -76,7 +76,7 @@ router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
           moment.uid,
         );
         //投诉权限
-        optionStatus.complaint = permission('complaintPost') ? true : null;
+        optionStatus.complaint = true;
         optionStatus.visibleMoment =
           !hasParent && permission('setMomentVisibleOther') ? true : null;
         optionStatus.editorMoment = false;

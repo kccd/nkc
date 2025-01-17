@@ -49,7 +49,7 @@ block content
               .options
                 include ../module_vote
                 +voteButtons(post, !!data.user)
-                if permission('creditKcb')
+                if data.user
                   .single-post-bottom-item(
                     data-global-click=`showCreditPanel`
                     data-global-data=objToStr({creditType: 'kcb', contentType: 'post', contentId: post.pid})
@@ -152,8 +152,8 @@ block scripts
 
   //- 下载资料询问框
   //include ../publicModules/downloadResource/downloadResource.pug
-  if permission("viewNote")
-    include ../publicModules/NKCHighlighter/NKCHighlighter
+  //- if permission("viewNote")
+  include ../publicModules/NKCHighlighter/NKCHighlighter
   +includeJS(`/thread/comments.js`)
   //include ../publicModules/imageViewer
   //include ../publicModules/replaceNKCRender

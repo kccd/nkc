@@ -130,7 +130,7 @@ router
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
       manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
       review: ctx.permission('review'),
-      creditKcb: ctx.permission('creditKcb'),
+      creditKcb: !!user,
       movePostsToRecycleOrMovePostsToDraft: ctx.permissionsOr([
         'movePostsToRecycle',
         'movePostsToDraft',

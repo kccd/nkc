@@ -53,7 +53,7 @@ block content
               a(href=`/nkc/applyForum`)
                 .fa.fa-paper-plane
                 | 专业申请
-                if !permission("nkcManagementApplyForum")
+                //-if !permission("nkcManagementApplyForum")
                   | （无权）
             li(class=data.nav === 'securityApplication' ? 'active' : '')
               a(href=`/nkc/securityApplication`)

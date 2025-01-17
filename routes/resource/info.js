@@ -18,7 +18,7 @@ router
     let resource = data.resource.toObject();
     resource.user = await db.UserModel.findOne({ uid: resource.uid });
     data.resource = resource;
-    data.hasPermission = ctx.permission('modifyResources');
+    data.hasPermission = data.user ? true : false;
     const libraries = await db.LibraryModel.find({
       rid: resource.rid,
       closed: false,

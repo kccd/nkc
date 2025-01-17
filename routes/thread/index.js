@@ -882,7 +882,6 @@ threadRouter
     // 获取文章附件数
     let attachmentsCount = 0;
     if (
-      ctx.permission('getPostResources') &&
       (await db.PostModel.ensureAttachmentPermission(
         data.user ? data.user.uid : '',
       ))
@@ -897,7 +896,7 @@ threadRouter
 
     // 加载笔记信息
     let notes = [];
-    if (ctx.permission('viewNote')) {
+    // if (ctx.permission('viewNote')) {
       const notePosts = [
         {
           pid: thread.oc,
@@ -911,7 +910,7 @@ threadRouter
         });
       });
       notes = await db.NoteModel.getNotesByPosts(notePosts);
-    }
+    // }
 
     // 黑名单判断
     let blacklistInfo = '';
@@ -1024,8 +1023,8 @@ threadRouter
           'moveThreads',
           'movePostsToDraft',
           'movePostsToRecycle',
-          'digestThread',
-          'unDigestThread',
+          // 'digestThread',
+          // 'unDigestThread',
           'toppedThread',
           'unToppedThread',
           'homeTop',
@@ -1043,13 +1042,12 @@ threadRouter
       ]),
       creditKcb:
         !thread.firstPost.anonymous &&
-        ctx.permission('creditKcb') &&
         data.user &&
         thread.firstPost.uid !== data.user.uid,
       violationRecord: ctx.permission('violationRecord'),
-      viewNote: ctx.permission('viewNote'),
+      viewNote: true,
       getPostAuthor: ctx.permission('getPostAuthor'),
-      creditKcbPost: ctx.permission('creditKcb'),
+      creditKcbPost: !!data.user,
       banSaleProductParams: ctx.permission('banSaleProductParams'),
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),

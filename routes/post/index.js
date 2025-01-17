@@ -242,14 +242,14 @@ router
       );
     }
 
-    if (ctx.permission('viewNote')) {
+    // if (ctx.permission('viewNote')) {
       data.notes = await db.NoteModel.getNotesByPosts([
         {
           pid: data.post.pid,
           cv: data.post.cv,
         },
       ]);
-    }
+    // }
     await next();
   })
   .put('/:pid', OnlyUnbannedUser(), async (ctx, next) => {
