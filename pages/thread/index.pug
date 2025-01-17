@@ -419,9 +419,10 @@ block content
                 .fa.fa-thumb-tack &nbsp;
                 | 置顶回复
               div
-                include ./singlePost/singleToppedPost
+                include ./singlePost/singlePost
                 for post in data.toppedPosts
-                  +singleToppedPost(post)
+                  //- +singleToppedPost(post)
+                  +singlePost(Object.assign({}, post, {cancelTopped: true, hidePostBottom: true, disableAutoHideContent: true ,hideComment: true}))
           //- 高赞回复
           if data.voteUpPosts && data.voteUpPosts.length
             .m-b-1

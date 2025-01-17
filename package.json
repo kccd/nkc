@@ -1,9 +1,8 @@
 {
   "name": "nkc",
-  "version": "1.0.0",
-  "description": "source of [kechuang.org]",
-  "homepage": "https://kechuang.org",
-  "private": true,
+  "version": "0.1.1",
+  "description": "source of [www.kechuang.org]",
+  "homepage": "https://www.kechuang.org",
   "scripts": {
     "build": "node install.js",
     "rebuild": "node install.js -r",
@@ -25,7 +24,8 @@
   "keywords": [
     "koa2",
     "mongoose",
-    "restful"
+    "restful",
+    "nodejs"
   ],
   "author": "nkc",
   "license": "ISC",

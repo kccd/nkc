@@ -328,6 +328,9 @@ resourceSchema.statics.getResourcesByJson = async (jsonContent = {}) => {
   return resources;
 };
 resourceSchema.methods.extendVideoPlayerData = async function () {
+  if (this.mediaType !== 'mediaVideo') {
+    return null;
+  }
   const r = this;
   await r.setFileExist();
   const { defaultFile, disabled, isFileExist, visitorAccess, mask } = r;
