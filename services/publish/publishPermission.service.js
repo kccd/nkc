@@ -276,7 +276,7 @@ class PublishPermissionService {
       if (
         !intervalItem ||
         !item.limited ||
-        item.interval > intervalItem.interval
+        item.interval < intervalItem.interval
       ) {
         intervalItem = item;
       }
