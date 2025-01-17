@@ -15,11 +15,16 @@ if !isIncluded('columns/article/articleOptions')
               -url = threadUrl + '#container';
             else
               -url = '#container';
+            a(href=url)
+              .fa.fa-comment-o
+              span=replyCount
           else
-            -url = "RootApp.openLoginPanel('login')"
-          a(href=url)
-            .fa.fa-comment-o
-            span=replyCount
+            a(onclick="RootApp.openLoginPanel();")
+              .fa.fa-comment-o
+              span=replyCount
+          //- a(href=url)
+          //-   .fa.fa-comment-o
+          //-   span=replyCount
 
       //- 回复按钮
       +replyItem
