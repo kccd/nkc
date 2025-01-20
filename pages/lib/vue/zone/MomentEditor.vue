@@ -290,7 +290,7 @@ import ResourceSelector from '../ResourceSelector';
 import { getMomentPlainJsonContentLength } from '../../js/checkData';
 import { getUrl } from '../../js/tools';
 import { screenTopWarning } from '../../js/topAlert';
-import { immediateDebounce } from '../../js/execution';
+import { debounce } from '../../js/execution';
 import { nkcAPI } from '../../js/netAPI';
 import EmojiSelector from '../EmojiSelector';
 import EditorCore from './EditorCore.plain.vue';
@@ -647,7 +647,7 @@ export default {
       this.autoSaving = true;
       this.onContentChangeCore();
     },
-    onContentChangeCore: immediateDebounce(function () {
+    onContentChangeCore: debounce(function () {
       this.saveContent().finally(() => {
         this.autoSaving = false;
       });

@@ -119,7 +119,7 @@ import MomentFiles from './MomentFiles';
 import ResourceSelector from '../ResourceSelector';
 import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';
-import { immediateDebounce } from '../../js/execution';
+import {} from '../../js/execution';
 import { lazyLoadInit } from '../../js/lazyLoad';
 import { publishPermissionTypes } from '../../js/publish';
 import PublishPermissionCheck from '../PublishPermissionCheck.vue';
@@ -228,7 +228,7 @@ export default {
       this.autoSaving = true;
       this.delayedSaveReplayContent();
     },
-    delayedSaveReplayContent: immediateDebounce(function () {
+    delayedSaveReplayContent: debounce(function () {
       this.saveReplayContent().finally(() => {
         this.autoSaving = false;
       });

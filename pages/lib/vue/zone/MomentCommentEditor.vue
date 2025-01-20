@@ -128,7 +128,7 @@
 
 <script>
 import { sweetError } from '../../js/sweetAlert';
-import { immediateDebounce } from '../../js/execution';
+import { debounce } from '../../js/execution';
 import { getLength } from '../../js/checkData';
 import EmojiSelector from '../EmojiSelector';
 import ResourceSelector from '../ResourceSelector';
@@ -288,7 +288,7 @@ export default {
       this.autoSaving = true;
       this.onContentChangeCore();
     },
-    onContentChangeCore: immediateDebounce(function () {
+    onContentChangeCore: debounce(function () {
       this.saveContent().finally(() => {
         this.autoSaving = false;
       });
