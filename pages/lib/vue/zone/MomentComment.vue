@@ -119,7 +119,7 @@ import MomentFiles from './MomentFiles';
 import ResourceSelector from '../ResourceSelector';
 import EditorCore from './EditorCore.plain.vue';
 import { getUrl } from '../../js/tools';
-import {} from '../../js/execution';
+import { debounce } from '../../js/execution';
 import { lazyLoadInit } from '../../js/lazyLoad';
 import { publishPermissionTypes } from '../../js/publish';
 import PublishPermissionCheck from '../PublishPermissionCheck.vue';
