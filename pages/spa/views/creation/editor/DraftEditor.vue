@@ -2,6 +2,8 @@
   .standard-fluid-max-container
     //-.m-b-1
       bread-crumb(:list="navList")
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.draft")
     div
       .m-b-1
         info-block(:mode="'info'")
@@ -12,8 +14,6 @@
             input.form-control.form-title(type="text" v-model="document.title" placeholder="请输入标题" maxlength='100' @input="contentChange")
           .form-group(v-if="ready")
             editor(:configs="editorConfigs" ref="draftEditor" @content-change="watchContentChange" :plugs="editorPlugs" @ready="insertContent" :l="document.l")
-      .permission-checker
-        publish-permission-checker(:type="publishPermissionTypes.draft")
       .m-b-1
         button.btn.btn-primary.m-r-05(@click="submit" :disabled="!draftId") 提交
         button.btn.btn-default.m-r-05(@click="manuallySaveAsHistory" :disabled="!draftId") 保存

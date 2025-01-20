@@ -5,12 +5,12 @@
         .fa.fa-spinner.fa-spin
         span 加载中...
     .single-comment-editor-container(v-else)
-      .single-comment-prompt 请避免因为你的修改而导致他人的发言文不对题，请确保输入内容合法、友善。
       .permission-checker
         publish-permission-checker(:type="publishPermissionTypes.comment")
+      .single-comment-prompt 请避免因为你的修改而导致他人的发言文不对题，请确保输入内容合法、友善。
       .single-comment-editor
         editor(:configs="editorConfigs" :ref="`commentEditor_${cid}`" @ready="removeEvent" :plugs="editorPlugs" @content-change="editorContentChange" :l="comment ? comment.l : '' ")
-      .single-comment-button(:data-tyep="this.cid")
+      .single-comment-button(:data-type="this.cid")
         .checkbox
           label
             input(type="checkbox" checked="checked" data-type="protocol" v-model="protocol")

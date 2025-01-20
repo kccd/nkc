@@ -66,8 +66,8 @@ var app = new Vue({
             }
           };
           var obj = {
-            roles: app.roles,
-            grades: app.grades
+            // roles: app.roles,
+            // grades: app.grades
           };
           if(['postToForum', 'postToThread'].includes(self.type)) {
             self.checkNumber(results_.survey.deadlineMax, {

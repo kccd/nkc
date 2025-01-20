@@ -311,8 +311,6 @@ module.exports = {
       PUT: Operations.experimentalUserAuth,
     },
     review: {
-      GET: Operations.experimentalReviewSettings,
-      PUT: Operations.experimentalReviewSettings,
       keyword: {
         PUT: Operations.experimentalKeywordSettings,
       },

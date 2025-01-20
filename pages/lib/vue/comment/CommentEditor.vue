@@ -1,5 +1,7 @@
 <template lang="pug">
   div
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.comment")
     .m-b-05(v-if="quote")
       .quote
         .quote-cancel(@click="clearQuote") 取消引用
@@ -26,8 +28,6 @@
           input(type="checkbox" value="true" v-model="checkProtocol")
           span 我已阅读并同意遵守与本次发表相关的全部协议。
           a(href="/protocol" target="_blank") 查看协议
-    .permission-checker
-      publish-permission-checker(:type="publishPermissionTypes.comment")
     .m-b-05
       button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="disabledPublish" v-if="!publishing") 发布
       button.m-r-05.btn.btn-primary.btn-sm(@click="publish" :disabled="disabledPublish" v-if="publishing") 发布中...

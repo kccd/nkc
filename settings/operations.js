@@ -616,7 +616,6 @@ const DynamicOperations = {
     weakPasswordCheck: 'weakPasswordCheck',
     weakPasswordCheckResult: 'weakPasswordCheckResult',
     experimentalUserAuth: 'experimentalUserAuth',
-    experimentalReviewSettings: 'experimentalReviewSettings',
     experimentalKeywordSettings: 'experimentalKeywordSettings',
     experimentalColumnSettings: 'experimentalColumnSettings',
     experimentalLibrarySettings: 'experimentalLibrarySettings',
