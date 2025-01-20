@@ -1,5 +1,7 @@
 <template lang="pug">
   .article-editor
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.article")
     .m-b-1
       .article-box(v-if="articles.length > 0")
         .article-box-header 草稿
@@ -56,8 +58,6 @@
       .checkbox 
         .editor-auto-save
           .fa.fa-exclamation-circle &nbsp; 文章发布后对所有人可见。
-    .permission-checker
-      publish-permission-checker(:type="publishPermissionTypes.article")
     .m-b-1
       button.btn.btn-primary.m-r-05(@click="publish" :disabled="lockPost || !articleId || !checkProtocol") 发布
       button.btn.btn-default.m-r-05(@click="saveArticle" :disabled="!articleId || lockPost") 保存

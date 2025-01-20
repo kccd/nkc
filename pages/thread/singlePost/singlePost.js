@@ -431,7 +431,7 @@ class SinglePostModule {
             ),
           );
 
-        editorContainer.append(promptDom).append(editorDom).append(permissionDom).append(buttonDom);
+        editorContainer.append(permissionDom).append(promptDom).append(editorDom).append(buttonDom);
       // }
 
       if (position === 'top') {

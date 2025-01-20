@@ -177,7 +177,6 @@
   "experimentalRegisterSettings": "后台管理-注册设置",
   "experimentalResourceLogs": "后台管理 - 附件上传记录",
   "experimentalReviewLog": "后台管理-查看审核记录",
-  "experimentalReviewSettings": "后台管理-审核设置",
   "experimentalSafeSettings": "后台安全设置",
   "experimentalScoreSettings": "后台管理 - 设置 - 积分",
   "experimentalShareSettings": "后台管理 - 分享设置",
@@ -332,7 +331,7 @@
   "modifyKcbRecordReason": "屏蔽/解除屏蔽 鼓励原因",
   "modifyKcbSettings": "修改科创币设置",
   "modifyLibraryFolder": "修改文库目录或文件",
-  "modifyMergeSettings": "modifyMergeSettings",
+  "modifyMergeSettings": "修改合并设置",
   "modifyMessageSettings": "聊天信息设置修改",
   "modifyMessageStatus": "标记信息为已读",
   "modifyMobile": "修改手机号码",
@@ -613,7 +612,7 @@
   "visitForumInfoSettings": "访问专业基本信息设置",
   "visitForumLatest": "查看专业最新文章",
   "visitForumLibrary": "访问专业文库",
-  "visitForumMergeSettings": "visitForumMergeSettings",
+  "visitForumMergeSettings": "访问论坛合并设置",
   "visitForumPermissionSettings": "访问专业权限设置",
   "visitForumsCategory": "访问专业分类",
   "visitFreightTemplate": "查看运费模板设置",
@@ -735,7 +734,7 @@
   "visitZoneSingleMoment": "访问电文详情页",
   "visitiShopProducts": "[SY]商城后台商品管理列表",
   "weakPasswordCheck": "弱密码检测",
-  "weakPasswordCheckResult": "weakPasswordCheckResult",
+  "weakPasswordCheckResult": "弱密码检查结果",
   "withdrawFundApplicationForm": "强制撤回基金申请",
   "zoneMomentCommentVote": "点赞/点踩空间电文评论",
   "zoneMomentVote": "点赞/点踩空间电文",
@@ -763,5 +762,7 @@
   "visitDocument": "访问文章信息",
   "visitArticle": "查看独立文章",
   "disableResource": "屏蔽附件",
-  "collectionPost": "收藏论坛文章下的回复"
+  "collectionPost": "收藏论坛文章下的回复",
+  "experimentalPublishSettings": "后台发表内容限制设置",
+  "disabledResource": "屏蔽资源"
 }

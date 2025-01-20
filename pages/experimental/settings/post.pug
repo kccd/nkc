@@ -25,9 +25,9 @@ block content
                 button.mdui-btn(:class='{"active": type === "postToThread"}' @click='type = "postToThread"') 发表回复
                 button.mdui-btn(:class='{"active": type === "postLibrary"}' @click='type = "postLibrary"') 文库操作
                 //button.mdui-btn(:class='{"mdui-color-theme": type === "postResource"}' @click='type = "postResource"') 上传资源
-              .col-sm-2.text-right
+              .col-sm-2.text-right(v-if="type==='postLibrary'")
                 h4 最小认证等级
-              .col-sm-10
+              .col-sm-10(v-if="type==='postLibrary'")
                 <label class="mdui-radio mdui-m-r-2">
                 <input type="radio" :value='0' v-model='postSettings[type].authLevelMin' />
                 <i class="mdui-radio-icon"></i>
@@ -49,7 +49,7 @@ block content
                 | 等级3（手持身份证照）
                 </label>
                 hr
-            .row
+            .row(v-if="type==='postLibrary'")
               .col-sm-2.text-right
                 h4 通过考试
               .col-sm-10
@@ -84,7 +84,7 @@ block content
                     input(class="table-input" v-model='postSettings[type].examCountLimit.countLimit')
                     | &nbsp;条/每天
                 hr
-            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
+            //-.row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
               .col-sm-2.text-right
                 h4 证书限制
               .col-sm-10
