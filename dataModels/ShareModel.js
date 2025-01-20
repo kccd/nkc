@@ -1,4 +1,7 @@
-const { getJsonStringTextSlice, getJsonStringText } = require('../nkcModules/json');
+const {
+  getJsonStringTextSlice,
+  getJsonStringText,
+} = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const settings = require('../settings');
 const mongoose = settings.database;
@@ -540,10 +543,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: firstPost.t,
       cover: getUrl('postCover', post.cover),
-      desc: post.l === 'json' ? getJsonStringTextSlice(post.c ,100) : nkcRender.htmlToPlain(
-        post.c,
-        100,
-      ),
+      desc:
+        post.l === 'json'
+          ? getJsonStringTextSlice(post.c, 100)
+          : nkcRender.htmlToPlain(post.c, 100),
     };
   } else if (type === shareTypes.thread) {
     const thread = await ThreadModel.findOnly({ tid: id });
@@ -560,12 +563,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: targetPost.t,
       cover: getUrl('postCover', targetPost.cover),
-      desc: targetPost.l === 'json'
-      ? getJsonStringTextSlice(targetPost.c,100)
-      : nkcRender.htmlToPlain(
-        targetPost.c,
-        100,
-      ),
+      desc:
+        targetPost.l === 'json'
+          ? getJsonStringTextSlice(targetPost.c, 100)
+          : nkcRender.htmlToPlain(targetPost.c, 100),
     };
   } else if (type === shareTypes.forum) {
     const forum = await ForumModel.findOnly({ fid: id });
@@ -581,12 +582,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: comment.articleDocument.title,
       cover: getUrl('documentCover', comment.cover),
-      desc: comment.commentDocument.l === 'json'
-      ? getJsonStringTextSlice(comment.commentDocument.content ,100)
-      :nkcRender.htmlToPlain(
-         comment.commentDocument.content,
-        100,
-      ),
+      desc:
+        comment.commentDocument.l === 'json'
+          ? getJsonStringTextSlice(comment.commentDocument.content, 100)
+          : nkcRender.htmlToPlain(comment.commentDocument.content, 100),
     };
   } else if (type === shareTypes.article) {
     let article = await ArticleModel.findOnly({ _id: id });
@@ -594,12 +593,10 @@ shareSchema.statics.getShareContent = async function (props) {
     shareContent = {
       title: article.document.title,
       cover: getUrl('documentCover', article.document.cover),
-      desc:  article.document.l === 'json'
-      ? getJsonStringTextSlice(article.document.content ,100)
-      : nkcRender.htmlToPlain(
-       article.document.content,
-        100,
-      ),
+      desc:
+        article.document.l === 'json'
+          ? getJsonStringTextSlice(article.document.content, 100)
+          : nkcRender.htmlToPlain(article.document.content, 100),
     };
   } else if (type === shareTypes.user) {
     const targetUser = await UserModel.findOnly({ uid: id });
@@ -650,7 +647,7 @@ shareSchema.statics.getShareContent = async function (props) {
     );
     const momentInfo = momentsData[0];
     shareContent = {
-      title: `「动态电文」${momentInfo.username || ''}`,
+      title: `「电文」${momentInfo.username || ''}`,
       cover: getUrl('userAvatar', momentInfo.user.avatar),
       desc: nkcRender.htmlToPlain(momentInfo.content || '', 100),
     };
