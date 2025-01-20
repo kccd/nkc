@@ -128,7 +128,7 @@
 
 <script>
 import { sweetError } from '../../js/sweetAlert';
-import { immediateDebounce } from '../../js/execution';
+import { debounce } from '../../js/execution';
 import { getLength } from '../../js/checkData';
 import EmojiSelector from '../EmojiSelector';
 import ResourceSelector from '../ResourceSelector';
@@ -153,6 +153,7 @@ export default {
     alsoPost: false,
     momentCommentId: '',
     submitting: false,
+    autoSaving: false,
     types: {
       repost: 'repost',
       comment: 'comment',
@@ -193,6 +194,7 @@ export default {
     },
     disablePostButton() {
       return (
+        this.autoSaving ||
         this.submitting ||
         (this.type === this.types.comment && this.disablePostChecked)
       );
@@ -282,8 +284,14 @@ export default {
     onTextareaEditorContentChange(content) {
       this.content = content;
     },
-    onContentChange: immediateDebounce(function () {
-      this.saveContent();
+    onContentChange() {
+      this.autoSaving = true;
+      this.onContentChangeCore();
+    },
+    onContentChangeCore: debounce(function () {
+      this.saveContent().finally(() => {
+        this.autoSaving = false;
+      });
     }, 1000),
     saveContent(t) {
       const {
@@ -296,7 +304,7 @@ export default {
       const self = this;
       if (disableSavingCount > 0) {
         this.disableSavingCount--;
-        return;
+        return Promise.resolve();
       }
       let type;
       if (t) {
