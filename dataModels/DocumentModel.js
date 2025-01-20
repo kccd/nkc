@@ -1356,14 +1356,41 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
+  const creationDrafts = mongoose.model('creationDrafts');
   const publishSettings = await SettingModel.getSettings(settingIds.publish);
   const { postReview } = publishSettings[this.source];
   const user = await UserModel.findOnly({ uid });
-  const { reviewedCount } = await UsersGeneralModel.findOnly(
-    { uid },
-    { reviewedCount: 1 },
-  );
+  const { article, comment, moment, draft } =
+    await DocumentModel.getDocumentSources();
+  let passedCount = 0;
+  if (source === moment) {
+    const { normal } = await MomentModel.getMomentStatus();
+    passedCount = await MomentModel.countDocuments({
+      status: normal,
+      uid,
+    });
+  } else if (source === article) {
+    const { normal } = await ArticleModel.getArticleStatus();
+    passedCount = await ArticleModel.countDocuments({
+      status: normal,
+      uid,
+    });
+  } else if (source === comment) {
+    const { normal } = await CommentModel.getCommentStatus();
+    passedCount = await CommentModel.countDocuments({
+      status: normal,
+      uid,
+    });
+  } else if (source === draft) {
+    passedCount = await creationDrafts.countDocuments({
+      del: false,
+      uid,
+    });
+  }
   const { nationCode } = await UsersPersonalModel.getUserPhoneNumber(uid);
   const { foreign, notPassVolumeA, notPassVolumeAD, whitelist, blacklist } =
     postReview;
@@ -1384,7 +1411,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   if (
     nationCode !== foreign.nationCode &&
     (foreign.type === 'all' ||
-      (foreign.type === 'count' && reviewedCount[source] < foreign.count))
+      (foreign.type === 'count' && passedCount < foreign.count))
   ) {
     return {
       needReview: true,
@@ -1397,8 +1424,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   if (
     !user.volumeAD &&
     (notPassVolumeAD.type === 'all' ||
-      (notPassVolumeAD.type === 'count' &&
-        reviewedCount[source] < notPassVolumeAD.count))
+      (notPassVolumeAD.type === 'count' && passedCount < notPassVolumeAD.count))
   ) {
     return {
       needReview: true,
@@ -1411,8 +1437,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   if (
     !user.volumeA &&
     (notPassVolumeA.type === 'all' ||
-      (notPassVolumeA.type === 'count' &&
-        reviewedCount[source] < notPassVolumeA.count))
+      (notPassVolumeA.type === 'count' && passedCount < notPassVolumeA.count))
   ) {
     return {
       needReview: true,
@@ -1426,10 +1451,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
     if (!roleList.includes(bl.id) || bl.type === 'none') {
       continue;
     }
-    if (
-      bl.type === 'all' ||
-      (bl.type === 'count' && reviewedCount[source] < bl.count)
-    ) {
+    if (bl.type === 'all' || (bl.type === 'count' && passedCount < bl.count)) {
       return {
         needReview: true,
         type: 'grade',

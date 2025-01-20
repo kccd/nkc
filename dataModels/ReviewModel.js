@@ -556,10 +556,12 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
   const UserModel = mongoose.model('users');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const UsersGeneralModel = mongoose.model('usersGeneral');
+  const PostModel = mongoose.model('posts');
+  const ThreadModel = mongoose.model('threads');
   const publishSettings = await SettingModel.getSettings(settingIds.publish);
   const reviewSettings = await SettingModel.getSettings('review');
   const { postReview } = publishSettings[type];
-  const review = reviewSettings[type];
+  const recycleId = await SettingModel.getRecycleId();
 
   const ReviewModel = mongoose.model('reviews');
   // const ThreadModel = mongoose.model('threads');
@@ -569,10 +571,21 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
 
   const user = await UserModel.findOne({ uid });
   if (!user) throwError(500, '在判断内容是否需要审核的时候，发现未知的uid');
-  const { reviewedCount } = await UsersGeneralModel.findOnly(
-    { uid },
-    { reviewedCount: 1 },
-  );
+  let passedCount = 0;
+  if (type === 'post') {
+    passedCount = await PostModel.countDocuments({
+      disabled: false,
+      reviewed: true,
+      uid,
+    });
+  } else {
+    passedCount = await ThreadModel.countDocuments({
+      disabled: false,
+      reviewed: true,
+      mainForumsId: { $ne: recycleId },
+      uid,
+    });
+  }
   let needReviewObj = await (async () => {
     const { nationCode } = await UsersPersonalModel.getUserPhoneNumber(uid);
     const { foreign, notPassVolumeA, notPassVolumeAD, whitelist, blacklist } =
@@ -594,7 +607,7 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
     if (
       nationCode !== foreign.nationCode &&
       (foreign.type === 'all' ||
-        (foreign.type === 'count' && reviewedCount[source] < foreign.count))
+        (foreign.type === 'count' && passedCount < foreign.count))
     ) {
       return {
         needReview: true,
@@ -608,7 +621,7 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
       !user.volumeAD &&
       (notPassVolumeAD.type === 'all' ||
         (notPassVolumeAD.type === 'count' &&
-          reviewedCount[source] < notPassVolumeAD.count))
+          passedCount < notPassVolumeAD.count))
     ) {
       return {
         needReview: true,
@@ -621,8 +634,7 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
     if (
       !user.volumeA &&
       (notPassVolumeA.type === 'all' ||
-        (notPassVolumeA.type === 'count' &&
-          reviewedCount[source] < notPassVolumeA.count))
+        (notPassVolumeA.type === 'count' && passedCount < notPassVolumeA.count))
     ) {
       return {
         needReview: true,
@@ -638,7 +650,7 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
       }
       if (
         bl.type === 'all' ||
-        (bl.type === 'count' && reviewedCount[source] < bl.count)
+        (bl.type === 'count' && passedCount < bl.count)
       ) {
         return {
           needReview: true,
