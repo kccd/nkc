@@ -169,6 +169,7 @@ export default {
     replyEditorStatus: false,
     replyContent: '',
     submitting: false,
+    autoSaving: false,
     icons: {
       image: {
         fill: iconFill.normal,
@@ -210,7 +211,10 @@ export default {
       return filesUrl;
     },
     disabledButton() {
-      return this.replyContent.length === 0 && this.picturesUrl.length === 0;
+      return (
+        (this.replyContent.length === 0 && this.picturesUrl.length === 0) ||
+        this.autoSaving
+      );
     },
   },
   mounted() {
@@ -221,10 +225,13 @@ export default {
     visitUrl,
     onReplyEditorContentChange(content) {
       this.replyContent = content;
+      this.autoSaving = true;
       this.delayedSaveReplayContent();
     },
     delayedSaveReplayContent: immediateDebounce(function () {
-      this.saveReplayContent();
+      this.saveReplayContent().finally(() => {
+        this.autoSaving = false;
+      });
     }, 1000),
     getReplayContent() {
       nkcAPI(`/api/v1/zone/editor/plain?parent=${this.commentData._id}`, 'GET')
@@ -244,7 +251,7 @@ export default {
         .catch(sweetError);
     },
     saveReplayContent() {
-      nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
+      return nkcAPI(`/api/v1/zone/editor/plain`, 'PUT', {
         parent: this.commentData._id,
         content: this.replyContent,
         resourcesId: this.picturesId,

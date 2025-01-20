@@ -326,6 +326,7 @@ export default {
   data: () => ({
     publishPermissionTypes,
     submitting: false,
+    autoSaving: false,
     textareaHeight: '0',
     maxContentLength: 1000,
     maxPictureCount: 9,
@@ -428,10 +429,20 @@ export default {
       return filesUrl;
     },
     disablePublish() {
-      const { submitting, momentId, content, picturesUrl, videosUrl, medias } =
-        this;
+      const {
+        autoSaving,
+        submitting,
+        momentId,
+        content,
+        picturesUrl,
+        videosUrl,
+        medias,
+      } = this;
       return (
-        submitting || !momentId || (content.length === 0 && medias.length === 0)
+        autoSaving ||
+        submitting ||
+        !momentId ||
+        (content.length === 0 && medias.length === 0)
       );
     },
   },
@@ -632,8 +643,14 @@ export default {
     onClickEnter() {
       this.publishContent();
     },
-    onContentChange: immediateDebounce(function () {
-      this.saveContent();
+    onContentChange() {
+      this.autoSaving = true;
+      this.onContentChangeCore();
+    },
+    onContentChangeCore: immediateDebounce(function () {
+      this.saveContent().finally(() => {
+        this.autoSaving = false;
+      });
     }, 1000),
     saveContent() {
       const self = this;
@@ -643,7 +660,7 @@ export default {
       const resourcesId = medias.map((item) => item.rid);
       //判断是否是已发表的电文的编辑
       if (momentStatus === 'normal') {
-        nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`, 'PUT', {
+        return nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`, 'PUT', {
           content,
           resourcesId,
         })
