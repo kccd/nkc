@@ -62,6 +62,7 @@ class PublishPermissionService {
 
   async getPublishPermissionExamStatus(props) {
     const {
+      examEnabled,
       userVolumeA,
       userVolumeB,
       userVolumeAD,
@@ -69,30 +70,34 @@ class PublishPermissionService {
       examVolumeB,
       examVolumeAD,
     } = props;
-    const result = {
-      type: 'exam',
-      name: ``,
-      completed: true,
-      link: `/exam`,
-      title: '去考试',
-    };
-    if (examVolumeAD) {
-      result.name = `通过入学考试`;
-      if (!userVolumeAD) {
-        result.completed = false;
+    if (examEnabled) {
+      const result = {
+        type: 'exam',
+        name: ``,
+        completed: true,
+        link: `/exam`,
+        title: '去考试',
+      };
+      if (examVolumeAD) {
+        result.name = `通过入学考试`;
+        if (!userVolumeAD) {
+          result.completed = false;
+        }
+      } else if (examVolumeA) {
+        result.name = '通过A卷考试';
+        if (!userVolumeA) {
+          result.completed = false;
+        }
+      } else {
+        result.name = '通过B卷考试';
+        if (!userVolumeB) {
+          result.completed = false;
+        }
       }
-    } else if (examVolumeA) {
-      result.name = '通过A卷考试';
-      if (!userVolumeA) {
-        result.completed = false;
-      }
+      return result;
     } else {
-      result.name = '通过B卷考试';
-      if (!userVolumeB) {
-        result.completed = false;
-      }
+      return null;
     }
-    return result;
   }
 
   async getPublishCountToday(props) {
@@ -207,6 +212,7 @@ class PublishPermissionService {
       tasks.authLevel = authLevelTask;
     }
     const examTask = await this.getPublishPermissionExamStatus({
+      examEnabled: permission.examEnabled,
       userVolumeAD: user.volumeAD,
       userVolumeA: user.volumeA,
       userVolumeB: user.volumeB,
@@ -243,6 +249,7 @@ class PublishPermissionService {
       publishedCount: countToday,
     };
     if (
+      examTask &&
       !examTask.completed &&
       permission.examNotPass.status &&
       permission.examNotPass.limited
