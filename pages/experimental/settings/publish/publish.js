@@ -34,8 +34,9 @@ const app = new window.Vue({
     addItem(arr) {
       arr.push({
         valueString: '',
-        count: 0,
         limited: false,
+        interval: 0,
+        count: 0,
       });
     },
     addReviewItem() {
