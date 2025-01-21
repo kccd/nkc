@@ -91,6 +91,7 @@ router.get('/:aid', Public(), async (ctx, next) => {
     const { normal: normalStatus } = await db.ArticleModel.getArticleStatus();
     if (_article.status !== normalStatus && !isModerator) {
       if (!permission('review')) {
+        delete data.columnPost;
         return ctx.throw(403, '权限不足');
       }
     }
@@ -227,9 +228,17 @@ router.get('/:aid', Public(), async (ctx, next) => {
       tid: columnPostData.thread.tid,
     });
     //
-    if (!thread) ctx.throw(400, '未找到文章，请刷新');
+    if (!thread) {
+      delete data.columnPost;
+      ctx.throw(400, '未找到文章，请刷新');
+    }
     // 专业权限判断
-    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    try {
+      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    } catch (error) {
+      delete data.columnPost;
+      throw error;
+    }
     //判断用户是否具有专家权限
     isModerator = await db.ForumModel.isModerator(
       state.uid,
@@ -252,8 +261,10 @@ router.get('/:aid', Public(), async (ctx, next) => {
     // 文章处于待审核的状态
     // 若当前用户不是专家、不是作者，则在此抛出403
     if (!thread.reviewed) {
-      if (!data.user || (!isModerator && data.user.uid !== thread.uid))
+      if (!data.user || (!isModerator && data.user.uid !== thread.uid)) {
+        delete data.columnPost;
         ctx.throw(403, '文章还未通过审核，暂无法阅读');
+      }
     }
     // 文章处于已被退回的状态
     if (thread.recycleMark) {
@@ -261,8 +272,10 @@ router.get('/:aid', Public(), async (ctx, next) => {
       if (!isModerator) {
         // 访问用户没有查看被退回文章的权限，且不是自己发表的文章则抛出403
         if (!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-          if (!data.user || thread.uid !== data.user.uid)
+          if (!data.user || thread.uid !== data.user.uid) {
+            delete data.columnPost;
             ctx.throw(403, '文章已被退回修改，暂无法阅读。');
+          }
         }
       }
       // 获取文章被退回的原因
