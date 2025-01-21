@@ -4,9 +4,10 @@ const { subscribeSources } = require('../../settings/subscribe');
 const {
   subscribeForumService,
 } = require('../../services/subscribe/subscribeForum.service');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 
 subscribeRouter
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, body } = ctx;
     const { fid } = params;
     const { cid = [] } = body;
@@ -48,7 +49,7 @@ subscribeRouter
     await db.KcbsRecordModel.insertSystemRecord('subscribeForum', user, ctx);
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { user } = data;
     const { fid } = params;

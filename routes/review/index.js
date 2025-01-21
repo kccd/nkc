@@ -2,10 +2,11 @@ const Router = require('koa-router');
 const router = new Router();
 const { eventEmitter } = require('../../events');
 const { getMomentPublishType } = require('../../events/moment');
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.review), async (ctx, next) => {
     ctx.template = 'review/review.pug';
     const { nkcModules, data, db, query } = ctx;
     const { page = 0, reviewType = 'post' } = query;
@@ -157,13 +158,10 @@ router
     const momentDocId = new Set();
     const uid = new Set();
     for (const document of documents) {
-      document.content =  document.l === 'json'
-      ? getJsonStringTextSlice(document.content, 100)
-      : nkcModules.apiFunction.obtainPureText(
-        document.content,
-        true,
-        100,
-      );
+      document.content =
+        document.l === 'json'
+          ? getJsonStringTextSlice(document.content, 100)
+          : nkcModules.apiFunction.obtainPureText(document.content, true, 100);
       if (document.source === articleSource) {
         articleDocId.add(document.did);
       }
@@ -273,7 +271,7 @@ router
     data.paging = paging;
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.review), async (ctx, next) => {
     //审核post和document
     const { data, db, body, state } = ctx;
     const { user } = data;
@@ -426,11 +424,16 @@ router
         let passType;
         if (document.source === 'article') {
           passType = 'documentPassReview';
-          const contribute = await db.ColumnContributeModel.findOne({ tid: document.sid,type:'submit'}).sort({toc:-1});
-          if(contribute&&contribute.passed==='unknown'){
+          const contribute = await db.ColumnContributeModel.findOne({
+            tid: document.sid,
+            type: 'submit',
+          }).sort({ toc: -1 });
+          if (contribute && contribute.passed === 'unknown') {
             // 是否具有专栏管理员添加文章权限或者专栏主
             // 获取专栏的基本信息。。与用户的信息进行对比
-            const column = await db.ColumnModel.findOnly({ _id: contribute.columnId });
+            const column = await db.ColumnModel.findOnly({
+              _id: contribute.columnId,
+            });
             const userPermissionObject =
               await db.ColumnModel.getUsersPermissionKeyObject();
             const isPermission = await db.ColumnModel.checkUsersPermission(
@@ -438,26 +441,36 @@ router
               document.uid,
               userPermissionObject.column_post_add,
             );
-            if(isPermission || column.uid === document.uid){
-              const article = await db.ArticleModel.findOne({_id:document.sid})
+            if (isPermission || column.uid === document.uid) {
+              const article = await db.ArticleModel.findOne({
+                _id: document.sid,
+              });
               let columnPost = await db.ColumnPostModel.findOne({
                 pid: document.sid,
                 type: 'article',
                 columnId: column._id,
               });
               if (!columnPost) {
-                await db.ColumnPostModel({
-                  _id: await db.SettingModel.operateSystemID("columnPosts", 1),
-                  tid: '',
-                  from: "contribute",
-                  pid: article._id,
-                  columnId: column._id,
-                  type: contribute.source,
-                  order: await db.ColumnPostModel.getColumnPostOrder(contribute.cid,contribute.mcid),
-                  top: article.toc,
-                  cid: contribute.cid,
-                  mcid: contribute.mcid,
-                }).save();
+                await db
+                  .ColumnPostModel({
+                    _id: await db.SettingModel.operateSystemID(
+                      'columnPosts',
+                      1,
+                    ),
+                    tid: '',
+                    from: 'contribute',
+                    pid: article._id,
+                    columnId: column._id,
+                    type: contribute.source,
+                    order: await db.ColumnPostModel.getColumnPostOrder(
+                      contribute.cid,
+                      contribute.mcid,
+                    ),
+                    top: article.toc,
+                    cid: contribute.cid,
+                    mcid: contribute.mcid,
+                  })
+                  .save();
               }
               // 需要进行更新article中sid
               let sidArray = [];
@@ -469,7 +482,7 @@ router
                 sidArray.push(columnPostItem.columnId);
               }
               sidArray = [...new Set(sidArray)];
-              await article.updateOne({ $set: { sid:sidArray.join('-')}});
+              await article.updateOne({ $set: { sid: sidArray.join('-') } });
               await contribute.updateOne({
                 tlm: Date.now(),
                 description: '具有专栏添加文章权限',

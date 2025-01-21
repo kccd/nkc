@@ -10,8 +10,9 @@ const recordRouter = require('./record');
 const questionsRouter = require('./questions');
 const publicRouter = require('./public');
 const { questionService } = require('../../services/exam/question.service');
+const { Public, OnlyUser } = require('../../middlewares/permission');
 examRouter
-  .use(async (ctx, next) => {
+  .use(Public(), async (ctx, next) => {
     const { db, data } = ctx;
     const papers = await db.ExamsPaperModel.find({
       submitted: false,
@@ -41,7 +42,7 @@ examRouter
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, state } = ctx;
     ctx.template = 'exam/home.pug';
     const categoryTypes = await db.ExamsCategoryModel.getExamCategoryTypes();
@@ -77,10 +78,9 @@ examRouter
       passRateObj[r.cid] = Math.round(r.passRate * 10000) / 10000;
     }
     const examsCategories = {
-      secretA: [],
-      secretB: [],
-      publicA: [],
-      publicB: [],
+      volumeA: [],
+      volumeB: [],
+      volumeAD: [],
     };
     for (const category of categories) {
       const targetCategory = {
@@ -91,18 +91,12 @@ examRouter
         type: category.type,
         volume: category.volume,
       };
-      if (category.type === categoryTypes.secret) {
-        if (category.volume === 'A') {
-          examsCategories.secretA.push(targetCategory);
-        } else {
-          examsCategories.secretB.push(targetCategory);
-        }
+      if (category.volume === 'AD') {
+        examsCategories.volumeAD.push(targetCategory);
+      } else if (category.volume === 'A') {
+        examsCategories.volumeA.push(targetCategory);
       } else {
-        if (category.volume === 'A') {
-          examsCategories.publicA.push(targetCategory);
-        } else {
-          examsCategories.publicB.push(targetCategory);
-        }
+        examsCategories.volumeB.push(targetCategory);
       }
     }
     const papers = await db.ExamsPaperModel.find({

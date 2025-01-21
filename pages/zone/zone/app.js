@@ -5,9 +5,9 @@ import Vuex from 'vuex';
 import EditorPage from '../../lib/vue/zone/views/Editor.vue';
 import EditorHistoryPage from '../../lib/vue/zone/views/EditorHistory.vue';
 
-Vue.use(Vuex);
+window.Vue.use(Vuex);
 //自定义长按事件
-Vue.directive('long-press', {
+window.Vue.directive('long-press', {
   bind(el, binding) {
     if (typeof binding.value !== 'function') {
       console.warn(`Expect a function, got ${typeof binding.value}`);
@@ -41,7 +41,7 @@ Vue.directive('long-press', {
     el.addEventListener('mouseout', cancel);
     el.addEventListener('touchend', cancel);
     el.addEventListener('touchcancel', cancel);
-  }
+  },
 });
 
 const zoneElementId = 'zoneApp';
@@ -145,16 +145,16 @@ function initZoneVueApp() {
     },
   ];
   // 防止路由重复点击报错
-  const originalPush = VueRouter.prototype.push;
-  const originalReplace = VueRouter.prototype.replace;
-  VueRouter.prototype.push = function push(location) {
+  const originalPush = window.VueRouter.prototype.push;
+  const originalReplace = window.VueRouter.prototype.replace;
+  window.VueRouter.prototype.push = function push(location) {
     return originalPush.call(this, location).catch((err) => err);
   };
-  VueRouter.prototype.replace = function replace(location) {
+  window.VueRouter.prototype.replace = function replace(location) {
     return originalReplace.call(this, location).catch((err) => err);
   };
 
-  const router = new VueRouter({
+  const router = new window.VueRouter({
     mode: 'history',
     routes,
     scrollBehavior(to, from, savePosition) {
@@ -186,7 +186,7 @@ function initZoneVueApp() {
     next();
   });
   router.afterEach((to, from) => {});
-  const app = new Vue({
+  const app = new window.Vue({
     el: `#${zoneElementId}`,
     router,
     store,

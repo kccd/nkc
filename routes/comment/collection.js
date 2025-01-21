@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 const router = new Router();
-router.post('/', async (ctx, next) => {
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { body, params, db, data } = ctx;
   const { _id } = params;
   const { type, cid = [] } = body;

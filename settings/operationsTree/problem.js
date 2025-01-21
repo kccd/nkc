@@ -12,11 +12,4 @@ module.exports = {
       DELETE: Operations.deleteProblem,
     },
   },
-  type: {
-    POST: Operations.addProblemsType,
-    PARAMETER: {
-      PUT: Operations.modifyProblemsType,
-      DELETE: Operations.deleteProblemsType,
-    },
-  },
 };

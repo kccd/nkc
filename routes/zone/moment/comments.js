@@ -1,6 +1,7 @@
 const router = require('koa-router')();
+const { Public } = require('../../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     //获取动态下的评论
     const { db, data, internalData, query, nkcModules, state, permission } =
       ctx;
@@ -74,7 +75,7 @@ router
     data.paging = paging;
     await next();
   })
-  .get('/child', async (ctx, next) => {
+  .get('/child', Public(), async (ctx, next) => {
     const { db, state, permission, data, query, internalData, nkcModules } =
       ctx;
     let { page = 0, sort = 'time', focus = '' } = query;

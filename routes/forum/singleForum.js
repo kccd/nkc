@@ -19,8 +19,14 @@ const { subscribeSources } = require('../../settings/subscribe');
 const { forumListService } = require('../../services/forum/forumList.service');
 const { userForumService } = require('../../services/user/userForum.service');
 const { editorRichService } = require('../../services/editor/rich.service');
+const {
+  OnlyUnbannedUser,
+  OnlyOperation,
+  Public,
+} = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 router
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
     const { ForumModel, ThreadModel, SubscribeModel } = db;
     const { fid } = params;
@@ -264,7 +270,7 @@ router
     // data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyOperation(Operations.deleteForum), async (ctx, next) => {
     ctx.throw(400, `暂不允许删除专业`);
     const { params, db, redis } = ctx;
     const { fid } = params;
@@ -301,7 +307,7 @@ router
   .use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
   // .use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { data, db, params, query, url, method, state } = ctx;
     let _url = url.replace(/\?.*/g, '');
     _url = _url.replace(/^\/f\/[0-9a-zA-Z]+?\/(.+)/i, '$1');
@@ -600,20 +606,20 @@ router
       },
       user: data.user,
     });
-    const { permit, warning } = await db.UserModel.getPostPermission(
-      state.uid,
-      'thread',
-      [fid],
-    );
-    data.noPermissionReason = '';
-    if (!permit) {
-      data.noPermissionReason = warning.join('<br/>');
-    }
+    // const { permit, warning } = await db.UserModel.getPostPermission(
+    //   state.uid,
+    //   'thread',
+    //   [fid],
+    // );
+    // data.noPermissionReason = '';
+    // if (!permit) {
+    //   data.noPermissionReason = warning.join('<br/>');
+    // }
 
     ctx.template = 'forum/forum.pug';
     await next();
   })
-  .get(['/', '/library'], async (ctx, next) => {
+  .get(['/', '/library'], Public(), async (ctx, next) => {
     const { data, db, query, state } = ctx;
     const { pageSettings, uid } = state;
     const { forum } = data;

@@ -11,8 +11,13 @@ const {
 const {
   registerExamService,
 } = require('../../services/register/registerExam.service.js');
+const {
+  Public,
+  OnlyVisitor,
+  OnlyUnbannedUser,
+} = require('../../middlewares/permission');
 registerRouter
-  .get(['/', '/mobile'], async (ctx, next) => {
+  .get(['/', '/mobile'], Public(), async (ctx, next) => {
     const { data, query } = ctx;
     const { user } = data;
     if (user) {
@@ -26,23 +31,13 @@ registerRouter
     ctx.template = 'register/register.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyVisitor(), async (ctx, next) => {
     // 手机注册
     const { db, body } = ctx;
     const { mobile, nationCode, code, username, password, activationCode } =
       body;
     delete body.password;
 
-    const { registerExamination } = await db.SettingModel.getSettings(
-      'register',
-    );
-
-    if (registerExamination) {
-      await activationCodeService.checkActivationCodeId(activationCode);
-    }
-
-    await usernameCheckerService.checkNewUsername(username);
-    await db.UserModel.checkNewPassword(password);
     if (!nationCode) {
       ctx.throw(400, '请选择国家区号');
     }
@@ -73,12 +68,7 @@ registerRouter
     option.regIP = ctx.address;
     option.regPort = ctx.port;
     delete option.type;
-    option.username = username;
-    option.password = password;
     const user = await db.UserModel.createUser(option);
-    if (registerExamination) {
-      await activationCodeService.useActivationCode(activationCode, user.uid);
-    }
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,
@@ -107,14 +97,14 @@ registerRouter
 
     await next();
   })
-  .post('/check', async (ctx, next) => {
+  .post('/check', OnlyVisitor(), async (ctx, next) => {
     const { body, db } = ctx;
     const { username, password } = body;
     await usernameCheckerService.checkNewUsername(username);
     await db.UserModel.checkNewPassword(password);
     await next();
   })
-  .get('/code', async (ctx, next) => {
+  .get('/code', OnlyVisitor(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     if (user) {
@@ -130,7 +120,7 @@ registerRouter
     data.svgData = codeData.data;
     await next();
   })
-  .get('/subscribe', async (ctx, next) => {
+  .get('/subscribe', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, db, data } = ctx;
     const { t } = query;
     if (!t) {
@@ -174,7 +164,7 @@ registerRouter
     }
     await next();
   })
-  .get('/exam', async (ctx, next) => {
+  .get('/exam', Public(), async (ctx, next) => {
     const { db, data, state } = ctx;
     //获取注册需要考哪些卷子
     if (state.uid) {
@@ -211,7 +201,7 @@ registerRouter
     ctx.template = 'exam/public.pug';
     await next();
   })
-  .get('/exam/code', async (ctx, next) => {
+  .get('/exam/code', OnlyVisitor(), async (ctx, next) => {
     const { data } = ctx;
     const { codeId, codeValue } =
       await registerExamService.getRegisterExamCode();

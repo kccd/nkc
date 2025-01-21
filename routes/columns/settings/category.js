@@ -1,43 +1,58 @@
-const Router = require("koa-router");
+const Router = require('koa-router');
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+} = require('../../../middlewares/permission');
 const router = new Router();
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { db } = ctx;
     const { user, column } = ctx.data;
-    const userPermissionObject = await db.ColumnModel.getUsersPermissionKeyObject();
-    const isPermission = await db.ColumnModel.checkUsersPermission(column.users,user.uid,userPermissionObject.column_settings_category)
+    const userPermissionObject =
+      await db.ColumnModel.getUsersPermissionKeyObject();
+    const isPermission = await db.ColumnModel.checkUsersPermission(
+      column.users,
+      user.uid,
+      userPermissionObject.column_settings_category,
+    );
     if (!isPermission && column.uid !== user.uid) {
       ctx.throw(403, '权限不足');
     }
     await next();
   })
-  .get("/", async (ctx, next) => {
-    ctx.template = "columns/settings/category.pug";
-    const {db, data} = ctx;
-    const {column} = data;
-    data.categoryList = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-    data.categoryTree = await db.ColumnPostCategoryModel.getCategoryTree(column._id);
-    data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(column._id);
-    data.nav = "category";
+  .get('/', OnlyUser(), async (ctx, next) => {
+    ctx.template = 'columns/settings/category.pug';
+    const { db, data } = ctx;
+    const { column } = data;
+    data.categoryList = await db.ColumnPostCategoryModel.getCategoryList(
+      column._id,
+    );
+    data.categoryTree = await db.ColumnPostCategoryModel.getCategoryTree(
+      column._id,
+    );
+    data.minorCategories = await db.ColumnPostCategoryModel.getMinorCategories(
+      column._id,
+    );
+    data.nav = 'category';
     await next();
   })
-  .put('/', async (ctx, next) => {
-    const {db, body, data} = ctx;
-    const {categories} = body;
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { db, body, data } = ctx;
+    const { categories } = body;
     const parentId = [];
-    const {column} = data;
-    categories.map(c => parentId.push(c._id));
+    const { column } = data;
+    categories.map((c) => parentId.push(c._id));
     const parentCategories = await db.ColumnPostCategoryModel.find({
       columnId: column._id,
       type: 'main',
-      _id: {$in: parentId}
+      _id: { $in: parentId },
     });
     const parentCategoriesObj = {};
-    parentCategories.map(c => parentCategoriesObj[c._id] = c);
-    for(const category of categories) {
-      let {parentId} = category;
+    parentCategories.map((c) => (parentCategoriesObj[c._id] = c));
+    for (const category of categories) {
+      let { parentId } = category;
       const parentCategory = parentCategoriesObj[parentId];
-      if(!parentCategory) category.parentId = null;
+      if (!parentCategory) category.parentId = null;
       /*await db.ColumnPostCategoryModel.updateOne({_id, columnId: column._id}, {
         $set: {
           order,
@@ -49,9 +64,9 @@ router
     const categoriesDB = categories;
     const parentsObj = {};
     const topCategories = [];
-    for(const c of categoriesDB) {
-      const {parentId} = c;
-      if(parentId) {
+    for (const c of categoriesDB) {
+      const { parentId } = c;
+      if (parentId) {
         parentsObj[parentId] = parentsObj[parentId] || [];
         parentsObj[parentId].push(c);
       } else {
@@ -59,35 +74,43 @@ router
       }
     }
     const func = (arr, level) => {
-      for(const c of arr) {
+      for (const c of arr) {
         c.level = level;
         const childCategories = parentsObj[c._id] || [];
         func(childCategories, level + 1);
       }
     };
     func(topCategories, 0);
-    categoriesDB.map(category => parentsObj[category._id] = category);
-    for(const c of categories) {
-      const {_id, order, parentId, level} = c;
-      await db.ColumnPostCategoryModel.updateOne({_id, columnId: column._id}, {
-        $set: {
-          order,
-          parentId,
-          level
-        }
-      })
+    categoriesDB.map((category) => (parentsObj[category._id] = category));
+    for (const c of categories) {
+      const { _id, order, parentId, level } = c;
+      await db.ColumnPostCategoryModel.updateOne(
+        { _id, columnId: column._id },
+        {
+          $set: {
+            order,
+            parentId,
+            level,
+          },
+        },
+      );
     }
     await next();
   })
-  .get("/:categoryId", async (ctx, next) => {
-    const {data, db, params} = ctx;
-    const {column} = data;
-    const {categoryId} = params;
-    data.categoryList = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-    if(categoryId !== "add") {
-      data.category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoryId});
+  .get('/:categoryId', OnlyUser(), async (ctx, next) => {
+    const { data, db, params } = ctx;
+    const { column } = data;
+    const { categoryId } = params;
+    data.categoryList = await db.ColumnPostCategoryModel.getCategoryList(
+      column._id,
+    );
+    if (categoryId !== 'add') {
+      data.category = await db.ColumnPostCategoryModel.findOne({
+        columnId: column._id,
+        _id: categoryId,
+      });
     }
-    ctx.template = "columns/settings/editCategory.pug";
+    ctx.template = 'columns/settings/editCategory.pug';
     await next();
   });
 module.exports = router;

@@ -1,0 +1,22 @@
+extends ../bootstrap_base
+block title
+  title 扫码登录
+  +includeCSS('/login/qr.css')
+block navbar
+block content
+  mixin warningInfo
+    .bg-danger.text-danger.login-qr-warning.pre-wrap {{QRWarning}}
+  .login-qr-container#app(v-cloak)
+    .login-qr-header
+      img(:src="logoUrl")
+      .login-qr-title 登录{{websiteName}}
+    .login-qr-buttons
+      +warningInfo
+      button.btn-block.btn-lg.btn.btn-primary(v-if='status === "unLogin"' :disabled="delay > 0" @click='submit') 确认{{delay>0? `(${delay})`: ''}}
+      button.btn-block.btn-lg.btn.btn-primary(v-else-if='status === "logging"' :disabled="true") 登录中...
+      button.btn-block.btn-lg.btn.btn-primary(v-else @click='done') 完成
+
+  #data.hidden=objToStr({qrRecordId: data.qrRecordId, QRWarning: data.QRWarning})
+block footer
+block scripts
+  +includeJS('/login/qr.js')

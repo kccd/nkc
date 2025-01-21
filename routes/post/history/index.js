@@ -1,11 +1,11 @@
 const Router = require('koa-router');
 const router = new Router();
 const rollback = require('./rollback');
-const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 const { getJsonStringText } = require('../../../nkcModules/json');
-
+const { OnlyOperation } = require('../../../middlewares/permission');
+const { Operations } = require('../../../settings/operations');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.visitPostHistory), async (ctx, next) => {
     const { pid } = ctx.params;
     const { db, data, query } = ctx;
     const { t, c } = query;
@@ -55,11 +55,10 @@ router
     for (let i = 0; i < histories.length; i++) {
       const history = histories[i];
       if (!t) {
-        history.c =  history.l === 'json'
-        ? getJsonStringText(history.c)
-        : nkcRender.htmlToPlain(
-         history.c,
-        );
+        history.c =
+          history.l === 'json'
+            ? getJsonStringText(history.c)
+            : nkcRender.htmlToPlain(history.c);
       }
       history.ipoc = ipsObj[history.ipoc];
       history.iplm = ipsObj[history.iplm];
@@ -85,7 +84,7 @@ router
     ctx.template = 'post/history.pug';
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.disableHistories), async (ctx, next) => {
     const { body, db, params, data } = ctx;
     // if(data.userLevel < 6) ctx.throw(403, '权限不足');
     const { pid } = params;
@@ -98,7 +97,7 @@ router
     }
     await next();
   })
-  .use('/:_id', async (ctx, next) => {
+  .use('/:_id', OnlyOperation(Operations.rollbackPost), async (ctx, next) => {
     const { pid, _id } = ctx.params;
     const { db, data } = ctx;
     const { PostModel, HistoriesModel, ThreadModel } = db;

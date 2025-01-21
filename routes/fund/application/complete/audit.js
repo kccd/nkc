@@ -6,15 +6,20 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
+const {
+  OnlyOperation,
+  OnlyUnbannedUser,
+} = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { status } = ctx.data.applicationForm;
     if (status.completed) {
       ctx.throw('该项目已结题');
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { applicationForm, user } = data;
     ctx.template = 'fund/complete/audit.pug';
@@ -44,7 +49,7 @@ router
     data.nav = '结题审核';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body } = ctx;
     const { applicationForm, user } = data;
     const { c, passed } = body;

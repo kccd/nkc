@@ -6,8 +6,13 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
+const {
+  OnlyOperation,
+  OnlyUnbannedUser,
+} = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, state } = ctx;
     const { applicationForm, fund } = data;
     if (
@@ -62,13 +67,13 @@ router
     ctx.template = 'fund/manage/audit/audit.pug';
     await next();
   })
-  .get(['/project', '/info'], async (ctx, next) => {
+  .get(['/project', '/info'], OnlyUnbannedUser(), async (ctx, next) => {
     const { data } = ctx;
     const { applicationForm } = data;
     data.auditComments = await applicationForm.getLastAuditComment();
     await next();
   })
-  .post('/project', async (ctx, next) => {
+  .post('/project', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, nkcModules, state } = ctx;
     const { applicationForm } = data;
     const { checkNumber } = nkcModules.checkData;
@@ -160,7 +165,7 @@ router
 
     await next();
   })
-  .post('/info', async (ctx, next) => {
+  .post('/info', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, nkcModules, state } = ctx;
     const { applicationForm } = data;
     const { comment, fact, remittance, reportNeedThreads } = body;
@@ -248,7 +253,7 @@ router
 
     await next();
   })
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data } = ctx;
     if (ctx.method !== 'POST') {
       return await next();

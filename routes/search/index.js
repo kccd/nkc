@@ -1,12 +1,12 @@
 const Router = require('koa-router');
-const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const {
   getJsonStringTextSlice,
   getJsonStringText,
 } = require('../../nkcModules/json');
 const { momentVisibleType } = require('../../settings/moment');
 const router = new Router();
-router.get('/', async (ctx, next) => {
+const { Public } = require('../../middlewares/permission');
+router.get('/', Public(), async (ctx, next) => {
   const time = Date.now();
   const { db, data, query, state, nkcModules } = ctx;
 

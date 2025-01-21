@@ -1,9 +1,8 @@
 module.exports = {
-  stayLogin: require('./stayLogin'),
+  auth: require('./auth'),
   init: require('./init'),
   initState: require('./initState'),
-  initAddress: require('./initAddress'),
-  initCtxMethods: require('./initCtxMethods'),
+  initMethods: require('./initMethods'),
   body: require('./body'),
   urlRewrite: require('./urlRewrite'),
   permission: require('./permission'),

@@ -1,7 +1,8 @@
 const router = require('koa-router')();
 const fsPromises = require('fs').promises;
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, db, data } = ctx;
     const { type } = query;
     const { user } = data;
@@ -12,7 +13,7 @@ router
   })
   // 20230829
   // 取消了短消息添加好友功能，此路由废弃
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data, body, nkcModules } = ctx;
     const { uid, type } = body;
     const { user } = data;
@@ -51,7 +52,7 @@ router
     await nkcModules.socket.sendNewFriendApplicationToSelf(application._id);
     await next();
   })
-  .post('/apply', async (ctx, next) => {
+  .post('/apply', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, db, body, data } = ctx;
     const { uid } = body;
     const { user } = data;
@@ -70,7 +71,7 @@ router
     await nkcModules.socket.sendEventUpdateChatList(user.uid);
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, nkcModules, data, settings, tools } = ctx;
     const { user } = data;
     const { fields, files } = body;
@@ -149,7 +150,7 @@ router
     await nkcModules.socket.sendEventUpdateChatList(user.uid);
     await next();
   })
-  .del('/', async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, db, query, data } = ctx;
     const { uid } = query;
     const { user } = data;

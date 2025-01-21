@@ -2,11 +2,15 @@ const router = require('koa-router')();
 const columnRouter = require('./column');
 const customCheerio = require('../../../nkcModules/nkcRender/customCheerio');
 const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+} = require('../../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/editor', async (ctx, next) => {
+  .get('/editor', OnlyUser(), async (ctx, next) => {
     //获取独立文章信息
     const { query, state, db, data, permission } = ctx;
     let { aid, mid, source } = query;
@@ -69,7 +73,7 @@ router
         hasDraft: true,
       };
       articles = await db.ArticleModel.find(m).sort({ toc: -1 }).limit(3);
-      const options = ['title','l'];
+      const options = ['title', 'l'];
       articles = await db.ArticleModel.extendDocumentsOfArticles(
         articles,
         'beta',
@@ -99,7 +103,7 @@ router
     }
     await next();
   })
-  .post('/editor', async (ctx, next) => {
+  .post('/editor', OnlyUnbannedUser(), async (ctx, next) => {
     //创建，修改，编辑文章
     const { db, data, state, body, nkcModules, permission } = ctx;
     const { files, fields } = body;
@@ -281,6 +285,5 @@ router
       });
     }
     await next();
-  })
-  .use('/column', columnRouter.routes(), columnRouter.allowedMethods());
+  });
 module.exports = router;

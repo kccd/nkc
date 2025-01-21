@@ -1,13 +1,15 @@
 const Router = require('koa-router');
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 const router = new Router();
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.visitExamSettings), async (ctx, next) => {
     const { db, data } = ctx;
     data.examSettings = (await db.SettingModel.findOnly({ _id: 'exam' })).c;
     ctx.template = 'experimental/settings/exam.pug';
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.modifyExamSettings), async (ctx, next) => {
     const { db, body } = ctx;
     const { examSettings } = body;
     let { count, countOneDay, waitingTime, examNotes, publicExamNotes } =

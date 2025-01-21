@@ -1,8 +1,9 @@
 const router = require('koa-router')();
+const { OnlyUser } = require('../../middlewares/permission');
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
-router.get('/', async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { db, data, params, state, permission, permissionsOr, query } = ctx;
   const { aid } = params;
   const { user } = data;
@@ -82,7 +83,7 @@ router.get('/', async (ctx, next) => {
       article._id,
     );
     //投诉权限
-    optionStatus.complaint = permission('complaintPost') ? true : null;
+    optionStatus.complaint = true;
     //查看IP
     optionStatus.ipInfo = ctx.permission('ipinfo') ? document.ip : null;
     // 未匿名

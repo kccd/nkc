@@ -13,12 +13,12 @@ const homePageTypes = {
   list: 'list',
 };
 
-const { OnlyUser } = require('../../middlewares/permission');
+const { OnlyUser, Public } = require('../../middlewares/permission');
 
 const onlyUserPermission = OnlyUser();
 
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, data, state } = ctx;
     await db.ColumnModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -28,7 +28,7 @@ router
     });
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, query } = ctx;
     const { t = homePageTypes.new } = query;
     data.t = t;
@@ -39,7 +39,7 @@ router
       await next();
     }
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, state, db } = ctx;
     data.column = null;
     if (state.uid) {

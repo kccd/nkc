@@ -3,8 +3,13 @@ const {
 } = require('../../services/sensitive/sensitiveDetection.service');
 const { checkString } = require('../../nkcModules/checkData');
 const router = require('koa-router')();
+const {
+  OnlyUnbannedUser,
+  OnlyOperation,
+} = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 router
-  .put('/:nid/content', async (ctx, next) => {
+  .put('/:nid/content', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, params, state, data } = ctx;
     const { nid, pid } = params;
     const { noticeContent: newNoticeContent } = body;
@@ -18,7 +23,7 @@ router
     const author = post.uid;
 
     //判断用户是否有权限修改
-    if (author !== state.uid && !ctx.permission('disablePostNotice')) {
+    if (author !== state.uid && !ctx.permission(Operations.disablePostNotice)) {
       ctx.throw(403, '权限不足');
     }
     if (status === noticeStatus.shield) {
@@ -54,40 +59,44 @@ router
     });
     await next();
   })
-  .put('/:nid/disabled', async (ctx, next) => {
-    const { db, params, body } = ctx;
-    const { nid, pid } = params;
-    const { isShield, reason } = body;
-    const { status } = await db.NewNoticesModel.findOnly(
-      { nid, pid },
-      { status: 1 },
-    );
-    const noticeStatus = await db.NewNoticesModel.noticeStatus();
+  .put(
+    '/:nid/disabled',
+    OnlyOperation(Operations.disablePostNotice),
+    async (ctx, next) => {
+      const { db, params, body } = ctx;
+      const { nid, pid } = params;
+      const { isShield, reason } = body;
+      const { status } = await db.NewNoticesModel.findOnly(
+        { nid, pid },
+        { status: 1 },
+      );
+      const noticeStatus = await db.NewNoticesModel.noticeStatus();
 
-    //判断用户是否有权限屏蔽
-    if (!ctx.permission('disablePostNotice')) {
-      ctx.throw(403, '权限不足');
-    }
+      //判断用户是否有权限屏蔽
+      if (!ctx.permission(Operations.disablePostNotice)) {
+        ctx.throw(403, '权限不足');
+      }
 
-    if (status === noticeStatus.history) {
-      ctx.throw(400, '无法操作历史版本');
-    }
-    if (isShield && status === noticeStatus.shield) {
-      ctx.throw(400, '内容已经被屏蔽了，请刷新页面');
-    }
-    if (!isShield && status !== noticeStatus.shield) {
-      ctx.throw(400, '内容未被屏蔽，请刷新页面');
-    }
+      if (status === noticeStatus.history) {
+        ctx.throw(400, '无法操作历史版本');
+      }
+      if (isShield && status === noticeStatus.shield) {
+        ctx.throw(400, '内容已经被屏蔽了，请刷新页面');
+      }
+      if (!isShield && status !== noticeStatus.shield) {
+        ctx.throw(400, '内容未被屏蔽，请刷新页面');
+      }
 
-    await db.NewNoticesModel.updateOne(
-      { nid, pid },
-      {
-        $set: {
-          status: isShield ? noticeStatus.shield : noticeStatus.normal,
-          reason: reason || '',
+      await db.NewNoticesModel.updateOne(
+        { nid, pid },
+        {
+          $set: {
+            status: isShield ? noticeStatus.shield : noticeStatus.normal,
+            reason: reason || '',
+          },
         },
-      },
-    );
-    await next();
-  });
+      );
+      await next();
+    },
+  );
 module.exports = router;

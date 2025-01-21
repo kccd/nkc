@@ -1,8 +1,9 @@
 const router = require('koa-router')();
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
-router.post('/', async (ctx, next) => {
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   //收藏独立文章
   const { db, data, params, body } = ctx;
   const { aid } = params;

@@ -10,14 +10,14 @@ const {
 const { momentModes } = require('../../../../../settings/moment');
 const { eventEmitter } = require('../../../../../events');
 
-const { OnlyUser } = require('../../../../../middlewares/permission');
+const { OnlyUnbannedUser } = require('../../../../../middlewares/permission');
 const { getMomentPublishType } = require('../../../../../events/moment');
 const router = new Router();
 
 router
   // 获取已存在的草稿
   // 刚打开编辑器，编辑器会尝试从此路由获取之前编辑过但未发表的草稿
-  .get('/', OnlyUser(), async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { state } = ctx;
     const { parent } = ctx.query;
     const moment = await momentExtenderService.getUnPublishedMomentDataByUid(
@@ -38,7 +38,7 @@ router
   })
   // 判断草稿是否存在，如果不存在则创建，然后再更新草稿
   // 在编辑器中输入了内容后，前端会将新内容提交到此路由
-  .put('/', OnlyUser(), async (ctx, next) => {
+  .put('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, db, body } = ctx;
     const { content, resourcesId, parent } = body;
     let moment = await momentExtenderService.getUnPublishedMomentByUid(
@@ -69,7 +69,7 @@ router
   })
   // 先更新草稿，再发布
   // 在编辑器中点击发表按钮后，前端会将待发表的内容提交到此路由
-  .post('/', OnlyUser(), async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { state, body } = ctx;
     const { content, resourcesId, parent, postType, alsoPost } = body;
     const moment = await momentExtenderService.getUnPublishedMomentByUid(

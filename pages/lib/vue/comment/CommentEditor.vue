@@ -1,5 +1,7 @@
 <template lang="pug">
   div
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.comment")
     .m-b-05(v-if="quote")
       .quote
         .quote-cancel(@click="clearQuote") 取消引用
@@ -76,6 +78,8 @@
   import {getCommentEditorConfigs} from '../../js/editor';
   import {debounce} from "../../js/execution";
   import {nkcAPI} from "../../js/netAPI";
+  import { publishPermissionTypes } from '../../js/publish';
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
   export default {
     props: ['source', 'aid', 'comment', 'column-info', 'to-column', 'added'],
     data: () => ({
@@ -93,10 +97,12 @@
       commentId: null,
       l:'',
       loading: true,
+      publishPermissionTypes,
     }),
     components: {
       'editor': Editor,
-      'column': Column
+      'column': Column,
+      'publish-permission-checker': PublishPermissionChecker,
     },
     computed: {
       disabledPublish(){

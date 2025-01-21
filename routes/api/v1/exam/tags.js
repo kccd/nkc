@@ -2,11 +2,11 @@ const router = require('koa-router')();
 const {
   questionTagService,
 } = require('../../../../services/exam/questionTag.service');
-const { OnlyPermission } = require('../../../../middlewares/permission');
+const { OnlyOperation, Public } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations.js');
 const { DynamicOperations } = require('../../../../settings/operations');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const tags = await questionTagService.getAllTag();
     ctx.apiData = {
       tags,
@@ -18,7 +18,7 @@ router
   })
   .post(
     '/',
-    OnlyPermission(Operations.createQuestionTags),
+    OnlyOperation(Operations.createQuestionTags),
     async (ctx, next) => {
       const { body } = ctx;
       const { name, desc } = body.tag;

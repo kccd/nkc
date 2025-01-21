@@ -1,7 +1,7 @@
 const tools = require('../../nkcModules/tools');
 const router = require('koa-router')();
-
-router.get('/', async (ctx, next) => {
+const { Public } = require('../../middlewares/permission');
+router.get('/', Public(), async (ctx, next) => {
   const { db, params, data, state } = ctx;
   const { pid } = params;
   const { uid } = state;

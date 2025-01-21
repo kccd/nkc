@@ -3,8 +3,10 @@ const columnTypes = {
   comment: 'comment',
   article: 'article',
 };
+const { Public } = require('../../middlewares/permission');
+
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { data, query, state, db } = ctx;
     let { t } = query;
     if (t !== columnTypes.comment) {
@@ -23,7 +25,7 @@ router
 
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     //获取最新专栏文章列表信息
     const { db, data, query, nkcModules, state, permission, internalData } =
       ctx;

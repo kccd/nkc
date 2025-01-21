@@ -1,6 +1,7 @@
 const { Operations } = require('../../settings/operations');
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
+router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { db, data, params, state, permission } = ctx;
   const { mid } = params;
   const { user } = data;
@@ -75,7 +76,7 @@ router.get('/', async (ctx, next) => {
           moment.uid,
         );
         //投诉权限
-        optionStatus.complaint = permission('complaintPost') ? true : null;
+        optionStatus.complaint = true;
         optionStatus.visibleMoment =
           !hasParent && permission('setMomentVisibleOther') ? true : null;
         optionStatus.editorMoment = false;

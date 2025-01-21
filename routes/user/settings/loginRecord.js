@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const loginRecordRouter = new Router();
-loginRecordRouter.put('/', async (ctx, next) => {
+const { OnlyUser } = require('../../../middlewares/permission');
+loginRecordRouter.put('/', OnlyUser(), async (ctx, next) => {
   const { data, db, body } = ctx;
   const { user } = data;
   const { loginRecordId } = body;

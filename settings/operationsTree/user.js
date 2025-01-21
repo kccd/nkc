@@ -114,12 +114,6 @@ module.exports = {
       GET: Operations.visitUserCard,
     },
     GET: Operations.visitUserCard,
-    userHome: {
-      GET: Operations.getUserHomeInfo,
-    },
-    navLinks: {
-      GET: Operations.getUserHomeInfo,
-    },
     userHomeCard: {
       GET: Operations.getUserHomeCard,
     },
@@ -147,12 +141,6 @@ module.exports = {
     },
     transaction: {
       GET: Operations.visitUserTransaction,
-    },
-    // 用户关注的 专业、用户、文章
-    sub: {
-      t: {
-        GET: Operations.visitUserSubThreads,
-      },
     },
     settings: {
       GET: Operations.visitUserInfoSettings,
@@ -264,68 +252,10 @@ module.exports = {
       POST: Operations.subscribeUser,
       DELETE: Operations.unSubscribeUser,
     },
-    bills: {
-      GET: Operations.visitUserBills,
-    },
     transfer: {
       GET: Operations.transferKcbToUser,
       POST: Operations.transferKcbToUser,
     },
-    // profile: {
-    // 	GET: Operations.userProfile,
-    // 	summary: {
-    // 		pie: {
-    // 			GET: "userProfile"
-    // 		},
-    // 		calendar: {
-    // 			GET: "userProfile"
-    // 		}
-    // 	},
-    // 	thread: {
-    // 		GET: "userProfile"
-    // 	},
-    // 	post: {
-    // 		GET: "userProfile"
-    // 	},
-    // 	draft: {
-    // 		GET: "userProfile"
-    // 	},
-    // 	finance: {
-    // 		GET: "userProfile"
-    // 	},
-    // 	follower: {
-    // 		GET: "userProfile"
-    // 	},
-    // 	subscribe: {
-    // 		user: {
-    // 			GET: "userProfile"
-    // 		},
-    // 		topic: {
-    // 			GET: "userProfile"
-    // 		},
-    // 		forum: {
-    // 			GET: Operations.userProfile,
-    // 		},
-    // 		discipline: {
-    // 			GET: "userProfile"
-    // 		},
-    // 		column: {
-    // 			GET: "userProfile"
-    // 		},
-    // 		thread: {
-    // 			GET: "userProfile"
-    // 		},
-    // 		collection: {
-    // 			GET: "userProfile"
-    // 		}
-    // 	},
-    // 	note: {
-    // 		GET: "userProfile"
-    // 	},
-    // 	blacklist: {
-    // 		GET: Operations.userProfile
-    // 	}
-    // },
     destroy: {
       GET: Operations.destroyAccount,
       POST: Operations.destroyAccount,

@@ -3,8 +3,9 @@ const { subscribeSources } = require('../../settings/subscribe');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const router = new Router();
+const { Public } = require('../../middlewares/permission');
 
-router.get('/', async (ctx, next) => {
+router.get('/', Public(), async (ctx, next) => {
   //获取用户卡片中的内容
   const { data, db, query, params, state, nkcModules, permission } = ctx;
   const { uid } = params;
@@ -194,10 +195,10 @@ router.get('/', async (ctx, next) => {
           continue;
         }
       }
-      post.c = post.l === 'json' ? getJsonStringTextSlice(post.c ,200) : nkcModules.nkcRender.htmlToPlain(
-        post.c,
-        200,
-      );
+      post.c =
+        post.l === 'json'
+          ? getJsonStringTextSlice(post.c, 200)
+          : nkcModules.nkcRender.htmlToPlain(post.c, 200);
       // post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
       let firstPost = {};
       let link;

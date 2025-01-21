@@ -1,9 +1,9 @@
 const path = require('path');
 const Router = require('koa-router');
-
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
 const verifyRouter = new Router();
 verifyRouter
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data } = ctx;
     data.selected = 'verify';
     const { user } = data;
@@ -76,7 +76,7 @@ verifyRouter
     ctx.template = 'user/settings/verify/verify.pug';
     await next();
   })
-  .post('/verify2_form', async (ctx, next) => {
+  .post('/verify2_form', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, db } = ctx;
     const { user } = data;
     const { files } = body;
@@ -93,7 +93,7 @@ verifyRouter
     await userPersonal.generateAuthenticateVerify2([surfaceA, surfaceB]);
     return next();
   })
-  .post('/verify3_form', async (ctx, next) => {
+  .post('/verify3_form', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, db } = ctx;
     const { user } = data;
     const { files, fields } = body;

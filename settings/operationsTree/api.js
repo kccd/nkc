@@ -55,11 +55,6 @@ module.exports = {
         },
       },
     },
-    recycle: {
-      'recycle-bin': {
-        GET: Operations.api_get_recycle_recycleBin,
-      },
-    },
     review: {
       GET: Operations.getReviewData,
     },
@@ -79,13 +74,16 @@ module.exports = {
     exam: {
       tags: {
         GET: Operations.getQuestionTags,
+        // POST: Operations.createQuestionTag,
         POST: Operations.createQuestionTag,
       },
       tag: {
         PARAMETER: {
-          GET: Operations.getQuestionTag,
-          PUT: Operations.putQuestionTag,
-          DELETE: Operations.deleteQuestionTag,
+          // GET: Operations.getQuestionTag,
+          // PUT: Operations.putQuestionTag,
+          // DELETE: Operations.deleteQuestionTag,
+          PUT: Operations.manageQuestionTags,
+          DELETE: Operations.manageQuestionTags,
         },
       },
       public: {
@@ -169,6 +167,13 @@ module.exports = {
           rollback: {
             POST: Operations.rollbackZoneMomentHistory,
           },
+        },
+      },
+    },
+    settings: {
+      publish: {
+        permission: {
+          GET: Operations.getPublishPermission,
         },
       },
     },

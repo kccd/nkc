@@ -1,7 +1,7 @@
 const Router = require('koa-router');
-const moment = require('moment');
 const router = new Router();
-router.get('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { db, data, params, nkcModules } = ctx;
   data.selected = 'security';
   const { uid } = params;

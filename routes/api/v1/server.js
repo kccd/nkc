@@ -1,5 +1,7 @@
+const { Public } = require('../../../middlewares/permission');
+
 const router = require('koa-router')();
-router.get('/info', async (ctx, next) => {
+router.get('/info', Public(), async (ctx, next) => {
   const { db } = ctx;
   const serverInfo = await db.SettingModel.getSettings('server');
   ctx.apiData = {

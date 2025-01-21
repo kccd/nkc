@@ -17,32 +17,30 @@ block content
             label(class="col-sm-2 control-label") 考卷介绍
             .col-sm-10
               textarea(class="form-control" placeholder="请输入考卷介绍，500字以内" v-model='category.description' style='min-height: 9rem;')
-
-          .form-group
-            label(class="col-sm-2 control-label") 考卷类型
-            .col-sm-10
-              div(v-if='!category._id')
-                label.radio-inline
-                  input(type="radio" value="secret" v-model='category.type')
-                  |闭卷
-                label.radio-inline
-                  input(type="radio" value="public" v-model='category.type')
-                  |开卷
-                .text-danger.m-t-05(v-if='category.type === "public"') 开卷考试会公开试题答案，请谨慎选择。
-              h5(v-else) {{{'public':'开卷','secret':'闭卷'}[category.type]}}
-
-
           .form-group
             label(class="col-sm-2 control-label") 考卷难度
             .col-sm-10
-              h5(v-if='category._id') {{{'A': 'A(基础级)', 'B': 'B(专业级)'}[category.volume]}}
+              h5(v-if='category._id') {{{'1': '基础级', '2': '专业级'}[category.level.toString()]}}
               div(v-else)
                 <label class="radio-inline">
-                  <input type="radio" value="A" v-model='category.volume'> A：基础
+                  <input type="radio" :value="1" v-model='category.level'> 基础级
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" value="B" v-model='category.volume'> B：专业
+                  <input type="radio" :value="2" v-model='category.level'> 专业级
                 </label>
+          .form-group
+            label(class='col-sm-2 control-label') 考卷类型
+            .col-sm-10
+              div
+                label.radio-inline
+                  input(type='radio' value="AD" v-model="category.volume")
+                  | 入学考试
+                label.radio-inline
+                  input(type='radio' value="A" v-model="category.volume")
+                  | A卷考试
+                label.radio-inline
+                  input(type='radio' value="B" v-model="category.volume")
+                  | B卷考试
           .form-group
             label(class="col-sm-2 control-label") 颁发证书
             .col-sm-10
@@ -50,6 +48,18 @@ block content
                 label(v-for='role in roles').m-r-1
                   input(type="checkbox" :value='role._id' v-model='category.rolesId')
                   | {{role.displayName}}
+          .form-group
+            label(class="col-sm-2 control-label") 考试形式
+            .col-sm-10
+              div(v-if='!category._id')
+                label.radio-inline
+                  input(type="radio" value="secret" v-model='category.type')
+                  | 闭卷
+                label.radio-inline
+                  input(type="radio" value="public" v-model='category.type')
+                  | 开卷
+                .text-danger.m-t-05(v-if='category.type === "public"') 开卷考试会公开试题答案，请谨慎选择。
+              h5(v-else) {{{'public':'开卷','secret':'闭卷'}[category.type]}}
           .form-group
             label(class="col-sm-2 control-label") 试题来源
             .col-sm-10
@@ -76,14 +86,14 @@ block content
                   thead
                     tr
                       th 标签名
-                      th {{category.volume === 'A'?'基础题数':'专业题数'}}
+                      th {{category.level === 1?'基础题数':'专业题数'}}
                   tbody
-                    tr(v-for='A in allTag.tagA' v-if="category.volume === 'A'" )
+                    tr(v-for='A in allTag.tagA' v-if="category.level === 1" )
                       th {{A.name}}
                       th {{A.count}}
                       th
                         button(@click='addTag(A)') 添加
-                    tr(v-for="B in allTag.tagB" v-if="category.volume === 'B'" )
+                    tr(v-for="B in allTag.tagB" v-if="category.level === 2" )
                       th {{B.name}}
                       th {{B.count}}
                       th
@@ -113,9 +123,9 @@ block content
         h3 已创建的考卷
         hr
         for c in data.categories
-          h4
+          h5
             span=`【${c.name}】`
-            span=`${{'A':'【基础题】','B': '【专业题】'}[c.volume]}${c.disabled?'【已屏蔽】':''}`
+            span=`${{'AD': '【入学考试】', 'A': "【A卷考试】", 'B': "【B卷考试】"}[c.volume]}${c.disabled?'【已屏蔽】':''}`
             a(href=`/exam/categories/editor?cid=${c._id}`) 编辑
 block scripts
   +includeJS('/exam/editCategory.js')

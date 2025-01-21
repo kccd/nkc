@@ -1,6 +1,8 @@
 import { sweetConfirm } from '../lib/js/sweetAlert';
+import { nkcAPI } from '../lib/js/netAPI';
+import { screenTopWarning } from '../lib/js/topAlert';
 
-var app = new Vue({
+var app = new window.Vue({
   el: '#app',
   data: {
     submitted: false,
@@ -15,7 +17,7 @@ var app = new Vue({
     countOneDay: 0,
   },
   methods: {
-    format: NKC.methods.format,
+    format: window.NKC.methods.format,
     compute: function () {
       var toc = this.paper.toc;
       var time = Date.now() - new Date(toc).getTime();
@@ -93,8 +95,8 @@ var app = new Vue({
           const obj = {
             type: item.type,
             hasImage: item.hasImage,
-            content_: NKC.methods.custom_xss_process(
-              NKC.methods.mdToHtml(
+            content_: window.NKC.methods.custom_xss_process(
+              window.NKC.methods.mdToHtml(
                 index + 1 + '、' + `【${questionInfo}】` + item.content,
               ),
             ),
@@ -110,8 +112,8 @@ var app = new Vue({
             obj.selected = [];
             obj.isIndefinite = item.isIndefinite;
             for (let j = 0; j < item.answer.length; j++) {
-              obj.ans_[j] = NKC.methods.custom_xss_process(
-                NKC.methods.mdToHtml(
+              obj.ans_[j] = window.NKC.methods.custom_xss_process(
+                window.NKC.methods.mdToHtml(
                   ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'][j] +
                     '. ' +
                     item.answer[j].text,
@@ -125,7 +127,7 @@ var app = new Vue({
           app.compute();
         }, 500);
         setTimeout(function () {
-          NKC.methods.renderFormula();
+          window.NKC.methods.renderFormula();
         }, 500);
       })
       .catch(function (err) {

@@ -1,7 +1,8 @@
 const Router = require('koa-router');
-const { subscribeSources } = require("../../settings/subscribe");
+const { subscribeSources } = require('../../settings/subscribe');
+const { Public } = require('../../middlewares/permission');
 const followerRouter = new Router();
-followerRouter.get('/', async (ctx, next) => {
+followerRouter.get('/', Public(), async (ctx, next) => {
   const { data, db, query, state } = ctx;
   const { pageSettings } = state;
   let { page } = query;

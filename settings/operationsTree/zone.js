@@ -15,9 +15,6 @@ module.exports = {
       vote: {
         POST: Operations.zoneMomentVote,
       },
-      options: {
-        GET: Operations.getZoneMomentOption,
-      },
       comments: {
         GET: Operations.getZoneMomentComments,
         child: {

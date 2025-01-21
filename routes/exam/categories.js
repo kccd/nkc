@@ -1,8 +1,10 @@
 const Router = require('koa-router');
 const { paperService } = require('../../services/exam/paper.service');
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 const router = new Router();
 router
-  .get('/editor', async (ctx, next) => {
+  .get('/editor',OnlyOperation(Operations.visitEditCategory), async (ctx, next) => {
     ctx.template = 'exam/editCategory.pug';
     const { data, db, query } = ctx;
     const { cid } = query;
@@ -24,7 +26,7 @@ router
       });
       data.category = { ...rest, from: newFrom, volume };
     }
-    data.roles = await db.RoleModel.find({ type: 'common' });
+    data.roles = await db.RoleModel.find({ auto: true }).sort({ toc: -1 });
     const tagQ = {
       volume: 'A',
       auth: true,
@@ -62,7 +64,7 @@ router
     data.categories = await db.ExamsCategoryModel.find();
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/',OnlyOperation(Operations.addExamsCategory), async (ctx, next) => {
     const { data, db, body, tools } = ctx;
     const { user } = data;
     const { contentLength } = tools.checkString;
@@ -77,6 +79,7 @@ router
       time,
       disabled,
       type,
+      level,
     } = category;
     if (!name) {
       ctx.throw(400, '考卷名不能为空');
@@ -86,22 +89,24 @@ router
       ctx.throw(400, '考卷介绍不能为空');
     } else if (contentLength(description) > 500) {
       ctx.throw(400, '考卷介绍字数不能大于500');
-    } else if (!['A', 'B'].includes(volume)) {
-      ctx.throw(400, '请选择试卷难度');
+    } else if (![1, 2].includes(level)) {
+      ctx.throw(400, '请选择考卷难度');
+    } else if (!['A', 'B', 'AD'].includes(volume)) {
+      ctx.throw(400, '请选择考卷类型');
     } else if (!rolesId) {
       rolesId = [];
     } else if (rolesId.length !== 0) {
       const roles = await db.RoleModel.find({
         _id: { $in: rolesId },
-        defaultRole: false,
+        auto: true,
       });
       rolesId = roles.map((r) => r._id);
     } else if (!from) {
-      from === [];
+      from = [];
     }
     let questionsCount = 0;
     const condition = {
-      volume,
+      volume: level === 1 ? 'A' : 'B',
       auth: true,
       disabled: false,
     };
@@ -133,6 +138,7 @@ router
       time,
       disabled,
       type,
+      level,
     });
     await c.save();
     await next();

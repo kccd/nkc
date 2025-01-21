@@ -147,8 +147,16 @@ schema.statics.extentDraftsData = async function (drafts) {
 schema.methods.modifyDraft = async function (props) {
   const {title, content} = props;
   const DocumentModel = mongoose.model('documents');
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const {did} = this;
   const toc = new Date();
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.draft,
+    this.uid,
+  );
   await DocumentModel.updateDocumentByDid(did, {
     title,
     content,

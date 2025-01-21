@@ -11,9 +11,16 @@ const voteRouter = require('./vote');
 const collectionRouter = require('./collection');
 const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
+const {
+  OnlyUser,
+  OnlyUnbannedUser,
+  Public,
+  OnlyOperation,
+} = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 module.exports = router;
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     //获取该图书下的全部评论和用户编辑框中未发布的内容
     const { db, data, state, query, permission } = ctx;
     const { sid } = query;
@@ -72,7 +79,7 @@ router
     data.comments = comments;
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     //创建，修改，发布评论
     const { db, body, data, state, nkcModules } = ctx;
     const {
@@ -202,7 +209,7 @@ router
     }
     await next();
   })
-  .get('/:_id', async (ctx, next) => {
+  .get('/:_id', OnlyUser(), async (ctx, next) => {
     //获取文章评论跳转到文章并定位到评论
     const { data, db, params, permission, query, nkcModules } = ctx;
     const { _id } = params;
@@ -215,17 +222,25 @@ router
     await next();
   })
   //获取评论的引用
-  .get('/:_id/quote', quoteRouter)
+  .get('/:_id/quote', OnlyUser(), quoteRouter)
   //获取评论编辑信息
-  .get('/:_id/commentEditor', editorRouter)
+  .get('/:_id/commentEditor', OnlyUser(), editorRouter)
   //废除， 评论退修或者禁用在审核路由传入docId即可
-  .post('/:_id/disabled', disabledRouter)
+  .post(
+    '/:_id/disabled',
+    OnlyOperation(Operations.disabledComment),
+    disabledRouter,
+  )
   //评论解封
-  .post('/:_id/unblock', unblockRouter)
+  .post(
+    '/:_id/unblock',
+    OnlyOperation(Operations.disabledComment),
+    unblockRouter,
+  )
   //获取评论更多操作权限
-  .get('/:_id/options', optionsRouter)
+  .get('/:_id/options', OnlyUser(), optionsRouter)
   //获取评论作者的ip信息
-  .get('/:_id/ipInfo', ipInfoRouter)
+  .get('/:_id/ipInfo', OnlyOperation(Operations.getCommentIpInfo), ipInfoRouter)
   .use('/:_id/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:_id/credit', creditRouter.routes(), creditRouter.allowedMethods())
   .use('/:_id/vote', voteRouter.routes(), voteRouter.allowedMethods())

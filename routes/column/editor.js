@@ -1,5 +1,7 @@
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
+
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   ctx.template = 'columns/columnEditor.pug';
   await next();
 });

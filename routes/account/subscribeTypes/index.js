@@ -1,8 +1,9 @@
 const router = require('koa-router')();
 const threadRouter = require('./thread');
 const { subscribeSources } = require('../../../settings/subscribe');
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { user } = data;
     const { count } = query;
@@ -44,7 +45,7 @@ router
     data.types = await db.SubscribeTypeModel.getTypesList(user.uid);
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { tools, data, db, body } = ctx;
     const { contentLength } = tools.checkString;
     const { user } = data;

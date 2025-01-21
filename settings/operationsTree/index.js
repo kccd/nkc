@@ -4,14 +4,11 @@ const resourceObj = require('./resource');
 const {
   avatar,
   banner,
-  shopLogo,
   poster,
   avatar_small,
   forum_avatar,
   r,
   rt,
-  rm,
-  ro,
   cover,
   frameImg,
   resources,
@@ -19,8 +16,6 @@ const {
   pfb,
   fundLogo,
   fundBanner,
-  photo,
-  photo_small,
 } = resourceObj;
 const api = require('./api');
 const mathJax = require('./mathJax');
@@ -61,7 +56,6 @@ const lottery = require('./lottery');
 const shop = require('./shop');
 const account = require('./account');
 const complaint = require('./complaint');
-const imageEdit = require('./imageEdit');
 const rs = require('./resources');
 const protocol = require('./protocol');
 const review = require('./review');
@@ -84,8 +78,8 @@ const community = require('./community');
 const watermark = require('./watermark');
 const drawData = require('./drawData');
 const logo = require('./logo');
+const { Operations } = require('../operations');
 const book = require('./book');
-const pim = require('./pim');
 const rc = require('./rc');
 const comment = require('./comment');
 const zone = require('./zone');
@@ -98,34 +92,39 @@ const oauth = require('./oauth');
 const tc = require('./tc');
 const browser = require('./browser');
 const apps = require('./apps');
-
+const attachIcon = require('./attachIcon');
+const photo = require('./photo');
+const photo_small = require('./photo_small');
+const rm = require('./rm');
+const ro = require('./ro');
+const shopLogo = require('./shopLogo');
 const operationTree = {
   home: {
     GET: 'visitHome', // 首页
 
     // 适配dz
     'forum.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     'index.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     'read.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     read: {
       PARAMETER: {
-        GET: 'discuz',
+        GET: Operations.discuz,
         PARAMETER: {
-          GET: 'discuz',
+          GET: Operations.discuz,
           PARAMETER: {
-            GET: 'discuz',
+            GET: Operations.discuz,
           },
         },
       },
     },
     'home.php': {
-      GET: 'discuz',
+      GET: Operations.discuz,
     },
     document, // 预览文章或历史
     draft, //预览草稿或历史
@@ -144,7 +143,6 @@ const operationTree = {
     ro, // 原图 3840
 
     default: resourceObj.default,
-    attachIcon: resourceObj.attachIcon,
 
     cover, // 文章封面
 
@@ -220,8 +218,6 @@ const operationTree = {
 
     shop, //商城
 
-    imageEdit, // 编辑图片
-
     protocol, // 论坛协议
 
     account, // 个人中心
@@ -256,7 +252,6 @@ const operationTree = {
     wm: watermark, //水印
     logo, // 网站 logo
     creation, // 用户创作中心
-    pim, // 产品管理系统
     test,
     draw: drawData, //获取手机浏览器左侧滑动框
     mathJax, // 编辑器预览公式
@@ -275,6 +270,7 @@ const operationTree = {
     browser, // 浏览器版本检测
     apps, // 资源页
     wx: weChat,
+    attachIcon,
   },
 };
 module.exports = {

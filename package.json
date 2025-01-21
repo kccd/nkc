@@ -1,6 +1,6 @@
 {
   "name": "nkc",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "source of [www.kechuang.org]",
   "homepage": "https://www.kechuang.org",
   "scripts": {
@@ -182,7 +182,7 @@
     "pug": "^3.0.3",
     "qcloudsms_js": "^0.1.0",
     "qr-image": "^3.2.0",
-    "qrcode": "1.4.4",
+    "qrcode": "^1.4.4",
     "randomatic": "^3.1.1",
     "redis": "^3.1.2",
     "redlock": "^4.0.0",

@@ -38,10 +38,10 @@ module.exports = {
     },
     vote: {
       up: {
-        POST: 'post-vote-up',
+        POST: Operations.postVoteUp,
       },
       down: {
-        POST: 'post-vote-down',
+        POST: Operations.postVoteDown,
       },
     },
     warning: {
@@ -83,9 +83,6 @@ module.exports = {
       GET: Operations.postCommentControl,
       POST: Operations.postCommentControl,
     },
-    /*delete: {
-			GET: "deletePost"
-		}*/
     collection: {
       POST: Operations.collectionPost,
     },

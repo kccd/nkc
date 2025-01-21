@@ -3,6 +3,8 @@ const { ThrowForbiddenResponseTypeError } = require('../nkcModules/error');
 const { ResponseTypes } = require('../settings/response');
 const { FixedOperations } = require('../settings/operations.js');
 
+const permissionRef = [];
+
 async function permission(ctx, next) {
   const { data } = ctx;
   const isFixedOperation = Object.values(FixedOperations).includes(
@@ -16,16 +18,18 @@ async function permission(ctx, next) {
 }
 
 function OnlyVisitor() {
-  return async (ctx, next) => {
+  const f = async (ctx, next) => {
     if (ctx.state.uid) {
       ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_LOGGED);
     }
     await next();
   };
+  permissionRef.push(f);
+  return f;
 }
 
 function OnlyUser() {
-  return async (ctx, next) => {
+  const f = async (ctx, next) => {
     if (!ctx.state.uid) {
       ThrowForbiddenResponseTypeError(
         ResponseTypes.FORBIDDEN_BECAUSE_UN_LOGGED,
@@ -33,10 +37,12 @@ function OnlyUser() {
     }
     await next();
   };
+  permissionRef.push(f);
+  return f;
 }
 
 function OnlyCert(roleId) {
-  return async (ctx, next) => {
+  const f = async (ctx, next) => {
     const userRoles = ctx.data.userRoles;
     let exists = false;
     for (const role of userRoles) {
@@ -53,19 +59,28 @@ function OnlyCert(roleId) {
     }
     await next();
   };
+  permissionRef.push(f);
+  return f;
 }
 
 function OnlyUnbannedUser() {
-  return async (ctx, next) => {
+  const f = async (ctx, next) => {
+    if (!ctx.state.uid) {
+      ThrowForbiddenResponseTypeError(
+        ResponseTypes.FORBIDDEN_BECAUSE_UN_LOGGED,
+      );
+    }
     if (ctx.data.user.certs.includes(defaultCerts.banned)) {
       ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN_BECAUSE_BANNED);
     }
     await next();
   };
+  permissionRef.push(f);
+  return f;
 }
 
 function OnlyBannedUser() {
-  return async (ctx, next) => {
+  const f = async (ctx, next) => {
     if (!ctx.data.user.certs.includes(defaultCerts.banned)) {
       ThrowForbiddenResponseTypeError(
         ResponseTypes.FORBIDDEN_BECAUSE_UN_BANNED,
@@ -73,9 +88,11 @@ function OnlyBannedUser() {
     }
     await next();
   };
+  permissionRef.push(f);
+  return f;
 }
 
-/*function OnlyCurrentPermission() {
+/*function OnlyCurrentOperation() {
   return async (ctx, next) => {
     const operationId = ctx.data.operationId;
     if (!ctx.data.userOperationsId.includes(operationId)) {
@@ -85,12 +102,14 @@ function OnlyBannedUser() {
   };
 }*/
 
-function OnlyPermission(operation) {
-  return OnlyPermissionsAnd([operation]);
+function OnlyOperation(operation) {
+  const f = OnlyOperationsAnd([operation]);
+  permissionRef.push(f);
+  return f;
 }
 
-function OnlyPermissionsOr(operations) {
-  return async (ctx, next) => {
+function OnlyOperationsOr(operations) {
+  const f = async (ctx, next) => {
     for (const operation of operations) {
       if (ctx.data.userOperationsId.includes(operation)) {
         return await next();
@@ -98,10 +117,12 @@ function OnlyPermissionsOr(operations) {
     }
     ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
   };
+  permissionRef.push(f);
+  return f;
 }
 
-function OnlyPermissionsAnd(operations) {
-  return async (ctx, next) => {
+function OnlyOperationsAnd(operations) {
+  const f = async (ctx, next) => {
     for (const operation of operations) {
       if (!ctx.data.userOperationsId.includes(operation)) {
         ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
@@ -109,6 +130,27 @@ function OnlyPermissionsAnd(operations) {
     }
     await next();
   };
+  permissionRef.push(f);
+  return f;
+}
+
+function Public() {
+  const f = async (ctx, next) => {
+    await next();
+  };
+  permissionRef.push(f);
+  return f;
+}
+
+function OnlyApp() {
+  const f = async (ctx, next) => {
+    if (!ctx.state.isApp) {
+      ThrowForbiddenResponseTypeError(ResponseTypes.FORBIDDEN);
+    }
+    await next();
+  };
+  permissionRef.push(f);
+  return f;
 }
 
 module.exports = {
@@ -118,7 +160,10 @@ module.exports = {
   OnlyBannedUser,
   OnlyCert,
   OnlyUnbannedUser,
-  OnlyPermission,
-  OnlyPermissionsAnd,
-  OnlyPermissionsOr,
+  OnlyOperation,
+  OnlyOperationsAnd,
+  OnlyOperationsOr,
+  Public,
+  OnlyApp,
+  permissionRef,
 };

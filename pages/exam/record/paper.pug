@@ -7,36 +7,36 @@ block content
     .row
       .col-xs-12.col-md-12
         include ../nav.pug
-      .col-xs-12.col-md-6
-        .bg-color-ffffff
-          ul.nav.nav-tabs
-            li(class=data.t==='self'?'active': '')
-              a(href='/exam/record/paper?t=self') 我的
-            if permission('viewAllPaperRecords')
-              li(class=!data.t?'active': '')
-                a(href='/exam/record/paper') 全部
-          if !data.t
-            .m-t-1
-              .form.form-inline
-                .form-group
-                  select.form-control(id='sortby')
-                    if data.sortby === 'username'
-                      option(value='username' selected) 用户名
-                    else
-                      option(value='username') 用户名
-                    if data.sortby === 'uid'
-                      option(value='uid' selected) UID
-                    else
-                      option(value='uid') UID
-                .form-group
-                  input.form-control(type='text' placeholder='请输入关键词' id='cat' value=data.cat)
-                .form-group
-                  button.btn.btn-primary(onclick='searchRecord()') 搜索
-                .form-group
-                  a.btn.btn-default(href='/exam/record/paper') 重置
-          .m-t-1
-            include ../../interface_navigation_paging
+      .col-xs-12.col-md-12
 
+        ul.nav.nav-tabs
+          li(class=data.t==='self'?'active': '')
+            a(href='/exam/record/paper?t=self') 我的
+          if permission('viewAllPaperRecords')
+            li(class=!data.t?'active': '')
+              a(href='/exam/record/paper') 全部
+        if !data.t
+          .m-t-1
+            .form.form-inline
+              .form-group
+                select.form-control(id='sortby')
+                  if data.sortby === 'username'
+                    option(value='username' selected) 用户名
+                  else
+                    option(value='username') 用户名
+                  if data.sortby === 'uid'
+                    option(value='uid' selected) UID
+                  else
+                    option(value='uid') UID
+              .form-group
+                input.form-control(type='text' placeholder='请输入关键词' id='cat' value=data.cat)
+              .form-group
+                button.btn.btn-primary(onclick='searchRecord()') 搜索
+              .form-group
+                a.btn.btn-default(href='/exam/record/paper') 重置
+        .m-t-1
+          include ../../interface_navigation_paging
+        .table-responsive
 
           table.table.table-striped
             thead
@@ -44,7 +44,8 @@ block content
                 th 时间
                 th 用户名
                 th 科目
-                th 题目类型
+                th 难度
+                th 类型
                 th 状态
             tbody
               for paper in data.papers
@@ -57,10 +58,19 @@ block content
                       span=`游客(${paper.ip})`
                   th= paper.category.name
                   th
-                    if paper.category.volume === 'A'
-                      | A(基础级)
+                    if paper.category.level === 1
+                      span 基础级
+                    else if paper.category.level === 2
+                      span 专业级
                     else
-                      | B(专业级)
+                      span=`未知（level=${paper.category.level}）`
+                  th
+                    if paper.category.volume === 'A'
+                      | A卷考试
+                    else if paper.category.volume === 'B'
+                      | B卷考试
+                    else
+                      | 入学考试
                   th
                     if paper.timeOut
                       span.text-danger 超时
@@ -72,10 +82,10 @@ block content
                           if paper.category.type === 'secret'
                             a.p-l-1(href=`/exam/paper/${paper._id}?created=true`) 继续考试
                           else
-                            a.p-l-1(href=`/exam/public/takeExam/${paper._id}`) 继续考试
+                            a.p-l-1(href=`/exam/public/public-paper/${paper._id}`) 继续考试
                       else
                         span.text-danger 未通过
-          include ../../interface_navigation_paging
+        include ../../interface_navigation_paging
 block scripts
   script.
     $('#cat').keydown(function() {

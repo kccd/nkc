@@ -3,7 +3,8 @@ const {
   userDescCheckerService,
 } = require('../../../services/user/userDescChecker.service');
 const infoRouter = new Router();
-infoRouter.put('info', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+infoRouter.put('info', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, body, nkcModules } = ctx;
   const { user } = data;
   let { description, postSign } = body;

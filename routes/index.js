@@ -9,7 +9,7 @@ const meRouter = routers.me;
 const threadRouter = routers.thread;
 const postRouter = routers.post;
 const forumRouter = routers.forum;
-const otherRouter = routers.other;
+const discuzRouter = routers.discuz;
 const experimentalRouter = routers.experimental;
 const resourceRouter = routers.resource;
 const resourcesRouter = routers.resources;
@@ -68,8 +68,6 @@ const linkRouter = routers.link;
 const communityRouter = routers.community;
 // 网站 logo
 const logoRouter = routers.logo;
-// 产品管理系统
-const pimRouter = routers.pim;
 //手机浏览器滑动框
 const drawDataRouter = routers.drawData;
 // 书籍详细页
@@ -102,6 +100,17 @@ const browserRouter = routers.browser;
 const appsRouter = routers.apps;
 const weChatRouter = routers.weChat;
 const navbarRouter = require('./navbar');
+const testRouter = require('./test');
+const shopLogoRouter = require('./shopLogo');
+const roRouter = require('./ro');
+const rmRouter = require('./rm');
+const posterRouter = require('./poster');
+const photoSmallRouter = require('./photo_small');
+const photoRouter = require('./photo');
+const pageRouter = require('./page');
+const logoutRouter = require('./logout');
+const attachIconRouter = require('./attachIcon');
+const sendMessageRouter = require('./sendMessage');
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -147,7 +156,7 @@ router.use(
 router.use('/editor', editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
-router.use('/', otherRouter.routes(), otherRouter.allowedMethods());
+router.use('/', discuzRouter.routes(), discuzRouter.allowedMethods());
 router.use('/search', searchRouter.routes(), searchRouter.allowedMethods());
 router.use('/u', userRouter.routes(), userRouter.allowedMethods());
 router.use('/me', meRouter.routes(), meRouter.allowedMethods());
@@ -243,7 +252,6 @@ router.use(
 );
 router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
 router.use('/c', communityRouter.routes(), communityRouter.allowedMethods());
-router.use('/pim', pimRouter.routes(), pimRouter.allowedMethods());
 router.use('/l', linkRouter.routes(), linkRouter.allowedMethods());
 router.use('/wm', watermarkRouter.routes(), watermarkRouter.allowedMethods());
 router.use('/logo', logoRouter.routes(), logoRouter.allowedMethods());
@@ -286,4 +294,32 @@ router.use('/browser', browserRouter.routes(), browserRouter.allowedMethods());
 router.use('/apps', appsRouter.routes(), appsRouter.allowedMethods());
 router.use('/wx', weChatRouter.routes(), weChatRouter.allowedMethods());
 router.use('', navbarRouter.routes(), navbarRouter.allowedMethods());
+router.use('/test', testRouter.routes(), testRouter.allowedMethods());
+router.use('/ro', roRouter.routes(), roRouter.allowedMethods());
+router.use('/rm', rmRouter.routes(), rmRouter.allowedMethods());
+router.use('/poster', posterRouter.routes(), posterRouter.allowedMethods());
+router.use('/page', pageRouter.routes(), pageRouter.allowedMethods());
+router.use('/logout', logoutRouter.routes(), logoutRouter.allowedMethods());
+router.use(
+  '/sendMessage',
+  sendMessageRouter.routes(),
+  sendMessageRouter.allowedMethods(),
+);
+router.use(
+  '/photo_small',
+  photoSmallRouter.routes(),
+  photoSmallRouter.allowedMethods(),
+);
+router.use('/photo', photoRouter.routes(), photoRouter.allowedMethods());
+router.use(
+  '/shopLogo',
+  shopLogoRouter.routes(),
+  shopLogoRouter.allowedMethods(),
+);
+router.use(
+  '/attachIcon',
+  attachIconRouter.routes(),
+  attachIconRouter.allowedMethods(),
+);
+
 module.exports = router;

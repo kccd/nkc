@@ -5,6 +5,7 @@ module.exports = {
     article: {
       postPermission: {
         authLevelMin: 0,
+        examVolumeAD: true,
         examVolumeA: true,
         examVolumeB: true,
         examNotPass: {
@@ -51,6 +52,10 @@ module.exports = {
           type: 'none',
           count: 1,
         },
+        notPassVolumeAD: {
+          type: 'none',
+          count: 1,
+        },
         foreign: {
           nationCode: '86',
           type: 'none',
@@ -79,6 +84,7 @@ module.exports = {
     comment: {
       postPermission: {
         authLevelMin: 0,
+        examVolumeAD: true,
         examVolumeA: true,
         examVolumeB: true,
         examNotPass: {
@@ -121,6 +127,10 @@ module.exports = {
       },
       postReview: {
         whitelist: ['role-dev'],
+        notPassVolumeAD: {
+          type: 'none',
+          count: 1,
+        },
         notPassVolumeA: {
           type: 'none',
           count: 1,
@@ -153,6 +163,7 @@ module.exports = {
     moment: {
       postPermission: {
         authLevelMin: 0,
+        examVolumeAD: true,
         examVolumeA: true,
         examVolumeB: true,
         examNotPass: {
@@ -195,6 +206,10 @@ module.exports = {
       },
       postReview: {
         whitelist: ['role-dev'],
+        notPassVolumeAD: {
+          type: 'none',
+          count: 1,
+        },
         notPassVolumeA: {
           type: 'none',
           count: 1,
@@ -227,6 +242,7 @@ module.exports = {
     draft: {
       postPermission: {
         authLevelMin: 0,
+        examVolumeAD: true,
         examVolumeA: true,
         examVolumeB: true,
         examNotPass: {
@@ -269,6 +285,10 @@ module.exports = {
       },
       postReview: {
         whitelist: ['role-dev'],
+        notPassVolumeAD: {
+          type: 'none',
+          count: 1,
+        },
         notPassVolumeA: {
           type: 'none',
           count: 1,

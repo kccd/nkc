@@ -3,7 +3,8 @@ const {
   usernameCheckerService,
 } = require('../../../services/user/usernameChecker.service');
 const router = new Router();
-router.put('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+router.put('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, db, body, nkcModules } = ctx;
   const { user } = data;
   const { newUsername } = body;

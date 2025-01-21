@@ -1,244 +1,125 @@
 const Router = require('koa-router');
 const router = new Router();
-const thread = require('./thread');
-const post = require('./post');
-const draft = require('./draft');
-const finance = require('./finance');
-const subscribeUser = require('./subscribe/user');
-const follower = require('./follower');
-const subscribeTopic = require('./subscribe/topic');
-const subscribeDiscipline = require('./subscribe/discipline');
-const subscribeColumn = require('./subscribe/column');
-const subscribeThread = require('./subscribe/thread');
-const subscribeForum = require('./subscribe/forum');
-const subscribeCollection = require('./subscribe/collection');
-const summaryPie = require('./summary/pie');
-const summaryCalendar = require('./summary/calendar');
-const note = require('./note');
-const blacklist = require('./blacklist');
-const serverConfig = require('../../../config/server.json');
+const subUserRouter = require('./subscribe/user');
+const subForumRouter = require('./subscribe/forum');
+const subColumnRouter = require('./subscribe/column');
+const subCollectionRouter = require('./subscribe/collection');
+const subThreadRouter = require('./subscribe/thread');
+const blacklistRouter = require('./subscribe/blackList');
+const momentRouter = require('./moment');
+const timelineRouter = require('./timeline');
+const postRouter = require('./post');
+const threadRouter = require('./thread');
+const followerRouter = require('./follower');
+const fanRouter = require('./fan');
+const manageRouter = require('./manage');
+const userRouter = require('./subUser');
+const financeRouter = require('./finance');
+const columnRouter = require('./column');
+const draftRouter = require('./draft');
+const noteRouter = require('./note');
+const { OnlyUnbannedUser, Public } = require('../../../middlewares/permission');
 router
-  .use('/', async (ctx, next) => {
-    const { db, data, params, state } = ctx;
+  .get('/', Public(), async (ctx, next) => {
+    //获取主页导航等信息
+    const { db, state, data, nkcModules } = ctx;
     const { user, targetUser } = data;
     // 验证权限
-    if (user.uid !== targetUser.uid && !ctx.permission('visitAllUserProfile')) {
-      ctx.throw(403, '权限不足');
-    }
-    const { threadCount, postCount, draftCount } = targetUser;
-    let url = ctx.url;
-    url = url.replace(/\?.*/gi, '');
-    url = url.replace(/\/u\/[0-9]+?\/profile\/*/gi, '');
-    data.type = url;
-    data.host = serverConfig.domain + ':' + serverConfig.port;
-    //获取关注的用户id
-    data.subUsersId = await db.SubscribeModel.getUserSubUsersId(targetUser.uid);
-    data.subTopicsId = await db.SubscribeModel.getUserSubForumsId(
+    // if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
+    //   ctx.throw(403, "权限不足");
+    // }
+    //获取关注的用户
+    const subUsersId = await db.SubscribeModel.getUserSubUsersId(
+      targetUser.uid,
+    );
+    //获取关注的专栏id
+    const subColumnsId = await db.SubscribeModel.getUserSubColumnsId(
+      targetUser.uid,
+    );
+    //获取关注的专业id
+    const subTopicsId = await db.SubscribeModel.getUserSubForumsId(
       targetUser.uid,
       'topic',
     );
-    data.subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(
+    const subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(
       targetUser.uid,
       'discipline',
     );
-    //获取关注的专业id
-    data.subForumsId = data.subTopicsId.concat(data.subDisciplinesId);
-    //获取关注的专栏id
-    data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(
-      targetUser.uid,
-    );
-    //获取关注的文章id
-    data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(
-      targetUser.uid,
-      'sub',
-    );
-    //获取粉丝id
-    data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
+    const subForumsId = subTopicsId.concat(subDisciplinesId);
+    // 获取用户积分信息
+    if (ctx.permission('viewUserScores')) {
+      data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
+    }
+    if (
+      !ctx.permission('hideUserHome') &&
+      (!user || user.uid !== targetUser.uid)
+    ) {
+      if (targetUser.hidden) {
+        nkcModules.throwError(
+          404,
+          '根据相关法律法规和政策，该内容不予显示',
+          'noPermissionToVisitHiddenUserHome',
+        );
+      }
+      if (
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'thread')) ||
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'post'))
+      ) {
+        data.contentNeedReview = true;
+        data.targetUser.username = '';
+        data.targetUser.description = '';
+        data.targetUser.avatar = '';
+        data.targetUser.banner = '';
+      }
+    }
+    // 获取用户能够访问的专业ID
+    data.targetUserSubForums = await db.ForumModel.find({
+      fid: {
+        $in: subForumsId,
+      },
+    });
     //获取收藏的文章id
-    data.collectionThreadsId =
+    const collectionThreadsId =
       await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
-    //获取当前用户等级信息
-    data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
-    data.targetColumn = await db.UserModel.getUserColumn(targetUser.uid);
-    data.targetColumnPermission =
-      await db.UserModel.ensureApplyColumnPermission(targetUser.uid);
-
-    if (state.isApp) {
-      data.appLinks = [
-        {
-          type: 'thread',
-          url: `/u/${targetUser.uid}/profile/thread`,
-          name: '我的文章',
-        },
-        {
-          type: 'post',
-          url: `/u/${targetUser.uid}/profile/post`,
-          name: '我的回复',
-        },
-        {
-          type: 'draft',
-          url: `/u/${targetUser.uid}/profile/draft`,
-          name: '我的草稿',
-        },
-        {
-          type: 'note',
-          name: '我的笔记',
-          url: `/u/${targetUser.uid}/profile/note`,
-        },
-        {
-          type: 'subscribe/user',
-          url: `/u/${targetUser.uid}/profile/subscribe/user`,
-          name: '关注的用户',
-        },
-        {
-          type: 'subscribe/forum',
-          url: `/u/${targetUser.uid}/profile/subscribe/forum`,
-          name: '关注的专业',
-        },
-        /*{
-          type: "subscribe/topic",
-          url: `/u/${targetUser.uid}/profile/subscribe/topic`,
-          name: "关注的话题",
-        },
-        {
-          type: "subscribe/discipline",
-          url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
-          name: "关注的学科",
-        },*/
-        {
-          type: 'subscribe/column',
-          name: '关注的专栏',
-          url: `/u/${targetUser.uid}/profile/subscribe/column`,
-        },
-        {
-          type: 'subscribe/thread',
-          url: `/u/${targetUser.uid}/profile/subscribe/thread`,
-          name: '关注的文章',
-        },
-        {
-          type: 'subscribe/collection',
-          url: `/u/${targetUser.uid}/profile/subscribe/collection`,
-          name: '收藏的文章',
-        },
-        {
-          type: 'finance',
-          url: `/u/${targetUser.uid}/profile/finance?t=all`,
-          name: '我的账单',
-        },
-        {
-          type: 'follower',
-          name: '我的粉丝',
-          url: `/u/${targetUser.uid}/profile/follower`,
-        },
-        {
-          type: 'blacklist',
-          name: '黑名单',
-          url: `/u/${targetUser.uid}/profile/blacklist`,
-        },
-      ];
-      data.name = '';
-      data.appLinks.map((link) => {
-        if (data.type === link.type) {
-          data.name = link.name;
-        }
-      });
-    } else {
+    if (user && user.uid === targetUser.uid) {
       data.navLinks = [
-        // {
-        //   name: "",
-        //   links: [
-        //     {
-        //       type: "",
-        //       url: `/u/${targetUser.uid}/profile`,
-        //       name: "数据概览",
-        //       count: 0
-        //     }
-        //   ]
-        // },
-        // {
-        //   name: "我的作品",
-        //   links: [
-        //     {
-        //       type: "thread",
-        //       url: `/u/${targetUser.uid}/profile/thread`,
-        //       name: "我的文章",
-        //       count: threadCount
-        //     },
-        //     {
-        //       type: "post",
-        //       url: `/u/${targetUser.uid}/profile/post`,
-        //       name: "我的回复",
-        //       count: postCount
-        //     },
-        //     {
-        //       type: "draft",
-        //       url: `/u/${targetUser.uid}/profile/draft`,
-        //       name: "我的草稿",
-        //       count: draftCount
-        //     },
-        //     {
-        //       type: "note",
-        //       url: `/u/${targetUser.uid}/profile/note`,
-        //       name: "我的笔记",
-        //       count: noteCount
-        //     }
-        //   ]
-        // },
         {
           name: '我的关注',
           links: [
             {
               type: 'subscribe/user',
-              url: `/u/${targetUser.uid}/p/s/user`,
+              url: `/u/${targetUser.uid}/profile/subscribe/user`,
               name: '关注的用户',
-              count: data.subUsersId.length,
+              count: subUsersId.length,
             },
             {
               type: 'subscribe/forum',
-              url: `/u/${targetUser.uid}/p/s/forum`,
+              url: `/u/${targetUser.uid}/profile/subscribe/forum`,
               name: '关注的专业',
-              count: data.subForumsId.length,
+              count: subForumsId.length,
             },
             {
               type: 'subscribe/column',
               name: '关注的专栏',
-              url: `/u/${targetUser.uid}/p/s/column`,
-              count: data.subColumnsId.length,
+              url: `/u/${targetUser.uid}/profile/subscribe/column`,
+              count: subColumnsId.length,
             },
-            // {
-            //   type: "subscribe/thread",
-            //   url: `/u/${targetUser.uid}/profile/subscribe/thread`,
-            //   name: "关注的文章",
-            //   count: data.subThreadsId.length
-            // },
             {
               type: 'subscribe/collection',
-              url: `/u/${targetUser.uid}/p/s/thread`,
+              url: `/u/${targetUser.uid}/profile/subscribe/collection`,
               name: '收藏的文章',
-              count: data.collectionThreadsId.length,
+              count: collectionThreadsId.length,
             },
             {
               type: 'blacklist',
               name: '黑名单',
-              url: `/u/${targetUser.uid}/p/s/blackList`,
+              url: `/u/${targetUser.uid}/profile/subscribe/blacklist`,
               count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid,
               }),
             },
           ],
         },
-        // {
-        //   name: "我的交往",
-        //   links: [
-        //     {
-        //       type: "follower",
-        //       name: "我的粉丝",
-        //       url: `/u/${targetUser.uid}/profile/follower`,
-        //       count: data.fansId.length
-        //     },
-        //
-        //   ]
-        // }
       ];
       data.name = '';
       data.navLinks.map((nav) => {
@@ -249,103 +130,85 @@ router
         });
       });
     }
-    data.code = await db.UserModel.getCode(targetUser.uid);
-    data.code = data.code.pop();
-    ctx.template = 'user/profile/profile.pug';
-    await next();
-  })
-  .get('/', async (ctx, next) => {
-    const { data, db } = ctx;
-    const { targetUser } = data;
-    // 看过的文章
-    const logs = await db.UsersBehaviorModel.find(
-      { uid: targetUser.uid, operationId: 'visitThread' },
-      { tid: 1, timeStamp: 1 },
-    )
-      .sort({ timeStamp: -1 })
-      .limit(25);
-    const threadsId = logs.map((l) => l.tid);
-    let threads = await db.ThreadModel.find({ tid: { $in: threadsId } });
-    threads = await db.ThreadModel.extendThreads(threads, {
-      forum: false,
-      category: false,
-      firstPost: true,
-      firstPostUser: true,
-      userInfo: false,
-      lastPost: false,
-      lastPostUser: false,
-      firstPostResource: false,
-      htmlToText: false,
-      count: 200,
-      showAnonymousUser: false,
-      excludeAnonymousPost: false,
-    });
-    const threadsObj = {};
-    threads.map((t) => (threadsObj[t.tid] = t));
-    const inserted = [];
-    data.visitThreadLogs = [];
-    for (let log of logs) {
-      const thread = threadsObj[log.tid];
-      if (thread && !inserted.includes(thread.tid)) {
-        inserted.push(thread.tid);
-        log = log.toObject();
-        log.thread = thread;
-        data.visitThreadLogs.push(log);
-      }
-    }
-    // 看过的用户
-    const visitUserlogs = await db.UsersBehaviorModel.find(
-      {
-        uid: targetUser.uid,
-        operationId: 'visitUserCard',
-        toUid: { $ne: targetUser.uid },
-      },
-      { uid: 1, toUid: 1, timeStamp: 1 },
-    )
-      .sort({ timeStamp: -1 })
-      .limit(25);
-    // 看过我的用户
-    const visitSelfLogs = await db.UsersBehaviorModel.find(
-      {
-        uid: { $nin: ['', targetUser.uid] },
-        operationId: 'visitUserCard',
-        toUid: targetUser.uid,
-      },
-      { uid: 1, toUid: 1, timeStamp: 1 },
-    )
-      .sort({ timeStamp: -1 })
-      .limit(25);
-    let usersId = visitUserlogs.map((u) => u.toUid);
-    usersId = usersId.concat(visitSelfLogs.map((u) => u.uid));
-    const users = await db.UserModel.find({ uid: { $in: usersId } });
+    //获取用户个人主页的粉丝和关注
+    const fansUsersId = await db.SubscribeModel.getUserFansId(targetUser.uid);
+
+    const latestFansUsersId = fansUsersId.slice(-8);
+    const latestSubUsersId = subUsersId.slice(-8);
+    const usersId = latestFansUsersId.concat(latestSubUsersId);
+    let users = await db.UserModel.find({ uid: { $in: usersId } });
+    users = await db.UserModel.extendUsersInfo(users);
     const usersObj = {};
-    users.map((u) => (usersObj[u.uid] = u));
-    data.visitUserLogs = [];
-    const visitUsersId = [];
-    const visitSelfUsersId = [];
-    data.visitSelfLogs = [];
-    for (let log of visitUserlogs) {
-      const user = usersObj[log.toUid];
-      if (user && !visitUsersId.includes(user.uid)) {
-        visitUsersId.push(user.uid);
-        log = log.toObject();
-        log.targetUser = user;
-        data.visitUserLogs.push(log);
-      }
+    for (const u of users) {
+      usersObj[u.uid] = u;
     }
-    for (let log of visitSelfLogs) {
-      const user = usersObj[log.uid];
-      if (user && !visitSelfUsersId.includes(user.uid)) {
-        visitSelfUsersId.push(user.uid);
-        log = log.toObject();
-        log.user = user;
-        data.visitSelfLogs.push(log);
+
+    const targetUserFans = [];
+    const targetUserFollowers = [];
+    for (const uid of latestFansUsersId) {
+      const u = usersObj[uid];
+      if (!u) {
+        continue;
       }
+      targetUserFans.push(u);
     }
-    // data.numberOfOtherUserOperation = await db.UserModel.getNumberOfOtherUserOperation(targetUser.uid);
+    for (const uid of latestSubUsersId) {
+      const u = usersObj[uid];
+      if (!u) {
+        continue;
+      }
+      targetUserFollowers.push(u);
+    }
+
+    data.fansCount = fansUsersId.length;
+    data.followersCount = subUsersId.length;
+    data.fansUsersId = fansUsersId;
+    data.subUsersId = subUsersId;
+
+    data.targetUserFans = targetUserFans;
+    data.targetUserFollowers = targetUserFollowers;
+
+    if (state.uid === targetUser.uid) {
+      data.code = await db.UserModel.getCode(targetUser.uid);
+      data.code = data.code.pop();
+    }
+
+    data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: data.targetUser.uid,
+    });
+
+    //用户的黑名单
+    const match = {};
+    if (user) {
+      match.uid = user.uid;
+    }
+    const bl = await db.BlacklistModel.find(match, { tUid: 1 }).sort({
+      toc: -1,
+    });
+    data.usersBlUid = bl.map((b) => {
+      return b.tUid;
+    });
     await next();
   })
-  .use('/subscribe', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
+    const { data, permission, state } = ctx;
+    const { user } = data;
+    const permissions = {
+      reviewed: null,
+      disabled: null,
+    };
+    if (user) {
+      if (permission('review')) {
+        permissions.reviewed = true;
+      }
+      if (permission('movePostsToRecycle') || permission('movePostsToDraft')) {
+        permissions.disabled = true;
+      }
+    }
+    data.permissions = permissions;
+    await next();
+  })
+  .use('/subscribe', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, data, db, state } = ctx;
     let { t } = query;
     const { targetUser } = data;
@@ -379,20 +242,47 @@ router
     }
     await next();
   })
-  .get('/summary/pie', summaryPie)
-  .get('/summary/calendar', summaryCalendar)
-  .get('/subscribe/user', subscribeUser)
-  .get('/subscribe/topic', subscribeTopic)
-  .get('/subscribe/forum', subscribeForum)
-  .get('/subscribe/discipline', subscribeDiscipline)
-  .get('/subscribe/column', subscribeColumn)
-  .get('/subscribe/thread', subscribeThread)
-  .get('/subscribe/collection', subscribeCollection)
-  .get('/follower', follower)
-  .get('/finance', finance)
-  .get('/draft', draft)
-  .get('/thread', thread)
-  .get('/note', note)
-  .get('/blacklist', blacklist)
-  .get('/post', post);
+  .get(
+    [
+      '/subscribe',
+      '/subscribe/user',
+      '/subscribe/forum',
+      '/subscribe/column',
+      '/subscribe/collection',
+      '/subscribe/thread',
+      '/subscribe/blacklist',
+      '/subscribe/thread',
+      '/timeline',
+      '/moment',
+      '/post',
+      '/thread',
+      '/fan',
+      '/follower',
+      '/manage',
+      '/draft',
+      '/note',
+      '/finance',
+      '/column',
+    ],
+    Public(),
+    async (ctx, next) => await next(),
+  )
+  .get('/subscribe/userData', OnlyUnbannedUser(), subUserRouter)
+  .get('/subscribe/forumData', OnlyUnbannedUser(), subForumRouter)
+  .get('/subscribe/columnData', OnlyUnbannedUser(), subColumnRouter)
+  .get('/subscribe/collectionData', OnlyUnbannedUser(), subCollectionRouter)
+  .get('/subscribe/threadDate', OnlyUnbannedUser(), subThreadRouter)
+  .get('/subscribe/blacklistData', OnlyUnbannedUser(), blacklistRouter)
+  .get('/subscribe/threadData', OnlyUnbannedUser(), subThreadRouter)
+  .get('/timelineData', Public(), timelineRouter)
+  .get('/momentData', Public(), momentRouter)
+  .get('/postData', Public(), postRouter)
+  .get('/threadData', Public(), threadRouter)
+  .get('/fanData', Public(), fanRouter)
+  .get('/followerData', Public(), followerRouter)
+  .get('/manageData', Public(), manageRouter)
+  .get('/draftData', OnlyUnbannedUser(), draftRouter)
+  .get('/noteData', OnlyUnbannedUser(), noteRouter)
+  .get('/financeData', OnlyUnbannedUser(), financeRouter)
+  .get('/columnData', Public(), columnRouter);
 module.exports = router;

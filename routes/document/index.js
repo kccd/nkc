@@ -1,4 +1,9 @@
 const router = require('koa-router')();
+const {
+  OnlyUser,
+  Public,
+  OnlyUnbannedUser,
+} = require('../../middlewares/permission');
 const nkcRender = require('../../nkcModules/nkcRender');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { DynamicOperations } = require('../../settings/operations');
@@ -6,6 +11,7 @@ const { DynamicOperations } = require('../../settings/operations');
 router
   .use(
     ['/preview', '/history', '/history/:_id', '/history/:_id/edit'],
+    OnlyUser(),
     async (ctx, next) => {
       const { db, query, state } = ctx;
       const { source, sid } = query;
@@ -23,7 +29,7 @@ router
       await next();
     },
   )
-  .get('/d/:did', async (ctx, next) => {
+  .get('/d/:did', Public(), async (ctx, next) => {
     const { db, state, permission } = ctx;
     const { did } = ctx.params;
     const { pageSettings } = state;
@@ -92,7 +98,7 @@ router
     }
     await next();
   })
-  .get('/preview', async (ctx, next) => {
+  .get('/preview', OnlyUser(), async (ctx, next) => {
     //获取文档预览信息
     const { db, data, query, nkcModules } = ctx;
     const { sid, source } = query;
@@ -145,7 +151,7 @@ router
     ctx.template = 'document/preview/document.pug';
     await next();
   })
-  .get('/history', async (ctx, next) => {
+  .get('/history', OnlyUser(), async (ctx, next) => {
     //获取文档历史版本
     ctx.template = 'document/history/document.pug';
     const { db, data, state, query, nkcModules } = ctx;
@@ -238,7 +244,7 @@ router
     }
     await next();
   })
-  .get('/history/:_id', async (ctx, next) => {
+  .get('/history/:_id', OnlyUser(), async (ctx, next) => {
     ctx.template = 'document/history/document.pug';
     const { db, data, params, query, nkcModules } = ctx;
     const { sid, source, page = 0 } = query;
@@ -348,7 +354,7 @@ router
     }
     await next();
   })
-  .post('/history/:_id/edit', async (ctx, next) => {
+  .post('/history/:_id/edit', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, params, query, state } = ctx;
     //  正在编辑的改为历史版
     const { sid, source } = query;

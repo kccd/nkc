@@ -6,7 +6,12 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
-router.post('/', async (ctx, next) => {
+const {
+  OnlyOperation,
+  OnlyUnbannedUser,
+} = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, state, body, nkcModules } = ctx;
   const { applicationForm, fund } = data;
   const { reason } = body;

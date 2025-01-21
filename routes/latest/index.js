@@ -2,11 +2,12 @@ const router = require('koa-router')();
 const zoneRouter = require('./zone');
 const communityRouter = require('./community');
 const columnRouter = require('./column');
+const { Public } = require('../../middlewares/permission');
 router
-  .get('/', async (ctx) => {
+  .get('/', Public(), async (ctx) => {
     return ctx.redirect('/n/community');
   })
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { data, db, state, internalData } = ctx;
     let visitedForums = [];
     if (data.user) {

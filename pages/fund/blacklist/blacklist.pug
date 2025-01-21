@@ -34,7 +34,8 @@ block fundContent
                         a(href=tools.getUrl('fundApplicationForm', l.applicationForm._id) target="_blank")=l.applicationForm.code
                     th.pre-wrap=l.reason
                     th
-                      button.btn.btn-xs.btn-default(onclick=`removeUserFromFundBlacklist('${l.user.uid}')`) 移除
+                      if data.removeFundListPermission
+                        button.btn.btn-xs.btn-default(onclick=`removeUserFromFundBlacklist('${l.user.uid}')`) 移除
             if !data.list.length
               .p-t-1.p-b-1.text-center 空空如也~
 block fundScripts

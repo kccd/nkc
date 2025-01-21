@@ -1,5 +1,7 @@
 <template lang="pug">
   .article-editor
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.article")
     .m-b-1
       .article-box(v-if="articles.length > 0")
         .article-box-header 草稿
@@ -210,11 +212,14 @@ import {immediateDebounce} from "../../js/execution";
 import EditorCategories from "../publicVue/moveThreadOrArticle/EditorCategories";
 import SelectColumn from "../../../editor/vueComponents/SelectColumn"
 import { sweetError } from "../../js/sweetAlert";
+import { publishPermissionTypes } from '../../js/publish';
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
 
 
 export default {
   props:['time', 'source', 'configs'],
   data: () => ({
+    publishPermissionTypes,
     ready: false,
     articleId: null,
     // articleCategories:[],//全部的独立文章分类
@@ -257,6 +262,7 @@ export default {
     }
   }),
   components: {
+    'publish-permission-checker': PublishPermissionChecker,
     "document-editor": DocumentEditor,
     'select-column-categories': selectColumnCategories,
     'editor-categories': EditorCategories,

@@ -2,9 +2,6 @@ const { Operations } = require('../operations.js');
 module.exports = {
   GET: Operations.visitMobileRegister,
   POST: Operations.submitRegister,
-  /*information: {
-		POST: Operations.submitInformation
-	},*/
   mobile: {
     GET: Operations.visitMobileRegister,
     POST: Operations.submitRegister,

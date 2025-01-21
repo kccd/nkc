@@ -1,6 +1,8 @@
+const { OnlyUnbannedUser, Public } = require('../../../middlewares/permission');
+
 const router = require('koa-router')();
 
-router.get('/:uid/public-info', async (ctx, next) => {
+router.get('/:uid/public-info', Public(), async (ctx, next) => {
   const { uid } = ctx.params;
   const user = await ctx.db.UserModel.findOne(
     { uid },

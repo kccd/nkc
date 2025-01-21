@@ -1,126 +1,161 @@
-const router = require("koa-router")();
+const router = require('koa-router')();
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 router
-  .get("/", async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
-    data.nav = "sticker";
-    const {page, t} = query;
-    data.t = t;
-    const q = {
-      from: "upload"
-    };
-    if(t === "unReviewed") {
-      q.reviewed = null;
-      // q.shared = false;
-      // 增加分享状态条件
-      q.shared = true;
-    } else if(t === "reviewed") {
-      // q.reviewed = {$ne: null};
-      // 改为已共享并且已审核的
-      q.reviewed = true;
-      q.shared = true;
-    } else if(t === "unShared") {
-      q.shared = false;
-      q.reviewed = true;
-    } else if(t === "shared") {
-      q.shared = true;
-      // 增加已审核
-      q.reviewed = true;
-    } else if(t === "disabled") {
-      q.disabled = true;
-      // // 增加未删除条件
-      // q.deleted = false;
-      // 增加已删除
-    } else if (t === "deleted") {
-      q.deleted = true;
-    }
-    const count = await db.StickerModel.countDocuments(q);
-    const paging = nkcModules.apiFunction.paging(page, count, 100);
-    let stickers = await db.StickerModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    data.stickers = [];
-    for(const s of stickers) {
-      const sticker = s.toObject();
-      sticker.user = await db.UserModel.findOne({uid: sticker.uid});
-      data.stickers.push(sticker);
-    }
-    data.paging = paging;
-    ctx.template = "nkc/sticker/sticker.pug";
-    await next();
-  })
-  .post("/", async (ctx, next) => {
-    const {body, db, nkcModules, tools} = ctx;
-    const {stickers, type, disabled} = body;
-    if(type === "review") {
-      for(const s of stickers) {
-        nkcModules.checkData.checkString(s.reason, {
-          name: "原因",
-          minLength: 0,
-          maxLength: 500
-        });
-        const sticker = await db.StickerModel.findOne({
-          from: "upload",
-          _id: s._id,
-          // shared: false,
-          // 改为 share: true
-          shared: true,
-          reviewed: null
-        });
-        if(!sticker) continue;
-        await sticker.updateOne({
-          shared: !!s.status,
-          reviewed: !!s.status,
-          reason: s.reason
-        });
-        const {rid} = sticker;
-        const {size} = s;
-        if(!["xs", "sm"].includes(size)) continue;
-        const resource = await db.ResourceModel.findOne({rid});
-        if(!resource) continue;
-        const stickerPath = await resource.getFilePath();
-        await tools.imageMagick.stickerify(stickerPath, size==="xs"?30:60);
+  .get(
+    '/',
+    OnlyOperation(Operations.nkcManagementSticker),
+    async (ctx, next) => {
+      const { data, db, query, nkcModules } = ctx;
+      data.nav = 'sticker';
+      const { page, t } = query;
+      data.t = t;
+      const q = {
+        from: 'upload',
+      };
+      if (t === 'unReviewed') {
+        q.reviewed = null;
+        // q.shared = false;
+        // 增加分享状态条件
+        q.shared = true;
+      } else if (t === 'reviewed') {
+        // q.reviewed = {$ne: null};
+        // 改为已共享并且已审核的
+        q.reviewed = true;
+        q.shared = true;
+      } else if (t === 'unShared') {
+        q.shared = false;
+        q.reviewed = true;
+      } else if (t === 'shared') {
+        q.shared = true;
+        // 增加已审核
+        q.reviewed = true;
+      } else if (t === 'disabled') {
+        q.disabled = true;
+        // // 增加未删除条件
+        // q.deleted = false;
+        // 增加已删除
+      } else if (t === 'deleted') {
+        q.deleted = true;
       }
-    } else if(type === "disable") {
-      for(const s of stickers) {
-        const sticker = await db.StickerModel.findOne({
-          from: "upload",
-          _id: s._id
-        });
-        if(!sticker) continue;
-        await sticker.updateOne({
-          disabled: !!disabled
-        });
+      const count = await db.StickerModel.countDocuments(q);
+      const paging = nkcModules.apiFunction.paging(page, count, 100);
+      let stickers = await db.StickerModel.find(q)
+        .sort({ toc: -1 })
+        .skip(paging.start)
+        .limit(paging.perpage);
+      data.stickers = [];
+      for (const s of stickers) {
+        const sticker = s.toObject();
+        sticker.user = await db.UserModel.findOne({ uid: sticker.uid });
+        data.stickers.push(sticker);
       }
-    } else if(type === "modifySize") {
-      for(const s of stickers) {
-        const {_id, size} = s;
-        const sticker = await db.StickerModel.findOne({
-          _id,
-          from: "upload",
-          reviewed: {$ne: null}
-        });
-        if(!sticker) continue;
-        if(!["md", "sm", "xs"].includes(size)) continue;
-        const resource = await db.ResourceModel.findOne({rid: sticker.rid});
-        if(!resource) continue;
-        const stickerPath = await resource.getFilePath();
-        await tools.imageMagick.stickerify(stickerPath, {
-          "md": 100,
-          "sm": 60,
-          "xs": 30
-        }[size]);
+      data.paging = paging;
+      ctx.template = 'nkc/sticker/sticker.pug';
+      await next();
+    },
+  )
+  .post(
+    '/',
+    OnlyOperation(Operations.nkcManagementSticker),
+    async (ctx, next) => {
+      const { body, db, nkcModules, tools } = ctx;
+      const { stickers, type, disabled } = body;
+      if (type === 'review') {
+        for (const s of stickers) {
+          nkcModules.checkData.checkString(s.reason, {
+            name: '原因',
+            minLength: 0,
+            maxLength: 500,
+          });
+          const sticker = await db.StickerModel.findOne({
+            from: 'upload',
+            _id: s._id,
+            // shared: false,
+            // 改为 share: true
+            shared: true,
+            reviewed: null,
+          });
+          if (!sticker) {
+            continue;
+          }
+          await sticker.updateOne({
+            shared: !!s.status,
+            reviewed: !!s.status,
+            reason: s.reason,
+          });
+          const { rid } = sticker;
+          const { size } = s;
+          if (!['xs', 'sm'].includes(size)) {
+            continue;
+          }
+          const resource = await db.ResourceModel.findOne({ rid });
+          if (!resource) {
+            continue;
+          }
+          const stickerPath = await resource.getFilePath();
+          await tools.imageMagick.stickerify(
+            stickerPath,
+            size === 'xs' ? 30 : 60,
+          );
+        }
+      } else if (type === 'disable') {
+        for (const s of stickers) {
+          const sticker = await db.StickerModel.findOne({
+            from: 'upload',
+            _id: s._id,
+          });
+          if (!sticker) {
+            continue;
+          }
+          await sticker.updateOne({
+            disabled: !!disabled,
+          });
+        }
+      } else if (type === 'modifySize') {
+        for (const s of stickers) {
+          const { _id, size } = s;
+          const sticker = await db.StickerModel.findOne({
+            _id,
+            from: 'upload',
+            reviewed: { $ne: null },
+          });
+          if (!sticker) {
+            continue;
+          }
+          if (!['md', 'sm', 'xs'].includes(size)) {
+            continue;
+          }
+          const resource = await db.ResourceModel.findOne({ rid: sticker.rid });
+          if (!resource) {
+            continue;
+          }
+          const stickerPath = await resource.getFilePath();
+          await tools.imageMagick.stickerify(
+            stickerPath,
+            {
+              md: 100,
+              sm: 60,
+              xs: 30,
+            }[size],
+          );
+        }
+      } else if (type === 'setShareStatus') {
+        for (const s of stickers) {
+          const sticker = await db.StickerModel.findOne({
+            from: 'upload',
+            _id: s._id,
+            shared: s.shared,
+          });
+          if (!sticker) {
+            continue;
+          }
+          await sticker.updateOne({
+            shared: !!body.shared,
+          });
+        }
       }
-    } else if (type === "setShareStatus") {
-      for(const s of stickers) {
-        const sticker = await db.StickerModel.findOne({
-          from: "upload",
-          _id: s._id,
-          shared: s.shared,
-        });
-        if(!sticker) continue;
-        await sticker.updateOne({
-          shared: !!body.shared
-        });
-      }
-    }
-    await next();
-  });
+      await next();
+    },
+  );
 module.exports = router;

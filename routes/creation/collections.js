@@ -1,9 +1,11 @@
+const { OnlyUser } = require('../../middlewares/permission');
+
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/data', async (ctx, next) => {
+  .get('/data', OnlyUser(), async (ctx, next) => {
     await next();
   });
 module.exports = router;

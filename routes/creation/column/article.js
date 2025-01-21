@@ -1,7 +1,8 @@
+const { OnlyUser } = require('../../../middlewares/permission');
 const { articleStatus } = require('../../../settings/article');
 
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   //获取专栏文章列表
   const { query, state, db, nkcModules, data } = ctx;
   const { page = 0 } = query;

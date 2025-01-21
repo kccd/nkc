@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { OnlyUser } = require('../../../../middlewares/permission');
+const { OnlyUser, Public } = require('../../../../middlewares/permission');
 const {
   momentCheckerService,
 } = require('../../../../services/moment/momentChecker.service');
@@ -23,7 +23,7 @@ const momentsCount = {
   interval: 3 * 60 * 1000, // 有效时间 ms
 };
 router
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { query, data, state } = ctx;
     const { t = '' } = query;
     const [type, tab] = t.split('-');
@@ -47,7 +47,7 @@ router
       await next();
     }
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { state, db, data, query, nkcModules, permission } = ctx;
     const { zoneTypes, zoneTab, type, tab } = data;
     const { page = 0 } = query;
@@ -69,9 +69,9 @@ router
     let subUid = [];
     // 我的关注页需要添加用户筛选
     const condition = {};
-    if(tab === zoneTab.subscribe) {
+    if (tab === zoneTab.subscribe) {
       const usersId = [];
-      if(state.uid) {
+      if (state.uid) {
         subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
         usersId.push(...subUid, state.uid);
       }
@@ -187,7 +187,7 @@ router
     };
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules, state } = ctx;
     const { zoneTypes, type, tab } = data;
     if (type !== zoneTypes.article) {
@@ -237,7 +237,7 @@ router
     };
     await next();
   })
-  .get('/m/:mid', async (ctx, next) => {
+  .get('/m/:mid', Public(), async (ctx, next) => {
     const { permission, data, state, db, params } = ctx;
     const { mid } = params;
     const moment = await db.MomentModel.findOne({ _id: mid });

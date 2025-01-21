@@ -139,6 +139,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    volumeAD: {
+      type: Boolean,
+      default: false,
+    },
     online: {
       type: String,
       default: '',
@@ -258,6 +262,14 @@ userSchema
   })
   .set(function (registerType) {
     this._registerType = registerType;
+  });
+userSchema
+  .virtual('paperAD')
+  .get(function () {
+    return this._paperAD;
+  })
+  .set(function (paperAD) {
+    this._paperAD = paperAD;
   });
 
 userSchema
@@ -534,20 +546,27 @@ userSchema.statics.extendUsersSecretInfo = async (users) => {
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const ExamsCategoryModel = mongoose.model('examsCategories');
   const ExamsPaperModel = mongoose.model('examsPapers');
-  const proExamsCategories = await ExamsCategoryModel.find({ volume: 'B' });
-  const proExamsCategoriesObj = {},
-    proExamsCategoriesId = [];
-  for (const p of proExamsCategories) {
-    proExamsCategoriesId.push(p._id);
-    proExamsCategoriesObj[p._id] = p;
+  const examsCategories = await ExamsCategoryModel.find({});
+  const proExamsCategoriesObj = {};
+  const proExamsCategoriesId = [];
+  const pubExamsCategoriesObj = {};
+  const pubExamsCategoriesId = [];
+  const admissionExamsCategoriesObj = {};
+  const admissionExamsCategoriesId = [];
+
+  for (const category of examsCategories) {
+    if (category.volume === 'A') {
+      pubExamsCategoriesId.push(category._id);
+      pubExamsCategoriesObj[category._id] = category;
+    } else if (category.volume === 'B') {
+      proExamsCategoriesId.push(category._id);
+      proExamsCategoriesObj[category._id] = category;
+    } else if (category.volume === 'AD') {
+      admissionExamsCategoriesId.push(category._id);
+      admissionExamsCategoriesObj[category._id] = category;
+    }
   }
-  const pubExamsCategories = await ExamsCategoryModel.find({ volume: 'A' });
-  const pubExamsCategoriesObj = {},
-    pubExamsCategoriesId = [];
-  for (const p of pubExamsCategories) {
-    pubExamsCategoriesId.push(p._id);
-    pubExamsCategoriesObj[p._id] = p;
-  }
+
   const usersId = [],
     usersObj = {};
   for (const user of users) {
@@ -610,6 +629,16 @@ userSchema.statics.extendUsersSecretInfo = async (users) => {
       }).sort({ toc: 1 });
       if (paperB) {
         user.paperB = proExamsCategoriesObj[paperB.cid];
+      }
+    }
+    if (user.volumeAD) {
+      const paperAD = await ExamsPaperModel.findOne({
+        uid: user.uid,
+        passed: true,
+        cid: { $in: admissionExamsCategoriesId },
+      }).sort({ toc: 1 });
+      if (paperAD) {
+        user.paperAD = admissionExamsCategoriesObj[paperAD.cid];
       }
     }
     results.push(user);
@@ -871,7 +900,6 @@ userSchema.statics.createUser = async (option) => {
   const apiFunction = require('../nkcModules/apiFunction');
   const UserModel = mongoose.model('users');
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const SubscribeModel = mongoose.model('subscribes');
   const SettingModel = mongoose.model('settings');
   const UsersGeneraModel = mongoose.model('usersGeneral');
   const SubscribeTypeModel = mongoose.model('subscribeTypes');
@@ -896,7 +924,7 @@ userSchema.statics.createUser = async (option) => {
   userObj.certs = [];
   // 生成默认用户名，符号"-"和uid保证此用户名全局唯一
   if (!userObj.username) {
-    userObj.username = `${serverSettings.websiteCode}-${uid}`;
+    userObj.username = `kc-${uid}`;
   }
   userObj.usernameLowerCase = userObj.username.toLowerCase();
   if (userObj.password) {
@@ -2687,7 +2715,7 @@ userSchema.statics.updateNumberOfOtherUserOperation = async (uid) => {
   const numberKey = getRedisKeys(`numberOfOtherUserOperation`, uid);
   match.operationId = 'visitThread';
   const numberOfRead = await UsersBehaviorModel.countDocuments(match);
-  match.opeartionId = 'post-vote-up';
+  match.opeartionId = 'post_vote_up';
   const numberOfVoteUp = await UsersBehaviorModel.countDocuments(match);
   match.operationId = 'postToThread';
   const numberOfPost = await UsersBehaviorModel.countDocuments(match);
@@ -3057,13 +3085,42 @@ userSchema.statics.getUserGlobalPostPermissionStatus = async (uid, type) => {
  * @author pengxiguaa 20200-12-18
  * */
 userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const UserModel = mongoose.model('users');
   const ForumModel = mongoose.model('forums');
+  // uid 可能没有
+  // 这里只能获取状态而不能直接报错
+  // let permit = false,
+  //   warning = [],
+  //   permissionStatus = null;
+
   let { permit, warning } = await UserModel.getUserGlobalPostPermissionStatus(
     uid,
     type,
   );
 
+  // if (type === 'thread') {
+  //   permissionStatus =
+  //     await publishPermissionService.getPublishPermissionStatus(
+  //       publishPermissionTypes.thread,
+  //       uid,
+  //     );
+  // } else {
+  //   permissionStatus =
+  //     await publishPermissionService.getPublishPermissionStatus(
+  //       publishPermissionTypes.post,
+  //       uid,
+  //     );
+  // }
+  // const { tasks, countLimit, timeLimit, examCountWarning } = permissionStatus;
+  // permit =
+  //   Object.values(tasks).every((task) => !(task && !task.completed)) &&
+  //   !countLimit.limited &&
+  //   timeLimit.till < Date.now() &&
+  //   !examCountWarning.show;
   if (fids.length > 0) {
     try {
       if (type === 'thread') {
@@ -3298,12 +3355,11 @@ userSchema.statics.getImproveUserInfoByMiddlewareUser = async function (user) {
   }
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const SettingModel = mongoose.model('settings');
-  const serverSettings = await SettingModel.getSettings('server');
   const { uid, username, avatar, banner, description } = user;
   const userSecuritySettings = await UsersPersonalModel.getUserSecuritySettings(
     uid,
   );
-  const reg = new RegExp(`^${serverSettings.websiteCode}-`);
+  const reg = new RegExp(`^kc-`);
   const setUsername = username && !reg.test(username);
   const needVerifyPhoneNumber =
     await UsersPersonalModel.shouldVerifyPhoneNumber(uid);

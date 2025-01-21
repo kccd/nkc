@@ -7,12 +7,12 @@ const articlesRouter = require('./articles');
 const threadsRouter = require('./threads');
 const threadRouter = require('./thread');
 const columnRouter = require('./column');
-const recycleRouter = require('./recycle');
 const usersRouter = require('./users');
 const examRouter = require('./exam');
 const forumsRouter = require('./forums');
 const registerRouter = require('./register');
 const zoneRouter = require('./zone');
+const settingsRouter = require('./settings');
 router
   .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/server', serverRouter.routes(), serverRouter.allowedMethods())
@@ -25,6 +25,6 @@ router
   .use('/exam', examRouter.routes(), examRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/thread/:tid', threadRouter.routes(), threadRouter.allowedMethods())
-  .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
+  .use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
   .use('/zone', zoneRouter.routes(), zoneRouter.allowedMethods());
 module.exports = router;

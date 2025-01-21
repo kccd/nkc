@@ -1,27 +1,31 @@
-const router = require("koa-router")();
+const router = require('koa-router')();
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
 router
   // 我所发布的商品列表
-  .get("/", async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
-    const {page, t} = query;
-    const {user} = data;
-    data.navType = "goods";
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { data, db, query, nkcModules } = ctx;
+    const { page, t } = query;
+    const { user } = data;
+    data.navType = 'goods';
     data.t = t;
     const q = {
-      uid: user.uid
+      uid: user.uid,
     };
-    if(!t || t === "onSale") {
-      q.productStatus = "insale";
-    } else if(t === "stopped") {
-      q.productStatus = "stopsale";
+    if (!t || t === 'onSale') {
+      q.productStatus = 'insale';
+    } else if (t === 'stopped') {
+      q.productStatus = 'stopsale';
     } else {
-      q.productStatus = "notonshelf";
+      q.productStatus = 'notonshelf';
     }
     const count = await db.ShopGoodsModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const products = await db.ShopGoodsModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const products = await db.ShopGoodsModel.find(q)
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
     data.products = await db.ShopGoodsModel.extendProductsInfo(products);
-    ctx.template = "shop/manage/goods/goods.pug";
+    ctx.template = 'shop/manage/goods/goods.pug';
     data.paging = paging;
     await next();
   });

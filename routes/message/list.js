@@ -1,5 +1,6 @@
 const router = require('koa-router')();
-router.get('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
+router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { db, data, nkcModules } = ctx;
   const { user } = data;
   data.chatList = await db.CreatedChatModel.getCreatedChat(user.uid);

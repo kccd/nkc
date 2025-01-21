@@ -1,9 +1,10 @@
 const router = require('koa-router')();
+const { OnlyUser, OnlyUnbannedUser } = require('../../middlewares/permission');
 const {
   blacklistCheckerService,
 } = require('../../services/blacklist/blacklistChecker.service');
 router
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params, state } = ctx;
     const { _id } = params;
     const comment = await db.CommentModel.findOnly({ _id });
@@ -15,7 +16,7 @@ router
     data.targetUser = await db.UserModel.findOnly({ uid: comment.uid });
     await next();
   })
-  .post('/up', async (ctx, next) => {
+  .post('/up', OnlyUnbannedUser(), async (ctx, next) => {
     //独立文章点赞
     const { db, data, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock('commentVote', 6000);
@@ -95,7 +96,7 @@ router
     }
     await next();
   })
-  .post('/down', async (ctx, next) => {
+  .post('/down', OnlyUnbannedUser(), async (ctx, next) => {
     //独立文章点踩
     const { db, data, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock('commentVote', 6000);

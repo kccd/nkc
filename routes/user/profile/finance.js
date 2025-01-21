@@ -1,7 +1,12 @@
 module.exports = async (ctx, next) => {
-  const {nkcModules, query, data, db} = ctx;
+  const {state, nkcModules, query, data, db} = ctx;
   const {targetUser} = data;
   const {t, page} = query;
+  // 用户积分
+  if(targetUser.uid !== state.uid && !ctx.permission('viewUserScores')) {
+    ctx.throw(403, '权限不足');
+  }
+  data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
   const q = {
     verify: true
   };
@@ -20,9 +25,14 @@ module.exports = async (ctx, next) => {
   }
   const count = await db.KcbsRecordModel.countDocuments(q);
   const paging = nkcModules.apiFunction.paging(page, count);
-  let kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+  let kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage)
   await db.KcbsRecordModel.hideSecretInfo(kcbsRecords);
-  data.kcbsRecords = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
+  const kcbNumber = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
+  data.kcbsRecords = kcbNumber.map((item)=>{
+    const m = item;
+    m.lang = nkcModules.translate.translate(nkcModules.language.languageNames.zh_cn, 'kcbsTypes', item.type);
+    return m;
+  });
   data.paging = paging;
   data.t = t;
   targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);

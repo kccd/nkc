@@ -3,236 +3,247 @@ import Editor from '../../lib/vue/Editor';
 import { toLogin } from '../../lib/js/account';
 import { lazyLoadInit } from '../../lib/js/lazyLoad';
 import { initNKCSource } from '../../lib/js/nkcSource';
+import { publishPermissionTypes } from '../../lib/js/publish';
+import PublishPermissionChecker from '../../lib/vue/PublishPermissionCheck.vue';
 
 const NKC = window.NKC;
 var _id;
 class SinglePostModule {
-  constructor() {
-    this.editors = {};
-    this.tid = null;
-    // 如果不允许评论，此字段为相关说明
-    this.cWriteInfo = true;
-    this.postPermission = {
-      permit: false,
-      warning: null,
-    };
-    this.sendAnonymousPost = false;
-  }
-  getPostHeightFloat() {
-    let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
-    if (!postHeight.length) {
-      throw '未读取到与post内容隐藏相关的配置';
+    constructor() {
+        this.editors = {};
+        this.tid = null;
+        // 如果不允许评论，此字段为相关说明
+        this.cWriteInfo = true;
+        this.postPermission = {
+            permit: false,
+            warning: null,
+        };
+        this.sendAnonymousPost = false;
     }
-    postHeight = NKC.methods.strToObj(postHeight.html());
-    return postHeight.float;
-  }
-  // 获取后台有关post高度的配置
-  // 根据屏幕尺寸判断是否需要隐藏
-  getPostMaxHeight() {
-    const DW = $(document).width();
-    let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
-    if (!postHeight.length) {
-      throw '未读取到与post内容隐藏相关的配置';
-    }
-    postHeight = NKC.methods.strToObj(postHeight.html());
-    let hidePostMaxHeight;
-    if (DW < 768) {
-      hidePostMaxHeight = postHeight.xs;
-    } else if (DW < 992) {
-      hidePostMaxHeight = postHeight.sm;
-    } else {
-      hidePostMaxHeight = postHeight.md;
-    }
-    return hidePostMaxHeight;
-  }
-  // 自动获取post列表、判断高度以及属性然后隐藏满足条件的post
-  autoHidePostContent() {
-    const containers = $('.single-post-container');
-    for (let i = 0; i < containers.length; i++) {
-      const c = containers.eq(i);
-      const hide = c.attr('data-hide');
-      const pid = c.attr('data-pid');
-      if (hide === 'not') {
-        continue;
-      }
-      const hidePostMaxHeight = this.getPostMaxHeight();
-      const contentHeight = c.find('.single-post-center').height();
-      if (contentHeight > hidePostMaxHeight) {
-        this.hidePostContent(pid);
-      }
-    }
-  }
-  // 隐藏post内容
-  hidePostContent(pid) {
-    const containers = $(`.single-post-container[data-pid="${pid}"]`);
-    for (let i = 0; i < containers.length; i++) {
-      const container = containers.eq(i);
-      if (container.attr('data-hide') === 'not') {
-        continue;
-      }
-      const postCenter = container.find('.single-post-center');
-      const hidePostFloat = this.getPostHeightFloat();
-      const hidePostMaxHeight = this.getPostMaxHeight();
-      postCenter.css({
-        'max-height': hidePostMaxHeight * hidePostFloat + 'px',
-      });
-      const buttonContainer = container.find('.switch-hidden-status');
-      const button = buttonContainer.find('.switch-hidden-status-button');
-      button.html(
-        `<div class="fa fa-angle-down"><strong> 加载全文</strong></div>`,
-      );
-      container.attr('data-hidden', 'true');
-      buttonContainer.removeClass('hidden');
-    }
-  }
-  // 取消隐藏post内容
-  showPostContent(pid) {
-    const containers = $(`.single-post-container[data-pid="${pid}"]`);
-    for (let i = 0; i < containers.length; i++) {
-      const container = containers.eq(i);
-      if (container.attr('data-hide') === 'not') {
-        continue;
-      }
-      const postCenter = container.find('.single-post-center');
-      postCenter.css({
-        'max-height': 'none',
-      });
-      const buttonContainer = container.find('.switch-hidden-status');
-      const button = buttonContainer.find('.switch-hidden-status-button');
-      button.html(`<div class="fa fa-angle-up"> 收起</div>`);
-      container.attr('data-hidden', 'false');
-      buttonContainer.removeClass('hidden');
-    }
-  }
-  // 切换post隐藏状态
-  switchPostContent(pid) {
-    const containers = $(`.single-post-container[data-pid="${pid}"]`);
-    for (let i = 0; i < containers.length; i++) {
-      const container = containers.eq(i);
-      if (container.attr('data-hide') === 'not') {
-        continue;
-      }
-      const hidden = container.attr('data-hidden');
-      if (hidden === 'true') {
-        const scrollY = $(document).scrollTop();
-        this.showPostContent(pid);
-        scrollTo(0, scrollY);
-      } else {
-        const pagePosition = new NKC.modules.PagePosition();
-        this.hidePostContent(pid);
-        pagePosition.restore();
-      }
-    }
-  }
-  // 获取回复最外层dom
-  getPostContainer(pid) {
-    return $(
-      `.single-post-container[data-pid="${pid}"]:has(.single-post-comment-container)`,
-    );
-  }
-  // 获取评论框最外层dom
-  getCommentContainer(pid) {
-    return $(`[data-type="singlePostCommentContainer"][data-pid="${pid}"]`);
-  }
-  // 获取单条评论最外层
-  getSingleComment(pid) {
-    return $(`.single-comment[data-pid="${pid}"]`);
-  }
-  // 获取控制评论显示与隐藏的按钮
-  getCommentButton(pid) {
-    return $(`[data-type="singlePostCommentButton"][data-pid="${pid}"]`);
-  }
-  // 获取编辑器以及编辑器上的提示
-  createCommentElements(pid) {
-    let comments = $(`.single-comments[data-pid="${pid}"]`);
-    if (!comments.length) {
-      comments = $(`<div class="single-comments" data-pid="${pid}"></div>`);
-    }
-    return comments;
-  }
-  getPages(pid, paging) {
-    let pages = $(`.single-comment-paging[data-pid="${pid}"]`);
-    if (!pages.length) {
-      pages = $(`<div class="single-comment-paging" data-pid="${pid}"></div>`);
-    }
-    pages.html('');
-    for (const button of paging.buttonValue) {
-      const b = $(`<span class="${button.type}">..</span>`);
-      if (button.type !== 'null') {
-        b.text(button.num + 1);
-        b.attr(
-          'onclick',
-          `NKC.methods.getPostCommentsByPage('${pid}', ${button.num})`,
-        );
-      }
-      pages.append(b);
-    }
-    return pages;
-  }
-  // 展开评论 添加或移除post背景
-  switchPostBackgroundColor(pid, show) {
-    const postContainer = this.getPostContainer(pid);
-    postContainer.attr('data-show-comments', show ? 'true' : 'false');
-  }
-  showPostComment(pid, page = 0, options = {}) {
-    const { highlightCommentId = null } = options;
-    this.removeAllEditorApp(pid);
-    const self = this;
-    const container = this.getCommentContainer(pid);
-    const button = this.getCommentButton(pid);
-    const _loadDom = container.find('.single-post-comment-loading');
-    const _errorDom = container.find('.single-post-comment-error');
-    if (_loadDom.length > 0) {
-      _loadDom.remove();
-    }
-    if (_errorDom.length > 0) {
-      _errorDom.remove();
-    }
-    this.getPostComments(pid, page)
-      .then((data) => {
-        const { tid, htmlContent, paging, postPermission } = data;
-        // htmlContent 是打开评论后显示的内容
-        if (!window.UE && $(htmlContent).children('div').length < 1) {
-          return screenTopWarning(`当前没有评论。如果要发表评论，请先登录。`);
+    getPostHeightFloat() {
+            let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
+            if (!postHeight.length) {
+                throw '未读取到与post内容隐藏相关的配置';
+            }
+            postHeight = NKC.methods.strToObj(postHeight.html());
+            return postHeight.float;
         }
-        this.switchPostBackgroundColor(pid, true);
-        const loading = $(
-          `<div class="single-post-comment-loading"><div class='fa fa-spinner fa-spin'></div>加载中...</div>`,
-        );
-        if (container.attr('data-opened') !== 'true') {
-          container.append(loading);
+        // 获取后台有关post高度的配置
+        // 根据屏幕尺寸判断是否需要隐藏
+    getPostMaxHeight() {
+            const DW = $(document).width();
+            let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
+            if (!postHeight.length) {
+                throw '未读取到与post内容隐藏相关的配置';
+            }
+            postHeight = NKC.methods.strToObj(postHeight.html());
+            let hidePostMaxHeight;
+            if (DW < 768) {
+                hidePostMaxHeight = postHeight.xs;
+            } else if (DW < 992) {
+                hidePostMaxHeight = postHeight.sm;
+            } else {
+                hidePostMaxHeight = postHeight.md;
+            }
+            return hidePostMaxHeight;
         }
-        container.attr('data-hide', 'false');
-        button.attr('data-show-number', 'false');
-        this.renderPostCommentNumber(pid);
-        if (paging.page + 1 >= paging.pageCount) {
-          container.attr('data-last-page', 'true');
-        } else {
-          container.attr('data-last-page', 'false');
+        // 自动获取post列表、判断高度以及属性然后隐藏满足条件的post
+    autoHidePostContent() {
+            const containers = $('.single-post-container');
+            for (let i = 0; i < containers.length; i++) {
+                const c = containers.eq(i);
+                const hide = c.attr('data-hide');
+                const pid = c.attr('data-pid');
+                if (hide === 'not') {
+                    continue;
+                }
+                const hidePostMaxHeight = this.getPostMaxHeight();
+                const contentHeight = c.find('.single-post-center').height();
+                if (contentHeight > hidePostMaxHeight) {
+                    this.hidePostContent(pid);
+                }
+            }
         }
-        self.postPermission = postPermission;
-        self.tid = tid;
-        self.sendAnonymousPost = data.sendAnonymousPost;
-        //获取编辑器上的提示
-        const comments = this.createCommentElements(pid);
-        comments.html(htmlContent);
-        loading.remove();
-        const pagesDom = self.getPages(pid, paging);
-        if (container.attr('data-opened') !== 'true') {
-          container.append(pagesDom);
-          container.append(comments);
-          container.append(pagesDom.clone(true));
-          container.attr('data-opened', 'true');
+        // 隐藏post内容
+    hidePostContent(pid) {
+            const containers = $(`.single-post-container[data-pid="${pid}"]`);
+            for (let i = 0; i < containers.length; i++) {
+                const container = containers.eq(i);
+                if (container.attr('data-hide') === 'not') {
+                    continue;
+                }
+                const postCenter = container.find('.single-post-center');
+                const hidePostFloat = this.getPostHeightFloat();
+                const hidePostMaxHeight = this.getPostMaxHeight();
+                postCenter.css({
+                    'max-height': hidePostMaxHeight * hidePostFloat + 'px',
+                });
+                const buttonContainer = container.find('.switch-hidden-status');
+                const button = buttonContainer.find('.switch-hidden-status-button');
+                button.html(
+                    `<div class="fa fa-angle-down"><strong> 加载全文</strong></div>`,
+                );
+                container.attr('data-hidden', 'true');
+                buttonContainer.removeClass('hidden');
+            }
         }
-        const editorApp = self.getEditorApp(pid, container, {
-          cancelEvent: 'switchPostComment',
-          keepOpened: true,
-          position: 'bottom',
-        });
-        this.cWriteInfo = data.cWriteInfo;
-        if (!data.cWriteInfo) {
-          editorApp.show = true;
-          editorApp.container.show();
+        // 取消隐藏post内容
+    showPostContent(pid) {
+            const containers = $(`.single-post-container[data-pid="${pid}"]`);
+            for (let i = 0; i < containers.length; i++) {
+                const container = containers.eq(i);
+                if (container.attr('data-hide') === 'not') {
+                    continue;
+                }
+                const postCenter = container.find('.single-post-center');
+                postCenter.css({
+                    'max-height': 'none',
+                });
+                const buttonContainer = container.find('.switch-hidden-status');
+                const button = buttonContainer.find('.switch-hidden-status-button');
+                button.html(`<div class="fa fa-angle-up"> 收起</div>`);
+                container.attr('data-hidden', 'false');
+                buttonContainer.removeClass('hidden');
+            }
+        }
+        // 切换post隐藏状态
+    switchPostContent(pid) {
+            const containers = $(`.single-post-container[data-pid="${pid}"]`);
+            for (let i = 0; i < containers.length; i++) {
+                const container = containers.eq(i);
+                if (container.attr('data-hide') === 'not') {
+                    continue;
+                }
+                const hidden = container.attr('data-hidden');
+                if (hidden === 'true') {
+                    const scrollY = $(document).scrollTop();
+                    this.showPostContent(pid);
+                    scrollTo(0, scrollY);
+                } else {
+                    const pagePosition = new NKC.modules.PagePosition();
+                    this.hidePostContent(pid);
+                    pagePosition.restore();
+                }
+            }
+        }
+        // 获取回复最外层dom
+    getPostContainer(pid) {
+            return $(
+                `.single-post-container[data-pid="${pid}"]:has(.single-post-comment-container)`,
+            );
+        }
+        // 获取评论框最外层dom
+    getCommentContainer(pid) {
+            return $(`[data-type="singlePostCommentContainer"][data-pid="${pid}"]`);
+        }
+        // 获取单条评论最外层
+    getSingleComment(pid) {
+            return $(`.single-comment[data-pid="${pid}"]`);
+        }
+        // 获取控制评论显示与隐藏的按钮
+    getCommentButton(pid) {
+            return $(`[data-type="singlePostCommentButton"][data-pid="${pid}"]`);
+        }
+        // 获取编辑器以及编辑器上的提示
+    createCommentElements(pid) {
+        let comments = $(`.single-comments[data-pid="${pid}"]`);
+        if (!comments.length) {
+            comments = $(`<div class="single-comments" data-pid="${pid}"></div>`);
+        }
+        return comments;
+    }
+    getPages(pid, paging) {
+            let pages = $(`.single-comment-paging[data-pid="${pid}"]`);
+            if (!pages.length) {
+                pages = $(`<div class="single-comment-paging" data-pid="${pid}"></div>`);
+            }
+            pages.html('');
+            for (const button of paging.buttonValue) {
+                const b = $(`<span class="${button.type}">..</span>`);
+                if (button.type !== 'null') {
+                    b.text(button.num + 1);
+                    b.attr(
+                        'onclick',
+                        `NKC.methods.getPostCommentsByPage('${pid}', ${button.num})`,
+                    );
+                }
+                pages.append(b);
+            }
+            return pages;
+        }
+        // 展开评论 添加或移除post背景
+    switchPostBackgroundColor(pid, show) {
+        const postContainer = this.getPostContainer(pid);
+        postContainer.attr('data-show-comments', show ? 'true' : 'false');
+    }
+    showPostComment(pid, page = 0, options = {}) {
+            const { highlightCommentId = null } = options;
+            this.removeAllEditorApp(pid);
+            const self = this;
+            const container = this.getCommentContainer(pid);
+            const button = this.getCommentButton(pid);
+            const _loadDom = container.find('.single-post-comment-loading');
+            const _errorDom = container.find('.single-post-comment-error');
+            if (_loadDom.length > 0) {
+                _loadDom.remove();
+            }
+            if (_errorDom.length > 0) {
+                _errorDom.remove();
+            }
+            this.getPostComments(pid, page)
+                .then((data) => {
+                        const { tid, htmlContent, paging, postPermission } = data;
+                        // htmlContent 是打开评论后显示的内容
+                        if (!window.UE && $(htmlContent).children('div').length < 1) {
+                            return screenTopWarning(`当前没有评论。如果要发表评论，请先登录。`);
+                        }
+                        this.switchPostBackgroundColor(pid, true);
+                        const loading = $(
+                            `<div class="single-post-comment-loading"><div class='fa fa-spinner fa-spin'></div>加载中...</div>`,
+                        );
+                        if (container.attr('data-opened') !== 'true') {
+                            container.append(loading);
+                        }
+                        container.attr('data-hide', 'false');
+                        button.attr('data-show-number', 'false');
+                        this.renderPostCommentNumber(pid);
+                        if (paging.page + 1 >= paging.pageCount) {
+                            container.attr('data-last-page', 'true');
+                        } else {
+                            container.attr('data-last-page', 'false');
+                        }
+                        self.postPermission = postPermission;
+                        self.tid = tid;
+                        self.sendAnonymousPost = data.sendAnonymousPost;
+                        //获取编辑器上的提示
+                        const comments = this.createCommentElements(pid);
+                        comments.html(htmlContent);
+                        loading.remove();
+                        const pagesDom = self.getPages(pid, paging);
+                        if (container.attr('data-opened') !== 'true') {
+                            container.append(pagesDom);
+                            container.append(comments);
+                            container.append(pagesDom.clone(true));
+                            container.attr('data-opened', 'true');
+                        }
+                        let editorApp = null
+                        this.cWriteInfo = data.cWriteInfo;
+                        if (!data.cWriteInfo) {
+                            if (NKC.configs.uid) {
+                                editorApp = self.getEditorApp(pid, container, {
+                                    cancelEvent: 'switchPostComment',
+                                    keepOpened: true,
+                                    position: 'bottom',
+                                });
+                                editorApp.show = true;
+                                editorApp.container.show();
+                            } else {
+                                container.append(
+                                        $(
+                                            `<div class="text-danger single-post-comment-error">${`游客没有发表内容的权限。想参与大家的讨论？现在就 <a href="/login" target="_blank">登录</a> 或 <a href="/register" target="_blank">注册</a>。`}</div>`,
+              ),
+            );
+          }
         } else {
           container.append(
             $(
@@ -312,6 +323,10 @@ class SinglePostModule {
   }
   // 显示、隐藏评论
   switchPostComment(pid, fixPosition, page) {
+    if (!NKC.configs.uid) {
+      window.RootApp.openLoginPanel();
+      return;
+    }
     // 游客没有window.UE
     // if(!window.UE) return screenTopWarning(`别着急，页面还在加载中...`);
     const container = this.getCommentContainer(pid);
@@ -361,16 +376,19 @@ class SinglePostModule {
       const editorContainer = $(
         `<div class="single-comment-editor-container"></div>`,
       );
-      const warningDom = $(`<div class="single-comment-warning"></div>`);
-      warningDom.html(this.postPermission.warning);
-      editorContainer.append(warningDom);
+      // const warningDom = $(`<div class="single-comment-warning"></div>`);
+      // warningDom.html(this.postPermission.warning);
+      // editorContainer.append(warningDom);
       let editorDom, app;
-      if (this.postPermission.permit) {
+      // if (this.postPermission.permit) {
         editorDom = $(
           `<div class="single-comment-editor" id="singlePostEditor_${pid}"><editor :configs="editorConfigs" ref="singleEditor_${pid}" @ready="removeEvent" @content-change="autoSave" :loading="waiting" :l="l" :plugs="editorPlugs"/></div>`,
         );
         const promptDom = $(
           `<div class="single-comment-prompt m-b-05">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`,
+        );
+        const permissionDom = $(
+          `<div class="permission-checker" id="permissionChecker_${pid}"><publish-permission-checker :type="publishPermissionTypes.post" /></div>`,
         );
         const buttonDom = $(
           `<div class="single-comment-button" data-type="${pid}"></div>`,
@@ -413,8 +431,8 @@ class SinglePostModule {
             ),
           );
 
-        editorContainer.append(promptDom).append(editorDom).append(buttonDom);
-      }
+        editorContainer.append(permissionDom).append(promptDom).append(editorDom).append(buttonDom);
+      // }
 
       if (position === 'top') {
         singleCommentBottom.prepend(editorContainer);
@@ -498,6 +516,15 @@ class SinglePostModule {
           },
         });
         app = singleEditor.getRef();
+        new Vue({
+          el: `#permissionChecker_${pid}`,
+          data: {
+            publishPermissionTypes
+          },
+          components: {
+            'publish-permission-checker': PublishPermissionChecker,
+          },
+        });
         // app = UE.getEditor(editorDom.attr('id'), NKC.configs.ueditor.commentConfigs);
       }
 

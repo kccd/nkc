@@ -125,10 +125,10 @@
               a(href='/e/settings/email')=lang('ex', 'emailSettings')
           if permission('visitEPostSettings')
             li
-              a(href='/e/settings/post')=lang('ex', 'postSettings')
-          if permission('experimentalDocumentPostSettings')
+              a(href='/e/settings/post') 论坛内容
+          if permission('experimentalPublishSettings')
             li
-              a(href=`/e/settings/documentPost`) 内容发表
+              a(href=`/e/settings/publish`) 发表&审核
           if permission('visitExamSettings')
             li
               a(href='/e/settings/exam')=lang('ex', 'exam')
@@ -172,9 +172,6 @@
           if permission('experimentalSafeSettings')
             li
               a(href='/e/settings/safe') 安全
-          if permission('experimentalReviewSettings')
-            li
-              a(href='/e/settings/review') 审核
           if permission('experimentalUserAuth')
             li
               a(href='/e/settings/auth') 身份认证

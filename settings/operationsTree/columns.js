@@ -37,10 +37,8 @@ module.exports = {
       GET: Operations.column_single_settings,
       post: {
         GET: Operations.column_single_settings_post,
-        POST: Operations.column_single_settings_post,
         add: {
           GET: Operations.column_single_settings_post,
-          POST: Operations.column_single_settings_post,
         },
       },
       contribute: {
@@ -64,9 +62,9 @@ module.exports = {
       },
       page: {
         GET: Operations.column_single_settings_page,
-        editor: {
-          GET: Operations.column_single_settings_page,
-        },
+        // editor: {
+        //   GET: Operations.column_single_settings_page,
+        // },
       },
       fans: {
         GET: Operations.column_single_settings_fans,

@@ -57,3 +57,27 @@ export function timeFormat(format, time) {
   time = time || new Date();
   return moment(time).format(format);
 }
+
+export function formatDuration(milliseconds) {
+  if (milliseconds < 0) {
+    return 'Invalid input';
+  }
+
+  const seconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const parts = [];
+  if (hours > 0) {
+    parts.push(`${hours}小时`);
+  }
+  if (minutes > 0) {
+    parts.push(`${minutes}分钟`);
+  }
+  if (secs > 0) {
+    parts.push(`${secs}秒`);
+  }
+
+  return parts.length > 0 ? parts.join('') : '0秒';
+}

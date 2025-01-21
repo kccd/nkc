@@ -1,14 +1,18 @@
 const router = require('koa-router')();
+const {
+  OnlyUnbannedUser,
+  Public,
+} = require('../../../../middlewares/permission');
 const articlesRouter = require('./articles');
 
 router
-  .use('/:_id', async (ctx, next) => {
+  .use('/:_id', Public(), async (ctx, next) => {
     const { db, params, data } = ctx;
     const { _id } = params;
     data.column = await db.ColumnModel.findById(_id);
     await next();
   })
-  .get('/:_id', async (ctx, next) => {
+  .get('/:_id', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules, params } = ctx;
     const { _id } = params;
     const column = await db.ColumnModel.findById(_id);

@@ -1,40 +1,37 @@
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
-    const {data, db, state} = ctx;
-    const {user} = ctx;
-    const {uid} = state;
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { data, db, state } = ctx;
+    const { user } = ctx;
+    const { uid } = state;
     data.userScores = await db.UserModel.updateUserScores(uid);
     data.scores = await db.SettingModel.getEnabledScores();
-    ctx.template = 'account/finance/exchange.pug'
+    ctx.template = 'account/finance/exchange.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
-    const {state, body, db, nkcModules} = ctx;
-    const {uid} = state;
-    const {
-      fromScoreType,
-      toScoreType,
-      toNum,
-      fromNum,
-      password,
-    } = body;
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
+    const { state, body, db, nkcModules } = ctx;
+    const { uid } = state;
+    const { fromScoreType, toScoreType, toNum, fromNum, password } = body;
     nkcModules.checkData.checkNumber(toNum, {
       name: '兑换金额',
-      min: 1
+      min: 1,
     });
     const userScores = await db.UserModel.updateUserScores(uid);
-    const userFromScore = userScores.find(s => s.type === fromScoreType);
+    const userFromScore = userScores.find((s) => s.type === fromScoreType);
     const fromScore = await db.SettingModel.getScoreByScoreType(fromScoreType);
     const toScore = await db.SettingModel.getScoreByScoreType(toScoreType);
-    if(!fromScore.enabled || !toScore.enabled) ctx.throw(400, '页面数据已过期，请刷新后再试');
-    let _fromNum = toNum * fromScore.weight / toScore.weight;
+    if (!fromScore.enabled || !toScore.enabled)
+      ctx.throw(400, '页面数据已过期，请刷新后再试');
+    let _fromNum = (toNum * fromScore.weight) / toScore.weight;
     _fromNum = Math.ceil(_fromNum);
-    if(_fromNum !== fromNum) {
+    if (_fromNum !== fromNum) {
       ctx.throw(400, '页面数据已过期，请刷新后再试');
     }
-    if(userFromScore.number < fromNum) ctx.throw(400, `${fromScore.name}不足`);
-    if(fromNum <= 0 || toNum <= 0) {
+    if (userFromScore.number < fromNum) ctx.throw(400, `${fromScore.name}不足`);
+    if (fromNum <= 0 || toNum <= 0) {
       ctx.throw(400, '数据错误，请刷新后再试');
     }
     await db.UsersPersonalModel.checkUserPassword(uid, password);
@@ -47,7 +44,7 @@ router
       type: 'scoreExchange',
       ip: ctx.address,
       port: ctx.port,
-      num: fromNum
+      num: fromNum,
     });
     const toRecord = db.KcbsRecordModel({
       _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
@@ -57,12 +54,12 @@ router
       type: 'scoreExchange',
       ip: ctx.address,
       port: ctx.port,
-      num: toNum
+      num: toNum,
     });
-    try{
+    try {
       await fromRecord.save();
       await toRecord.save();
-    } catch(err) {
+    } catch (err) {
       await fromRecord.deleteOne();
       await toRecord.deleteOne();
       throw err;

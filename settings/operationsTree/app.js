@@ -31,7 +31,6 @@ module.exports = {
       GET: Operations.appVisitProfile,
     },
     sub: {
-      GET: Operations.appVisitProfile,
       user: {
         GET: Operations.appVisitProfile,
       },
@@ -53,11 +52,6 @@ module.exports = {
       collection: {
         GET: Operations.appVisitProfile,
       },
-    },
-  },
-  scoreChange: {
-    PARAMETER: {
-      GET: Operations.APPgetScoreChange,
     },
   },
   android: {

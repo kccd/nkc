@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
+const { Public } = require('../../middlewares/permission');
 const zoneTypes = {
   moment: 'moment',
   article: 'article',
@@ -13,7 +14,7 @@ const momentsCount = {
 };
 
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { query, data, db, state } = ctx;
     let { t } = query;
     if (t !== zoneTypes.article) {
@@ -33,7 +34,7 @@ router
     await next();
   })
   // 动态
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { state, db, data, query, nkcModules, permission } = ctx;
     const { t, zoneTypes } = data;
     if (t !== zoneTypes.moment) {
@@ -150,7 +151,7 @@ router
     ctx.remoteTemplate = 'latest/zone/moment.pug';
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { t, zoneTypes } = data;
     if (t !== zoneTypes.article) {

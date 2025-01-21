@@ -3,8 +3,9 @@ const { paperService } = require('../../../../services/exam/paper.service');
 const {
   categoryService,
 } = require('../../../../services/exam/category.service');
+const { Public } = require('../../../../middlewares/permission');
 router
-  .get('/register', async (ctx, next) => {
+  .get('/register', Public(), async (ctx, next) => {
     const { db } = ctx;
     const {
       c: { registerExamination },
@@ -14,7 +15,7 @@ router
     };
     await next();
   })
-  .get('/paper/:pid', async (ctx, next) => {
+  .get('/paper/:pid', Public(), async (ctx, next) => {
     //获取开卷考试的题目数据
     const {
       params: { pid },
@@ -83,7 +84,7 @@ router
     };
     await next();
   })
-  .post('/result/:pid', async (ctx, next) => {
+  .post('/result/:pid', Public(), async (ctx, next) => {
     const {
       body,
       params: { pid },
@@ -171,15 +172,23 @@ router
     }
     await next();
   })
-  .post('/final-result/:pid', async (ctx, next) => {
+  .post('/final-result/:pid', Public(), async (ctx, next) => {
     const {
       params: { pid },
       db,
+      state,
     } = ctx;
+    const { uid } = state;
+    const paper = await db.ExamsPaperModel.findOnly({
+      _id: pid,
+      uid,
+    });
+    const { record, from, cid } = paper;
+    const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
+    if (category.disabled) {
+      ctx.throw(403, '该科目下的考试已被屏蔽');
+    }
     const hasFinish = await paperService.checkIsFinishPaper(pid);
-    const paper = await db.ExamsPaperModel.findOnly({ _id: pid });
-    const { record, from } = paper;
-    const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (hasFinish !== -1) {
       ctx.throw('该用户还未完成试卷');
     } else {
@@ -195,22 +204,21 @@ router
         },
       );
 
-      if (from === register) {
-        const activationCode = await paperService.createActivationCodeByPaperId(
-          pid,
-        );
-        ctx.apiData = {
-          redirectUrl: `/login?t=register`,
-          activationCode: activationCode._id,
-          from,
-        };
-      } else if (from === exam) {
-        ctx.apiData = {
-          redirectUrl: `/exam`,
-          activationCode: '',
-          from,
-        };
-      }
+      const userObj = {
+        $addToSet: {
+          certs: {
+            $each: category.rolesId,
+          },
+        },
+      };
+      userObj[`volume${category.volume}`] = true;
+      await db.UserModel.updateOne({ uid }, userObj);
+
+      ctx.apiData = {
+        redirectUrl: `/exam`,
+        activationCode: '',
+        from,
+      };
     }
     await next();
   });

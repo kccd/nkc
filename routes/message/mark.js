@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const markRouter = new Router();
-markRouter.put('/', async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../middlewares/permission');
+markRouter.put('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { data, db, body, nkcModules } = ctx;
   const { type, uid } = body;
   const { user } = data;

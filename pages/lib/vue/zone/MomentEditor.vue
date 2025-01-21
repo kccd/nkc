@@ -2,6 +2,8 @@
   .moment-editor
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.moment")
     .content-body
       .textarea-editor-container
         editor-core(ref="editorCore" @content-change="onEditorContentChange" @click-ctrl-enter="onClickEnter")
@@ -288,11 +290,13 @@ import ResourceSelector from '../ResourceSelector';
 import { getMomentPlainJsonContentLength } from '../../js/checkData';
 import { getUrl } from '../../js/tools';
 import { screenTopWarning } from '../../js/topAlert';
-import { immediateDebounce } from '../../js/execution';
+import { debounce } from '../../js/execution';
 import { nkcAPI } from '../../js/netAPI';
 import EmojiSelector from '../EmojiSelector';
 import EditorCore from './EditorCore.plain.vue';
 import { visitUrl } from '../../js/pageSwitch';
+import PublishPermissionChecker from '../PublishPermissionCheck.vue';
+import { publishPermissionTypes } from '../../js/publish';
 import {
   Home as HomeIcon,
   AddPicture,
@@ -317,9 +321,12 @@ export default {
     'video-two': VideoTwo,
     'winking-face': WinkingFace,
     'newspaper-folding': NewspaperFolding,
+    'publish-permission-checker': PublishPermissionChecker,
   },
   data: () => ({
+    publishPermissionTypes,
     submitting: false,
+    autoSaving: false,
     textareaHeight: '0',
     maxContentLength: 1000,
     maxPictureCount: 9,
@@ -422,10 +429,20 @@ export default {
       return filesUrl;
     },
     disablePublish() {
-      const { submitting, momentId, content, picturesUrl, videosUrl, medias } =
-        this;
+      const {
+        autoSaving,
+        submitting,
+        momentId,
+        content,
+        picturesUrl,
+        videosUrl,
+        medias,
+      } = this;
       return (
-        submitting || !momentId || (content.length === 0 && medias.length === 0)
+        autoSaving ||
+        submitting ||
+        !momentId ||
+        (content.length === 0 && medias.length === 0)
       );
     },
   },
@@ -626,8 +643,14 @@ export default {
     onClickEnter() {
       this.publishContent();
     },
-    onContentChange: immediateDebounce(function () {
-      this.saveContent();
+    onContentChange() {
+      this.autoSaving = true;
+      this.onContentChangeCore();
+    },
+    onContentChangeCore: debounce(function () {
+      this.saveContent().finally(() => {
+        this.autoSaving = false;
+      });
     }, 1000),
     saveContent() {
       const self = this;
@@ -637,7 +660,7 @@ export default {
       const resourcesId = medias.map((item) => item.rid);
       //判断是否是已发表的电文的编辑
       if (momentStatus === 'normal') {
-        nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`, 'PUT', {
+        return nkcAPI(`/api/v1/zone/moment/${this.mid}/editor/plain`, 'PUT', {
           content,
           resourcesId,
         })

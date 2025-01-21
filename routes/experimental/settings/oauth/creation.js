@@ -1,19 +1,22 @@
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
+
 const router = require('koa-router')();
 
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.manageOauthApp), async (ctx, next) => {
     // ctx.remoteTemplate = 'oauth/creation/creation.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
-    const {body, db, nkcModules, state} = ctx;
+  .post('/', OnlyOperation(Operations.manageOauthApp), async (ctx, next) => {
+    const { body, db, nkcModules, state } = ctx;
     const name = body.fields.name.trim();
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
     const ips = JSON.parse(body.fields.ips);
     const operations = JSON.parse(body.fields.operations);
-    const {icon} = body.files;
-    const {checkString} = nkcModules.checkData;
+    const { icon } = body.files;
+    const { checkString } = nkcModules.checkData;
     checkString(name, {
       name: '名称',
       minLength: 1,
@@ -35,7 +38,7 @@ router
       desc,
       home,
       operations,
-      ips
+      ips,
     });
     await db.AttachmentModel.saveOAuthAppIcon(app._id, icon);
     await next();

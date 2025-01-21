@@ -3,7 +3,8 @@ const router = require('koa-router')();
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
-router.get('/', async (ctx, next) => {
+const { Public, OnlyUser } = require('../../middlewares/permission');
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { state, data, db, params } = ctx;
   const { user } = data;
   const { uid } = state;
@@ -118,7 +119,7 @@ router.get('/', async (ctx, next) => {
       optionStatus.xsf = true;
     }
     // 鼓励
-    if (ctx.permission('creditKcb')) {
+    if (user.uid) {
       optionStatus.kcb = true;
     }
     // 建议修改
@@ -160,7 +161,7 @@ router.get('/', async (ctx, next) => {
           : null;
     }
     // 投诉
-    optionStatus.complaint = ctx.permission('complaintPost') ? true : null;
+    optionStatus.complaint = true;
     optionStatus.ipInfo = ctx.permission('ipinfo')
       ? post.iplm || post.ipoc
       : null;

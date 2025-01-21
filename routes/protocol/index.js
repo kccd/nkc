@@ -1,10 +1,9 @@
 const Router = require('koa-router');
 const protocolRouter = new Router();
-const nkcModules = require('../../nkcModules');
 const nkcRender = require('../../nkcModules/nkcRender');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
-
-protocolRouter.get('/', async (ctx, next) => {
+const { Public } = require('../../middlewares/permission');
+protocolRouter.get('/', Public(), async (ctx, next) => {
   const { data, query, db } = ctx;
   const { type } = query;
   data.protocol = await db.ProtocolModel.findOne({ protocolTypeId: type });

@@ -2,8 +2,9 @@ const markNotes = require('../../nkcModules/nkcRender/markNotes');
 const Router = require('koa-router');
 const router = new Router();
 
+const { OnlyUser } = require('../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, data, query } = ctx;
     const { user } = data;
     await db.UserModel.checkUserBaseInfo(user, true);
@@ -36,7 +37,7 @@ router
   })
   // 获取不同编辑器基本内容
   // 注意查询草稿以did的最新修改编辑版为准
-  .get('/data', async (ctx, next) => {
+  .get('/data', OnlyUser(), async (ctx, next) => {
     const { db, data, query, state } = ctx;
     const { type, id } = query;
     const { user } = data;
@@ -209,7 +210,9 @@ router
       // 从草稿箱来
       // let { id, o, _id } = query;
       let { id, o, draftDid } = query;
-      if (!draftDid) ctx.throw(400, '参数异常');
+      if (!draftDid) {
+        ctx.throw(400, '参数异常');
+      }
       // 社区的草稿只能使用_id 才能具体查找到一篇文章
       let draft;
       // if (_id) {
@@ -497,19 +500,19 @@ router
     }
 
     // 编辑器上边有关权限的提示
-    if (data.type === 'newPost') {
-      data.postPermission = await db.UserModel.getPostPermission(
-        state.uid,
-        'post',
-        selectedForumsId,
-      );
-    } else if (data.type === 'newThread') {
-      data.postPermission = await db.UserModel.getPostPermission(
-        state.uid,
-        'thread',
-        [],
-      );
-    }
+    // if (data.type === 'newPost') {
+    //   data.postPermission = await db.UserModel.getPostPermission(
+    //     state.uid,
+    //     'post',
+    //     selectedForumsId,
+    //   );
+    // } else if (data.type === 'newThread') {
+    //   data.postPermission = await db.UserModel.getPostPermission(
+    //     state.uid,
+    //     'thread',
+    //     [],
+    //   );
+    // }
 
     data.post = data.post || {};
     state.editorSettings = await db.SettingModel.getSettings('editor');
@@ -521,7 +524,7 @@ router
     });
     await next();
   })
-  .get('/publishNotice', async (ctx, next) => {
+  .get('/publishNotice', OnlyUser(), async (ctx, next) => {
     const { db, data, query, state } = ctx;
     const { type, id } = query;
     //判断用户是否能编辑文章之后发布通告

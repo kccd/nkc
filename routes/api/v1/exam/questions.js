@@ -2,8 +2,8 @@ const router = require('koa-router')();
 const {
   questionService,
 } = require('../../../../services/exam/question.service');
-const { OnlyUser } = require('../../../../middlewares/permission');
-router.post('/', OnlyUser(), async (ctx, next) => {
+const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+router.post('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { state, body } = ctx;
   const { fields, files } = body;
   const form = JSON.parse(fields.form);

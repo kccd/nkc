@@ -1,4 +1,5 @@
 const mongoose = require('../settings/database');
+const { settingIds } = require('../settings/serverSettings');
 const {
   ThrowServerInternalError,
   ThrowCommonError,
@@ -1214,12 +1215,13 @@ schema.methods.sendMessageToAtUsers = async function (from) {
 };
 
 /*
+ * 当前方法在2025-01-09已废弃，请使用publishPermissionService.checkPublishPermission
  * 检测用户是否有权发表指定来源的内容
  * @param {String} uid 发表人 ID
  * @param {String} source 来源 参考 DocumentModel.statics.getDocumentSources
  * @param {String} type 类型 默认 stable, 可选 stable, betaHistory, stableHistory, beta
  * */
-schema.statics.checkGlobalPostPermission = async (
+/*schema.statics.checkGlobalPostPermission = async (
   uid,
   source,
   type = 'stable',
@@ -1230,8 +1232,8 @@ schema.statics.checkGlobalPostPermission = async (
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const apiFunction = require('../nkcModules/apiFunction');
   await DocumentModel.checkDocumentSource(source);
-  const documentPostSettings = await SettingModel.getSettings('documentPost');
-  const { postPermission } = documentPostSettings[source];
+  const publishSettings = await SettingModel.getSettings(settingIds.publish);
+  const { postPermission } = publishSettings[source];
   const user = await UserModel.findOnly({ uid });
   const usersPersonal = await UsersPersonalModel.findOnly({ uid });
   const authLevel = await usersPersonal.getAuthLevel();
@@ -1239,6 +1241,7 @@ schema.statics.checkGlobalPostPermission = async (
     authLevelMin,
     examVolumeA,
     examVolumeB,
+    examVolumeAD,
     examNotPass,
     defaultInterval,
     defaultCount,
@@ -1262,16 +1265,20 @@ schema.statics.checkGlobalPostPermission = async (
     toc: { $gte: today },
   });
   // 考试判断
-  if ((!examVolumeA || !user.volumeA) && (!examVolumeB || !user.volumeB)) {
+  if (
+    (!examVolumeAD || !user.volumeAD) &&
+    (!examVolumeA || !user.volumeA) &&
+    (!examVolumeB || !user.volumeB)
+  ) {
     if (!examNotPass.status) {
-      if (!examVolumeA && !examVolumeB) {
+      if (!examVolumeAD && !examVolumeA && !examVolumeB) {
         ThrowCommonError(403, `发表功能已关闭`);
       } else {
         ThrowCommonError(403, `请参加考试，通过后可获得发表权限`);
       }
     }
     if (examNotPass.limited && examNotPass.count <= documentCountToday) {
-      if (!examVolumeA && !examVolumeB) {
+      if (!examVolumeAD && !examVolumeA && !examVolumeB) {
         ThrowCommonError(
           403,
           `今日发表次数已达上限（${examNotPass.count} 次），请明天再试`,
@@ -1339,7 +1346,7 @@ schema.statics.checkGlobalPostPermission = async (
       `您当前的账号等级限定每天发表次数不能超过 ${countItem.count} 次，请明天再试`,
     );
   }
-};
+};*/
 
 /*
  * 根据后台发表内容设置，获取审核状态
@@ -1349,16 +1356,44 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const UsersGeneralModel = mongoose.model('usersGeneral');
-  const documentPostSettings = await SettingModel.getSettings('documentPost');
-  const { postReview } = documentPostSettings[this.source];
+  const DocumentModel = mongoose.model('documents');
+  const ArticleModel = mongoose.model('articles');
+  const CommentModel = mongoose.model('comments');
+  const MomentModel = mongoose.model('moments');
+  const creationDrafts = mongoose.model('creationDrafts');
+  const publishSettings = await SettingModel.getSettings(settingIds.publish);
+  const { postReview } = publishSettings[this.source];
   const user = await UserModel.findOnly({ uid });
-  const { reviewedCount } = await UsersGeneralModel.findOnly(
-    { uid },
-    { reviewedCount: 1 },
-  );
+  const { article, comment, moment, draft } =
+    await DocumentModel.getDocumentSources();
+  let passedCount = 0;
+  if (source === moment) {
+    const { normal } = await MomentModel.getMomentStatus();
+    passedCount = await MomentModel.countDocuments({
+      status: normal,
+      uid,
+    });
+  } else if (source === article) {
+    const { normal } = await ArticleModel.getArticleStatus();
+    passedCount = await ArticleModel.countDocuments({
+      status: normal,
+      uid,
+    });
+  } else if (source === comment) {
+    const { normal } = await CommentModel.getCommentStatus();
+    passedCount = await CommentModel.countDocuments({
+      status: normal,
+      uid,
+    });
+  } else if (source === draft) {
+    passedCount = await creationDrafts.countDocuments({
+      del: false,
+      uid,
+    });
+  }
   const { nationCode } = await UsersPersonalModel.getUserPhoneNumber(uid);
-  const { foreign, notPassVolumeA, whitelist, blacklist } = postReview;
+  const { foreign, notPassVolumeA, notPassVolumeAD, whitelist, blacklist } =
+    postReview;
 
   const roles = await user.extendRoles();
   const grade = await user.extendGrade();
@@ -1376,7 +1411,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   if (
     nationCode !== foreign.nationCode &&
     (foreign.type === 'all' ||
-      (foreign.type === 'count' && reviewedCount[source] < foreign.count))
+      (foreign.type === 'count' && passedCount < foreign.count))
   ) {
     return {
       needReview: true,
@@ -1385,12 +1420,24 @@ schema.methods.getGlobalPostReviewStatus = async function () {
     };
   }
 
+  // 未通过AD卷(入学)考试
+  if (
+    !user.volumeAD &&
+    (notPassVolumeAD.type === 'all' ||
+      (notPassVolumeAD.type === 'count' && passedCount < notPassVolumeAD.count))
+  ) {
+    return {
+      needReview: true,
+      type: 'notPassedAD',
+      reason: '用户没有通过入学考试，审核通过的文章数量不足',
+    };
+  }
+
   // 未通过 A 卷考试
   if (
     !user.volumeA &&
     (notPassVolumeA.type === 'all' ||
-      (notPassVolumeA.type === 'count' &&
-        reviewedCount[source] < notPassVolumeA.count))
+      (notPassVolumeA.type === 'count' && passedCount < notPassVolumeA.count))
   ) {
     return {
       needReview: true,
@@ -1404,10 +1451,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
     if (!roleList.includes(bl.id) || bl.type === 'none') {
       continue;
     }
-    if (
-      bl.type === 'all' ||
-      (bl.type === 'count' && reviewedCount[source] < bl.count)
-    ) {
+    if (bl.type === 'all' || (bl.type === 'count' && passedCount < bl.count)) {
       return {
         needReview: true,
         type: 'grade',
@@ -1444,7 +1488,9 @@ schema.methods.getVerifyPhoneNumberReviewStatus = async function () {
 schema.methods.getKeywordsReviewStatus = async function () {
   const SettingModel = mongoose.model('settings');
   const ReviewModel = mongoose.model('reviews');
-  const documentPostSettings = await SettingModel.getSettings('documentPost');
+  const documentPostSettings = await SettingModel.getSettings(
+    settingIds.publish,
+  );
   const { keywordGroupId } = documentPostSettings[this.source].postReview;
   const { content = '', title = '', abstract = '', abstractEN = '' } = this;
   const keywords = this.keywords || [];

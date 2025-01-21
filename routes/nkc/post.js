@@ -1,13 +1,17 @@
-const router = require("koa-router")();
-router
-  .get("/", async(ctx, next) => {
+const router = require('koa-router')();
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
+router.get(
+  '/',
+  OnlyOperation(Operations.nkcManagementPost),
+  async (ctx, next) => {
     // 将最新的post直接渲染到页面上
-    const {data, db, query, nkcModules} = ctx;
-    let {page = 0, t, c} = query;
-    if(c === undefined) {
+    const { data, db, query, nkcModules } = ctx;
+    let { page = 0, t, c } = query;
+    if (c === undefined) {
       c = Date.now();
       let url = `/nkc/post?c=${c}`;
-      if(t) {
+      if (t) {
         url += `&t=${t}`;
       }
       return ctx.redirect(url);
@@ -15,89 +19,96 @@ router
       c = parseInt(c);
     }
     const match = {
-      toc: {$lte: c}
+      toc: { $lte: c },
     };
-    if(t === 'thread') {
+    if (t === 'thread') {
       match.type = 'thread';
-    } else if(t === 'post') {
+    } else if (t === 'post') {
       match.type = 'post';
-    } else if(t === 'comment') {
+    } else if (t === 'comment') {
       match.type = 'post';
-      match.parentPostId = {$ne: ''};
+      match.parentPostId = { $ne: '' };
     } else {
-
+      //
     }
 
     const recycleId = await db.SettingModel.getRecycleId();
 
     const count = await db.PostModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
-    let posts = await db.PostModel
-      .find(match)
-      .sort({toc: -1})
+    let posts = await db.PostModel.find(match)
+      .sort({ toc: -1 })
       .skip(paging.start)
       .limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, {
-      visitor: {xsf: 9999},
+      visitor: { xsf: 9999 },
       renderHTML: true,
       user: true,
       resource: true,
       showAnonymousUser: true,
-      url: true
+      url: true,
     });
 
-    const forums = await db.ForumModel.find({}, {displayName: 1, fid: 1});
+    const forums = await db.ForumModel.find({}, { displayName: 1, fid: 1 });
     const forumsObj = {};
-    forums.map(forum => forumsObj[forum.fid] = forum);
+    forums.map((forum) => (forumsObj[forum.fid] = forum));
 
     const results = [];
 
     const threadsId = [];
 
-    for(const post of posts) {
-      if(post.type === 'thread') continue;
+    for (const post of posts) {
+      if (post.type === 'thread') {
+        continue;
+      }
       threadsId.push(post.tid);
     }
-    const threads = await db.ThreadModel.find({tid: {$in: threadsId}}, {tid: 1, oc: 1});
-    const threadPosts = await db.PostModel.find({pid: {$in: threads.map(thread => thread.oc)}}, {tid: 1, t: 1});
+    const threads = await db.ThreadModel.find(
+      { tid: { $in: threadsId } },
+      { tid: 1, oc: 1 },
+    );
+    const threadPosts = await db.PostModel.find(
+      { pid: { $in: threads.map((thread) => thread.oc) } },
+      { tid: 1, t: 1 },
+    );
     const threadsObj = {};
-    for(const tp of threadPosts) {
-      const {tid, t} = tp;
+    for (const tp of threadPosts) {
+      const { tid, t } = tp;
       threadsObj[tid] = {
         tid,
-        t
-      }
+        t,
+      };
     }
 
     const colors = ['red', 'green', 'blue', '#791E94', 'yellow', '#87314e'];
     let colorIndex = 0;
     const getColor = () => {
       const color = colors[colorIndex];
-      colorIndex ++;
-      if(colorIndex > colors.length - 1) {
+      colorIndex++;
+      if (colorIndex > colors.length - 1) {
         colorIndex = 0;
       }
       return color;
     };
 
-    for(const post of posts) {
+    for (const post of posts) {
       let postType;
-      if(post.type === 'thread') {
+      if (post.type === 'thread') {
         postType = 'thread';
-      } else if(post.parentPostId) {
+      } else if (post.parentPostId) {
         postType = 'comment';
       } else {
         postType = 'post';
       }
 
       let status = 'normal';
-      if(postType === 'thread') {
-        if(post.mainForumsId.includes(recycleId)) {
+      if (postType === 'thread') {
+        if (post.mainForumsId.includes(recycleId)) {
           status = 'disabled';
         }
       } else {
-        if(post.disabled) {
-          if(post.toDraft) {
+        if (post.disabled) {
+          if (post.toDraft) {
             status = 'toDraft';
           } else {
             status = 'disabled';
@@ -107,19 +118,21 @@ router
 
       const _forums = [];
 
-      for(const fid of post.mainForumsId) {
+      for (const fid of post.mainForumsId) {
         const forum = forumsObj[fid];
-        if(!forum) continue;
+        if (!forum) {
+          continue;
+        }
         _forums.push(forum);
       }
 
       let thread;
 
-      if(post.type === 'thread') {
+      if (post.type === 'thread') {
         thread = {
           tid: post.tid,
-          t: post.t
-        }
+          t: post.t,
+        };
       } else {
         thread = threadsObj[post.tid];
       }
@@ -130,7 +143,7 @@ router
         user: {
           avatar: post.user.avatar,
           uid: post.user.uid,
-          username: post.user.username
+          username: post.user.username,
         },
         type: postType,
         forums: _forums,
@@ -147,7 +160,7 @@ router
         categoriesId: post.categoriesId,
         status,
         borderColor: getColor(),
-      }
+      };
 
       results.push(result);
     }
@@ -157,7 +170,8 @@ router
     data.t = t;
     data.c = c;
     data.nav = 'post';
-    ctx.template = "nkc/post/post.pug";
+    ctx.template = 'nkc/post/post.pug';
     await next();
-  });
+  },
+);
 module.exports = router;

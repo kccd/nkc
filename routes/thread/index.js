@@ -7,7 +7,6 @@ const toppedRouter = require('./topped');
 const blockRouter = require('./block');
 const closeRouter = require('./close');
 const Path = require('path');
-const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const tools = require('../../nkcModules/tools');
 const {
   collectionService,
@@ -15,9 +14,9 @@ const {
 const { Operations } = require('../../settings/operations');
 const { ObjectId } = require('mongodb');
 const { editorRichService } = require('../../services/editor/rich.service');
-
+const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 threadRouter
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
     await db.ForumModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -27,7 +26,7 @@ threadRouter
     });
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { user } = data;
     const { from, keywords, self, type, title, pid, applicationFormId } = query;
@@ -225,18 +224,18 @@ threadRouter
     }
     await next();
   })
-  .use('/:tid', async (ctx, next) => {
+  .use('/:tid', Public(), async (ctx, next) => {
     const { internalData, db, params } = ctx;
     internalData.thread = await db.ThreadModel.findOnly({ tid: params.tid });
     await next();
   })
-  .get('/:tid', async (ctx, next) => {
+  .get('/:tid', Public(), async (ctx, next) => {
     // 设置 referer 策略
     // 解决分享文章时附件链接跨域无法读取referer中token的问题
     ctx.set('Referrer-Policy', 'unsafe-url');
     await next();
   })
-  .get('/:tid', async (ctx, next) => {
+  .get('/:tid', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules, state, internalData } = ctx;
     const { token } = query;
     const { page = 0, pid, last_page, highlight, step, t, e = false } = query;
@@ -883,7 +882,6 @@ threadRouter
     // 获取文章附件数
     let attachmentsCount = 0;
     if (
-      ctx.permission('getPostResources') &&
       (await db.PostModel.ensureAttachmentPermission(
         data.user ? data.user.uid : '',
       ))
@@ -898,7 +896,7 @@ threadRouter
 
     // 加载笔记信息
     let notes = [];
-    if (ctx.permission('viewNote')) {
+    // if (ctx.permission('viewNote')) {
       const notePosts = [
         {
           pid: thread.oc,
@@ -912,7 +910,7 @@ threadRouter
         });
       });
       notes = await db.NoteModel.getNotesByPosts(notePosts);
-    }
+    // }
 
     // 黑名单判断
     let blacklistInfo = '';
@@ -952,11 +950,11 @@ threadRouter
     // 帖子设置
     const threadSettings = await db.SettingModel.getSettings('thread');
     // 发表权限
-    const postPermission = await db.UserModel.getPostPermission(
-      state.uid,
-      'post',
-      thread.mainForumsId,
-    );
+    // const postPermission = await db.UserModel.getPostPermission(
+    //   state.uid,
+    //   'post',
+    //   thread.mainForumsId,
+    // );
 
     // 回复遮罩设置
     const hidePostSettings = await db.SettingModel.getSettings('hidePost');
@@ -1025,8 +1023,8 @@ threadRouter
           'moveThreads',
           'movePostsToDraft',
           'movePostsToRecycle',
-          'digestThread',
-          'unDigestThread',
+          // 'digestThread',
+          // 'unDigestThread',
           'toppedThread',
           'unToppedThread',
           'homeTop',
@@ -1044,13 +1042,12 @@ threadRouter
       ]),
       creditKcb:
         !thread.firstPost.anonymous &&
-        ctx.permission('creditKcb') &&
         data.user &&
         thread.firstPost.uid !== data.user.uid,
       violationRecord: ctx.permission('violationRecord'),
-      viewNote: ctx.permission('viewNote'),
+      viewNote: true,
       getPostAuthor: ctx.permission('getPostAuthor'),
-      creditKcbPost: ctx.permission('creditKcb'),
+      creditKcbPost: !!data.user,
       banSaleProductParams: ctx.permission('banSaleProductParams'),
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
@@ -1211,7 +1208,7 @@ threadRouter
     data.blacklistInfo = blacklistInfo;
     data.sameLevelForums = sameLevelForums;
     data.threadSettings = threadSettings;
-    data.postPermission = postPermission;
+    // data.postPermission = postPermission;
     data.authorAvatarUrl = authorAvatarUrl;
     data.authorRegisterInfo = authorRegisterInfo;
     data.userSubscribeUsersId = userSubscribeUsersId;
@@ -1266,7 +1263,7 @@ threadRouter
     ctx.remoteTemplate = 'thread/index.pug';
     await next();
   })
-  .get('/:tid', async (ctx, next) => {
+  .get('/:tid', Public(), async (ctx, next) => {
     const { data, db, state } = ctx;
     const { thread } = data;
     if (thread && thread.tid && state.uid) {
@@ -1274,7 +1271,7 @@ threadRouter
     }
     await next();
   })
-  .post('/:tid', async (ctx, next) => {
+  .post('/:tid', OnlyUnbannedUser(), async (ctx, next) => {
     // 社区文章发表评论
     const { data, nkcModules, params, db, body, state, address: ip } = ctx;
 
@@ -1400,7 +1397,7 @@ threadRouter
     //   await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
     //   || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
     // 自动送审
-    const needReview = await db.ReviewModel.autoPushToReview(_post);
+    const needReview = await db.ReviewModel.getReviewStatusAndCreateLog(_post);
     if (!needReview) {
       await db.PostModel.updateOne(
         { pid: _post.pid },
@@ -1607,7 +1604,7 @@ threadRouter
     }
     await next();
   })
-  .put('/:tid/post-order', async (ctx, next) => {
+  .put('/:tid/post-order', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, body, state, params } = ctx;
     const { postIdsOrder = [], type } = body;
     const { tid } = params;

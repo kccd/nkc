@@ -251,22 +251,22 @@ function viewPostComments(tid, pid, page, callback) {
   nkcAPI(url, 'GET')
     .then(function (data) {
       var html = data.html;
-      var postPermission = data.postPermission;
+      // var postPermission = data.postPermission;
       var singlePostComment = $(
         '.single-post-comment[data-type="singlePostComment"][data-pid="' +
           pid +
           '"]',
       );
-      var postCommentWarning = singlePostComment.find('.post-comment-warning');
+      // var postCommentWarning = singlePostComment.find('.post-comment-warning');
       var editorNotice = singlePostComment.find('.post-editor-notice');
-      if (postPermission.permit) {
+      // if (postPermission.permit) {
         postComment(tid, pid, true);
         editorNotice.show();
-      } else {
-        editorNotice.hide();
-      }
+      // } else {
+      //   editorNotice.hide();
+      // }
       singlePostComment.show();
-      postCommentWarning.html(postPermission.warning.join('<br/>'));
+      // postCommentWarning.html(postPermission.warning.join('<br/>'));
       var buttonValue = data.paging.buttonValue;
       comments[pid] = html ? html : ' ';
       commentsDiv.html(html);

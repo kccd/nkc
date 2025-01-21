@@ -1,4 +1,5 @@
 const tools = require('../tools');
+const getRealId = require('../nkcModules/getRealIP');
 const body = require('./body');
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
@@ -28,6 +29,14 @@ const fsSync = {
 };
 
 module.exports = async (ctx, next) => {
+  const { ip, port } = getRealId({
+    remoteIp: ctx.ip,
+    remotePort: ctx.req.connection.remotePort,
+    xForwardedFor: ctx.get('x-forwarded-for'),
+    xForwardedRemotePort: ctx.get(`x-forwarded-remote-port`),
+  });
+  ctx.address = ip;
+  ctx.port = port;
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;

@@ -11,15 +11,15 @@ const uploadRouter = require('./upload');
 const gradeRouter = require('./grade');
 const kcbRouter = require('./kcb');
 const logRouter = require('./log');
-const threadRouter = require("./thread");
-const usernameRouter = require("./username");
+const threadRouter = require('./thread');
+const usernameRouter = require('./username');
 const homeRouter = require('./home');
 const appRouter = require('./app');
 const pageRouter = require('./page');
 const examRouter = require('./exam');
 const messageRouter = require('./message');
-const reviewRouter = require("./review");
-const hidePostRouter = require("./hidePost");
+const reviewRouter = require('./review');
+const hidePostRouter = require('./hidePost');
 const shareRouter = require('./share');
 const smsRouter = require('./sms');
 const postRouter = require('./post');
@@ -29,21 +29,21 @@ const emailRouter = require('./email');
 const subRouter = require('./sub');
 const shopRouter = require('./shop');
 const registerRouter = require('./register');
-const loginRouter = require("./login");
-const authRouter = require("./auth");
-const columnRouter = require("./column");
+const loginRouter = require('./login');
+const authRouter = require('./auth');
+const columnRouter = require('./column');
 const safeRouter = require('./safe');
-const cacheRouter = require("./cache");
+const cacheRouter = require('./cache');
 const protocolRouter = require('./protocol');
-const toppingRouter = require("./topping");
+const toppingRouter = require('./topping');
 const toolsRouter = require('./tools');
-const transferRouter = require("./transfer");
-const libraryRouter = require("./library");
-const stickerRouter = require("./sticker");
-const editorRouter = require("./editor");
+const transferRouter = require('./transfer');
+const libraryRouter = require('./library');
+const stickerRouter = require('./sticker');
+const editorRouter = require('./editor');
 const rechargeRouter = require('./recharge');
-const userSensitiveRouter = require("./userSensitive");
-const userScoresRouter = require("./userScores");
+const userSensitiveRouter = require('./userSensitive');
+const userScoresRouter = require('./userScores');
 const verificationRouter = require('./verification');
 const sensitiveWordsRouter = require('./sensitiveWords');
 const threadCategoryRouter = require('./threadCategory');
@@ -51,68 +51,86 @@ const visitRouter = require('./visit');
 const ipRouter = require('./ip');
 const fundRouter = require('./fund');
 const complaintRouter = require('./complaint');
-const documentPostRouter = require('./documentPost');
+const publishRouter = require('./publish');
 const oauth = require('./oauth');
 const noteRouter = require('./note');
 settingRouter
-	.get('/', async (ctx, next) => {
-		await next();
-	})
-	.post('/', async (ctx, next) => {
-		await next();
-	})
-  .use("/transfer", transferRouter.routes(), transferRouter.allowedMethods())
-  .use("/hidePost", hidePostRouter.routes(), hidePostRouter.allowedMethods())
-  .use("/topping", toppingRouter.routes(), toppingRouter.allowedMethods())
-  .use("/cache", cacheRouter.routes(), cacheRouter.allowedMethods())
-  .use('/red-envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
+  .use('/transfer', transferRouter.routes(), transferRouter.allowedMethods())
+  .use('/hidePost', hidePostRouter.routes(), hidePostRouter.allowedMethods())
+  .use('/topping', toppingRouter.routes(), toppingRouter.allowedMethods())
+  .use('/cache', cacheRouter.routes(), cacheRouter.allowedMethods())
+  .use(
+    '/red-envelope',
+    redEnvelopeRouter.routes(),
+    redEnvelopeRouter.allowedMethods(),
+  )
   .use('/xsf', xsfRouter.routes(), xsfRouter.allowedMethods())
-	.use('/post', postRouter.routes(), postRouter.allowedMethods())
-	.use('/message', messageRouter.routes(), messageRouter.allowedMethods())
-	.use('/share', shareRouter.routes(), shareRouter.allowedMethods())
-	.use('/sms', smsRouter.routes(), smsRouter.allowedMethods())
-	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-	.use('/app', appRouter.routes(), appRouter.allowedMethods())
-	.use('/page', pageRouter.routes(), pageRouter.allowedMethods())
-	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
-	.use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
-	.use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())
+  .use('/post', postRouter.routes(), postRouter.allowedMethods())
+  .use('/message', messageRouter.routes(), messageRouter.allowedMethods())
+  .use('/share', shareRouter.routes(), shareRouter.allowedMethods())
+  .use('/sms', smsRouter.routes(), smsRouter.allowedMethods())
+  .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
+  .use('/app', appRouter.routes(), appRouter.allowedMethods())
+  .use('/page', pageRouter.routes(), pageRouter.allowedMethods())
+  .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
+  .use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
+  .use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())
   .use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
   .use('/upload', uploadRouter.routes(), uploadRouter.allowedMethods())
-	.use('/role', roleRouter.routes(), roleRouter.allowedMethods())
-	.use('/base', baseRouter.routes(), baseRouter.allowedMethods())
+  .use('/role', roleRouter.routes(), roleRouter.allowedMethods())
+  .use('/base', baseRouter.routes(), baseRouter.allowedMethods())
   .use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
   .use('/log', logRouter.routes(), logRouter.allowedMethods())
-	.use('/user', userRouter.routes(), userRouter.allowedMethods())
-	.use('/exam', examRouter.routes(), examRouter.allowedMethods())
+  .use('/user', userRouter.routes(), userRouter.allowedMethods())
+  .use('/exam', examRouter.routes(), examRouter.allowedMethods())
   .use('/sub', subRouter.routes(), subRouter.allowedMethods())
   .use('/email', emailRouter.routes(), emailRouter.allowedMethods())
-	.use('/forum', forumRouter.routes(), forumRouter.allowedMethods())
+  .use('/forum', forumRouter.routes(), forumRouter.allowedMethods())
   .use('/safe', safeRouter.routes(), safeRouter.allowedMethods())
-  .use("/auth", authRouter.routes(), authRouter.allowedMethods())
+  .use('/auth', authRouter.routes(), authRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/shop', shopRouter.routes(), shopRouter.allowedMethods())
-  .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
-  .use("/column", columnRouter.routes(), columnRouter.allowedMethods())
-  .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
-  .use("/username", usernameRouter.routes(), usernameRouter.allowedMethods())
-  .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods())
-	.use("/thread", threadRouter.routes(), threadRouter.allowedMethods())
-	.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
-	.use("/editor", editorRouter.routes(), editorRouter.allowedMethods())
-	.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods())
-	.use('/recharge', rechargeRouter.routes(), rechargeRouter.allowedMethods())
-	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods())
-	.use('/verification', verificationRouter.routes(), verificationRouter.allowedMethods())
-	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods())
+  .use('/review', reviewRouter.routes(), reviewRouter.allowedMethods())
+  .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
+  .use('/login', loginRouter.routes(), loginRouter.allowedMethods())
+  .use('/username', usernameRouter.routes(), usernameRouter.allowedMethods())
+  .use('/library', libraryRouter.routes(), libraryRouter.allowedMethods())
+  .use('/thread', threadRouter.routes(), threadRouter.allowedMethods())
+  .use('/sticker', stickerRouter.routes(), stickerRouter.allowedMethods())
+  .use('/editor', editorRouter.routes(), editorRouter.allowedMethods())
+  .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods())
+  .use('/recharge', rechargeRouter.routes(), rechargeRouter.allowedMethods())
+  .use(
+    '/sensitive',
+    userSensitiveRouter.routes(),
+    userSensitiveRouter.allowedMethods(),
+  )
+  .use(
+    '/verification',
+    verificationRouter.routes(),
+    verificationRouter.allowedMethods(),
+  )
+  .use(
+    '/userScores',
+    userScoresRouter.routes(),
+    userScoresRouter.allowedMethods(),
+  )
   .use('/visit', visitRouter.routes(), visitRouter.allowedMethods())
   .use('/fund', fundRouter.routes(), fundRouter.allowedMethods())
   .use('/ip', ipRouter.routes(), ipRouter.allowedMethods())
   .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
-	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods())
-	.use('/complaint', complaintRouter.routes(), complaintRouter.allowedMethods())
-  .use('/threadCategory', threadCategoryRouter.routes(), threadCategoryRouter.allowedMethods())
-  .use('/documentPost', documentPostRouter.routes(), documentPostRouter.allowedMethods())
-	.use('/oauth', oauth.routes(), oauth.allowedMethods())
-	.use('/note',noteRouter .routes(),noteRouter .allowedMethods())
+  .use(
+    '/sensitiveWords',
+    sensitiveWordsRouter.routes(),
+    sensitiveWordsRouter.allowedMethods(),
+  )
+  .use('/complaint', complaintRouter.routes(), complaintRouter.allowedMethods())
+  .use(
+    '/threadCategory',
+    threadCategoryRouter.routes(),
+    threadCategoryRouter.allowedMethods(),
+  )
+  .use('/publish', publishRouter.routes(), publishRouter.allowedMethods())
+  .use('/oauth', oauth.routes(), oauth.allowedMethods())
+  .use('/note', noteRouter.routes(), noteRouter.allowedMethods());
 module.exports = settingRouter;

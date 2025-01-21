@@ -529,13 +529,15 @@ block content
               else
                 //- 发表权限判断
                 //- warning中的内容为html，由服务器根据发表设置动态渲染
-                if data.postPermission.warning && data.postPermission.warning.length > 0
-                  .m-b-1.text-danger!=data.postPermission.warning.join('<br/>')
+                //- if data.postPermission.warning && data.postPermission.warning.length > 0
+                //-   .m-b-1.text-danger!=data.postPermission.warning.join('<br/>')
                 //- 是否显示编辑器
-                if data.postPermission.permit
-                  -const blacklistInfo = data.blacklistInfo;
-                  include ../publicModules/blacklistInfo
-                  +inputPanel
+                //- if data.postPermission.permit
+                .permission-checker#permissionChecker(v-cloak)
+                    publish-permission-checker(:type="publishPermissionTypes.post")
+                -const blacklistInfo = data.blacklistInfo;
+                include ../publicModules/blacklistInfo
+                +inputPanel
             else
               //- 游客
               p 想参与大家的讨论？现在就&nbsp;
@@ -635,8 +637,8 @@ block scripts
   if data.permissions.violationRecord
     include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug
-  if data.permissions.viewNote
-    include ../publicModules/NKCHighlighter/NKCHighlighter
+  //- if data.permissions.viewNote
+  include ../publicModules/NKCHighlighter/NKCHighlighter
   if data.attachmentsCount > 0
     include ../publicModules/resourceInfo/resourceInfo
     include ../publicModules/attachments/attachments_js

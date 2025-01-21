@@ -1,4 +1,7 @@
-const { getJsonStringTextSlice, getJsonStringText } = require('../nkcModules/json');
+const {
+  getJsonStringTextSlice,
+  getJsonStringText,
+} = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const mongoose = require('../settings/database');
 const commentSource = {
@@ -241,12 +244,19 @@ schema.methods.publishComment = async function (
   const CommentModel = mongoose.model('comments');
   const MomentModel = mongoose.model('moments');
   const ColumnPostModel = mongoose.model('columnPosts');
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const socket = require('../nkcModules/socket');
   const { did } = this;
   const { normal: normalStatus } = await CommentModel.getCommentStatus();
   const { comment: commentQuoteType } = await MomentModel.getMomentQuoteTypes();
   //检测评论发布权限
-  await DocumentModel.checkGlobalPostPermission(this.uid, 'comment');
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.comment,
+    this.uid,
+  );
   await DocumentModel.publishDocumentByDid(did);
   const newComment = await CommentModel.findOnly({ _id: this._id });
   //将文章推送到专栏
@@ -514,10 +524,10 @@ schema.statics.extendPostComments = async (props) => {
       uid,
       toc,
       tlm,
-      content:l === 'json' ? getJsonStringTextSlice(content ,100) : htmlToPlain(
-        content,
-        100,
-      ),
+      content:
+        l === 'json'
+          ? getJsonStringTextSlice(content, 100)
+          : htmlToPlain(content, 100),
       docId: _id,
       sid,
       did,
@@ -663,10 +673,10 @@ schema.statics.extendSingleComment = async (comment) => {
       uid,
       toc,
       tlm,
-      content: l === 'json' ? getJsonStringTextSlice(content ,100) : htmlToPlain(
-         content,
-        100,
-      ),
+      content:
+        l === 'json'
+          ? getJsonStringTextSlice(content, 100)
+          : htmlToPlain(content, 100),
       docId: _id,
       sid,
       did,
@@ -867,10 +877,10 @@ schema.methods.extendEditorComment = async function () {
       uid,
       toc,
       tlm,
-      content: l === 'json' ? getJsonStringTextSlice(content ,100) : htmlToPlain(
-        content,
-        100,
-      ),
+      content:
+        l === 'json'
+          ? getJsonStringTextSlice(content, 100)
+          : htmlToPlain(content, 100),
       docId: _id,
       sid,
       did,
@@ -1294,11 +1304,10 @@ schema.statics.getCommentsInfo = async function (comments) {
       url,
       isAuthor: commentDocument.uid === articleDocument.uid,
       commentUrl,
-      content: commentDocument.l === 'json'
-      ? getJsonStringText(commentDocument.content)
-      : nkcRender.htmlToPlain(
-         commentDocument.content,
-      ),
+      content:
+        commentDocument.l === 'json'
+          ? getJsonStringText(commentDocument.content)
+          : nkcRender.htmlToPlain(commentDocument.content),
       credits,
     });
   }
@@ -1378,10 +1387,9 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       title: nkcRender.replaceLink(title),
       status,
       content: nkcRender.replaceLink(
-        l === 'json' ? getJsonStringTextSlice(articleContent,200) : nkcRender.htmlToPlain(
-          articleContent,
-          200,
-        ),
+        l === 'json'
+          ? getJsonStringTextSlice(articleContent, 200)
+          : nkcRender.htmlToPlain(articleContent, 200),
       ),
       coverUrl: cover ? getUrl('postCover', cover) : '',
       username: articleUser.username,
@@ -1398,11 +1406,8 @@ schema.statics.getCommentsByCommentsId = async function (commentsId) {
       replyUrl: comment.commentUrl,
       replyContent: nkcRender.replaceLink(
         commentDocument.l === 'json'
-            ? getJsonStringTextSlice(commentContent ,200)
-            : nkcRender.htmlToPlain(
-          commentContent,
-          200,
-        ),
+          ? getJsonStringTextSlice(commentContent, 200)
+          : nkcRender.htmlToPlain(commentContent, 200),
       ),
       replyUsername: commentUser.username,
       replyUid: commentUid,

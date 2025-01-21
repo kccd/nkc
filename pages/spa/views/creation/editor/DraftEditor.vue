@@ -2,6 +2,8 @@
   .standard-fluid-max-container
     //-.m-b-1
       bread-crumb(:list="navList")
+    .permission-checker
+      publish-permission-checker(:type="publishPermissionTypes.draft")
     div
       .m-b-1
         info-block(:mode="'info'")
@@ -83,6 +85,8 @@ import InfoBlock from '../../../components/InfoBlock';
 import Editor from '../../../../lib/vue/Editor.vue';
 import { getDocumentEditorConfigs } from '../../../../lib/js/editor';
 import { debounce } from '../../../../lib/js/execution';
+import { publishPermissionTypes } from '../../../../lib/js/publish';
+import PublishPermissionChecker from '../../../../lib/vue/PublishPermissionCheck.vue';
 
 export default {
   data: function (){
@@ -115,7 +119,8 @@ export default {
         create: 'create',
         save: 'save',
         autoSave: 'autoSave'
-      }
+      },
+      publishPermissionTypes,
     }
   },
   mounted() {
@@ -145,6 +150,7 @@ export default {
   components: {
     'info-block': InfoBlock,
     'editor': Editor,
+    'publish-permission-checker': PublishPermissionChecker,
   },
   watch: {
   },

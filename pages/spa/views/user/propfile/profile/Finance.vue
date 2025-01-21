@@ -18,7 +18,7 @@
       .m-b-1(v-if="pageButtons.length > 0")
         paging(ref="paging" :pages="pageButtons" @click-button="clickBtn")
       .finance-context-table.table-responsive
-        table.table.table-bordered(v-if="navType !== 'all'" )
+        table.table.table-bordered.table-striped(v-if="navType !== 'all'" )
           thead
             tr
               th 时间
@@ -52,7 +52,7 @@
               th
                 a(:href="item.url" target="_blank" v-if="item.url" ) 查看详情
                 span(v-if="item.ordersId && item.ordersId.length !== 0" ) {{'订单号（'+item.ordersId.join(', ')}}
-        table.table.table-bordered(v-else)
+        table.table.table-bordered.table-striped(v-else)
           thead
             tr
               th 时间
@@ -90,8 +90,8 @@
 
 </template>
 <style lang="less" scoped>
-.finance-box{
-  .finance-head{
+.finance-box {
+  .finance-head {
     user-select: none;
     position: relative;
     text-align: right;
@@ -99,14 +99,14 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
-    .finance-head-link{
+    .finance-head-link {
       position: absolute;
       right: 0;
       box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
       padding: 15px;
       background-color: #fff;
       border-radius: 3px;
-      a{
+      a {
         display: block;
         color: #555;
         text-align: center;
@@ -115,73 +115,71 @@
         line-height: 3rem;
         cursor: pointer;
         transition: background-color 100ms;
-        &:hover{
+        &:hover {
           background-color: #f4f4f4;
           text-decoration: none;
         }
       }
     }
-
   }
-  .finance-context{
+  .finance-context {
     background: #fff;
-    .finance-context-nav{
+    .finance-context-nav {
       border-bottom: 1px solid #ddd;
-      &::after{
-        content: "";
+      &::after {
+        content: '';
         display: block;
         height: 0;
         visibility: hidden;
         clear: both;
       }
-      li{
-        list-style:none;
+      li {
+        list-style: none;
         float: left;
         margin: 0 1px -2px 1px;
         cursor: pointer;
         padding: 10px 15px;
         color: #337ab7;
-        &:hover{
-          background: #DCDCDC;
+        &:hover {
+          background: #dcdcdc;
           border-radius: 2px;
         }
       }
-      .active{
+      .active {
         color: #555;
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 2px;
         border-bottom-color: transparent;
-        &:hover{
+        &:hover {
           background-color: #fff;
         }
       }
     }
-    .finance-context-table{
+    .finance-context-table {
       margin-top: 1rem;
       font-size: 1rem;
     }
   }
-  .table-content{
+  .table-content {
     max-width: 10rem;
   }
 }
-
 </style>
 <script>
-import {nkcAPI} from "../../../../../lib/js/netAPI";
-import {timeFormat} from "../../../../../lib/js/time";
-import {getState} from "../../../../../lib/js/state";
-import Paging from "../../../../../lib/vue/Paging";
-import {getUrl} from "../../../../../lib/js/tools";
-const {uid: visitUserId} = getState();
+import { nkcAPI } from '../../../../../lib/js/netAPI';
+import { timeFormat } from '../../../../../lib/js/time';
+import { getState } from '../../../../../lib/js/state';
+import Paging from '../../../../../lib/vue/Paging';
+import { getUrl } from '../../../../../lib/js/tools';
+const { uid: visitUserId } = getState();
 
 export default {
   props: ['targetUid'],
   data: () => ({
     targetUserScores: null,
     show: false,
-    navType:'all',
+    navType: 'all',
     nkcBankName: null,
     kcbsRecords: null,
     t: null,
@@ -190,32 +188,34 @@ export default {
     uid: null,
   }),
   components: {
-    "paging": Paging
+    paging: Paging,
   },
   created() {
-    const {uid} = this.$route.params;
+    const { uid } = this.$route.params;
     this.uid = this.targetUid || uid || visitUserId;
     this.getUserAccountInfo();
   },
   computed: {
     pageButtons() {
-      return this.paging && this.paging.buttonValue? this.paging.buttonValue: [];
+      return this.paging && this.paging.buttonValue
+        ? this.paging.buttonValue
+        : [];
     },
   },
   mounted() {
-    window.addEventListener("click", this.clickOther);
+    window.addEventListener('click', this.clickOther);
   },
   methods: {
     getUrl,
     timeFormat: timeFormat,
-    getUserAccountInfo(page=0, type=''){
+    getUserAccountInfo(page = 0, type = '') {
       const self = this;
       let url = `/u/${self.uid}/profile/financeData?page=${page}`;
-      if(type){
+      if (type) {
         url += `&t=${type}`;
       }
       nkcAPI(url, 'GET')
-        .then(res => {
+        .then((res) => {
           self.targetUserScores = res.targetUserScores;
           self.kcbsRecords = res.kcbsRecords;
           self.nkcBankName = res.nkcBankName;
@@ -224,35 +224,35 @@ export default {
           self.targetUser = res.targetUser;
           // self.nkcBankName = res.nkcBankName;
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
-        })
+        });
     },
     //打开操作框
-    operationShow(){
+    operationShow() {
       this.show = !this.show;
     },
     //点击其他地方关闭操作
     clickOther() {
       const showType = this.show;
-      if(showType){
+      if (showType) {
         this.show = false;
-      }else {
+      } else {
         return;
       }
     },
-    navTypeChange(type){
+    navTypeChange(type) {
       this.navType = type;
       // this.getUserAccountInfo(this.paging.page, type);
       this.getUserAccountInfo(0, type);
     },
     clickBtn(num) {
       this.getUserAccountInfo(num, this.t);
-    }
+    },
   },
-  beforeDestroy() {  // 实例销毁之前对点击事件进行解绑
+  beforeDestroy() {
+    // 实例销毁之前对点击事件进行解绑
     window.removeEventListener('click', this.clickOther);
   },
-
-}
+};
 </script>

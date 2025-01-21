@@ -2,48 +2,15 @@ const Router = require('koa-router');
 const orderRouter = new Router();
 const refundRouter = require('./refund');
 const cancelRouter = require('./cancel');
-
+const { OnlyUnbannedUser } = require('../../../middlewares/permission');
 orderRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data } = ctx;
     data.active = 'order';
     await next();
   })
-  .get('/', async (ctx, next) => {
-    const { data, db, params, query, nkcModules } = ctx;
-    const { page = 0 } = query;
-    let { orderStatus } = query;
-    const { user } = data;
-    // 构造查询条件
-    let searchMap = {
-      sellUid: user.uid,
-    };
-    if (orderStatus == 'refunding') {
-      searchMap.refundStatus = 'ing';
-    } else if (
-      orderStatus &&
-      orderStatus !== 'all' &&
-      orderStatus !== 'close'
-    ) {
-      searchMap.orderStatus = orderStatus;
-    } else if (orderStatus == 'close') {
-      searchMap.closeStatus = true;
-    }
-    const count = await db.ShopOrdersModel.countDocuments(searchMap);
-    const paging = nkcModules.apiFunction.paging(page, count);
-    data.paging = paging;
-    const orders = await db.ShopOrdersModel.find(searchMap)
-      .sort({ orderToc: -1 })
-      .skip(paging.start)
-      .limit(paging.perpage);
-    data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);
-    data.orders = await db.ShopOrdersModel.translateOrderStatus(data.orders);
-    data.orderStatus = orderStatus;
-    ctx.template = 'shop/manage/order.pug';
-    await next();
-  })
   // 发货
-  .put('/sendGoods', async (ctx, next) => {
+  .put('/sendGoods', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, query, body } = ctx;
     const { orderId, trackNumber, trackName } = body.post;
     if (!orderId || !trackNumber) {
@@ -74,7 +41,7 @@ orderRouter
     await next();
   })
   // 修改物流信息
-  .put('/editGoods', async (ctx, next) => {
+  .put('/editGoods', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, query, body } = ctx;
     const { orderId, trackNumber, trackName } = body.post;
     if (!orderId || !trackNumber) {
@@ -90,7 +57,7 @@ orderRouter
     await next();
   })
   // 无物流发货
-  .put('/sendGoodsNoLog', async (ctx, next) => {
+  .put('/sendGoodsNoLog', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, query, body } = ctx;
     const { orderId } = body.post;
     const order = await db.ShopOrdersModel.findOne({ orderId });
@@ -113,7 +80,7 @@ orderRouter
     await next();
   })
   // 修改订单价格
-  .put('/editOrder', async (ctx, next) => {
+  .put('/editOrder', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, body } = ctx;
     const { user } = data;
     const { orderId, price } = body.post;
@@ -132,7 +99,7 @@ orderRouter
     await order.updateOne({ $set: { orderPrice: price } });
     await next();
   })
-  .put('/editOrderTrackNumber', async (ctx, next) => {
+  .put('/editOrderTrackNumber', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, body } = ctx;
     const { user } = data;
     const { orderId, trackNumber } = body;
@@ -152,7 +119,7 @@ orderRouter
     await next();
   })
   // 查看订单详情
-  .get('/detail', async (ctx, next) => {
+  .get('/detail', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, params, query, nkcModules } = ctx;
     const { user } = data;
     const { orderId } = query;
@@ -184,7 +151,7 @@ orderRouter
     await next();
   })
   // 查看订单物流详情
-  .get('/logositics', async (ctx, next) => {
+  .get('/logositics', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, query, body, nkcModules } = ctx;
     const { user } = data;
     const { orderId } = query;
@@ -217,7 +184,7 @@ orderRouter
     await next();
   })
   // 修改订单卖家备注
-  .put('/editSellMessage', async (ctx, next) => {
+  .put('/editSellMessage', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, query, db } = ctx;
     const { sellMessage, orderId } = body;
     const order = await db.ShopOrdersModel.findOne({ orderId });
@@ -231,7 +198,7 @@ orderRouter
     await next();
   })
   // 修改购买记录中的价格
-  .put('/editCostRecord', async (ctx, next) => {
+  .put('/editCostRecord', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, data, body, db } = ctx;
     const { type, costId, orderId, costObj, freightPrice } = body;
     const { user } = data;
@@ -313,7 +280,7 @@ orderRouter
 		await next();
 	})*/
   // 修改购买订单中的价格
-  .put('/editOrderPrice', async (ctx, next) => {
+  .put('/editOrderPrice', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, query, db } = ctx;
     const { orderId, orderObj } = body;
     // 找出订单并修改
@@ -326,7 +293,7 @@ orderRouter
     await next();
   })
   // 订单导出
-  .get('/orderListToExcel', async (ctx, next) => {
+  .get('/orderListToExcel', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, db, query } = ctx;
     const { user } = data;
     const { orderStartStamp, orderEndStamp } = query;

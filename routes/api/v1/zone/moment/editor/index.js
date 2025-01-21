@@ -5,7 +5,9 @@ const richRouter = require('./rich');
 const {
   momentExtenderService,
 } = require('../../../../../../services/moment/momentExtender.service');
-const { OnlyUser } = require('../../../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+} = require('../../../../../../middlewares/permission');
 const {
   ThrowBadRequestResponseTypeError,
 } = require('../../../../../../nkcModules/error');
@@ -15,7 +17,7 @@ const { ResponseTypes } = require('../../../../../../settings/response');
 // 编辑电文相关路由的权限判断
 // 只有电文的作者才能编辑电文
 // 当前路由仅允许编辑已发表的电文
-router.use('/', OnlyUser(), async (ctx, next) => {
+router.use('/', OnlyUnbannedUser(), async (ctx, next) => {
   const { state, params, internalData } = ctx;
   const { momentId } = params;
   const moment = await momentExtenderService.getMomentById(momentId);

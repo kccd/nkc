@@ -8,14 +8,16 @@ const {
 const {
   userDescCheckerService,
 } = require('../../../../services/user/userDescChecker.service');
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 const userRouter = new Router();
 userRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyOperation(Operations.visitEUserSettings), async (ctx, next) => {
     ctx.template = 'experimental/settings/user.pug';
     ctx.data.type = 'user';
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.visitEUserSettings), async (ctx, next) => {
     const { query, data, db, nkcModules, state } = ctx;
     const { page = 0, t = 'default', c = '' } = query;
     let users, paging;
@@ -103,7 +105,7 @@ userRouter
     ctx.template = 'experimental/settings/user/user.pug';
     await next();
   })
-  .put('/', async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.modifyEUserInfo), async (ctx, next) => {
     const { body, db } = ctx;
     const { type, disable, usersId } = body;
     let obj;
@@ -132,7 +134,7 @@ userRouter
     await next();
   })
 
-  .get('/:uid', async (ctx, next) => {
+  .get('/:uid', OnlyOperation(Operations.visitEUserInfo), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { uid } = params;
     const targetUser = await db.UserModel.findOnly({ uid });
@@ -144,97 +146,104 @@ userRouter
     }).sort({ toc: 1 });
     await next();
   })
-  .put('/:uid', async (ctx, next) => {
-    const { params, db, body, nkcModules } = ctx;
-    let {
-      username = '',
-      description = '',
-      certs = [],
-      email = '',
-      mobile = '',
-      nationCode = '',
-      password = '',
-      lastVerifyPhoneNumberTime = new Date(),
-    } = body;
-    const { uid } = params;
-    const targetUser = await db.UserModel.findOnly({ uid });
-    const targetUsersPersonal = await db.UsersPersonalModel.findOnly({ uid });
-    const serverSettings = await db.SettingModel.getSettings('server');
-    // 用户名重名检测
-    if (username) {
-      if (targetUser.username !== username) {
-        await usernameCheckerService.checkNewUsername(username, targetUser.uid);
+  .put(
+    '/:uid',
+    OnlyOperation(Operations.modifyEUserInfo),
+    async (ctx, next) => {
+      const { params, db, body, nkcModules } = ctx;
+      let {
+        username = '',
+        description = '',
+        certs = [],
+        email = '',
+        mobile = '',
+        nationCode = '',
+        password = '',
+        lastVerifyPhoneNumberTime = new Date(),
+      } = body;
+      const { uid } = params;
+      const targetUser = await db.UserModel.findOnly({ uid });
+      const targetUsersPersonal = await db.UsersPersonalModel.findOnly({ uid });
+      const serverSettings = await db.SettingModel.getSettings('server');
+      // 用户名重名检测
+      if (username) {
+        if (targetUser.username !== username) {
+          await usernameCheckerService.checkNewUsername(
+            username,
+            targetUser.uid,
+          );
+        }
+      } else {
+        username = `${serverSettings.websiteCode}-${targetUser.uid}`;
       }
-    } else {
-      username = `${serverSettings.websiteCode}-${targetUser.uid}`;
-    }
-    await userDescCheckerService.checkUserDesc(description);
-    // 邮箱检测
-    if (targetUsersPersonal.email !== email && !!email) {
-      const sameEmailUser = await db.UsersPersonalModel.findOne({
-        uid: { $ne: uid },
-        email: email.toLowerCase(),
+      await userDescCheckerService.checkUserDesc(description);
+      // 邮箱检测
+      if (targetUsersPersonal.email !== email && !!email) {
+        const sameEmailUser = await db.UsersPersonalModel.findOne({
+          uid: { $ne: uid },
+          email: email.toLowerCase(),
+        });
+        if (sameEmailUser) {
+          ctx.throw(400, '邮箱已存在，请更换');
+        }
+      }
+      // 手机号码检测
+      if (
+        mobile &&
+        nationCode &&
+        (targetUsersPersonal.mobile !== mobile ||
+          targetUsersPersonal.nationCode !== nationCode)
+      ) {
+        const sameMobileUser = await db.UsersPersonalModel.findOne({
+          uid: { $ne: uid },
+          nationCode,
+          mobile,
+        });
+        if (sameMobileUser) {
+          ctx.throw(400, '手机号码已被其他用户绑定，请更换');
+        }
+      }
+      // 证书检测
+      let certsId = await db.RoleModel.find({
+        _id: { $in: certs },
+        type: { $in: ['common', 'management'] },
       });
-      if (sameEmailUser) {
-        ctx.throw(400, '邮箱已存在，请更换');
-      }
-    }
-    // 手机号码检测
-    if (
-      mobile &&
-      nationCode &&
-      (targetUsersPersonal.mobile !== mobile ||
-        targetUsersPersonal.nationCode !== nationCode)
-    ) {
-      const sameMobileUser = await db.UsersPersonalModel.findOne({
-        uid: { $ne: uid },
-        nationCode,
+      certsId = certsId.map((cert) => cert._id);
+      // 保留原有的系统类证书
+      let oldCertsId = await db.RoleModel.find({
+        _id: { $in: targetUser.certs },
+        type: 'system',
+      });
+      oldCertsId = oldCertsId.map((cert) => cert._id);
+      certsId = [...new Set(oldCertsId.concat(certsId))];
+      const userObj = {
+        username,
+        usernameLowerCase: username.toLowerCase(),
+        description,
+        certs: certsId,
+      };
+      const userPersonalObj = {
         mobile,
-      });
-      if (sameMobileUser) {
-        ctx.throw(400, '手机号码已被其他用户绑定，请更换');
-      }
-    }
-    // 证书检测
-    let certsId = await db.RoleModel.find({
-      _id: { $in: certs },
-      type: { $in: ['common', 'management'] },
-    });
-    certsId = certsId.map((cert) => cert._id);
-    // 保留原有的系统类证书
-    let oldCertsId = await db.RoleModel.find({
-      _id: { $in: targetUser.certs },
-      type: 'system',
-    });
-    oldCertsId = oldCertsId.map((cert) => cert._id);
-    certsId = [...new Set(oldCertsId.concat(certsId))];
-    const userObj = {
-      username,
-      usernameLowerCase: username.toLowerCase(),
-      description,
-      certs: certsId,
-    };
-    const userPersonalObj = {
-      mobile,
-      nationCode,
-      email: email.toLowerCase(),
-      lastVerifyPhoneNumberTime,
-    };
+        nationCode,
+        email: email.toLowerCase(),
+        lastVerifyPhoneNumberTime,
+      };
 
-    if (password) {
-      const { contentLength, checkPass } = ctx.tools.checkString;
-      if (contentLength(password) < 8) {
-        ctx.throw(400, '密码长度不能小于8位');
+      if (password) {
+        const { contentLength, checkPass } = ctx.tools.checkString;
+        if (contentLength(password) < 8) {
+          ctx.throw(400, '密码长度不能小于8位');
+        }
+        if (!checkPass(password)) {
+          ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
+        }
+        const newPassword = nkcModules.apiFunction.newPasswordObject(password);
+        userPersonalObj.password = newPassword.password;
+        userPersonalObj.hashType = newPassword.hashType;
       }
-      if (!checkPass(password)) {
-        ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
-      }
-      const newPassword = nkcModules.apiFunction.newPasswordObject(password);
-      userPersonalObj.password = newPassword.password;
-      userPersonalObj.hashType = newPassword.hashType;
-    }
-    await targetUser.updateOne(userObj);
-    await targetUsersPersonal.updateOne(userPersonalObj);
-    await next();
-  });
+      await targetUser.updateOne(userObj);
+      await targetUsersPersonal.updateOne(userPersonalObj);
+      await next();
+    },
+  );
 module.exports = userRouter;

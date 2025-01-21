@@ -2,17 +2,18 @@ const router = require('koa-router')();
 const articleRouter = require('./article');
 const momentRouter = require('./moment');
 const draftRouter = require('./draft');
+const { OnlyUser } = require('../../../middlewares/permission');
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/article', async (ctx, next) => {
+  .get('/article', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/draft', async (ctx, next) => {
+  .get('/draft', OnlyUser(), async (ctx, next) => {
     await next();
   })
-  .get('/article/editor', async (ctx, next) => {
+  .get('/article/editor', OnlyUser(), async (ctx, next) => {
     await next();
   })
   .use('/article', articleRouter.routes(), articleRouter.allowedMethods())

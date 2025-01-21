@@ -1,8 +1,10 @@
 const Router = require('koa-router');
+const { OnlyOperation } = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 const router = new Router();
 
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyOperation(Operations.visitEPostSettings), async (ctx, next) => {
     const { data, db } = ctx;
     const from = ctx.request.get('FROM');
     if (from !== 'nkcAPI') {
@@ -26,92 +28,96 @@ router
     data.grades = await db.UsersGradeModel.find().sort({ toc: 1 });
     await next();
   })
-  .put('/', async (ctx, next) => {
-    const { body, db, nkcModules } = ctx;
-    const { roles, grades, postToThread, postToForum, postLibrary } = body;
-    const q = {};
-    const { checkNumber } = nkcModules.checkData;
-    if (postToForum || postToThread) {
-      if (postToForum) {
-        const { exam, originalWordLimit, minorForumCount } = postToForum;
+  .put(
+    '/',
+    OnlyOperation(Operations.modifyEPostSettings),
+    async (ctx, next) => {
+      const { body, db, nkcModules } = ctx;
+      const { roles, grades, postToThread, postToForum, postLibrary } = body;
+      const q = {};
+      const { checkNumber } = nkcModules.checkData;
+      if (postToForum || postToThread) {
+        if (postToForum) {
+          const { exam, originalWordLimit, minorForumCount } = postToForum;
+          // if (exam.notPass.status) {
+          //   exam.volumeA = true;
+          //   exam.volumeB = true;
+          // } else if (exam.volumeA) {
+          //   exam.volumeB = true;
+          // }
+          checkNumber(originalWordLimit, {
+            name: '原创声明内容最小字数',
+            min: 0,
+          });
+          const { min, max } = minorForumCount;
+          checkNumber(min, {
+            name: '辅助专业最小数量',
+            min: 0,
+          });
+          checkNumber(max, {
+            name: '辅助专业最大数量',
+            min: 0,
+          });
+          if (max < min) {
+            ctx.throw(400, `辅助专业数量设置错误`);
+          }
+          q['c.postToForum'] = postToForum;
+        }
+        if (postToThread) {
+          // const { exam } = postToThread;
+          // if (exam.notPass.status) {
+          //   exam.volumeA = true;
+          //   exam.volumeB = true;
+          // } else if (exam.volumeA) {
+          //   exam.volumeB = true;
+          // }
+          q['c.postToThread'] = postToThread;
+        }
+        await db.SettingModel.updateOne({ _id: 'post' }, { $set: q });
+        // await Promise.all(
+        //   roles.map(async (role) => {
+        //     await db.RoleModel.updateOne(
+        //       { _id: role._id },
+        //       {
+        //         $set: {
+        //           postToForum: role.postToForum,
+        //           postToThread: role.postToThread,
+        //         },
+        //       },
+        //     );
+        //   }),
+        // );
+        // await Promise.all(
+        //   grades.map(async (grade) => {
+        //     await db.UsersGradeModel.updateOne(
+        //       { _id: grade._id },
+        //       {
+        //         $set: {
+        //           postToForum: grade.postToForum,
+        //           postToThread: grade.postToThread,
+        //         },
+        //       },
+        //     );
+        //   }),
+        // );
+        await db.SettingModel.saveSettingsToRedis('post');
+      } else if (postLibrary) {
+        const { exam } = postLibrary;
         if (exam.notPass.status) {
           exam.volumeA = true;
           exam.volumeB = true;
         } else if (exam.volumeA) {
           exam.volumeB = true;
         }
-        checkNumber(originalWordLimit, {
-          name: '原创声明内容最小字数',
-          min: 0,
-        });
-        const { min, max } = minorForumCount;
-        checkNumber(min, {
-          name: '辅助专业最小数量',
-          min: 0,
-        });
-        checkNumber(max, {
-          name: '辅助专业最大数量',
-          min: 0,
-        });
-        if (max < min) {
-          ctx.throw(400, `辅助专业数量设置错误`);
-        }
-        q['c.postToForum'] = postToForum;
+        q.c = postLibrary;
+        await db.SettingModel.updateOne({ _id: 'library' }, { $set: q });
+        await db.SettingModel.saveSettingsToRedis('library');
       }
-      if (postToThread) {
-        const { exam } = postToThread;
-        if (exam.notPass.status) {
-          exam.volumeA = true;
-          exam.volumeB = true;
-        } else if (exam.volumeA) {
-          exam.volumeB = true;
-        }
-        q['c.postToThread'] = postToThread;
-      }
-      await db.SettingModel.updateOne({ _id: 'post' }, { $set: q });
-      await Promise.all(
-        roles.map(async (role) => {
-          await db.RoleModel.updateOne(
-            { _id: role._id },
-            {
-              $set: {
-                postToForum: role.postToForum,
-                postToThread: role.postToThread,
-              },
-            },
-          );
-        }),
-      );
-      await Promise.all(
-        grades.map(async (grade) => {
-          await db.UsersGradeModel.updateOne(
-            { _id: grade._id },
-            {
-              $set: {
-                postToForum: grade.postToForum,
-                postToThread: grade.postToThread,
-              },
-            },
-          );
-        }),
-      );
-      await db.SettingModel.saveSettingsToRedis('post');
-    } else if (postLibrary) {
-      const { exam } = postLibrary;
-      if (exam.notPass.status) {
-        exam.volumeA = true;
-        exam.volumeB = true;
-      } else if (exam.volumeA) {
-        exam.volumeB = true;
-      }
-      q.c = postLibrary;
-      await db.SettingModel.updateOne({ _id: 'library' }, { $set: q });
-      await db.SettingModel.saveSettingsToRedis('library');
-    }
-    // 更新用户等级、证书的缓存信息
-    await db.UsersGradeModel.saveGradesToRedis();
-    await db.RoleModel.saveRolesToRedis();
-    await next();
-  });
+      // 更新用户等级、证书的缓存信息
+      await db.UsersGradeModel.saveGradesToRedis();
+      await db.RoleModel.saveRolesToRedis();
+      await next();
+    },
+  );
 
 module.exports = router;

@@ -24,6 +24,7 @@ const staticServe = (path) => {
     },
   });
 };
+const { permissionRef } = require('./middlewares/permission');
 const app = new Koa();
 const conditional = require('koa-conditional-get');
 const etag = require('koa-etag');
@@ -33,14 +34,12 @@ app.on('error', (err) => {
 });
 
 const {
-  stayLogin,
+  auth,
   init,
   initState,
-  initAddress,
-  initCtxMethods,
+  initMethods,
   body,
   urlRewrite,
-  permission,
   logger,
   cache,
   IPLimit,
@@ -49,7 +48,21 @@ const {
 } = require('./middlewares');
 
 const uploadConfig = require('./config/upload');
-
+for (const item of mainRouter.stack) {
+  if (item.methods.length > 0) {
+    // 需要检测权限中间件
+    if (!permissionRef.includes(item.stack[0])) {
+      console.error(
+        new Error(
+          `No permission middleware in [${item.methods.join(',')}:${
+            item.path
+          }]`,
+        ),
+      );
+      process.exit(1);
+    }
+  }
+}
 const koaBodySetting = settings.upload.koaBodySetting;
 koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
 app.keys = getCookieKeys();
@@ -77,16 +90,14 @@ app
   .use(etag())
   .use(urlRewrite)
   .use(koaRewrite('/favicon.ico', getUrl('siteIcon', 'ico')))
-  .use(initAddress)
   .use(init)
   .use(initState)
-  .use(initCtxMethods)
+  .use(initMethods)
   .use(filterDomain)
   // IP 黑名单
   .use(IPLimit)
-  .use(stayLogin)
+  .use(auth)
   .use(cache)
-  .use(permission.permission)
   .use(logger)
   .use(mainRouter.routes())
   .use(apiData)

@@ -1,20 +1,17 @@
 const router = require('koa-router')();
-const {attachment} = require('../../config/store.json');
-router
-  .get('/', async (ctx, next) => {
-    const {nkcModules, data} = ctx;
-    const {usage} = await nkcModules.os.getCPUInfo();
-    const {
-      totalMemMb,
-      usedMemMb,
-    } = await nkcModules.os.getMemoryInfo();
+const { attachment } = require('../../config/store.json');
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
+router.get(
+  '/',
+  OnlyOperation(Operations.nkcManagementOS),
+  async (ctx, next) => {
+    const { nkcModules, data } = ctx;
+    const { usage } = await nkcModules.os.getCPUInfo();
+    const { totalMemMb, usedMemMb } = await nkcModules.os.getMemoryInfo();
     const disks = [];
-    for(const a of attachment) {
-      const {
-        free,
-        size,
-        diskPath,
-      } = await nkcModules.os.getDriveInfo(a.path);
+    for (const a of attachment) {
+      const { free, size, diskPath } = await nkcModules.os.getDriveInfo(a.path);
       const disk = {
         ...a,
         free,
@@ -27,9 +24,10 @@ router
     data.totalMemory = totalMemMb;
     data.usedMemory = usedMemMb;
     data.cpuUsage = usage;
-    data.nav = "os";
-    ctx.template = "nkc/os/os.pug";
+    data.nav = 'os';
+    ctx.template = 'nkc/os/os.pug';
     // 次路由未开放
     await next();
-  })
+  },
+);
 module.exports = router;

@@ -1,38 +1,63 @@
-const router = require("koa-router")();
-router
-  .get("/logs", async (ctx, next) => {
-    const {db, data, query, nkcModules} = ctx;
-    const {page = 0, t = "", c = ""} = query;
-    let targetUser, q = {};
+const router = require('koa-router')();
+const { OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
+router.get(
+  '/logs',
+  OnlyOperation(Operations.getLibraryLogs),
+  async (ctx, next) => {
+    const { db, data, query, nkcModules } = ctx;
+    const { page = 0, t = '', c = '' } = query;
+    let targetUser,
+      q = {};
     data.c = c;
     data.t = t;
-    if(t === "username") {
-      targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
-    } else if(t === "uid") {
-      targetUser = await db.UserModel.findOne({uid: c});
+    if (t === 'username') {
+      targetUser = await db.UserModel.findOne({
+        usernameLowerCase: c.toLowerCase(),
+      });
+    } else if (t === 'uid') {
+      targetUser = await db.UserModel.findOne({ uid: c });
     }
-    if(t) {
-      if(targetUser) {
+    if (t) {
+      if (targetUser) {
         q.uid = targetUser.uid;
       } else {
-        q.uid = "null";
+        q.uid = 'null';
       }
     }
     const count = await db.LibraryModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, 60);
-    const libraries = await db.LibraryModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const libraries = await db.LibraryModel.find(q)
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
     data.libraries = [];
-    for(let library of libraries) {
+    for (let library of libraries) {
       const nav = await library.getNav();
       library = library.toObject();
-      library.user = await db.UserModel.findOne({uid: library.uid}, {uid: 1, avatar: 1, username: 1});
-      library.resourceUser = await db.UserModel.findOne({uid: library.rUid}, {uid: 1, avatar: 1, username: 1});
-      library.forum = await db.ForumModel.findOne({lid: nav[0]._id}, {displayName: 1, fid: 1, lid: 1});
-      library.path = "/ " + nav.slice(0, -1).map(n => n.name).join(" / ");
+      library.user = await db.UserModel.findOne(
+        { uid: library.uid },
+        { uid: 1, avatar: 1, username: 1 },
+      );
+      library.resourceUser = await db.UserModel.findOne(
+        { uid: library.rUid },
+        { uid: 1, avatar: 1, username: 1 },
+      );
+      library.forum = await db.ForumModel.findOne(
+        { lid: nav[0]._id },
+        { displayName: 1, fid: 1, lid: 1 },
+      );
+      library.path =
+        '/ ' +
+        nav
+          .slice(0, -1)
+          .map((n) => n.name)
+          .join(' / ');
       data.libraries.push(library);
     }
     data.paging = paging;
-    ctx.template = "libraries/logs.pug";
+    ctx.template = 'libraries/logs.pug';
     await next();
-  });
+  },
+);
 module.exports = router;

@@ -3,9 +3,14 @@ const router = new Router();
 const {
   blacklistCheckerService,
 } = require('../../services/blacklist/blacklistChecker.service');
+const {
+  OnlyUnbannedUser,
+  OnlyOperation,
+} = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 
 router
-  .post('/xsf', async (ctx, next) => {
+  .post('/xsf', OnlyOperation(Operations.creditXsf), async (ctx, next) => {
     const { db, data, params, body } = ctx;
     const { pid } = params;
     const { user } = data;
@@ -91,57 +96,61 @@ router
     await ctx.nkcModules.socket.sendMessageToUser(message._id);
     await next();
   })
-  .del('/xsf/:recordId', async (ctx, next) => {
-    const { data, db, query, params } = ctx;
-    const { reason } = query;
-    const { user } = data;
-    const { recordId, pid } = params;
-    const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
-    const record = await db.XsfsRecordModel.findOnly({
-      _id: recordId,
-      pid,
-      type: xsfsRecordTypes.post,
-    });
-    const post = await db.PostModel.findOnly({ pid });
-    const thread = await post.extendThread();
-    const targetUser = await db.UserModel.findOnly({ uid: post.uid });
-    const forums = await thread.extendForums(['mainForums', 'minorForums']);
-    let isModerator = ctx.permission('superModerator');
-    if (!isModerator) {
-      for (const f of forums) {
-        isModerator = await f.isModerator(user);
-        if (isModerator) {
-          break;
+  .del(
+    '/xsf/:recordId',
+    OnlyOperation(Operations.cancelXsf),
+    async (ctx, next) => {
+      const { data, db, query, params } = ctx;
+      const { reason } = query;
+      const { user } = data;
+      const { recordId, pid } = params;
+      const xsfsRecordTypes = await db.XsfsRecordModel.getXsfsRecordTypes();
+      const record = await db.XsfsRecordModel.findOnly({
+        _id: recordId,
+        pid,
+        type: xsfsRecordTypes.post,
+      });
+      const post = await db.PostModel.findOnly({ pid });
+      const thread = await post.extendThread();
+      const targetUser = await db.UserModel.findOnly({ uid: post.uid });
+      const forums = await thread.extendForums(['mainForums', 'minorForums']);
+      let isModerator = ctx.permission('superModerator');
+      if (!isModerator) {
+        for (const f of forums) {
+          isModerator = await f.isModerator(user);
+          if (isModerator) {
+            break;
+          }
         }
       }
-    }
-    if (!isModerator) {
-      ctx.throw(400, '权限不足');
-    }
-    data.isModerator = isModerator;
-    if (reason.length < 2) {
-      ctx.throw(400, '撤销原因写的太少啦~');
-    }
-    const oldXsf = targetUser.xsf;
-    targetUser.xsf -= record.num;
-    await targetUser.save();
-    try {
-      await record.updateOne({
-        reason,
-        tlm: Date.now(),
-        lmOperatorId: user.uid,
-        canceled: true,
-        lmOperatorIp: ctx.address,
-        lmOperatorPort: ctx.port,
-      });
-    } catch (err) {
-      targetUser.xsf = oldXsf;
+      if (!isModerator) {
+        ctx.throw(400, '权限不足');
+      }
+      data.isModerator = isModerator;
+      if (reason.length < 2) {
+        ctx.throw(400, '撤销原因写的太少啦~');
+      }
+      const oldXsf = targetUser.xsf;
+      targetUser.xsf -= record.num;
       await targetUser.save();
-      throw err;
-    }
-    await next();
-  })
-  .post('/kcb', async (ctx, next) => {
+      try {
+        await record.updateOne({
+          reason,
+          tlm: Date.now(),
+          lmOperatorId: user.uid,
+          canceled: true,
+          lmOperatorIp: ctx.address,
+          lmOperatorPort: ctx.port,
+        });
+      } catch (err) {
+        targetUser.xsf = oldXsf;
+        await targetUser.save();
+        throw err;
+      }
+      await next();
+    },
+  )
+  .post('/kcb', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body, params, nkcModules } = ctx;
     const lock = await nkcModules.redLock.redLock.lock('creditKCB', 6000);
     try {
@@ -231,23 +240,27 @@ router
     }
     await next();
   })
-  .put('/kcb/:recordId', async (ctx, next) => {
-    const { db, body, params } = ctx;
-    const { recordId, pid } = params;
-    const { hide } = body;
-    await db.KcbsRecordModel.updateOne(
-      {
-        _id: recordId,
-        pid,
-        type: 'creditKcb',
-      },
-      {
-        $set: {
-          hideDescription: !!hide,
+  .put(
+    '/kcb/:recordId',
+    OnlyOperation(Operations.modifyKcbRecordReason),
+    async (ctx, next) => {
+      const { db, body, params } = ctx;
+      const { recordId, pid } = params;
+      const { hide } = body;
+      await db.KcbsRecordModel.updateOne(
+        {
+          _id: recordId,
+          pid,
+          type: 'creditKcb',
         },
-      },
-    );
-    await next();
-  });
+        {
+          $set: {
+            hideDescription: !!hide,
+          },
+        },
+      );
+      await next();
+    },
+  );
 
 module.exports = router;

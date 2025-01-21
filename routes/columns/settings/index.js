@@ -7,8 +7,12 @@ const closeRouter = require('./close');
 const transferRouter = require('./transfer');
 const pageRouter = require('./page');
 const fansRouter = require('./fans');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
-  .use(['/transfer', '/close'], async (ctx, next) => {
+  .use(['/transfer', '/close'], OnlyUser(), async (ctx, next) => {
     const { user, column } = ctx.data;
     if (column.uid !== user.uid && !ctx.permission('column_single_disabled')) {
       ctx.throw(403, '权限不足');
@@ -17,6 +21,7 @@ router
   })
   .use(
     ['/post', '/contribute', '/category', '/page', '/fans'],
+    OnlyUser(),
     async (ctx, next) => {
       const { user, column } = ctx.data;
       if (
@@ -29,7 +34,7 @@ router
       await next();
     },
   )
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { column, user } = ctx.data;
     if (column.uid !== user.uid && !ctx.permission('column_single_disabled')) {
       ctx.throw(403, '权限不足');

@@ -44,10 +44,10 @@ module.exports = {
     },
     vote: {
       up: {
-        POST: 'post-vote-up',
+        POST: Operations.post_vote_up,
       },
       down: {
-        POST: 'post-vote-down',
+        POST: Operations.post_vote_down,
       },
     },
     collection: {

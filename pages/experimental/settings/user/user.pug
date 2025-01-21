@@ -48,8 +48,9 @@ block eContent
                 th UID
                 th 用户名(提示)
                 th 证书
-                th A卷
-                th B卷
+                th 入学考试
+                th A卷考试
+                th B卷考试
                 th IP
                 th 其他
             tbody(v-for='u in users' :class="{'hidden-user-home': u.hidden}")
@@ -77,6 +78,10 @@ block eContent
                     span(v-if="u.nickname") ({{u.nickname}})
                 th
                   span(v-for='r in u.roles') {{r.displayName}}&nbsp;
+                th.mwd
+                  span(v-if='u.volumeAD')
+                    span.text-success 通过({{u.paperAD?u.paperAD.name: '试卷丢失或已过A卷或B卷'}})
+                  span(v-else).text-danger 未通过
                 th.mwd
                   span(v-if='u.volumeA')
                     span.text-success 通过({{u.paperA?u.paperA.name: '试卷丢失或已过B卷'}})

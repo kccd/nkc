@@ -3,10 +3,11 @@ const { paperService } = require('../../services/exam/paper.service');
 const {
   registerExamService,
 } = require('../../services/register/registerExam.service');
+const { Public, OnlyUser } = require('../../middlewares/permission');
 const paperRouter = new Router();
 
 paperRouter
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { db, query, nkcModules, state } = ctx;
     const { uid } = state;
     let { cid, from: userFrom, codeId, codeResult } = query;
@@ -17,7 +18,7 @@ paperRouter
     const category = await db.ExamsCategoryModel.findOnly({ _id: cid });
     const examCategoryTypes =
       await db.ExamsCategoryModel.getExamCategoryTypes();
-    const { passScore, time, from, volume, type } = category;
+    const { passScore, time, from, type, level } = category;
     const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');
@@ -126,7 +127,7 @@ paperRouter
     }
     // 加载不同考卷的题目
     const condition = {
-      volume,
+      volume: level === 1 ? 'A' : 'B',
       auth: true,
       disabled: false,
     };
@@ -189,7 +190,7 @@ paperRouter
       // return ctx.redirect(`/exam/public/public-paper/${newPaper._id}`);
     }
   })
-  .get('/:_id', async (ctx, next) => {
+  .get('/:_id', Public(), async (ctx, next) => {
     //获取闭卷考试的题目数据
     const { db, data, params, query, nkcModules, state } = ctx;
     const { created } = query;
@@ -253,7 +254,7 @@ paperRouter
     ctx.template = 'exam/paper.pug';
     await next();
   })
-  .post('/:_id', async (ctx, next) => {
+  .post('/:_id', Public(), async (ctx, next) => {
     const { params, db, data, body, state } = ctx;
     const { uid } = state;
     const { _id } = params;
@@ -322,17 +323,15 @@ paperRouter
     q.tlm = time;
 
     if (q.passed) {
-      const userObj = {};
+      const userObj = {
+        $addToSet: {
+          certs: {
+            $each: category.rolesId,
+          },
+        },
+      };
       userObj[`volume${category.volume}`] = true;
-      if (category.volume === 'B') {
-        userObj.volumeA = true;
-      }
       await db.UserModel.updateOne({ uid }, userObj);
-      for (const id of category.rolesId) {
-        if (id) {
-          await db.UserModel.updateOne({ uid }, { $addToSet: { certs: id } });
-        }
-      }
     }
     await db.ExamsPaperModel.updateOne({ _id: Number(_id), uid }, q);
     data.passed = q.passed;

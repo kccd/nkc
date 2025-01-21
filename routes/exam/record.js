@@ -1,28 +1,34 @@
 const Router = require('koa-router');
 const router = new Router();
 const { questionService } = require('../../services/exam/question.service');
+const { OnlyOperation, OnlyUser } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 router
-  .get('/question', async (ctx, next) => {
-    const { query, db, data, nkcModules } = ctx;
-    const { user } = data;
-    const { page = 0 } = query;
-    const q = {
-      uid: user.uid,
-    };
-    const count = await db.QuestionModel.countDocuments(q);
-    const paging = await nkcModules.apiFunction.paging(page, count);
-    const questions = await db.QuestionModel.find(q)
-      .sort({ toc: -1 })
-      .skip(paging.start)
-      .limit(paging.perpage);
-    data.questions = await questionService.extendQuestions(questions);
-    const questionsId = questions.map((q) => q._id);
-    await questionService.markQuestionsAsViewed(questionsId);
-    data.paging = paging;
-    ctx.template = 'exam/record/question.pug';
-    await next();
-  })
-  .get('/paper', async (ctx, next) => {
+  .get(
+    '/question',
+    OnlyOperation(Operations.viewQuestionRecord),
+    async (ctx, next) => {
+      const { query, db, data, nkcModules } = ctx;
+      const { user } = data;
+      const { page = 0 } = query;
+      const q = {
+        uid: user.uid,
+      };
+      const count = await db.QuestionModel.countDocuments(q);
+      const paging = await nkcModules.apiFunction.paging(page, count);
+      const questions = await db.QuestionModel.find(q)
+        .sort({ toc: -1 })
+        .skip(paging.start)
+        .limit(paging.perpage);
+      data.questions = await questionService.extendQuestions(questions);
+      const questionsId = questions.map((q) => q._id);
+      await questionService.markQuestionsAsViewed(questionsId);
+      data.paging = paging;
+      ctx.template = 'exam/record/question.pug';
+      await next();
+    },
+  )
+  .get('/paper', OnlyUser(), async (ctx, next) => {
     const { data, query, db, nkcModules } = ctx;
     const { page = 0, t, sortby, cat } = query;
     data.t = t;

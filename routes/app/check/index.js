@@ -5,7 +5,8 @@ const Router = require('koa-router');
 const config = require('../../../config/server.json');
 const checkRouter = new Router();
 const { appStores } = require('../../../settings/app');
-checkRouter.get('/', async (ctx, next) => {
+const { Public } = require('../../../middlewares/permission');
+checkRouter.get('/', Public(), async (ctx, next) => {
   const { data, db, query, state } = ctx;
   /*
     此处为了兼容旧版APP，新平台不再需要

@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUser } = require('../../middlewares/permission');
+const { OnlyUser, Public } = require('../../middlewares/permission');
 const articleRouter = require('./article');
 const momentRouter = require('./moment');
 const zoneTypes = {
@@ -23,7 +23,7 @@ const momentsCount = {
 };
 
 router
-  .use('/', async (ctx, next) => {
+  .use('/', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
     await db.MomentModel.checkAccessControlPermissionWithThrowError({
       uid: state.uid,
@@ -33,7 +33,7 @@ router
     });
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { query, data, state } = ctx;
     const { t = '' } = query;
     const [type, tab] = t.split('-');
@@ -60,7 +60,7 @@ router
       await next();
     }
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { state, db, data, query, nkcModules, permission } = ctx;
     const { zoneTypes, zoneTab, type, tab } = data;
     const { page = 0 } = query;
@@ -83,9 +83,9 @@ router
     let subUid = [];
     // 我的关注页需要添加用户筛选
     const condition = {};
-    if(tab === zoneTab.subscribe) {
+    if (tab === zoneTab.subscribe) {
       const usersId = [];
-      if(state.uid) {
+      if (state.uid) {
         subUid = await db.SubscribeModel.getUserSubUsersId(state.uid);
         usersId.push(...subUid, state.uid);
       }
@@ -191,7 +191,7 @@ router
     data.permissions = permissions;
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, db, query, nkcModules, state } = ctx;
     const { zoneTypes, type, tab } = data;
     if (type !== zoneTypes.article) {
@@ -230,10 +230,17 @@ router
     data.paging = paging;
     await next();
   })
-  .get(['/editor/rich', '/editor/rich/history'], async (ctx, next) => {
-    ctx.remoteTemplate = 'zone/zone.pug';
-    await next();
-  })
+  .get(
+    ['/editor/rich', '/editor/rich/history'],
+    OnlyUser(),
+    async (ctx, next) => {
+      if (!ctx.state.uid) {
+        ctx.throw(403, '权限不足');
+      }
+      ctx.remoteTemplate = 'zone/zone.pug';
+      await next();
+    },
+  )
   .use('/m', momentRouter.routes(), momentRouter.allowedMethods())
   .use('/a', articleRouter.routes(), articleRouter.allowedMethods());
 module.exports = router;

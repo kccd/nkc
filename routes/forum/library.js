@@ -1,6 +1,9 @@
+const { Public, OnlyOperation } = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
+
 const router = require('koa-router')();
 router
-  .get('/', async (ctx, next) => {
+  .get('/', Public(), async (ctx, next) => {
     const { data, db, query } = ctx;
     data.type = 'library';
     const { t, id } = query;
@@ -34,35 +37,39 @@ router
     data.sizeLimit = sizeLimit;
     await next();
   })
-  .post('/', async (ctx, next) => {
-    const { data, db, body } = ctx;
-    const { forum } = data;
-    const { type } = body;
-    if (type === 'create') {
-      data.library = await forum.createLibrary(data.user.uid);
-    } else {
-      if (!forum.lid) {
-        ctx.throw(400, '专业暂未开设文库');
-      }
-      const library = await db.LibraryModel.findOnly({ _id: forum.lid });
-      if (!library) {
-        ctx.throw(400, `未找到文库, lid: ${forum.lid}`);
-      }
-      data.library = library;
-      if (type === 'open') {
-        if (!library.closed) {
-          ctx.throw(400, '文库未关闭');
-        }
-        await library.updateOne({ closed: false });
-        data.libraryClosed = false;
+  .post(
+    '/',
+    OnlyOperation(Operations.createForumLibrary),
+    async (ctx, next) => {
+      const { data, db, body } = ctx;
+      const { forum } = data;
+      const { type } = body;
+      if (type === 'create') {
+        data.library = await forum.createLibrary(data.user.uid);
       } else {
-        if (library.closed) {
-          ctx.throw(400, '文库已关闭');
+        if (!forum.lid) {
+          ctx.throw(400, '专业暂未开设文库');
         }
-        await library.updateOne({ closed: true });
-        data.libraryClosed = true;
+        const library = await db.LibraryModel.findOnly({ _id: forum.lid });
+        if (!library) {
+          ctx.throw(400, `未找到文库, lid: ${forum.lid}`);
+        }
+        data.library = library;
+        if (type === 'open') {
+          if (!library.closed) {
+            ctx.throw(400, '文库未关闭');
+          }
+          await library.updateOne({ closed: false });
+          data.libraryClosed = false;
+        } else {
+          if (library.closed) {
+            ctx.throw(400, '文库已关闭');
+          }
+          await library.updateOne({ closed: true });
+          data.libraryClosed = true;
+        }
       }
-    }
-    await next();
-  });
+      await next();
+    },
+  );
 module.exports = router;

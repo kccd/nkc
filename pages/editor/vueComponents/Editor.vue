@@ -2,6 +2,8 @@
 .editor(v-if="show")
   .row
     .col-xs-12.col-md-9.m-b-2
+      .permission-checker
+        publish-permission-checker(:type="['newPost','modifyPost','modifyComment','newComment'].includes(pageData.type)? publishPermissionTypes.post : publishPermissionTypes.thread")
       div
         //- 1.data中需要 type  thread.comment thread.title thread.comment thread.url forum.url forum.titl post.t  .clear-padding
         //- 2.notice editorSettings.onEditNotes
@@ -119,6 +121,8 @@ import { sweetError } from "../../lib/js/sweetAlert.js";
 import {getState} from "../../lib/js/state";
 import {getRequest, timeFormat, addUrlParam, delUrlParam} from "../../lib/js/tools";
 import { immediateDebounce ,debounce } from '../../lib/js/execution';
+import PublishPermissionChecker from '../../lib/vue/PublishPermissionCheck.vue';
+import { publishPermissionTypes } from "../../lib/js/publish.js";
 
 // import 'url-search-params-polyfill';
 // import '../../../public/external_pkgs/plyr/plyr.polyfilled.min';
@@ -137,6 +141,7 @@ export default {
     original: Original,
     investigation: Investigation,
     column: Column,
+    'publish-permission-checker': PublishPermissionChecker,
   },
   props: {
     reqUrl: {
@@ -159,7 +164,8 @@ export default {
     allowSave: true,
     initEditorContent: false,
     publishNotice: false,
-    noticesExplain: ''
+    noticesExplain: '',
+    publishPermissionTypes,
   }),
   customOptions: {
     saveDraftIndex: 0,

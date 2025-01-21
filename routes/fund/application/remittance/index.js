@@ -9,8 +9,14 @@ const {
 const {
   fundOperationService,
 } = require('../../../../services/fund/FundOperation.service');
+const {
+  OnlyUser,
+  OnlyOperation,
+  OnlyUnbannedUser,
+} = require('../../../../middlewares/permission');
+const { Operations } = require('../../../../settings/operations');
 remittanceRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { applicationForm } = ctx.data;
     if (applicationForm.disabled) {
       ctx.throw(400, '申请表已被屏蔽');
@@ -27,7 +33,7 @@ remittanceRouter
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { db, data } = ctx;
     const { user, applicationForm } = data;
     const { remittance, fund } = applicationForm;
@@ -54,7 +60,7 @@ remittanceRouter
     ctx.template = 'fund/remittance/audit.pug';
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, body, db } = ctx;
     const { applicationForm, user } = data;
     const { number } = body;

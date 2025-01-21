@@ -6,9 +6,10 @@ const {
 const {
   columnAbbrCheckerService,
 } = require('../../services/column/columnAbbrChecker.service');
+const { OnlyUser } = require('../../middlewares/permission');
 const router = new Router();
 router
-  .get('/', async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     const column = await db.ColumnModel.findOne({ uid: user.uid });
@@ -57,7 +58,7 @@ router
     ctx.template = 'column/column.pug';
     await next();
   })
-  .get('/getColumn', async (ctx, next) => {
+  .get('/getColumn', OnlyUser(), async (ctx, next) => {
     const { db, data, state } = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(
       data.user,
@@ -70,7 +71,7 @@ router
     };
     await next();
   })
-  .get('/getColumn', async (ctx, next) => {
+  .get('/getColumn', OnlyUser(), async (ctx, next) => {
     const { db, data, query } = ctx;
     const { columnId, columnName, articleId } = query;
     const targetColumns = [];
@@ -184,7 +185,7 @@ router
     data.targetColumns = targetColumns;
     await next();
   })
-  .post('/', async (ctx, next) => {
+  .post('/', OnlyUser(), async (ctx, next) => {
     const { data, db, body, state } = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(
       data.user,
@@ -236,7 +237,7 @@ router
     await db.ColumnModel.toSearch(column._id);
     await next();
   })
-  .get('/apply', async (ctx, next) => {
+  .get('/apply', OnlyUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(
       data.user,

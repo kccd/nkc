@@ -10,7 +10,6 @@ const transactionRouter = require('./transaction');
 const photoRouter = require('./photo');
 const certRouter = require('./cert');
 const socialRouter = require('./social');
-const messageRouter = require('./message');
 const usernameRouter = require('./username');
 const waterRouter = require('./water');
 const appsRouter = require('./apps');
@@ -19,10 +18,10 @@ const securityRouter = require('./security');
 const bankRouter = require('./bank');
 const displayRouter = require('./display');
 const redEnvelopeRouter = require('./redEnvelope');
-const resourceRouter = require('./resource');
 const loginRecordRouter = require('./loginRecord');
+const { OnlyUser } = require('../../../middlewares/permission');
 settingRouter
-  .use('/', async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, params, db, nkcModules } = ctx;
     const { user } = data;
     const { uid } = params;
@@ -36,7 +35,7 @@ settingRouter
     data.authLevel = await userPersonal.getAuthLevel();
     await next();
   })
-  .get(['/', '/info'], async (ctx, next) => {
+  .get(['/', '/info'], OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     data.selected = 'info';
@@ -90,9 +89,7 @@ settingRouter
   .use('/', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/display', displayRouter.routes(), displayRouter.allowedMethods())
   .use('/bank', bankRouter.routes(), bankRouter.allowedMethods())
-  .use('/message', messageRouter.routes(), messageRouter.allowedMethods())
   .use('/security', securityRouter.routes(), securityRouter.allowedMethods())
-  .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
   .use('/water', waterRouter.routes(), waterRouter.allowedMethods())
   .use(
     '/loginRecord',

@@ -175,10 +175,6 @@ module.exports = {
       PUT: Operations.modifyWebBase,
     },
     home: {
-      top: {
-        GET: Operations.visitHomeTopSettings,
-        PUT: Operations.modifyHomeTopSettings,
-      },
       notice: {
         GET: Operations.visitHomeNoticeSettings,
         PUT: Operations.modifyHomeNoticeSettings,
@@ -281,9 +277,9 @@ module.exports = {
       GET: Operations.visitEPostSettings,
       PUT: Operations.modifyEPostSettings,
     },
-    documentPost: {
-      GET: Operations.experimentalDocumentPostSettings,
-      PUT: Operations.experimentalDocumentPostSettings,
+    publish: {
+      GET: Operations.experimentalPublishSettings,
+      PUT: Operations.experimentalPublishSettings,
     },
     sub: {
       GET: Operations.experimentalSubSettings,
@@ -315,8 +311,6 @@ module.exports = {
       PUT: Operations.experimentalUserAuth,
     },
     review: {
-      GET: Operations.experimentalReviewSettings,
-      PUT: Operations.experimentalReviewSettings,
       keyword: {
         PUT: Operations.experimentalKeywordSettings,
       },

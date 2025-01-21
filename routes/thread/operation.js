@@ -3,6 +3,11 @@ const operationRouter = new Router();
 const {
   collectionService,
 } = require('../../services/subscribe/collection.service');
+const {
+  OnlyUnbannedUser,
+  OnlyOperation,
+} = require('../../middlewares/permission');
+const { Operations } = require('../../settings/operations');
 operationRouter
   // //获取奖励的配置数据
   // .get("/rewards", async (ctx, next) => {
@@ -17,7 +22,7 @@ operationRouter
   //   await next();
   // })
   // 收藏文章
-  .post('/collection', async (ctx, next) => {
+  .post('/collection', OnlyUnbannedUser(), async (ctx, next) => {
     const { body, params, db, data } = ctx;
     const { tid } = params;
     const { type, cid = [] } = body;
@@ -55,41 +60,45 @@ operationRouter
     await next();
   })
   // 修改退修原因
-  .put('/moveDraft/reason', async (ctx, next) => {
-    const { body, db } = ctx;
-    const { log } = body;
-    if (!log.reason) {
-      ctx.throw(400, '退修原因不能为空');
-    }
-    await db.DelPostLogModel.updateOne(
-      {
-        _id: log._id,
-      },
-      {
-        $set: {
-          reason: log.reason,
+  .put(
+    '/moveDraft/reason',
+    OnlyOperation(Operations.modifyReasonThreadReturn),
+    async (ctx, next) => {
+      const { body, db } = ctx;
+      const { log } = body;
+      if (!log.reason) {
+        ctx.throw(400, '退修原因不能为空');
+      }
+      await db.DelPostLogModel.updateOne(
+        {
+          _id: log._id,
         },
-      },
-    );
+        {
+          $set: {
+            reason: log.reason,
+          },
+        },
+      );
 
-    let mType,
-      obj = {
-        ty: 'STU',
-      };
-    if (log.postType === 'thread') {
-      mType = 'threadWasReturned';
-      obj[`c.tid`] = log.threadId;
-    } else {
-      mType = 'postWasReturned';
-      obj[`c.pid`] = log.postId;
-    }
-    obj[`c.type`] = mType;
+      let mType,
+        obj = {
+          ty: 'STU',
+        };
+      if (log.postType === 'thread') {
+        mType = 'threadWasReturned';
+        obj[`c.tid`] = log.threadId;
+      } else {
+        mType = 'postWasReturned';
+        obj[`c.pid`] = log.postId;
+      }
+      obj[`c.type`] = mType;
 
-    await db.MessageModel.updateOne(obj, {
-      $set: {
-        'c.rea': log.reason,
-      },
-    });
-    await next();
-  });
+      await db.MessageModel.updateOne(obj, {
+        $set: {
+          'c.rea': log.reason,
+        },
+      });
+      await next();
+    },
+  );
 module.exports = operationRouter;

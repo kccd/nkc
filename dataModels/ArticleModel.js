@@ -3,7 +3,6 @@ const moment = require('moment');
 const tools = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
-
 const { articleSources, articleStatus } = require('../settings/article');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
 
@@ -709,12 +708,15 @@ schema.methods.publishArticle = async function (options) {
   const { source, selectCategory } = options;
   const DocumentModel = mongoose.model('documents');
   const { did, uid, _id: articleId } = this;
-  const documentSources = await DocumentModel.getDocumentSources();
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const articleSources = await ArticleModel.getArticleSources();
   //检测当前用户的发表权限
-  await DocumentModel.checkGlobalPostPermission(
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.article,
     this.uid,
-    documentSources.article,
   );
   let columnPost;
   let articleUrl;
@@ -785,12 +787,14 @@ schema.methods.submitArticle = async function (options) {
   const { sid, selectCategory, reviewPermission } = options;
   const DocumentModel = mongoose.model('documents');
   const { did, uid, _id: articleId } = this;
-  const documentSources = await DocumentModel.getDocumentSources();
-  const articleSources = await ArticleModel.getArticleSources();
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   //检测当前用户的发表权限
-  await DocumentModel.checkGlobalPostPermission(
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.article,
     this.uid,
-    documentSources.article,
   );
   let articleUrl;
   const { article: documentSource } = await DocumentModel.getDocumentSources();
