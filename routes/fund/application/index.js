@@ -63,7 +63,16 @@ applicationRouter
       data.userGrade,
       data.user,
     );
-    await applicationForm.extendApplicationFormInfo(state.uid, accessForumsId);
+    try {
+      await applicationForm.extendApplicationFormInfo(
+        state.uid,
+        accessForumsId,
+      );
+    } catch (error) {
+      delete data.applicationForm;
+      delete data.fund;
+      throw error;
+    }
     data.targetUserInFundBlacklist = await db.FundBlacklistModel.inBlacklist(
       applicationForm.uid,
     );
