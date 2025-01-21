@@ -112,6 +112,7 @@ router
     const _article = (await db.ArticleModel.getArticlesInfo([article]))[0];
     if (_article.document.status !== normalStatus && !isModerator) {
       if (!permission('review')) {
+        delete data.columnPost;
         return ctx.throw(403, '权限不足');
       }
     }
