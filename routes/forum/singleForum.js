@@ -327,6 +327,12 @@ router
     const { token } = query;
 
     const forum = await db.ForumModel.findOnly({ fid });
+
+    // 专业权限判断: 若不是该专业的专家，走正常的权限判断
+    if (!(await db.ShareModel.hasPermission(token, fid))) {
+      await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+    }
+
     data.forumNav = await forum.getForumNav(query.cat);
     // 加载上级专业导航
     const navParentForumsId = [];
@@ -343,10 +349,6 @@ router
       navParentForums,
     );
 
-    // 专业权限判断: 若不是该专业的专家，走正常的权限判断
-    if (!(await db.ShareModel.hasPermission(token, fid))) {
-      await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
-    }
     // await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
     data.isModerator =
       (await forum.isModerator(data.user)) || ctx.permission('superModerator');
