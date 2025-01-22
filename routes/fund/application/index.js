@@ -79,32 +79,38 @@ applicationRouter
     data.permissions = {
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
     };
-    // 拓展历史版本所需要的信息
-    if (applicationForm.tid && state.uid) {
-      // 根据tid 获取文章的pid 以及获取访问用户是否具有查看历史版本的权限==》管理员
-      const thread = await db.ThreadModel.findOnly(
-        { tid: applicationForm.tid },
-        { oc: 1 },
-      );
-      if (thread) {
-        const post = await db.PostModel.findOnly({ pid: thread.oc });
-        const isModerator = await db.PostModel.isModerator(
-          state.uid,
-          thread.oc,
+    let thread = null;
+    if (applicationForm.tid) {
+      thread = await db.ThreadModel.findOne({ tid: applicationForm.tid });
+      try {
+        await thread.ensurePermission(
+          data.userRoles,
+          data.userGrade,
+          data.user,
         );
-        if (
-          post.tlm > post.toc &&
-          ctx.permission('visitPostHistory') &&
-          isModerator &&
-          (!post.hideHistories || ctx.permission('displayPostHideHistories'))
-        ) {
-          data.userFundRoles.push('visitPostHistory');
-          applicationForm.pid = thread.oc;
-          // data.permissions.visitPostHistory =
-          //   !post.hideHistories || ctx.permission('displayPostHideHistories')
-          //     ? true
-          //     : null;
-        }
+      } catch (error) {
+        delete data.applicationForm;
+        delete data.fund;
+        throw error;
+      }
+    }
+    // 拓展历史版本所需要的信息
+    if (thread && state.uid) {
+      // 根据tid 获取文章的pid 以及获取访问用户是否具有查看历史版本的权限==》管理员
+      const post = await db.PostModel.findOnly({ pid: thread.oc });
+      const isModerator = await db.PostModel.isModerator(state.uid, thread.oc);
+      if (
+        post.tlm > post.toc &&
+        ctx.permission('visitPostHistory') &&
+        isModerator &&
+        (!post.hideHistories || ctx.permission('displayPostHideHistories'))
+      ) {
+        data.userFundRoles.push('visitPostHistory');
+        applicationForm.pid = thread.oc;
+        // data.permissions.visitPostHistory =
+        //   !post.hideHistories || ctx.permission('displayPostHideHistories')
+        //     ? true
+        //     : null;
       }
     }
     // 定时超时放弃任务
