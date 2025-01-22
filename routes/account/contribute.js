@@ -1,7 +1,7 @@
 const Router = require('koa-router');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 const router = new Router();
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   ctx.template = 'account/contribute/contribute.pug';
   const { nkcModules, data, db, query } = ctx;
   const { page = 0, articleId = '' } = query;

@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const meRouter = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 meRouter
-    .get('/resource', OnlyUnbannedUser(), async(ctx, next) => {
+    .get('/resource', OnlyUser(), async(ctx, next) => {
         const { user } = ctx.data;
         const { db } = ctx;
         const quota = parseInt(ctx.query.quota);
@@ -11,7 +11,7 @@ meRouter
             .limit(quota);
         await next();
     })
-    .get('/media', OnlyUnbannedUser(), async(ctx, next) => {
+    .get('/media', OnlyUser(), async(ctx, next) => {
         //获取资源选择/资源管理
         const { user } = ctx.data;
         const { db, data, nkcModules, state } = ctx;
@@ -120,7 +120,7 @@ meRouter
         }
         await next();
     })
-    .get('/life_photos', OnlyUnbannedUser(), async(ctx, next) => {
+    .get('/life_photos', OnlyUser(), async(ctx, next) => {
         const { data, db } = ctx;
         const { user } = data;
         const userPersonal = await db.UsersPersonalModel.findOnly({

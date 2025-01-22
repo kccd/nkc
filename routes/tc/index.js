@@ -1,6 +1,6 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { db, data, query } = ctx;
   const { type } = query;
   if (type === 'thread') {

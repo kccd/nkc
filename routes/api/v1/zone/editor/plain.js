@@ -10,14 +10,17 @@ const {
 const { momentModes } = require('../../../../../settings/moment');
 const { eventEmitter } = require('../../../../../events');
 
-const { OnlyUnbannedUser } = require('../../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../../../middlewares/permission');
 const { getMomentPublishType } = require('../../../../../events/moment');
 const router = new Router();
 
 router
   // 获取已存在的草稿
   // 刚打开编辑器，编辑器会尝试从此路由获取之前编辑过但未发表的草稿
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { state } = ctx;
     const { parent } = ctx.query;
     const moment = await momentExtenderService.getUnPublishedMomentDataByUid(

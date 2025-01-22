@@ -1,7 +1,7 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { nkcModules, data, db } = ctx;
     const { targetUser, user } = data;
     const today = nkcModules.apiFunction.today();
@@ -45,7 +45,7 @@ router
     }
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     await next();
   })
   .post('/', OnlyUnbannedUser(), async (ctx, next) => {

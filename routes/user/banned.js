@@ -3,7 +3,7 @@ const bannedRouter = new Router();
 const { OnlyOperation } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
 bannedRouter
-  .put('/', OnlyOperation(Operations.unbannedUser), async (ctx, next) => {
+  .put('/', OnlyOperation(Operations.unBannedUser), async (ctx, next) => {
     const { db, params, body } = ctx;
     const { uid } = params;
     const { reason = '' } = body;
@@ -49,7 +49,7 @@ bannedRouter
     }
     await targetUser.updateOne({ $addToSet: { certs: 'banned' } });
     await db.ManageBehaviorModel.insertLog({
-      uid,
+      uid: user.uid,
       toUid: targetUser.uid,
       operationId: ctx.data.operationId,
       toc: new Date(),

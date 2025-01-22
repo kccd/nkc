@@ -1,7 +1,10 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data } = ctx;
     data.navType = 'settings';
     ctx.template = 'shop/manage/settings/settings.pug';

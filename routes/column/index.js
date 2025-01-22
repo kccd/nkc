@@ -6,7 +6,7 @@ const {
 const {
   columnAbbrCheckerService,
 } = require('../../services/column/columnAbbrChecker.service');
-const { OnlyUser } = require('../../middlewares/permission');
+const { OnlyUser, OnlyUnbannedUser } = require('../../middlewares/permission');
 const router = new Router();
 router
   .get('/', OnlyUser(), async (ctx, next) => {
@@ -185,7 +185,7 @@ router
     data.targetColumns = targetColumns;
     await next();
   })
-  .post('/', OnlyUser(), async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, db, body, state } = ctx;
     const columnPermission = await db.UserModel.ensureApplyColumnPermission(
       data.user,

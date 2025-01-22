@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data } = ctx;
     const { user, order } = data;
     if (user.uid !== order.buyUid) {
@@ -10,7 +10,7 @@ router
     }
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     let { order } = data;
     await order.extendCerts('buyer');

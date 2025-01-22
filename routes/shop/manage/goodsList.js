@@ -1,13 +1,16 @@
 const Router = require('koa-router');
 const goodslistRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 goodslistRouter
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data } = ctx;
     data.active = 'goodslist';
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params, query, nkcModules } = ctx;
     const { page = 0 } = query;
     let { productStatus } = query;
@@ -37,7 +40,7 @@ goodslistRouter
     await next();
   })
   // 访问规格重新编辑页面
-  .get('/editParam', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/editParam', OnlyUser(), async (ctx, next) => {
     const { data, query, db, nkcModules } = ctx;
     const { paraId } = query;
     if (!paraId) {
@@ -116,7 +119,7 @@ goodslistRouter
     await next();
   })
   // 访问商品重新编辑页面
-  .get('/editProduct', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/editProduct', OnlyUser(), async (ctx, next) => {
     const { data, body, query, params, db } = ctx;
     const { productId } = query;
     if (!productId) {

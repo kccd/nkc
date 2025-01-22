@@ -1,6 +1,6 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
+router.get('/', OnlyUser(), async (ctx, next) => {
   //获取需要展示的动态
   const { state, db, data, query, nkcModules, permission } = ctx;
   const { page = 0 } = query;

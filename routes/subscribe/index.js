@@ -3,9 +3,9 @@ const momentRouter = require('./moment');
 const nkcRender = require('../../nkcModules/nkcRender');
 const { subscribeSources } = require('../../settings/subscribe');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { state, data, db, path, internalData } = ctx;
 
     // 游客跳转到首页
@@ -69,7 +69,7 @@ router
   })
   .get(
     ['/user', '/forum', '/column', '/thread'],
-    OnlyUnbannedUser(),
+    OnlyUser(),
     async (ctx, next) => {
       const { data, query, db, state, internalData, nkcModules } = ctx;
       const { page = 0 } = query;

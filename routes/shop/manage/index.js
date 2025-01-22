@@ -17,12 +17,15 @@ const goodsRouter = require('./goods');
 const shelfRouter = require('./shelf');
 
 const manageRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 manageRouter
-  .get('/', OnlyUnbannedUser(), async (ctx) => {
+  .get('/', OnlyUser(), async (ctx) => {
     return ctx.redirect(`/shop/manage/home`);
   })
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { user } = data;
     const { active } = query;
@@ -45,7 +48,7 @@ manageRouter
 
   .use(
     ['/home', '/order', '/goods', '/shelf'],
-    OnlyUnbannedUser(),
+    OnlyUser(),
     async (ctx, next) => {
       if (!ctx.data.dealInfo) {
         return ctx.redirect(`/shop/manage/settings`);
@@ -62,7 +65,7 @@ manageRouter
   // .use("/:uid/shelf", shelfRouter.routes(), shelfRouter.allowedMethods())
 
   .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use('/:uid', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/:uid', OnlyUser(), async (ctx, next) => {
     const { data, params } = ctx;
     if (
       !['order', 'settings', 'goods', 'shelf', 'home'].includes(params.uid) &&

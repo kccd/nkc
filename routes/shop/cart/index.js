@@ -1,9 +1,12 @@
 const Router = require('koa-router');
 const router = new Router();
 const singleCartRouter = require('./singleCart');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     data.navType = 'cart';

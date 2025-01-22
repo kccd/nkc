@@ -1,4 +1,4 @@
-const { OnlyUser } = require('../../middlewares/permission');
+const { OnlyUser, OnlyUnbannedUser } = require('../../middlewares/permission');
 
 const router = require('koa-router')();
 router
@@ -30,7 +30,7 @@ router
     );
     await next();
   })
-  .post('/', OnlyUser(), async (ctx, next) => {
+  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { body, data, db } = ctx;
     const { tUid, from, pid, cid, aid } = body;
     const { user } = data;
@@ -44,7 +44,7 @@ router
     );
     await next();
   })
-  .del('/', OnlyUser(), async (ctx, next) => {
+  .del('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { query, data, db } = ctx;
     const { user } = data;
     const { tUid } = query;

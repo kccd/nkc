@@ -24,7 +24,7 @@ router
     ctx.remoteTemplate = 'oauth/authentication/authentication.pug';
     await next();
   })
-  .post('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .post('/', Public(), async (ctx, next) => {
     const { data, db, body } = ctx;
     const types = {
       getToken: 'getToken',

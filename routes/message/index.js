@@ -13,9 +13,9 @@ const addFriend = require('./addFriend');
 const categoryRouter = require('./category');
 const listRouter = require('./list');
 const friendRouter = require('./friend');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 messageRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { query, data, db } = ctx;
     const { uid } = query;
     const targetUser = await db.UserModel.findOne({ uid });

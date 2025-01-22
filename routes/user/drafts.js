@@ -3,9 +3,9 @@ const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const draftsRouter = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 draftsRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { user } = data;
     const { page = 0, id } = query;

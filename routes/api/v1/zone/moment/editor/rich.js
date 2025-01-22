@@ -7,11 +7,12 @@ const {
 } = require('../../../../../../nkcModules/json');
 const {
   OnlyUnbannedUser,
+  OnlyUser,
 } = require('../../../../../../middlewares/permission');
 const router = new Router();
 
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { internalData } = ctx;
     const { moment } = internalData;
     ctx.apiData = await momentExtenderService.getPublishedMomentDraft(
