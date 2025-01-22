@@ -3,6 +3,7 @@ const mongoose = require('../settings/database');
 const { settingIds } = require('../settings/serverSettings');
 const Mint = require('mint-filter').default;
 const Schema = mongoose.Schema;
+const { getJsonStringText } = require('../nkcModules/json.js');
 
 const schema = new Schema(
   {
@@ -207,12 +208,15 @@ schema.statics.matchKeywords = async (content, groups) => {
   if (!wordGroup || wordGroup.length === 0) {
     return [];
   }
-  content = content.replace(pureWordRegExp, '').toLowerCase();
+  content = content
+    .replace(/\n/gi, '')
+    .replace(pureWordRegExp, '')
+    .toLowerCase();
   let results = [];
   for (const group of groups) {
     let { keywords } = group;
     keywords = keywords.map((keyword) =>
-      keyword.replace(pureWordRegExp, '').toLowerCase(),
+      keyword.replace(/\n/gi, '').replace(pureWordRegExp, '').toLowerCase(),
     );
     const {
       times: leastKeywordTimes,
@@ -265,7 +269,10 @@ schema.statics.includesKeyword = async ({ content, useGroups }) => {
     return false;
   }
   // 把待检测文本聚合起来并提取纯文字（无标点符号和空格）
-  let pure_content = content.replace(pureWordRegExp, '').toLowerCase();
+  let pure_content = content
+    .replace(/\n/gi, '')
+    .replace(pureWordRegExp, '')
+    .toLowerCase();
   // 循环采用每一个设置的敏感词组做一遍检测
   const groupsId = wordGroup.map((g) => g.id);
   useGroups = useGroups.filter((g) => groupsId.includes(g.id));
@@ -278,7 +285,7 @@ schema.statics.includesKeyword = async ({ content, useGroups }) => {
     let keywordList = group.keywords;
     // 把此组中配置的敏感词也提取纯文字
     keywordList = keywordList.map((keyword) =>
-      keyword.replace(pureWordRegExp, '').toLowerCase(),
+      keyword.replace(/\n/gi, '').replace(pureWordRegExp, '').toLowerCase(),
     );
     // 读取判断逻辑配置
     const {
@@ -492,7 +499,7 @@ schema.statics.autoPushToReview = async function (post) {
         useKeywordGroups.includes(g.id),
       );
       const matchedKeywords = await ReviewModel.matchKeywords(
-        post.t + post.c,
+        post.t + (post.l === 'json' ? getJsonStringText(post.c) : post.c),
         useKeywordGroups,
       );
       if (matchedKeywords.length > 0) {
@@ -741,7 +748,7 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
         useKeywordGroups.includes(g.id),
       );
       const matchedKeywords = await ReviewModel.matchKeywords(
-        post.t + post.c,
+        post.t + (post.l === 'json' ? getJsonStringText(post.c) : post.c),
         useKeywordGroups,
       );
       if (matchedKeywords.length > 0) {
@@ -847,7 +854,11 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
       keyWordsEn = [],
     } = post;
     const Content =
-      c + t + abstractCn + abstractEn + keyWordsCn.concat(keyWordsEn).join(' ');
+      (post.l === 'json' ? getJsonStringText(post.c) : post.c) +
+      t +
+      abstractCn +
+      abstractEn +
+      keyWordsCn.concat(keyWordsEn).join(' ');
     const matchedKeywords = await ReviewModel.matchKeywordsByGroupsId(
       Content,
       keywordGroupId,

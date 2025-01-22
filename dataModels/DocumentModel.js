@@ -8,6 +8,7 @@ const cheerio = require('cheerio');
 const markNotes = require('../nkcModules/nkcRender/markNotes');
 const documentSettings = require('../settings/document');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
+const { getJsonStringText } = require('../nkcModules/json');
 
 /*
  * document状态
@@ -1492,11 +1493,11 @@ schema.methods.getKeywordsReviewStatus = async function () {
     settingIds.publish,
   );
   const { keywordGroupId } = documentPostSettings[this.source].postReview;
-  const { content = '', title = '', abstract = '', abstractEN = '' } = this;
+  const { content = '', title = '', abstract = '', abstractEN = '', l } = this;
   const keywords = this.keywords || [];
   const keywordsEN = this.keywordsEN || [];
   const documentContent =
-    content +
+    (l === 'json' ? getJsonStringText(content) : content) +
     title +
     abstract +
     abstractEN +
