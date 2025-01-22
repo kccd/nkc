@@ -1,5 +1,9 @@
 const Router = require('koa-router');
-const { OnlyUnbannedUser, Public } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  Public,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 const router = new Router();
 router
   .post('/payment', OnlyUnbannedUser(), async (ctx, next) => {
@@ -98,7 +102,7 @@ router
     });
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { query, data, nkcModules, db } = ctx;
     const { user } = data;
     const rechargeSettings = await db.SettingModel.getSettings('recharge');

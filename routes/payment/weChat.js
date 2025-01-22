@@ -1,5 +1,9 @@
 const router = require('koa-router')();
-const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
+const {
+  Public,
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../middlewares/permission');
 router
   .post('/', Public(), async (ctx, next) => {
     const { db, body } = ctx;
@@ -13,7 +17,7 @@ router
     }
     await next();
   })
-  .get('/:_id', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/:_id', OnlyUser(), async (ctx, next) => {
     const { db, params, data } = ctx;
     const { _id } = params;
     const weChatPayRecord = await db.WechatPayRecordModel.findOne({ _id });

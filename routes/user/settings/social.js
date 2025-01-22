@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const socialRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 socialRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { uid } = params;
     const userPersonal = await db.UsersPersonalModel.findOnly({ uid });

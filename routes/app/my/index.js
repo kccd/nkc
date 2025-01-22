@@ -1,7 +1,10 @@
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 
 const router = require('koa-router')();
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { db, data } = ctx;
   data.userColumn = await data.user.extendUserColumn();
   data.userCertsName = await data.user.getCertsNameString();

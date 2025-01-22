@@ -1,7 +1,7 @@
 const { Operations } = require('../../settings/operations');
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { db, data, params, state, permission } = ctx;
   const { mid } = params;
   const { user } = data;

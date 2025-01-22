@@ -18,7 +18,11 @@ const financeRouter = require('./finance');
 const columnRouter = require('./column');
 const draftRouter = require('./draft');
 const noteRouter = require('./note');
-const { OnlyUnbannedUser, Public } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  Public,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
   .get('/', Public(), async (ctx, next) => {
     //获取主页导航等信息
@@ -208,7 +212,7 @@ router
     data.permissions = permissions;
     await next();
   })
-  .use('/subscribe', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/subscribe', OnlyUser(), async (ctx, next) => {
     const { query, data, db, state } = ctx;
     let { t } = query;
     const { targetUser } = data;
@@ -267,13 +271,13 @@ router
     Public(),
     async (ctx, next) => await next(),
   )
-  .get('/subscribe/userData', OnlyUnbannedUser(), subUserRouter)
-  .get('/subscribe/forumData', OnlyUnbannedUser(), subForumRouter)
-  .get('/subscribe/columnData', OnlyUnbannedUser(), subColumnRouter)
-  .get('/subscribe/collectionData', OnlyUnbannedUser(), subCollectionRouter)
-  .get('/subscribe/threadDate', OnlyUnbannedUser(), subThreadRouter)
-  .get('/subscribe/blacklistData', OnlyUnbannedUser(), blacklistRouter)
-  .get('/subscribe/threadData', OnlyUnbannedUser(), subThreadRouter)
+  .get('/subscribe/userData', OnlyUser(), subUserRouter)
+  .get('/subscribe/forumData', OnlyUser(), subForumRouter)
+  .get('/subscribe/columnData', OnlyUser(), subColumnRouter)
+  .get('/subscribe/collectionData', OnlyUser(), subCollectionRouter)
+  .get('/subscribe/threadDate', OnlyUser(), subThreadRouter)
+  .get('/subscribe/blacklistData', OnlyUser(), blacklistRouter)
+  .get('/subscribe/threadData', OnlyUser(), subThreadRouter)
   .get('/timelineData', Public(), timelineRouter)
   .get('/momentData', Public(), momentRouter)
   .get('/postData', Public(), postRouter)
@@ -281,8 +285,8 @@ router
   .get('/fanData', Public(), fanRouter)
   .get('/followerData', Public(), followerRouter)
   .get('/manageData', Public(), manageRouter)
-  .get('/draftData', OnlyUnbannedUser(), draftRouter)
-  .get('/noteData', OnlyUnbannedUser(), noteRouter)
-  .get('/financeData', OnlyUnbannedUser(), financeRouter)
+  .get('/draftData', OnlyUser(), draftRouter)
+  .get('/noteData', OnlyUser(), noteRouter)
+  .get('/financeData', OnlyUser(), financeRouter)
   .get('/columnData', Public(), columnRouter);
 module.exports = router;

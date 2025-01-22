@@ -1,9 +1,12 @@
 const Router = require('koa-router');
 const resumeRouter = new Router();
 const moment = require('moment');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 resumeRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     data.selected = 'resume';
     const { uid } = params;

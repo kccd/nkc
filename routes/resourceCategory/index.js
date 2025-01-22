@@ -1,7 +1,7 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, data, state } = ctx;
     let categories = await db.ResourceCategoryModel.find({
       uid: state.uid,

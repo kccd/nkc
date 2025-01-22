@@ -2,9 +2,12 @@ const Router = require('koa-router');
 const decorationRouter = new Router();
 const mime = require('mime');
 const fs = require('fs');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 decorationRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { user } = data;
     const storeId = params.account;
@@ -114,14 +117,14 @@ decorationRouter
     await next();
   })
   // 获取全部商品
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const storeId = params.account;
     const products = await db.ShopGoodsModel.find({ storeId });
     data.products = await db.ShopGoodsModel.extendProductsInfo(products);
     await next();
   })
-  .get('/featured', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/featured', OnlyUser(), async (ctx, next) => {
     const { data, params, db } = ctx;
     const storeId = params.account;
     let products = data.products;
@@ -169,7 +172,7 @@ decorationRouter
     });
     await next();
   })
-  .get('/singleClass', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/singleClass', OnlyUser(), async (ctx, next) => {
     const { data, params, body, db, query } = ctx;
     const { index } = query;
     const storeId = params.account;

@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const shelfRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 shelfRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { user } = data;
     // 检测是否被封禁商品上架功能

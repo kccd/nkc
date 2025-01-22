@@ -1,9 +1,12 @@
 const router = require('koa-router')();
 const threadRouter = require('./thread');
 const { subscribeSources } = require('../../../settings/subscribe');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { user } = data;
     const { count } = query;

@@ -1,7 +1,10 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { db, state, data } = ctx;
     const authLevel = await db.UsersPersonalModel.getUserAuthLevel(state.uid);
     data.pendingApplication =
@@ -11,7 +14,7 @@ router
     }
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, nkcModules, data, state } = ctx;
     const { uid } = state;
     const email = await db.UsersPersonalModel.getUserEmail(uid);

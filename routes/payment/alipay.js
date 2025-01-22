@@ -1,7 +1,11 @@
 const router = require('koa-router')();
-const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
+const {
+  Public,
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../middlewares/permission');
 router
-  .get('/:_id', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/:_id', OnlyUser(), async (ctx, next) => {
     const { db, params, data } = ctx;
     const { _id } = params;
     const aliPayRecord = await db.AliPayRecordModel.findOne({ _id });

@@ -1,9 +1,9 @@
 const Router = require('koa-router');
 const router = new Router();
 const singleOrderRouter = require('./singleOrder');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, nkcModules } = ctx;
     const { user } = data;
     data.navType = 'order';
@@ -12,7 +12,7 @@ router
     }
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { user } = data;
     const { t, page = 0 } = query;

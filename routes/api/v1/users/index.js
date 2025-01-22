@@ -2,9 +2,12 @@ const router = require('koa-router')();
 const {
   userMemoService,
 } = require('../../../../services/user/userMemo.service');
-const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../../middlewares/permission');
 router
-  .get('/memo', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/memo', OnlyUser(), async (ctx, next) => {
     const { state, query } = ctx;
     const { uid } = query;
     const memo = await userMemoService.getUserMemo({

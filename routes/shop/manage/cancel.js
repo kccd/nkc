@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { body, query, db, data, method } = ctx;
     let orderId;
     if (method === 'POST') {
@@ -37,7 +40,7 @@ router
     data.order = orders[0];
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     ctx.template = 'shop/manage/cancel/cancel.pug';
     await next();
   })

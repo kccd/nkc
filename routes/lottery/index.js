@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const luckRouter = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 luckRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { nkcModules, data, db } = ctx;
     const { user } = data;
     const today = nkcModules.apiFunction.today();

@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const templateRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../../middlewares/permission');
 templateRouter
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, db, nkcModules } = ctx;
     const { user } = data;
     const dealInfo = await db.ShopDealInfoModel.findOne({ uid: user.uid });
@@ -11,7 +11,7 @@ templateRouter
     }
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { user } = data;
     const dealInfo = await db.ShopDealInfoModel.findOne({ uid: user.uid });

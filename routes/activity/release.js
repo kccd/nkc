@@ -1,8 +1,8 @@
 const Router = require('koa-router');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 const releaseRouter = new Router();
 releaseRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     ctx.template = 'activity/activityRelease.pug';
     await next();
   })

@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const {
   OnlyUnbannedUser,
+  OnlyUser,
 } = require('../../../../../../middlewares/permission');
 const {
   momentExtenderService,
@@ -15,7 +16,7 @@ const historyRouter = require('./history');
 const router = new Router();
 
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { state } = ctx;
     const moment =
       await momentExtenderService.getUnPublishedMomentRichDataByUid(state.uid);

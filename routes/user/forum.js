@@ -1,15 +1,15 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { state, params } = ctx;
     if (state.uid !== params.uid) {
       ctx.throw(400, `权限不足`);
     }
     await next();
   })
-  .use('/apply', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/apply', OnlyUser(), async (ctx, next) => {
     const { db, state } = ctx;
     const hasPermission =
       await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
@@ -18,7 +18,7 @@ router
     }
     await next();
   })
-  .get('/apply', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/apply', OnlyUser(), async (ctx, next) => {
     const { db, data, state } = ctx;
     const forumSettings = await db.SettingModel.getSettings('forum');
     data.reviewNewForumGuide = forumSettings.reviewNewForumGuide;
@@ -88,7 +88,7 @@ router
     }
     await next();
   })
-  .use('/invitation', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/invitation', OnlyUser(), async (ctx, next) => {
     const { state, query, body, db, data } = ctx;
     let { pfid } = query;
     if (!pfid) {
@@ -113,7 +113,7 @@ router
     data.founder = founder;
     await next();
   })
-  .get('/invitation', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/invitation', OnlyUser(), async (ctx, next) => {
     const { query, db, data } = ctx;
     const { pfid } = query;
     const pForum = await db.PreparationForumModel.findOnly({ pfid });

@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const resourceRouter = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
-resourceRouter.get('/:_id', OnlyUnbannedUser(), async (ctx, next) => {
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
+resourceRouter.get('/:_id', OnlyUser(), async (ctx, next) => {
   const { db, params, query, data } = ctx;
   const { _id } = params;
   const { user } = data;

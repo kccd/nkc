@@ -1426,6 +1426,17 @@ forumSchema.statics.ensureForumsPermission = async(arr, userInfo) => {
 forumSchema.methods.ensurePermission = async function(roles, grade, user) {
     const throwError = require('../nkcModules/throwError');
     const ForumModel = mongoose.model('forums');
+    const { defaultCerts } = require('../settings/userCerts');
+    if (user && user?.certs.includes(defaultCerts.banned)) {
+        // 对于开除学籍的用户专业权限设置没有勾选【开除学籍】
+        if(!this.permission.read.rolesId.includes(defaultCerts.banned)){
+            throwError(
+                403,
+                `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`,
+                'noPermissionToReadForum',
+            );
+        }
+    }
     const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
     if (!fid.includes(this.fid)) {
         if (this.permission.read.rolesId.includes('default')) {

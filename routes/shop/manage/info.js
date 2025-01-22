@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const infoRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 infoRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     const { user } = data;
     let dealInfo = await db.ShopDealInfoModel.findOne({ uid: user.uid });

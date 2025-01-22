@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const passwordRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 passwordRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     ctx.template = 'interface_user_settings_password.pug';
     await next();
   })

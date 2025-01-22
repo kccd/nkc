@@ -1,6 +1,9 @@
-const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../../middlewares/permission');
 const router = require('koa-router')();
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   const { data, nkcModules, db } = ctx;
   const userScores = await db.UserModel.getUserScores(data.user.uid);
   const userColumn = await db.UserModel.getUserColumn(data.user.uid);
