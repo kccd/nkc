@@ -223,15 +223,17 @@ block eContent
           h3.m-b-2 内容审核设置
           .form.form-horizontal
             .form-group
-              label.control-label.col-sm-2 白名单
+              label.control-label.col-sm-2 审核条数
               .col-sm-10
-                .checkbox
+                div
+                  label.control-label 白名单
+                  .text-danger 白名单用户可绕过审核条数的判断
+                .checkbox.m-b-1
                   label.m-r-2(v-for='r in roleList')
                     input(type='checkbox' :value='r.type' v-model='settings.postReview.whitelist')
                     span {{r.name}}
-            .form-group
-              label.control-label.col-sm-2 审核条数
-              .col-sm-10
+                .m-b-1
+                  label.control-label 其他设置
                 .table-responsive
                   table.table.table-bordered.nkc-table
                     thead

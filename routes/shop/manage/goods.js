@@ -1,8 +1,11 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
   // 我所发布的商品列表
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
     const { page, t } = query;
     const { user } = data;

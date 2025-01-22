@@ -11,6 +11,7 @@ const {
 } = require('../../../../../../services/moment/momentExtender.service');
 const {
   OnlyUnbannedUser,
+  OnlyUser,
 } = require('../../../../../../middlewares/permission');
 const { momentStatus } = require('../../../../../../settings/moment');
 const {
@@ -18,7 +19,7 @@ const {
 } = require('../../../../../../nkcModules/checkData');
 const router = new Router();
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { query, db, state, data } = ctx;
     const documentId = parseInt(query.documentId);
     const momentId = query.momentId;

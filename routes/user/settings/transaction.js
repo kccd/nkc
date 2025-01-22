@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const transactionRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 transactionRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, params } = ctx;
     data.selected = 'transaction';
     const { uid } = params;

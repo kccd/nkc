@@ -1,8 +1,11 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data, method, query, body, db } = ctx;
     let ordersId = '';
     const { user } = data;
@@ -32,7 +35,7 @@ router
     data.orders = orders;
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, query, db } = ctx;
     const { user } = data;
     let { ordersId } = query;

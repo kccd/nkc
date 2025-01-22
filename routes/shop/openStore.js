@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const openStoreRouter = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 openStoreRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db } = ctx;
     const { user } = data;
     data.applyHis = await db.ShopApplyStoreModel.findOne({

@@ -1,8 +1,8 @@
 const router = require('koa-router')();
 const fsPromises = require('fs').promises;
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { query, db, data } = ctx;
     const { type } = query;
     const { user } = data;

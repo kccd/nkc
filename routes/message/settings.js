@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 settingsRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, data } = ctx;
     const { user } = data;
     data.grades = await db.UsersGradeModel.find(

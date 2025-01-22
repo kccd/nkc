@@ -1,9 +1,12 @@
 const path = require('path');
 const Router = require('koa-router');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 const verifyRouter = new Router();
 verifyRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, data } = ctx;
     data.selected = 'verify';
     const { user } = data;

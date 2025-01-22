@@ -1,8 +1,11 @@
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 
 const router = require('koa-router')();
 router
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { data, db, state } = ctx;
     const { user } = ctx;
     const { uid } = state;

@@ -1,12 +1,15 @@
 const Router = require('koa-router');
 const emailRouter = new Router();
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 emailRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     await next();
   })
   // 验证绑定邮箱
-  .get('/bind', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/bind', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { user } = data;
     let { email, token } = query;
@@ -36,7 +39,7 @@ emailRouter
     ctx.template = 'interface_user_settings_email.pug';
     await next();
   })
-  .get('/unbind', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/unbind', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { token } = query;
     const { user } = data;
@@ -65,7 +68,7 @@ emailRouter
     await next();
   })
   // 验证新邮箱
-  .get('/verify', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/verify', OnlyUser(), async (ctx, next) => {
     const { data, db, query } = ctx;
     const { user } = data;
     let { email, token, oldToken } = query;

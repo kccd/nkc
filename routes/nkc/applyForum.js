@@ -1,7 +1,7 @@
 const router = require('koa-router')();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { db, data } = ctx;
     const { user } = data;
     const forumSettings = await db.SettingModel.getSettings('forum');
@@ -19,7 +19,7 @@ router
     data.nav = 'applyForum';
     await next();
   })
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     const { db, data, query, nkcModules } = ctx;
     const { page = 0 } = query;
     const count = await db.PreparationForumModel.countDocuments();

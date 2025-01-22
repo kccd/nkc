@@ -1,8 +1,8 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 
-router.get('/', OnlyUnbannedUser(), async (ctx, next) => {
+router.get('/', OnlyUser(), async (ctx, next) => {
   // 根据前端传来的参数uid和username判断
   // 若存在uid则通过uid查找精准匹配的用户
   // 若存在username则通过username用正则查找匹配的用户

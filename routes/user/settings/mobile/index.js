@@ -2,9 +2,12 @@ const Router = require('koa-router');
 const mobileRouter = new Router();
 const applyRouter = require('./apply');
 const verifyRouter = require('./verify');
-const { OnlyUnbannedUser } = require('../../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../../middlewares/permission');
 mobileRouter
-  .get('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/', OnlyUser(), async (ctx, next) => {
     ctx.template = 'interface_user_settings_mobile.pug';
     const { data, db } = ctx;
     const { user } = data;

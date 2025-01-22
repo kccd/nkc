@@ -4,9 +4,9 @@ const financeRouter = require('./finance');
 const contributeRouter = require('./contribute');
 const subscribeReouter = require('./subscribes');
 const subTypesRouter = require('./subscribeTypes');
-const { OnlyUnbannedUser } = require('../../middlewares/permission');
+const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
 router
-  .get('/subscribe_settings', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/subscribe_settings', OnlyUser(), async (ctx, next) => {
     const { db, data } = ctx;
     const generalSettings = await db.UsersGeneralModel.findOne(
       { uid: data.user.uid },

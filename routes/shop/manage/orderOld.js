@@ -2,9 +2,12 @@ const Router = require('koa-router');
 const orderRouter = new Router();
 const refundRouter = require('./refund');
 const cancelRouter = require('./cancel');
-const { OnlyUnbannedUser } = require('../../../middlewares/permission');
+const {
+  OnlyUnbannedUser,
+  OnlyUser,
+} = require('../../../middlewares/permission');
 orderRouter
-  .use('/', OnlyUnbannedUser(), async (ctx, next) => {
+  .use('/', OnlyUser(), async (ctx, next) => {
     const { data } = ctx;
     data.active = 'order';
     await next();
@@ -119,7 +122,7 @@ orderRouter
     await next();
   })
   // 查看订单详情
-  .get('/detail', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/detail', OnlyUser(), async (ctx, next) => {
     const { data, db, params, query, nkcModules } = ctx;
     const { user } = data;
     const { orderId } = query;
@@ -151,7 +154,7 @@ orderRouter
     await next();
   })
   // 查看订单物流详情
-  .get('/logositics', OnlyUnbannedUser(), async (ctx, next) => {
+  .get('/logositics', OnlyUser(), async (ctx, next) => {
     const { data, db, query, body, nkcModules } = ctx;
     const { user } = data;
     const { orderId } = query;
