@@ -158,7 +158,6 @@ export default {
       repost: 'repost',
       comment: 'comment',
     },
-    disableSavingCount: 0,
   }),
   watch: {
     content: 'onContentChange',
@@ -214,16 +213,9 @@ export default {
   },
   methods: {
     reset() {
-      this.lockAutoSaving(1);
       this.momentCommentId = '';
       this.setTextareaEditorContent('');
       this.picturesId = [];
-    },
-    lockAutoSaving(num) {
-      this.disableSavingCount = num;
-    },
-    unlockAutoSaving() {
-      this.disableSavingCount = 0;
     },
     selectEmoji() {
       const self = this;
@@ -294,18 +286,8 @@ export default {
       });
     }, 1000),
     saveContent(t) {
-      const {
-        content,
-        momentId,
-        disableSavingCount,
-        momentCommentId,
-        picturesId,
-      } = this;
+      const { content, momentId, momentCommentId, picturesId } = this;
       const self = this;
-      if (disableSavingCount > 0) {
-        this.disableSavingCount--;
-        return Promise.resolve();
-      }
       let type;
       if (t) {
         type = t;
