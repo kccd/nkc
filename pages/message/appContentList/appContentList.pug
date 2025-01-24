@@ -5,7 +5,7 @@ block title
 block content
   .hidden#data=objToStr({type: data.type, tUser: data.tUser, mUser: data.mUser, messages: data.messages, type: data.type, twemoji: data.twemoji, statusOfSendingMessage: data.statusOfSendingMessage})
   #app(v-cloak)
-    #container
+    #container.type-tip
       #listContainer(ref="listContent")
         #info
           span(v-if="getMessageStatus === 'loading'")
