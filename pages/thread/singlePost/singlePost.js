@@ -240,7 +240,7 @@ class SinglePostModule {
                             } else {
                                 container.append(
                                         $(
-                                            `<div class="text-danger single-post-comment-error">${`游客没有发表内容的权限。想参与大家的讨论？现在就 <a href="/login" target="_blank">登录</a> 或 <a href="/register" target="_blank">注册</a>。`}</div>`,
+                                            `<div class="text-danger single-post-comment-error">${`游客没有发表内容的权限。想参与大家的讨论？现在就 <a onclick="RootApp.openLoginPanel('login')">登录</a> 或 <a onclick="RootApp.openLoginPanel('register')">注册</a>。`}</div>`,
               ),
             );
           }
@@ -323,10 +323,10 @@ class SinglePostModule {
   }
   // 显示、隐藏评论
   switchPostComment(pid, fixPosition, page) {
-    if (!NKC.configs.uid) {
-      window.RootApp.openLoginPanel();
-      return;
-    }
+    // if (!NKC.configs.uid) {
+    //   window.RootApp.openLoginPanel();
+    //   return;
+    // }
     // 游客没有window.UE
     // if(!window.UE) return screenTopWarning(`别着急，页面还在加载中...`);
     const container = this.getCommentContainer(pid);
