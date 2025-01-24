@@ -18,16 +18,16 @@
 </template>
 
 <script>
-import {nkcAPI} from "../../js/netAPI";
-import {sweetError} from "../../js/sweetAlert";
-import {screenTopAlert} from "../../js/topAlert";
-import { immediateDebounce } from "../../js/execution";
-import { visitUrl } from "../../js/pageSwitch";
-import {getRichJsonContentLength} from '../../js/checkData'
-import Editor from '../Editor.vue'
+import { nkcAPI } from '../../js/netAPI';
+import { sweetError } from '../../js/sweetAlert';
+import { screenTopAlert } from '../../js/topAlert';
+import { debounce } from '../../js/execution';
+import { visitUrl } from '../../js/pageSwitch';
+import { getRichJsonContentLength } from '../../js/checkData';
+import Editor from '../Editor.vue';
 export default {
   components: {
-    'editor': Editor,
+    editor: Editor,
   },
   data() {
     return {
@@ -36,7 +36,8 @@ export default {
       content: '',
       momentId: '',
       isEditMoment: false,
-    }
+      autoSaving: false,
+    };
   },
   props: ['id'],
   mounted() {
@@ -46,50 +47,69 @@ export default {
   },
   computed: {
     disablePublish() {
-      return this.loading || this.submitting || this.wordCount === 0;
+      return (
+        this.autoSaving ||
+        this.loading ||
+        this.submitting ||
+        this.wordCount === 0
+      );
     },
     wordCount() {
-      return getRichJsonContentLength(this.content)
+      return getRichJsonContentLength(this.content);
     },
   },
   methods: {
     // 获取富文本草稿
     initDraft() {
-      const url = this.isEditMoment ? `/api/v1/zone/moment/${this.momentId}/editor/rich` : `/api/v1/zone/editor/rich`;
-      nkcAPI(url, 'GET').then(res => {
-        if(res.data.momentId) {
-          this.momentId = res.data.momentId;
-          this.content = res.data.content;
-          this.$refs.editor.setContent(this.content);
-        }
-        this.loading = false;
-      })
-        .catch(sweetError)
+      const url = this.isEditMoment
+        ? `/api/v1/zone/moment/${this.momentId}/editor/rich`
+        : `/api/v1/zone/editor/rich`;
+      nkcAPI(url, 'GET')
+        .then((res) => {
+          if (res.data.momentId) {
+            this.momentId = res.data.momentId;
+            this.content = res.data.content;
+            this.$refs.editor.setContent(this.content);
+          }
+          this.loading = false;
+        })
+        .catch(sweetError);
     },
     editorContentChange(newContent) {
       this.content = newContent;
+      this.autoSaving = true;
       this.saveDraftDebounce();
     },
     saveDraft() {
-      const url = this.isEditMoment ? `/api/v1/zone/moment/${this.momentId}/editor/rich` : `/api/v1/zone/editor/rich`;
+      const url = this.isEditMoment
+        ? `/api/v1/zone/moment/${this.momentId}/editor/rich`
+        : `/api/v1/zone/editor/rich`;
       return nkcAPI(url, 'PUT', {
         content: this.content,
-      }).then(res => {
+      }).then((res) => {
         this.momentId = res.data.momentId;
-        console.log('保存成功')
-      })
+        console.log('保存成功');
+      });
     },
     saveDraftManual() {
-      this.saveDraft().then(() => {
-        screenTopAlert('保存成功');
-      }).catch(sweetError);
+      this.saveDraft()
+        .then(() => {
+          screenTopAlert('保存成功');
+        })
+        .catch(sweetError);
     },
-    saveDraftDebounce: immediateDebounce(function() {
-      this.saveDraft().catch(sweetError);
+    saveDraftDebounce: debounce(function () {
+      this.saveDraft()
+        .catch(sweetError)
+        .finally(() => {
+          this.autoSaving = false;
+        });
     }, 1000),
     publish() {
       this.submitting = true;
-      const url = this.isEditMoment ? `/api/v1/zone/moment/${this.momentId}/editor/rich` : `/api/v1/zone/editor/rich`;
+      const url = this.isEditMoment
+        ? `/api/v1/zone/moment/${this.momentId}/editor/rich`
+        : `/api/v1/zone/editor/rich`;
       nkcAPI(url, 'POST', {
         content: this.content,
       })
@@ -101,7 +121,7 @@ export default {
         .catch(sweetError)
         .finally(() => {
           this.submitting = false;
-        })
+        });
     },
     visitHistory() {
       this.$refs.editor.removeNoticeEvent();
@@ -110,7 +130,7 @@ export default {
           this.$router.push(`/z/editor/rich/history?id=${this.momentId}`);
         })
         .catch(sweetError);
-    }
-  }
-}
+    },
+  },
+};
 </script>
