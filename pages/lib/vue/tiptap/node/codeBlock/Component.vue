@@ -17,7 +17,6 @@
 <script>
 import { nodeViewProps, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-2';
 import hljs from 'highlight.js';
-// import 'highlight.js/styles/github.min.css';
 import { highlightLanguages } from '../../../../js/highlight';
 export default {
   components: {
@@ -55,16 +54,18 @@ export default {
       }
       const highlightCodeDom = code[0];
       const codeDom = code[1];
-      if (this.language === 'other') {
-        highlightCodeDom.innerHTML =
-          hljs.highlightAuto(codeDom.textContent).value ||
-          '<br className="ProseMirror-trailingBreak" />';
-      } else {
-        highlightCodeDom.innerHTML =
-          hljs.highlight(codeDom.textContent, {
-            language: this.language,
-          }).value || '<br className="ProseMirror-trailingBreak" />';
-      }
+      setTimeout(() => {
+        if (this.language === 'other') {
+          highlightCodeDom.innerHTML =
+            hljs.highlightAuto(codeDom.textContent).value ||
+            '<br className="ProseMirror-trailingBreak" />';
+        } else {
+          highlightCodeDom.innerHTML =
+            hljs.highlight(codeDom.textContent, {
+              language: this.language,
+            }).value || '<br className="ProseMirror-trailingBreak" />';
+        }
+      });
     },
     deleteCodeBlock(e) {
       e.preventDefault();

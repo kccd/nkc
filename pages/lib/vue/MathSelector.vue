@@ -1,5 +1,6 @@
 <template>
   <draggable-dialog
+    class="type-tip"
     ref="dialog"
     title="LaTeX 数学公式预览"
     width="43rem"

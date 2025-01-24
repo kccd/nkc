@@ -484,6 +484,18 @@ router.get('/', Public(), async (ctx, next) => {
         if (!thread) {
           continue;
         }
+        // 需要判断内容的权限（时间限制）
+        try {
+          await db.SettingModel.restrictAccess({
+            toc: thread.toc,
+            forums: thread.forums,
+            isAuthor: state.uid && state.uid === thread.uid,
+            userRolesId: data.userRoles.map((role) => role._id),
+            userGradeId: data.userGrade._id,
+          });
+        } catch (error) {
+          continue loop1;
+        }
         for (const fid of thread.mainForumsId) {
           if (!fidOfCanGetThreads.includes(fid)) {
             continue loop1;

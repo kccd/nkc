@@ -759,7 +759,7 @@ threadSchema.methods.newPost = async function (post, user, ip) {
   const pid = await SettingModel.operateSystemID('posts', 1);
   const {
     c,
-    t,
+    t = '',
     l,
     abstractCn,
     abstractEn,
@@ -767,9 +767,9 @@ threadSchema.methods.newPost = async function (post, user, ip) {
     keyWordsEn = [],
     authorInfos = [],
     originState,
-    parentPostId,
+    parentPostId = '',
   } = post;
-  const isComment = parentPostId !== '';
+  // const isComment = parentPostId !== '';
   let { quote = '' } = post;
   // 如果存在引用，则先判断引用的post是否存在
   let quotePost;
@@ -841,13 +841,13 @@ threadSchema.methods.newPost = async function (post, user, ip) {
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
   _post = _post.toObject();
-  if (!isComment) {
-    // 只有发表回复时才更新文章上的最后回复和时间
-    await this.updateOne({
-      lm: pid,
-      tlm: nowTime,
-    });
-  }
+  // if (!isComment) {
+  //   // 只有发表回复时才更新文章上的最后回复和时间
+  //   await this.updateOne({
+  //     lm: pid,
+  //     tlm: nowTime,
+  //   });
+  // }
   // 如果存在引用并且不需要审核，则给被引用者发送引用通知
   if (quotePost) {
     // 如果引用的不是自己的回复
@@ -1059,11 +1059,10 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     );
     posts.map(async (post) => {
       if (o.htmlToText) {
-        post.c = post.l === 'json' ? getJsonStringTextSlice(post.c,Number(o.count)) : obtainPureText(
-          post.c,
-          true,
-          o.count,
-        );
+        post.c =
+          post.l === 'json'
+            ? getJsonStringTextSlice(post.c, Number(o.count))
+            : obtainPureText(post.c, true, o.count);
       }
       if (o.firstPostUser || o.lastPostUser) {
         usersId.add(post.uid);
@@ -1132,6 +1131,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         logo: 1,
         banner: 1,
         iconFileName: 1,
+        disablePost: 1,
       },
     );
     /* forums.map(forum => {

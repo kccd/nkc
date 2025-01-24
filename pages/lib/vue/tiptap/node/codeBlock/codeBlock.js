@@ -1,4 +1,3 @@
-import { mergeAttributes, Node } from '@tiptap/vue-2';
 import { VueNodeViewRenderer } from '@tiptap/vue-2';
 import CodeBlock from '@tiptap/extension-code-block';
 import Component from './Component.vue';
