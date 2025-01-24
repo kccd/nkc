@@ -20,6 +20,7 @@ class MomentCheckerService {
       normal: normalMomentStatus,
       deleted: deleteMomentStatus,
       disabled: disabledMomentStatus,
+      unknown: unknownMomentStatus,
     } = momentStatusSettings;
     const { own, attention } = momentVisibleTypeSettings;
 
@@ -42,6 +43,9 @@ class MomentCheckerService {
         } else if (momentStatus === disabledMomentStatus) {
           // 被屏蔽
           ThrowCommonError(403, '内容已被屏蔽');
+        } else if (momentStatus === unknownMomentStatus) {
+          // 待审核
+          ThrowCommonError(403, '内容审核中');
         } else {
           // 其他
           ThrowCommonError(403, '权限不足');
