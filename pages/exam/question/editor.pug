@@ -47,8 +47,7 @@ block content
             .form-group
               label(class="col-sm-2 control-label") 试题难度
               .col-sm-10
-                h5(v-if='isFixedBaseInfo') {{question.volume==='A'?'A(基础级)': 'B(专业级)'}}
-                .radio(v-else)
+                .radio
                   label.m-r-1
                     input(type='radio' value='A' v-model='question.volume')
                     span 基础级

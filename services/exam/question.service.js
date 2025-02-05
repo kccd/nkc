@@ -187,10 +187,10 @@ class QuestionService {
       }),
       hasImage,
       isIndefinite,
+      volume,
     };
     if (oldAuth !== true) {
       updateBody.type = type;
-      updateBody.volume = volume;
     }
     // 如果之前的审核状态为审核未通过，则在编辑后审核状态自动变为待审核
     if (oldAuth === false) {
