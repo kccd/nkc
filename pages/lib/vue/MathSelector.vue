@@ -60,6 +60,7 @@
 
 <script>
 import DraggableDialog from './DraggableDialog/DraggableDialog.vue';
+import { fixFormulaText, removeFormulaWrappers } from '../js/tools';
 export default {
   components: {
     'draggable-dialog': DraggableDialog,
@@ -85,9 +86,9 @@ export default {
       this.$refs.dialog.close();
     },
     confirm() {
-      if (!this.callback || !this.text) return;
+      if (!this.callback || !this.formulaText) return;
       this.callback({
-        text: this.text,
+        text: this.formulaText,
         block: this.block,
       });
       this.close();
@@ -98,13 +99,15 @@ export default {
   },
   computed: {
     formula() {
-      if (!this.text) {
+      const text = this.formulaText;
+      if (!text) {
         return '';
-      } else if (this.block) {
-        return `$$${this.text}$$`;
-      } else {
-        return `$${this.text}$`;
       }
+
+      return fixFormulaText(text, this.block);
+    },
+    formulaText() {
+      return removeFormulaWrappers(this.text || '');
     },
   },
   watch: {
