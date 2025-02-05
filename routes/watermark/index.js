@@ -2,8 +2,24 @@ const router = require('koa-router')();
 const FILE = require('../../nkcModules/file');
 const statics = require('../../settings/statics');
 const { OnlyUser } = require('../../middlewares/permission');
+const {
+  secretWatermarkService,
+} = require('../../services/watermark/secretWatermark.service');
+const ContentDisposition = require('content-disposition');
 //获取偏好设置用户水印图
 router
+  .get('/:uid/secret', OnlyUser(), async (ctx, next) => {
+    const { uid } = ctx.state;
+    ctx.body = secretWatermarkService.generateWatermarkBase64(
+      `非公开内容禁止转载 ${uid}`,
+    );
+    ctx.set(
+      'Content-Disposition',
+      ContentDisposition('watermark.png', { type: 'inline' }),
+    );
+    ctx.set('Content-Type', 'image/png');
+    return;
+  })
   .get('/:uid', OnlyUser(), async (ctx, next) => {
     const { db, params, query, state } = ctx;
     const { type, style } = query;

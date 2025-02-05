@@ -70,6 +70,7 @@ app
   .use(
     cors({
       origin: serverConfig.domain,
+      credentials: true,
       allowMethods: ['GET', 'HEAD', 'OPTIONS', 'POST'],
       allowHeaders: ['Content-Type', 'Authorization', 'FROM'],
     }),

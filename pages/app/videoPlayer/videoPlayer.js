@@ -30,7 +30,7 @@ function initVideoPlayer(
   const video = document.createElement('video');
   video.controls = true;
   video.autoplay = true;
-  video.crossOrigin = '';
+  video.crossOrigin = 'use-credentials';
   video.poster = poster;
   for (let i = 0; i < sources.length; i++) {
     const sourceInfo = sources[i];

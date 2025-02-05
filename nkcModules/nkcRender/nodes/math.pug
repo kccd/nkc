@@ -1,5 +1,6 @@
 mixin renderMath(node)
+  - var text = tools.removeFormulaWrappers(node.attrs.text);
   if !node.attrs.block
-    span=`$${node.attrs.text}$`
+    span=`$${text}$`
   else 
-    p=`$$${node.attrs.text}$$`
+    p=`$$${text}$$`

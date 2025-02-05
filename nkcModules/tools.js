@@ -529,6 +529,45 @@ var Tools = function () {
     var result2 = str.substr(index + 1, str.length - index - 1);
     return [result1, result2];
   };
+
+  // 去掉公式包裹符
+  self.removeFormulaWrappers = function (text) {
+    text = text || '';
+    text = text.trim();
+    // 定义所有可能的包装符号对
+    var wrappers = [
+      ['$$', '$$'],
+      ['\\[', '\\]'],
+      ['\\(', '\\)'],
+      ['$', '$'],
+    ];
+
+    // 对包装符号按起始符号的长度降序排序，防止 "$$" 被错误地匹配为 "$"
+    wrappers.sort((a, b) => b[0].length - a[0].length);
+
+    // 遍历所有包装符号，如果匹配则去除
+    for (var i = 0; i < wrappers.length; i++) {
+      var open = wrappers[i][0];
+      var close = wrappers[i][1];
+      if (text.startsWith(open) && text.endsWith(close)) {
+        // 去掉开头和结尾的包装符号
+        return text.slice(open.length, text.length - close.length);
+      }
+    }
+    // 如果不匹配任何包装符号，则直接返回原字符串
+    return text.trim();
+  };
+
+  // 修复公式
+  self.fixFormulaText = function (text, block) {
+    var cleanedText = self.removeFormulaWrappers(text);
+
+    if (block) {
+      return `$$${cleanedText}$$`;
+    } else {
+      return `$${cleanedText}$`;
+    }
+  };
 };
 
 var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -536,5 +575,5 @@ var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 if (isNode) {
   module.exports = new Tools();
 } else {
-  NKC.methods.tools = new Tools();
+  window.NKC.methods.tools = new Tools();
 }

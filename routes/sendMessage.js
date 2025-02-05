@@ -355,7 +355,7 @@ sendMessageRouter
     await nkcModules.sendMessage(smsCodeObj);
     await next();
   })
-  .post('/common', OnlyOperation(OnlyUnbannedUser()), async (ctx, next) => {
+  .post('/common', OnlyUnbannedUser(), async (ctx, next) => {
     const { nkcModules, db, body } = ctx;
     const { number, nationCode, type } = body;
     if (!['changeUnusedPhoneNumber'].includes(type)) {

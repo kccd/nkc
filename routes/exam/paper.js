@@ -19,6 +19,10 @@ paperRouter
     const examCategoryTypes =
       await db.ExamsCategoryModel.getExamCategoryTypes();
     const { passScore, time, from, type, level } = category;
+    let categoryQuestionCount = 0;
+    for (const f of category.from) {
+      categoryQuestionCount += f.count;
+    }
     const { register, exam } = await db.ExamsPaperModel.getFromType();
     if (category.disabled) {
       ctx.throw(403, '该科目的下的考试已被屏蔽，请刷新');
@@ -97,7 +101,7 @@ paperRouter
         cid,
         toc: { $gte: Date.now() - timeLimit },
       }).sort({ toc: -1 });
-      if (paper) {
+      if (paper && paper.record.length === categoryQuestionCount) {
         const { record } = paper;
         nkcModules.apiFunction.shuffle(record);
         const newRecord = record.map((r) => {
