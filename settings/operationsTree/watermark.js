@@ -3,5 +3,8 @@ module.exports = {
   GET: Operations.getWatermark,
   PARAMETER: {
     GET: Operations.getAppsWatermark,
+    secret: {
+      GET: Operations.getWatermark,
+    },
   },
 };
