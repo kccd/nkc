@@ -397,6 +397,7 @@
   "nkcManagementSection": "网站板块管理",
   "nkcManagementSecurityApplication": "前台管理 - 手机号申诉",
   "nkcManagementSticker": "前台管理 - 共享表情",
+  "nkcManagementSecretWatermark": "前台管理 - 水印解密",
   "openPublicExam": "openPublicExam",
   "openStoreApply": "[CO]商家后台发起店铺申请",
   "openThread": "开放主题",
@@ -766,5 +767,6 @@
   "disableResource": "屏蔽附件",
   "collectionPost": "收藏论坛文章下的回复",
   "experimentalPublishSettings": "后台发表内容限制设置",
-  "disabledResource": "屏蔽资源"
+  "disabledResource": "屏蔽资源",
+  "decodeSecretWatermark": "解密水印信息"
 }

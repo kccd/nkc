@@ -16,7 +16,7 @@ block content
                 .category-panel-header
                   div(onclick=`createPaper(${category._id})` title='开始考试')=category.name
                 .category-panel-body
-                  div=`${category.volume==='A'? '基础级': '专业级'}`
+                  div=`${category.level === 1 ? '基础级': '专业级'}`
                   div=`${category.type === 'secret'?'闭卷': '开卷'}`
                   div=`通过率 ${(category.passRate * 100).toFixed(2)}%`
               .category-button-container

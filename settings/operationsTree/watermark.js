@@ -1,10 +1,13 @@
 const { Operations } = require('../operations.js');
 module.exports = {
   GET: Operations.getWatermark,
-  PARAMETER: {
+  media: {
     GET: Operations.getAppsWatermark,
-    secret: {
-      GET: Operations.getWatermark,
+  },
+  secret: {
+    GET: Operations.getWatermark,
+    decode: {
+      GET: Operations.decodeSecretWatermark,
     },
   },
 };

@@ -19,6 +19,9 @@ var Tools = function () {
       t += '&t=' + size;
     }
     switch (type) {
+      case 'secretWatermark': {
+        return '/wm/secret?id=' + id;
+      }
       case 'getIcons': {
         return '/statics/icons/' + id;
       }

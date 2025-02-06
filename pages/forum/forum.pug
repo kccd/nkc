@@ -5,6 +5,8 @@ block title
   +includeCSS("/forum/forum.css")
   if data.type === "home"
     include ../publicModules/plyr/plyr.css.pug
+  include ../publicModules/secretWatermark
+  +renderSecretWatermarkStyle(data.secretWatermarkUrl)
 block content
   //- 判断用户是否有权限管理专业内的文章
   -let canManagement = false;
@@ -163,7 +165,7 @@ block content
                   .child-forum-avatar(style=`background-color: ${f.color}`)
                 a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
         if data.type === "latest"
-          div
+          div.secret-watermark
             .m-b-1
               //- 手机导航 其他文章链接
               if !(state.isApp && state.platform === 'reactNative')
@@ -215,7 +217,7 @@ block content
             -showPagingDigestButton = false;
             include ../publicModules/paging/paging_input
         else if data.type === "home"
-          div
+          div.secret-watermark
             .m-b-1
               include ../publicModules/paging/forum_nav
             if data.forum.declare
@@ -254,7 +256,7 @@ block content
             .m-t-1
               include ../publicModules/paging/paging
         else if data.type === "library"
-          div
+          div.secret-watermark
             div
               include ../publicModules/paging/forum_nav
             .m-t-05

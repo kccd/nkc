@@ -25,6 +25,10 @@ const {
   Public,
 } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
+const {
+  forumPermissionService,
+} = require('../../services/forum/forumPermission.service');
+const tools = require('../../nkcModules/tools');
 router
   .post('/', OnlyUnbannedUser(), async (ctx, next) => {
     const { data, params, db, address: ip, fs, query, nkcModules, state } = ctx;
@@ -618,6 +622,11 @@ router
     //   data.noPermissionReason = warning.join('<br/>');
     // }
 
+    const showSecretWatermark =
+      !(await forumPermissionService.visitorHasReadPermission([forum.fid]));
+    if (showSecretWatermark) {
+      ctx.data.secretWatermarkUrl = tools.getUrl('secretWatermark', forum.fid);
+    }
     ctx.template = 'forum/forum.pug';
     await next();
   })

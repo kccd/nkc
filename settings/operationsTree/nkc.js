@@ -60,4 +60,7 @@ module.exports = {
   os: {
     GET: Operations.nkcManagementOS,
   },
+  secretWatermark: {
+    GET: Operations.nkcManagementSecretWatermark,
+  },
 };
