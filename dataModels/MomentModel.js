@@ -1480,7 +1480,9 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   );
   for (const moment of moments) {
     const { _id } = moment;
-    moment.files = [...stableDocumentsObj[_id].files];
+    if (stableDocumentsObj[_id] && stableDocumentsObj[_id].files) {
+      moment.files = [...stableDocumentsObj[_id].files];
+    }
     resourcesId = resourcesId.concat(moment.files);
   }
   // 准备附件数据
