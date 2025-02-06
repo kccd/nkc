@@ -75,7 +75,7 @@ router
       questionTotal: record.length,
       index,
       paperName: `${category.name} ${
-        category.volume === 'A' ? '基础级' : '专业级'
+        category.level === 1 ? '基础级' : '专业级'
       }`,
       paperTitle: category.name,
       paperCategory: category.volume,

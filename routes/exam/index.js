@@ -90,6 +90,7 @@ examRouter
         passRate: passRateObj[category._id] || 0,
         type: category.type,
         volume: category.volume,
+        level: category.level,
       };
       if (category.volume === 'AD') {
         examsCategories.volumeAD.push(targetCategory);
