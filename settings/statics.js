@@ -2,6 +2,7 @@ const path = require('path');
 const defaultPath = path.resolve(__dirname, '../public/default');
 const resourcesPath = path.resolve(__dirname, '../resources');
 const staticPath = path.resolve(__dirname, '../public/statics');
+const tmpDirPath = path.resolve(__dirname, '../tmp');
 const siteSpecificPath = path.resolve(staticPath, './site');
 const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
@@ -129,4 +130,6 @@ module.exports = {
   logoSM,
   logoMD,
   logoLG,
+
+  tmpDirPath,
 };

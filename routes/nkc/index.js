@@ -8,6 +8,7 @@ const postRouter = require('./post');
 const section = require('./section');
 const applyForumRouter = require('./applyForum');
 const securityApplication = require('./securityApplication');
+const secretWatermark = require('./secretWatermark');
 const moment = require('moment');
 const documentRouter = require('./document');
 const { Operations } = require('../../settings/operations');
@@ -293,6 +294,11 @@ router
     '/securityApplication',
     securityApplication.routes(),
     securityApplication.allowedMethods(),
+  )
+  .use(
+    '/secretWatermark',
+    secretWatermark.routes(),
+    secretWatermark.allowedMethods(),
   )
   .use('/column', columnRouter.routes(), columnRouter.allowedMethods())
   .use('/document', documentRouter.routes(), documentRouter.allowedMethods())

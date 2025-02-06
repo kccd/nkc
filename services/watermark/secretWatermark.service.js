@@ -1,28 +1,58 @@
-const { createCanvas } = require('canvas');
-
+const path = require('path');
+const fs = require('fs');
+const { tmpDirPath } = require('../../settings/statics');
+const mongoose = require('../../settings/database');
+const { generateSecretWatermark } = require('../../tools/imageMagick');
 class SecretWatermarkService {
-  generateWatermarkBase64(text) {
-    // 创建画布（建议尺寸与文字倾斜后的可视区域匹配）
-    const canvas = createCanvas(200, 100);
-    const ctx = canvas.getContext('2d');
+  chars = '0123456789abcdefghijklmnpqrstuvwxyz';
 
-    // 设置透明背景
-    ctx.fillStyle = 'transparent';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  encodeText(uid, targetId) {
+    let targetIdNumber = Number(targetId);
+    if (isNaN(targetIdNumber)) {
+      targetIdNumber = 0;
+    }
+    const sum = Number(uid) + targetIdNumber;
+    return this.toBase32(sum);
+  }
 
-    // 设置文字样式（根据需求调整）
-    ctx.font = '14px "Microsoft Yahei"'; // 使用系统自带字体
-    ctx.fillStyle = 'rgba(128, 128, 128, 0.3)'; // 半透明灰色
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+  decodeText(encodedText, targetId) {
+    const sum = this.toBase10(encodedText);
+    return (sum - Number(targetId)).toString();
+  }
 
-    // 倾斜文字（-20度）
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((-20 * Math.PI) / 180);
-    ctx.fillText(text, 0, 0);
+  toBase32(num) {
+    let result = '';
 
-    // 转换为 Base64
-    return canvas.toBuffer('image/png');
+    while (num > 0) {
+      result = this.chars[num % 32] + result;
+      num = Math.floor(num / 32);
+    }
+
+    return result || '0';
+  }
+
+  toBase10(str) {
+    let result = 0;
+
+    for (let i = 0; i < str.length; i++) {
+      result = result * 32 + this.chars.indexOf(str[i]);
+    }
+
+    return result;
+  }
+
+  async generateWatermark(uid, targetId) {
+    const tempImagePath = path.join(
+      tmpDirPath,
+      `secret_watermark_${new mongoose.Types.ObjectId()}.png`,
+    );
+    await generateSecretWatermark(
+      '非公开内容禁止转载 ' + this.encodeText(uid, targetId),
+      tempImagePath,
+    );
+    const fileBuffer = await fs.promises.readFile(tempImagePath);
+    await fs.promises.unlink(tempImagePath);
+    return fileBuffer;
   }
 }
 

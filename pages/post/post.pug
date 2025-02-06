@@ -15,13 +15,15 @@ block title
   +includeJS("/external_pkgs/imageToBig/preview.js")
   include ../publicModules/plyr/plyr.css.pug
   include ../thread/singlePost/singlePost
+  include ../publicModules/secretWatermark
+  +renderSecretWatermarkStyle(data.secretWatermarkUrl)
 block content
   .container-fluid.max-width
     include ../module_digest
     include ../module_credit
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-1
-        .ThreadBox.post
+        .ThreadBox.post.secret-watermark
           if !post.reviewed
             -let reviewData = {reviewPid: post.pid, reviewType: "post"}
             include ../publicModules/module_review

@@ -15,6 +15,9 @@ const { Operations } = require('../../settings/operations');
 const { ObjectId } = require('mongodb');
 const { editorRichService } = require('../../services/editor/rich.service');
 const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
+const {
+  forumPermissionService,
+} = require('../../services/forum/forumPermission.service');
 threadRouter
   .use('/', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
@@ -233,6 +236,20 @@ threadRouter
     // 设置 referer 策略
     // 解决分享文章时附件链接跨域无法读取referer中token的问题
     ctx.set('Referrer-Policy', 'unsafe-url');
+    await next();
+  })
+  .get('/:tid', Public(), async (ctx, next) => {
+    //
+    const showSecretWatermark =
+      !(await forumPermissionService.visitorHasReadPermission(
+        ctx.internalData.thread.mainForumsId,
+      ));
+    if (showSecretWatermark) {
+      ctx.data.secretWatermarkUrl = tools.getUrl(
+        'secretWatermark',
+        ctx.internalData.thread.tid,
+      );
+    }
     await next();
   })
   .get('/:tid', Public(), async (ctx, next) => {
@@ -882,9 +899,9 @@ threadRouter
     // 获取文章附件数
     let attachmentsCount = 0;
     if (
-      (await db.PostModel.ensureAttachmentPermission(
+      await db.PostModel.ensureAttachmentPermission(
         data.user ? data.user.uid : '',
-      ))
+      )
     ) {
       const allPosts = await db.PostModel.find({ tid: thread.tid }, { pid: 1 });
       const pid = allPosts.map((p) => p.pid);
@@ -897,19 +914,19 @@ threadRouter
     // 加载笔记信息
     let notes = [];
     // if (ctx.permission('viewNote')) {
-      const notePosts = [
-        {
-          pid: thread.oc,
-          cv: thread.firstPost.cv,
-        },
-      ];
-      posts.map((post) => {
-        notePosts.push({
-          pid: post.pid,
-          cv: post.cv,
-        });
+    const notePosts = [
+      {
+        pid: thread.oc,
+        cv: thread.firstPost.cv,
+      },
+    ];
+    posts.map((post) => {
+      notePosts.push({
+        pid: post.pid,
+        cv: post.cv,
       });
-      notes = await db.NoteModel.getNotesByPosts(notePosts);
+    });
+    notes = await db.NoteModel.getNotesByPosts(notePosts);
     // }
 
     // 黑名单判断

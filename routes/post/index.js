@@ -15,7 +15,6 @@ const commentsRouter = require('./comments');
 const commentRouter = require('./comment');
 const collectionRouter = require('./collection');
 const router = new Router();
-const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 const {
   sensitiveDetectionService,
 } = require('../../services/sensitive/sensitiveDetection.service');
@@ -26,6 +25,10 @@ const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { editorRichService } = require('../../services/editor/rich.service');
 
 const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
+const {
+  forumPermissionService,
+} = require('../../services/forum/forumPermission.service');
+const tools = require('../../nkcModules/tools');
 router
   .use('/', Public(), async (ctx, next) => {
     const { state, data, db } = ctx;
@@ -55,7 +58,10 @@ router
       return ctx.redirect(url);
     }
     const thread = await post.extendThread();
-
+    const visitHasReadPermission =
+      await forumPermissionService.visitorHasReadPermission(
+        thread.mainForumsId,
+      );
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const { user } = data;
     let isModerator = ctx.permission('superModerator');
@@ -257,6 +263,12 @@ router
         cv: data.post.cv,
       },
     ]);
+    if (!visitHasReadPermission) {
+      ctx.data.secretWatermarkUrl = tools.getUrl(
+        'secretWatermark',
+        post.pid.replace(/t/g, ''),
+      );
+    }
     // }
     await next();
   })
