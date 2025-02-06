@@ -52,48 +52,50 @@ block eContent
               .form-group
                 label 学术分至少{{regSettings.recommendUsers.xsf}}分
                 input.form-control(type="text" v-model.number="regSettings.recommendUsers.xsf")
-        h4 三、注册前考试设置
-        .row
-          .col-xs-12.col-md-4
-            .form
-              .form-group
-                label 注册考试
-                .radio
-                  label.m-r-1
-                    input(type="radio" :value="true" v-model="regSettings.registerExamination")
-                    span 开启
-                  label
-                    input(type="radio" :value="false" v-model="regSettings.registerExamination")
-                    span 关闭
-                  .form-group
-                    h5(style="font-weight: bold;") 已选试卷（注意：进入考试前默认选中首张试卷）
-                    div(v-if='regSettings.examSource.length === 0')
-                      h5.text-danger 暂未选择任何试卷
-                    div(v-else)
-                      table.table.table-bordered
-                        thead
-                          tr
-                            th 考卷名称
-                            th
-                        tbody
-                          tr(v-for='examSource in regSettings.examSource' :key="examSource._id")
-                            th {{examSource.name}}
-                            th
-                              button(@click="deleteExam" :id=`examSource._id`) 移除
-                    h5(style="font-weight: bold;") 全部试卷
-                    div
-                      table.table.table-bordered
-                        thead
-                          tr
-                            th 考卷名称
-                            th 操作
-                        tbody
-                          tr(v-for='categorie in categories' :key="categorie._id")
-                            th {{categorie.name}}
-                            th
-                              button(@click='addExam' :id=`categorie._id` :name='categorie.name' :disabled="regSettings.examSource.findIndex(item=>item._id==categorie._id) !== -1") 添加
-                    h5(style="font-weight: bold;") 说明（Markdown）
-                    textarea.form-control(v-model="regSettings.examNotice" rows=7)
+        .bg-danger.p-a-1
+          h4 三、注册前考试设置
+            span.text-danger （当前设置项已废弃）
+          .row
+            .col-xs-12.col-md-4
+              .form
+                .form-group
+                  label 注册考试
+                  .radio
+                    label.m-r-1
+                      input(type="radio" :value="true" v-model="regSettings.registerExamination")
+                      span 开启
+                    label
+                      input(type="radio" :value="false" v-model="regSettings.registerExamination")
+                      span 关闭
+                    .form-group
+                      h5(style="font-weight: bold;") 已选试卷（注意：进入考试前默认选中首张试卷）
+                      div(v-if='regSettings.examSource.length === 0')
+                        h5.text-danger 暂未选择任何试卷
+                      div(v-else)
+                        table.table.table-bordered
+                          thead
+                            tr
+                              th 考卷名称
+                              th
+                          tbody
+                            tr(v-for='examSource in regSettings.examSource' :key="examSource._id")
+                              th {{examSource.name}}
+                              th
+                                button(@click="deleteExam" :id=`examSource._id`) 移除
+                      h5(style="font-weight: bold;") 全部试卷
+                      div
+                        table.table.table-bordered
+                          thead
+                            tr
+                              th 考卷名称
+                              th 操作
+                          tbody
+                            tr(v-for='categorie in categories' :key="categorie._id")
+                              th {{categorie.name}}
+                              th
+                                button(@click='addExam' :id=`categorie._id` :name='categorie.name' :disabled="regSettings.examSource.findIndex(item=>item._id==categorie._id) !== -1") 添加
+                      h5(style="font-weight: bold;") 说明（Markdown）
+                      textarea.form-control(v-model="regSettings.examNotice" rows=7)
 
         h4 四、注销设置
         .row
