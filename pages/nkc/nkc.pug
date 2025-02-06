@@ -74,7 +74,7 @@ block content
               a(href=`/nkc/secretWatermark`)
                 .fa.fa-list-alt
                 | 水印解密
-                if !permission("decodeSecretWatermark")
+                if !permission("nkcManagementSecretWatermark")
                   | （无权）
       .col-xs-12.col-md-10.box-shadow-panel
         block nkcContent
