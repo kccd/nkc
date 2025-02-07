@@ -45,6 +45,24 @@ class PublishPermissionService {
     };
   }
 
+  async getMomentCountStatus(props) {
+    const { uid, momentCount, examEnabled } = props;
+    if (!momentCount.limited || !examEnabled) {
+      return null;
+    }
+    const publishedMomentCount = await MomentModel.countDocuments({
+      uid,
+      status: momentStatus.normal,
+    });
+    return {
+      type: 'momentCount',
+      name: `发表${momentCount.count}条电文`,
+      completed: publishedMomentCount >= momentCount.count,
+      link: `/z`,
+      title: '去发表',
+    };
+  }
+
   async getPublishPermissionAuthLevelStatus(props) {
     const { authLevelMin, authLevel, uid } = props;
     const result = {
@@ -223,6 +241,14 @@ class PublishPermissionService {
     if (examTask) {
       tasks.exam = examTask;
     }
+    const momentTask = await this.getMomentCountStatus({
+      uid,
+      momentCount: permission.momentCount,
+      examEnabled: permission.examEnabled,
+    });
+    if (momentTask) {
+      tasks.moment = momentTask;
+    }
     const verifyPhoneNumberTask = await this.getVerifyPhoneNumberStatus(uid);
     if (verifyPhoneNumberTask) {
       tasks.verifyPhoneNumber = verifyPhoneNumberTask;
@@ -337,7 +363,8 @@ class PublishPermissionService {
   async checkPublishPermission(type, uid) {
     const { tasks, timeLimit, countLimit, permission } =
       await this.getPublishPermissionStatus(type, uid);
-    const { username, avatar, exam, authLevel, verifyPhoneNumber } = tasks;
+    const { username, avatar, exam, authLevel, verifyPhoneNumber, moment } =
+      tasks;
     const te = (text) => {
       ThrowCommonError(403, `权限不足，因为您还${text}`);
     };
@@ -354,6 +381,9 @@ class PublishPermissionService {
       if (!permission.examNotPass.status) {
         te(`未${exam.name}`);
       }
+    }
+    if (moment && !moment.completed) {
+      te(`未${moment.name}`);
     }
     if (verifyPhoneNumber && !verifyPhoneNumber.completed) {
       const authSettings = await SettingModel.getSettings('auth');

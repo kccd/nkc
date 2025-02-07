@@ -55,6 +55,7 @@ export default {
         (tasks.avatar && !tasks.avatar.completed) ||
         (tasks.authLevel && !tasks.authLevel.completed) ||
         (tasks.exam && !tasks.exam.completed) ||
+        (tasks.moment && !tasks.moment.completed) ||
         (tasks.verifyPhoneNumber && !tasks.verifyPhoneNumber.completed) ||
         countLimit.limited ||
         this.timeTill ||

@@ -22,6 +22,10 @@ module.exports = {
           limited: false,
           count: 1,
         },
+        momentCount: {
+          limited: false,
+          count: 1,
+        },
         intervalLimit: [
           {
             id: 'role-dev',
@@ -99,6 +103,10 @@ module.exports = {
           interval: 1,
         },
         defaultCount: {
+          limited: false,
+          count: 1,
+        },
+        momentCount: {
           limited: false,
           count: 1,
         },
@@ -182,6 +190,10 @@ module.exports = {
           limited: false,
           count: 1,
         },
+        momentCount: {
+          limited: false,
+          count: 1,
+        },
         intervalLimit: [
           {
             id: 'role-dev',
@@ -259,6 +271,10 @@ module.exports = {
           interval: 1,
         },
         defaultCount: {
+          limited: false,
+          count: 1,
+        },
+        momentCount: {
           limited: false,
           count: 1,
         },
@@ -342,6 +358,10 @@ module.exports = {
           limited: false,
           count: 1,
         },
+        momentCount: {
+          limited: false,
+          count: 1,
+        },
         intervalLimit: [
           {
             id: 'role-dev',
@@ -419,6 +439,10 @@ module.exports = {
           interval: 1,
         },
         defaultCount: {
+          limited: false,
+          count: 1,
+        },
+        momentCount: {
           limited: false,
           count: 1,
         },
