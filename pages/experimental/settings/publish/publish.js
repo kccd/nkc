@@ -25,6 +25,9 @@ const app = new window.Vue({
     settings() {
       return this.publishSettings[this.selectSourceType] || null;
     },
+    disableMomentCount() {
+      return this.selectSourceType === 'moment';
+    },
   },
   methods: {
     selectSource(type) {
