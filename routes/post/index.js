@@ -163,6 +163,26 @@ router
       data.postHistory = postHistory;
     }
     await thread.extendFirstPost();
+    if (!thread.reviewed) {
+      if (!data.user || (!isModerator && data.user.uid !== thread.uid)) {
+        ctx.throw(403, '文章还未通过审核，暂无法阅读');
+      }
+    }
+    if (thread.recycleMark) {
+      if (!data.user || (!isModerator && data.user.uid !== thread.uid)) {
+        ctx.throw(403, '文章退回修改中，暂无法阅读');
+      }
+    }
+    if (!post.reviewed) {
+      if (!data.user || (!isModerator && data.user.uid !== post.uid)) {
+        ctx.throw(403, '回复还未通过审核，暂无法阅读');
+      }
+    }
+    if (post.toDraft) {
+      if (!data.user || (!isModerator && data.user.uid !== post.uid)) {
+        ctx.throw(403, '回复退回修改中，暂无法阅读');
+      }
+    }
     data.thread = {
       tid: thread.tid,
       oc: thread.oc,
@@ -185,18 +205,6 @@ router
 
     // 判断用户是否具有访问该post所在文章的权限
     data.isModerator = isModerator;
-
-    if (!thread.reviewed) {
-      if (!data.user || (!isModerator && data.user.uid !== thread.uid)) {
-        ctx.throw(403, '文章还未通过审核，暂无法阅读');
-      }
-    }
-    if (!post.reviewed) {
-      if (!data.user || (!isModerator && data.user.uid !== post.uid)) {
-        ctx.throw(403, '回复还未通过审核，暂无法阅读');
-      }
-    }
-
     await db.SettingModel.restrictAccess({
       toc: post.toc,
       forums: forums,
