@@ -58,6 +58,14 @@ router
         ctx.throw(500, error);
       }
       // console.log(completePath);
+      const entryFile = `index.html`; // 入口文件名
+      const entryFilePath = findFileInRoot(completePath, entryFile);
+      if (!entryFilePath) {
+        if (completePath) {
+          await deleteFolder(completePath);
+        }
+        ctx.throw(400, `未找到入口文件: ${entryFile}`);
+      }
     }
     // 更新工具信息
     let toolsModel = db.ToolsModel;
@@ -109,6 +117,14 @@ router
         ctx.throw(500, error);
       }
       // console.log(completePath);
+      const entryFile = `index.html`; // 入口文件名
+      const entryFilePath = findFileInRoot(completePath, entryFile);
+      if (!entryFilePath) {
+        if (completePath) {
+          await deleteFolder(completePath);
+        }
+        ctx.throw(400, `未找到入口文件: ${entryFile}`);
+      }
     }
     // 信息入库
     const toolsModel = db.ToolsModel;
@@ -203,9 +219,9 @@ function checkToolInfo(data) {
     res.err = '工具名不能为空';
     return res;
   }
-  if (!data.entry) {
-    data.entry = '/index.html';
-  }
+  // if (!data.entry) {
+  //   data.entry = '/index.html';
+  // }
   if (!data.version) {
     data.version = '1.0';
   }
@@ -224,7 +240,7 @@ function checkToolInfo(data) {
     summary: data.summary,
     author: data.author,
     uid: data.uid,
-    entry: data.entry,
+    entry: data.isOtherSite ? data.entry : '/index.html',
     isOtherSite: data.isOtherSite,
     lastModify: Date.now(),
   };
@@ -258,4 +274,22 @@ async function deleteFolder(path) {
   }
 }
 
+/**
+ * 查找压缩包根目录中的目标文件
+ * @param {string} dir - 解压后的根目录
+ * @param {string} targetFile - 要查找的文件名（如 index.html）
+ * @returns {string|null} - 返回目标文件的路径，未找到时返回 null
+ */
+function findFileInRoot(dir, targetFile) {
+  const files = fs.readdirSync(dir); // 读取目录中的文件和文件夹
+  for (const file of files) {
+    const fullPath = path.join(dir, file); // 获取完整路径
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isFile() && file === targetFile) {
+      return fullPath; // 返回完整路径
+    }
+  }
+  return null; // 未找到目标文件
+}
 module.exports = router;
