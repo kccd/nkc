@@ -1313,11 +1313,26 @@ threadRouter
     if (thread.closed) {
       ctx.throw(400, '主题已关闭，暂不能发表回复/评论');
     }
+    if (!thread.reviewed) {
+      ctx.throw(403, '文章还未通过审核，暂不能发表回复/评论');
+    }
+    if (thread.recycleMark) {
+      ctx.throw(403, '文章退回修改中，暂不能发表回复/评论');
+    }
 
     if (!ctx.permission('canSendToEveryOne')) {
       let inBlacklist;
       if (postType === 'comment') {
         const pp = await db.PostModel.findOnly({ pid: post.parentPostId });
+        if (!pp.reviewed) {
+          ctx.throw(403, '回复还未通过审核，暂不能发表回复/评论');
+        }
+        if (pp.toDraft) {
+          ctx.throw(403, '回复退回修改中，暂不能发表回复/评论');
+        }
+        if (pp.disabled) {
+          ctx.throw(403, '回复已被屏蔽，暂不能发表回复/评论');
+        }
         inBlacklist = await db.BlacklistModel.inBlacklist(pp.uid, user.uid);
       } else {
         inBlacklist = await db.BlacklistModel.inBlacklist(thread.uid, user.uid);

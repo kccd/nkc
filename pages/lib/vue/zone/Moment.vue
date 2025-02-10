@@ -1057,10 +1057,16 @@ export default {
       }
     },
     visitRichContent() {
-      if (state.isApp) {
-        this.visitUrl(this.momentData.url, true);
-      } else {
+      // if (state.isApp) {
+      //   this.visitUrl(this.momentData.url, true);
+      // } else {
+      //   this.$router.push(`${this.momentData.url}`);
+      // }
+      if( this.$route &&
+      (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') && !state.isApp){
         this.$router.push(`${this.momentData.url}`);
+      }else{
+        this.visitUrl(this.momentData.url, true);
       }
     },
     closeContent() {
