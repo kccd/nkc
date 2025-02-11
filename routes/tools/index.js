@@ -9,6 +9,10 @@ router
   // 工具列表
   .get('/', Public(), async (ctx, next) => {
     const { data, db } = ctx;
+    const toolsSettings = await db.SettingModel.getSettings('tools');
+    if (!toolsSettings.enabled && !ctx.permission(Operations.enableSiteTools)) {
+      ctx.throw(403, '权限不足');
+    }
     let toolsModel = db.ToolsModel;
     let toolList = await toolsModel.find();
     toolList.forEach((model, index) => {
@@ -22,9 +26,19 @@ router
   // 打开工具
   .get('/open/:toolid', Public(), async (ctx, next) => {
     const { data, db, params } = ctx;
+    const toolsSettings = await db.SettingModel.getSettings('tools');
+    if (!toolsSettings.enabled && !ctx.permission(Operations.enableSiteTools)) {
+      ctx.throw(403, '权限不足');
+    }
     let toolsModel = db.ToolsModel;
     let toolInfo = await toolsModel.findOne({ _id: params.toolid });
     // console.log(toolInfo);
+    if (!toolInfo) {
+      ctx.throw(400, `未找到ID为${params.toolid}的工具`);
+    }
+    if (toolInfo.isHide && !ctx.permission(Operations.hideTool)) {
+      ctx.throw(403, '权限不足');
+    }
     data.toolInfo = toolInfo.toObject();
     ctx.template = 'tools/container.pug';
     await next();
