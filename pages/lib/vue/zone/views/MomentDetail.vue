@@ -14,7 +14,7 @@
         .zone-moment-container
           complaint(ref="complaint")
           violation-record(ref="violationRecord")
-          moment-comment-child(ref='momentCommentChild')
+          //- moment-comment-child(ref='momentCommentChild')
           moment(
             ref='moment'
             @complaint="complaint"
@@ -133,7 +133,7 @@ import ComplaintVue from '../../Complaint.vue';
 import Loading from '../../Loading.vue';
 import ViolationRecordVue from '../../ViolationRecord.vue';
 import Moment from '../Moment.vue';
-import MomentCommentChildVue from '../MomentCommentChild.vue';
+// import MomentCommentChildVue from '../MomentCommentChild.vue';
 
 // import {momentVote} from "../../js/zone/vote";
 export default {
@@ -141,7 +141,7 @@ export default {
     moment: Moment,
     complaint: ComplaintVue,
     'violation-record': ViolationRecordVue,
-    'moment-comment-child': MomentCommentChildVue,
+    // 'moment-comment-child': MomentCommentChildVue,
     loading: Loading,
   },
   // props: ['data', 'focus', 'permissions', 'mode', 'type'],

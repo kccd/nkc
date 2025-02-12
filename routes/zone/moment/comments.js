@@ -26,33 +26,37 @@ router
       faulty: faultyStatus,
       unknown: unknownStatus,
       disabled: disabledStatus,
+      deleted: deletedStatus,
     } = await db.MomentModel.getMomentStatus();
     const match = {
       parent: moment._id,
       $or: [
         {
-          status: normalStatus,
-        },
-        {
-          uid: state.uid,
+          // status: normalStatus,
           status: {
-            $in: [normalStatus, faultyStatus, unknownStatus],
+            $in: [normalStatus, disabledStatus, deletedStatus, unknownStatus],
           },
         },
+        // {
+        //   uid: state.uid,
+        //   status: {
+        //     $in: [normalStatus, faultyStatus, unknownStatus],
+        //   },
+        // },
       ],
     };
-    if (user) {
-      if (permission('review')) {
-        delete match.$or[1].uid;
-      }
-    }
-    if (ctx.permission('managementMoment')) {
-      match.$or.push({
-        status: {
-          $in: [disabledStatus],
-        },
-      });
-    }
+    // if (user) {
+    //   if (permission('review')) {
+    //     delete match.$or[1].uid;
+    //   }
+    // }
+    // if (ctx.permission('managementMoment')) {
+    //   match.$or.push({
+    //     status: {
+    //       $in: [disabledStatus],
+    //     },
+    //   });
+    // }
     const sortObj = sort === 'hot' ? { voteUp: -1, top: 1 } : { top: 1 };
     const count = await db.MomentModel.countDocuments(match);
     const perPage = await db.MomentModel.getMomentCommentPerPage(mode);

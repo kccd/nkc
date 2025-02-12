@@ -3,9 +3,9 @@
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
     .moment-comment-item(
-      :class=`{'active': focus === commentData._id, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted', 'disable-hover': replyEditorStatus}`
+      :class=`{'active': focus === commentData._id, 'abnormal': commentData.status === 'disabled' ||  (commentData.status === 'deleted' && (!permissions || !permissions.reviewed)),'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted' && permissions && permissions.reviewed, 'disable-hover': replyEditorStatus}`
     )
-      moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
+      // moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
       .moment-comment-item-header
         a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
           img(
@@ -46,6 +46,14 @@
               :ref="`momentOption_${commentData._id}`"
               @complaint="complaint"
             )
+      .moment-status(v-if="commentData && commentData.status === 'unknown'")
+        .review 内容审核中
+      .moment-status(v-else-if="commentData && commentData.status === 'deleted'") 
+        .deleted(v-if="permissions && permissions.reviewed") 该评论已被删除
+        span(v-else) 该评论暂时无法显示
+      .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
+        span(v-if="permissions && permissions.reviewed") 该评论已被屏蔽
+        span(v-else) 该评论暂时无法显示
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       //- 图片视频
       .moment-comment-item-files(v-if="type === 'comment'")
@@ -103,7 +111,6 @@
 </template>
 
 <script>
-import MomentStatus from './MomentStatus';
 import MomentOptionFixed from './momentOption/MomentOptionFixed';
 import FromNow from '../FromNow';
 import { toLogin } from '../../js/account';
@@ -154,7 +161,6 @@ export default {
   },
   components: {
     'editor-core': EditorCore,
-    'moment-status': MomentStatus,
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
     'winking-face': WinkingFace,
@@ -402,11 +408,19 @@ export default {
     background-color: #ffebcf;
     padding: 0.5rem;
   }
+  &.disabled {
+    // background: #8f8f8f;
+    background-color:rgba(143, 143, 143, 0.5);
+  }
   &.unknown {
     background: #ffd598;
   }
   &.deleted {
-    background: #bdbdbd;
+    // background: #bdbdbd;
+    background: #e85a71;
+  }
+  &.abnormal {
+    background-color:rgba(143, 143, 143, 0.5);
   }
   padding: 0.5rem 0;
   margin-bottom: 0;
