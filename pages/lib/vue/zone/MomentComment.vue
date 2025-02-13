@@ -3,7 +3,7 @@
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
     .moment-comment-item(
-      :class=`{'active': focus === commentData._id, 'abnormal': commentData.status === 'disabled' ||  (commentData.status === 'deleted' && (!permissions || !permissions.reviewed)),'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted' && permissions && permissions.reviewed, 'disable-hover': replyEditorStatus}`
+      :class=`panelClass`
     )
       // moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
       .moment-comment-item-header
@@ -33,7 +33,7 @@
           from-now(:time="commentData.toc")
           span &nbsp;IP:{{commentData.addr}}
 
-        .moment-comment-options
+        .moment-comment-options(v-if="!hideContent")
           .moment-comment-option(title="回复" @click="switchEditor" v-if="type === 'comment'")
             .fa.fa-comment-o
           .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
@@ -47,13 +47,20 @@
               @complaint="complaint"
             )
       .moment-status(v-if="commentData && commentData.status === 'unknown'")
-        .review 内容审核中
+        .review(v-if="isAuthor || hasReviewPermission") 内容审核中
+        .hidden-content(v-else)
+          <lock theme="outline" />
+          span 内容不可见
       .moment-status(v-else-if="commentData && commentData.status === 'deleted'") 
-        .deleted(v-if="permissions && permissions.reviewed") 该评论已被删除
-        span(v-else) 该评论暂时无法显示
+        .deleted(v-if="permissions && permissions.reviewed") 内容已被删除
+        .hidden-content(v-else)
+          <lock theme="outline" />
+          span 内容不可见
       .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
-        span(v-if="permissions && permissions.reviewed") 该评论已被屏蔽
-        span(v-else) 该评论暂时无法显示
+        .disabled(v-if="permissions && permissions.reviewed") 内容已被屏蔽
+        .hidden-content(v-else)
+          <lock theme="outline" />
+          span 内容不可见
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       //- 图片视频
       .moment-comment-item-files(v-if="type === 'comment'")
@@ -120,7 +127,7 @@ import { sweetError } from '../../js/sweetAlert';
 import { getState } from '../../js/state';
 import { objToStr } from '../../js/tools';
 import { nkcAPI } from '../../js/netAPI';
-import { WinkingFace } from '@icon-park/vue';
+import { WinkingFace, Lock } from '@icon-park/vue';
 import EmojiSelector from '../EmojiSelector.vue';
 import MomentFiles from './MomentFiles';
 import ResourceSelector from '../ResourceSelector';
@@ -168,6 +175,7 @@ export default {
     'moment-files': MomentFiles,
     'resource-selector': ResourceSelector,
     'publish-permission-checker': PublishPermissionCheck,
+    lock: Lock,
   },
   data: () => ({
     publishPermissionTypes,
@@ -201,6 +209,36 @@ export default {
     picturesId: [],
   }),
   computed: {
+    hideContent() {
+      return (
+        !this.hasReviewPermission &&
+        this.commentData.status !== 'normal' &&
+        (!this.isAuthor || this.commentData.status !== 'unknown')
+      );
+    },
+    isAuthor() {
+      return state.uid && state.uid === this.commentData.uid;
+    },
+    hasReviewPermission() {
+      return this.permissions && this.permissions.reviewed;
+    },
+    panelClass() {
+      const classArr = [];
+      if (this.focus === this.commentData._id) classArr.push('active');
+      if (this.replyEditorStatus) classArr.push('disable-hover');
+      if (this.hasReviewPermission) {
+        // 管理员
+        classArr.push(this.commentData.status);
+      } else if (!this.isAuthor) {
+        // 其他用户
+      } else {
+        // 作者
+        if (this.commentData.status === 'unknown') {
+          classArr.push('unknown');
+        }
+      }
+      return classArr.join(' ');
+    },
     commentData() {
       return this.comment;
     },
@@ -398,6 +436,32 @@ export default {
 <style lang="less" scoped>
 @import '../../../publicModules/base';
 .moment-comment-item {
+  .moment-status {
+    text-align: center;
+    .hidden-content {
+      padding-top: 0.2rem;
+      font-size: 1.1rem;
+      border: 1px solid #efefef;
+      background-color: #f7f7f7;
+      color: #d7cece;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      & > span:first-child {
+        padding-top: 0.3rem;
+        margin-right: 0.2rem;
+      }
+    }
+    .deleted {
+      color: #d57070;
+    }
+    .disabled {
+      color: #d57070;
+    }
+    .review {
+      color: #d57070;
+    }
+  }
   &:hover {
     background-color: #f4f4f4;
   }
@@ -409,18 +473,13 @@ export default {
     padding: 0.5rem;
   }
   &.disabled {
-    // background: #8f8f8f;
-    background-color:rgba(143, 143, 143, 0.5);
+    background-color: rgba(143, 143, 143, 0.5);
   }
   &.unknown {
     background: #ffd598;
   }
   &.deleted {
-    // background: #bdbdbd;
-    background: #e85a71;
-  }
-  &.abnormal {
-    background-color:rgba(143, 143, 143, 0.5);
+    background: #e6bfc4;
   }
   padding: 0.5rem 0;
   margin-bottom: 0;
