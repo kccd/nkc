@@ -59,7 +59,8 @@ router
     if (!fields._id) {
       ctx.throw(400, '缺少参数 _id');
     }
-    const filePath = toolsPath + `/${fields._id}`;
+    const toolData = await db.ToolsModel.findOnly({ _id: fields._id });
+    const filePath = toolsPath + `/${toolData._id}`;
     if (file) {
       if (!isZipFile(file)) {
         ctx.throw(400, '文件必须是一个压缩包');
@@ -82,8 +83,7 @@ router
       }
     }
     // 更新工具信息
-    let toolsModel = db.ToolsModel;
-    await toolsModel.where({ _id: fields._id }).updateOne(info);
+    await toolData.updateOne(info);
     // 把解压好的文件夹移动到最终位置(如果有)
     if (completePath) {
       await deleteFolder(filePath);
@@ -98,10 +98,12 @@ router
     if (!id) {
       ctx.throw(400, '缺少参数 _id');
     }
-    let toolsModel = db.ToolsModel;
-    await toolsModel.where({ _id: id }).deleteOne();
-    const { toolsPath } = ctx.settings.upload;
-    await deleteFolder(toolsPath + `/${id}`);
+    const toolData = await db.ToolsModel.findOne({ _id: id });
+    if (toolData) {
+      await db.ToolsModel.where({ _id: id }).deleteOne();
+      const { toolsPath } = ctx.settings.upload;
+      await deleteFolder(toolsPath + `/${toolData._id}`);
+    }
     await next();
   })
   // 上传工具
