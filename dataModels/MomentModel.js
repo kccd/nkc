@@ -496,7 +496,7 @@ schema.methods.deleteMoment = async function () {
   const { did } = this;
   const document = await DocumentModel.findOnly({ did, type: stable });
   await document.setStatus(this.status);
-  await this.updateParentCommentCountWhileDeleted();
+  // await this.updateParentCommentCountWhileDeleted();
 };
 
 schema.methods.updateParentCommentCountWhileDeleted = async function () {
@@ -507,6 +507,7 @@ schema.methods.updateParentCommentCountWhileDeleted = async function () {
   }
   // 运行到这里，表示当前moment为电文回复
   // 更新上一层 moment 的评论数
+  // 存在问题，会出现负的情况
   await MomentModel.updateOne(
     {
       _id: this.parent,
@@ -1053,8 +1054,12 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
+  const { moment: momentSource } = await DocumentModel.getDocumentSources();
+  const { normal: normalStatus } = await DocumentModel.getDocumentStatus();
+  const { stable: stableDocumentTypes } =
+    await DocumentModel.getDocumentTypes();
   const { moment: quoteType } = momentQuoteTypes;
-  const { uid, parent } = this;
+  const { uid, parent, did } = this;
   const { content, ip: ipId, port, files } = await this.getBetaDocument();
   const { uid: parentUid } = await MomentModel.findOne(
     { _id: parent },
@@ -1726,6 +1731,52 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
   return results;
 };
 
+schema.statics.clearContentForAbnormal = async function (
+  data,
+  uid = '',
+  managementMoment = false,
+) {
+  const MomentModel = mongoose.model('moments');
+  const momentStatus = await MomentModel.getMomentStatus();
+  for (const item of data) {
+    // 检查当前项的状态
+    if (item.status !== momentStatus.normal) {
+      if (
+        item.status === momentStatus.unknown &&
+        uid !== item.uid &&
+        !managementMoment
+      ) {
+        item.content = '';
+        item.files = [];
+      }
+      if (
+        (item.status === momentStatus.disabled ||
+          item.status === momentStatus.deleted) &&
+        !managementMoment
+      ) {
+        item.content = '';
+        item.files = [];
+      }
+    }
+
+    // 如果有子项，则递归调用
+    if (item.commentsData && item.commentsData.length > 0) {
+      await MomentModel.clearContentForAbnormal(
+        item.commentsData,
+        uid,
+        managementMoment,
+      );
+    }
+    // 如果有父项
+    if (item.parentData && item.parentData.status !== momentStatus.normal) {
+      await MomentModel.clearContentForAbnormal(
+        [item.parentData],
+        uid,
+        managementMoment,
+      );
+    }
+  }
+};
 schema.statics.extendCommentsDataCommentsData = async function (
   commentsData,
   uid,
@@ -1746,17 +1797,17 @@ schema.statics.extendCommentsDataCommentsData = async function (
   }
 
   const match = {
-    $or: [
-      {
-        status: momentStatus.normal,
-      },
-      {
-        uid,
-        status: {
-          $in: [momentStatus.normal, momentStatus.faulty, momentStatus.unknown],
-        },
-      },
-    ],
+    // $or: [
+    //   {
+    //     status: momentStatus.normal,
+    //   },
+    //   {
+    //     uid,
+    //     status: {
+    //       $in: [momentStatus.normal, momentStatus.faulty, momentStatus.unknown],
+    //     },
+    //   },
+    // ],
   };
 
   if (mode === momentCommentModes.simple) {
@@ -1769,13 +1820,13 @@ schema.statics.extendCommentsDataCommentsData = async function (
     };
   }
 
-  if (managementMoment) {
-    match.$or.push({
-      status: {
-        $in: [momentStatus.disabled, momentStatus.faulty, momentStatus.unknown],
-      },
-    });
-  }
+  // if (managementMoment) {
+  //   match.$or.push({
+  //     status: {
+  //       $in: [momentStatus.disabled, momentStatus.faulty, momentStatus.unknown],
+  //     },
+  //   });
+  // }
   const latestComments = await MomentModel.find(match);
   const latestCommentsDataObj = {};
   let latestCommentsData = await MomentModel.extendCommentsData(
@@ -1799,6 +1850,11 @@ schema.statics.extendCommentsDataCommentsData = async function (
     const { _id } = commentData;
     commentData.commentsData = latestCommentsDataObj[_id] || [];
   }
+  await MomentModel.clearContentForAbnormal(
+    commentsData,
+    uid,
+    managementMoment,
+  );
   return commentsData;
 };
 
@@ -1817,17 +1873,17 @@ schema.statics.extendCommentsDataParentData = async function (
     _id: {
       $in: parentsId,
     },
-    $or: [
-      {
-        status: momentStatus.normal,
-      },
-      {
-        uid,
-        status: {
-          $in: [momentStatus.normal, momentStatus.faulty, momentStatus.unknown],
-        },
-      },
-    ],
+    // $or: [
+    //   {
+    //     status: momentStatus.normal,
+    //   },
+    //   {
+    //     uid,
+    //     status: {
+    //       $in: [momentStatus.normal, momentStatus.faulty, momentStatus.unknown],
+    //     },
+    //   },
+    // ],
   });
   const parentCommentsDataObj = {};
   const parentCommentsData = await MomentModel.extendCommentsData(

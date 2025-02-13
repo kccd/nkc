@@ -696,7 +696,7 @@ import CommonModal from './CommonModal';
 import SelectCategory from './SelectCategory';
 import { openImageViewer } from '../js/imageViewer';
 
-const { isApp, fileDomain } = getState();
+const { isApp, fileDomain, uid } = getState();
 const isReactNative = isApp && getState().platform === 'reactNative';
 import {
   RNTakePictureAndUpload,
@@ -764,7 +764,9 @@ export default {
     this.initDragUploadEvent();
   },
   destroyed() {
-    this.removeSocketEvent();
+    if(uid){
+      this.removeSocketEvent();
+    }
     this.destroyCropper();
     this.destroyDraggable();
     this.disableDragUploadEvent();

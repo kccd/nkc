@@ -3,10 +3,10 @@
     resource-selector(ref="resourceSelector")
     emoji-selector(ref="emojiSelector")
     .moment-comment-item(
-      :class=`{'active': focus === commentData._id, 'unknown': commentData.status === 'unknown', 'deleted': commentData.status === 'deleted', 'disable-hover': replyEditorStatus}`
+      :class=`panelClass`
     )
-      moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
-      .moment-comment-item-header
+      // moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
+      .moment-comment-item-header(v-if="!hideContent")
         a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
           img(
             :src="commentData.avatarUrl"
@@ -46,6 +46,15 @@
               :ref="`momentOption_${commentData._id}`"
               @complaint="complaint"
             )
+      .moment-status(v-if="commentData && commentData.status === 'unknown'")
+        .review(v-if="isAuthor || hasReviewPermission") 内容审核中
+        .hidden-content(v-else) 内容不可见
+      .moment-status(v-else-if="commentData && commentData.status === 'deleted'") 
+        .deleted(v-if="permissions && permissions.reviewed") 内容已被删除
+        .hidden-content(v-else) 内容不可见
+      .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
+        .disabled(v-if="permissions && permissions.reviewed") 内容已被屏蔽
+        .hidden-content(v-else) 内容不可见
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       //- 图片视频
       .moment-comment-item-files(v-if="type === 'comment'")
@@ -103,7 +112,6 @@
 </template>
 
 <script>
-import MomentStatus from './MomentStatus';
 import MomentOptionFixed from './momentOption/MomentOptionFixed';
 import FromNow from '../FromNow';
 import { toLogin } from '../../js/account';
@@ -113,7 +121,7 @@ import { sweetError } from '../../js/sweetAlert';
 import { getState } from '../../js/state';
 import { objToStr } from '../../js/tools';
 import { nkcAPI } from '../../js/netAPI';
-import { WinkingFace } from '@icon-park/vue';
+import { WinkingFace, Lock } from '@icon-park/vue';
 import EmojiSelector from '../EmojiSelector.vue';
 import MomentFiles from './MomentFiles';
 import ResourceSelector from '../ResourceSelector';
@@ -154,7 +162,6 @@ export default {
   },
   components: {
     'editor-core': EditorCore,
-    'moment-status': MomentStatus,
     'moment-option': MomentOptionFixed,
     'from-now': FromNow,
     'winking-face': WinkingFace,
@@ -162,6 +169,7 @@ export default {
     'moment-files': MomentFiles,
     'resource-selector': ResourceSelector,
     'publish-permission-checker': PublishPermissionCheck,
+    lock: Lock,
   },
   data: () => ({
     publishPermissionTypes,
@@ -195,6 +203,36 @@ export default {
     picturesId: [],
   }),
   computed: {
+    hideContent() {
+      return (
+        !this.hasReviewPermission &&
+        this.commentData.status !== 'normal' &&
+        (!this.isAuthor || this.commentData.status !== 'unknown')
+      );
+    },
+    isAuthor() {
+      return state.uid && state.uid === this.commentData.uid;
+    },
+    hasReviewPermission() {
+      return this.permissions && this.permissions.reviewed;
+    },
+    panelClass() {
+      const classArr = [];
+      if (this.focus === this.commentData._id) classArr.push('active');
+      if (this.replyEditorStatus) classArr.push('disable-hover');
+      if (this.hasReviewPermission) {
+        // 管理员
+        classArr.push(this.commentData.status);
+      } else if (!this.isAuthor) {
+        // 其他用户
+      } else {
+        // 作者
+        if (this.commentData.status === 'unknown') {
+          classArr.push('unknown');
+        }
+      }
+      return classArr.join(' ');
+    },
     commentData() {
       return this.comment;
     },
@@ -392,6 +430,28 @@ export default {
 <style lang="less" scoped>
 @import '../../../publicModules/base';
 .moment-comment-item {
+  .moment-status {
+    text-align: center;
+    .hidden-content {
+      font-size: 1.1rem;
+      border: 1px solid #efefef;
+      background-color: #f7f7f7;
+      color: #d7cece;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 2rem;
+    }
+    .deleted {
+      color: #d57070;
+    }
+    .disabled {
+      color: #d57070;
+    }
+    .review {
+      color: #d57070;
+    }
+  }
   &:hover {
     background-color: #f4f4f4;
   }
@@ -402,11 +462,14 @@ export default {
     background-color: #ffebcf;
     padding: 0.5rem;
   }
+  &.disabled {
+    background-color: rgba(143, 143, 143, 0.5);
+  }
   &.unknown {
     background: #ffd598;
   }
   &.deleted {
-    background: #bdbdbd;
+    background: #e6bfc4;
   }
   padding: 0.5rem 0;
   margin-bottom: 0;

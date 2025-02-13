@@ -9,6 +9,10 @@ router
   // 工具列表
   .get('/', Public(), async (ctx, next) => {
     const { data, db } = ctx;
+    const toolsSettings = await db.SettingModel.getSettings('tools');
+    if (!toolsSettings.enabled && !ctx.permission(Operations.enableSiteTools)) {
+      ctx.throw(403, '权限不足');
+    }
     let toolsModel = db.ToolsModel;
     let toolList = await toolsModel.find();
     toolList.forEach((model, index) => {
@@ -22,9 +26,19 @@ router
   // 打开工具
   .get('/open/:toolid', Public(), async (ctx, next) => {
     const { data, db, params } = ctx;
+    const toolsSettings = await db.SettingModel.getSettings('tools');
+    if (!toolsSettings.enabled && !ctx.permission(Operations.enableSiteTools)) {
+      ctx.throw(403, '权限不足');
+    }
     let toolsModel = db.ToolsModel;
     let toolInfo = await toolsModel.findOne({ _id: params.toolid });
     // console.log(toolInfo);
+    if (!toolInfo) {
+      ctx.throw(400, `未找到ID为${params.toolid}的工具`);
+    }
+    if (toolInfo.isHide && !ctx.permission(Operations.hideTool)) {
+      ctx.throw(403, '权限不足');
+    }
     data.toolInfo = toolInfo.toObject();
     ctx.template = 'tools/container.pug';
     await next();
@@ -45,7 +59,8 @@ router
     if (!fields._id) {
       ctx.throw(400, '缺少参数 _id');
     }
-    const filePath = toolsPath + `/${fields._id}`;
+    const toolData = await db.ToolsModel.findOnly({ _id: fields._id });
+    const filePath = toolsPath + `/${toolData._id}`;
     if (file) {
       if (!isZipFile(file)) {
         ctx.throw(400, '文件必须是一个压缩包');
@@ -58,10 +73,17 @@ router
         ctx.throw(500, error);
       }
       // console.log(completePath);
+      const entryFile = `index.html`; // 入口文件名
+      const entryFilePath = findFileInRoot(completePath, entryFile);
+      if (!entryFilePath) {
+        if (completePath) {
+          await deleteFolder(completePath);
+        }
+        ctx.throw(400, `未找到入口文件: ${entryFile}`);
+      }
     }
     // 更新工具信息
-    let toolsModel = db.ToolsModel;
-    await toolsModel.where({ _id: fields._id }).updateOne(info);
+    await toolData.updateOne(info);
     // 把解压好的文件夹移动到最终位置(如果有)
     if (completePath) {
       await deleteFolder(filePath);
@@ -76,10 +98,12 @@ router
     if (!id) {
       ctx.throw(400, '缺少参数 _id');
     }
-    let toolsModel = db.ToolsModel;
-    await toolsModel.where({ _id: id }).deleteOne();
-    const { toolsPath } = ctx.settings.upload;
-    await deleteFolder(toolsPath + `/${id}`);
+    const toolData = await db.ToolsModel.findOne({ _id: id });
+    if (toolData) {
+      await db.ToolsModel.where({ _id: id }).deleteOne();
+      const { toolsPath } = ctx.settings.upload;
+      await deleteFolder(toolsPath + `/${toolData._id}`);
+    }
     await next();
   })
   // 上传工具
@@ -109,6 +133,14 @@ router
         ctx.throw(500, error);
       }
       // console.log(completePath);
+      const entryFile = `index.html`; // 入口文件名
+      const entryFilePath = findFileInRoot(completePath, entryFile);
+      if (!entryFilePath) {
+        if (completePath) {
+          await deleteFolder(completePath);
+        }
+        ctx.throw(400, `未找到入口文件: ${entryFile}`);
+      }
     }
     // 信息入库
     const toolsModel = db.ToolsModel;
@@ -203,9 +235,9 @@ function checkToolInfo(data) {
     res.err = '工具名不能为空';
     return res;
   }
-  if (!data.entry) {
-    data.entry = '/index.html';
-  }
+  // if (!data.entry) {
+  //   data.entry = '/index.html';
+  // }
   if (!data.version) {
     data.version = '1.0';
   }
@@ -224,7 +256,7 @@ function checkToolInfo(data) {
     summary: data.summary,
     author: data.author,
     uid: data.uid,
-    entry: data.entry,
+    entry: data.isOtherSite ? data.entry : '/index.html',
     isOtherSite: data.isOtherSite,
     lastModify: Date.now(),
   };
@@ -258,4 +290,22 @@ async function deleteFolder(path) {
   }
 }
 
+/**
+ * 查找压缩包根目录中的目标文件
+ * @param {string} dir - 解压后的根目录
+ * @param {string} targetFile - 要查找的文件名（如 index.html）
+ * @returns {string|null} - 返回目标文件的路径，未找到时返回 null
+ */
+function findFileInRoot(dir, targetFile) {
+  const files = fs.readdirSync(dir); // 读取目录中的文件和文件夹
+  for (const file of files) {
+    const fullPath = path.join(dir, file); // 获取完整路径
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isFile() && file === targetFile) {
+      return fullPath; // 返回完整路径
+    }
+  }
+  return null; // 未找到目标文件
+}
 module.exports = router;

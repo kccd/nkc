@@ -1,6 +1,6 @@
 <template lang="pug">
   .moment-commments.p-t-1
-    moment-comment-child-editor(ref="momentCommentChildEditor")
+    //- moment-comment-child-editor(ref="momentCommentChildEditor")
     .m-b-1
       moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
     .moment-comment-nav(v-if="postType === 'comment'")
@@ -25,7 +25,6 @@
           :type="postType"
           :focus="focusCommentId"
           :permissions="permissions"
-          @visit-comment-child="visitCommentChild"
           @on-reply-comment="onReplyComment"
           :mode="mode"
         )
@@ -75,7 +74,7 @@
   import {getState} from "../../js/state";
   import {toLogin} from "../../js/account";
   import MomentComment from "./MomentComment";
-  import MomentCommentChildrenEditor from './MomentCommentChild';
+  // import MomentCommentChildrenEditor from './MomentCommentChild';
   const {uid} = getState();
 
   export default {
@@ -86,7 +85,7 @@
       'from-now': FromNow,
       'moment-comment-editor': MomentCommentEditor,
       'moment-status': MomentStatus,
-      'moment-comment-child-editor': MomentCommentChildrenEditor,
+      // 'moment-comment-child-editor': MomentCommentChildrenEditor,
       'moment-comment': MomentComment
     },
     data: () => ({
@@ -271,17 +270,17 @@
       complaint(mid) {
         this.$emit('complaint', mid);
       },
-      visitCommentChild(comment) {
-        this.$refs.momentCommentChildEditor.open({
-          commentId: comment._id,
-        });
-      },
-      replyComment(comment) {
-        this.$refs.momentCommentChildEditor.open({
-          commentId: comment.parentsId[1] || comment._id,
-          replyCommentId: comment._id,
-        });
-      },
+      // visitCommentChild(comment) {
+      //   this.$refs.momentCommentChildEditor.open({
+      //     commentId: comment._id,
+      //   });
+      // },
+      // replyComment(comment) {
+      //   this.$refs.momentCommentChildEditor.open({
+      //     commentId: comment.parentsId[1] || comment._id,
+      //     replyCommentId: comment._id,
+      //   });
+      // },
       onReplyComment(commentId) {
         this.setFocusCommentId(commentId);
         this.setActiveNav(this.nav[0].type);

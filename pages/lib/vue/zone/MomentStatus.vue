@@ -19,7 +19,7 @@
     .faulty 内容已被退回修改
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 @import '../../../publicModules/base';
 .moment-status {
   text-align: center;
@@ -29,7 +29,7 @@
     color: red;
   }
   .faulty {
-    background: #FFBC42;
+    background: #ffbc42;
   }
   .disabled {
     background: #8f8f8f;
@@ -41,53 +41,49 @@
 </style>
 
 <script>
-import {nkcAPI} from "../../js/netAPI";
+import { nkcAPI } from '../../js/netAPI';
 
 export default {
   props: ['moment', 'permissions'],
-  data: () => ({
-  }),
-  mounted() {
-  },
+  data: () => ({}),
+  mounted() {},
   methods: {
     //动态审核通过
     reviewMoment() {
-      const {docId} = this.moment;
+      const { docId } = this.moment;
       nkcAPI('/review', 'PUT', {
         pass: true,
         docId,
-        type: 'document'
+        type: 'document',
       })
-        .then(res => {
+        .then((res) => {
           sweetSuccess('操作成功');
           setTimeout(() => {
             window.location.reload();
           }, 500);
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
-        })
+        });
     },
     //删除动态
     deleteMoment() {
-      const {momentId, momentCommentId} = this.moment;
+      const { momentId, momentCommentId } = this.moment;
       let _id = momentCommentId;
-      if(!_id) {
+      if (!_id) {
         _id = momentId;
       }
-      if(!_id) return;
-      sweetQuestion("你确定要删除吗？")
-        .then(() => {
-          nkcAPI(`/moment/${_id}`, 'DELETE', {
+      if (!_id) return;
+      sweetQuestion('你确定要删除吗？').then(() => {
+        nkcAPI(`/moment/${_id}`, 'DELETE', {})
+          .then(() => {
+            sweetSuccess('操作成功');
           })
-            .then(() => {
-              sweetSuccess('操作成功');
-            })
-            .catch(err => {
-              sweetError(err);
-            })
-        })
-    }
-  }
-}
+          .catch((err) => {
+            sweetError(err);
+          });
+      });
+    },
+  },
+};
 </script>
