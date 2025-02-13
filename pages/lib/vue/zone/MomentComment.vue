@@ -6,7 +6,7 @@
       :class=`panelClass`
     )
       // moment-status(ref="momentStatus" :moment="commentData" :permissions="permissions")
-      .moment-comment-item-header
+      .moment-comment-item-header(v-if="!hideContent")
         a.moment-comment-avatar(:href="commentData.userHome" target="_blank")
           img(
             :src="commentData.avatarUrl"
@@ -33,7 +33,7 @@
           from-now(:time="commentData.toc")
           span &nbsp;IP:{{commentData.addr}}
 
-        .moment-comment-options(v-if="!hideContent")
+        .moment-comment-options
           .moment-comment-option(title="回复" @click="switchEditor" v-if="type === 'comment'")
             .fa.fa-comment-o
           .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
@@ -48,19 +48,13 @@
             )
       .moment-status(v-if="commentData && commentData.status === 'unknown'")
         .review(v-if="isAuthor || hasReviewPermission") 内容审核中
-        .hidden-content(v-else)
-          <lock theme="outline" />
-          span 内容不可见
+        .hidden-content(v-else) 内容不可见
       .moment-status(v-else-if="commentData && commentData.status === 'deleted'") 
         .deleted(v-if="permissions && permissions.reviewed") 内容已被删除
-        .hidden-content(v-else)
-          <lock theme="outline" />
-          span 内容不可见
+        .hidden-content(v-else) 内容不可见
       .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
         .disabled(v-if="permissions && permissions.reviewed") 内容已被屏蔽
-        .hidden-content(v-else)
-          <lock theme="outline" />
-          span 内容不可见
+        .hidden-content(v-else) 内容不可见
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       //- 图片视频
       .moment-comment-item-files(v-if="type === 'comment'")
@@ -439,7 +433,6 @@ export default {
   .moment-status {
     text-align: center;
     .hidden-content {
-      padding-top: 0.2rem;
       font-size: 1.1rem;
       border: 1px solid #efefef;
       background-color: #f7f7f7;
@@ -447,10 +440,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      & > span:first-child {
-        padding-top: 0.3rem;
-        margin-right: 0.2rem;
-      }
+      height: 2rem;
     }
     .deleted {
       color: #d57070;
