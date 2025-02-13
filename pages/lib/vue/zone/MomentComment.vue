@@ -441,6 +441,7 @@ export default {
       justify-content: center;
       align-items: center;
       height: 2rem;
+      padding-top: 0.3rem;
     }
     .deleted {
       color: #d57070;
