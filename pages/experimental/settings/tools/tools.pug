@@ -14,12 +14,12 @@ block eContent
         else
           button.btn.btn-primary(@click=`enableSiteTool()`) 启用网站工具
       .form-group.text-danger
-        p 注意：仅支持上传zip格式的压缩包（需要包含一个根目录文件夹），上传后服务器会自动解压。
+        p 注意：仅支持上传zip格式的压缩包，结构如下：
       .form-group
         pre(style="padding:1rem;").
             xxx.zip
-              └──build/                  # 根目录文件夹         
-                  ├── index.html        # 入口 HTML 文件                        
+              └──build/                 # 根文件夹
+                  ├── index.html        # 入口文件
                   └── ....              # 其他
       .table-responsive
         table.table.table-bordered
