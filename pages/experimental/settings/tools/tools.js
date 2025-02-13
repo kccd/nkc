@@ -11,7 +11,7 @@ new Vue({
         const t = dom.text().trim();
         if(t === '工具压缩包') dom.hide();
         const t1 = dom1.text().trim();
-        if(t1 === '入口文件') {
+        if(t1 === '入口文件名') {
           dom1.children('h5').text('链接');
           dom1.children('input').attr('placeholder', '请输入链接');
         }
@@ -20,8 +20,8 @@ new Vue({
           if(t === '工具压缩包') dom.show();
           const t1 = dom1.text().trim();
           if(t1 === '链接') {
-            dom1.children('h5').text('入口文件');
-            dom1.children('input').attr('placeholder', '默认/index.html');
+            dom1.children('h5').text('入口文件名');
+            dom1.children('input').attr('placeholder', '默认index');
           }
         }
     },
@@ -39,13 +39,27 @@ new Vue({
         return;
       }
       if(select){
-          this.setStyle(select.checked, dom, dom1);
+          // this.setStyle(select.checked, dom, dom1);
+          if(select.checked){
+            dom1.show();
+            dom.hide();
+          }else{
+            dom1.hide();
+            dom.show();
+          }
       }
       radio[0].onclick = ({ target }) => {
         let link = (select && select.checked) || false;
         if(target.type === 'radio' && target.value === "true" ) link = true;
         if(target.type === 'radio' && target.value === "false") link = false;
-        this.setStyle(link, dom, dom1);
+        if(link){
+          dom1.show();
+          dom.hide();
+        }else{
+          dom1.hide();
+          dom.show();
+        }
+        // this.setStyle(link, dom, dom1);
       }
     },
     editTool: function(version, name, summary, uid, author, entry, isOtherSite, id) {
@@ -112,12 +126,19 @@ new Vue({
               {name: "否", value: false}
             ]
           },
+          // {
+          //   dom: "input",
+          //   label: "入口文件名",
+          //   name: "entry",
+          //   value: entry,
+          //   placeholder: "必填，默认index"
+          // },
           {
             dom: "input",
-            label: "入口文件",
+            label: "链接",
             name: "entry",
-            value: entry,
-            placeholder: "必填，默认/index.html"
+            value: isOtherSite?entry:'',
+            placeholder: "请输入链接"
           },
           {
             dom: "input",
@@ -210,14 +231,20 @@ new Vue({
               {name: "否", value: false}
             ]
           },
+          // {
+          //   dom: "input",
+          //   label: "入口文件名",
+          //   name: "entry",
+          //   value: "",
+          //   placeholder: "默认index"
+          // },
           {
             dom: "input",
-            label: "入口文件",
+            label: "链接",
             name: "entry",
-            value: "",
-            placeholder: "默认/index.html"
+            value: '',
+            placeholder: "请输入链接"
           },
-    
           {
             dom: "input",
             label: "工具压缩包",
