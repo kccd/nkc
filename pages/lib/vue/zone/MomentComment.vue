@@ -50,10 +50,10 @@
         .review(v-if="isAuthor || hasReviewPermission") 内容审核中
         .hidden-content(v-else) 内容不可见
       .moment-status(v-else-if="commentData && commentData.status === 'deleted'") 
-        .deleted(v-if="permissions && permissions.reviewed") 内容已被删除
+        .deleted(v-if="hasReviewPermission") 内容已被删除
         .hidden-content(v-else) 内容不可见
       .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
-        .disabled(v-if="permissions && permissions.reviewed") 内容已被屏蔽
+        .disabled(v-if="hasReviewPermission") 内容已被屏蔽
         .hidden-content(v-else) 内容不可见
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       //- 图片视频
@@ -214,7 +214,7 @@ export default {
       return state.uid && state.uid === this.commentData.uid;
     },
     hasReviewPermission() {
-      return this.permissions && this.permissions.reviewed;
+      return this.permissions && this.permissions.managementMoment;
     },
     panelClass() {
       const classArr = [];
