@@ -48,13 +48,13 @@
             )
       .moment-status(v-if="commentData && commentData.status === 'unknown'")
         .review(v-if="isAuthor || hasReviewPermission") 内容审核中
-        .hidden-content(v-else) 内容不可见
+        .hidden-content(v-else)
       .moment-status(v-else-if="commentData && commentData.status === 'deleted'") 
-        .deleted(v-if="permissions && permissions.reviewed") 内容已被删除
-        .hidden-content(v-else) 内容不可见
+        .deleted(v-if="hasReviewPermission") 内容已被删除
+        .hidden-content(v-else)
       .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
-        .disabled(v-if="permissions && permissions.reviewed") 内容已被屏蔽
-        .hidden-content(v-else) 内容不可见
+        .disabled(v-if="hasReviewPermission") 内容已被屏蔽
+        .hidden-content(v-else)
       .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
       //- 图片视频
       .moment-comment-item-files(v-if="type === 'comment'")
@@ -214,7 +214,7 @@ export default {
       return state.uid && state.uid === this.commentData.uid;
     },
     hasReviewPermission() {
-      return this.permissions && this.permissions.reviewed;
+      return this.permissions && this.permissions.managementMoment;
     },
     panelClass() {
       const classArr = [];
@@ -440,7 +440,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 2rem;
+      height: 0.5rem;
     }
     .deleted {
       color: #d57070;
