@@ -269,6 +269,7 @@ router
       reviewed:
         state.uid &&
         (permission('movePostsToRecycle') || permission('movePostsToDraft')),
+      managementMoment: permission('managementMoment'),
     };
     data.focusCommentId = focusCommentId;
     if (state.uid) {
