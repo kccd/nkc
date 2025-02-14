@@ -244,11 +244,6 @@ router
     if (!moment) {
       ctx.throw(404, `动态 ID 错误 momentId=${mid}`);
     }
-    await momentCheckerService.checkMomentPermission(
-      state.uid,
-      moment,
-      permission('review'),
-    );
     let targetMoment;
     let focusCommentId;
     if (moment.parents.length > 0) {
@@ -258,6 +253,11 @@ router
       targetMoment = moment;
       focusCommentId = '';
     }
+    await momentCheckerService.checkMomentPermission(
+      state.uid,
+      targetMoment,
+      permission('review'),
+    );
     const [momentListData] = await db.MomentModel.extendMomentsListData(
       [targetMoment],
       state.uid,
