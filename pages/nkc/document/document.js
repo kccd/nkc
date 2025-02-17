@@ -30,6 +30,14 @@ window.deleteArticle = function (_id) {
       });
   });
 };
+// 添加独立文章恢复入口：deleted\disabled====》normal
+window.recoveryArticle = function (id) {
+  return nkcAPI(`/article/${id}/recovery`, 'POST')
+    .then(() => {
+      sweetSuccess('操作成功');
+    })
+    .catch(sweetError);
+};
 
 window.deleteMoment = function (momentId) {
   if (!momentId) {
@@ -83,6 +91,7 @@ window.handleSearch = function () {
     .filter((checkbox) => checkbox.checked)
     .map((checkbox) => checkbox.value);
 
+  const tUid = document.getElementsByClassName('tUid')[0].value.trim();
   const documentStatus = {
     normal: 'normal',
     deleted: 'deleted',
@@ -104,6 +113,7 @@ window.handleSearch = function () {
     const t = {
       source: [],
       status: [],
+      tUid,
     };
 
     if (

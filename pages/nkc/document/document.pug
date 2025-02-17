@@ -36,6 +36,9 @@ block nkcContent
           label.form-check-label.m-r-05(for="disabled")
             input.form-check-input.contentStatus(type="checkbox", value="disabled", id="disabled" checked=data.status.includes('disabled') onclick='uncheckStatus()')
             span 屏蔽
+      .form-group.form-inline
+        label 作者筛选：
+        input.form-control.tUid(type='text' placeholder='请输入用户uid' value=data.tUid)
       .m-b-05
         button.btn.btn-primary.btn-sm(type="button" onclick='handleSearch()') 查询
     include ../../publicModules/paging/paging_input
@@ -69,6 +72,12 @@ block nkcContent
                   else if document.status === 'normal'
                     button.btn-xs.btn.btn-danger(onclick=`deleteMoment('${document.momentInfo.momentId}')`) 删除
 
+              else if document.source === 'article'
+                if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                  if document.status === 'deleted' || document.status === 'disabled'
+                    button.btn-xs.btn.btn-success(onclick=`recoveryArticle('${document.sid}')`) 恢复
+                  else if document.status === 'normal'
+                    button.btn-xs.btn.btn-danger(onclick=`deleteArticle('${document._id}')`) 退修/删除
               else
                 if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
                   button.btn-xs.btn.btn-danger(onclick=`deleteArticle('${document._id}')`) 退修/删除
