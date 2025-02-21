@@ -166,7 +166,7 @@ schema.statics.reviewDocument = async (props) => {
   });
 };
 
-const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
+const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9-_,.，。!！])/gi;
 const MatchedKeyword = { result: [] };
 
 /*
@@ -223,6 +223,7 @@ schema.statics.matchKeywords = async (content, groups) => {
       count: leastKeywordCount,
       logic: relationship,
     } = group.conditions;
+
     const mint = new Mint(keywords);
     const contentFilterValue = await mint.filter(content, { replace: false });
     // 保存结果
