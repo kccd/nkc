@@ -24,9 +24,12 @@
             span(v-else)
               a.button ..
         .paging-button(v-if="paging.buttonValue.length")
-          span(style="font-size: 1rem;") 跳转到&nbsp;
-          input.input.radius-left(type="text" v-model.number="pageNumber")
-          a.button.radius-right(@click="fastSelectPage") 确定
+          input.input.radius-left(type="text" v-model.number="pageNumber" placeholder="页码")
+          a.button.radius-right(@click="fastSelectPage") 跳转
+        .paging-button
+          a.button.radius-left(:class="{'active': sort === 1}" @click="selectSort(1)") 正序
+          a.button.radius-right.m-r-05(:class="{'active': sort === -1}" @click="selectSort(-1)") 倒序
+          a(@click="selectAllResources" v-if="showSelectAll") 全选
     .resource-container-header(v-if="pageType !== 'editPicture'")
       .resource-categories
         .categoryName(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')")
@@ -64,7 +67,7 @@
         .resource-upload
           input.hidden(ref='inputElement' type="file" multiple="true" @change="selectedFiles")
           button.btn.btn-default.btn-sm.m-r-05(@click="clickInput" v-if="watchType === 'category' && isApp") 上传文件
-          button.btn.btn-default.btn-sm.m-r-05(@click="selectAllResources" v-if="watchType === 'category' && selectedResources.length") 全选
+          //button.btn.btn-default.btn-sm.m-r-05(@click="selectAllResources" v-if="watchType === 'category' && selectedResources.length") 全选
           button.btn.btn-default.btn-sm.m-r-05(@click="delResource('', 'delete')" v-if="watchType === 'category' && selectedResources.length && resourceCategories !== 'trash'") 移动到回收站
           button.btn.btn-default.btn-sm.m-r-05(@click="delResource('', 'trash')" v-if="watchType === 'category' && selectedResources.length && resourceCategories === 'trash'") 恢复选中
           button.btn.btn-default.btn-sm(@click="moveToCategory" v-if="watchType === 'category' && selectedResources.length && resourceCategories !== 'trash'") 移动到分组
@@ -731,6 +734,7 @@ export default {
     isTouchEmit: false,
     sizeLimit: null,
     callback: null,
+    sort: -1, // 1， -1
 
     cropper: null,
 
@@ -764,7 +768,7 @@ export default {
     this.initDragUploadEvent();
   },
   destroyed() {
-    if(uid){
+    if (uid) {
       this.removeSocketEvent();
     }
     this.destroyCropper();
@@ -772,6 +776,18 @@ export default {
     this.disableDragUploadEvent();
   },
   computed: {
+    showSelectAll() {
+      return this.resources.length <= this.countLimit;
+    },
+    usableResources() {
+      const arr = [];
+      for (const r of this.resources) {
+        if (r.state === 'usable') {
+          arr.push(r);
+        }
+      }
+      return arr;
+    },
     allTypes() {
       if (this.allowedExt.includes('all')) {
         return ['audio', 'video', 'attachment', 'picture'];
@@ -1137,7 +1153,8 @@ export default {
         this;
       // quota 每页数据量 skip 第几页 resource Type '全部 已上传 未上传' category 资源类型
       const type = resourceType === 'all' ? allTypes.join('-') : resourceType;
-      const url = `/me/media?quota=${quota}&skip=${skip}&type=${type}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}&reqType=${reqType}`;
+      const sort = this.sort;
+      const url = `/me/media?sort=${sort}&quota=${quota}&skip=${skip}&type=${type}&c=${category}&resourceCategories=${resourceCategories}&t=${Date.now()}&reqType=${reqType}`;
       const self = this;
       nkcAPI(url, 'GET')
         .then(function (data) {
@@ -1616,11 +1633,32 @@ export default {
     }, 300),
     //全选文件
     selectAllResources() {
-      if (this.selectedResources.length === this.resources.length) {
-        this.selectedResources = [];
-      } else {
-        this.selectedResources = [].concat(this.resources);
+      const resources =
+        this.watchType === 'category' ? this.resources : this.usableResources;
+      let selectedAll = true;
+      for (const r of resources) {
+        if (!this.selectedResources.includes(r)) {
+          selectedAll = false;
+        }
       }
+
+      if (selectedAll) {
+        for (const r of resources) {
+          const index = this.selectedResources.indexOf(r);
+          if (index > -1) {
+            this.selectedResources.splice(index, 1);
+          }
+        }
+      } else {
+        for (const r of resources) {
+          if (this.selectedResources.includes(r)) continue;
+          this.selectedResources.push(r);
+        }
+      }
+    },
+    selectSort(s) {
+      this.sort = s;
+      this.getResources();
     },
   },
 };

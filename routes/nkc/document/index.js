@@ -36,6 +36,7 @@ router.get(
       documentStatus.faulty,
       documentStatus.disabled,
     ];
+    let tUid = '';
 
     //配置数据库查询状态
     if (t && Array.isArray(source) && source.length > 0) {
@@ -51,6 +52,7 @@ router.get(
       const parsedT = JSON.parse(jsonString);
       source = parsedT.source;
       status = parsedT.status;
+      tUid = parsedT.tUid;
     }
 
     const match = {
@@ -59,6 +61,9 @@ router.get(
       type: stableDocumentType,
     };
 
+    if (tUid) {
+      match.uid = tUid;
+    }
     const count = await db.DocumentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const documents = await db.DocumentModel.find(match)
@@ -239,6 +244,7 @@ router.get(
         url,
         status,
         source,
+        sid,
       };
       //如果是动态就加入动态资源和引用信息
       if (source === documentSourcesObj.moment) {
@@ -251,6 +257,7 @@ router.get(
     data.t = t;
     data.source = source;
     data.status = status;
+    data.tUid = tUid;
     data.paging = paging;
     ctx.template = 'nkc/document/document.pug';
     data.nav = 'document';
