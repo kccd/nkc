@@ -27,9 +27,9 @@
           input.input.radius-left(type="text" v-model.number="pageNumber" placeholder="页码")
           a.button.radius-right(@click="fastSelectPage") 跳转
         .paging-button
-          a.button.radius-left(:class="{'active': sort === 1}" @click="selectSort(1)") 正序
-          a.button.radius-right.m-r-05(:class="{'active': sort === -1}" @click="selectSort(-1)") 倒序
-          a(@click="selectAllResources" v-if="showSelectAll") 全选
+          a.button.radius-left(@click="selectAllResources(1)") 正序全选
+          a.button.radius-right.m-r-05(@click="selectAllResources(-1)") 倒序全选
+          //a(@click="selectAllResources" v-if="showSelectAll") 全选
     .resource-container-header(v-if="pageType !== 'editPicture'")
       .resource-categories
         .categoryName(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')")
@@ -1632,26 +1632,31 @@ export default {
       );
     }, 300),
     //全选文件
-    selectAllResources() {
-      const resources =
-        this.watchType === 'category' ? this.resources : this.usableResources;
+    selectAllResources(s) {
+      let resources =
+        this.watchType === 'category'
+          ? [...this.resources]
+          : [...this.usableResources];
+      if (s === 1) {
+        resources = resources.reverse();
+      }
       let selectedAll = true;
       for (const r of resources) {
-        if (!this.selectedResources.includes(r)) {
+        if (!this.selectedResourcesId.includes(r.rid)) {
           selectedAll = false;
         }
       }
 
       if (selectedAll) {
         for (const r of resources) {
-          const index = this.selectedResources.indexOf(r);
+          const index = this.selectedResourcesId.indexOf(r.rid);
           if (index > -1) {
             this.selectedResources.splice(index, 1);
           }
         }
       } else {
         for (const r of resources) {
-          if (this.selectedResources.includes(r)) continue;
+          if (this.selectedResourcesId.includes(r.rid)) continue;
           this.selectedResources.push(r);
         }
       }
