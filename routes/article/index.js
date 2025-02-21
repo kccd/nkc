@@ -7,6 +7,7 @@ const digestRouter = require('./digest');
 const homeTopRouter = require('./homeTop');
 const creditRouter = require('./credit');
 const voteRouter = require('./vote');
+const recovery = require('./recovery');
 const nkcRender = require('../../nkcModules/nkcRender');
 const {
   OnlyUser,
@@ -274,5 +275,6 @@ router
   .use('/:aid/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:aid/homeTop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
   .use('/:aid/credit', creditRouter.routes(), creditRouter.allowedMethods())
+  .use('/:aid/recovery', recovery.routes(), recovery.allowedMethods())
   .use('/:aid/vote', voteRouter.routes(), voteRouter.allowedMethods());
 module.exports = router;
