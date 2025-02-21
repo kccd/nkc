@@ -37,6 +37,9 @@ module.exports = {
         },
       },
     },
+    recovery: {
+      POST: Operations.unblockArticle,
+    },
     vote: {
       up: {
         POST: Operations.post_vote_up,

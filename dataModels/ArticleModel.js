@@ -605,9 +605,9 @@ schema.methods.deleteArticle = async function () {
     await this.deleteColumnContribute();
     await ColumnPostModel.deleteColumnPost(_id);
   }
-  //暂时对document禁封处理
   const { article: articleSource } = await DocumentModel.getDocumentSources();
-  const { disabled: disabledStatus } = await DocumentModel.getDocumentStatus();
+  const { disabled: disabledStatus, deleted: deletedDocStatus } =
+    await DocumentModel.getDocumentStatus();
   const { stable: stableType } = await DocumentModel.getDocumentTypes();
   const document = await DocumentModel.findOne({
     sid: _id,
@@ -617,7 +617,7 @@ schema.methods.deleteArticle = async function () {
   if (document) {
     await document.updateOne({
       $set: {
-        status: disabledStatus,
+        status: deletedDocStatus,
       },
     });
   }
