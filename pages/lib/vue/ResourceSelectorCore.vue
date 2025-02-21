@@ -29,7 +29,7 @@
         .paging-button
           a.button.radius-left(:class="{'active': sort === 1}" @click="selectSort(1)") 正序
           a.button.radius-right.m-r-05(:class="{'active': sort === -1}" @click="selectSort(-1)") 倒序
-          a(@click="selectAllResources") 全选
+          a(@click="selectAllResources" v-if="showSelectAll") 全选
     .resource-container-header(v-if="pageType !== 'editPicture'")
       .resource-categories
         .categoryName(:class="{'active': resourceCategories === 'all'}" @click="selectUserCategory('all')")
@@ -776,6 +776,9 @@ export default {
     this.disableDragUploadEvent();
   },
   computed: {
+    showSelectAll() {
+      return this.resources.length <= this.countLimit;
+    },
     usableResources() {
       const arr = [];
       for (const r of this.resources) {
