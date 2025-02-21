@@ -1637,7 +1637,7 @@ export default {
         this.watchType === 'category'
           ? [...this.resources]
           : [...this.usableResources];
-      if (s === 1) {
+      if (s === -1) {
         resources = resources.reverse();
       }
       let selectedAll = true;
