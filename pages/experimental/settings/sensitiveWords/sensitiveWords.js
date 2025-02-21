@@ -261,9 +261,10 @@ var app = new Vue({
       if (!group.searchInputText) {
         return;
       }
-      group.keywords.forEach(function (keyword) {
+      const keywordsLC = group.keywords.map((k) => k.toLowerCase());
+      keywordsLC.forEach(function (keyword, index) {
         if (keyword.indexOf(el.value.toLowerCase()) !== -1) {
-          group.searchedWords.push(keyword);
+          group.searchedWords.push(group.keywords[index]);
         }
       });
     },
