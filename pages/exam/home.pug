@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   title=`${state.serverSettings.websiteName} | 考试系统`
-  -const {countOneDay, count, waitingTime, examNotes ,publicExamNotes} = data.examSettings;
+  -const {countOneDay, count, waitingTime, examNotes ,publicExamNotes, volumeADNotes, volumeANotes, volumeBNotes} = data.examSettings;
   +includeCSS('/exam/exam.css')
 block content
   mixin examsCategoryList(categories)
@@ -21,6 +21,9 @@ block content
                   div=`通过率 ${(category.passRate * 100).toFixed(2)}%`
               .category-button-container
                 div.fa.fa-chevron-circle-right(onclick=`createPaper(${category._id})` title='开始考试')
+  mixin examDescription(notes)
+    .text-info.p-a-1.bg-info.border-radius-3px
+      .pre-content= notes
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
@@ -28,17 +31,21 @@ block content
       .col-xs-12.col-md-9.box-shadow-panel
         .m-b-1
           .panel-header 考试说明
-          .text-info.p-a-1.bg-info.border-radius-3px
-            .pre-content= examNotes
-            h5= `每天最多进行 ${countOneDay} 次考试，考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`
+          +examDescription(examNotes + `\n\n每天最多进行 ${countOneDay} 次考试，考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`)
         .m-b-1
-          .panel-header 入学考试
+          .panel-header 入学培训
+          .m-b-1
+            +examDescription(volumeADNotes)
           +examsCategoryList(data.examsCategories.volumeAD)
         .m-b-1
           .panel-header A卷考试
+          .m-b-1
+            +examDescription(volumeANotes)
           +examsCategoryList(data.examsCategories.volumeA)
         .m-b-1
           .panel-header B卷考试
+          .m-b-1
+            +examDescription(volumeBNotes)
           +examsCategoryList(data.examsCategories.volumeB)
 
       .col-xs-12.col-md-3.box-shadow-panel.p-l-0

@@ -97,7 +97,7 @@ class PublishPermissionService {
         title: '去考试',
       };
       if (examVolumeAD) {
-        result.name = `通过入学考试`;
+        result.name = `通过入学培训`;
         if (!userVolumeAD) {
           result.completed = false;
         }
@@ -337,7 +337,7 @@ class PublishPermissionService {
         timeLimit.till =
           lastPublishTime.getTime() + intervalItem.interval * 60 * 1000;
         timeLimit.interval = intervalItem.interval * 60 * 1000;
-        timeLimit.reason = `您当前的账号等级限定发表间隔时间不能小于 ${intervalItem.interval} 分钟，请稍候再试。`;
+        timeLimit.reason = `您当前的账号等级（${grade.displayName}）限定发表间隔时间不能小于 ${intervalItem.interval} 分钟，请稍候再试。`;
       }
     }
     if (
@@ -348,7 +348,7 @@ class PublishPermissionService {
       // 今日条数被限制了
       countLimit.limited = true;
       countLimit.maxPublishCount = countItem.count;
-      countLimit.reason = `今日发表次数已达上限（${countItem.count} 次），请明天再试。`;
+      countLimit.reason = `您当前的账号等级（${grade.displayName}）限定每天仅能发表 ${countItem.count} 次，今日发表次数已达上限，请明天再试。`;
     }
 
     return {
