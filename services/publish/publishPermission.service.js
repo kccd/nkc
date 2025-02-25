@@ -100,16 +100,19 @@ class PublishPermissionService {
         result.name = `通过入学培训`;
         if (!userVolumeAD) {
           result.completed = false;
+          result.link = `/exam#AD`;
         }
       } else if (examVolumeA) {
         result.name = '通过A卷考试';
         if (!userVolumeA) {
           result.completed = false;
+          result.link = `/exam#A`;
         }
       } else {
         result.name = '通过B卷考试';
         if (!userVolumeB) {
           result.completed = false;
+          result.link = `/exam#B`;
         }
       }
       return result;

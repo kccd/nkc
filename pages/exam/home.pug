@@ -22,7 +22,7 @@ block content
               .category-button-container
                 div.fa.fa-chevron-circle-right(onclick=`createPaper(${category._id})` title='开始考试')
   mixin examDescription(notes)
-    .text-info.p-a-1.bg-info.border-radius-3px
+    .volume-description
       .pre-content= notes
   .container-fluid.max-width
     .row
@@ -32,20 +32,20 @@ block content
         .m-b-1
           .panel-header 考试说明
           +examDescription(examNotes + `\n\n每天最多进行 ${countOneDay} 次考试，考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`)
-        .m-b-1
+        #AD(style='scroll-margin-top: 5rem;')
           .panel-header 入学培训
-          .m-b-1
-            +examDescription(volumeADNotes)
+          +examDescription(volumeADNotes)
+        .m-b-1(data-id='#AD')
           +examsCategoryList(data.examsCategories.volumeAD)
-        .m-b-1
+        #A(style='scroll-margin-top: 5rem;')
           .panel-header A卷考试
-          .m-b-1
-            +examDescription(volumeANotes)
+          +examDescription(volumeANotes)
+        .m-b-1(data-id='#A')
           +examsCategoryList(data.examsCategories.volumeA)
-        .m-b-1
+        #B(style='scroll-margin-top: 5rem;')
           .panel-header B卷考试
-          .m-b-1
-            +examDescription(volumeBNotes)
+          +examDescription(volumeBNotes)
+        .m-b-1(data-id='#B')
           +examsCategoryList(data.examsCategories.volumeB)
 
       .col-xs-12.col-md-3.box-shadow-panel.p-l-0
