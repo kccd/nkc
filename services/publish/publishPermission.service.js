@@ -97,11 +97,13 @@ class PublishPermissionService {
         title: '去考试',
       };
       if (
-        (examVolumeA && !userVolumeA) ||
-        (examVolumeB && !userVolumeB) ||
-        (examVolumeAD && !userVolumeAD)
+        (examVolumeA && userVolumeA) ||
+        (examVolumeB && userVolumeB) ||
+        (examVolumeAD && userVolumeAD)
       ) {
-        // 未满足考试条件
+        // 有权
+      } else {
+        // 无权
         if (examVolumeAD) {
           result.name = `通过入学培训`;
           if (!userVolumeAD) {
