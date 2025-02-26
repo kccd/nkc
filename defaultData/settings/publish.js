@@ -5,6 +5,7 @@ module.exports = {
     thread: {
       postPermission: {
         authLevelMin: 0,
+        baseEnabled: false,
         examEnabled: false,
         examVolumeAD: true,
         examVolumeA: true,
@@ -89,6 +90,7 @@ module.exports = {
     post: {
       postPermission: {
         authLevelMin: 0,
+        baseEnabled: false,
         examEnabled: false,
         examVolumeAD: true,
         examVolumeA: true,
@@ -173,6 +175,7 @@ module.exports = {
     article: {
       postPermission: {
         authLevelMin: 0,
+        baseEnabled: false,
         examEnabled: false,
         examVolumeAD: true,
         examVolumeA: true,
@@ -257,6 +260,7 @@ module.exports = {
     comment: {
       postPermission: {
         authLevelMin: 0,
+        baseEnabled: false,
         examEnabled: false,
         examVolumeAD: true,
         examVolumeA: true,
@@ -341,6 +345,7 @@ module.exports = {
     moment: {
       postPermission: {
         authLevelMin: 0,
+        baseEnabled: false,
         examEnabled: false,
         examVolumeAD: true,
         examVolumeA: true,
@@ -425,6 +430,7 @@ module.exports = {
     draft: {
       postPermission: {
         authLevelMin: 0,
+        baseEnabled: false,
         examEnabled: false,
         examVolumeAD: true,
         examVolumeA: true,
