@@ -305,7 +305,7 @@ class PublishPermissionService {
       examCountWarning.maxPublishCount = permission.examNotPass.count;
 
       if (type !== publishPermissionTypes.moment) {
-        examCountWarning.desc = `您还没有完成所有任务，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
+        examCountWarning.desc = `您还有任务没有完成，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
         if (countToday >= permission.examNotPass.count) {
           countLimit.limited = true;
           countLimit.maxPublishCount = permission.examNotPass.count;
@@ -313,7 +313,7 @@ class PublishPermissionService {
         }
       } else {
         if (examTask && !examTask.completed) {
-          examCountWarning.desc = `您还没有完成所有任务，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
+          examCountWarning.desc = `您还有任务没有完成，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
           if (countToday >= permission.examNotPass.count) {
             countLimit.limited = true;
             countLimit.maxPublishCount = permission.examNotPass.count;
