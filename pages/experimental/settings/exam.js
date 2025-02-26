@@ -1,28 +1,21 @@
-var app = new Vue({
+import { getDataById } from '../../lib/js/dataConversion';
+import { nkcAPI } from '../../lib/js/netAPI';
+import { sweetSuccess, sweetError } from '../../lib/js/sweetAlert';
+
+const data = getDataById('data');
+var app = new window.Vue({
   el: '#app',
   data: {
-    examSettings: {},
-  },
-  mounted: function () {
-    var data = document.getElementById('data');
-    data = JSON.parse(data.innerHTML);
-    var settings = data.examSettings;
-    var examSettings = {};
-    examSettings.count = settings.count || 0;
-    examSettings.countOneDay = settings.countOneDay || 0;
-    examSettings.waitingTime = settings.waitingTime || 0;
-    examSettings.examNotes = settings.examNotes || '';
-    examSettings.publicExamNotes = settings.publicExamNotes || '';
-    this.examSettings = examSettings;
+    examSettings: data.examSettings,
   },
   methods: {
     save: function () {
       nkcAPI('/e/settings/exam', 'PUT', { examSettings: app.examSettings })
         .then(function () {
-          screenTopAlert('保存成功');
+          sweetSuccess('保存成功');
         })
         .catch(function (data) {
-          screenTopWarning(data);
+          sweetError(data);
         });
     },
   },

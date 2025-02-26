@@ -10,7 +10,7 @@ block content
       include ../nav
       .hidden#data= JSON.stringify({examSettings: data.examSettings})
       .col-xs-12.col-md-12#app(v-cloak)
-        h4 闭卷考试设置
+        h4 考试设置
         .form-horizontal
           .form-group
             label.col-sm-2.control-label 每天最多考试次数
@@ -26,27 +26,22 @@ block content
               input.form-control(type='number' v-model.number='examSettings.waitingTime')
               h5.text-danger 考试次数达到总次数限制后，该用户将会被禁考一段时间。
 
-        h4 闭卷考试须知
-        .form-horizontal
-          .form-group
-            .col-sm-6
+        .col-md-6.col-xs-12
+          .form
+            .form-group
+              h4 考试说明
               textarea.form-control(rows="10" v-model="examSettings.examNotes")= data.examSettings.examNotes
-          .form-group
-            label.col-sm-2.control-label
-            .col-sm-4
-
-        h4 开卷考试须知
-        .form-horizontal
-          .form-group
-            .col-sm-6
-              textarea.form-control(rows="10" v-model="examSettings.publicExamNotes")= data.examSettings.publicExamNotes
-          .form-group
-            label.col-sm-2.control-label
-            .col-sm-4
+            .form-group
+              h4 入学培训说明
+              textarea.form-control(rows="10" v-model="examSettings.volumeADNotes")= data.examSettings.volumeADNotes
+            .form-group
+              h4 A卷考试说明
+              textarea.form-control(rows="10" v-model="examSettings.volumeANotes")= data.examSettings.volumeANotes
+            .form-group
+              h4 B卷考试说明
+              textarea.form-control(rows="10" v-model="examSettings.volumeBNotes")= data.examSettings.volumeBNotes
+            .form-group
               button.btn.btn-primary.btn-block(@click='save') 保存
-
-
-
 
 block scripts
   +includeJS('/experimental/settings/exam.js')

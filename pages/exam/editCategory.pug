@@ -34,7 +34,7 @@ block content
               div
                 label.radio-inline
                   input(type='radio' value="AD" v-model="category.volume")
-                  | 入学考试
+                  | 入学培训
                 label.radio-inline
                   input(type='radio' value="A" v-model="category.volume")
                   | A卷考试
@@ -125,7 +125,7 @@ block content
         for c in data.categories
           h5
             span=`【${c.name}】`
-            span=`${{'AD': '【入学考试】', 'A': "【A卷考试】", 'B': "【B卷考试】"}[c.volume]}${c.disabled?'【已屏蔽】':''}`
+            span=`${{'AD': '【入学培训】', 'A': "【A卷考试】", 'B': "【B卷考试】"}[c.volume]}${c.disabled?'【已屏蔽】':''}`
             a(href=`/exam/categories/editor?cid=${c._id}`) 编辑
 block scripts
   +includeJS('/exam/editCategory.js')

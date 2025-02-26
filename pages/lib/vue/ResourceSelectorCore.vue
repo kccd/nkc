@@ -27,8 +27,8 @@
           input.input.radius-left(type="text" v-model.number="pageNumber" placeholder="页码")
           a.button.radius-right(@click="fastSelectPage") 跳转
         .paging-button
-          a.button.radius-left(@click="selectAllResources(1)") 正序全选
-          a.button.radius-right.m-r-05(@click="selectAllResources(-1)") 倒序全选
+          a.button.radius-left(v-if="showSelectAll" @click="selectAllResources(1)") 正序全选
+          a.button.radius-right.m-r-05(v-if="showSelectAll" @click="selectAllResources(-1)") 倒序全选
           //a(@click="selectAllResources" v-if="showSelectAll") 全选
     .resource-container-header(v-if="pageType !== 'editPicture'")
       .resource-categories
