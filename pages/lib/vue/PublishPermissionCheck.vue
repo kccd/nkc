@@ -2,12 +2,12 @@
   div(:class="$style.container" v-if="showPanel").m-b-1.bg-danger.p-a-05
     div(:class="$style.tasksContainer" v-if="showTask")
       h5 请完成以下任务，获取完整发表权限。
-      div(:class="$style.taskContainer" v-for="task in tasks" v-if="type !== 'moment' || task.type !== 'momentCount'")
+      div(:class="$style.taskContainer" v-for="task in tasks")
         div
           <check-one :class="$style.icon" class='text-success' theme="outline" v-if='task.completed'/>
           <close-one :class="$style.icon" class='text-danger' theme="outline" v-else/>
         div {{task.name}}
-        div
+        div(v-if="type !== 'moment' || task.type !== 'momentCount'")
           a.btn.btn-xs.btn-default(v-if='!task.completed' :href="task.link" target="_blank") {{task.title}}
     div(:class="$style.warningContainer")
       div(:class="$style.countLimitContainer" v-if="permissionStatus.examCountWarning.show")
@@ -70,14 +70,8 @@ export default {
     },
     showTask() {
       for (const task of this.tasks) {
-        if (this.type !== publishPermissionTypes.moment) {
-          if (!task.completed) {
-            return true;
-          }
-        } else {
-          if (!task.completed && task.type !== 'momentCount') {
-            return true;
-          }
+        if (!task.completed) {
+          return true;
         }
       }
       return false;
