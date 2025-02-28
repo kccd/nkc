@@ -94,7 +94,7 @@ class PublishPermissionService {
         name: ``,
         completed: true,
         link: `/exam`,
-        title: '去考试',
+        title: '去答题',
       };
       if (
         (examVolumeA && userVolumeA) ||
@@ -320,7 +320,7 @@ class PublishPermissionService {
             countLimit.reason = `今日发表次数已达上限（${permission.examNotPass.count} 次），请完成任务以获取更多发表权限。`;
           }
         } else {
-          examCountWarning.desc = `您当前的账号等级（${grade.displayName}）限定每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
+          examCountWarning.desc = `您还有任务没有完成，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
           if (countToday >= permission.examNotPass.count) {
             countLimit.limited = true;
             countLimit.maxPublishCount = permission.examNotPass.count;
