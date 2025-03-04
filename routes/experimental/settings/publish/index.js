@@ -1,6 +1,9 @@
 const { OnlyOperation } = require('../../../../middlewares/permission');
 const { Operations } = require('../../../../settings/operations');
-const { settingIds } = require('../../../../settings/serverSettings');
+const {
+  settingIds,
+  publishPermissionTypes,
+} = require('../../../../settings/serverSettings');
 const router = require('koa-router')();
 router
   .get(
@@ -44,8 +47,7 @@ router
       const { db, body, nkcModules, state } = ctx;
       const { publishSettings } = body;
       const { checkNumber } = nkcModules.checkData;
-      const sources = await db.DocumentModel.getDocumentSources();
-      const sourcesType = Object.values(sources);
+      const sourcesType = Object.values(publishPermissionTypes);
       const sourcesObj = {};
       for (const s of sourcesType) {
         sourcesObj[s] = state.lang('publishSources', s);
@@ -63,6 +65,7 @@ router
         postPermission.examVolumeA = !!postPermission.examVolumeA;
         postPermission.examVolumeB = !!postPermission.examVolumeB;
         if (
+          postPermission.examEnabled &&
           !postPermission.examVolumeAD &&
           !postPermission.examVolumeA &&
           !postPermission.examVolumeB

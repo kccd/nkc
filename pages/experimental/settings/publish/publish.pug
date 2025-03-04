@@ -42,37 +42,42 @@ block eContent
                   strong 功能状态
                   .radio
                     label.m-r-1
-                      input(type='radio' :value='true' v-model='settings.postPermission.examEnabled')
+                      input(type='radio' :value='true' v-model='settings.postPermission.baseEnabled')
                       span 开启
                     label
-                      input(type='radio' :value='false' v-model='settings.postPermission.examEnabled')
+                      input(type='radio' :value='false' v-model='settings.postPermission.baseEnabled')
                       span 关闭
                 .m-b-1
-                  strong 允许通过下面哪些考试的用户发表？
-                  .checkbox
+                  strong 要求通过考试（或）
+                  .checkbox.radio
+                    label.m-r-1
+                      input(type='radio' :value='false' v-model='settings.postPermission.examEnabled')
+                      span 否
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='settings.postPermission.examEnabled')
+                      span 是
                     label.m-r-1
                       input(type='checkbox' :value='true' v-model='settings.postPermission.examVolumeAD')
-                      span 入学考试
+                      span 入学培训
                     label.m-r-1
                       input(type='checkbox' :value='true' v-model='settings.postPermission.examVolumeA')
                       span A 卷
                     label
                       input(type='checkbox' :value='true' v-model='settings.postPermission.examVolumeB')
                       span B 卷
-                  .m-t-05.text-danger(v-if='!settings.postPermission.examVolumeAD && !settings.postPermission.examVolumeA && !settings.postPermission.examVolumeB')
-                    | 请至少勾选一种考试
-                .m-b-1(:class='disableMomentCount?"moment-count-disabled": ""')
+                  .m-t-05.text-danger(v-if='mustSelectOneExam') {{mustSelectOneExam}}
+
+                .m-b-1
                   strong 是否必须先发表电文？
                   .radio
                     label.m-r-1
-                      input(type='radio' :value='false' v-model='settings.postPermission.momentCount.limited' :disabled='disableMomentCount')
+                      input(type='radio' :value='false' v-model='settings.postPermission.momentCount.limited')
                       span 否
                     label.m-r-1
-                      input(type='radio' :value='true' v-model='settings.postPermission.momentCount.limited' :disabled='disableMomentCount')
+                      input(type='radio' :value='true' v-model='settings.postPermission.momentCount.limited')
                       span 是
                     span.m-r-05 不少于
                     input.m-r-05.exam-count(
-                      :disabled='disableMomentCount'
                       style='max-width: 5rem;'
                       type='text'
                       v-model.number='settings.postPermission.momentCount.count'
@@ -87,6 +92,7 @@ block eContent
                     label
                       input(type='radio' :value='false' v-model='settings.postPermission.examNotPass.status')
                       span 禁止
+                  .text-danger.m-t-05(v-if='canNotPublishMoment') {{canNotPublishMoment}}
                 .m-b-1
                   strong 是否限制无权用户的发表条数？
                   .radio
@@ -285,7 +291,7 @@ block eContent
                               :disabled='settings.postReview.foreign.type !== "count"'
                             )
                       tr
-                        th 未通过入学考试
+                        th 未通过入学培训
                         th
                           .radio
                             label.m-r-1

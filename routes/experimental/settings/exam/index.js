@@ -12,8 +12,15 @@ router
   .put('/', OnlyOperation(Operations.modifyExamSettings), async (ctx, next) => {
     const { db, body } = ctx;
     const { examSettings } = body;
-    let { count, countOneDay, waitingTime, examNotes, publicExamNotes } =
-      examSettings;
+    let {
+      count,
+      countOneDay,
+      waitingTime,
+      examNotes,
+      volumeADNotes,
+      volumeANotes,
+      volumeBNotes,
+    } = examSettings;
     count = Number(count);
     countOneDay = Number(countOneDay);
     waitingTime = Number(waitingTime);
@@ -38,7 +45,9 @@ router
             countOneDay,
             waitingTime,
             examNotes,
-            publicExamNotes,
+            volumeADNotes,
+            volumeANotes,
+            volumeBNotes,
           },
         },
       },

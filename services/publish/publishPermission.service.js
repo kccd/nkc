@@ -13,7 +13,6 @@ const {
 } = require('../../settings/serverSettings');
 const apiFunction = require('../../nkcModules/apiFunction');
 const { ThrowCommonError } = require('../../nkcModules/error');
-const mongoose = require('../../settings/database');
 class PublishPermissionService {
   async getUserBaseInfoStatus(uid) {
     const user = await UserModel.findById(uid);
@@ -46,8 +45,8 @@ class PublishPermissionService {
   }
 
   async getMomentCountStatus(props) {
-    const { uid, momentCount, examEnabled } = props;
-    if (!momentCount.limited || !examEnabled) {
+    const { uid, momentCount, baseEnabled } = props;
+    if (!momentCount.limited || !baseEnabled) {
       return null;
     }
     const publishedMomentCount = await MomentModel.countDocuments({
@@ -80,6 +79,7 @@ class PublishPermissionService {
 
   async getPublishPermissionExamStatus(props) {
     const {
+      baseEnabled,
       examEnabled,
       userVolumeA,
       userVolumeB,
@@ -88,28 +88,40 @@ class PublishPermissionService {
       examVolumeB,
       examVolumeAD,
     } = props;
-    if (examEnabled) {
+    if (examEnabled && baseEnabled) {
       const result = {
         type: 'exam',
         name: ``,
         completed: true,
         link: `/exam`,
-        title: '去考试',
+        title: '去答题',
       };
-      if (examVolumeAD) {
-        result.name = `通过入学考试`;
-        if (!userVolumeAD) {
-          result.completed = false;
-        }
-      } else if (examVolumeA) {
-        result.name = '通过A卷考试';
-        if (!userVolumeA) {
-          result.completed = false;
-        }
+      if (
+        (examVolumeA && userVolumeA) ||
+        (examVolumeB && userVolumeB) ||
+        (examVolumeAD && userVolumeAD)
+      ) {
+        // 有权
       } else {
-        result.name = '通过B卷考试';
-        if (!userVolumeB) {
-          result.completed = false;
+        // 无权
+        if (examVolumeAD) {
+          result.name = `通过入学培训`;
+          if (!userVolumeAD) {
+            result.completed = false;
+            result.link = `/exam#AD`;
+          }
+        } else if (examVolumeA) {
+          result.name = '通过A卷考试';
+          if (!userVolumeA) {
+            result.completed = false;
+            result.link = `/exam#A`;
+          }
+        } else {
+          result.name = '通过B卷考试';
+          if (!userVolumeB) {
+            result.completed = false;
+            result.link = `/exam#B`;
+          }
         }
       }
       return result;
@@ -220,6 +232,9 @@ class PublishPermissionService {
     const publishSettings = await SettingModel.getSettings(settingIds.publish);
     const permission = publishSettings[type].postPermission;
 
+    const roles = await user.extendRoles();
+    const grade = await user.extendGrade();
+
     const tasks = await this.getUserBaseInfoStatus(uid);
     const authLevelTask = await this.getPublishPermissionAuthLevelStatus({
       uid,
@@ -230,6 +245,7 @@ class PublishPermissionService {
       tasks.authLevel = authLevelTask;
     }
     const examTask = await this.getPublishPermissionExamStatus({
+      baseEnabled: permission.baseEnabled,
       examEnabled: permission.examEnabled,
       userVolumeAD: user.volumeAD,
       userVolumeA: user.volumeA,
@@ -244,7 +260,7 @@ class PublishPermissionService {
     const momentTask = await this.getMomentCountStatus({
       uid,
       momentCount: permission.momentCount,
-      examEnabled: permission.examEnabled,
+      baseEnabled: permission.baseEnabled,
     });
     if (momentTask) {
       tasks.moment = momentTask;
@@ -273,19 +289,44 @@ class PublishPermissionService {
       show: false,
       maxPublishCount: 0,
       publishedCount: countToday,
+      type: 'exam', // exam, moment
+      desc: '',
     };
     if (
-      examTask &&
-      !examTask.completed &&
+      ((examTask && !examTask.completed) ||
+        (momentTask && !momentTask.completed)) &&
       permission.examNotPass.status &&
       permission.examNotPass.limited
     ) {
+      // 需要考试但没通过
+      // 或
+      // 开启了电文限制且未满足条件
       examCountWarning.show = true;
       examCountWarning.maxPublishCount = permission.examNotPass.count;
-      if (countToday >= permission.examNotPass.count) {
-        countLimit.limited = true;
-        countLimit.maxPublishCount = permission.examNotPass.count;
-        countLimit.reason = `今日发表次数已达上限（${permission.examNotPass.count} 次），请参加考试，通过后可获取更多发表权限。`;
+
+      if (type !== publishPermissionTypes.moment) {
+        examCountWarning.desc = `您还有任务没有完成，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
+        if (countToday >= permission.examNotPass.count) {
+          countLimit.limited = true;
+          countLimit.maxPublishCount = permission.examNotPass.count;
+          countLimit.reason = `今日发表次数已达上限（${permission.examNotPass.count} 次），请完成任务以获取更多发表权限。`;
+        }
+      } else {
+        if (examTask && !examTask.completed) {
+          examCountWarning.desc = `您还有任务没有完成，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
+          if (countToday >= permission.examNotPass.count) {
+            countLimit.limited = true;
+            countLimit.maxPublishCount = permission.examNotPass.count;
+            countLimit.reason = `今日发表次数已达上限（${permission.examNotPass.count} 次），请完成任务以获取更多发表权限。`;
+          }
+        } else {
+          examCountWarning.desc = `您还有任务没有完成，每天仅允许发表 ${examCountWarning.maxPublishCount} 次，今日已发表 ${examCountWarning.publishedCount} 次。`;
+          if (countToday >= permission.examNotPass.count) {
+            countLimit.limited = true;
+            countLimit.maxPublishCount = permission.examNotPass.count;
+            countLimit.reason = `今日发表次数已达上限（${permission.examNotPass.count} 次），请明天再试。`;
+          }
+        }
       }
     }
     const lastPublishTime = await this.getLastPublishTime({
@@ -293,8 +334,6 @@ class PublishPermissionService {
       type,
     });
     // 发表间隔、数量限制
-    const roles = await user.extendRoles();
-    const grade = await user.extendGrade();
     const rolesId = roles.map((r) => `role-${r._id}`);
     rolesId.push(`grade-${grade._id}`);
     let intervalItem = null;
@@ -337,7 +376,7 @@ class PublishPermissionService {
         timeLimit.till =
           lastPublishTime.getTime() + intervalItem.interval * 60 * 1000;
         timeLimit.interval = intervalItem.interval * 60 * 1000;
-        timeLimit.reason = `您当前的账号等级限定发表间隔时间不能小于 ${intervalItem.interval} 分钟，请稍候再试。`;
+        timeLimit.reason = `您当前的账号等级（${grade.displayName}）限定发表间隔时间不能小于 ${intervalItem.interval} 分钟，请稍候再试。`;
       }
     }
     if (
@@ -348,7 +387,7 @@ class PublishPermissionService {
       // 今日条数被限制了
       countLimit.limited = true;
       countLimit.maxPublishCount = countItem.count;
-      countLimit.reason = `今日发表次数已达上限（${countItem.count} 次），请明天再试。`;
+      countLimit.reason = `您当前的账号等级（${grade.displayName}）限定每天仅能发表 ${countItem.count} 次，今日发表次数已达上限，请明天再试。`;
     }
 
     return {
@@ -357,6 +396,7 @@ class PublishPermissionService {
       countLimit,
       permission,
       examCountWarning,
+      userGradeName: grade.displayName,
     };
   }
 
@@ -383,7 +423,9 @@ class PublishPermissionService {
       }
     }
     if (moment && !moment.completed) {
-      te(`未${moment.name}`);
+      if (!permission.examNotPass.status) {
+        te(`未${moment.name}`);
+      }
     }
     if (verifyPhoneNumber && !verifyPhoneNumber.completed) {
       const authSettings = await SettingModel.getSettings('auth');

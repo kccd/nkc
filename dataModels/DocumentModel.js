@@ -1430,7 +1430,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
     return {
       needReview: true,
       type: 'notPassedAD',
-      reason: '用户没有通过入学考试，审核通过的文章数量不足',
+      reason: '用户没有通过入学培训，审核通过的文章数量不足',
     };
   }
 

@@ -25,8 +25,20 @@ const app = new window.Vue({
     settings() {
       return this.publishSettings[this.selectSourceType] || null;
     },
-    disableMomentCount() {
-      return this.selectSourceType === 'moment';
+    canNotPublishMoment() {
+      return this.selectSourceType === 'moment' &&
+        this.settings.postPermission.momentCount.limited &&
+        this.settings.postPermission.examNotPass.status === false
+        ? '当前设置会导致永远无权发表电文'
+        : '';
+    },
+    mustSelectOneExam() {
+      return this.settings.postPermission.examEnabled &&
+        !this.settings.postPermission.examVolumeA &&
+        !this.settings.postPermission.examVolumeB &&
+        !this.settings.postPermission.examVolumeAD
+        ? '请至少勾选一种考试'
+        : '';
     },
   },
   methods: {
@@ -54,6 +66,12 @@ const app = new window.Vue({
     },
     submit() {
       const { publishSettings } = this;
+      if (this.canNotPublishMoment) {
+        return sweetError(this.canNotPublishMoment);
+      }
+      if (this.mustSelectOneExam) {
+        return sweetError(this.mustSelectOneExam);
+      }
       nkcAPI('/e/settings/publish', 'PUT', { publishSettings })
         .then(() => {
           sweetSuccess(`保存成功`);

@@ -166,7 +166,7 @@ schema.statics.reviewDocument = async (props) => {
   });
 };
 
-const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
+const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9-_,.，。!！])/gi;
 const MatchedKeyword = { result: [] };
 
 /*
@@ -223,6 +223,7 @@ schema.statics.matchKeywords = async (content, groups) => {
       count: leastKeywordCount,
       logic: relationship,
     } = group.conditions;
+
     const mint = new Mint(keywords);
     const contentFilterValue = await mint.filter(content, { replace: false });
     // 保存结果
@@ -689,7 +690,7 @@ schema.statics.getReviewStatusAndCreateLog = async function (post) {
       return {
         needReview: true,
         type: 'notPassedAD',
-        reason: '用户没有通过入学考试，审核通过的文章数量不足',
+        reason: '用户没有通过入学培训，审核通过的文章数量不足',
       };
     }
 

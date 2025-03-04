@@ -7,18 +7,18 @@
           <check-one :class="$style.icon" class='text-success' theme="outline" v-if='task.completed'/>
           <close-one :class="$style.icon" class='text-danger' theme="outline" v-else/>
         div {{task.name}}
-        div
+        div(v-if="type !== 'moment' || task.type !== 'momentCount'")
           a.btn.btn-xs.btn-default(v-if='!task.completed' :href="task.link" target="_blank") {{task.title}}
     div(:class="$style.warningContainer")
       div(:class="$style.countLimitContainer" v-if="permissionStatus.examCountWarning.show")
         <info theme="outline" :class="$style.icon + ' text-danger'" />
-        div.text-danger 您还未参加考试，每天仅允许发表 {{permissionStatus.examCountWarning.maxPublishCount}} 次，今日已发表 {{permissionStatus.examCountWarning.publishedCount}} 次。
+        div.text-danger {{permissionStatus.examCountWarning.desc}}
       div(:class="$style.countLimitContainer" v-if="permissionStatus.countLimit.limited")
         <info theme="outline" :class="$style.icon + ' text-danger'" />
         div.text-danger {{permissionStatus.countLimit.reason}}
       div(:class="$style.timeLimitContainer" v-if="timeTill")
         <info theme="outline" :class="$style.icon + ' text-danger'" />
-        div.text-danger 您当前的账号等级限定发表间隔时间不能小于 {{formatDuration(permissionStatus.timeLimit.interval)}}，请在 {{timeTill}} 后再试。
+        div.text-danger 您当前的账号等级（{{permissionStatus.userGradeName}}）限定发表间隔时间不能小于 {{formatDuration(permissionStatus.timeLimit.interval)}}，请在 {{timeTill}} 后再试。
 </template>
 
 <script>
@@ -26,6 +26,7 @@ import { nkcAPI } from '../js/netAPI';
 import { sweetError } from '../js/sweetAlert';
 import { CheckOne, CloseOne, Info } from '@icon-park/vue';
 import { formatDuration } from '../js/time';
+import { publishPermissionTypes } from '../js/publish';
 
 export default {
   data: () => ({
@@ -63,7 +64,9 @@ export default {
       );
     },
     tasks() {
-      return Object.values(this.permissionStatus.tasks);
+      return Object.values(this.permissionStatus.tasks).filter((item) => {
+        return item.completed === false;
+      });
     },
     showTask() {
       for (const task of this.tasks) {
