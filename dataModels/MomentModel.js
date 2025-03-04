@@ -1058,6 +1058,10 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   const { normal: normalStatus } = await DocumentModel.getDocumentStatus();
   const { stable: stableDocumentTypes } =
     await DocumentModel.getDocumentTypes();
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
   const { moment: quoteType } = momentQuoteTypes;
   const { uid, parent, did } = this;
   const { content, ip: ipId, port, files } = await this.getBetaDocument();
@@ -1073,10 +1077,10 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   // 是否生成转发
   const postForward = postType === 'repost' || alsoPost;
   if (postComment) {
+    await this.publish();
     // 需要创建评论
     await this.updateMomentCommentOrder();
     await this.updateParentLatestId();
-    await this.publish();
     commentMomentId = this._id;
   } else {
     // 不需要创建评论
@@ -1091,6 +1095,11 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
     });
   }
   if (postForward) {
+    // 检测发表权限
+    await publishPermissionService.checkPublishPermission(
+      publishPermissionTypes.moment,
+      this.uid,
+    );
     // 需要转发动态
     // 这里需要将moment作为转发的moment，避免多生成一个moment，导致原moment没地儿放
     const repostMoment = await MomentModel.createQuoteMomentAndPublish({
