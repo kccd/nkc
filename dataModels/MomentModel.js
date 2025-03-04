@@ -1051,6 +1051,15 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   if (!['comment', 'repost'].includes(postType)) {
     ThrowCommonError(500, `类型指定错误 postType=${postType}`);
   }
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
+  // 检测发表权限
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.moment,
+    this.uid,
+  );
   const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
@@ -1058,10 +1067,6 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   const { normal: normalStatus } = await DocumentModel.getDocumentStatus();
   const { stable: stableDocumentTypes } =
     await DocumentModel.getDocumentTypes();
-  const {
-    publishPermissionService,
-  } = require('../services/publish/publishPermission.service');
-  const { publishPermissionTypes } = require('../settings/serverSettings');
   const { moment: quoteType } = momentQuoteTypes;
   const { uid, parent, did } = this;
   const { content, ip: ipId, port, files } = await this.getBetaDocument();
@@ -1095,11 +1100,6 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
     });
   }
   if (postForward) {
-    // 检测发表权限
-    await publishPermissionService.checkPublishPermission(
-      publishPermissionTypes.moment,
-      this.uid,
-    );
     // 需要转发动态
     // 这里需要将moment作为转发的moment，避免多生成一个moment，导致原moment没地儿放
     const repostMoment = await MomentModel.createQuoteMomentAndPublish({
