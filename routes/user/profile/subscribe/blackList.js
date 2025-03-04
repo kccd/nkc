@@ -28,8 +28,10 @@ module.exports = async (ctx, next) => {
       fromHTML = '短消息系统';
     } else if(from === 'userCard') {
       fromHTML = '用户名片';
-    } else {
+    } else if(from === 'post') {
       fromHTML = `<a href="${nkcModules.tools.getUrl('post', pid, true)}" target='_blank'>文号${pid}</a>`;
+    } else if(from === 'userHome'){
+      fromHTML = '用户主页';
     }
     data.bl.push({
       _id,

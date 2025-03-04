@@ -1051,6 +1051,15 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   if (!['comment', 'repost'].includes(postType)) {
     ThrowCommonError(500, `类型指定错误 postType=${postType}`);
   }
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
+  // 检测发表权限
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.moment,
+    this.uid,
+  );
   const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
@@ -1073,10 +1082,10 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   // 是否生成转发
   const postForward = postType === 'repost' || alsoPost;
   if (postComment) {
+    await this.publish();
     // 需要创建评论
     await this.updateMomentCommentOrder();
     await this.updateParentLatestId();
-    await this.publish();
     commentMomentId = this._id;
   } else {
     // 不需要创建评论
