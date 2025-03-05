@@ -13,6 +13,7 @@ const {
 } = require('../../settings/serverSettings');
 const apiFunction = require('../../nkcModules/apiFunction');
 const { ThrowCommonError } = require('../../nkcModules/error');
+const UsersGeneralModel = require('../../dataModels/UsersGeneralModel');
 class PublishPermissionService {
   async getUserBaseInfoStatus(uid) {
     const user = await UserModel.findById(uid);
@@ -53,10 +54,17 @@ class PublishPermissionService {
       uid,
       status: momentStatus.normal,
     });
+    const userGeneral = await UsersGeneralModel.findOne(
+      { uid },
+      { isOlderUser: 1 },
+    );
     return {
       type: 'momentCount',
       name: `发表${momentCount.count}条电文`,
-      completed: publishedMomentCount >= momentCount.count,
+      // completed: publishedMomentCount >= momentCount.count,
+      completed:
+        publishedMomentCount >= momentCount.count ||
+        (userGeneral && userGeneral.isOlderUser),
       link: `/z`,
       title: '去发表',
     };

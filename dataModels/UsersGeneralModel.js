@@ -299,6 +299,11 @@ const usersGeneralSchema = new Schema(
       type: Date,
       default: Date.now(),
     },
+    // 是否是老用户
+    isOlderUser: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     collection: 'usersGeneral',
