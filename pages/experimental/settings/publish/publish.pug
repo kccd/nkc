@@ -69,7 +69,7 @@ block eContent
 
                 .m-b-1
                   strong 是否必须先发表电文？
-                  span.text-danger (老用户发表不受电文条数限制)
+                  span.text-danger (2025-01-01前注册的用户不受限制)
                   .radio
                     label.m-r-1
                       input(type='radio' :value='false' v-model='settings.postPermission.momentCount.limited')
