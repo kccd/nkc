@@ -1394,6 +1394,35 @@ schema.statics.extendMomentsQuotesData = async (moments, uid = '') => {
   }
   return results;
 };
+schema.statics.extendMomentsParentData = async (moments, uid = '') => {
+  const MomentModel = mongoose.model('moments');
+  const parentsId = [];
+  for (const moment of moments) {
+    const { parent } = moment;
+    if (!parent) {
+      continue;
+    }
+    parentsId.push(parent);
+  }
+  const parentMoments = await MomentModel.getMomentsByMomentsId(parentsId);
+  const parentMomentsData = await MomentModel.extendMomentsData(
+    parentMoments,
+    uid,
+  );
+  const results = {};
+  for (const moment of moments) {
+    let parentData = null;
+    const { parent } = moment;
+    parentData = {
+      quoteType: '',
+      parentId: parent,
+      data: parentMomentsData[parent],
+    };
+
+    results[moment._id] = parentData;
+  }
+  return results;
+};
 
 /*
  * 当动态引用了其他内容且当前动态不存在内容时，调用此函数生成默认的内容
@@ -1735,6 +1764,20 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
     const { _id } = moment;
     const momentData = momentsData[_id];
     momentData.quoteData = quotesData[_id];
+    results.push(momentData);
+  }
+  return results;
+};
+schema.statics.extendListForReply = async (moments, uid = '') => {
+  const MomentModel = mongoose.model('moments');
+  const momentsData = await MomentModel.extendMomentsData(moments, uid);
+  //拓展动态的引用数据
+  const parentsData = await MomentModel.extendMomentsParentData(moments, uid);
+  const results = [];
+  for (const moment of moments) {
+    const { _id } = moment;
+    const momentData = momentsData[_id];
+    momentData.parentData = parentsData[_id];
     results.push(momentData);
   }
   return results;

@@ -56,9 +56,9 @@
             .account-nav-box.row
               .account-nav-left.col-xs-12.col-sm-2.col-md-2.hidden-xs.p-a-0
               .account-nav-center.col-xs-12.col-sm-10.col-md-10
-                .account-nav-item.m-r-2f5(@click="containerChange('timeline')" :class="{'active': $route.name === 'timeline'}")
-                  .account-nav-item-name 动态
-                  .account-nav-item-value {{targetUser.timelineCount}}
+                //- .account-nav-item.m-r-2f5(@click="containerChange('timeline')" :class="{'active': $route.name === 'timeline'}")
+                //-   .account-nav-item-name 动态
+                //-   .account-nav-item-value {{targetUser.timelineCount}}
                 .account-nav-item.m-r-2f5(@click="containerChange('moment')" :class="{'active': $route.name === 'moment'}")
                   .account-nav-item-name 电波
                   .account-nav-item-value {{targetUser.momentCount}}
