@@ -1006,7 +1006,7 @@ userSchema.methods.extendColumnAndZoneThreadCount = async function () {
     status: momentStatus.normal,
     parent: '',
     quoteType: {
-      $in: ['', momentQuoteType.article, momentQuoteType.moment],
+      $in: ['', momentQuoteType.moment],
     },
   });
   this.timelineCount = await MomentModel.countDocuments({
@@ -1766,35 +1766,7 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
   if (!user) {
     ThrowServerInternalError('在判断内容是否需要审核的时候，发现未知的uid');
   }
-  const reviewSettings = (await SettingModel.findById('review')).c;
-  const review = reviewSettings[type];
-
-  // 一、特殊限制
-  const { whitelistUid, blacklistUid } = review.special;
-  // 1. 白名单
-  if (whitelistUid.includes(uid)) {
-    return false;
-  }
-  // 2. 黑名单
-  if (blacklistUid.includes(uid)) {
-    return true;
-  }
-
-  // 二、白名单（用户证书和用户等级）
-  const { gradesId, certsId } = review.whitelist;
-  await user.extendGrade();
-  if (gradesId.includes(user.grade._id)) {
-    return false;
-  }
-  await user.extendRoles();
-  for (const role of user.roles) {
-    if (certsId.includes(role._id)) {
-      return false;
-    }
-  }
-
-  // 三、黑名单（海外手机号、未通过A卷和用户等级）
-  let passedCount;
+  let passedCount = 0;
   if (type === 'post') {
     passedCount = await PostModel.countDocuments({
       disabled: false,
@@ -1809,47 +1781,59 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
       uid,
     });
   }
-  const { grades, notPassedA, foreign } = review.blacklist;
-  const userPersonal = await UsersPersonalModel.findOnly({ uid });
+  const reviewSettings = (await SettingModel.findById('publish')).c;
+  const { postReview } = reviewSettings[type];
 
-  // 开启了海外手机号用户发表需审核
-  // 用户绑定了海外手机号
-  // 用户通过审核的数量小于设置的数量
-  // 满足的用户所发表的文章 需要审核
-  if (foreign.status && userPersonal.nationCode !== '86') {
-    if (foreign.type === 'all' || foreign.count > passedCount) {
+  const { nationCode } = await UsersPersonalModel.getUserPhoneNumber(uid);
+  const { foreign, notPassVolumeA, notPassVolumeAD, whitelist, blacklist } =
+    postReview;
+
+  const roles = await user.extendRoles();
+  const grade = await user.extendGrade();
+  const roleList = roles.map((r) => `role-${r._id}`);
+  roleList.push(`grade-${grade._id}`);
+  // 白名单
+  for (const r of roleList) {
+    if (whitelist.includes(r)) {
+      return false;
+    }
+  }
+  // 海外手机号注册用户
+  if (
+    nationCode !== foreign.nationCode &&
+    (foreign.type === 'all' ||
+      (foreign.type === 'count' && passedCount < foreign.count))
+  ) {
+    return true;
+  }
+
+  // 未通过AD卷(入学)考试
+  if (
+    !user.volumeAD &&
+    (notPassVolumeAD.type === 'all' ||
+      (notPassVolumeAD.type === 'count' && passedCount < notPassVolumeAD.count))
+  ) {
+    return true;
+  }
+
+  // 未通过 A 卷考试
+  if (
+    !user.volumeA &&
+    (notPassVolumeA.type === 'all' ||
+      (notPassVolumeA.type === 'count' && passedCount < notPassVolumeA.count))
+  ) {
+    return true;
+  }
+
+  // 黑名单
+  for (const bl of blacklist) {
+    if (!roleList.includes(bl.id) || bl.type === 'none') {
+      continue;
+    }
+    if (bl.type === 'all' || (bl.type === 'count' && passedCount < bl.count)) {
       return true;
     }
   }
-
-  // 开启了未通过A卷考试的用户发表需审核
-  // 用户没有通过A卷考试
-  // 用户通过审核的数量小于设置的数量
-  // 满足以上的用户所发表的文章 需要审核
-  if (notPassedA.status && !user.volumeA) {
-    if (notPassedA.type === 'all' || notPassedA.count > passedCount) {
-      return true;
-    }
-  }
-
-  let grade;
-  for (const g of grades) {
-    if (g.gradeId === user.grade._id) {
-      grade = g;
-    }
-  }
-  if (!grade) {
-    ThrowServerInternalError(
-      '系统无法确定您账号的等级信息，请点击页脚下的报告问题，告知网站管理员。',
-    );
-  }
-  if (grade.status) {
-    // 目前调取的地方都在发表相应内容之后，所以用户已发表内容的数量需要-1
-    if (grade.type === 'all' || grade.count > passedCount - 1) {
-      return true;
-    }
-  }
-
   // 四、未验证手机号码的用户发表文章要送审
   return !!(await UsersPersonalModel.shouldVerifyPhoneNumber(uid));
 };

@@ -4,7 +4,8 @@
       moment-editor(ref="momentEditor" @published="onPublished")
     .paging-button.m-r-05
       a.button.radius-left(@click="toType('moment')" :class="t === 'moment'?'active':''") 电文
-      a.button.radius-right(@click="toType('thread')" :class="t === 'thread'?'active':''") 长电文
+      // a.button.radius-right(@click="toType('thread')" :class="t === 'thread'?'active':''") 长电文
+      a.button.radius-right(@click="toType('momentReply')" :class="t === 'momentReply'?'active':''") 回电
     paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
     .user-list-warning(v-if="!momentsData && loading") 加载中~
     .moment-list(v-else).m-t-05
@@ -17,11 +18,19 @@
         :permissions="permissions"
         v-else-if="momentsData && momentsData.length !== 0 && t === 'moment'"
       )
-      article-list(
-        ref="articleList"
-        :articles="momentsData"
-        v-else-if="momentsData && momentsData.length !== 0 && t === 'thread'"
+      reply-list(
+        ref="reply-list"
+        :moments="momentsData"
+        @complaint="complaint"
+        @violation-record="violationRecord"
+        :permissions="permissions"
+        v-else-if="momentsData && momentsData.length !== 0 && t==='momentReply' "
       )
+      // article-list(
+      //   ref="articleList"
+      //   :articles="momentsData"
+      //   v-else-if="momentsData && momentsData.length !== 0 && t === 'thread'"
+      // )
       complaint(ref="complaint")
       violation-record(ref="violationRecord")
       paging(ref="paging" :pages="pageButtons" @click-button="clickButton")
@@ -39,11 +48,12 @@
 </style>
 <script>
 import Moments from "../../../../../lib/vue/zone/Moments";
+import MomentReplyList from "../../../../../lib/vue/zone/MomentReplyList";
 import Complaint from "../../../../../lib/vue/Complaint";
 import ViolationRecord from "../../../../../lib/vue/ViolationRecord";
 import Paging from "../../../../../lib/vue/Paging";
 import Blank from "../../../../components/Blank";
-import ArticleList from "../../../../../lib/vue/article/ArticleList";
+// import ArticleList from "../../../../../lib/vue/article/ArticleList";
 import MomentEditor from "../../../../../lib/vue/zone/MomentEditor";
 import {nkcAPI} from "../../../../../lib/js/netAPI";
 import {getState} from "../../../../../lib/js/state";
@@ -63,7 +73,7 @@ export default {
     "violation-record": ViolationRecord,
     "paging": Paging,
     "blank": Blank,
-    "article-list": ArticleList,
+    "reply-list": MomentReplyList,
     "moment-editor": MomentEditor
   },
   computed: {

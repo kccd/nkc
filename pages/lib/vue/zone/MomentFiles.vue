@@ -12,11 +12,27 @@
       .moment-file-container(v-if=" fileData.type === types.video && (filesData.length===1 || isZoneDetail) ")
         video-player(:file="fileData")
       .moment-file-container(
-        v-else="fileData.type === types.picture"
+        v-else-if="fileData.type === types.picture&&isApp"
         :style="`${fileData.pictureContainerStyle}`"
         :class="fileData.pictureContainerClass"
         @click="viewMedias(index)"
         v-long-press="() => longPress(index)"
+        )
+        img(
+          :class="{'lazyload': true}"
+          :data-src=" fileData.type === types.picture ? (isZoneDetail? fileData.url: fileData.urlMD) : fileData.coverUrl"
+          :alt="fileData.filename"
+          :title="fileData.filename"
+          :data-count="filesData.length > 1? 'more-than-one' : 'only-one'"
+          :data-direction="fileData.height > fileData.width? 'ver': 'hor'"
+          )
+        .play-icon(v-if="fileData.type === types.video")
+          play-one(size="24" theme="filled")
+      .moment-file-container(
+        v-else-if="fileData.type === types.picture&&!isApp"
+        :style="`${fileData.pictureContainerStyle}`"
+        :class="fileData.pictureContainerClass"
+        @click="viewMedias(index)"
         )
         img(
           :class="{'lazyload': true}"
