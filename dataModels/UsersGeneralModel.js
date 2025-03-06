@@ -299,6 +299,10 @@ const usersGeneralSchema = new Schema(
       type: Date,
       default: Date.now(),
     },
+    ignoreMomentCountAuth: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     collection: 'usersGeneral',

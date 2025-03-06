@@ -50,7 +50,7 @@ export default [
   {
     name: routerName.user,
     path: '/u/:uid',
-    redirect: '/u/:uid/profile/timeline',
+    redirect: '/u/:uid/profile/moment',
     component: User,
     children: [
       {
@@ -62,14 +62,14 @@ export default [
           {
             name: routerName.profile,
             path: '/',
-            redirect: '/u/:uid/profile/timeline',
+            redirect: '/u/:uid/profile/moment',
             component: Profile,
             children: [
-              {
-                name: routerName.timeline,
-                path: '/u/:uid/profile/timeline',
-                component: UserTimeline,
-              },
+              // {
+              //   name: routerName.timeline,
+              //   path: '/u/:uid/profile/timeline',
+              //   component: UserTimeline,
+              // },
               {
                 name: routerName.moment,
                 path: '/u/:uid/profile/moment',

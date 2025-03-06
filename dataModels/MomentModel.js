@@ -1051,6 +1051,15 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   if (!['comment', 'repost'].includes(postType)) {
     ThrowCommonError(500, `类型指定错误 postType=${postType}`);
   }
+  const {
+    publishPermissionService,
+  } = require('../services/publish/publishPermission.service');
+  const { publishPermissionTypes } = require('../settings/serverSettings');
+  // 检测发表权限
+  await publishPermissionService.checkPublishPermission(
+    publishPermissionTypes.moment,
+    this.uid,
+  );
   const DocumentModel = mongoose.model('documents');
   const MomentModel = mongoose.model('moments');
   const IPModel = mongoose.model('ips');
@@ -1073,10 +1082,10 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   // 是否生成转发
   const postForward = postType === 'repost' || alsoPost;
   if (postComment) {
+    await this.publish();
     // 需要创建评论
     await this.updateMomentCommentOrder();
     await this.updateParentLatestId();
-    await this.publish();
     commentMomentId = this._id;
   } else {
     // 不需要创建评论
@@ -1382,6 +1391,35 @@ schema.statics.extendMomentsQuotesData = async (moments, uid = '') => {
       };
     }
     results[moment._id] = quoteData;
+  }
+  return results;
+};
+schema.statics.extendMomentsParentData = async (moments, uid = '') => {
+  const MomentModel = mongoose.model('moments');
+  const parentsId = [];
+  for (const moment of moments) {
+    const { parent } = moment;
+    if (!parent) {
+      continue;
+    }
+    parentsId.push(parent);
+  }
+  const parentMoments = await MomentModel.getMomentsByMomentsId(parentsId);
+  const parentMomentsData = await MomentModel.extendMomentsData(
+    parentMoments,
+    uid,
+  );
+  const results = {};
+  for (const moment of moments) {
+    let parentData = null;
+    const { parent } = moment;
+    parentData = {
+      quoteType: '',
+      parentId: parent,
+      data: parentMomentsData[parent],
+    };
+
+    results[moment._id] = parentData;
   }
   return results;
 };
@@ -1726,6 +1764,20 @@ schema.statics.extendMomentsListData = async (moments, uid = '') => {
     const { _id } = moment;
     const momentData = momentsData[_id];
     momentData.quoteData = quotesData[_id];
+    results.push(momentData);
+  }
+  return results;
+};
+schema.statics.extendListForReply = async (moments, uid = '') => {
+  const MomentModel = mongoose.model('moments');
+  const momentsData = await MomentModel.extendMomentsData(moments, uid);
+  //拓展动态的引用数据
+  const parentsData = await MomentModel.extendMomentsParentData(moments, uid);
+  const results = [];
+  for (const moment of moments) {
+    const { _id } = moment;
+    const momentData = momentsData[_id];
+    momentData.parentData = parentsData[_id];
     results.push(momentData);
   }
   return results;

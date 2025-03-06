@@ -105,6 +105,7 @@ import {removeUserFromBlacklist} from "../../../../lib/js/subscribe";
 import {objToStr} from "../../../../lib/js/tools";
 import Paging from "../../../../lib/vue/Paging";
 import {getState} from "../../../../lib/js/state";
+import { setPageTitle } from "../../../../lib/js/pageSwitch";
 export default {
   data: () => ({
     uid: null,
@@ -116,6 +117,7 @@ export default {
     'paging': Paging
   },
   mounted() {
+    setPageTitle('黑名单');
     this.initData();
     this.getBlackList();
   },
