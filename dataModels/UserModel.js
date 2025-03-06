@@ -1752,6 +1752,7 @@ userSchema.statics.getModifyPostTimeLimit = async (uid) => {
  * @author pengxiguaa 2019-5-31
  * */
 userSchema.statics.contentNeedReview = async (uid, type) => {
+  const { settingIds } = require('../settings/serverSettings');
   if (!['post', 'thread'].includes(type)) {
     ThrowServerInternalError(`未知的审核类型: ${type}`);
   }
@@ -1781,7 +1782,7 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
       uid,
     });
   }
-  const reviewSettings = (await SettingModel.findById('publish')).c;
+  const reviewSettings = await SettingModel.getSettings(settingIds.publish);
   const { postReview } = reviewSettings[type];
 
   const { nationCode } = await UsersPersonalModel.getUserPhoneNumber(uid);

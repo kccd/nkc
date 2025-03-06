@@ -56,7 +56,7 @@ class PublishPermissionService {
     });
     const userGeneral = await UsersGeneralModel.findOne(
       { uid },
-      { isOlderUser: 1 },
+      { ignoreMomentCountAuth: 1 },
     );
     return {
       type: 'momentCount',
@@ -64,7 +64,7 @@ class PublishPermissionService {
       // completed: publishedMomentCount >= momentCount.count,
       completed:
         publishedMomentCount >= momentCount.count ||
-        (userGeneral && userGeneral.isOlderUser),
+        (userGeneral && userGeneral.ignoreMomentCountAuth),
       link: `/z`,
       title: '去发表',
     };

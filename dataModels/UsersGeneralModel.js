@@ -299,8 +299,7 @@ const usersGeneralSchema = new Schema(
       type: Date,
       default: Date.now(),
     },
-    // 是否是老用户
-    isOlderUser: {
+    ignoreMomentCountAuth: {
       type: Boolean,
       default: false,
     },
