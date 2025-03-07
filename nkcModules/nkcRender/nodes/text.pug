@@ -65,7 +65,8 @@ mixin renderText(node)
         else
           if link.href && !domainWhitelistReg.test(link.href)
             a(href=`/l?t=${encodeURIComponent(Buffer.from(link.href).toString('base64'))}` target='_blank' rel=link.rel)
-              span= node.text
+              - const hiddenArr = Array(link.href.length).fill('X');
+              span(data-type='nkc-url' data-url=`${Buffer.from(encodeURIComponent(link.href)).toString('base64')}`)=hiddenArr.join('')
           else 
             a(href=link.href target=link.target rel=link.rel)
               span= node.text
