@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const { domainWhitelistReg } = require('./regExp');
+const { getUrl } = require('./tools');
 
 function getHTMLText(html = '') {
   const $ = cheerio.load(html);
@@ -48,8 +49,58 @@ function replaceHTMLExternalLink(html = '') {
   }
   return $.html();
 }
+function renderAtUsers(html = '', atUsers = []) {
+  // 创建用户名到 UID 的映射
+  const usersObj = {};
+  const names = [];
+  for (const { username, uid } of atUsers) {
+    usersObj[username] = uid;
+    const usernameLC = username.toLowerCase();
+    usersObj[usernameLC] = uid;
+    names.push(username, usernameLC);
+  }
+
+  // 解析 HTML
+  const $ = cheerio.load(html, null, false);
+
+  $('*').each((_, element) => {
+    // 跳过 <a> 标签本身
+    if ($(element).is('a')) {
+      return;
+    }
+    $(element)
+      .contents()
+      .each((_, node) => {
+        // 只处理纯文本节点，确保不会修改 <a> 标签内部的文本
+        if (node.type === 'text') {
+          const text = node.data;
+
+          const replacedText = text.replace(
+            new RegExp(`@(${names.join('|')})`, 'ig'),
+            (match, username) => {
+              const uid = usersObj[username];
+              if (uid) {
+                return `<a href="${getUrl(
+                  'userHome',
+                  uid,
+                )}" target="_blank">@${username}</a>`;
+              }
+              return match; // 如果找不到用户，则不替换
+            },
+          );
+
+          if (replacedText !== text) {
+            $(node).replaceWith(replacedText);
+          }
+        }
+      });
+  });
+
+  return $.html();
+}
 module.exports = {
   getHTMLText,
   replaceLinksWithATags,
   replaceHTMLExternalLink,
+  renderAtUsers,
 };

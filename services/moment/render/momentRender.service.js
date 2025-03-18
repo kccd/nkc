@@ -8,6 +8,7 @@ const DocumentModel = require('../../../dataModels/DocumentModel');
 const {
   replaceLinksWithATags,
   replaceHTMLExternalLink,
+  renderAtUsers,
 } = require('../../../nkcModules/html');
 class MomentRenderService {
   filterMomentSimpleHTML(html) {
@@ -85,16 +86,17 @@ class MomentRenderService {
       $('p').each(function () {
         const text = $(this).text().trim();
         const isEmpty = !text || text === '\n';
-        if(isEmpty) {
+        if (isEmpty) {
           $(this).remove();
         }
       });
       html = $.html();
     }
-    // 处理AT功能，识别@符号，然后将@符号后的用户名识别出来，然后将其替换为a标签
-    html = DocumentModel.renderAtUsers(html, atUsers);
+
     // 识别文本链接，将其替换为a标签
     html = replaceLinksWithATags(html);
+    // 处理AT功能，识别@符号，然后将@符号后的用户名识别出来，然后将其替换为a标签
+    html = renderAtUsers(html, atUsers);
     // 处理html中href只想外部链接的a标签，将href替换为/l?t=urlBase64
     html = replaceHTMLExternalLink(html);
     // 过滤html，只允许白名单中的标签和属性
