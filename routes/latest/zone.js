@@ -41,6 +41,7 @@ router
       return await next();
     }
     const { page = 0 } = query;
+    const { zoneMomentList = 50 } = await db.SettingModel.getSettings('page');
     const momentStatus = await db.MomentModel.getMomentStatus();
     const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
     const { own, everyone, attention } =
@@ -137,7 +138,7 @@ router
     } else {
       count = momentsCount.number;
     }
-    const paging = nkcModules.apiFunction.paging(page, count);
+    const paging = nkcModules.apiFunction.paging(page, count, zoneMomentList);
     const moments = await db.MomentModel.find(match)
       .sort({ top: -1 })
       .skip(paging.start)
