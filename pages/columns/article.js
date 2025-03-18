@@ -3,6 +3,7 @@ import { screenTopAlert, screenTopWarning } from '../lib/js/topAlert';
 import { nkcAPI } from '../lib/js/netAPI';
 import MoveBox from '../lib/vue/publicVue/moveThreadOrArticle/MoveBox';
 import { getDataById } from '../lib/js/dataConversion';
+import Product from '../lib/vue/Product.vue';
 const data = getDataById('data');
 
 if ($('#CommentHitBox').length > 0) {
@@ -127,6 +128,18 @@ $(function () {
     window.moduleToColumn.init();
   }
 });
+if ($('#productAppRoot').length > 0) {
+  const { store } = getDataById('productAppData');
+  new Vue({
+    el: '#productAppRoot',
+    components: {
+      product: Product,
+    },
+    data: {
+      store,
+    },
+  });
+}
 Object.assign(window, {
   cancelArticleXsf,
   hideArticleKcbRecordReason,

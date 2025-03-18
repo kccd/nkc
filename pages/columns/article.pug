@@ -31,17 +31,43 @@ block baseColumnContent
         toc: tools.timeFormat(new Date(dt || toc)), allToc: tools.timeFormat(new Date(dt || toc)), originState,
         columnId: _id, columnName: name, addr: article ? article.document && article.document.addr : article.addr, originDesc
       })
-      include ./article/abstract
-      +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
       include ./article/content
-      +content(c)
-      include ./article/articleEditTime
-      include ../publicModules/articleCenter/articleCredits
-      -var {kcb = [], xsf = []} = article;
-      +articleCredits(kcb.concat(xsf), article._id, data.permissions)
-      +articleEditTime(tlm, dt, toc)
-      include ./article/categoryName
-      +categoryName({categoriesTree})
+      if thread.type ==='product'
+        div.p-t-3
+        -
+          var productAppData = {
+            product: data.product,
+            abstract: abstractCn,
+            keywords: keyWordsCn,
+            vipDiscount: data.vipDiscount, // 会员折扣
+            vipDisNum: data.vipDisNum, // 会员折扣值
+            userAddress: data.userAddress, // 后端识别的用户位置
+            permissions: {
+              banProduct: data.permissions.banSaleProductParams,
+            }
+          }
+        #productAppData.hidden=objToStr({store: productAppData})
+        #productAppRoot(v-cloak)
+          product(:store="store")
+        +content(c)
+        include ./article/articleEditTime
+        include ../publicModules/articleCenter/articleCredits
+        -var {kcb = [], xsf = []} = article;
+        +articleCredits(kcb.concat(xsf), article._id, data.permissions)
+        +articleEditTime(tlm, dt, toc)
+        include ./article/categoryName
+        +categoryName({categoriesTree})
+      else 
+        include ./article/abstract
+        +abstract({abstractCn, abstractEn, keyWordsCn, keyWordsEn})
+        +content(c)
+        include ./article/articleEditTime
+        include ../publicModules/articleCenter/articleCredits
+        -var {kcb = [], xsf = []} = article;
+        +articleCredits(kcb.concat(xsf), article._id, data.permissions)
+        +articleEditTime(tlm, dt, toc)
+        include ./article/categoryName
+        +categoryName({categoriesTree})
       include ../columns/article/articleOptions
       +articleOptions({
         logged: !!data.user,

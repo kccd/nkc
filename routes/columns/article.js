@@ -108,6 +108,7 @@ router.get('/:aid', Public(), async (ctx, next) => {
       await db.ColumnModel.getUsersPermissionKeyObject();
     const permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
+      banSaleProductParams: ctx.permission('banSaleProductParams'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
       manageZoneArticleCategory: ctx.permission('manageZoneArticleCategory'),
       showManagement: ctx.permissionsOr([
@@ -286,6 +287,27 @@ router.get('/:aid', Public(), async (ctx, next) => {
         modifyType: false,
       }).sort({ toc: -1 });
       thread.reason = threadLogOne.reason || '';
+    }
+    //拓展商品信息
+    if (thread.type === 'product') {
+      const {
+        product,
+        vipDiscount,
+        vipDisNum,
+        closeSaleDescription,
+        userAddress,
+      } = await db.ThreadModel.extendShopInfo({
+        tid: thread.tid,
+        oc: thread.oc,
+        uid: state.uid,
+        gradeId: data.user ? data.user.grade._id : 0,
+        address: ctx.address,
+      });
+      data.product = product;
+      data.vipDiscount = vipDiscount;
+      data.vipDisNum = vipDisNum;
+      data.closeSaleDescription = closeSaleDescription;
+      data.userAddress = userAddress;
     }
     //文章回复查询规则 只查询状态正常的回复
     const match = {
