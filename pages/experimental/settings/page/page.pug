@@ -68,6 +68,10 @@ block eContent
             label.col-sm-3.control-label 文章页/回复详细页的评论列表
             .col-sm-3
               input.form-control(type='text' v-model.number="pageSettings.threadPostCommentList")
+          .form-group
+            label.col-sm-3.control-label 电波页电文列表
+            .col-sm-3
+              input.form-control(type='text' v-model.number="pageSettings.zoneMomentList")
       .col-xs-12.col-md-12
         h4 文章列表风格设置
         mixin radio(name, listStyle, link)
