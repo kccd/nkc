@@ -1578,7 +1578,10 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
         });
         plain = content;
       } else {
-        const renderingData = await stableDocument.getRenderingData(visitorUid);
+        const renderingData = await stableDocument.getRenderingData(
+          visitorUid,
+          stableDocument.atUsers,
+        );
         plain = momentRenderService.renderingSimpleJson({
           content: stableDocument.content,
           atUsers: stableDocument.atUsers,

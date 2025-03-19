@@ -34,6 +34,7 @@ router
       searchResourceList,
       threadListStyle,
       articlePanelStyle,
+      zoneMomentList,
     } = pageSettings;
     threadPostCommentList = parseInt(threadPostCommentList);
     homeThreadList = parseInt(homeThreadList);
@@ -48,6 +49,7 @@ router
     forumUserList = parseInt(forumUserList);
     searchColumnList = parseInt(searchColumnList);
     searchResourceList = parseInt(searchResourceList);
+    zoneMomentList = parseInt(zoneMomentList);
     const articlePanelStyleTypesArr = Object.values(articlePanelStyleTypes);
     const articlePanelCoverTypesArr = Object.values(articlePanelCoverTypes);
     if (!articlePanelStyleTypesArr.includes(threadListStyle.type)) {
@@ -85,6 +87,7 @@ router
           searchColumnList,
           threadListStyle,
           articlePanelStyle,
+          zoneMomentList,
         },
       },
     );

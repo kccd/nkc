@@ -998,7 +998,7 @@ schema.statics.getStableDocumentRenderingContent = async (source, sid, uid) => {
  *   @param {String} title 标题
  *   @param {String} content 渲染后的富文本内容
  * */
-schema.methods.getRenderingData = async function (uid) {
+schema.methods.getRenderingData = async function (uid, atUsers = []) {
   const { timeFormat, fromNow, getUrl } = require('../nkcModules/tools');
   const nkcRender = require('../nkcModules/nkcRender');
   const ResourceModel = mongoose.model('resources');
@@ -1019,6 +1019,7 @@ schema.methods.getRenderingData = async function (uid) {
           xsf: user ? user.xsf : 0,
           source: 'document',
           sid: this._id,
+          atUsers,
         })
       : nkcRender.renderHTML({
           type: 'article',
