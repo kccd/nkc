@@ -270,6 +270,9 @@ function showResource(lid) {
   ResourceInfo.open({ lid: lid });
 }
 
+function showAttachment(rid) {
+  ResourceInfo.open({ rid, lid: '' });
+}
 function bandUser(uid, banned) {
   banUser(uid, banned);
 }
@@ -283,4 +286,5 @@ Object.assign(window, {
   clearUserDescription,
   clearUserAvatar,
   clearUserBanner,
+  showAttachment,
 });

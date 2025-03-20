@@ -141,6 +141,24 @@
       .search-result-time
         //-=fromNow(result.resource.tlm || result.resource.toc)
         +fromNow(result.resource.tlm || result.resource.toc)
+    .search-result-abstract!= "文件（来自文库）：" + (result.c || "暂无简介")
+    .search-result-info.resource
+      button(data-type='downloadPanel' data-id=result.resource.rid)
+        .fa.fa-cloud-download &nbsp;
+        | 立即下载&nbsp;
+      div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`
+  else if result.docType === "attachment"
+    a(onclick=`showAttachment('${result.resource.rid}')`).pointer.clear-a-style.search-result-title!= result.t
+    .search-result-info
+      a.clear-a-style.search-result-author(href=`/u/${result.resource.uid}`
+        data-global-mouseover="showUserPanel"
+        data-global-mouseout="hideUserPanel"
+        data-global-data=objToStr({uid: result.resource.uid})
+      )
+        img(src=tools.getUrl("userAvatar", result.resource.user.avatar, "sm"))
+        span=result.resource.user.username
+      .search-result-time
+        +fromNow(result.resource.tlm || result.resource.toc)
     .search-result-abstract!= "文件：" + (result.c || "暂无简介")
     .search-result-info.resource
       button(data-type='downloadPanel' data-id=result.resource.rid)

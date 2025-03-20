@@ -244,6 +244,7 @@ router.get('/', Public(), async (ctx, next) => {
     const columnId = new Set();
     const columnPageId = new Set();
     const resourceId = new Set();
+    const libId = new Set();
     const articleDocumentId = new Set();
     const commentDocumentId = new Set();
     const momentDocumentId = new Set();
@@ -260,6 +261,8 @@ router.get('/', Public(), async (ctx, next) => {
       } else if (r.docType === 'columnPage') {
         columnPageId.add(r.tid);
       } else if (r.docType === 'resource') {
+        libId.add(r.tid);
+      } else if (r.docType === 'attachment') {
         resourceId.add(r.tid);
       } else if (r.docType === 'document_article') {
         articleDocumentId.add(r.tid);
@@ -358,6 +361,16 @@ router.get('/', Public(), async (ctx, next) => {
           if (r.highlight.content) {
             highlightObj[r.tid + '_c'] = r.highlight.content;
           }
+        } else if (r.docType === 'attachment') {
+          if (r.highlight.title) {
+            highlightObj[r.tid + '_t'] = r.highlight.title;
+          }
+          if (r.content) {
+            highlightObj[r.tid + '_d'] = r.content;
+          }
+          if (r.highlight.content) {
+            highlightObj[r.tid + '_c'] = r.highlight.content;
+          }
         }
       }
     });
@@ -420,12 +433,66 @@ router.get('/', Public(), async (ctx, next) => {
     pageColumns.map((pc) => {
       pageColumnObj[pc._id] = pc;
     });
-    const resources = await db.LibraryModel.find({
-      _id: { $in: [...resourceId] },
+    const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(
+      data.userRoles,
+      data.userGrade,
+      user,
+    );
+    let libraries = await db.LibraryModel.find({
+      _id: { $in: [...libId] },
     });
+    const filteredLibraries = [];
+    for (const item of libraries) {
+      if (item.deleted || item.closed) {
+        continue;
+      } else if (item.uid !== state.uid) {
+        const resourceItem = await db.ResourceModel.findOne({ rid: item.rid });
+        if (!resourceItem) {
+          continue;
+        }
+        const perm = await resourceItem.getPermission(accessibleForumsId);
+        if (!perm) {
+          continue;
+        }
+        filteredLibraries.push(item);
+      } else {
+        filteredLibraries.push(item);
+      }
+    }
+    libraries = filteredLibraries;
+    // const resources = await db.LibraryModel.find({
+    //   _id: { $in: [...resourceId] },
+    // });
+    let resources = await db.ResourceModel.find({
+      rid: { $in: [...resourceId] },
+      type: 'resource',
+    });
+    // 需要判断用户是否有权限访问此附件(专业相关)。。。。
+    const filteredResources = [];
+    for (const item of resources) {
+      if (item.disabled || item.del) {
+        continue;
+      } else if (item.uid !== state.uid) {
+        if (item.references.length === 0) {
+          continue;
+        }
+        const perm = await item.getPermission(accessibleForumsId);
+        if (!perm) {
+          continue;
+        }
+        filteredResources.push(item);
+      } else {
+        filteredResources.push(item);
+      }
+    }
+    resources = filteredResources;
     const resourcesObj = {};
+    const librariesObj = {};
+    libraries.map((r) => {
+      librariesObj[r._id] = r;
+    });
     resources.map((r) => {
-      resourcesObj[r._id] = r;
+      resourcesObj[r.rid] = r;
     });
     const threadCategories = await db.ThreadCategoryModel.getCategoriesById([
       ...new Set(threadCategoriesId),
@@ -637,6 +704,21 @@ router.get('/', Public(), async (ctx, next) => {
         r.t = elasticSearch.replaceSearchResultHTMLLink(r.t + '');
         r.c = elasticSearch.replaceSearchResultHTMLLink(r.c + '');
       } else if (docType === 'resource') {
+        let library = librariesObj[tid];
+        if (!library) {
+          continue;
+        }
+        library = library.toObject();
+        library.user = userObj[library.uid];
+        r = {
+          docType,
+          t: highlightObj[`${tid}_t`] || library.name,
+          c: highlightObj[`${tid}_c`] || library.description,
+          resource: library,
+        };
+        r.t = elasticSearch.replaceSearchResultHTMLLink(r.t + '');
+        r.c = elasticSearch.replaceSearchResultHTMLLink(r.c + '');
+      } else if (docType === 'attachment') {
         let resource = resourcesObj[tid];
         if (!resource) {
           continue;
@@ -645,8 +727,8 @@ router.get('/', Public(), async (ctx, next) => {
         resource.user = userObj[resource.uid];
         r = {
           docType,
-          t: highlightObj[`${tid}_t`] || resource.name,
-          c: highlightObj[`${tid}_c`] || resource.description,
+          t: highlightObj[`${tid}_t`] || resource.oname,
+          c: highlightObj[`${tid}_c`] || highlightObj[`${tid}_d`] || '',
           resource,
         };
         r.t = elasticSearch.replaceSearchResultHTMLLink(r.t + '');

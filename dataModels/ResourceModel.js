@@ -612,6 +612,7 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
     return;
   }
   const model = mongoose.model('resources');
+  const elasticSearch = require('../nkcModules/elasticSearch');
   const targetTypes = [
     'nkc-video-block',
     'nkc-audio-block',
@@ -638,6 +639,26 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
     typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent,
     targetTypes,
   );
+  // 同步搜索数据库中的附件数据，先在resource中查一遍
+  const searchDBData = await model.find(
+    {
+      rid: { $in: rids },
+      mediaType: 'mediaAttachment',
+      type: 'resource',
+    },
+    { rid: 1, oname: 1, toc: 1, uid: 1, ext: 1 },
+  );
+
+  for (const file of searchDBData) {
+    // 后期可以完善：把多条数据同时更新到搜索数据库中
+    await elasticSearch.save('attachment', {
+      tid: file.rid,
+      t: file.oname.split(`.` + file.ext)[0],
+      c: '',
+      toc: file.toc,
+      uid: file.uid,
+    });
+  }
   await model.updateMany(
     {
       rid: { $in: rids },
@@ -1193,6 +1214,81 @@ resourceSchema.methods.checkAccessPermission = async function (
   }
 };
 
+/*
+ * 判断用户是否有权限访问资源并返回结果
+ * @param {[String]} accessibleForumsId 访问能够访问的专业ID组成的数组
+ * */
+resourceSchema.methods.getPermission = async function (accessibleForumsId) {
+  const PostModel = mongoose.model('posts');
+  const LibraryModel = mongoose.model('libraries');
+  const ForumModel = mongoose.model('forums');
+  const ThreadModel = mongoose.model('threads');
+  const { references } = this;
+  // let inLibrary = false;
+  let forumsId = [];
+  let postIds = [];
+  for (const id of references) {
+    if (!id.includes('-')) {
+      postIds.push(id);
+    } else {
+      const [type, qid] = id.split('-');
+      if (type === 'library') {
+        // 专业文库
+        const files = await LibraryModel.find({
+          type: 'file',
+          rid: this.rid,
+          deleted: false,
+          closed: false,
+        });
+        if (files.length > 0) {
+          // inLibrary = true;
+          const foldersId = [];
+          for (const file of files) {
+            const nav = await file.getNav();
+            foldersId.push(nav[0]);
+          }
+          const forums = await ForumModel.find(
+            { lid: { $in: foldersId } },
+            { fid: 1 },
+          );
+          forumsId = forumsId.concat(forums.map((f) => f.fid));
+        }
+      }
+    }
+  }
+  const posts = await PostModel.find(
+    {
+      pid: { $in: postIds },
+      disabled: false,
+      toDraft: { $ne: true },
+      reviewed: true,
+      anonymous: false,
+      type: 'post',
+    },
+    { mainForumsId: 1 },
+  );
+  const threads = await ThreadModel.find(
+    {
+      oc: { $in: postIds },
+      disabled: false,
+      recycleMark: { $ne: true },
+      reviewed: true,
+      type: 'article',
+    },
+    { mainForumsId: 1 },
+  );
+  for (const post of posts) {
+    forumsId = forumsId.concat(post.mainForumsId);
+  }
+  for (const thread of threads) {
+    forumsId = forumsId.concat(thread.mainForumsId);
+  }
+  forumsId = [...new Set(forumsId)];
+  if (forumsId.every((forumId) => !accessibleForumsId.includes(forumId))) {
+    return false;
+  }
+  return true;
+};
 /*
  * 清除文件信息
  * */

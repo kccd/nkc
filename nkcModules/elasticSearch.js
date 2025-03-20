@@ -185,6 +185,7 @@ func.save = async (docType, document) => {
       'column',
       'columnPage',
       'resource',
+      'attachment',
       'document_article',
       'document_comment',
       'document_moment',
@@ -244,6 +245,8 @@ func.save = async (docType, document) => {
     id = `comment_${tid}`;
   } else if (docType === 'document_moment') {
     id = `document_${tid}`;
+  } else if (docType === 'attachment') {
+    id = `attachment_${tid}`;
   }
 
   return await client.index({
@@ -497,9 +500,23 @@ func.search = async (t, c, options) => {
                 bool: {
                   must: [
                     {
-                      match: {
-                        docType: 'resource',
+                      bool: {
+                        should: [
+                          {
+                            match: {
+                              docType: 'resource',
+                            },
+                          },
+                          {
+                            match: {
+                              docType: 'attachment',
+                            },
+                          },
+                        ],
                       },
+                      // match: {
+                      //   docType: 'resource',
+                      // },
                     },
                     {
                       bool: {
@@ -682,9 +699,25 @@ func.search = async (t, c, options) => {
       },
     });
   } else if (t === 'resource') {
+    // body.query.bool.must.push({
+    //   match: {
+    //     docType: 'resource',
+    //   },
+    // });
     body.query.bool.must.push({
-      match: {
-        docType: 'resource',
+      bool: {
+        should: [
+          {
+            match: {
+              docType: 'resource',
+            },
+          },
+          {
+            match: {
+              docType: 'attachment',
+            },
+          },
+        ],
       },
     });
   } else if (t === 'document_article') {
