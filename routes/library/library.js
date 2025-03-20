@@ -151,6 +151,7 @@ router
     });
     await library.updateOne(obj);
     if (library.type === 'file') {
+      await library.updateResourceReferences();
       await db.LibraryModel.saveToES(library._id);
     }
     await next();
