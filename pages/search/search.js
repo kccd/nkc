@@ -133,6 +133,9 @@ var app = new Vue({
       if (type === 'document_article') {
         t = '&t=document_article';
       }
+      if (type === 'document_moment') {
+        t = '&t=document_moment';
+      }
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
       NKC.methods.visitUrl(
         '/search?c=' + encodeURIComponent(this.c) + t + '&d=' + this.options,
