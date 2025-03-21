@@ -31,7 +31,7 @@ block content
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
-            .form-group(v-if="t !== 'resource' && t !== 'document_article'")
+            .form-group(v-if="t !== 'resource' && t !== 'document_article' && t!=='document_moment'")
               label 专业筛选：
               .search-forum-div
                 .search-forum(v-for="(forum, index) in selectedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
@@ -41,7 +41,7 @@ block content
                       option(:value='""') 不分类
                   .fa.fa-remove(@click="removeFromArr(selectedForums, index)")
                 button.btn.btn-default.btn-sm(@click="selectForum('selected')") 添加
-            .form-group(v-if="t !== 'resource' && t !== 'document_article'")
+            .form-group(v-if="t !== 'resource' && t !== 'document_article' && t!=='document_moment'")
               label 专业排除：
               .search-forum-div
                 .search-forum(v-for="(forum, index) in excludedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
@@ -121,6 +121,8 @@ block content
           ul
             li
               a(class=!data.t? "active" : "" onclick="app.clickNav('all')") 全部
+            li
+              a(class=data.t === "document_moment" ? "active" : "" onclick="app.clickNav('document_moment')") 电文
             li
               a(class=data.t === "thread" ? "active" : "" onclick="app.clickNav('thread')") 文章
             li

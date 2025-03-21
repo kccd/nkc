@@ -341,7 +341,7 @@ func.search = async (t, c, options) => {
     t === 'document_comment' ||
     t === 'document_moment'
   ) {
-    size = searchDocumentList;
+    size = searchDocumentList || searchAllList;
   } else {
     size = searchAllList;
   }
@@ -851,6 +851,7 @@ func.search = async (t, c, options) => {
       body.query.bool.must[0].bool.should[5].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[6].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[7].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[8].bool.must.push(authorMatch);
     }
 
     if (digest) {
