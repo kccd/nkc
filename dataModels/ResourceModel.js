@@ -1224,7 +1224,6 @@ resourceSchema.methods.getPermission = async function (accessibleForumsId) {
   const ForumModel = mongoose.model('forums');
   const ThreadModel = mongoose.model('threads');
   const { references } = this;
-  // let inLibrary = false;
   let forumsId = [];
   let postIds = [];
   for (const id of references) {
@@ -1241,7 +1240,6 @@ resourceSchema.methods.getPermission = async function (accessibleForumsId) {
           closed: false,
         });
         if (files.length > 0) {
-          // inLibrary = true;
           const foldersId = [];
           for (const file of files) {
             const nav = await file.getNav();
@@ -1259,30 +1257,30 @@ resourceSchema.methods.getPermission = async function (accessibleForumsId) {
   const posts = await PostModel.find(
     {
       pid: { $in: postIds },
-      disabled: false,
-      toDraft: { $ne: true },
-      reviewed: true,
-      anonymous: false,
-      type: 'post',
+      // disabled: false,
+      // toDraft: { $ne: true },
+      // reviewed: true,
+      // anonymous: false,
+      // type: 'post',
     },
     { mainForumsId: 1 },
   );
-  const threads = await ThreadModel.find(
-    {
-      oc: { $in: postIds },
-      disabled: false,
-      recycleMark: { $ne: true },
-      reviewed: true,
-      type: 'article',
-    },
-    { mainForumsId: 1 },
-  );
+  // const threads = await ThreadModel.find(
+  //   {
+  //     oc: { $in: postIds },
+  //     disabled: false,
+  //     recycleMark: { $ne: true },
+  //     reviewed: true,
+  //     type: 'article',
+  //   },
+  //   { mainForumsId: 1 },
+  // );
   for (const post of posts) {
     forumsId = forumsId.concat(post.mainForumsId);
   }
-  for (const thread of threads) {
-    forumsId = forumsId.concat(thread.mainForumsId);
-  }
+  // for (const thread of threads) {
+  //   forumsId = forumsId.concat(thread.mainForumsId);
+  // }
   forumsId = [...new Set(forumsId)];
   if (forumsId.every((forumId) => !accessibleForumsId.includes(forumId))) {
     return false;
