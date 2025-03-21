@@ -133,6 +133,9 @@ var app = new Vue({
       if (type === 'document_article') {
         t = '&t=document_article';
       }
+      if (type === 'document_moment') {
+        t = '&t=document_moment';
+      }
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
       NKC.methods.visitUrl(
         '/search?c=' + encodeURIComponent(this.c) + t + '&d=' + this.options,
@@ -270,6 +273,9 @@ function showResource(lid) {
   ResourceInfo.open({ lid: lid });
 }
 
+function showAttachment(rid) {
+  ResourceInfo.open({ rid, lid: '' });
+}
 function bandUser(uid, banned) {
   banUser(uid, banned);
 }
@@ -283,4 +289,5 @@ Object.assign(window, {
   clearUserDescription,
   clearUserAvatar,
   clearUserBanner,
+  showAttachment,
 });
