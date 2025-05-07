@@ -138,6 +138,20 @@ new Vue({
     goBack() {
       history.back();
     },
+    viewImage(data) {
+      const { name = '', url = '' } = data;
+      const images = [
+        {
+          name,
+          url,
+        },
+      ];
+      const readyFiles = images.map((item) => {
+        return { ...item, type: 'picture' };
+      });
+      window.RootApp.$refs.preview.setData(true, 0, readyFiles);
+      window.RootApp.$refs.preview.init(0);
+    },
   },
   components: {
     'el-date-picker': DatePicker,

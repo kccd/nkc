@@ -59,11 +59,11 @@ block eContent
             .row
               .col-xs-12.col-md-6.text-center
                 h5 身份证正面
-                a.verify2__img(href=srcB target='_blank')
+                .verify2__img(@click="viewImage({name:'身份证正面',url:IDCardA})")
                   img(:src="IDCardA" style='max-width: 100%;').center-block
               .col-xs-12.col-md-6.text-center
                 h5 身份证背面
-                a.verify2__img(href=srcB target='_blank')
+                .verify2__img(@click="viewImage({name:'身份证背面',url:IDCardB})")
                   img(:src="IDCardB" style='max-width: 100%;').center-block
 
               if (data.verifiedAState === 'inProcess' && data.verifiedBState === 'inProcess')
