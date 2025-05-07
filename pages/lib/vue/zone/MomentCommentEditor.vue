@@ -34,7 +34,7 @@
             input(type="checkbox" :value="true" :disabled="disablePostChecked" v-model="alsoPost")
             span 同时评论
       .option-box-right
-        span {{remainingWords}}
+        span(:class="remainingWords<0 ? 'warning' : '' ") {{remainingWords}}
         button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-if="submitting" title="发表中，请稍候")
           .fa.fa-spinner.fa-spin
         button.btn.btn-default.btn-sm(@click="publish" :disabled="disablePostButton" v-else) 发射
@@ -129,7 +129,7 @@
 <script>
 import { sweetError } from '../../js/sweetAlert';
 import { debounce } from '../../js/execution';
-import { getLength } from '../../js/checkData';
+import { getMomentPlainJsonContentLength } from '../../js/checkData';
 import EmojiSelector from '../EmojiSelector';
 import ResourceSelector from '../ResourceSelector';
 import { getUrl } from '../../js/tools';
@@ -181,7 +181,7 @@ export default {
       return this.mid;
     },
     contentLength() {
-      return getLength(this.content);
+      return getMomentPlainJsonContentLength(this.content);
     },
     allowedToPublish() {
       const { contentLength, maxContentLength } = this;
@@ -216,6 +216,7 @@ export default {
       this.momentCommentId = '';
       this.setTextareaEditorContent('');
       this.picturesId = [];
+      this.content='';
     },
     selectEmoji() {
       const self = this;
