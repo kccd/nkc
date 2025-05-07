@@ -905,7 +905,7 @@ export default {
     },
     clickDetail(url, e) {
       e.preventDefault();
-      if (state.isApp) {
+      if (state.isApp ||(this.$route && this.$route.name !== 'Zone')) {
         this.visitUrl(url, true);
       } else {
         this.$router.push(url);

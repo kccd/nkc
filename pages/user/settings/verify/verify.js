@@ -96,6 +96,20 @@ const vm = new Vue({
     },
   },
   methods: {
+    viewImage(data) {
+      const { name = '', url = '' } = data;
+      const images = [
+        {
+          name,
+          url,
+        },
+      ];
+      const readyFiles = images.map((item) => {
+        return { ...item, type: 'picture' };
+      });
+      window.RootApp.$refs.preview.setData(true, 0, readyFiles);
+      window.RootApp.$refs.preview.init(0);
+    },
     videoUpdate(file) {
       this.videoInputFile = file;
       if (file.type !== 'video/mp4') {
@@ -104,11 +118,11 @@ const vm = new Vue({
     },
     IDCardAInputFileChange(file) {
       this.IDCardAInputFile = file;
-      console.log(file);
+      // console.log(file);
     },
     IDCardBInputFileChange(file) {
       this.IDCardBInputFile = file;
-      console.log(file);
+      // console.log(file);
     },
     async submitVerify2() {
       const { IDCardAInputFile, IDCardBInputFile } = this;
@@ -143,7 +157,7 @@ const vm = new Vue({
           'POST',
           form,
           function (e, progress) {
-            console.log(typeof progress);
+            // console.log(typeof progress);
             self.uploadProgress = parseInt(progress);
           },
         ).then(() => {
@@ -160,7 +174,7 @@ const vm = new Vue({
   },
 });
 
-console.log(vm);
+// console.log(vm);
 
 // $(function() {
 // 	initEvent('idCardA');
@@ -221,7 +235,7 @@ $('#pickVerify3Video').on('click', () => {
       'POST',
       formData,
       function (event, percentage) {
-        console.log(percentage);
+        // console.log(percentage);
       },
     );
   });
