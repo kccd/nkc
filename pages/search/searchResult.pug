@@ -1,4 +1,18 @@
 .search-result
+
+  mixin fileButtonGroup(rid, ext)
+    button.btn.btn-success.btn-xs(data-type='downloadPanel' data-id=rid)
+      .fa.fa-cloud-download &nbsp;
+      | 立即下载&nbsp;
+    if ext === 'pdf'
+      a.btn.btn-default.btn-xs(
+        href=`/reader/pdf/web/viewer?file=%2fr%2f${rid}?time%3D${Date.now()}`
+        target="_blank"
+        title='预览文件已被压缩处理，并不代表真实文件质量'
+      )
+        .fa.fa-eye &nbsp;
+        | 预览
+
   if ["thread", "post"].includes(result.docType)
     if 1 || result.docType === "thread"
       .checkbox.thread-checkbox(style="display: inline;")
@@ -143,13 +157,7 @@
         +fromNow(result.resource.tlm || result.resource.toc)
     .search-result-abstract!= "文件（来自文库）：" + (result.c || "暂无简介")
     .search-result-info.resource
-      button(data-type='downloadPanel' data-id=result.resource.rid)
-        .fa.fa-cloud-download &nbsp;
-        | 立即下载&nbsp;
-      if result.resource.ext === 'pdf'
-        span(style="color:#2b90d9;font-size:1.1rem;")
-          a(href=`/reader/pdf/web/viewer?file=%2fr%2f${result.resource.rid}?time%3D${Date.now()}` target="_blank") 预览
-          span.fa.fa-question-circle(title="预览文件已被压缩处理，并不代表真实文件质量")
+      +fileButtonGroup(result.resource.rid, result.resource.ext)
       div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`
   else if result.docType === "attachment"
     a(onclick=`showAttachment('${result.resource.rid}')`).pointer.clear-a-style.search-result-title!= result.t
@@ -165,13 +173,7 @@
         +fromNow(result.resource.tlm || result.resource.toc)
     .search-result-abstract!= "文件：" + (result.c || "暂无简介")
     .search-result-info.resource
-      button(data-type='downloadPanel' data-id=result.resource.rid)
-        .fa.fa-cloud-download &nbsp;
-        | 立即下载&nbsp;
-      if result.resource.ext === 'pdf'
-        span(style="color:#2b90d9;font-size:1.1rem;")
-          a(href=`/reader/pdf/web/viewer?file=%2fr%2f${result.resource.rid}?time%3D${Date.now()}` target="_blank") 预览
-          span.fa.fa-question-circle(title="预览文件已被压缩处理，并不代表真实文件质量")
+      +fileButtonGroup(result.resource.rid, result.resource.ext)
       div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`
   else if result.docType === "document_article"
     .checkbox.thread-checkbox(style="display: inline;")
