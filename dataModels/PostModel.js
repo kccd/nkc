@@ -1148,10 +1148,10 @@ postSchema.statics.extendPosts = async (posts, options) => {
       post = post.toObject();
     }
     if (o.htmlToText) {
-      post.c = post.l === 'json'? getJsonStringTextSlice(post.c,Number(o.count)): obtainPureText( post.c,
-        true,
-        o.count,
-      );
+      post.c =
+        post.l === 'json'
+          ? getJsonStringTextSlice(post.c, Number(o.count))
+          : obtainPureText(post.c, true, o.count);
     }
     post.ownPost = post.uid === o.uid;
     if (post.anonymous && o.excludeAnonymousPost) {
@@ -1221,7 +1221,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
         }
         let c =
           quotePost.l === 'json'
-            ? getJsonStringTextSlice(quoteContent,50)
+            ? getJsonStringTextSlice(quoteContent, 50)
             : nkcRender.htmlToPlain(quoteContent, 50);
         c = nkcRender.replaceLink(c);
         post.quotePost = {
@@ -1434,7 +1434,7 @@ postSchema.statics.newPost = async (options) => {
  * @return {String} 不带域名的url
  * @author pengxiguaa 2019-6-11
  * */
-postSchema.statics.getUrl = async function (pid, redirect) {
+postSchema.statics.getUrl = async function (pid, redirect, judge) {
   // 2020-3-20 pengxiguaa
   // 由于新能问题，此方法不再返回带楼层的链接地址
   // 返回post详细页并附带跳转参数，post详情页路由再做处理。
@@ -1468,8 +1468,79 @@ postSchema.statics.getUrl = async function (pid, redirect) {
     if (!tid) {
       return;
     }
-    const { postIds } = await ThreadModel.findOnly({ tid }, { postIds: 1 });
-    const step = postIds.indexOf(post.pid);
+    let step = 0;
+    if (judge) {
+      const {
+        displayRecycleMarkThreads,
+        displayDisabledPosts,
+        uid,
+        isModerator,
+      } = judge;
+      const match = {
+        tid,
+        type: 'post',
+        parentPostsId: {
+          $size: 0,
+        },
+      };
+
+      const $and = [];
+      // 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
+      // 判断是否为该专业的专家
+      // 如果是该专业的专家，加载所有的post；如果不是，则判断有没有相应权限。
+      if (!isModerator) {
+        if (!displayRecycleMarkThreads) {
+          const $or = [
+            {
+              disabled: false,
+              toDraft: { $ne: true },
+            },
+          ];
+          // 用户能查看自己被退回的回复
+          if (uid) {
+            $or.push({
+              toDraft: true,
+              uid: uid,
+            });
+          }
+          $and.push({ $or });
+        }
+        if (!displayDisabledPosts) {
+          const $or = [
+            {
+              disabled: false,
+            },
+          ];
+          $and.push({ $or });
+        }
+        if ($and.length !== 0) {
+          match.$and = $and;
+        }
+      }
+      if (uid) {
+        if (!isModerator) {
+          match.$or = [
+            {
+              reviewed: true,
+            },
+            {
+              reviewed: false,
+              uid: uid,
+            },
+          ];
+        }
+      } else {
+        match.reviewed = true;
+      }
+      const { postIds } = await ThreadModel.findOnly({ tid }, { postIds: 1 });
+      const posts = await PostModel.find(match, { pid: 1 });
+      const existingPids = new Set(posts.map((p) => p.pid));
+      const filteredPostIds = postIds.filter((id) => existingPids.has(id));
+      step = filteredPostIds.indexOf(post.pid);
+    } else {
+      const { postIds } = await ThreadModel.findOnly({ tid }, { postIds: 1 });
+      step = postIds.indexOf(post.pid);
+    }
     if (step === -1) {
       return `/t/${post.tid}`;
     }
@@ -1616,11 +1687,10 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     if (!user || !thread) {
       return;
     }
-    post.c = post.l === 'json' ? getJsonStringTextSlice( post.c,200) :obtainPureText(
-       post.c,
-      true,
-      200,
-    );
+    post.c =
+      post.l === 'json'
+        ? getJsonStringTextSlice(post.c, 200)
+        : obtainPureText(post.c, true, 200);
     if (!post.anonymous) {
       post.user = user;
     }
@@ -1690,7 +1760,7 @@ postSchema.statics.getSocketCommentByPid = async (post) => {
   }
   content =
     post.l === 'json'
-      ? getJsonStringTextSlice(post.c,50)
+      ? getJsonStringTextSlice(post.c, 50)
       : nkcRender.htmlToPlain(post.c, 50);
   contentUrl = tools.getUrl('post', post.pid);
   return {
@@ -2169,12 +2239,10 @@ postSchema.statics.extendActivityPosts = async (posts) => {
         toc: firstPost.toc,
         title: firstPost.t,
         url: tools.getUrl('thread', firstPost.tid),
-        content: firstPost.l === 'json'
-        ? getJsonStringTextSlice(firstPost.c,200)
-        :nkcRender.htmlToPlain(
-           firstPost.c,
-          200,
-        ),
+        content:
+          firstPost.l === 'json'
+            ? getJsonStringTextSlice(firstPost.c, 200)
+            : nkcRender.htmlToPlain(firstPost.c, 200),
         cover: firstPost.cover
           ? tools.getUrl('postCover', firstPost.cover)
           : null,
@@ -2191,10 +2259,10 @@ postSchema.statics.extendActivityPosts = async (posts) => {
       toc,
       url,
       title: t,
-      content:  l === 'json' ? getJsonStringTextSlice(c,200) :nkcRender.htmlToPlain(
-        c,
-        200,
-      ),
+      content:
+        l === 'json'
+          ? getJsonStringTextSlice(c, 200)
+          : nkcRender.htmlToPlain(c, 200),
       cover: cover ? tools.getUrl('postCover', cover) : null,
       forumsId: mainForumsId,
       quote,
@@ -2393,11 +2461,8 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
       result.title = nkcRender.replaceLink(threadPost.t);
       result.content = nkcRender.replaceLink(
         threadPost.l === 'json'
-        ? getJsonStringTextSlice(threadPost.c,200)
-        : nkcRender.htmlToPlain(
-         threadPost.c,
-          200,
-        ),
+          ? getJsonStringTextSlice(threadPost.c, 200)
+          : nkcRender.htmlToPlain(threadPost.c, 200),
       );
       result.coverUrl = threadPost.cover
         ? getUrl('postCover', threadPost.cover)
@@ -2422,11 +2487,8 @@ postSchema.statics.getPostsDataByPostsId = async (postsId, uid) => {
         result.replyUrl = getUrl('post', targetPost.pid);
         result.replyContent = nkcRender.replaceLink(
           targetPost.l === 'json'
-          ? getJsonStringTextSlice(targetPost.c,200)
-          :  nkcRender.htmlToPlain(
-          targetPost.c,
-            200,
-          ),
+            ? getJsonStringTextSlice(targetPost.c, 200)
+            : nkcRender.htmlToPlain(targetPost.c, 200),
         );
         result.replyUsername = targetUser.username;
         result.replyUid = targetUser.uid;

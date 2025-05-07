@@ -54,7 +54,12 @@ router
     data.page = page;
     const post = await db.PostModel.findOnly({ pid });
     if (redirect === 'true') {
-      const url = await db.PostModel.getUrl(post.pid, true);
+      const url = await db.PostModel.getUrl(post.pid, true, {
+        isModerator: ctx.permission('superModerator'),
+        uid: data.user ? data.user.uid : '',
+        displayRecycleMarkThreads: ctx.permission('displayRecycleMarkThreads'),
+        displayDisabledPosts: ctx.permission('displayDisabledPosts'),
+      });
       return ctx.redirect(url);
     }
     const thread = await post.extendThread();
