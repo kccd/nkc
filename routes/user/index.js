@@ -72,12 +72,17 @@ userRouter
   .use('/:uid', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
     if (!state.uid || state.uid !== data.targetUser.uid) {
-      await db.UserModel.checkAccessControlPermissionWithThrowError({
-        uid: state.uid,
-        rolesId: data.userRoles.map((role) => role._id),
-        gradeId: state.uid ? data.userGrade._id : undefined,
-        isApp: state.isApp,
-      });
+      try {
+        await db.UserModel.checkAccessControlPermissionWithThrowError({
+          uid: state.uid,
+          rolesId: data.userRoles.map((role) => role._id),
+          gradeId: state.uid ? data.userGrade._id : undefined,
+          isApp: state.isApp,
+        });
+      } catch (error) {
+        delete data.targetUser;
+        throw error;
+      }
     }
     ctx.template = 'vueRoot/index.pug';
     await next();
@@ -122,6 +127,7 @@ userRouter
       (!user || user.uid !== targetUser.uid)
     ) {
       if (targetUser.hidden) {
+        delete data.targetUser;
         nkcModules.throwError(
           404,
           '根据相关法律法规和政策，该内容不予显示',
@@ -142,6 +148,7 @@ userRouter
 
     // 禁止游客查看开除学籍用户的名片
     if (!user && targetUser.certs.includes('banned')) {
+      delete data.targetUser;
       nkcModules.throwError(
         404,
         '根据相关法律法规和政策，该内容不予显示',
@@ -194,6 +201,7 @@ userRouter
       return await next();
     } else if (from === 'message') {
       if (!user) {
+        delete data.targetUser;
         ctx.throw(403, '你暂未登录');
       }
       data.friend = await db.FriendModel.findOne({
