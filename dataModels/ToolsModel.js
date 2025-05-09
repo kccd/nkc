@@ -6,56 +6,61 @@ const toolsSchema = new Schema({
   // 工具id
   _id: {
     type: Number,
-    required: true
+    required: true,
   },
   // 创建时间
   toc: {
     type: Date,
     default: Date.now,
-    index: 1
+    index: 1,
   },
   // 工具名字
   name: {
     type: String,
-    required: true
+    required: true,
   },
   // 作者uid(如果有的话)
   uid: {
     type: String,
-    default: ""
+    default: '',
   },
   // 作者的名字(如果有的话)
-  author:{
+  author: {
     type: String,
-    default: ""
+    default: '',
   },
   // 版本号
   version: {
     type: String,
-    default: "1.0.0"
+    default: '1.0.0',
   },
   // 简介(如果有的话)
   summary: String,
   // 最后修改日期
   lastModify: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   // 入口文件名
   entry: {
     type: String,
-    default: "/index.html"
+    default: '/index.html',
   },
   // 是否是站外链接
   isOtherSite: {
     type: Boolean,
-    default: false
+    default: false,
   },
   // 是否被屏蔽了
   isHide: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
+  // 自定义排序
+  order: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model('tools', toolsSchema);

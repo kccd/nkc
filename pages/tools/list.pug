@@ -2,26 +2,30 @@ extends ../bootstrap_base
 
 block title
   title 工具列表
-  +includeCSS("/tools/list2.css")
+  +includeCSS("/tools/list.css")
 
 block content
   .container-fluid.max-width
-    #toollist
+    h3=`计算工具(${data.list.length})`
+    .tool-list-container
       for info, index in data.list
+        -
+          var toolHomeUrl = info.isOtherSite? info.entry: '/tools/open/' + info._id;
         if !info.isHide
-          .tool-item(onclick=`NKC.methods.visitUrl('${info.isOtherSite? info.entry: '/tools/open/' + info._id}', '_blank')`)
-            .tool-container
-              .tool-info
-                p.tool-name #{info.name}
-                p.tool-summary #{info.summary}
-              .tool-control
-                a.tool-author(href=info.uid? `/u/${info.uid}`: null)
-                  span.tool-author-label author
-                  span.tool-author-text #{info.author || "[匿名]"}
-                //- .tool-start
-                //-   if info.isOtherSite
-                //-     a.tool-start-button(href=`${info.entry}`, target="_blank") 打开
-                //-   else
-                //-     a.tool-start-button(href=`/tools/open/${info._id}`, target="_blank") 打开
-      //- include ./index.htm
-      //- +includeCSS("/tools/list.css")
+          .tool-item-container
+            .tool-box-left
+              a.tool-item-name(title=info.name href=toolHomeUrl target="_blank")=info.name
+              .tool-item-desc(title=info.summary)=info.summary
+              .tool-item-author
+                span.m-r-05 上传于
+                span.m-r-2=format('YYYY-MM-DD HH:mm:ss', info.toc)
+                span 作者：
+                if info.author
+                  if info.uid
+                    a.tool-author(href=info.uid? `/u/${info.uid}`: null target='_blank')=info.author
+                  else
+                    span=info.author
+                else
+                  span 匿名
+            a.tool-box-right.pointer(href=toolHomeUrl target='_blank')
+              span.fa.fa-chevron-circle-right

@@ -1,0 +1,72 @@
+@import "../publicModules/base";
+.tool-list-container{
+  font-size: 0;
+  .tool-item-container{
+    display: inline-block;
+    width: 49%;
+    height: 7.5rem;
+    position: relative;
+    background-color: #fff;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    padding: 1rem 4rem 1rem 1rem;
+    margin-right: 1%;
+    border: 1px solid #eee;
+    .tool-box-left{
+      .tool-item-name{
+        font-size: 1.4rem;
+        .hideText(@line: 1);
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+      }
+      .tool-item-desc{
+        font-size: 1.2rem;
+        .hideText(@line: 1);
+      }
+      .tool-item-author{
+        font-size: 1.2rem;
+        .hideText(@line: 1);
+      }
+    }
+    .tool-box-right{
+      color: #8a8a8a;
+      text-align: center;
+      display: block;
+      width: 6rem;
+      height: 7.5rem;
+      line-height: 7.5rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 1.8rem;
+      &:hover, &:active{
+        color: #333;
+      }
+    }
+  }
+}
+@media (max-width: 992px){
+  .tool-list-container{
+    .tool-item-container{
+      width: 100%;
+      margin-right: 0;
+      height: auto;
+      padding: 1rem;
+      .tool-box-left{
+        .tool-item-name{
+          .hideText(@line: 2)
+        }
+        .tool-item-desc{
+          .hideText(@line: 2);
+        }
+        .tool-item-author{
+          .hideText(@line: 2);
+        }
+      }
+      .tool-box-right{
+        display: none;
+      }
+    }
+  }
+}

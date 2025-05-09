@@ -30,7 +30,7 @@
       .fa.fa-edit
       span &nbsp;编辑
 </template>
-<style lang="less">
+<style lang="less" scoped>
   @import "../../../../publicModules/base";
   .operations{
     color: #404040;
@@ -101,7 +101,6 @@
       border-radius: 3px;
       max-height: 5rem;
       font-size: 1.2rem;
-      overflow: hidden;
       font-weight: 700;
       /*background-color: #d9e1e8;*/
       display: inline-block;
@@ -109,6 +108,7 @@
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 3;
       overflow: hidden;
+      word-break: break-word;
     }
     .single-post-content:hover, .single-post-content:link, .single-post-content:active, .single-post-content:visited {
       text-decoration: none;

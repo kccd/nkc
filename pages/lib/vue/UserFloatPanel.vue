@@ -336,7 +336,12 @@ export default {
           if(dom['0']&&!document.contains(dom['0'])){
             return false
           }
-          return self.getUserById(targetUid);
+          try {
+            return self.getUserById(targetUid);
+          } catch (error) {
+            console.error(error)
+            return false
+          }
         })
         .then((userObj) => {
           const {user, subscribed} = userObj;
@@ -403,7 +408,7 @@ export default {
             resolve(userObj);
           })
           .catch(err => {
-            sweetError(err);
+            // sweetError(err);
             reject(err);
           });
       });

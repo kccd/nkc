@@ -1,10 +1,10 @@
 const Router = require('koa-router');
 const router = new Router();
-const { OnlyOperation } = require('../../middlewares/permission');
+const { OnlyOperation, OnlyUnbannedUser } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
 router.put(
   '/',
-  OnlyOperation(Operations.userWithdrawnMessage),
+  OnlyUnbannedUser(),
   async (ctx, next) => {
     const { body, db, nkcModules, data } = ctx;
     const { user } = data;

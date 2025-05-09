@@ -1,3 +1,5 @@
+import { objToStr } from "../../lib/js/tools";
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -32,6 +34,7 @@ var app = new Vue({
     fromNow: NKC.methods.fromNow,
     visitUrl: NKC.methods.visitUrl,
     getUrl: NKC.methods.tools.getUrl,
+    objToStr: objToStr,
     reset: function() {
       this.filter = {
         uid: "",
@@ -101,7 +104,21 @@ var app = new Vue({
         .catch(function(data) {
           sweetError(data);
         });
-    }
+    },
+    viewImage(data) {
+      const { name = '', url = '' } = data;
+      const images = [
+        {
+          name,
+          url,
+        },
+      ];
+      const readyFiles = images.map((item) => {
+        return { ...item, type: 'picture' };
+      });
+      window.RootApp.$refs.preview.setData(true, 0, readyFiles);
+      window.RootApp.$refs.preview.init(0);
+    },
   },
   mounted: function() {
     this.setC();
