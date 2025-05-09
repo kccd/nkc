@@ -21,4 +21,7 @@ module.exports = {
   enableSiteTools: {
     POST: Operations.enableSiteTools,
   },
+  order: {
+    POST: Operations.modifyToolsOrder,
+  },
 };

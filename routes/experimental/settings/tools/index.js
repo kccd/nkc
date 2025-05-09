@@ -9,7 +9,7 @@ router
     const { data, db, params } = ctx;
 
     // 网站工具列表
-    let list = await db.ToolsModel.find().sort({ toc: -1 });
+    let list = await db.ToolsModel.find().sort({ order: 1 });
     list.forEach((model, index) => {
       list[index] = model._doc;
     });
@@ -21,5 +21,4 @@ router
     ctx.template = 'experimental/settings/tools/tools.pug';
     await next();
   });
-
 module.exports = router;
