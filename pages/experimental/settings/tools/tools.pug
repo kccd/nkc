@@ -5,6 +5,7 @@ block eTitle
   title 网站工具管理
 
 block eContent
+  #data.hidden=tools.objToStr({list: data.list})
   .container-fluid.max-width
     #app
       .form-group
@@ -32,33 +33,29 @@ block eContent
               th 简介
               th 作者
               th 入口
-              th 是否是站外链接
               th 操作
           tbody
             //- 循环模板
-            for info, index in data.list
-              tr
-                th= info._id
-                th= info.version
-                th= format("YYYY/MM/DD HH:mm:ss", info.lastModify)
-                th= info.name
-                th= info.summary
-                - let author = info.author? info.author:'[匿名]'
-                th
-                  if info.uid
-                    a(href=`/u/${info.uid}`, target="_blank") #{author}
-                  else
-                    span #{author}
-                th
-                  if info.isOtherSite
-                    a(href=`${info.entry}`, target="_blank") #{info.entry}
-                  else
-                    a(href=`/tools/open/${info._id}`, target="_blank") #{info.entry}
-                th #{info.isOtherSite? '是':'否'}
-                th
-                  button.btn.btn-sm.btn-default(@click=`editTool('${info.version}','${info.name}','${info.summary}','${info.uid}','${info.author}','${info.entry}',${info.isOtherSite},'${info._id}')`) 编辑
-                  button.btn.btn-sm.btn-danger(@click=`deleteTool('${info._id}','${info.name}')`) 删除
-                  button.btn.btn-sm.btn-primary(@click=`hideTool('${info._id}','${info.name}',${info.isHide})`) #{info.isHide?'解除屏蔽':'屏蔽'}
+            tr(v-for='(info, index) in list')
+              th {{info._id}}
+              th(style='width: 5rem;') {{info.version}}
+              th(style='width: 12rem;') {{timeFormat("YYYY/MM/DD HH:mm:ss", info.lastModify)}}
+              th {{info.name}}
+              th {{info.summary}}
+              th
+                a(v-if="info.uid"  :href=`'/u/' + info.uid`, target="_blank") {{info.author? info.author:'[匿名]'}}
+                span(v-else) {{info.author? info.author:'[匿名]'}}
+              th(style='width: 12rem;')
+                div(v-if='info.isOtherSite')
+                  span [外链]&nbsp;
+                  a(:href="info.entry", target="_blank") {{info.entry}}
+                a(v-else :href="'/tools/open/' + info._id", target="_blank") {{info.entry}}
+              th
+                button.btn.btn-xs.btn-default(@click=`move("up", index)` :disabled='index <= 0') 上移
+                button.btn.btn-xs.btn-default(@click=`move("down", index)` :disabled="index >= list.length - 1") 下移
+                button.btn.btn-xs.btn-default(@click=`editTool(info.version,info.name,info.summary,info.uid,info.author,info.entry,info.isOtherSite,info._id)`) 编辑
+                button.btn.btn-xs.btn-danger(@click=`deleteTool(info._id,info.name)`) 删除
+                button.btn.btn-xs.btn-primary(@click=`hideTool(info._id,info.name,info.isHide)`) {{info.isHide?'解除屏蔽':'屏蔽'}}
             
 
 block scripts

@@ -765,6 +765,7 @@ const DynamicOperations = {
   deleteTool: 'deleteTool',
   hideTool: 'hideTool',
   enableSiteTools: 'enableSiteTools',
+  modifyToolsOrder: 'modifyToolsOrder',
   ipinfo: 'ipinfo',
   creationCenterDeleteList: 'creationCenterDeleteList',
   creationCenterMoveList: 'creationCenterMoveList',

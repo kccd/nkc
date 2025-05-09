@@ -154,6 +154,7 @@
   "editThreadPostOrder": "调整文章回复顺序路由",
   "editorAutoUploadImage": "编辑器自动上传文件",
   "enableSiteTools": "网站工具的启用和禁用",
+  "modifyToolsOrder": "调整网站工具排序",
   "enabledQuestion": "取消屏蔽考试题",
   "experimentalAppSettings": "后台APP管理",
   "experimentalCacheSettings": "后台管理-缓存设置",

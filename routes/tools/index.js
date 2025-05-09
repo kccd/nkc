@@ -14,11 +14,11 @@ router
       ctx.throw(403, '权限不足');
     }
     let toolsModel = db.ToolsModel;
-    let toolList = await toolsModel.find();
-    toolList.forEach((model, index) => {
-      toolList[index] = model._doc;
-    });
-    data.list = toolList;
+    data.list = await toolsModel
+      .find({
+        isHide: false,
+      })
+      .sort({ order: 1 });
     ctx.template = 'tools/list.pug';
     await next();
   })
@@ -145,9 +145,10 @@ router
     // 信息入库
     const toolsModel = db.ToolsModel;
     const settingModel = db.SettingModel;
+    const toolsCount = await db.ToolsModel.countDocuments();
     let id = await settingModel.operateSystemID('tools', 1);
     const filePath = toolsPath + `/${id}`;
-    let doc = toolsModel({ ...info, _id: id });
+    let doc = toolsModel({ ...info, _id: id, order: toolsCount });
     await doc.save();
     // 移动文件到最终位置
     if (completePath) {
@@ -191,6 +192,33 @@ router
       data.enabled = updatedStatu;
       data.message = updatedStatu ? '已启用网站工具' : '已禁用网站工具';
       return next();
+    },
+  )
+  .post(
+    '/order',
+    OnlyOperation(Operations.modifyToolsOrder),
+    async (ctx, next) => {
+      const { body, db } = ctx;
+      const { toolsId } = body;
+
+      // 获取所有工具的 _id
+      const tools = await db.ToolsModel.find({}, { _id: 1 });
+
+      // 构建批量更新操作
+      const bulkOps = tools.map((tool) => {
+        const index = toolsId.indexOf(tool._id);
+        return {
+          updateOne: {
+            filter: { _id: tool._id },
+            update: { $set: { order: index } },
+          },
+        };
+      });
+
+      // 执行批量更新
+      await db.ToolsModel.bulkWrite(bulkOps);
+
+      await next();
     },
   );
 
