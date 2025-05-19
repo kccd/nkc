@@ -39,6 +39,7 @@ const kcbsRecordSchema = new Schema({
   // digestComment 加精独立文章评论
   // digestArticle 加精独立文章
   // ...
+  //'modifyUsernameAudit','revokeUsernameAudit',''rejectUsernameAudit''
   type: {
     type: String,
     required: true,

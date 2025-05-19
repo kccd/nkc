@@ -134,5 +134,6 @@
   "digestCommentWithMoney": "回复被列入精选",
   "momentRepost": "电文被转发",
   "momentComment": "电文被回复",
-  "noteDisabled" : "笔记被屏蔽"
+  "noteDisabled" : "笔记被屏蔽",
+  "userAuditRejected" : "基本资料修改申请已被拒绝"
 }

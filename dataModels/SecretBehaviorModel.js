@@ -16,6 +16,7 @@ const secretBehaviorSchema = new Schema({
 		  'bindEmail', 'unbindEmail', 'changeEmail',
 		  'modifyUsername', 'modifyPassword',
 		  'destroy'
+			,'modifyUsernameAudit','revokeUsernameAudit'
 		]
 		*/
 	},
