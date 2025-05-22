@@ -694,6 +694,24 @@ module.exports = {
       ],
       content: "您提交的基本资料修改申请，由于[text=reason]等原因已被拒绝。请您提交内容时确保符合规章，消除存在的问题，否则下次将您的提交内容标记为违规。",
       type: "userAuditRejected"
+    },
+      {
+      parameters: [
+        'momentUrl',
+        'reason',
+        'content',
+      ],
+      content: "您发布的电文[text=content]由于[text=reason]等原因，已被屏蔽，[url=momentUrl(点击查看)]。该操作不可恢复，也不接受申诉。请您在下次发表时，认真对照国家法律法规、社区规章，确保标题和内容清晰详细，品质优良。",
+      type: 'momentWasReturned'
+    },
+     {
+      parameters: [
+        'momentUrl',
+        'reason',
+        'content',
+      ],
+      content: "您发布的电文评论[text=content]由于[text=reason]等原因，已被屏蔽，[url=momentUrl(点击查看)]。该操作不可恢复，也不接受申诉。请您在下次发表时，认真对照国家法律法规、社区规章，确保标题和内容清晰详细，品质优良。",
+      type: 'momentCommentWasReturned'
     }
   ]
 };

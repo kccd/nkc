@@ -1663,6 +1663,60 @@ messageSchema.statics.getParametersData = async (message) => {
       momentUrl: getUrl('zoneMoment', momentId),
       content: getJsonStringText(betaDocument.content),
     };
+  } else if (type === 'momentWasReturned') {
+    const { momentId, reason } = message.c;
+    const moment = await MomentModel.findOne(
+      {
+        _id: momentId,
+      },
+      {
+        uid: 1,
+      },
+    );
+    if (!moment) {
+      return null;
+    }
+    const documentSources = await DocumentModel.getDocumentSources();
+    const betaDocuments = await DocumentModel.getStableDocumentsBySource(
+      documentSources.moment,
+      [moment._id],
+    );
+    if (betaDocuments.length === 0) {
+      return null;
+    }
+    const betaDocument = betaDocuments[0];
+    parameters = {
+      momentUrl: getUrl('zoneMoment', momentId),
+      reason,
+      content: getJsonStringText(betaDocument.content),
+    };
+  } else if (type === 'momentCommentWasReturned') {
+    const { momentId, reason } = message.c;
+    const moment = await MomentModel.findOne(
+      {
+        _id: momentId,
+      },
+      {
+        uid: 1,
+      },
+    );
+    if (!moment) {
+      return null;
+    }
+    const documentSources = await DocumentModel.getDocumentSources();
+    const betaDocuments = await DocumentModel.getStableDocumentsBySource(
+      documentSources.moment,
+      [moment._id],
+    );
+    if (betaDocuments.length === 0) {
+      return null;
+    }
+    const betaDocument = betaDocuments[0];
+    parameters = {
+      momentUrl: getUrl('zoneMoment', momentId),
+      reason,
+      content: getJsonStringText(betaDocument.content),
+    };
   }
   return parameters;
 };
