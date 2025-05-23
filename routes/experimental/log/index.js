@@ -24,6 +24,7 @@ const filterRouter = require('./filter');
 const userCodeRouter = require('./userCode');
 const paymentRouter = require('./payment');
 const sensitiveRouter = require('./sensitive');
+const disMomentRouter = require('./dismoment');
 const { OnlyOperation } = require('../../../middlewares/permission');
 const { Operations } = require('../../../settings/operations');
 logRouter
@@ -42,6 +43,7 @@ logRouter
     experimentalRouter.allowedMethods(),
   )
   .use('/recycle', recycleRouter.routes(), recycleRouter.allowedMethods())
+  .use('/dismoment', disMomentRouter.routes(), disMomentRouter.allowedMethods())
   .use('/secret', secretRouter.routes(), secretRouter.allowedMethods())
   .use('/warning', warningRouter.routes(), warningRouter.allowedMethods())
   .use('/behavior', behaviorRouter.routes(), behaviorRouter.allowedMethods())

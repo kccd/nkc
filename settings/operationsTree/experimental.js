@@ -412,6 +412,9 @@ module.exports = {
     recycle: {
       GET: Operations.visitRecycleMarkThreads,
     },
+    dismoment: {
+      GET: Operations.managementMoment,
+    },
     public: {
       GET: Operations.visitPublicLogs,
       DELETE: Operations.deletePublicLogs,

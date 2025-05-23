@@ -62,6 +62,14 @@ settingRouter
       ...scoreObject,
       number: myScore,
     };
+    const auditStatus = db.UserAuditModel.getAuditStatus();
+    const userAudit_ = await db.UserAuditModel.findOne({
+      uid: user.uid,
+      status: auditStatus.pending,
+    }).sort({ toc: -1 });
+    if (userAudit_) {
+      data.userAudit = userAudit_;
+    }
     ctx.template = 'interface_user_settings_info.pug';
     await next();
   })

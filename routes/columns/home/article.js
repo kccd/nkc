@@ -45,6 +45,15 @@ module.exports = async function (ctx, next) {
       $in: subColumnsId,
     };
   }
+  //已经屏蔽的专栏
+  const disabledCols = await db.ColumnModel.find(
+    { disabled: true },
+    { _id: 1 },
+  );
+  const disabledIds = disabledCols.map((c) => c._id);
+  postMatch.columnId = Object.assign(postMatch.columnId || {}, {
+    $nin: disabledIds,
+  });
 
   const count = await db.ColumnPostModel.countDocuments(postMatch);
   const paging = nkcModules.apiFunction.paging(
