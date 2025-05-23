@@ -1125,6 +1125,14 @@ messageSchema.statics.getParametersData = async (message) => {
     parameters = {
       reason: reason ? reason : '未知',
     };
+  } else if (type === 'userAuditApproved') {
+    const { link } = message.c;
+    if (!link) {
+      return null;
+    }
+    parameters = {
+      link,
+    };
   } else if (
     [
       'documentFaulty',

@@ -697,6 +697,13 @@ module.exports = {
     },
       {
       parameters: [
+        "link",
+      ],
+      content: "您提交的基本资料修改申请，已经通过了审核。[url=link(立即查看)]",
+      type: "userAuditApproved"
+      },
+      {
+      parameters: [
         'momentUrl',
         'reason',
         'content',

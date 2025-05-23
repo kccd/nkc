@@ -136,6 +136,7 @@
   "momentComment": "电文被回复",
   "noteDisabled" : "笔记被屏蔽",
   "userAuditRejected" : "基本资料修改申请已被拒绝",
+  "userAuditApproved" : "基本资料修改申请通过审核",
   "momentWasReturned":"电文被屏蔽",
   "momentCommentWasReturned":"电文评论被屏蔽"
 }
