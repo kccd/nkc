@@ -716,6 +716,15 @@ router
 
       if (pass) {
         await db.UserAuditModel.approve(userAudit._id, user.uid);
+        message = await db.MessageModel({
+            _id: await db.SettingModel.operateSystemID('messages', 1),
+            r: userAudit.uid,
+            ty: 'STU',
+            c: {
+              type: 'userAuditApproved',
+              link:`/u/${userAudit.uid}/settings`
+            },
+          });
       } else {
         await db.UserAuditModel.reject(userAudit._id, user.uid, reason || '');
         if (userAudit.username) {

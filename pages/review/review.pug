@@ -210,21 +210,43 @@ block content
                 .review-info 类型:
                  .review-time 基本资料
                 .review-post-content
-                  .form-horizontal
-                    .form-group
-                      label.control-label.col-sm-2(v-if=`'${r.userAudit.avatar}'`) 头像:
-                      h5.col-xs-10(v-if=`'${r.userAudit.avatar}'`)
-                        img(:src=`getUrl('userAvatar', '${r.userAudit.avatar}', 'sm')` style="cursor:pointer;" @click=`viewImage({name: 'banner', url: getUrl('userAvatar', '${r.userAudit.avatar}', 'lg')})`)
-                      label.control-label.col-sm-2(v-if=`'${r.userAudit.banner}'`) 用户背景:
-                      h5.col-xs-10(v-if=`'${r.userAudit.banner}'`)
-                        img(:src=`getUrl('userBanner', '${r.userAudit.banner}')` style="cursor:pointer;" @click=`viewImage({name: 'banner', url: getUrl('userBanner', '${r.userAudit.banner}')})`)
-                      label.control-label.col-sm-2(v-if=`'${r.userAudit.homeBanner}'`) 主页背景:
-                      h5.col-xs-10(v-if=`'${r.userAudit.homeBanner}'`)
-                        img(:src=`getUrl('userHomeBanner', '${r.userAudit.homeBanner}')` style="cursor:pointer;" @click=`viewImage({name: 'banner', url: getUrl('userHomeBanner', '${r.userAudit.homeBanner}')})`)
-                      label.control-label.col-sm-2(v-if=`'${r.userAudit.username}'`) 用户名:
-                      h5.col-xs-10(v-if=`'${r.userAudit.username}'`)=r.userAudit.username
-                      label.control-label.col-sm-2 个人简介:
-                      h5.col-xs-10(v-html=`auditDescriptionObject['${r.userAudit._id}']`)
+                  .form-audit
+                    //- 头像
+                    .form-item(v-if=`'${r.userAudit.avatar}'`)
+                      label.control-label 头像:
+                      img.avatar-img(
+                        :src=`getUrl('userAvatar', '${r.userAudit.avatar}', 'sm')`
+                        style="cursor:pointer;"
+                        @click=`viewImage({name: 'avatar', url: getUrl('userAvatar', '${r.userAudit.avatar}', 'lg')})`
+                      )
+
+                    //- 用户背景
+                    .form-item(v-if=`'${r.userAudit.banner}'`)
+                      label.control-label 用户背景:
+                      img.banner-img(
+                        :src=`getUrl('userBanner', '${r.userAudit.banner}')`
+                        style="cursor:pointer;"
+                        @click=`viewImage({name: 'banner', url: getUrl('userBanner', '${r.userAudit.banner}')})`
+                      )
+
+                    //- 主页背景
+                    .form-item(v-if=`'${r.userAudit.homeBanner}'`)
+                      label.control-label 主页背景:
+                      img.banner-img(
+                        :src=`getUrl('userHomeBanner', '${r.userAudit.homeBanner}')`
+                        style="cursor:pointer;"
+                        @click=`viewImage({name: 'homeBanner', url: getUrl('userHomeBanner', '${r.userAudit.homeBanner}')})`
+                      )
+
+                    //- 用户名
+                    .form-item(v-if=`'${r.userAudit.username}'`)
+                      label.control-label 用户名:
+                      span.username=r.userAudit.username
+
+                    //- 个人简介
+                    .form-item
+                      label.control-label 个人简介:
+                      .description(v-html=`auditDescriptionObject['${r.userAudit._id}']`)
                   .review-input-div
                     .m-b-1
                       label

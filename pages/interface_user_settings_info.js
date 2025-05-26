@@ -189,10 +189,10 @@ $(function () {
         // 1. 先做校验，不改变 loading
         if (this.showName) {
           if (!this.newUsername.trim()) {
-            return screenTopWarning('新用户名不能为空');
+            return sweetWarning('新用户名不能为空');
           }
           if (this.newUsername === this.user.username) {
-            return screenTopWarning('新用户名不能与旧用户名相同');
+            return sweetWarning('新用户名不能与旧用户名相同');
           }
         }
 
@@ -233,7 +233,7 @@ $(function () {
             location.reload();
           })
           .catch((err) => {
-            screenTopWarning(err.error || '提交失败');
+            sweetError(err.error || '提交失败');
           })
           .finally(() => {
             this.loading = false;
