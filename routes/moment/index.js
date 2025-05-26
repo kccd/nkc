@@ -93,6 +93,7 @@ router
       // 更新对应的动态(moment)屏蔽记录。
       const log = await db.DisMomentLogModel.findOne({
         momentId: moment._id,
+        recovered: false,
       }).sort({ toc: -1 });
       await log.updateOne({
         $set: {

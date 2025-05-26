@@ -715,6 +715,20 @@ router
       }
 
       if (pass) {
+        if (userAudit.username) {
+          const tUser = await db.UserModel.findOne({ uid: userAudit.uid });
+          const behavior = {
+            oldUsername: tUser.username,
+            oldUsernameLowerCase: tUser.usernameLowerCase,
+            newUsername: userAudit.username,
+            newUsernameLowerCase: userAudit.username.toLowerCase(),
+            uid: userAudit.uid,
+            type: 'modifyUsername',
+            ip: userAudit.ip,
+            port: userAudit.port,
+          };
+          await db.SecretBehaviorModel(behavior).save();
+        }
         await db.UserAuditModel.approve(userAudit._id, user.uid);
         message = await db.MessageModel({
           _id: await db.SettingModel.operateSystemID('messages', 1),

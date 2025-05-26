@@ -92,14 +92,14 @@ infoRouter.put('info', OnlyUnbannedUser(), async (ctx, next) => {
     if (Object.values(userAudit).some((value) => value !== '')) {
       if (!userAudit_.username && userAudit.username) {
         // 创建一个用户申请修改用户名的行为记录
-        const behavior = {
-          oldUsername: user.username,
-          oldUsernameLowerCase: user.usernameLowerCase,
-          uid: user.uid,
-          type: 'modifyUsernameAudit',
-          ip: ctx.address,
-          port: ctx.port,
-        };
+        // const behavior = {
+        //   oldUsername: user.username,
+        //   oldUsernameLowerCase: user.usernameLowerCase,
+        //   uid: user.uid,
+        //   type: 'modifyUsernameAudit',
+        //   ip: ctx.address,
+        //   port: ctx.port,
+        // };
         if (needScore && needScore > 0) {
           await db
             .KcbsRecordModel({
@@ -114,9 +114,9 @@ infoRouter.put('info', OnlyUnbannedUser(), async (ctx, next) => {
             })
             .save();
         }
-        behavior.newUsername = newUsername;
-        behavior.newUsernameLowerCase = newUsername.toLowerCase();
-        await db.SecretBehaviorModel(behavior).save();
+        // behavior.newUsername = newUsername;
+        // behavior.newUsernameLowerCase = newUsername.toLowerCase();
+        // await db.SecretBehaviorModel(behavior).save();
         await db.UsersGeneralModel.updateOne(
           { uid: user.uid },
           {
@@ -136,19 +136,21 @@ infoRouter.put('info', OnlyUnbannedUser(), async (ctx, next) => {
           username: userAudit.username || userAudit_.username,
           description: userAudit.description || userAudit_.description,
         },
+        ip: ctx.address,
+        port: ctx.port,
       });
     }
   } else {
     if (userAudit.username) {
       // 创建一个用户申请修改用户名的行为记录
-      const behavior = {
-        oldUsername: user.username,
-        oldUsernameLowerCase: user.usernameLowerCase,
-        uid: user.uid,
-        type: 'modifyUsernameAudit',
-        ip: ctx.address,
-        port: ctx.port,
-      };
+      // const behavior = {
+      //   oldUsername: user.username,
+      //   oldUsernameLowerCase: user.usernameLowerCase,
+      //   uid: user.uid,
+      //   type: 'modifyUsernameAudit',
+      //   ip: ctx.address,
+      //   port: ctx.port,
+      // };
       if (needScore && needScore > 0) {
         await db
           .KcbsRecordModel({
@@ -163,9 +165,9 @@ infoRouter.put('info', OnlyUnbannedUser(), async (ctx, next) => {
           })
           .save();
       }
-      behavior.newUsername = newUsername;
-      behavior.newUsernameLowerCase = newUsername.toLowerCase();
-      await db.SecretBehaviorModel(behavior).save();
+      // behavior.newUsername = newUsername;
+      // behavior.newUsernameLowerCase = newUsername.toLowerCase();
+      // await db.SecretBehaviorModel(behavior).save();
       await db.UsersGeneralModel.updateOne(
         { uid: user.uid },
         {
@@ -176,7 +178,12 @@ infoRouter.put('info', OnlyUnbannedUser(), async (ctx, next) => {
       );
     }
     if (Object.values(userAudit).some((value) => value !== '')) {
-      await db.UserAuditModel.submit({ uid: user.uid, changes: userAudit });
+      await db.UserAuditModel.submit({
+        uid: user.uid,
+        changes: userAudit,
+        ip: ctx.address,
+        port: ctx.port,
+      });
     }
   }
   await next();
