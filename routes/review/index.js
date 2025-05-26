@@ -711,20 +711,20 @@ router
         status: auditStatus.pending,
       });
       if (!userAudit) {
-        ctx.throw(404, `未找到ID为${auditId}的审核中用户资料，请刷新后重试`);
+        ctx.throw(404, `用户信息审核记录的状态已改变，请刷新`);
       }
 
       if (pass) {
         await db.UserAuditModel.approve(userAudit._id, user.uid);
         message = await db.MessageModel({
-            _id: await db.SettingModel.operateSystemID('messages', 1),
-            r: userAudit.uid,
-            ty: 'STU',
-            c: {
-              type: 'userAuditApproved',
-              link:`/u/${userAudit.uid}/settings`
-            },
-          });
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: userAudit.uid,
+          ty: 'STU',
+          c: {
+            type: 'userAuditApproved',
+            link: `/u/${userAudit.uid}/settings`,
+          },
+        });
       } else {
         await db.UserAuditModel.reject(userAudit._id, user.uid, reason || '');
         if (userAudit.username) {

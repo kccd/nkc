@@ -95,7 +95,7 @@ $(function () {
       },
       statusText() {
         if (this.isPending) {
-          return '内容审核中';
+          return '审核中';
         } else {
           return '完全公开';
         }
