@@ -229,8 +229,10 @@ $(function () {
         // 5. 发请求
         nkcUploadFile(`/u/${this.user.uid}/settings/info`, 'PUT', formData)
           .then(() => {
-            screenTopAlert('资料审核提交成功');
-            location.reload();
+            screenTopAlert('提交成功');
+            setTimeout(() => {
+              location.reload();
+            }, 1500);
           })
           .catch((err) => {
             sweetError(err.error || '提交失败');
