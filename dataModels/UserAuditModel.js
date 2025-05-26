@@ -33,6 +33,16 @@ const schema = new mongoose.Schema(
     description: { type: String, default: '' },
     // 审核原因（拒绝时填写）
     reason: { type: String, default: '' },
+    ip: {
+      type: String,
+      required: true,
+      index: 1,
+    },
+    port: {
+      type: String,
+      required: true,
+    },
+
     // 是否自动审核
     autoReviewed: { type: Boolean, default: false },
   },
@@ -54,7 +64,7 @@ schema.statics.getNewId = () => new mongoose.Types.ObjectId().toString();
  * @param {String} options.uid - 提交人ID
  * @param {Object} options.changes - 包含 avatar, banner, homeBanner, username, description
  */
-schema.statics.submit = async function ({ uid, changes }) {
+schema.statics.submit = async function ({ uid, changes, ip, port }) {
   const hasPending = await this.exists({ uid, status: auditStatus.pending });
   if (hasPending) {
     ThrowCommonError(400, '已有待审核的修改请求');
@@ -69,6 +79,8 @@ schema.statics.submit = async function ({ uid, changes }) {
     username: changes.username || '',
     description: changes.description || '',
     status: auditStatus.pending,
+    ip,
+    port,
     autoReviewed: false,
   });
   return rec.save();
