@@ -414,6 +414,9 @@ module.exports = {
     },
     dismoment: {
       GET: Operations.managementMoment,
+      reason: {
+        PUT: Operations.managementMoment,
+      },
     },
     public: {
       GET: Operations.visitPublicLogs,

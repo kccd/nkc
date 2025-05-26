@@ -83,7 +83,7 @@ router
         if (secret.newMobile) {
           secret.afterData = '+' + newNationCode + ' ' + newMobile;
         }
-      } else if (['modifyUsername'].includes(type)) {
+      } else if (['modifyUsername', 'modifyUsernameAudit'].includes(type)) {
         secret.beforeData = oldUsername;
         secret.afterData = newUsername;
       }
