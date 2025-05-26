@@ -1,11 +1,13 @@
 module.exports = {
-
   // AttachmentModel
 
   // 用户头像
   userAvatar: 'attachment/avatar',
+  userAvatarAudit: 'attachment/userAvatarAudit',
   // 用户背景
   userBanner: 'attachment/avatar',
+  userBannerAudit: 'attachment/userBannerAudit',
+  userHomeBannerAudit: 'attachment/userHomeBannerAudit',
   // 专栏头像
   columnAvatar: 'attachment/avatar',
   // 专栏背景
@@ -39,7 +41,6 @@ module.exports = {
   // OAuth App
   OAuthAppIcon: 'attachment/cover',
 
-
   // VerifiedUploadModel
 
   // 用户实名身份认证上传的身份证、视频
@@ -50,8 +51,6 @@ module.exports = {
   identityPictureB: 'identity/authenticate',
   // 手持身份证视频
   identityVideo: 'identity/authenticate',
-
-
 
   // MessageFileModel
 
@@ -65,7 +64,6 @@ module.exports = {
   messageFile: 'message/file',
   // 聊天中的音频文件
   messageAudio: 'message/audio',
-
 
   // ResourceModel
 

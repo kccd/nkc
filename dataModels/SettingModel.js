@@ -1086,6 +1086,7 @@ settingSchema.statics.getManagementData = async (user) => {
   const ProblemModel = mongoose.model('problems');
   const NoteContentModel = mongoose.model('noteContent');
   const UsersPersonalModel = mongoose.model('usersPersonal');
+  const UserAuditModel = mongoose.model('userAudits');
   const results = [];
 
   if (await user.hasPermission('nkcManagement')) {
@@ -1162,6 +1163,11 @@ settingSchema.statics.getManagementData = async (user) => {
     };
     //获取需要审核的note数量
     count += await NoteContentModel.countDocuments(n);
+    // 用户基本资料审核
+    const auditStatus = UserAuditModel.getAuditStatus();
+    count += await UserAuditModel.countDocuments({
+      status: auditStatus.pending,
+    });
     results.push({
       name: '内容审核',
       url: '/review',

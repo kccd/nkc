@@ -1,6 +1,7 @@
 <template lang="pug">
 div
   MomentVisible(ref='momentVisible')
+  disabled-moment(ref='disabledMoment')
   .moment-options(v-show='show')
     .post-options-panel(v-if='loading')
       .loading 加载中...
@@ -133,6 +134,7 @@ import { getUrl } from '../../../js/tools';
 import MomentVisible from '../MomentVisible.vue';
 import { getState } from '../../../js/state';
 import { copyTextToClipboard } from '../../../js/clipboard';
+import DisabledMoment from '../../DisabledMoment.vue';
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -148,6 +150,7 @@ export default {
   mounted() {},
   components: {
     MomentVisible,
+    'disabled-moment':DisabledMoment,
   },
   methods: {
     objToStr: objToStr,
@@ -388,22 +391,31 @@ export default {
           });
       });
     },
-    disableMoment() {
-      const { momentId, momentCommentId } = this.moment;
+    disableMoment(e) {
+      const { momentId, momentCommentId, parentId = undefined } = this.moment;
+
       let _id = momentCommentId || '';
       if (!_id) {
         _id = momentId;
       }
       if (!_id) return;
-      sweetQuestion('确定要屏蔽吗？').then(() => {
-        nkcAPI(`/moment/${_id}/disable`, 'POST', {})
-          .then(() => {
-            sweetSuccess('操作成功');
-          })
-          .catch((err) => {
-            sweetError(err);
-          });
-      });
+      e.stopPropagation();
+      e.preventDefault();
+      this.show = false;
+      this.$refs.disabledMoment.open(function (res) {
+      }, {
+        momentId: _id,
+        typeName: !parentId?'电文':'评论'
+      })
+      // sweetQuestion('确定要屏蔽吗？').then(() => {
+      //   nkcAPI(`/moment/${_id}/disable`, 'POST', {})
+      //     .then(() => {
+      //       sweetSuccess('操作成功');
+      //     })
+      //     .catch((err) => {
+      //       sweetError(err);
+      //     });
+      // });
     },
     //解除屏蔽
     recoveryMoment() {

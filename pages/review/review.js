@@ -2,13 +2,17 @@ import { sweetError } from '../lib/js/sweetAlert';
 import { nkcAPI } from '../lib/js/netAPI';
 import { screenTopAlert, screenTopWarning } from '../lib/js/topAlert';
 import { initNKCSource } from '../lib/js/nkcSource';
+import { getUrl } from '../lib/js/tools';
+import { markdownToHTML } from '../lib/js/dataConversion';
 
 var data = window.NKC.methods.getDataById('data');
 var pid = [];
 var did = [];
 var nid = [];
+var aid = [];
 var review = {};
 var reviewType = data.reviewType;
+const auditDescriptionObject = {};
 for (var i = 0; i < data.results.length; i++) {
   if (['thread', 'post'].includes(data.results[i].type)) {
     var p = data.results[i].post.pid;
@@ -53,6 +57,21 @@ for (var i = 0; i < data.results.length; i++) {
       noticeType: true,
       illegalType: false,
     };
+  } else if (data.results[i].type === 'userAudit') {
+    let item = data.results[i].userAudit._id;
+    aid.push(item);
+    review[item] = {
+      noteId: item,
+      pass: true,
+      reason: '',
+      delType: 'disabled',
+      noticeType: true,
+      illegalType: false,
+    };
+    const description = data.results[i].userAudit.description;
+    if (description) {
+      auditDescriptionObject[item] = markdownToHTML(description, {});
+    }
   }
 }
 
@@ -62,16 +81,34 @@ var app = new window.Vue({
     selectedPid: [],
     selectedDid: [],
     selectedNid: [],
+    selectedAid: [],
     showInputPid: [],
     pid: pid,
     did: did,
     nid: nid,
+    aid: aid,
     review: review,
+    auditDescriptionObject: auditDescriptionObject,
   },
   mounted() {
     initNKCSource();
   },
   methods: {
+    getUrl,
+    viewImage(data) {
+      const { name = '', url = '' } = data;
+      const images = [
+        {
+          name,
+          url,
+        },
+      ];
+      const readyFiles = images.map((item) => {
+        return { ...item, type: 'picture' };
+      });
+      window.RootApp.$refs.preview.setData(true, 0, readyFiles);
+      window.RootApp.$refs.preview.init(0);
+    },
     selectAll: function () {
       if (this.selectedPid.length === this.pid.length) {
         this.selectedPid = [];
@@ -88,6 +125,8 @@ var app = new window.Vue({
       } else {
         this.selectedNid = [].concat(this.nid);
       }
+      this.selectedAid =
+        this.selectedAid.length === this.aid.length ? [] : this.aid.slice();
     },
     //提交document审核
     document(arr, index) {
@@ -239,6 +278,33 @@ var app = new window.Vue({
           app.note(arr, index + 1);
         });
     },
+    userAudit(arr, index = 0) {
+      const data = arr[index];
+      if (!data) return;
+      const payload = {
+        type: 'userAudit',
+        pass: data.pass,
+        auditId: data.userAuditId,
+        ...(data.pass
+          ? {}
+          : {
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType,
+            }),
+      };
+      nkcAPI('/review', 'PUT', payload)
+        .then(() => {
+          screenTopAlert(`UserAudit ${data.userAuditId} 处理成功`);
+          this.userAudit(arr, index + 1);
+        })
+        .catch((err) => {
+          screenTopWarning(
+            `UserAudit ${data.userAuditId} 处理失败: ${err.error || err}`,
+          );
+          this.userAudit(arr, index + 1);
+        });
+    },
     submit: function (id, type) {
       const self = this;
       Promise.resolve()
@@ -320,6 +386,23 @@ var app = new window.Vue({
             self.note(arr, 0);
           }
         })
+        .then(() => {
+          // 处理 userAudit
+          if (self.selectedAid.length || (id && type === 'userAudit')) {
+            const aidArr = typeof id === 'string' ? [id] : self.selectedAid;
+            const arr = aidArr.map((uid) => {
+              const rd = self.review[uid];
+              return {
+                userAuditId: uid,
+                pass: rd.pass,
+                reason: rd.reason,
+                noticeType: rd.noticeType,
+                illegalType: rd.illegalType,
+              };
+            });
+            self.userAudit(arr);
+          }
+        })
         .catch((err) => {
           sweetError(err);
         });
@@ -338,6 +421,11 @@ var app = new window.Vue({
       }
       for (let i = 0; i < this.selectedNid.length; i++) {
         const n = this.selectedNid[i];
+        const reviewData = this.review[n];
+        reviewData.pass = type;
+      }
+      for (let i = 0; i < this.selectedAid.length; i++) {
+        const n = this.selectedAid[i];
         const reviewData = this.review[n];
         reviewData.pass = type;
       }

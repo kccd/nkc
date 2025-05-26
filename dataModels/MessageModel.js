@@ -381,6 +381,7 @@ messageSchema.statics.getParametersData = async (message) => {
   const XsfsRecordModel = mongoose.model('xsfsRecords');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const NoteContentModel = mongoose.model('noteContent');
+  const UserAuditModel = mongoose.model('userAudits');
   const apiFunction = require('../nkcModules/apiFunction');
   const { htmlToPlain } = require('../nkcModules/nkcRender');
   const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
@@ -802,9 +803,10 @@ messageSchema.statics.getParametersData = async (message) => {
       threadURL: getUrl('thread', thread.tid),
       threadTitle: firstPost.t,
       postURL: await PostModel.getUrl(post),
-      postContent: post.l === 'json' ? getJsonStringText(post.c) : apiFunction.obtainPureText(
-        post.c,
-      ),
+      postContent:
+        post.l === 'json'
+          ? getJsonStringText(post.c)
+          : apiFunction.obtainPureText(post.c),
     };
   } else if (type === 'replyThread') {
     const { targetPid } = message.c;
@@ -832,9 +834,10 @@ messageSchema.statics.getParametersData = async (message) => {
       threadURL: getUrl('thread', thread.tid),
       threadTitle: firstPost.t,
       postURL: await PostModel.getUrl(post),
-      postContent: post.l === 'json' ? getJsonStringText( post.c ) :apiFunction.obtainPureText(
-         post.c,
-      ),
+      postContent:
+        post.l === 'json'
+          ? getJsonStringText(post.c)
+          : apiFunction.obtainPureText(post.c),
     };
   } else if (type === 'replyArticle') {
     //独立文章通知作者文章被回复了
@@ -863,11 +866,10 @@ messageSchema.statics.getParametersData = async (message) => {
       articleURL: comment.url,
       articleTitle: articleDocument.title,
       commentURL: comment.commentUrl,
-      commentContent: commentDocument.l === 'json'
-      ? getJsonStringText(commentDocument.content)
-      :  apiFunction.obtainPureText(
-        commentDocument.content,
-      ),
+      commentContent:
+        commentDocument.l === 'json'
+          ? getJsonStringText(commentDocument.content)
+          : apiFunction.obtainPureText(commentDocument.content),
     };
   } else if (type === 'replyComment') {
     //独立文章通知作者文章被评论了
@@ -894,11 +896,10 @@ messageSchema.statics.getParametersData = async (message) => {
       articleURL: comment.url,
       articleTitle: articleDocument.title,
       commentURL: comment.commentUrl,
-      commentContent: commentDocument.l === 'json'
-      ? getJsonStringText(commentDocument.content)
-      :apiFunction.obtainPureText(
-         commentDocument.content,
-      ),
+      commentContent:
+        commentDocument.l === 'json'
+          ? getJsonStringText(commentDocument.content)
+          : apiFunction.obtainPureText(commentDocument.content),
     };
   } else if (type === 'comment') {
     const { pid } = message.c;
@@ -917,9 +918,10 @@ messageSchema.statics.getParametersData = async (message) => {
     }
     parameters = {
       postURL: await PostModel.getUrl(post),
-      postContent: post.l === 'json' ? getJsonStringText(post.c) : apiFunction.obtainPureText(
-         post.c,
-      ),
+      postContent:
+        post.l === 'json'
+          ? getJsonStringText(post.c)
+          : apiFunction.obtainPureText(post.c),
       userURL: user.uid ? getUrl('userHome', user.uid) : '',
       username: user.username,
     };
@@ -1114,6 +1116,23 @@ messageSchema.statics.getParametersData = async (message) => {
       reason: reason ? reason : '未知',
       content: htmlToPlain(note.content, 100),
     };
+  } else if (type === 'userAuditRejected') {
+    const { auditId, reason } = message.c;
+    const userAudit = await UserAuditModel.findOne({ _id: auditId });
+    if (!userAudit) {
+      return null;
+    }
+    parameters = {
+      reason: reason ? reason : '未知',
+    };
+  } else if (type === 'userAuditApproved') {
+    const { link } = message.c;
+    if (!link) {
+      return null;
+    }
+    parameters = {
+      link,
+    };
   } else if (
     [
       'documentFaulty',
@@ -1158,12 +1177,10 @@ messageSchema.statics.getParametersData = async (message) => {
       parameters = {
         //获取document所在comment的url
         reviewLink: _comment[0].url || '',
-        content: document.l === 'json'
-        ? getJsonStringTextSlice(document.content,100)
-        : htmlToPlain(
-          document.content,
-          100,
-        ),
+        content:
+          document.l === 'json'
+            ? getJsonStringTextSlice(document.content, 100)
+            : htmlToPlain(document.content, 100),
         reason: reason ? reason : '未知',
         title: _comment[0].title || '未知',
       };
@@ -1652,6 +1669,60 @@ messageSchema.statics.getParametersData = async (message) => {
       userHomeUrl: getUrl('userHome', user.uid),
       username: user.username,
       momentUrl: getUrl('zoneMoment', momentId),
+      content: getJsonStringText(betaDocument.content),
+    };
+  } else if (type === 'momentWasReturned') {
+    const { momentId, reason } = message.c;
+    const moment = await MomentModel.findOne(
+      {
+        _id: momentId,
+      },
+      {
+        uid: 1,
+      },
+    );
+    if (!moment) {
+      return null;
+    }
+    const documentSources = await DocumentModel.getDocumentSources();
+    const betaDocuments = await DocumentModel.getStableDocumentsBySource(
+      documentSources.moment,
+      [moment._id],
+    );
+    if (betaDocuments.length === 0) {
+      return null;
+    }
+    const betaDocument = betaDocuments[0];
+    parameters = {
+      momentUrl: getUrl('zoneMoment', momentId),
+      reason,
+      content: getJsonStringText(betaDocument.content),
+    };
+  } else if (type === 'momentCommentWasReturned') {
+    const { momentId, reason } = message.c;
+    const moment = await MomentModel.findOne(
+      {
+        _id: momentId,
+      },
+      {
+        uid: 1,
+      },
+    );
+    if (!moment) {
+      return null;
+    }
+    const documentSources = await DocumentModel.getDocumentSources();
+    const betaDocuments = await DocumentModel.getStableDocumentsBySource(
+      documentSources.moment,
+      [moment._id],
+    );
+    if (betaDocuments.length === 0) {
+      return null;
+    }
+    const betaDocument = betaDocuments[0];
+    parameters = {
+      momentUrl: getUrl('zoneMoment', momentId),
+      reason,
       content: getJsonStringText(betaDocument.content),
     };
   }

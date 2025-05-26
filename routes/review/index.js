@@ -267,6 +267,26 @@ router
         reason: reviewRecord ? reviewRecord.reason : '',
       });
     }
+    // 查找需要审核的用户基本资料
+    const userAudits = await db.UserAuditModel.getPendingAudits();
+    const auditsUid = new Set();
+    for (const item of userAudits) {
+      auditsUid.add(item.uid);
+    }
+    const auditUsers = await db.UserModel.find({
+      uid: { $in: [...auditsUid] },
+    });
+    const auditsObj = {};
+    auditUsers.map((user) => {
+      auditsObj[user.uid] = user;
+    });
+    for (const userAudit of userAudits) {
+      data.results.push({
+        type: 'userAudit',
+        userAudit,
+        user: auditsObj[userAudit.uid],
+      });
+    }
     data.reviewType = reviewType;
     data.paging = paging;
     await next();
@@ -285,6 +305,7 @@ router
       violation,
       delType,
       noteId,
+      auditId,
     } = body; //remindUser 是否通知用户 violation 是否标记违规 delType 退修或禁用
     if (!reviewType) {
       if (pid) {
@@ -293,6 +314,8 @@ router
         reviewType = 'document';
       } else if (noteId) {
         reviewType = 'note';
+      } else if (auditId) {
+        reviewType = 'userAudit';
       }
     }
     let message;
@@ -675,6 +698,120 @@ router
               violation,
               type: 'noteDisabled',
               noteId: note._id,
+              reason,
+            },
+          });
+        }
+      }
+    } else if (reviewType === 'userAudit') {
+      // 查找对应审核，仅仅查找：pending状态
+      const auditStatus = db.UserAuditModel.getAuditStatus();
+      const userAudit = await db.UserAuditModel.findOne({
+        _id: auditId,
+        status: auditStatus.pending,
+      });
+      if (!userAudit) {
+        ctx.throw(404, `用户信息审核记录的状态已改变，请刷新`);
+      }
+
+      if (pass) {
+        if (userAudit.username) {
+          const tUser = await db.UserModel.findOne({ uid: userAudit.uid });
+          const behavior = {
+            oldUsername: tUser.username,
+            oldUsernameLowerCase: tUser.usernameLowerCase,
+            newUsername: userAudit.username,
+            newUsernameLowerCase: userAudit.username.toLowerCase(),
+            uid: userAudit.uid,
+            type: 'modifyUsername',
+            ip: userAudit.ip,
+            port: userAudit.port,
+          };
+          await db.SecretBehaviorModel(behavior).save();
+        }
+        await db.UserAuditModel.approve(userAudit._id, user.uid);
+        message = await db.MessageModel({
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: userAudit.uid,
+          ty: 'STU',
+          c: {
+            type: 'userAuditApproved',
+            link: `/u/${userAudit.uid}/settings`,
+          },
+        });
+      } else {
+        await db.UserAuditModel.reject(userAudit._id, user.uid, reason || '');
+        if (userAudit.username) {
+          let usernameSettings = await db.SettingModel.getSettings('username');
+          let usersGeneral = await db.UsersGeneralModel.findOnly({
+            uid: userAudit.uid,
+          });
+          const kcbsRecord = await db.KcbsRecordModel.findOne({
+            type: 'modifyUsernameAudit',
+            from: userAudit.uid,
+            to: 'bank',
+          }).sort({ toc: -1 });
+          if (
+            !usernameSettings.free &&
+            usersGeneral.modifyUsernameCount - 1 >=
+              usernameSettings.freeCount &&
+            kcbsRecord
+          ) {
+            // 归还kcb
+            const scoreObject = await db.SettingModel.getScoreByOperationType(
+              'usernameScore',
+            );
+            await db
+              .KcbsRecordModel({
+                _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
+                type: 'rejectUsernameAudit',
+                from: 'bank',
+                to: userAudit.uid,
+                num: kcbsRecord.num,
+                // 审核人的ip
+                ip: ctx.address,
+                port: ctx.port,
+                scoreType: scoreObject.type,
+              })
+              .save();
+          }
+          if (usersGeneral.modifyUsernameCount - 1 >= 0) {
+            await db.UsersGeneralModel.updateOne(
+              { uid: userAudit.uid },
+              {
+                $inc: {
+                  modifyUsernameCount: -1,
+                },
+              },
+            );
+          }
+        }
+        if (violation) {
+          const targetUser = await db.UserModel.findOne({ uid: userAudit.uid });
+          //新增违规记录
+          await db.UsersScoreLogModel.insertLog({
+            user: targetUser,
+            type: 'score',
+            typeIdOfScoreChange: 'violation',
+            port: ctx.port,
+            ip: ctx.address,
+            key: 'violationCount',
+            description: reason || '拒绝基本资料修改并标记违规',
+            // noteId: userAudit._id,
+          });
+        }
+        //提醒用户
+        if (remindUser) {
+          // 发送消息需要兼容模版类型
+          message = await db.MessageModel({
+            _id: await db.SettingModel.operateSystemID('messages', 1),
+            r: userAudit.uid,
+            ty: 'STU',
+            c: {
+              delType,
+              violation,
+              type: 'userAuditRejected',
+              auditId: userAudit._id,
               reason,
             },
           });

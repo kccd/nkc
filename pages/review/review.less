@@ -1,49 +1,128 @@
-body{
+body {
   background-color: #f9f9f9;
 }
-.review-panel{
+
+.review-panel {
   margin-bottom: 1rem;
 }
-.review-time{
+
+.review-time {
   font-size: 1.2rem;
   display: inline-block;
   color: #e85a71;
   font-weight: 700;
   margin-right: 0.5rem;
 }
-.review-user-avatar{
+
+.review-user-avatar {
   height: 1.6rem;
   margin-right: 0.2rem;
   vertical-align: text-top;
   width: 1.6rem;
   border-radius: 50%;
 }
-.review-user{
+
+.review-user {
   display: inline-block;
   font-size: 1.2rem;
   color: #2b90d9;
   font-weight: 700;
   margin-right: 0.5rem;
 }
-.review-info{
+
+.review-info {
   font-size: 1.2rem;
   color: #282c37;
   display: inline-block;
   font-weight: 700;
 }
-.review-thread-title{
+
+.review-thread-title {
   font-size: 1.2rem;
   display: inline-block;
   margin-right: 0.5rem;
   font-weight: 700;
   color: #2b90d9;
 }
-.review-post-content{
+
+.review-post-content {
   margin-top: 1rem;
 }
-.review-post-content img, .review-post-content audio, .review-post-content video{
+
+.review-post-content img,
+.review-post-content audio,
+.review-post-content video {
   max-width: 100%;
 }
-.review-input-div{
+
+.review-input-div {
   padding: 1rem 0;
+}
+
+.form-audit {
+  .form-item {
+    display: flex;
+    align-items: center;
+    /* 垂直居中 */
+    margin-bottom: 24px;
+    width: 100%;
+  }
+
+  /* 左侧标签固定宽度、右对齐 */
+  .form-item>.control-label {
+    width: 120px;
+    margin: 0;
+    /* 去掉默认的垂直 margin */
+    padding-right: 16px;
+    /* 标签与内容间距 */
+    text-align: right;
+  }
+
+  /* 内容区域自适应 */
+  .form-item>*:not(.control-label) {
+    flex: 1;
+  }
+
+  .avatar-img {
+    width: 100%;
+    max-width: 100px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .banner-img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .username {
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+
+  .description {
+    text-align: left;
+    word-break: break-word;
+  }
+   @media (max-width: 768px) {
+    .form-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .form-item > .control-label {
+      width: auto;
+      text-align: left;
+      padding-right: 0;
+      margin-bottom: 8px;
+    }
+    .form-item > *:not(.control-label) {
+      width: 100%;
+    }
+  }
 }
