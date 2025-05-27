@@ -46,6 +46,7 @@ router.get('/', OnlyUser(), async (ctx, next) => {
     disable: null,
     delete: null,
     visibleMoment: null,
+    commentControl: false,
     editorMoment: null,
     visitHistory: null,
     ipInfo: null,
@@ -67,6 +68,9 @@ router.get('/', OnlyUser(), async (ctx, next) => {
       optionStatus.delete = true;
     }
 
+    if (!hasParent && permission('momentCommentControl')) {
+      optionStatus.commentControl = true;
+    }
     // 未匿名
     if (!moment.anonymous) {
       if (!isAuthor) {

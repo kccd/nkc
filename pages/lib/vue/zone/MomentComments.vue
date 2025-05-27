@@ -1,18 +1,23 @@
 <template lang="pug">
   .moment-commments.p-t-1
     //- moment-comment-child-editor(ref="momentCommentChildEditor")
-    .m-b-1
+    .m-b-1(v-if="commentControl === 'rw'")
       moment-comment-editor(:mid="momentId" :type="postType" @published="onPublished" v-if="logged")
+    .m-b-1.text-danger.text-center(v-if="commentControl === 'r'") 当前电文不允许添加新的评论
     .moment-comment-nav(v-if="postType === 'comment'")
-      .post-type 评论列表
-      .sort-item(
-        v-for='n in nav'
-        :class="{'active': n.type === sort}"
-        @click="setActiveNav(n.type)"
-        ) {{n.name}}
+      div(v-if="commentControl !== 'n'")
+        .post-type 评论列表
+        .sort-item(
+          v-for='n in nav'
+          :class="{'active': n.type === sort}"
+          @click="setActiveNav(n.type)"
+          ) {{n.name}}
+      div(v-else)
+        .post-type 评论列表
+        .text-danger.m-t-05.text-center 根据相关法律法规和政策，当前电文的评论不予显示
     .moment-comment-nav(v-else)
       .post-type 转发列表
-    .moment-comment-list-container
+    .moment-comment-list-container(v-if="commentControl !== 'n' || postType==='repost'")
       .moment-comment-null.m-b-2(v-if="listData.length === 0")
         span(v-if="loading") 加载中...
         span(v-else) 空空如也~
@@ -28,6 +33,7 @@
           @on-reply-comment="onReplyComment"
           :mode="mode"
           @complaint="complaint"
+          :control="commentControl"
         )
       paging(:pages="pageButtons" @click-button="clickPageButton")
 </template>
@@ -110,6 +116,7 @@
       ],
       timer: null,
       timerCounter: 0,
+      commentControl: '',
     }),
     mounted() {
       this.setFocusCommentId(this.focus);
@@ -223,10 +230,22 @@
       getList(page = 0) {
         const {postType} = this;
         if(postType === 'comment') {
+          this.getMomentControl()
           this.getComments(page);
         } else {
           this.getRepost(page);
         }
+      },
+      getMomentControl() {
+        if(!this.momentId) return;
+        const self = this;
+        nkcAPI(`/moment/${this.momentId}/comment`, 'GET')
+          .then((res) => {
+            self.commentControl = res.commentControl;
+          })
+          .catch((err) => {
+            sweetError(err);
+          });
       },
       clickPageButton(page) {
         this.getList(page);

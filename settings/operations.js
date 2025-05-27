@@ -793,6 +793,7 @@ const DynamicOperations = {
   rollbackZoneMomentHistory: 'rollbackZoneMomentHistory',
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
   disableResource: 'disabledResource',
+  momentCommentControl: 'momentCommentControl',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

@@ -769,5 +769,6 @@
   "collectionPost": "收藏论坛文章下的回复",
   "experimentalPublishSettings": "后台发表内容限制设置",
   "disabledResource": "屏蔽资源",
-  "decodeSecretWatermark": "解密水印信息"
+  "decodeSecretWatermark": "解密水印信息",
+  "momentCommentControl": "电文中评论的控制"
 }
