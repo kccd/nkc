@@ -38,9 +38,10 @@ router.get('/', OnlyUser(), async (ctx, next) => {
   //   type: 'thread',
   // };
   const q = {
-    mainForumsId: {
-      $in: subForumsId,
-    },
+    $and: [
+      { mainForumsId: { $in: subForumsId } },
+      { mainForumsId: { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } } },
+    ],
     recycleMark: {
       $ne: true,
     },
