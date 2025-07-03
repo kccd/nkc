@@ -652,7 +652,12 @@ router
       match.categoriesId = parseInt(cat);
       data.cat = match.categoriesId;
     }
-    // 拿到该专业下可从中拿文章的所有子专业id
+    // 用户可以访问的所有专业
+    const allFidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+      data.userRoles,
+      data.userGrade,
+      data.user,
+    );
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
@@ -685,7 +690,13 @@ router
 
     const topThreadsId = toppedThreads.map((t) => t.tid);
 
-    match.mainForumsId = { $in: fidOfCanGetThreads };
+    // match.mainForumsId = { $in: fidOfCanGetThreads };
+    match.$and = [
+      { mainForumsId: { $in: fidOfCanGetThreads } },
+      {
+        mainForumsId: { $not: { $elemMatch: { $nin: allFidOfCanGetThreads } } },
+      },
+    ];
     match.tid = { $nin: topThreadsId };
     if (forum.fid !== recycleId) {
       match.disabled = false;
