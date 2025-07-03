@@ -653,13 +653,18 @@ router
       data.cat = match.categoriesId;
     }
     // 用户可以访问的所有专业
+    const allFidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+      data.userRoles,
+      data.userGrade,
+      data.user,
+    );
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
       data.user,
-      // forum.fid,
+      forum.fid,
     );
-    // fidOfCanGetThreads.push(forum.fid);
+    fidOfCanGetThreads.push(forum.fid);
 
     // 构建置顶文章查询条件
     const toppedThreadMatch = {
@@ -685,7 +690,13 @@ router
 
     const topThreadsId = toppedThreads.map((t) => t.tid);
 
-    match.mainForumsId = { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } };
+    // match.mainForumsId = { $in: fidOfCanGetThreads };
+    match.$and = [
+      { mainForumsId: { $in: fidOfCanGetThreads } },
+      {
+        mainForumsId: { $not: { $elemMatch: { $nin: allFidOfCanGetThreads } } },
+      },
+    ];
     match.tid = { $nin: topThreadsId };
     if (forum.fid !== recycleId) {
       match.disabled = false;
