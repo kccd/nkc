@@ -53,11 +53,17 @@ router
       return await next();
     }
     const { page = 0 } = query;
+    const { fidOfCanGetThreads } = internalData;
     const q = {
       type: { $in: ['post', 'thread'] },
+      $and: [
+        { mainForumsId: { $in: fidOfCanGetThreads } },
+        {
+          mainForumsId: { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } },
+        },
+      ],
     };
     const pageSettings = await db.SettingModel.getSettings('page');
-    const { fidOfCanGetThreads } = internalData;
     const count = await db.PostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(
       page,
@@ -104,7 +110,14 @@ router
     posts = await db.PostModel.extendActivityPosts(posts);
     const parentPosts = await db.PostModel.find(
       {
-        mainForumsId: { $in: fidOfCanGetThreads },
+        $and: [
+          { mainForumsId: { $in: fidOfCanGetThreads } },
+          {
+            mainForumsId: {
+              $not: { $elemMatch: { $nin: fidOfCanGetThreads } },
+            },
+          },
+        ],
         reviewed: true,
         toDraft: { $ne: true },
         disabled: false,
@@ -203,9 +216,14 @@ router
     const { fidOfCanGetThreads } = internalData;
     const { user } = data;
     const q = {
-      mainForumsId: {
-        $in: fidOfCanGetThreads,
-      },
+      $and: [
+        { mainForumsId: { $in: fidOfCanGetThreads } },
+        {
+          mainForumsId: {
+            $not: { $elemMatch: { $nin: fidOfCanGetThreads } },
+          },
+        },
+      ],
     };
     if (data.t === data.communityTypes.digest) {
       q.digest = true;

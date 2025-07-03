@@ -14,9 +14,13 @@ module.exports = async (ctx, next) => {
   //获取用户的文章
   const q = {
     uid: targetUser.uid,
-    mainForumsId: {
-      $in: accessibleFid
-    }
+    // mainForumsId: {
+    //   $in: accessibleFid
+    // }
+    $and: [
+      { mainForumsId: { $in: accessibleFid } },
+      { mainForumsId: { $not: { $elemMatch: { $nin: accessibleFid } } } },
+    ],
   };
   if(user) {
     // 不具有特殊专家权限的用户

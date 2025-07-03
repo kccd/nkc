@@ -1477,7 +1477,10 @@ threadSchema.statics.getHomeToppedThreads = async (fid = [], type) => {
   }
   let threads = await ThreadModel.find({
     tid: { $in: threadsId },
-    mainForumsId: { $in: fid },
+    $and: [
+      { mainForumsId: { $in: fid } },
+      { mainForumsId: { $not: { $elemMatch: { $nin: fid } } } },
+    ],
     disabled: false,
     recycleMark: { $ne: true },
     reviewed: true,
@@ -1867,9 +1870,10 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     {
       $match: {
         digest: true,
-        mainForumsId: {
-          $in: fid,
-        },
+        $and: [
+          { mainForumsId: { $in: fid } },
+          { mainForumsId: { $not: { $elemMatch: { $nin: fid } } } },
+        ],
         toc: {
           $gte: new Date(time),
         },
@@ -2055,9 +2059,10 @@ threadSchema.statics.getNewacademicThreads = async (fid) => {
 threadSchema.statics.getLatestPostThreads = async (fid, limit = 9) => {
   const ThreadModel = mongoose.model('threads');
   const threads = await ThreadModel.find({
-    mainForumsId: {
-      $in: fid,
-    },
+    $and: [
+      { mainForumsId: { $in: fid } },
+      { mainForumsId: { $not: { $elemMatch: { $nin: fid } } } },
+    ],
     disabled: false,
     reviewed: true,
     recycleMark: {
@@ -2091,9 +2096,10 @@ threadSchema.statics.getLatestThreads = async (
   sortObj[sort] = -1;
   const ThreadModel = mongoose.model('threads');
   const threads = await ThreadModel.find({
-    mainForumsId: {
-      $in: fid,
-    },
+    $and: [
+      { mainForumsId: { $in: fid } },
+      { mainForumsId: { $not: { $elemMatch: { $nin: fid } } } },
+    ],
     disabled: false,
     reviewed: true,
     recycleMark: {
