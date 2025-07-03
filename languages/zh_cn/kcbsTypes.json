@@ -52,6 +52,7 @@
   "digestComment": "回复被加精",
   "unDigestComment": "回复被取消加精",
   "attachmentDownload": "附件下载",
-
+  "modifyUsernameAudit": "修改用户名",
+  "rejectUsernameAudit": "修改用户名退款",
   "scoreExchange": "积分兑换"
 }

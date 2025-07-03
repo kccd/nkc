@@ -412,6 +412,12 @@ module.exports = {
     recycle: {
       GET: Operations.visitRecycleMarkThreads,
     },
+    dismoment: {
+      GET: Operations.managementMoment,
+      reason: {
+        PUT: Operations.managementMoment,
+      },
+    },
     public: {
       GET: Operations.visitPublicLogs,
       DELETE: Operations.deletePublicLogs,

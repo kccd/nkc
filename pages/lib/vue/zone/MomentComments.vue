@@ -27,6 +27,7 @@
           :permissions="permissions"
           @on-reply-comment="onReplyComment"
           :mode="mode"
+          @complaint="complaint"
         )
       paging(:pages="pageButtons" @click-button="clickPageButton")
 </template>

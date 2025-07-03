@@ -198,6 +198,77 @@ block content
                         textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.note._id}'].reason` )
                     .m-t-1
                       button.btn.btn-sm.btn-primary(@click=`submit('${r.note._id}','note')`,) 提交
+            else if r.type === 'userAudit'
+              .review-panel
+                .review-time
+                  input(type='checkbox' value = r.userAudit._id v-model=`selectedAid`)
+                .review-info 时间:
+                .review-time=`${format("YYYY/MM/DD HH:mm:ss", r.userAudit.toc)}`
+                .review-info 用户:
+                .review-user
+                  a(href=`/u/${r.user.uid}` target = "_blank")=r.user.username
+                .review-info 类型:
+                 .review-time 基本资料
+                .review-post-content
+                  .form-audit
+                    //- 头像
+                    .form-item(v-if=`'${r.userAudit.avatar}'`)
+                      label.control-label 头像:
+                      img.avatar-img(
+                        :src=`getUrl('userAvatar', '${r.userAudit.avatar}', 'sm')`
+                        style="cursor:pointer;"
+                        @click=`viewImage({name: 'avatar', url: getUrl('userAvatar', '${r.userAudit.avatar}', 'lg')})`
+                      )
+
+                    //- 用户背景
+                    .form-item(v-if=`'${r.userAudit.banner}'`)
+                      label.control-label 用户背景:
+                      img.banner-img(
+                        :src=`getUrl('userBanner', '${r.userAudit.banner}')`
+                        style="cursor:pointer;"
+                        @click=`viewImage({name: 'banner', url: getUrl('userBanner', '${r.userAudit.banner}')})`
+                      )
+
+                    //- 主页背景
+                    .form-item(v-if=`'${r.userAudit.homeBanner}'`)
+                      label.control-label 主页背景:
+                      img.banner-img(
+                        :src=`getUrl('userHomeBanner', '${r.userAudit.homeBanner}')`
+                        style="cursor:pointer;"
+                        @click=`viewImage({name: 'homeBanner', url: getUrl('userHomeBanner', '${r.userAudit.homeBanner}')})`
+                      )
+
+                    //- 用户名
+                    .form-item(v-if=`'${r.userAudit.username}'`)
+                      label.control-label 用户名:
+                      span.username=r.userAudit.username
+
+                    //- 个人简介
+                    .form-item
+                      label.control-label 个人简介:
+                      .description(v-html=`auditDescriptionObject['${r.userAudit._id}']`)
+                  .review-input-div
+                    .m-b-1
+                      label
+                        input(type='radio' :value='true' v-model=`review['${r.userAudit._id}'].pass` )
+                        span.m-r-1 通过
+                      label
+                        input(type='radio' :value='false' v-model=`review['${r.userAudit._id}'].pass` )
+                        span 不通过
+                    div(v-if=`!review['${r.userAudit._id}'].pass`)
+                      //- input(type='radio' value='disabled' v-model=`review['${r.userAudit._id}'].delType`)
+                      //- span.m-r-1 屏蔽
+                      .m-t-1
+                        label
+                          input(type='checkbox' :value='true' v-model=`review['${r.userAudit._id}'].noticeType`)
+                          span.m-r-1 通知用户
+                        label
+                          input(type='checkbox' :value='true' v-model=`review['${r.userAudit._id}'].illegalType`)
+                          span.m-r-1 标记为违规
+                      .m-t-1
+                        textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.userAudit._id}'].reason` )
+                    .m-t-1
+                      button.btn.btn-sm.btn-primary(@click=`submit('${r.userAudit._id}','userAudit')`,) 提交
         .p-t-1
           include ../publicModules/paging/paging_input
           .paging-button.pointer

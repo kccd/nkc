@@ -7,6 +7,7 @@ const schema = new Schema({
   // 附件类型
   type: {
     // userAvatar, userBanner,
+    // userAvatarAudit, userBannerAudit,userHomeBannerAudit
     // forumBanner, forumLogo
     // columnAvatar, columnBanner,
     // homeBigLogo,
@@ -973,5 +974,88 @@ schema.statics.disableAttachment = async (aid) => {
     }
   });
 }
+
+schema.statics.saveUserAudit = async (uid, file, type) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const time = new Date();
+  const FILE = require('../nkcModules/file');
+  const aid = await AttachmentModel.getNewId();
+  const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
+  let attachment = {};
+  if (type === 'userAvatar') {
+    attachment = await AttachmentModel.createAttachmentAndPushFile({
+      aid,
+      file,
+      uid,
+      ext,
+      sizeLimit: 20 * 1024 * 1024,
+      time,
+      type: 'userAvatarAudit',
+      images: [
+        {
+          type: 'def',
+          name: `${aid}.${ext}`,
+          height: 192,
+          width: 192,
+          quality: 90,
+        },
+        {
+          type: 'sm',
+          name: `${aid}_sm.${ext}`,
+          height: 48,
+          width: 48,
+          quality: 90,
+        },
+        {
+          type: 'lg',
+          name: `${aid}_lg.${ext}`,
+          height: 600,
+          width: 600,
+          quality: 90,
+        },
+      ],
+    });
+  } else if (type === 'userBanner') {
+    attachment = await AttachmentModel.createAttachmentAndPushFile({
+      aid,
+      file,
+      ext,
+      uid,
+      sizeLimit: 20 * 1024 * 1024,
+      time,
+      type: 'userBannerAudit',
+      images: [
+        {
+          type: 'def',
+          name: `${aid}.${ext}`,
+          height: 400,
+          width: 800,
+          quality: 95,
+        },
+      ],
+    });
+  } else if (type === 'userHomeBanner') {
+    attachment = await AttachmentModel.createAttachmentAndPushFile({
+      aid,
+      file,
+      ext,
+      uid,
+      sizeLimit: 20 * 1024 * 1024,
+      time,
+      reviewed: false,
+      type: 'userHomeBannerAudit',
+      images: [
+        {
+          type: 'def',
+          name: `${aid}.${ext}`,
+          height: 180,
+          width: 1270,
+          quality: 95,
+        },
+      ],
+    });
+  }
+  return attachment;
+};
 
 module.exports = mongoose.model('attachments', schema);
