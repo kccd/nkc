@@ -653,12 +653,12 @@ router
       data.cat = match.categoriesId;
     }
     // 用户可以访问的所有专业
-    const allFidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+    const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(
       data.userRoles,
       data.userGrade,
       data.user,
     );
-    let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
       data.user,
@@ -690,11 +690,10 @@ router
 
     const topThreadsId = toppedThreads.map((t) => t.tid);
 
-    // match.mainForumsId = { $in: fidOfCanGetThreads };
     match.$and = [
       { mainForumsId: { $in: fidOfCanGetThreads } },
       {
-        mainForumsId: { $not: { $elemMatch: { $nin: allFidOfCanGetThreads } } },
+        mainForumsId: { $not: { $elemMatch: { $nin: accessibleForumsId } } },
       },
     ];
     match.tid = { $nin: topThreadsId };
