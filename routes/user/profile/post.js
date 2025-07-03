@@ -24,10 +24,7 @@ module.exports = async (ctx, next) => {
   const q = {
     uid,
     // mainForumsId: {$in: accessibleFid},
-    $and: [
-      { mainForumsId: { $in: accessibleFid } },
-      { mainForumsId: { $not: { $elemMatch: { $nin: accessibleFid } } } },
-    ],
+    mainForumsId: { $not: { $elemMatch: { $nin: accessibleFid } } },
     type: 'post',
   };
   if(

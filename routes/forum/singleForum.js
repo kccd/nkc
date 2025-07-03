@@ -685,11 +685,7 @@ router
 
     const topThreadsId = toppedThreads.map((t) => t.tid);
 
-    // match.mainForumsId = { $in: fidOfCanGetThreads };
-    match.$and = [
-      { mainForumsId: { $in: fidOfCanGetThreads } },
-      { mainForumsId: { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } } },
-    ];
+    match.mainForumsId = { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } };
     match.tid = { $nin: topThreadsId };
     if (forum.fid !== recycleId) {
       match.disabled = false;

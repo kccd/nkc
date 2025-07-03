@@ -40,7 +40,7 @@ router.get('/', OnlyUser(), async (ctx, next) => {
   const q = {
     $and: [
       { mainForumsId: { $in: subForumsId } },
-      { mainForumsId: { $not: { $elemMatch: { $nin: subForumsId } } } },
+      { mainForumsId: { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } } },
     ],
     recycleMark: {
       $ne: true,

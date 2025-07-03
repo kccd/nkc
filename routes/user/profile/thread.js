@@ -17,10 +17,7 @@ module.exports = async (ctx, next) => {
     // mainForumsId: {
     //   $in: accessibleFid
     // }
-    $and: [
-      { mainForumsId: { $in: accessibleFid } },
-      { mainForumsId: { $not: { $elemMatch: { $nin: accessibleFid } } } },
-    ],
+    mainForumsId: { $not: { $elemMatch: { $nin: accessibleFid } } },
   };
   if(user) {
     // 不具有特殊专家权限的用户

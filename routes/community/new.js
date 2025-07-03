@@ -56,12 +56,7 @@ router
     const { fidOfCanGetThreads } = internalData;
     const q = {
       type: { $in: ['post', 'thread'] },
-      $and: [
-        { mainForumsId: { $in: fidOfCanGetThreads } },
-        {
-          mainForumsId: { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } },
-        },
-      ],
+      mainForumsId: { $not: { $elemMatch: { $nin: fidOfCanGetThreads } } },
     };
     const pageSettings = await db.SettingModel.getSettings('page');
     const count = await db.PostModel.countDocuments(q);
@@ -110,14 +105,9 @@ router
     posts = await db.PostModel.extendActivityPosts(posts);
     const parentPosts = await db.PostModel.find(
       {
-        $and: [
-          { mainForumsId: { $in: fidOfCanGetThreads } },
-          {
-            mainForumsId: {
-              $not: { $elemMatch: { $nin: fidOfCanGetThreads } },
-            },
-          },
-        ],
+        mainForumsId: {
+          $not: { $elemMatch: { $nin: fidOfCanGetThreads } },
+        },
         reviewed: true,
         toDraft: { $ne: true },
         disabled: false,
@@ -216,14 +206,9 @@ router
     const { fidOfCanGetThreads } = internalData;
     const { user } = data;
     const q = {
-      $and: [
-        { mainForumsId: { $in: fidOfCanGetThreads } },
-        {
-          mainForumsId: {
-            $not: { $elemMatch: { $nin: fidOfCanGetThreads } },
-          },
-        },
-      ],
+      mainForumsId: {
+        $not: { $elemMatch: { $nin: fidOfCanGetThreads } },
+      },
     };
     if (data.t === data.communityTypes.digest) {
       q.digest = true;
