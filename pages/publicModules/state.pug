@@ -35,4 +35,4 @@ if remoteState.isApp
 -windowData.websiteBrief = remoteState.serverSettings.brief;
 -windowData.isProduction = remoteState.isProduction;
 -windowData.appVersionCode = remoteState.appVersionCode;
-meta(name='window-data' content=objToStr(windowData))
+meta(name='window-data' content=objToBase64(windowData))

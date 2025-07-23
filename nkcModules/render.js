@@ -401,6 +401,12 @@ let pugRender = (template, data, state, remoteState) => {
     },
     basedir: process.cwd() + '/pages',
     tools,
+    // 将数据对象转义为base64字符串
+    // 解码在前端的lib/dataConversion.js base64ToObj
+    objToBase64: (data = {}) => {
+      const dataString = JSON.stringify(data);
+      return Buffer.from(dataString || '').toString('base64');
+    },
   };
   options.data = data;
   options.filters = filters;

@@ -40,6 +40,14 @@ export function base64ToStr(base64) {
   return decodeURIComponent(window.atob(base64));
 }
 
+/* 
+  解码由对象转义为base64的数据
+*/
+export function base64ToObj(base64) {
+  const dataString = window.atob(base64);
+  return JSON.parse(dataString);
+}
+
 /*
  * 获取特定的 nkcsource Dom 内容
  * @param {String} type 类型 picture, sticker, video, audio, attachment, pre, xsf, twemoji, formula
