@@ -1,4 +1,4 @@
-import { strToObj } from './dataConversion';
+import { base64ToObj } from './dataConversion';
 export function getState() {
   const state = {
     uid: '',
@@ -17,7 +17,7 @@ export function getState() {
   };
   try {
     const windowDataDom = document.querySelector('meta[name="window-data"]');
-    const windowData = strToObj(windowDataDom.getAttribute('content'));
+    const windowData = base64ToObj(windowDataDom.getAttribute('content'));
     state.uid = windowData.uid;
     state.isApp = windowData.isApp;
     state.appOS = windowData.appOS;
