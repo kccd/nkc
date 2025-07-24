@@ -44,8 +44,23 @@ export function base64ToStr(base64) {
   解码由对象转义为base64的数据
 */
 export function base64ToObj(base64) {
-  const dataString = window.atob(base64);
-  return JSON.parse(dataString);
+  // 解码Base64得到二进制字符串
+  const binaryString = window.atob(base64);
+
+  // 转换为Uint8Array字节数组
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  // 使用TextDecoder按UTF-8解码
+  try {
+    const decoder = new TextDecoder('utf-8');
+    return JSON.parse(decoder.decode(bytes));
+  } catch (error) {
+    console.error('Error decoding base64 to object:', error);
+    return {}; // Return an empty object as a fallback
+  }
 }
 
 /*
