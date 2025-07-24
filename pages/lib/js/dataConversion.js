@@ -54,8 +54,13 @@ export function base64ToObj(base64) {
   }
 
   // 使用TextDecoder按UTF-8解码
-  const decoder = new TextDecoder('utf-8');
-  return JSON.parse(decoder.decode(bytes));
+  try {
+    const decoder = new TextDecoder('utf-8');
+    return JSON.parse(decoder.decode(bytes));
+  } catch (error) {
+    console.error('Error decoding base64 to object:', error);
+    return {}; // Return an empty object as a fallback
+  }
 }
 
 /*
