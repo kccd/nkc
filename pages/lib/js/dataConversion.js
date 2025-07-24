@@ -41,7 +41,7 @@ export function base64ToStr(base64) {
 }
 
 /* 
-  解密由对象转义为base64的数据
+  解码由对象转义为base64的数据
 */
 export function base64ToObj(base64) {
   // 解码Base64得到二进制字符串
