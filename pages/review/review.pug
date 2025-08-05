@@ -21,7 +21,7 @@ block content
             a.radius-left.radius-right.button(@click="submit") 提交已选
           include ../publicModules/paging/paging
         .review-panel-div.box-shadow-panel
-          for r in data.results
+          for r, resultIndex in data.results
             if r.type === 'post' || r.type === 'thread'
               .review-panel
                 .review-time
@@ -137,31 +137,36 @@ block content
                 if r.reason
                   .review-info 理由：
                   span(v-pre)= r.reason
-                .review-post-content!=r.document.content
-                  .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document._id}') !== -1`)
-                    .m-b-1
-                      input(type="radio" :value="true" v-model=`review['${r.document._id}'].pass`)
-                      span.m-r-1 通过
-                      input(type="radio" :value="false" v-model=`review['${r.document._id}'].pass`)
-                      span 不通过
-                    div(v-if=`!review['${r.document._id}'].pass`)
-                      if r.document.source === 'moment'
-                        input(type="radio" value="deleted" v-model=`review['${r.document._id}'].delType`)
-                        span.m-r-1 删除
-                      else
-                        input(type="radio" value="faulty" v-model=`review['${r.document._id}'].delType`)
-                        span.m-r-1 退修
-                        input(type="radio" value="disabled" v-model=`review['${r.document._id}'].delType`)
-                        span 屏蔽
-                      .m-t-1
-                        input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].noticeType`)
-                        span.m-r-1 通知用户
-                        input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].illegalType`)
-                        span.m-r-1 标记为违规
-                      .m-t-1
-                        textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document._id}'].reason`)
+                if r.document.source === 'moment'
+                  .review-post-content!=r.content.content
+                  if r.content.mode === 'plain'
+                    moment-files(:data="results[" + resultIndex + "].content.files" v-if=`results[${resultIndex}].content.files && results[${resultIndex}].content.files.length`)
+                else  
+                  .review-post-content!=r.document.content
+                .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document._id}') !== -1`)
+                  .m-b-1
+                    input(type="radio" :value="true" v-model=`review['${r.document._id}'].pass`)
+                    span.m-r-1 通过
+                    input(type="radio" :value="false" v-model=`review['${r.document._id}'].pass`)
+                    span 不通过
+                  div(v-if=`!review['${r.document._id}'].pass`)
+                    if r.document.source === 'moment'
+                      input(type="radio" value="deleted" v-model=`review['${r.document._id}'].delType`)
+                      span.m-r-1 删除
+                    else
+                      input(type="radio" value="faulty" v-model=`review['${r.document._id}'].delType`)
+                      span.m-r-1 退修
+                      input(type="radio" value="disabled" v-model=`review['${r.document._id}'].delType`)
+                      span 屏蔽
                     .m-t-1
-                      button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}', 'document')`) 提交
+                      input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].noticeType`)
+                      span.m-r-1 通知用户
+                      input(type="checkbox" :value="true" v-model=`review['${r.document._id}'].illegalType`)
+                      span.m-r-1 标记为违规
+                    .m-t-1
+                      textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.document._id}'].reason`)
+                  .m-t-1
+                    button.btn.btn-sm.btn-primary(@click=`submit('${r.document._id}', 'document')`) 提交
             else if r.type === 'note'
               .review-panel
                 .review-time
@@ -180,24 +185,24 @@ block content
                    .review-info 理由:
                    span(v-pre)= r.reason
                 .review-post-content!=r.note.content
-                  .review-input-div
-                    .m-b-1
-                      input(type='radio' :value='true' v-model=`review['${r.note._id}'].pass` )
-                      span.m-r-1 通过
-                      input(type='radio' :value='false' v-model=`review['${r.note._id}'].pass` )
-                      span 不通过
-                    div(v-if=`!review['${r.note._id}'].pass`)
-                      input(type='radio' value='disabled' v-model=`review['${r.note._id}'].delType`)
-                      span.m-r-1 屏蔽
-                      .m-t-1
-                        input(type='checkbox' :value='true' v-model=`review['${r.note._id}'].noticeType`)
-                        span.m-r-1 通知用户
-                        input(type='checkbox' :value='true' v-model=`review['${r.note._id}'].illegalType`)
-                        span.m-r-1 标记为违规
-                      .m-t-1
-                        textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.note._id}'].reason` )
+                .review-input-div
+                  .m-b-1
+                    input(type='radio' :value='true' v-model=`review['${r.note._id}'].pass` )
+                    span.m-r-1 通过
+                    input(type='radio' :value='false' v-model=`review['${r.note._id}'].pass` )
+                    span 不通过
+                  div(v-if=`!review['${r.note._id}'].pass`)
+                    input(type='radio' value='disabled' v-model=`review['${r.note._id}'].delType`)
+                    span.m-r-1 屏蔽
                     .m-t-1
-                      button.btn.btn-sm.btn-primary(@click=`submit('${r.note._id}','note')`,) 提交
+                      input(type='checkbox' :value='true' v-model=`review['${r.note._id}'].noticeType`)
+                      span.m-r-1 通知用户
+                      input(type='checkbox' :value='true' v-model=`review['${r.note._id}'].illegalType`)
+                      span.m-r-1 标记为违规
+                    .m-t-1
+                      textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.note._id}'].reason` )
+                  .m-t-1
+                    button.btn.btn-sm.btn-primary(@click=`submit('${r.note._id}','note')`,) 提交
             else if r.type === 'userAudit'
               .review-panel
                 .review-time
@@ -247,28 +252,28 @@ block content
                     .form-item
                       label.control-label 个人简介:
                       .description(v-html=`auditDescriptionObject['${r.userAudit._id}']`)
-                  .review-input-div
-                    .m-b-1
-                      label
-                        input(type='radio' :value='true' v-model=`review['${r.userAudit._id}'].pass` )
-                        span.m-r-1 通过
-                      label
-                        input(type='radio' :value='false' v-model=`review['${r.userAudit._id}'].pass` )
-                        span 不通过
-                    div(v-if=`!review['${r.userAudit._id}'].pass`)
-                      //- input(type='radio' value='disabled' v-model=`review['${r.userAudit._id}'].delType`)
-                      //- span.m-r-1 屏蔽
-                      .m-t-1
-                        label
-                          input(type='checkbox' :value='true' v-model=`review['${r.userAudit._id}'].noticeType`)
-                          span.m-r-1 通知用户
-                        label
-                          input(type='checkbox' :value='true' v-model=`review['${r.userAudit._id}'].illegalType`)
-                          span.m-r-1 标记为违规
-                      .m-t-1
-                        textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.userAudit._id}'].reason` )
+                .review-input-div
+                  .m-b-1
+                    label
+                      input(type='radio' :value='true' v-model=`review['${r.userAudit._id}'].pass` )
+                      span.m-r-1 通过
+                    label
+                      input(type='radio' :value='false' v-model=`review['${r.userAudit._id}'].pass` )
+                      span 不通过
+                  div(v-if=`!review['${r.userAudit._id}'].pass`)
+                    //- input(type='radio' value='disabled' v-model=`review['${r.userAudit._id}'].delType`)
+                    //- span.m-r-1 屏蔽
                     .m-t-1
-                      button.btn.btn-sm.btn-primary(@click=`submit('${r.userAudit._id}','userAudit')`,) 提交
+                      label
+                        input(type='checkbox' :value='true' v-model=`review['${r.userAudit._id}'].noticeType`)
+                        span.m-r-1 通知用户
+                      label
+                        input(type='checkbox' :value='true' v-model=`review['${r.userAudit._id}'].illegalType`)
+                        span.m-r-1 标记为违规
+                    .m-t-1
+                      textarea.form-control(rows=5 placeholder='请说明理由' v-model=`review['${r.userAudit._id}'].reason` )
+                  .m-t-1
+                    button.btn.btn-sm.btn-primary(@click=`submit('${r.userAudit._id}','userAudit')`,) 提交
         .p-t-1
           include ../publicModules/paging/paging_input
           .paging-button.pointer
