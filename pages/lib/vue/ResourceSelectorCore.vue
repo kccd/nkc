@@ -468,6 +468,7 @@ img.image {
   text-align: center;
   font-size: 1rem;
   background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
 .resource-mask {
   position: absolute;
