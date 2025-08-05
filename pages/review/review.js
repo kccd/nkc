@@ -4,6 +4,7 @@ import { screenTopAlert, screenTopWarning } from '../lib/js/topAlert';
 import { initNKCSource } from '../lib/js/nkcSource';
 import { getUrl } from '../lib/js/tools';
 import { markdownToHTML } from '../lib/js/dataConversion';
+import MomentFiles from '../lib/vue/zone/MomentFiles';
 
 var data = window.NKC.methods.getDataById('data');
 var pid = [];
@@ -11,7 +12,6 @@ var did = [];
 var nid = [];
 var aid = [];
 var review = {};
-var reviewType = data.reviewType;
 const auditDescriptionObject = {};
 for (var i = 0; i < data.results.length; i++) {
   if (['thread', 'post'].includes(data.results[i].type)) {
@@ -74,7 +74,6 @@ for (var i = 0; i < data.results.length; i++) {
     }
   }
 }
-
 var app = new window.Vue({
   el: '#app',
   data: {
@@ -89,6 +88,10 @@ var app = new window.Vue({
     aid: aid,
     review: review,
     auditDescriptionObject: auditDescriptionObject,
+    results: data.results,
+  },
+  components: {
+    'moment-files': MomentFiles,
   },
   mounted() {
     initNKCSource();
@@ -280,7 +283,9 @@ var app = new window.Vue({
     },
     userAudit(arr, index = 0) {
       const data = arr[index];
-      if (!data) return;
+      if (!data) {
+        return;
+      }
       const payload = {
         type: 'userAudit',
         pass: data.pass,
