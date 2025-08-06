@@ -15,7 +15,7 @@ router.post('/', OnlyOperation(Operations.moveThreads), async (ctx, next) => {
     threadCategoriesId,
   } = body;
 
-  if (remindUser && !reason) {
+  if ((remindUser || violation) && !reason) {
     ctx.throw(400, `请输入原因`);
   }
 
