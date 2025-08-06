@@ -170,6 +170,14 @@ router
       .sort({ top: -1 })
       .skip(paging.start)
       .limit(paging.perpage);
+    await db.MomentModel.updateMany(
+      { _id: { $in: moments.map((m) => m._id) } },
+      {
+        $inc: {
+          hits: 1,
+        },
+      },
+    );
     data.momentsData = await db.MomentModel.extendMomentsListData(
       moments,
       state.uid,
