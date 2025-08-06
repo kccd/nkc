@@ -184,6 +184,14 @@ router
       .sort({ top: -1 })
       .skip(paging.start)
       .limit(paging.perpage);
+    // 电文阅读数+1
+    const momentIds = moments.map((m) => m._id);
+    if (momentIds.length) {
+      await db.MomentModel.updateMany(
+        { _id: { $in: momentIds } },
+        { $inc: { hits: 1 } },
+      );
+    }
     data.momentsData = await db.MomentModel.extendMomentsListData(
       moments,
       state.uid,
