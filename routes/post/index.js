@@ -254,6 +254,19 @@ router
       data.post.user = await db.UserModel.findOnly({ uid: post.uid });
       await db.UserModel.extendUsersInfo([data.post.user]);
       await data.post.user.extendGrade();
+
+      if (!ctx.permission('hideUserHome') && (!user || user.uid !== post.uid)) {
+        if (
+          (await db.UserModel.contentNeedReview(post.uid, 'thread')) ||
+          (await db.UserModel.contentNeedReview(post.uid, 'post'))
+        ) {
+          data.post.user.username = '';
+          data.post.user.description = '';
+          data.post.user.avatar = '';
+          data.post.user.banner = '';
+          data.post.user.postSign = '';
+        }
+      }
     }
     data.redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');
     data.kcbSettings = await db.SettingModel.getSettings('kcb');
