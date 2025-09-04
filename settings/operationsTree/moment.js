@@ -8,6 +8,10 @@ module.exports = {
     disable: {
       POST: Operations.managementMoment,
     },
+    comment: {
+      GET: Operations.momentCommentControl,
+      POST: Operations.momentCommentControl,
+    },
     options: {
       GET: Operations.getMomentOption,
     },

@@ -100,6 +100,12 @@ router
         momentId: moment._id,
       };
     } else {
+      const parentMoment = await momentExtenderService.getTopParentMoment(
+        moment._id,
+      );
+      if (parentMoment && parentMoment.commentControl !== 'rw') {
+        ctx.throw(400, '当前电文不允许添加新的评论');
+      }
       // 发表电文回复
       const { repostMomentId } = await moment.publishMomentComment(
         postType,
