@@ -770,5 +770,5 @@
   "experimentalPublishSettings": "后台发表内容限制设置",
   "disabledResource": "屏蔽资源",
   "decodeSecretWatermark": "解密水印信息",
-  "momentCommentControl": "电文中评论的控制"
+  "momentCommentControl": "控制电文评论（只读、可读可发、禁读禁发）"
 }
