@@ -214,7 +214,7 @@ import SelectColumn from "../../../editor/vueComponents/SelectColumn"
 import { sweetError } from "../../js/sweetAlert";
 import { publishPermissionTypes } from '../../js/publish';
 import PublishPermissionChecker from '../PublishPermissionCheck.vue';
-
+import { getRichJsonContentLength } from "../../js/checkData";
 
 export default {
   props:['time', 'source', 'configs'],
@@ -727,10 +727,11 @@ export default {
     //检测内容
     checkContent() {
       let contentText = this.article.content;
-      if(contentText.length > 100000) {
+      const contentLength = getRichJsonContentLength(contentText);
+      if(contentLength > 2 * 100000) {
         throw ('内容不能超过10万字');
       }
-      if(contentText.length < 2) {
+      if(contentLength < 2 * 2) {
         throw ('内容不能少于2个字');
       }
     },
