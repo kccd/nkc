@@ -140,8 +140,8 @@ block content
                 if r.document.source === 'moment'
                   .review-post-content!=r.content.content
                   if r.content.mode === 'plain'
-                    div(style="width: 50%;")
-                      moment-files(:data="results[" + resultIndex + "].content.files" v-if=`results[${resultIndex}].content.files && results[${resultIndex}].content.files.length`)
+                    moment-files(:data="results[" + resultIndex + "].content.files" v-if=`results[${resultIndex}].content.files && results[${resultIndex}].content.files.length`)
+                      
                 else  
                   .review-post-content!=r.document.content
                 .review-input-div(v-if=`1 || selectedDid.indexOf('${r.document._id}') !== -1`)

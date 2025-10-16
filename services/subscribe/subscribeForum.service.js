@@ -70,7 +70,10 @@ class SubscribeForumService {
   async getSubscribeForumsFromCache(uid) {
     const { forumListService } = require('../forum/forumList.service');
     const subscribeForumsId = await this.getSubscribeForumsIdFromCache(uid);
-    const forums = await ForumModel.getForumsByIdFromRedis(subscribeForumsId);
+    const readableForumsId = await ForumModel.getReadableForumsIdByUid(uid);
+    const forums = await ForumModel.getForumsByIdFromRedis(
+      subscribeForumsId.filter((fid) => readableForumsId.includes(fid)),
+    );
     return await forumListService.extendForumsBaseInfo(forums);
   }
 }

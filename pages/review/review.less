@@ -55,6 +55,13 @@ body {
   max-width: 100%;
 }
 
+.review-post-content .message-emoji {
+  height: 2rem;
+  width: 2rem;
+  margin: 0 0.1rem;
+  vertical-align: text-bottom;
+}
+
 .review-input-div {
   padding: 1rem 0;
 }
@@ -69,7 +76,7 @@ body {
   }
 
   /* 左侧标签固定宽度、右对齐 */
-  .form-item>.control-label {
+  .form-item > .control-label {
     width: 120px;
     margin: 0;
     /* 去掉默认的垂直 margin */
@@ -79,7 +86,7 @@ body {
   }
 
   /* 内容区域自适应 */
-  .form-item>*:not(.control-label) {
+  .form-item > *:not(.control-label) {
     flex: 1;
   }
 
@@ -110,7 +117,7 @@ body {
     text-align: left;
     word-break: break-word;
   }
-   @media (max-width: 768px) {
+  @media (max-width: 768px) {
     .form-item {
       flex-direction: column;
       align-items: flex-start;

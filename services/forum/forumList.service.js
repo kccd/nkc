@@ -42,7 +42,10 @@ class ForumListService {
   async getUserVisitedForums(uid, count = 5) {
     let visitedForumsId = await UsersGeneralModel.getUserVisitedForumsId(uid);
     visitedForumsId = visitedForumsId.slice(0, count);
-    const forums = await this.getForumsByForumsIdFromCache(visitedForumsId);
+    const readableForumsId = await ForumModel.getReadableForumsIdByUid(uid);
+    const forums = await this.getForumsByForumsIdFromCache(
+      visitedForumsId.filter((fid) => readableForumsId.includes(fid)),
+    );
     return await this.extendForumsBaseInfo(forums);
   }
 
