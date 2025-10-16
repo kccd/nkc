@@ -106,6 +106,7 @@
           :permissions='permissions',
           :mode='mode'
           @complaint="complaint"
+          :comment-control="momentData.commentControl"
         )
     div(v-if='selectedMomentId === momentData.momentId && !submitting')
       .moment-editor-header
@@ -225,6 +226,7 @@
           :permissions='permissions',
           :mode='mode'
           @complaint="complaint"
+          :comment-control="momentData.commentControl"
         )
     div(v-if='selectedMomentId === momentData.momentId && !submitting')
       .moment-editor-header

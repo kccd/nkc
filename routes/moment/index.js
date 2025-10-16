@@ -2,6 +2,7 @@ const router = require('koa-router')();
 const optionsRouter = require('./option');
 const iPInfoRouter = require('./ipInfo');
 const visibleRouter = require('./visible');
+const commentRouter = require('./comment');
 const {
   OnlyUnbannedUser,
   OnlyOperation,
@@ -105,7 +106,8 @@ router
   )
   .use('/:mid/ipInfo', iPInfoRouter.routes(), iPInfoRouter.allowedMethods())
   .use('/:mid/options', optionsRouter.routes(), optionsRouter.allowedMethods())
-  .use('/:mid/visible', visibleRouter.routes(), visibleRouter.allowedMethods());
+  .use('/:mid/visible', visibleRouter.routes(), visibleRouter.allowedMethods())
+  .use('/:mid/comment', commentRouter.routes(), commentRouter.allowedMethods());
 // .use('/:aid/unblock', unblockRouter.routes(), unblockRouter.allowedMethods())
 // .use('/:aid/collection', collectionRouter.routes(), collectionRouter.allowedMethods())
 module.exports = router;

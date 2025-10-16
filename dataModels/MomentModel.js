@@ -133,6 +133,17 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  /**
+   * 评论控制：
+   *  "rw" = 可查看、可评论
+   *  "r"  = 只可查看
+   *  "n"  = 不可查看、不可评论
+   */
+  commentControl: {
+    type: String,
+    enum: ['rw', 'r', 'n'],
+    default: 'rw',
+  },
   // 转发数
   repost: {
     type: Number,
@@ -1558,6 +1569,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       tlm,
       hits,
       mode,
+      commentControl,
     } = moment;
 
     let f = moment[field];
@@ -1687,6 +1699,7 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
       url: getUrl('zoneMoment', _id),
       visibleType,
       mode,
+      commentControl,
     };
 
     if (moment.status !== momentStatus.normal) {
