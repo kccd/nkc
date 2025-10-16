@@ -189,6 +189,15 @@ class MomentExtenderService {
       status: momentStatus.default,
     });
   }
+  async getTopParentMoment(momentId) {
+    const moment = await this.getMomentById(momentId);
+    if (moment?.parent) {
+      const parentMoment = await this.getMomentById(moment.parents[0]);
+      return parentMoment;
+    } else {
+      return null;
+    }
+  }
   async getPublishedMomentDraft(momentId) {
     const moment = await this.getMomentById(momentId);
     let document = await DocumentModel.getBetaDocumentBySource(

@@ -34,7 +34,7 @@
           span &nbsp;IP:{{commentData.addr}}
 
         .moment-comment-options
-          .moment-comment-option(title="回复" @click="switchEditor" v-if="type === 'comment'")
+          .moment-comment-option(title="回复" @click="switchEditor" v-if="type === 'comment' && control==='rw'")
             .fa.fa-comment-o
           .moment-comment-option(@click="vote(commentData)" :class="{'active': commentData.voteType === 'up'}" title="点赞")
             .fa.fa-thumbs-o-up
@@ -107,6 +107,7 @@
         :key="_comment._id"
         @on-reply-comment="onReplyComment"
         :mode="mode"
+        :control="control"
       )
       .more-comment(v-if="mode === 'simple' && commentData.commentCount > 2" @click="visitCommentChild") 共 {{commentData.commentCount}} 条回复
 </template>
@@ -159,6 +160,10 @@ export default {
       type: String,
       default: 'simple',
     },
+    control:{
+      type: String,
+      default: '',
+    }
   },
   components: {
     'editor-core': EditorCore,

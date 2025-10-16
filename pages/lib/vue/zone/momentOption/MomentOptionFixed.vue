@@ -2,6 +2,7 @@
 div
   MomentVisible(ref='momentVisible')
   disabled-moment(ref='disabledMoment')
+  control-comment(ref='controlComment')
   .moment-options(v-show='show')
     .post-options-panel(v-if='loading')
       .loading 加载中...
@@ -40,6 +41,9 @@ div
       .option(v-if='options.editorMoment', @click='editorMoment')
         .fa.fa-edit
         span 编辑
+      .option(v-if='options.commentControl' @click='toCommentControl')
+          .fa.fa-commenting
+          span 评论控制
       .option(v-if='options.visitHistory', @click='visitHistory')
         .fa.fa-history
         span 历史
@@ -135,6 +139,7 @@ import MomentVisible from '../MomentVisible.vue';
 import { getState } from '../../../js/state';
 import { copyTextToClipboard } from '../../../js/clipboard';
 import DisabledMoment from '../../DisabledMoment.vue';
+import ControlCommentVue from '../../ControlComment.vue';
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -151,6 +156,7 @@ export default {
   components: {
     MomentVisible,
     'disabled-moment':DisabledMoment,
+    'control-comment':ControlCommentVue
   },
   methods: {
     objToStr: objToStr,
@@ -466,6 +472,15 @@ export default {
     visitHistory() {
       visitUrl(getUrl('zoneMomentHistory', this.moment.momentId), true);
     },
+    toCommentControl() {
+      const { momentId, momentCommentId,did,commentControl} = this.moment;
+      if (!momentId) return;
+      this.$refs.controlComment.open({
+        momentId,
+        did,
+        commentControl,
+      });
+    }
   },
 };
 </script>
