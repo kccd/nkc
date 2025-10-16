@@ -50,7 +50,7 @@
                   input.form-control(type="text" v-model.trim="newCategory.name")
                 .form-group
                   label 分类简介（不超过100字符）
-                  textarea.form-control(v-model.trim="newCategory.description" rows=3)
+                  textarea.form-control(v-model.trim="newCategory.brief" rows=3)
                 .form-group(v-if='newCategory.type === "main"')
                   label 父级分类
                   select.form-control(v-model="newCategory.parentId")
@@ -80,7 +80,7 @@ export default {
     newCategory: {
       parentId: "",
       name: "",
-      description: "",
+      brief: "",
       type: "main"
     },
     columnId: "",
@@ -181,14 +181,14 @@ export default {
       var category = this.newCategory;
       if (!category.type) return (this.error = "请选择分类类型");
       if (!category.name) return (this.error = "请输入分类名");
-      if (!category.description) return (this.error = "请输入分类介绍");
+      if (!category.brief) return (this.error = "请输入分类简介");
       nkcAPI("/m/" + this.columnId + "/category", "POST", category)
         .then(function() {
           app.getCategories();
           app.createCategory = false;
           app.newCategory = {
             name: "",
-            description: "",
+            brief: "",
             parentId: "",
             type: "main"
           };
