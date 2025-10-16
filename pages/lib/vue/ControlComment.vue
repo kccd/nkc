@@ -7,7 +7,7 @@
   .module-dialog-content
     .draggable-panel-loading(v-if='loading') 加载中...
     .draggable-panel-content(v-else)
-      .p-t-05
+      .p-t-05.p-b-1
         div 文号：{{ `D${did}` }}
         .m-r-1
           .radio.m-l-1(v-for='opt in commentOptions', :key='opt.value')

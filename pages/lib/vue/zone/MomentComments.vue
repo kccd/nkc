@@ -14,7 +14,7 @@
           ) {{n.name}}
       div(v-else)
         .post-type 评论列表
-        .text-danger.m-t-05.text-center 根据相关法律法规和政策，当前电文的评论不予显示
+        .text-danger.m-t-05.text-center 根据相关法律法规和政策，当前电文的评论不予显示。
     .moment-comment-nav(v-else)
       .post-type 转发列表
     .moment-comment-list-container(v-if="commentControl !== 'n' || postType==='repost'")
@@ -86,7 +86,7 @@
 
   export default {
     // mode: simple, complete,
-    props: ['mid', 'type', 'focus', 'permissions', 'mode'],
+    props: ['mid', 'type', 'focus', 'permissions', 'mode', 'comment-control'],
     components: {
       'paging': Paging,
       'from-now': FromNow,
@@ -116,7 +116,6 @@
       ],
       timer: null,
       timerCounter: 0,
-      commentControl: '',
     }),
     mounted() {
       this.setFocusCommentId(this.focus);
@@ -230,22 +229,10 @@
       getList(page = 0) {
         const {postType} = this;
         if(postType === 'comment') {
-          this.getMomentControl()
           this.getComments(page);
         } else {
           this.getRepost(page);
         }
-      },
-      getMomentControl() {
-        if(!this.momentId) return;
-        const self = this;
-        nkcAPI(`/moment/${this.momentId}/comment`, 'GET')
-          .then((res) => {
-            self.commentControl = res.commentControl;
-          })
-          .catch((err) => {
-            sweetError(err);
-          });
       },
       clickPageButton(page) {
         this.getList(page);
