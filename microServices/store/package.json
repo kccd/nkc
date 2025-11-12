@@ -9,7 +9,7 @@
   "author": "pengxiguaa",
   "license": "ISC",
   "dependencies": {
-    "koa": "^2.4.1",
+    "koa": "^3.0.3",
     "koa-body": "^2.5.0",
     "koa-router": "^7.3.0",
     "koa-static": "^4.0.2",
