@@ -640,24 +640,15 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
     targetTypes,
   );
   // 同步搜索数据库中的附件数据，先在resource中查一遍
-  const searchDBData = await model.find(
-    {
-      rid: { $in: rids },
-      mediaType: 'mediaAttachment',
-      type: 'resource',
-    },
-    { rid: 1, oname: 1, toc: 1, uid: 1, ext: 1 },
-  );
+  const searchDBData = await model.find({
+    rid: { $in: rids },
+    mediaType: 'mediaAttachment',
+    type: 'resource',
+  });
 
   for (const file of searchDBData) {
     // 后期可以完善：把多条数据同时更新到搜索数据库中
-    await elasticSearch.save('attachment', {
-      tid: file.rid,
-      t: file.oname.split(`.` + file.ext)[0],
-      c: '',
-      toc: file.toc,
-      uid: file.uid,
-    });
+    await file.saveToElasticSearch();
   }
   await model.updateMany(
     {
@@ -669,6 +660,52 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
       },
     },
   );
+};
+
+// 保存附件到搜索数据库
+resourceSchema.methods.saveToElasticSearch = async function () {
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  if (
+    this.mediaType !== 'mediaAttachment' ||
+    this.references.length === 0 ||
+    this.type !== 'resource'
+  ) {
+    return;
+  }
+  await elasticSearch.save('attachment', {
+    tid: this.rid,
+    t: this.oname.split(`.` + this.ext)[0],
+    c: '',
+    toc: this.toc,
+    uid: this.uid,
+  });
+};
+
+/* 
+  同步所有已被使用的附件到搜索数据库
+*/
+resourceSchema.statics.saveAllResourcesToElasticSearch = async () => {
+  const match = {
+    type: 'resource',
+    mediaType: 'mediaAttachment',
+    $expr: { $gt: [{ $size: '$references' }, 0] },
+  };
+  const ResourceModel = mongoose.model('resources');
+  const count = await ResourceModel.countDocuments(match);
+  const limit = 2000;
+  for (let i = 0; i < count; i += limit) {
+    const resources = await ResourceModel.find(match)
+      .sort({ toc: 1 })
+      .skip(i)
+      .limit(limit);
+    for (const resource of resources) {
+      await resource.saveToElasticSearch();
+    }
+    console.log(
+      `【同步Resources到ES】 总：${count}, 当前：${i} - ${i + limit}`,
+    );
+  }
+  console.log(`【同步Resources到ES】 总：${count}`);
 };
 
 /*
@@ -1685,6 +1722,38 @@ resourceSchema.statics.getResourcesObjectByResourcesId = async (
     obj[resource.rid] = resource;
   }
   return obj;
+};
+
+/*
+ * 批量同步所有资源到ElasticSearch
+ * @author pengxiguaa 2025-11-13
+ * */
+resourceSchema.statics.saveAllResourcesToElasticSearchBatch = async () => {
+  const ResourceModel = mongoose.model('resources');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const count = await ResourceModel.countDocuments({ disabled: false });
+  const batchSize = 2000;
+
+  console.log(`开始批量同步 ${count} 个资源到ElasticSearch...`);
+
+  for (let i = 0; i < count; i += batchSize) {
+    const resources = await ResourceModel.find({ disabled: false })
+      .sort({ toc: 1 })
+      .skip(i)
+      .limit(batchSize);
+
+    const documents = resources.map((resource) => ({
+      docType: 'resource',
+      document: resource,
+    }));
+
+    await elasticSearch.bulkSave(documents);
+    console.log(
+      `【批量同步Resource到ES】 总：${count}, 已完成：${i + resources.length}`,
+    );
+  }
+
+  console.log('【批量同步Resource到ES】完成');
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

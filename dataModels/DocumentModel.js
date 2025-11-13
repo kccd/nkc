@@ -1614,6 +1614,73 @@ schema.methods.pushToSearchDB = async function () {
     });
 };
 
+// 同步所有数据到搜索数据库
+schema.statics.saveAllDocumentToElasticSearch = async () => {
+  const DocumentModel = mongoose.model('documents');
+  const match = {
+    type: (await DocumentModel.getDocumentTypes()).stable,
+  };
+  const count = await DocumentModel.countDocuments(match);
+  const limit = 2000;
+  for (let i = 0; i < count; i += limit) {
+    const documents = await DocumentModel.find(match)
+      .sort({ toc: 1 })
+      .limit(limit)
+      .skip(i);
+    for (const document of documents) {
+      await document.pushToSearchDB();
+    }
+    console.log(
+      `【同步Documents到ES】 总：${count}, 当前：${i} - ${i + limit}`,
+    );
+  }
+  console.log('【同步Documents到ES】 完成');
+};
+
+/*
+ * 批量同步所有数据到搜索数据库
+ * @author pengxiguaa 2025-11-13
+ */
+schema.statics.saveAllDocumentToElasticSearchBatch = async () => {
+  const DocumentModel = mongoose.model('documents');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const match = {
+    type: (await DocumentModel.getDocumentTypes()).stable,
+  };
+  const count = await DocumentModel.countDocuments(match);
+  const batchSize = 2000;
+
+  console.log(`开始批量同步 ${count} 个文档到ElasticSearch...`);
+
+  for (let i = 0; i < count; i += batchSize) {
+    const documents = await DocumentModel.find(match)
+      .sort({ toc: 1 })
+      .skip(i)
+      .limit(batchSize);
+
+    // 根据文档source类型确定docType
+    const documentsData = documents.map((document) => {
+      let docType = 'document_article'; // 默认类型
+      if (document.source === 'comment') {
+        docType = 'document_comment';
+      } else if (document.source === 'moment') {
+        docType = 'document_moment';
+      }
+      return {
+        docType,
+        document,
+      };
+    });
+
+    await elasticSearch.bulkSave(documentsData);
+    console.log(
+      `【批量同步Documents到ES】 总：${count}, 已完成：${i + documents.length}`,
+    );
+  }
+
+  console.log('【批量同步Documents到ES】完成');
+};
+
 /*
  * 向document中插入引用信息
  * */

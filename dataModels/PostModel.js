@@ -846,6 +846,38 @@ postSchema.statics.saveAllPostToElasticSearch = async function () {
   console.log(`【同步Post到ES】完成`);
 };
 
+/*
+ * 批量同步所有的post到es
+ * @author pengxiguaa 2025-11-13
+ * */
+postSchema.statics.saveAllPostToElasticSearchBatch = async function () {
+  const PostModel = mongoose.model('posts');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const count = await PostModel.countDocuments();
+  const batchSize = 2000;
+
+  console.log(`开始批量同步 ${count} 个帖子到ElasticSearch...`);
+
+  for (let i = 0; i < count; i += batchSize) {
+    const posts = await PostModel.find()
+      .sort({ toc: 1 })
+      .skip(i)
+      .limit(batchSize);
+
+    const documents = posts.map((post) => ({
+      docType: post.type, // 'thread' 或 'post'
+      document: post,
+    }));
+
+    await elasticSearch.bulkSave(documents);
+    console.log(
+      `【批量同步Post到ES】 总：${count}, 已完成：${i + posts.length}`,
+    );
+  }
+
+  console.log('【批量同步Post到ES】完成');
+};
+
 //监听post数据库的save操作，将新增的记录内容保存到一条新建的search记录中以便于搜索
 postSchema.pre('save', async function (next) {
   // elasticSearch: insert/update data

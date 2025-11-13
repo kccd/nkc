@@ -281,6 +281,153 @@ func.save = async (docType, document) => {
   });
 };
 
+/*
+ * 批量更新数据，提高同步效率
+ * @param {Array} documents 文档数组，每个元素包含 docType 和 document
+ * @param {Number} batchSize 批处理大小，默认1000
+ * @author pengxiguaa 2025-11-13
+ * */
+func.bulkSave = async (documents, batchSize = 1000) => {
+  const apiFunction = require('../nkcModules/apiFunction');
+  const FundApplicationFormModel = require('../dataModels/FundApplicationFormModel');
+
+  for (let i = 0; i < documents.length; i += batchSize) {
+    const batch = documents.slice(i, i + batchSize);
+    const body = [];
+
+    for (const { docType, document } of batch) {
+      // 验证文档类型
+      if (
+        ![
+          'user',
+          'post',
+          'thread',
+          'column',
+          'columnPage',
+          'resource',
+          'attachment',
+          'document_article',
+          'document_comment',
+          'document_moment',
+        ].includes(docType)
+      ) {
+        console.warn(`跳过无效的文档类型: ${docType}`);
+        continue;
+      }
+
+      let aid = '';
+      const {
+        pid = '',
+        toc = new Date(),
+        tid = '',
+        uid = '',
+        mainForumsId = [],
+        t = '',
+        c = '',
+        digest = false,
+        abstractEn = '',
+        abstractCn = '',
+        keyWordsEn = [],
+        keyWordsCn = [],
+        authorInfos = [],
+        voteUp = 0,
+        voteDown = 0,
+        description = '',
+        username = '',
+        tcId = [],
+        l = '',
+      } = document;
+
+      if (docType === 'thread') {
+        const fundForm = await FundApplicationFormModel.findOne({ tid });
+        if (fundForm) {
+          aid = fundForm.code;
+        }
+      }
+
+      // 生成唯一ID
+      let id;
+      if (docType === 'thread') {
+        id = `thread_${tid}`;
+      } else if (docType === 'post') {
+        id = `post_${pid}`;
+      } else if (docType === 'user') {
+        id = `user_${uid}`;
+      } else if (docType === 'column') {
+        id = `column_${tid}`;
+      } else if (docType === 'columnPage') {
+        id = `columnPage_${tid}`;
+      } else if (docType === 'resource') {
+        id = `resource_${tid}`;
+      } else if (docType === 'document_article') {
+        id = `article_${tid}`;
+      } else if (docType === 'document_comment') {
+        id = `comment_${tid}`;
+      } else if (docType === 'document_moment') {
+        id = `document_${tid}`;
+      } else if (docType === 'attachment') {
+        id = `attachment_${tid}`;
+      }
+
+      // 添加索引操作和文档数据
+      body.push({
+        index: {
+          _index: indexName,
+          _type: 'documents',
+          _id: id,
+        },
+      });
+
+      body.push({
+        docType,
+        toc,
+        pid,
+        description,
+        username,
+        uid,
+        tid,
+        aid,
+        digest,
+        mainForumsId,
+        tcId,
+        title: t,
+        content:
+          l === 'json'
+            ? getJsonTextFilter(c, ['nkc-xsf-limit'])
+            : apiFunction.obtainPureText(c),
+        abstractCN: abstractCn,
+        abstractEN: abstractEn,
+        keywordsCN: keyWordsCn,
+        keywordsEN: keyWordsEn,
+        authors: authorInfos.map((a) => a.name),
+        voteUp,
+        voteDown,
+      });
+    }
+
+    if (body.length > 0) {
+      try {
+        const response = await client.bulk({ body });
+        const errors = response.items.filter(
+          (item) => item.index && item.index.error,
+        );
+
+        if (errors.length > 0) {
+          console.error(
+            `批次 ${Math.floor(i / batchSize) + 1} 中有 ${
+              errors.length
+            } 个错误:`,
+            errors,
+          );
+        }
+      } catch (error) {
+        console.error(`批次 ${Math.floor(i / batchSize) + 1} 同步失败:`, error);
+        throw error;
+      }
+    }
+  }
+};
+
 // 搜索
 func.search = async (t, c, options) => {
   const SettingModel = require('../dataModels/SettingModel');

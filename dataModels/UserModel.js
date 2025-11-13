@@ -2653,6 +2653,38 @@ userSchema.statics.saveAllUserToElasticSearch = async () => {
 };
 
 /*
+ * 批量同步用户信息到ES数据库
+ * @author pengxiguaa 2025-11-13
+ * */
+userSchema.statics.saveAllUserToElasticSearchBatch = async () => {
+  const UserModel = mongoose.model('users');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const count = await UserModel.countDocuments();
+  const batchSize = 2000;
+
+  console.log(`开始批量同步 ${count} 个用户到ElasticSearch...`);
+
+  for (let i = 0; i < count; i += batchSize) {
+    const users = await UserModel.find()
+      .sort({ toc: 1 })
+      .skip(i)
+      .limit(batchSize);
+
+    const documents = users.map((user) => ({
+      docType: 'user',
+      document: user,
+    }));
+
+    await elasticSearch.bulkSave(documents);
+    console.log(
+      `【批量同步User到ES】 总：${count}, 已完成：${i + users.length}`,
+    );
+  }
+
+  console.log('【批量同步User到ES】完成');
+};
+
+/*
  * 同步用户信息到ES数据库
  * @param {Object} user 用户对象
  * @author pengxiguaa 2020/7/7
