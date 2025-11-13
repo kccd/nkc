@@ -397,6 +397,38 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 };
 
 /*
+ * 批量同步所有专栏数据到ES数据库
+ * @author pengxiguaa 2025-11-13
+ * */
+schema.statics.saveAllColumnToElasticSearchBatch = async () => {
+  const ColumnModel = mongoose.model('columns');
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  const count = await ColumnModel.countDocuments();
+  const batchSize = 2000;
+
+  console.log(`开始批量同步 ${count} 个专栏到ElasticSearch...`);
+
+  for (let i = 0; i < count; i += batchSize) {
+    const columns = await ColumnModel.find()
+      .sort({ toc: 1 })
+      .skip(i)
+      .limit(batchSize);
+
+    const documents = columns.map((column) => ({
+      docType: 'column',
+      document: column,
+    }));
+
+    await elasticSearch.bulkSave(documents);
+    console.log(
+      `【批量同步Column到ES】 总：${count}, 已完成：${i + columns.length}`,
+    );
+  }
+
+  console.log('【批量同步Column到ES】完成');
+};
+
+/*
  * 拓展专栏的最新文章
  * */
 schema.statics.extendColumnsPosts = async (columns, count) => {
