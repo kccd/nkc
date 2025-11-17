@@ -297,13 +297,11 @@ import EditorCore from './EditorCore.plain.vue';
 import { visitUrl } from '../../js/pageSwitch';
 import PublishPermissionChecker from '../PublishPermissionCheck.vue';
 import { publishPermissionTypes } from '../../js/publish';
-import {
-  Home as HomeIcon,
-  AddPicture,
-  VideoTwo,
-  WinkingFace,
-  NewspaperFolding,
-} from '@icon-park/vue';
+import HomeIcon from '@icon-park/vue/es/icons/Home';
+import AddPicture from '@icon-park/vue/es/icons/AddPicture';
+import VideoTwo from '@icon-park/vue/es/icons/VideoTwo';
+import WinkingFace from '@icon-park/vue/es/icons/WinkingFace';
+import NewspaperFolding from '@icon-park/vue/es/icons/NewspaperFolding';
 
 const iconFill = {
   normal: '#555',

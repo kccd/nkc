@@ -165,6 +165,7 @@
     "moleculer": "^0.14.21",
     "moleculer-web": "^0.10.4",
     "moment": "^2.29.4",
+    "dayjs": "^1.11.11",
     "mongodb": "^6.7.0",
     "mongodb-uri": "^0.9.7",
     "mongoose": "^8.4.1",

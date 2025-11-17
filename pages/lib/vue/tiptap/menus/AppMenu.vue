@@ -95,21 +95,19 @@
 </style>
 
 <script>
-import {
-  MoreOne,
-  NewPicture,
-  VideoTwo,
-  InsertTable,
-  Music,
-  Paperclip,
-  Terminal,
-  SmilingFace,
-  Box,
-  Formula,
-  DividingLineOne,
-  CheckCorrect,
-  Protect,
-} from '@icon-park/vue';
+import MoreOne from '@icon-park/vue/es/icons/MoreOne';
+import NewPicture from '@icon-park/vue/es/icons/NewPicture';
+import VideoTwo from '@icon-park/vue/es/icons/VideoTwo';
+import InsertTable from '@icon-park/vue/es/icons/InsertTable';
+import Music from '@icon-park/vue/es/icons/Music';
+import Paperclip from '@icon-park/vue/es/icons/Paperclip';
+import Terminal from '@icon-park/vue/es/icons/Terminal';
+import SmilingFace from '@icon-park/vue/es/icons/SmilingFace';
+import Box from '@icon-park/vue/es/icons/Box';
+import Formula from '@icon-park/vue/es/icons/Formula';
+import DividingLineOne from '@icon-park/vue/es/icons/DividingLineOne';
+import CheckCorrect from '@icon-park/vue/es/icons/CheckCorrect';
+import Protect from '@icon-park/vue/es/icons/Protect';
 export default {
   components: {
     'more-one': MoreOne,

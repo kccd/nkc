@@ -21,7 +21,7 @@ import { getUrl } from '../../js/tools';
 import { nkcAPI } from '../../js/netAPI';
 import { sweetError } from '../../js/sweetAlert';
 import { logger } from '../../js/logger';
-import { LoadingFour } from '@icon-park/vue';
+import LoadingFour from '@icon-park/vue/es/icons/LoadingFour';
 export default {
   data: () => ({
     pageUrl: '',

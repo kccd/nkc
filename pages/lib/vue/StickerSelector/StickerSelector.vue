@@ -45,7 +45,7 @@
 <script>
 import DraggableDialog from '../DraggableDialog/DraggableDialog.vue';
 import {getUrl} from "../../js/tools";
-import {UploadOne} from "@icon-park/vue";
+import UploadOne from "@icon-park/vue/es/icons/UploadOne";
 import EmojiList from '../EmojiList.vue';
 import { getSocket } from "../../js/socket";
 import {nkcAPI} from "../../js/netAPI";

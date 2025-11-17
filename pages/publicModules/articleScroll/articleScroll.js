@@ -1,4 +1,7 @@
-import { ToTop, ToBottom, Up, Down } from '@icon-park/vue';
+import ToTop from '@icon-park/vue/es/icons/ToTop';
+import ToBottom from '@icon-park/vue/es/icons/ToBottom';
+import Up from '@icon-park/vue/es/icons/Up';
+import Down from '@icon-park/vue/es/icons/Down';
 import Vue from 'vue';
 import { scrollToTop, scrollToBottom, scrollTo } from '../../lib/js/scrollPage';
 

@@ -120,7 +120,9 @@ import {getUrl} from '../js/tools.js';
 import { openImageViewer } from "../js/imageViewer.js";
 import {getState} from '../js/state.js';
 import AddressSelector from "./AddressSelector.vue";
-import {Plus as PlusIcon, Minus as MinusIcon, SpeakerOne as SpeakerOneIcon} from '@icon-park/vue'
+import PlusIcon from '@icon-park/vue/es/icons/Plus'
+import MinusIcon from '@icon-park/vue/es/icons/Minus'
+import SpeakerOneIcon from '@icon-park/vue/es/icons/SpeakerOne'
 import { addProductToCart, submitProductToBill, banSale } from "../js/product.js";
 const {uid} = getState();
 import {toLogin} from '../js/account.js';

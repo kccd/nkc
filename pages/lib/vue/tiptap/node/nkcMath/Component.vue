@@ -23,7 +23,8 @@
 
 <script>
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
-import { Delete, Write } from '@icon-park/vue';
+import Delete from '@icon-park/vue/es/icons/Delete';
+import Write from '@icon-park/vue/es/icons/Write';
 
 export default {
   components: {

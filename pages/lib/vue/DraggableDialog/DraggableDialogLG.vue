@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { Close as close } from "@icon-park/vue";
+import close from "@icon-park/vue/es/icons/Close";
 import { DraggableElement } from "../../js/draggable";
 import { disableScroll, enableScroll } from "../../js/scrollBar";
 

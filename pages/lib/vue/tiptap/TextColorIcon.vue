@@ -13,7 +13,9 @@
 
 <script>
 import ColorPalette from '../ColorPalette.vue'
-import {FontSizeTwo, Down, HighLight} from '@icon-park/vue'
+import FontSizeTwo from '@icon-park/vue/es/icons/FontSizeTwo'
+import Down from '@icon-park/vue/es/icons/Down'
+import HighLight from '@icon-park/vue/es/icons/HighLight'
 import {colorPaletteColors} from "../ColorPalette.vue";
 
 export default {

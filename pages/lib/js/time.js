@@ -1,4 +1,8 @@
-import moment from 'moment';
+// Replaced full moment import with lightweight dayjs to avoid bundling all locales.
+// Only zh-cn locale is loaded; adjust if you need more.
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+dayjs.locale('zh-cn');
 
 /*
  * 获取凌晨时刻的时间
@@ -7,8 +11,7 @@ import moment from 'moment';
  * */
 export function earlyMorning(time) {
   time = time || new Date();
-  const str = moment(time).format(`YYYY-MM-DD 00:00:00`);
-  return new Date(str);
+  return dayjs(time).startOf('day').toDate();
 }
 
 /*
@@ -28,12 +31,12 @@ export function briefTime(time) {
     if (time.getDate() !== now.getDate()) {
       return '昨天';
     } else {
-      return moment(time).format(`HH:mm`);
+      return dayjs(time).format('HH:mm');
     }
   } else if (timeYear !== nowYear) {
-    return moment(time).format(`YYYY-M-D`);
+    return dayjs(time).format('YYYY-M-D');
   } else {
-    return moment(time).format(`M-D`);
+    return dayjs(time).format('M-D');
   }
 }
 
@@ -44,7 +47,7 @@ export function briefTime(time) {
  * */
 export function detailedTime(time) {
   time = time || new Date();
-  return moment(time).format(`YYYY-MM-DD HH:mm:ss`);
+  return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
 }
 
 /*
@@ -55,7 +58,7 @@ export function detailedTime(time) {
  * */
 export function timeFormat(format, time) {
   time = time || new Date();
-  return moment(time).format(format);
+  return dayjs(time).format(format);
 }
 
 export function formatDuration(milliseconds) {

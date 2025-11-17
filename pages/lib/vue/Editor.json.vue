@@ -225,34 +225,32 @@ import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import Placeholder from '@tiptap/extension-placeholder';
 import Gapcursor from '@tiptap/extension-gapcursor';
-import {
-  ClearFormat,
-  AlignTextLeft,
-  AlignTextCenter,
-  AlignTextRight,
-  Quote,
-  Minus,
-  Terminal,
-  ListNumbers,
-  ListTwo,
-  Return,
-  GoOn,
-  TextBold,
-  TextItalic,
-  TextUnderline,
-  LinkOne,
-  Unlink,
-  RightSmallDown,
-  RightSmallUp,
-  Strikethrough,
-  Code as CodeIcon,
-  CodeOne,
-  AddPicture,
-  MoreOne,
-  FontSizeTwo,
-  IndentLeft,
-  NewPicture,
-} from '@icon-park/vue';
+import ClearFormat from '@icon-park/vue/es/icons/ClearFormat';
+import AlignTextLeft from '@icon-park/vue/es/icons/AlignTextLeft';
+import AlignTextCenter from '@icon-park/vue/es/icons/AlignTextCenter';
+import AlignTextRight from '@icon-park/vue/es/icons/AlignTextRight';
+import Quote from '@icon-park/vue/es/icons/Quote';
+import Minus from '@icon-park/vue/es/icons/Minus';
+import Terminal from '@icon-park/vue/es/icons/Terminal';
+import ListNumbers from '@icon-park/vue/es/icons/ListNumbers';
+import ListTwo from '@icon-park/vue/es/icons/ListTwo';
+import Return from '@icon-park/vue/es/icons/Return';
+import GoOn from '@icon-park/vue/es/icons/GoOn';
+import TextBold from '@icon-park/vue/es/icons/TextBold';
+import TextItalic from '@icon-park/vue/es/icons/TextItalic';
+import TextUnderline from '@icon-park/vue/es/icons/TextUnderline';
+import LinkOne from '@icon-park/vue/es/icons/LinkOne';
+import Unlink from '@icon-park/vue/es/icons/Unlink';
+import RightSmallDown from '@icon-park/vue/es/icons/RightSmallDown';
+import RightSmallUp from '@icon-park/vue/es/icons/RightSmallUp';
+import Strikethrough from '@icon-park/vue/es/icons/Strikethrough';
+import CodeIcon from '@icon-park/vue/es/icons/Code';
+import CodeOne from '@icon-park/vue/es/icons/CodeOne';
+import AddPicture from '@icon-park/vue/es/icons/AddPicture';
+import MoreOne from '@icon-park/vue/es/icons/MoreOne';
+import FontSizeTwo from '@icon-park/vue/es/icons/FontSizeTwo';
+import IndentLeft from '@icon-park/vue/es/icons/IndentLeft';
+import NewPicture from '@icon-park/vue/es/icons/NewPicture';
 import ResourceSelector from './ResourceSelector.vue';
 import nkcAudioBlock from './tiptap/node/nkcAudioBlock/nkcAudioBlock.js';
 import nkcAttachmentBlock from './tiptap/node/nkcAttachmentBlock/nkcAttachmentBlock.js';

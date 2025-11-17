@@ -1,4 +1,5 @@
 const path = require('path');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const webpack = require('webpack');
 const globby = require('globby');
 const { VueLoaderPlugin } = require('vue-loader');
@@ -195,7 +196,6 @@ module.exports = {
     ],
   },
   plugins: [
-    // new BundleAnalyzerPlugin(),
     new VueLoaderPlugin(),
     /* new ESLintPlugin({
       extensions: '.vue',
@@ -215,6 +215,7 @@ module.exports = {
         }
       },
     }),
+    // new BundleAnalyzerPlugin({ analyzerMode: 'server', openAnalyzer: true }), // 临时开启
   ],
   externals: {
     vue: 'Vue',
