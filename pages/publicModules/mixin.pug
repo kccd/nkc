@@ -3,6 +3,7 @@
   @author pengxiguaa 2019/2/15
 if !isIncluded('baseMixin')
   mixin includeJS(url, origin)
+    -url = remoteState.fileDomain + url;
     if origin
       script(src=`${url}`)
     else
@@ -11,6 +12,7 @@ if !isIncluded('baseMixin')
     @param url: css地址
     @author pengxiguaa 2019/2/15
   mixin includeCSS(url)
+    -url = remoteState.fileDomain + url;
     link(rel="stylesheet", href=`${url}?v=${remoteState.startTime}`)
 
   //-  标题
@@ -42,8 +44,10 @@ if !isIncluded('baseMixin')
       title=tools.timeFormat(time)
       )
   mixin includeVueApp(url, selector)
+    -url = remoteState.fileDomain + url;  
     script(src=`${url}?v=${remoteState.startTime}` data-vue-app-selector=selector)
   mixin includeDeferJS(url, origin)
+    -url = remoteState.fileDomain + url;
     if origin
       script(src=`${url}`)
     else

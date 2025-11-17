@@ -8,11 +8,10 @@ const koaCompress = require('koa-compress');
 const koaRewrite = require('koa-rewrite');
 const settings = require('./settings');
 const helmet = require('koa-helmet');
-const cors = require('@koa/cors');
+const { corsMiddleware } = require('./middlewares');
 const { isProduction } = require('./settings/env');
 const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
-const serverConfig = require('./config/server');
 const { getUrl } = require('./nkcModules/tools');
 const staticServe = (path) => {
   return require('koa-static')(path, {
@@ -67,14 +66,7 @@ const koaBodySetting = settings.upload.koaBodySetting;
 koaBodySetting.formidable.maxFileSize = uploadConfig.maxFileSize;
 app.keys = getCookieKeys();
 app
-  .use(
-    cors({
-      origin: serverConfig.domain,
-      credentials: true,
-      allowMethods: ['GET', 'HEAD', 'OPTIONS', 'POST'],
-      allowHeaders: ['Content-Type', 'Authorization', 'FROM'],
-    }),
-  )
+  .use(corsMiddleware)
   // gzip
   .use(koaCompress({ threshold: 2048 }))
   // 静态文件映射
