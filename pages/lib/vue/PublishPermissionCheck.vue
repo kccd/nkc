@@ -24,7 +24,9 @@
 <script>
 import { nkcAPI } from '../js/netAPI';
 import { sweetError } from '../js/sweetAlert';
-import { CheckOne, CloseOne, Info } from '@icon-park/vue';
+import CheckOne from '@icon-park/vue/es/icons/CheckOne';
+import CloseOne from '@icon-park/vue/es/icons/CloseOne';
+import Info from '@icon-park/vue/es/icons/Info';
 import { formatDuration } from '../js/time';
 import { publishPermissionTypes } from '../js/publish';
 

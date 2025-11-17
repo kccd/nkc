@@ -17,7 +17,7 @@
 </template>
 
 <script>
-  import { Close as close } from "@icon-park/vue";
+  import close from "@icon-park/vue/es/icons/Close";
 
   export default {
     components: { close },

@@ -3,7 +3,8 @@ import { replaceNKCUrl } from './nkcUrl';
 export function replaceNKCRender(selector) {
   return replaceNKCUrl(selector);
 }
-const Plyr = require('../../../public/external_pkgs/plyr/plyr.polyfilled.min');
+// TODO: 去掉动态引用，使用全局静态引入
+// const Plyr = require('../../../public/external_pkgs/plyr/plyr.polyfilled.min');
 const initPlyrMask = NKC.methods.initPlyrMask;
 export function initNKCVideo() {
   var players = [];
@@ -60,7 +61,7 @@ export function initNKCVideo() {
     if (plyrDom.length === 0) {
       continue;
     }
-    var player = new Plyr(plyrDom, {
+    var player = new window.Plyr(plyrDom, {
       ratio: '4:3',
       title: title,
       controls: videoControls,

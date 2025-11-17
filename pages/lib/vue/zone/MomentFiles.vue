@@ -194,7 +194,7 @@ import { RNViewVideo } from '../../js/reactNative';
 import { longPressImage } from '../../js/reactNative';
 import { getState } from '../../js/state';
 import VideoPlayer from '../VideoPlayer';
-import { PlayOne } from '@icon-park/vue';
+import PlayOne from '@icon-park/vue/es/icons/PlayOne';
 const { isApp, appVersionCode } = getState();
 export default {
   /*

@@ -441,7 +441,7 @@
   import {briefTime} from '../../js/time.js';
   import {nkcAPI} from '../../js/netAPI';
   import {sweetError} from "../../js/sweetAlert";
-  import {Search as SearchIcon} from "@icon-park/vue";
+  import SearchIcon from "@icon-park/vue/es/icons/Search";
   import { debounce } from "../../js/execution";
   
   export default {

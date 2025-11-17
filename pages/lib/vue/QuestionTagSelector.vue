@@ -72,7 +72,7 @@ import Draggable from './publicVue/draggable.vue'
 import { HttpMethods, nkcAPI } from "../js/netAPI";
 import {sweetError} from "../js/sweetAlert";
 import {checkString} from "../js/checkData";
-import {Close} from "@icon-park/vue";
+import Close from "@icon-park/vue/es/icons/Close";
 
 const names = {
   list: 'list',

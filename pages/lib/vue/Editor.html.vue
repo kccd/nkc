@@ -98,9 +98,9 @@
 </style>
 
 <script>
-  import '../../../pages/ueditor/ueditor.less';
+  /* import '../../../pages/ueditor/ueditor.less';
   import '../../../pages/ueditor/ueditor.config';
-  import '../../../pages/ueditor/ueditor.all.js';
+  import '../../../pages/ueditor/ueditor.all.js'; */
   import {getUrl} from "../js/tools";
   import {nkcAPI} from "../js/netAPI";
   import {initDblclick} from "../js/dblclick";

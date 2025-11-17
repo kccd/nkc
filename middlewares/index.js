@@ -11,4 +11,5 @@ module.exports = {
   filterDomain: require('./filterDomain'),
   apiData: require('./apiData'),
   cache: require('./cache'),
+  corsMiddleware: require('./cors'),
 };

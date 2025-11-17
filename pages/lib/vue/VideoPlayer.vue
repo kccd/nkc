@@ -89,9 +89,10 @@
 }
 </style>
 <script>
-import '../../../public/external_pkgs/plyr/plyr.css';
-import '../../../public/external_pkgs/plyr/plyr.polyfilled.min.js';
-import Plyr from '../../../public/external_pkgs/plyr/plyr.min.js';
+// TODO: 去掉动态引用，使用全局静态引入
+// import '../../../public/external_pkgs/plyr/plyr.css';
+// import '../../../public/external_pkgs/plyr/plyr.polyfilled.min.js';
+// import Plyr from '../../../public/external_pkgs/plyr/plyr.min.js';
 import { getState } from '../js/state';
 import DownloadPanel from '../vue/DownloadPanel';
 const state = getState();
@@ -147,7 +148,7 @@ export default {
   },
   methods: {
     initPlayer() {
-      this.player = new Plyr(this.$refs.videoDom, {
+      this.player = new window.Plyr(this.$refs.videoDom, {
         ratio: this.ratio ? this.ratio : '4:3',
         controls: [
           'play-large',

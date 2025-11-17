@@ -58,7 +58,7 @@ import { getState } from '../js/state';
 import { RNCloseWebview, RNLogin } from '../js/reactNative';
 import { visitUrl } from '../js/pageSwitch';
 import LoginCore, { modes } from './LoginCore.v2.vue';
-import { CloseSmall } from '@icon-park/vue';
+import CloseSmall from '@icon-park/vue/es/icons/CloseSmall';
 const { isApp } = getState();
 import { getDefaultLoginType, loginTypes } from '../js/login';
 import { logger } from '../js/logger';
