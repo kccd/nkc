@@ -12,16 +12,27 @@ const { corsMiddleware } = require('./middlewares');
 const { isProduction } = require('./settings/env');
 const { getCookieKeys } = require('./nkcModules/cookie');
 const awesomeStatic = require('awesome-static');
+const koaStaticCache = require('koa-static-cache');
+const koaStatic = require('koa-static');
 const { getUrl } = require('./nkcModules/tools');
-const staticServe = (path) => {
-  return require('koa-static')(path, {
-    setHeaders: function (response) {
-      response.setHeader(
-        'Cache-Control',
-        `public, ${isProduction ? 'max-age=604800' : 'no-cache'}`,
-      );
-    },
-  });
+const staticServe = (p, cache) => {
+  if (cache) {
+    return koaStaticCache(p, {
+      buffer: true,
+      dynamic: true,
+      gzip: true,
+      maxAge: isProduction ? 604800 : 0,
+    });
+  } else {
+    return koaStatic(p, {
+      setHeaders: function (response) {
+        response.setHeader(
+          'Cache-Control',
+          `public, ${isProduction ? 'max-age=604800' : 'no-cache'}`,
+        );
+      },
+    });
+  }
 };
 const { permissionRef } = require('./middlewares/permission');
 const app = new Koa();
@@ -70,10 +81,10 @@ app
   // gzip
   .use(koaCompress({ threshold: 2048 }))
   // 静态文件映射
-  .use(staticServe(path.resolve('./nkcModules')))
-  .use(staticServe(path.resolve('./public')))
-  .use(staticServe(path.resolve('./node_modules')))
-  .use(staticServe(path.resolve('./dist/pages')))
+  .use(staticServe(path.resolve('./nkcModules'), false))
+  .use(staticServe(path.resolve('./public'), false))
+  .use(staticServe(path.resolve('./node_modules'), false))
+  .use(staticServe(path.resolve('./dist/pages'), false))
   .use(awesomeStatic('./resources/tools', { route: '/tools' }))
   // 请求头安全设置
   .use(helmet())

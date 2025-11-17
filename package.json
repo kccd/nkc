@@ -153,6 +153,7 @@
     "koa-router": "^7.3.0",
     "koa-sslify": "^2.1.2",
     "koa-static": "^4.0.2",
+    "koa-static-cache": "^5.1.4",
     "log4js": "^6.7.1",
     "markdown-it": "^12.3.2",
     "marked": "^4.0.14",
