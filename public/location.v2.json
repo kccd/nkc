@@ -1,4 +1,4 @@
-export const location = [
+[
   {
     "id": "1",
     "cname": "中国",
@@ -38519,4 +38519,4 @@ export const location = [
       }
     ]
   }
-];
+]

@@ -2,7 +2,7 @@ import { strToObj, objToStr } from './dataConversion';
 import { base64ToStr } from './dataConversion';
 import { getState } from './state';
 import { getSize, getUrl } from './tools';
-import hljs from 'highlight.js';
+import hljs from './highlight';
 const isLogged = !!getState().uid;
 import { lazyLoadInit } from './lazyLoad';
 import { copyTextToClipboard } from './clipboard';
@@ -433,23 +433,30 @@ export function renderCodeBlock() {
     }
     const codeText = code.innerText;
     const multipleLineMode = code.getAttribute('data-line-mode') === 'multiple';
-    let language = fixLanguage(
-      container.getAttribute('data-id').trim().toLowerCase(),
-    );
+    const requestedLang = container
+      .getAttribute('data-id')
+      .trim()
+      .toLowerCase();
+    let language = fixLanguage(requestedLang);
     let html = '';
     if (language === 'other') {
       const r = hljs.highlightAuto(codeText);
       html = r.value;
-      language = r.language;
+      language = r.language || language;
     } else {
       const r = hljs.highlight(codeText, {
         language,
       });
       html = r.value;
     }
-    language = fixLanguage(language);
-    const languageName =
-      highlightLanguagesObject[language] || highlightLanguagesObject['other'];
+    // 展示名称优先使用用户选择的语言名，否则使用归一化语言名，再退回 Other
+    const displayLangKey =
+      requestedLang && highlightLanguagesObject[requestedLang]
+        ? requestedLang
+        : language && highlightLanguagesObject[language]
+        ? language
+        : 'other';
+    const languageName = highlightLanguagesObject[displayLangKey];
     code.innerHTML = html;
     const headerDiv = document.createElement('div');
     const span = document.createElement('span');

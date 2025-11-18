@@ -135,7 +135,6 @@
   import {fixUrl} from "../js/url";
   import {getUrl} from "../js/tools";
   import ClipboardJS from "../../../public/clipboard/clipboard.min";
-  import QRCode from 'qrcode/build/qrcode.min';
 
   export default {
     data: () => ({

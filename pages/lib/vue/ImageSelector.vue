@@ -107,9 +107,7 @@
 
 <script>
   import {fileToBase64} from "../js/file";
-  import 'cropperjs/dist/cropper.css';
   import {DraggableElement} from "../js/draggable";
-  import Cropper from 'cropperjs';
 import { sweetError } from "../js/sweetAlert";
   export default {
     data: () => ({

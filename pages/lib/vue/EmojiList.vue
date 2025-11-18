@@ -11,7 +11,6 @@
         v-for="emoji in selectedGroup.emoji"
         @click="selectEmoji(emoji)"
         :key="emoji.unicode"
-        :title="emoji.tts"
       )
         img(:src="getUrl('emoji', emoji.unicode)")
 </template>

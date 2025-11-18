@@ -684,8 +684,6 @@ img.image {
   }*/
 </style>
 <script>
-import 'cropperjs/dist/cropper.css';
-import Cropper from 'cropperjs';
 import { getFileMD5, blobToFile } from '../js/file';
 import { getSize, timeFormat, getUrl } from '../js/tools';
 import { debounce } from '../js/execution';

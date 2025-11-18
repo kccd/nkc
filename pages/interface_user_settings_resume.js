@@ -155,7 +155,7 @@ function addIndElement(obj, i) {
 	col2.append(getInfo('&nbsp;'));
 	col2.append(dutySelect);
 	var occu = $('<input type="text" class="form-control" id="indOccu'+i+'" placeholder="职位名称" value="'+(obj.occupation || '')+'">');
-	col3 = getDivByClass('col-xs-12 col-md-4');
+	var col3 = getDivByClass('col-xs-12 col-md-4');
 	col3.append(getInfo('职位名称'));
 	col3.append(occu);
 	var br = getDivByClass('col-xs-12 col-md-12');
