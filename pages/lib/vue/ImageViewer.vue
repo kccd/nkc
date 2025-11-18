@@ -2,7 +2,7 @@
 
 </template>
 <script>
-import 'viewerjs/dist/viewer.css'
+import 'viewerjs/dist/viewer.min.css'
 import { component as Viewer } from "v-viewer"
 export default {
   components: {

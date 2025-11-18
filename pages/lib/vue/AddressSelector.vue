@@ -2,12 +2,17 @@
   .location-container
     draggable(title="地区选择" @clock="close" ref="draggable" maxWidth="30rem")
       div(slot="content")
-        .selected-locations
+        .selected-locations(style="padding-left: 0.5rem;")
           .selected-location(v-if="!selectedLocations.length") 请选择
           .selected-location(v-else ="!selectedLocations.length" @click="selectAll" :class="{'active':!activeLocation}") 全部
           .selected-location(v-for="sl in selectedLocations" @click="cancelSelect(sl)" :class="{'active': activeLocation.id === sl.id}") {{sl.cname}}
         .locations(v-if="childrenLocations && childrenLocations.length")
-          .location(@click="selectLocation(location)" :class="{'active': selectedLocations.indexOf(location) !== -1}" v-for="location of childrenLocations")
+          .location(
+            style="padding-left: 1rem;"
+            @click="selectLocation(location)"  
+            :class="{'active': selectedLocations.indexOf(location) !== -1}" 
+            v-for="location of childrenLocations"
+            )
             span {{location.cname}}
             .pull-right(v-if="selectedLocations.indexOf(location) !== -1")
               .fa.fa-check-circle
@@ -19,14 +24,14 @@
 
 <script>
 import Draggable from '../../lib/vue/publicVue/draggable.vue'
-import {location} from "../../publicModules/location";
+import { screenTopWarning } from '../js/topAlert';
 export default {
   components: {
     'draggable': Draggable,
   },
   data: () => ({
     showPanel: false,
-    locationsOrigin: location,
+    locationsOrigin: null,
     onlyChina: true,
     selectedLocations: [],
     activeLocation: "",
@@ -40,14 +45,15 @@ export default {
       return !arr || !arr.length;
     },
     childrenLocations: function() {
+      if (!this.locations || this.locations.length === 0) return [];
       if(!this.activeLocation) {
         return this.locations;
       } else {
-        return this.activeLocation.childrens;
+        return this.activeLocation.childrens || [];
       }
     },
     locationsObj: function() {
-      var locations = this.locations;
+      var locations = this.locations || [];
       var obj = {};
       var arr = [];
       var func = function(ls) {
@@ -67,14 +73,31 @@ export default {
       return obj;
     },
     locations: function() {
+      if(!this.locationsOrigin) return [];
       if(this.onlyChina) {
-        return this.locationsOrigin[0].childrens;
+        return (this.locationsOrigin[0] && this.locationsOrigin[0].childrens) || [];
       } else {
-        return this.locationsOrigin;
+        return this.locationsOrigin || [];
       }
     }
   },
   methods: {
+    loadLocations() {
+      if (this.locationsOrigin && this.locationsOrigin.length) return Promise.resolve();
+      // 通过网络加载 JSON（使用 jQuery $.getJSON）
+      return new Promise((resolve, reject) => {
+        // 根据站点部署，优先尝试绝对路径
+        window.$
+          .getJSON('/location.v2.json')
+          .done((data) => {
+            this.locationsOrigin = data || [];
+            resolve();
+          })
+          .fail((err) => {
+            reject(err);
+          });
+      });
+    },
     show() {
       this.$refs.draggable.open();
     },
@@ -89,7 +112,13 @@ export default {
       } else {
         this.onlyChina = true;
       }
-      this.show();
+      this.loadLocations()
+        .then(() => {
+          this.show();
+        })
+        .catch((err) => {
+          screenTopWarning((err && (err.message || err.error)) || '地区数据加载失败，请稍后重试');
+        });
     },
     close() {
       this.hide();

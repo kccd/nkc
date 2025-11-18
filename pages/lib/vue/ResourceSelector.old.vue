@@ -468,8 +468,6 @@
 </style>
 
 <script>
-  import 'cropperjs/dist/cropper.css';
-  import Cropper from 'cropperjs';
   import {DraggableElement} from "../js/draggable";
   import {getFileMD5, blobToFile} from "../js/file";
   import {getSize, timeFormat, getUrl} from "../js/tools";

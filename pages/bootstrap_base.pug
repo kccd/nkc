@@ -72,7 +72,9 @@ block head
   include ./publicModules/mathFormula
   // 代码高亮样式
   +includeCSS('/highlight.js/styles/github.min.css')
-
+  // 图片裁切
+  +includeJS('/cropperjs/dist/cropper.min.js')
+  +includeCSS('/cropperjs/dist/cropper.min.css')
   // 旧编辑器
   +includeCSS('/ueditor/ueditor.css')
   +includeJS('/ueditor/ueditor.config.js')
