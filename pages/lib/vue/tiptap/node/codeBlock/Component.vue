@@ -16,8 +16,7 @@
 
 <script>
 import { nodeViewProps, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-2';
-import hljs from 'highlight.js';
-import { highlightLanguages } from '../../../../js/highlight';
+import hljs, { fixLanguage, highlightLanguages } from '../../../../js/highlight';
 export default {
   components: {
     'node-view-wrapper': NodeViewWrapper,
@@ -55,14 +54,15 @@ export default {
       const highlightCodeDom = code[0];
       const codeDom = code[1];
       setTimeout(() => {
-        if (this.language === 'other') {
+        const lang = fixLanguage(this.language);
+        if (lang === 'other') {
           highlightCodeDom.innerHTML =
             hljs.highlightAuto(codeDom.textContent).value ||
             '<br className="ProseMirror-trailingBreak" />';
         } else {
           highlightCodeDom.innerHTML =
             hljs.highlight(codeDom.textContent, {
-              language: this.language,
+              language: lang,
             }).value || '<br className="ProseMirror-trailingBreak" />';
         }
       });

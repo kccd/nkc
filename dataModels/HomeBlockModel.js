@@ -1,194 +1,202 @@
 const mongoose = require('../settings/database');
-const schema = new mongoose.Schema({
-  _id: String,
-  // 是否为默认分类
-  defaultBlock: {
-    type: Boolean,
-    default: false,
-    index: 1
-  },
-  // 模块名称
-  name: {
-    type: String,
-    default: '',
-    index: 1
-  },
-  // 专业 ID
-  forumsId: {
-    type: [String],
-    default: [],
-  },
-  // 文章属性 ID
-  tcId: {
-    type: [String],
-    default: []
-  },
-  // 是否必须为精选文章
-  digest: {
-    type: Boolean,
-    default: false
-  },
-  // 是否必须为原创
-  origin: {
-    type: Boolean,
-    default: false,
-  },
-  // 回复数最小值
-  postCountMin: {
-    type: Number,
-    default: 0
-  },
-  // 点赞数最小值
-  voteUpMin: {
-    type: Number,
-    default: 0
-  },
-  // 文章加所有回复的点赞数最小值
-  voteUpTotalMin: {
-    type: Number,
-    default: 0,
-  },
-  // 最大点踩数
-  voteDownMax: {
-    type: Number,
-    default: 0
-  },
-  // 更新的间隔时间 小时
-  updateInterval: {
-    type: Number,
-    default: 1
-  },
-  // 发表时间距离当前 最小值 天
-  timeOfPostMin: {
-    type: Number,
-    default: 0
-  },
-  // 发表时间距离当前 最大值 天
-  timeOfPostMax: {
-    type: Number,
-    default: 999
-  },
-  // 文章列表风格
-  threadStyle: {
-    type: String, // abstract: 摘要模式, brief: 简略模式, minimalist
-    default: ''
-  },
-  // 文章列表 css 样式
-  blockStyle: {
-    headerTitleColor: {
-      type: String,
-      default: '#000000'
+const schema = new mongoose.Schema(
+  {
+    _id: String,
+    // 是否为默认分类
+    defaultBlock: {
+      type: Boolean,
+      default: false,
+      index: 1,
     },
-    backgroundColor: {
+    // 模块名称
+    name: {
       type: String,
-      default: '#ffffff'
+      default: '',
+      index: 1,
     },
-    usernameColor: {
-      type: String,
-      default: '#3494da'
+    // 专业 ID
+    forumsId: {
+      type: [String],
+      default: [],
     },
-    forumColor: {
-      type: String,
-      default: '#3494da'
+    // 文章属性 ID
+    tcId: {
+      type: [String],
+      default: [],
     },
-    titleColor: {
-      type: String,
-      default: '#000000'
+    // 是否必须为精选文章
+    digest: {
+      type: Boolean,
+      default: false,
     },
-    abstractColor: {
-      type: String,
-      default: '#000000'
+    // 是否必须为原创
+    origin: {
+      type: Boolean,
+      default: false,
     },
-    infoColor: {
-      type: String,
-      default: '#333333'
-    }
-  },
-  // 文章封面图位置
-  coverPosition: {
-    type: String,
-    default: 'left', // left, right
-  },
-  // 文章篇数
-  threadCount: {
-    type: Number,
-    default: 10
-  },
-  // 屏蔽
-  disabled: {
-    type: Boolean,
-    default: false,
-    index: 1
-  },
-  // 手动推送文章显示条数
-  fixedThreadCount: {
-    type: Number,
-    default: 0,
-  },
-  // 自动推送文章入选条数 已废弃的字段
-  autoThreadCount: {
-    type: Number,
-    default: 0,
-  },
-  // 入选条数和排序
-  autoThread: {
-    type: [{
-      sort: { // random, toc, voteUpCount
+    // 回复数最小值
+    postCountMin: {
+      type: Number,
+      default: 0,
+    },
+    // 点赞数最小值
+    voteUpMin: {
+      type: Number,
+      default: 0,
+    },
+    // 文章加所有回复的点赞数最小值
+    voteUpTotalMin: {
+      type: Number,
+      default: 0,
+    },
+    // 最大点踩数
+    voteDownMax: {
+      type: Number,
+      default: 0,
+    },
+    // 更新的间隔时间 小时
+    updateInterval: {
+      type: Number,
+      default: 1,
+    },
+    // 发表时间距离当前 最小值 天
+    timeOfPostMin: {
+      type: Number,
+      default: 0,
+    },
+    // 发表时间距离当前 最大值 天
+    timeOfPostMax: {
+      type: Number,
+      default: 999,
+    },
+    // 文章列表风格
+    threadStyle: {
+      type: String, // abstract: 摘要模式, brief: 简略模式, minimalist
+      default: '',
+    },
+    // 文章列表 css 样式
+    blockStyle: {
+      headerTitleColor: {
         type: String,
-        default: 'random'
+        default: '#000000',
       },
-      count: {
-        type: Number,
-        default: 20
-      }
-    }],
-    default: [{
-      sort: 'random',
-      count:  20
-    }],
+      backgroundColor: {
+        type: String,
+        default: '#ffffff',
+      },
+      usernameColor: {
+        type: String,
+        default: '#3494da',
+      },
+      forumColor: {
+        type: String,
+        default: '#3494da',
+      },
+      titleColor: {
+        type: String,
+        default: '#000000',
+      },
+      abstractColor: {
+        type: String,
+        default: '#000000',
+      },
+      infoColor: {
+        type: String,
+        default: '#333333',
+      },
+    },
+    // 文章封面图位置
+    coverPosition: {
+      type: String,
+      default: 'left', // left, right
+    },
+    // 文章篇数
+    threadCount: {
+      type: Number,
+      default: 10,
+    },
+    // 屏蔽
+    disabled: {
+      type: Boolean,
+      default: false,
+      index: 1,
+    },
+    // 手动推送文章显示条数
+    fixedThreadCount: {
+      type: Number,
+      default: 0,
+    },
+    // 自动推送文章入选条数 已废弃的字段
+    autoThreadCount: {
+      type: Number,
+      default: 0,
+    },
+    // 入选条数和排序
+    autoThread: {
+      type: [
+        {
+          sort: {
+            // random, toc, voteUpCount
+            type: String,
+            default: 'random',
+          },
+          count: {
+            type: Number,
+            default: 20,
+          },
+        },
+      ],
+      default: [
+        {
+          sort: 'random',
+          count: 20,
+        },
+      ],
+    },
+    // 自动选择的文章 ID
+    autoThreadsId: {
+      type: [String],
+      default: [],
+    },
+    // 手动选择的文章 ID
+    fixedThreadsId: {
+      type: [String],
+      default: [],
+    },
+    // 显示时的排序
+    sort: {
+      type: String,
+      default: 'random', // random, toc, postCount, voteUpCount, tlm
+    },
+    // 在页面中的位置
+    position: {
+      type: String,
+      default: 'left', // left, right
+    },
+    // 模块排序
+    order: {
+      type: Number,
+      default: 1,
+      index: 1,
+    },
   },
-  // 自动选择的文章 ID
-  autoThreadsId: {
-    type: [String],
-    default: []
+  {
+    collection: 'homeBlocks',
   },
-  // 手动选择的文章 ID
-  fixedThreadsId: {
-    type: [String],
-    default: []
-  },
-  // 显示时的排序
-  sort: {
-    type: String,
-    default: 'random', // random, toc, postCount, voteUpCount, tlm
-  },
-  // 在页面中的位置
-  position: {
-    type: String,
-    default: 'left',  // left, right
-  },
-  // 模块排序
-  order: {
-    type: Number,
-    default: 1,
-    index: 1
-  }
-}, {
-  collection: 'homeBlocks'
-});
+);
 
 /*
-* 获取默认模块的 ID
-* @return {[String]}
-* */
+ * 获取默认模块的 ID
+ * @return {[String]}
+ * */
 schema.statics.getDefaultHomeBlocksId = async () => {
   const HomeBlockModel = mongoose.model('homeBlocks');
-  const blocks = await HomeBlockModel.find({defaultBlock: true}, {_id: 1});
-  return blocks.map(b => b._id);
+  const blocks = await HomeBlockModel.find({ defaultBlock: true }, { _id: 1 });
+  return blocks.map((b) => b._id);
 };
 
 schema.statics.checkBlockValue = async (block) => {
-  const {checkString, checkNumber} = require('../nkcModules/checkData');
+  const { checkString, checkNumber } = require('../nkcModules/checkData');
   const ForumModel = mongoose.model('forums');
   const ThreadCategoryModel = mongoose.model('threadCategories');
   const {
@@ -207,178 +215,184 @@ schema.statics.checkBlockValue = async (block) => {
     blockStyle,
     fixedThreadCount,
     autoThread,
-    sort
+    sort,
   } = block;
   checkString(name, {
     name: '模块名',
     minLength: 1,
-    maxLength: 100
+    maxLength: 100,
   });
-  if(forumsId.length > 0) {
-    const forums = await ForumModel.find({fid: {$in: forumsId}}, {fid: 1});
+  if (forumsId.length > 0) {
+    const forums = await ForumModel.find(
+      { fid: { $in: forumsId } },
+      { fid: 1 },
+    );
     const forumsObj = {};
-    forums.map(f => forumsObj[f.fid] = true);
-    for(const fid of forumsId) {
-      if(!forumsObj[fid]) throwErr(400, `专业 ID 错误，fid: ${fid}`);
+    forums.map((f) => (forumsObj[f.fid] = true));
+    for (const fid of forumsId) {
+      if (!forumsObj[fid]) {
+        throwErr(400, `专业 ID 错误，fid: ${fid}`);
+      }
     }
   }
-  if(block.tcId.length > 0) {
+  if (block.tcId.length > 0) {
     const tcId = [];
-    const categories = await ThreadCategoryModel.find({}, {_id: 1});
+    const categories = await ThreadCategoryModel.find({}, { _id: 1 });
     const categoriesObj = {};
-    categories.map(c => categoriesObj[c._id] = true);
-    for(const id of block.tcId) {
+    categories.map((c) => (categoriesObj[c._id] = true));
+    for (const id of block.tcId) {
       const [categoryId, nodeId] = id.split('-');
-      if(
-        categoriesObj[categoryId]
-        && (nodeId === 'default' || categoriesObj[nodeId])
-      ) tcId.push(id);
+      if (
+        categoriesObj[categoryId] &&
+        (nodeId === 'default' || categoriesObj[nodeId])
+      ) {
+        tcId.push(id);
+      }
     }
     block.tcId.length = 0;
     block.tcId.push(...tcId);
   }
   checkNumber(postCountMin, {
     name: '最小回复数',
-    min: 0
+    min: 0,
   });
   checkNumber(voteUpMin, {
     name: '最小点赞数',
-    min: 0
+    min: 0,
   });
   checkNumber(voteDownMax, {
     name: '最大点踩数',
-    min: 0
+    min: 0,
   });
   checkNumber(voteUpTotalMin, {
     name: '文章总点赞数',
-    min: 0
+    min: 0,
   });
   checkNumber(updateInterval, {
     name: '更新间隔时间',
     min: 0.01,
-    fractionDigits: 2
+    fractionDigits: 2,
   });
   checkNumber(timeOfPostMin, {
     name: '最短发表天数',
     min: 0,
-    fractionDigits: 2
+    fractionDigits: 2,
   });
   checkNumber(timeOfPostMax, {
     name: '最大发表天数',
     min: 0,
-    fractionDigits: 2
+    fractionDigits: 2,
   });
-  if(!['abstract', 'brief', 'minimalist'].includes(threadStyle)) {
+  if (!['abstract', 'brief', 'minimalist'].includes(threadStyle)) {
     throwErr(400, `文章列表风格设置错误`);
   }
-  if(!['left', 'right'].includes(coverPosition)) {
+  if (!['left', 'right'].includes(coverPosition)) {
     throwErr(400, `文章封面图位置设置错误`);
   }
-  if(!['random', 'toc', 'postCount', 'voteUpCount', 'tlm'].includes(sort)) {
+  if (!['random', 'toc', 'postCount', 'voteUpCount', 'tlm'].includes(sort)) {
     throwErr(400, `显示时的排序设置错误`);
   }
   checkNumber(threadCount, {
     name: '文章数目',
-    min: 1
+    min: 1,
   });
   checkNumber(fixedThreadCount, {
     name: '手动推选文章显示条数',
     min: 0,
   });
-  if(autoThread.length === 0) throwErr(400, `入选排序和入选条数不能为空`);
-  for(const a of autoThread) {
-    if(!['random', 'toc', 'voteUpCount'].includes(a.sort)) {
+  if (autoThread.length === 0) {
+    throwErr(400, `入选排序和入选条数不能为空`);
+  }
+  for (const a of autoThread) {
+    if (!['random', 'toc', 'voteUpCount'].includes(a.sort)) {
       throwErr(400, `自动推送文章入选排序设置错误`);
     }
     checkNumber(a.count, {
       name: '自动推送文章入选条数',
-      min: 0
+      min: 0,
     });
   }
   checkString(blockStyle.headerTitleColor, {
     name: '模块标题颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
   checkString(blockStyle.backgroundColor, {
     name: '模块背景颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
   checkString(blockStyle.usernameColor, {
     name: '用户名颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
   checkString(blockStyle.forumColor, {
     name: '专业名颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
   checkString(blockStyle.titleColor, {
     name: '文章标题颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
   checkString(blockStyle.abstractColor, {
     name: '文章摘要颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
   checkString(blockStyle.infoColor, {
     name: '时间等信息颜色',
     minLength: 0,
-    maxLength: 20
+    maxLength: 20,
   });
-}
+};
 /*
-* @param {[String]} fidOfCanGetThreads 可访问的专业 ID
-* @param {[Object]} 文章对象组成的数组
-* */
-schema.methods.extendData = async function(fidOfCanGetThreads) {
+ * @param {[String]} fidOfCanGetThreads 可访问的专业 ID
+ * @param {[Object]} 文章对象组成的数组
+ * */
+schema.methods.extendData = async function (fidOfCanGetThreads) {
   const ThreadModel = mongoose.model('threads');
   const apiFunction = require('../nkcModules/apiFunction');
-  const {
-    autoThreadsId,
-    fixedThreadsId,
-    fixedThreadCount,
-    threadCount,
-    sort
-  } = this;
-  if(threadCount <= 0) {
+  const { autoThreadsId, fixedThreadsId, fixedThreadCount, threadCount, sort } =
+    this;
+  if (threadCount <= 0) {
     return [];
   }
   const _fixedThreadsId = apiFunction.arrayShuffle(fixedThreadsId);
   let selectedThreadsId = _fixedThreadsId.slice(0, fixedThreadCount);
   const autoThreadsCount = threadCount - selectedThreadsId.length;
   const _autoThreadsId = apiFunction.arrayShuffle(autoThreadsId);
-  selectedThreadsId = selectedThreadsId.concat(_autoThreadsId.slice(0, autoThreadsCount));
-  if(selectedThreadsId.length === 0) {
+  selectedThreadsId = selectedThreadsId.concat(
+    _autoThreadsId.slice(0, autoThreadsCount),
+  );
+  if (selectedThreadsId.length === 0) {
     return [];
   }
   const findObj = {
     tid: {
-      $in: selectedThreadsId
+      $in: selectedThreadsId,
     },
     reviewed: true,
     disabled: false,
-    recycleMark: {$ne: true},
+    recycleMark: { $ne: true },
     mainForumsId: {
-      $in: fidOfCanGetThreads
-    }
+      $in: fidOfCanGetThreads,
+    },
   };
   const sortObj = {};
-  if(sort === 'toc') {
+  if (sort === 'toc') {
     sortObj.toc = -1;
-  } else  if (sort === 'postCount') {
+  } else if (sort === 'postCount') {
     sortObj.count = -1;
-  } else if(sort === 'voteUpCount') {
+  } else if (sort === 'voteUpCount') {
     sortObj.voteUp = -1;
-  } else if(sort === 'tlm') {
+  } else if (sort === 'tlm') {
     sortObj.tlm = -1;
   }
   let threads;
-  if(sort === 'random'){
+  if (sort === 'random') {
     threads = await ThreadModel.find(findObj);
     threads = apiFunction.arrayShuffle(threads);
   } else {
@@ -391,7 +405,7 @@ schema.methods.extendData = async function(fidOfCanGetThreads) {
   });*/
   threads = await ThreadModel.extendArticlesPanelData(threads);
   return threads;
-}
+};
 
 schema.statics.getHomeBlockData = async (props) => {
   const SettingModel = mongoose.model('settings');
@@ -399,18 +413,17 @@ schema.statics.getHomeBlockData = async (props) => {
   const ColumnModel = mongoose.model('columns');
   const HomeBlockModel = mongoose.model('homeBlocks');
   const ShopGoodsModel = mongoose.model('shopGoods');
-  const {
-    user,
-    fidOfCanGetThreads = [],
-    showDisabledBlock = false
-  } = props;
-  let {showShopGoods,showHomeWebApply,navigationButtons} = await SettingModel.getSettings('home');
-  const {movable, fixed} = await ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
+  const { user, fidOfCanGetThreads = [], showDisabledBlock = false } = props;
+  let { showShopGoods, showHomeWebApply, navigationButtons } =
+    await SettingModel.getSettings('home');
+  const { movable, fixed } = await ThreadModel.getHomeRecommendThreads(
+    fidOfCanGetThreads,
+  );
   const match = {};
-  if(!showDisabledBlock) {
+  if (!showDisabledBlock) {
     match.disabled = false;
   }
-  const homeBlocks = await HomeBlockModel.find(match).sort({order: 1});
+  const homeBlocks = await HomeBlockModel.find(match).sort({ order: 1 });
   // 置顶专栏
   const defaultData = {
     // toppedThreads: await ThreadModel.getHomeToppedThreads(fidOfCanGetThreads),
@@ -443,17 +456,17 @@ schema.statics.getHomeBlockData = async (props) => {
     },
   };
   // 热销商品
-  if(showShopGoods) {
+  if (showShopGoods) {
     defaultData.goods = await ShopGoodsModel.getHomeGoods();
   }
-  if(showHomeWebApply){
+  if (showHomeWebApply) {
     defaultData.webApply = await SettingModel.getAppsData();
   }
   const homeBlocksData = {
     left: [],
-    right: []
+    right: [],
   };
-  for(const homeBlock of homeBlocks) {
+  for (const homeBlock of homeBlocks) {
     const {
       _id,
       defaultBlock,
@@ -462,7 +475,7 @@ schema.statics.getHomeBlockData = async (props) => {
       coverPosition,
       threadStyle,
       disabled,
-      blockStyle
+      blockStyle,
     } = homeBlock;
 
     let homeBlockData = {
@@ -475,7 +488,7 @@ schema.statics.getHomeBlockData = async (props) => {
       threadStyle,
     };
 
-    if(defaultBlock) {
+    if (defaultBlock) {
       homeBlockData.data = defaultData[_id];
     } else {
       homeBlockData.data = await homeBlock.extendData(fidOfCanGetThreads);
@@ -486,13 +499,13 @@ schema.statics.getHomeBlockData = async (props) => {
 };
 
 /*
-* 更新自动推送的文章
-* */
-schema.methods.updateThreadsId = async function() {
+ * 更新自动推送的文章
+ * */
+schema.methods.updateThreadsId = async function () {
   const PostModel = mongoose.model('posts');
   const HomeBlock = mongoose.model('homeBlocks');
   const ThreadCategoryModel = mongoose.model('threadCategories');
-  const homeBlock = await HomeBlock.findOnly({_id: this._id});
+  const homeBlock = await HomeBlock.findOnly({ _id: this._id });
   const {
     forumsId,
     tcId,
@@ -510,135 +523,150 @@ schema.methods.updateThreadsId = async function() {
     type: 'thread',
     reviewed: true,
     disabled: false,
-    toDraft: {$ne: true},
+    toDraft: { $ne: true },
     toc: {
-      $gte: new Date(Date.now() - (timeOfPostMax * 24 * 60 * 60 * 1000)),
-      $lte: new Date(Date.now() - (timeOfPostMin * 24 * 60 * 60 * 1000)),
+      $gte: new Date(Date.now() - timeOfPostMax * 24 * 60 * 60 * 1000),
+      $lte: new Date(Date.now() - timeOfPostMin * 24 * 60 * 60 * 1000),
     },
     threadPostCount: {
-      $gte: postCountMin
+      $gte: postCountMin,
     },
-    voteUpTotal: {$gte: voteUpTotalMin},
-    voteUp: {$gte: voteUpMin},
-    voteDown: {$lte: voteDownMax}
+    voteUpTotal: { $gte: voteUpTotalMin },
+    voteUp: { $gte: voteUpMin },
+    voteDown: { $lte: voteDownMax },
   };
-  if(forumsId.length > 0) {
-    match.mainForumsId = {$in: forumsId};
+  if (forumsId.length > 0) {
+    match.mainForumsId = { $in: forumsId };
   }
-  if(tcId.length > 0) {
+  if (tcId.length > 0) {
     const categoryTree = await ThreadCategoryModel.getCategoryTree();
     const categoryTreeObj = {};
-    for(const c of categoryTree) {
-      categoryTreeObj[c._id] = c.nodes.map(n => n._id);
+    for (const c of categoryTree) {
+      categoryTreeObj[c._id] = c.nodes.map((n) => n._id);
     }
     const categoryObj = {};
-    for(const id of tcId) {
+    for (const id of tcId) {
       let [categoryId, nodeId] = id.split('-');
-      if(!categoryObj[categoryId]) {
+      if (!categoryObj[categoryId]) {
         categoryObj[categoryId] = new Set();
       }
-      if(categoryObj[categoryId].has(nodeId)) continue;
+      if (categoryObj[categoryId].has(nodeId)) {
+        continue;
+      }
       categoryObj[categoryId].add(nodeId);
     }
-    for(let categoryId in categoryObj) {
-      if(!categoryObj.hasOwnProperty(categoryId)) continue;
-      if(!match.$and) {
+    for (let categoryId in categoryObj) {
+      if (!categoryObj.hasOwnProperty(categoryId)) {
+        continue;
+      }
+      if (!match.$and) {
         match.$and = [];
       }
       let nodesId = categoryObj[categoryId];
       categoryId = Number(categoryId);
       const hasDefault = nodesId.has('default');
       nodesId.delete('default');
-      nodesId = [...nodesId].map(n => Number(n));
-      if(hasDefault) {
+      nodesId = [...nodesId].map((n) => Number(n));
+      if (hasDefault) {
         const $or = [
           {
-            tcId: {$nin: categoryTreeObj[categoryId]}
-          }
+            tcId: { $nin: categoryTreeObj[categoryId] },
+          },
         ];
-        if(nodesId.length > 0) {
+        if (nodesId.length > 0) {
           $or.push({
             tcId: {
-              $in: nodesId
-            }
-          })
+              $in: nodesId,
+            },
+          });
         }
-        match.$and.push({$or});
+        match.$and.push({ $or });
       } else {
         match.$and.push({
-          tcId: {$in: nodesId}
+          tcId: { $in: nodesId },
         });
       }
     }
   }
-  if(digest) {
+  if (digest) {
     match.digest = true;
   }
-  if(origin) {
+  if (origin) {
     match.originState = {
-      $in: ['4', '5', '6']
+      $in: ['4', '5', '6'],
     };
   }
 
   let posts = [];
   let postsId = [];
 
-  for(const a of autoThread) {
-    const {sort, count} = a;
+  for (const a of autoThread) {
+    const { sort, count } = a;
+    // 规范化 count，确保为非负整数
+    const n = Math.max(0, Math.floor(Number(count) || 0));
     const arr = [
       {
-        $match: Object.assign({}, match, {pid: {$nin: postsId}})
+        $match: Object.assign({}, match, { pid: { $nin: postsId } }),
       },
       {
         $project: {
           pid: 1,
           tid: 1,
           toc: 1,
-          voteUp: 1
-        }
-      }
+          voteUp: 1,
+        },
+      },
     ];
-    if(sort === 'random') {
+    if (sort === 'random') {
+      // $sample 的 size 必须为正整数，n<=0 时跳过本轮
+      if (n <= 0) {
+        continue;
+      }
       arr.push({
         $sample: {
-          size: count
-        }
+          size: n,
+        },
       });
-    } else if(sort === 'toc') {
+    } else if (sort === 'toc') {
+      if (n <= 0) {
+        continue;
+      }
       arr.push(
         {
           $sort: {
-            toc: -1
-          }
+            toc: -1,
+          },
         },
         {
-          $limit: count
-        }
+          $limit: n,
+        },
       );
     } else {
+      if (n <= 0) {
+        continue;
+      }
       arr.push(
         {
           $sort: {
-            voteUp: -1
-          }
+            voteUp: -1,
+          },
         },
         {
-          $limit: count
-        }
-      )
+          $limit: n,
+        },
+      );
     }
     let _posts = await PostModel.aggregate(arr);
     _posts = _posts || [];
     posts = posts.concat(_posts);
-    postsId = postsId.concat(_posts.map(p => p.pid));
+    postsId = postsId.concat(_posts.map((p) => p.pid));
   }
-  const threadsId = posts.map(post => post.tid);
+  const threadsId = posts.map((post) => post.tid);
   await homeBlock.updateOne({
     $set: {
-      autoThreadsId: threadsId
-    }
+      autoThreadsId: threadsId,
+    },
   });
-}
-
+};
 
 module.exports = mongoose.model('homeBlocks', schema);

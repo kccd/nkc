@@ -1,4 +1,6 @@
-import Swal from 'sweetalert2';
+// 使用全局引入的 SweetAlert2，避免打包进模块体积
+const Swal =
+  typeof window !== 'undefined' && window.Swal ? window.Swal : undefined;
 export function sweetAlert(text) {
   text = (text.error || text) + '';
   return Swal({
