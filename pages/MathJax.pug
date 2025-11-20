@@ -2,7 +2,8 @@ if !isIncluded('mathJax')
   script.
     window.MathJax = {
       loader: {
-        load: ["input/tex", "output/chtml"],
+        // 追加 mhchem 拓展以支持化学方程式 \ce{H2O}
+        load: ["input/tex", "output/chtml", "[tex]/mhchem"],
       },
       startup: {
         // elements: ".math-jax", // 指定渲染的dom或class
@@ -28,6 +29,8 @@ if !isIncluded('mathJax')
         inlineMath: [["$", "$"], ["\\(", "\\)"]],
         displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
         processEscapes: false, // use \$ to produce a literal dollar sign
-      }
+        // 在已有包基础上追加 mhchem（无需列出默认包）
+        packages: { '[+]': ['mhchem'] }
+      },
     }
   +includeJS('/mathjax/es5/tex-mml-chtml.js')

@@ -23,6 +23,18 @@ import {
 const state = getState();
 const isReactNative = state.isApp && state.platform === 'reactNative';
 
+// 触摸后短时间内抑制 mouseover/mouseout 的触发，避免移动端触摸后触发鼠标事件
+let __lastTouchTs = 0;
+const __TOUCH_SUPPRESS_MS = 700;
+function __isFromTouch(e) {
+  // 优先使用浏览器提供的能力判断
+  if (e && e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) {
+    return true;
+  }
+  // 退化：基于时间窗口抑制
+  return Date.now() - __lastTouchTs < __TOUCH_SUPPRESS_MS;
+}
+
 /*
  * 下载文件
  * @param {Object} data
@@ -111,7 +123,7 @@ const eventFunctions = {
   showCreditPanel,
   openDownloadPanel,
   longPressImageForRN,
-}
+};
 
 /*
  * 点击事件、触摸时间触发之后执行的函数，统一处理
@@ -168,12 +180,34 @@ export function initGlobalLongPressEvent() {
  * 监听鼠标移入移出悬浮事件
  * */
 export function initGlobalMouseOverEvent() {
-  //鼠标移入
+  // 记录触摸发生时间，用于抑制随后合成的鼠标事件
+  document.addEventListener(
+    'touchstart',
+    () => {
+      __lastTouchTs = Date.now();
+    },
+    { passive: true },
+  );
+  document.addEventListener(
+    'touchend',
+    () => {
+      __lastTouchTs = Date.now();
+    },
+    { passive: true },
+  );
+
+  // 鼠标移入
   document.addEventListener('mouseover', (e) => {
+    if (__isFromTouch(e)) {
+      return;
+    }
     globalEvent('mouseover', e);
   });
-  //鼠标移出
+  // 鼠标移出
   document.addEventListener('mouseout', (e) => {
+    if (__isFromTouch(e)) {
+      return;
+    }
     globalEvent('mouseout', e);
   });
 }
@@ -217,6 +251,8 @@ export function initAppGlobalClickLinkEvent() {
 }
 // 暂时针对app默认无法选中文字事件进行重置
 export function resetSelectionEvent() {
-  if(!isReactNative) return;
+  if (!isReactNative) {
+    return;
+  }
   window.document.onselectstart = null;
 }
