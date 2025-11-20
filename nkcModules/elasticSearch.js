@@ -274,7 +274,7 @@ func.save = async (docType, document) => {
       abstractEN: abstractEn,
       keywordsCN: keyWordsCn,
       keywordsEN: keyWordsEn,
-      authors: authorInfos.map((a) => a.name),
+      authors: (authorInfos ? authorInfos : []).map((a) => a.name),
       voteUp,
       voteDown,
     },

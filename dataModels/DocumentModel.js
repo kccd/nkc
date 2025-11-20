@@ -1668,7 +1668,18 @@ schema.statics.saveAllDocumentToElasticSearchBatch = async () => {
       }
       return {
         docType,
-        document,
+        document: {
+          tid: document.did,
+          uid: document.uid,
+          toc: document.toc,
+          t: document.title,
+          c: document.content,
+          abstractEN: document.abstractEN,
+          abstractCN: document.abstract,
+          keywordsCN: document.keywords || [],
+          keywordsEN: document.keywordsEN || [],
+          l: document.l,
+        },
       };
     });
 
