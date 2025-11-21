@@ -28,6 +28,7 @@
         //- 1. @content-change 编辑器内容改变触发 2. c 编辑器内容  newPost
         article-content(
           ref="content",
+          :type="reqUrl.type"
           :c="pageData.post.c",
           :l="pageData.post.l",
           @content-change="contentChange"

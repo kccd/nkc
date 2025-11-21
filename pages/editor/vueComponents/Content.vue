@@ -39,6 +39,9 @@ export default {
     l: {
       type: String,
     },
+    type: {
+      type: String
+    }
   },
   watch: {
     c: {
@@ -60,7 +63,7 @@ export default {
   },
   computed: {
     editorConfigs() {
-      return { ...getEditorConfigs(), autoFloatEnabled: true };
+      return { ...getEditorConfigs(this.type === 'modifyComment'? 500: 100000), autoFloatEnabled: true };
     },
   },
   methods: {

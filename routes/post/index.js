@@ -360,9 +360,9 @@ router
     }
     // 字数限制
     if (targetPost.parentPostId) {
-      // 作为评论 不能超过200字
-      if (contentSize > 200) {
-        ctx.throw(400, `内容不能超过200字`);
+      // 作为评论 不能超过500字
+      if (contentSize > 500) {
+        ctx.throw(400, `内容不能超过500字`);
       }
     } else {
       // 作为文章、回复 不能超过10万字

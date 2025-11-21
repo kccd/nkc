@@ -457,7 +457,6 @@ export default {
     // 检测json内容
     checkJsonContent(jsonString) {
       const size = this.getRichJsonContentLength(jsonString);
-      console.log('json字数：', size);
       if (size > 100000) {
         throw new Error("内容不能超过10万字");
       }
