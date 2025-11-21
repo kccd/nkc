@@ -1,19 +1,52 @@
-import {getState} from './state';
-const {isApp} = getState();
+import { getState } from './state';
+const { isApp } = getState();
 let topOffset = 50;
-if(isApp) {
+if (isApp) {
   topOffset = 0;
 }
 //发表文章编辑器
-export function getEditorConfigs() {
+export function getEditorConfigs(maxWords = 100000) {
   return {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
-    maximumWords: 100000, // 最大字符数
+    maximumWords: maxWords, // 最大字符数
     initialFrameHeight: 800, // 编辑器高度
     autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长
@@ -28,10 +61,9 @@ export function getEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
-
+    zIndex: 499,
+  };
+}
 
 //基金配置
 export function getFundDescriptionEditorConfigs() {
@@ -39,8 +71,41 @@ export function getFundDescriptionEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
@@ -57,9 +122,9 @@ export function getFundDescriptionEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
+    zIndex: 499,
+  };
+}
 
 //商品配置
 export function getShopDescriptionEditorConfigs() {
@@ -67,8 +132,41 @@ export function getShopDescriptionEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
@@ -85,8 +183,8 @@ export function getShopDescriptionEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
+    zIndex: 499,
+  };
 }
 //协议配置
 export function getExperimentalProtocolEditorConfigs() {
@@ -94,8 +192,41 @@ export function getExperimentalProtocolEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
@@ -112,8 +243,8 @@ export function getExperimentalProtocolEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
+    zIndex: 499,
+  };
 }
 //活动配置
 export function getActiveDescriptionEditorConfigs() {
@@ -121,8 +252,41 @@ export function getActiveDescriptionEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
@@ -139,8 +303,8 @@ export function getActiveDescriptionEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
+    zIndex: 499,
+  };
 }
 //专栏类型编辑器
 export function getColumnCategoryEditorConfigs() {
@@ -148,8 +312,41 @@ export function getColumnCategoryEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 200, // 编辑器高度
@@ -166,17 +363,50 @@ export function getColumnCategoryEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
+    zIndex: 499,
+  };
 }
 //文章回复编辑器
-export  function getPostEditorConfigs() {
+export function getPostEditorConfigs() {
   return {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 200, // 编辑器高度
@@ -193,9 +423,9 @@ export  function getPostEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
+    zIndex: 499,
+  };
+}
 //文章页评论编辑器
 export function getCommentEditorConfigs() {
   return {
@@ -203,8 +433,25 @@ export function getCommentEditorConfigs() {
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
         //'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+      ],
     ],
     maximumWords: 500, // 最大字符数
     initialFrameHeight: 100, // 编辑器高度
@@ -221,9 +468,9 @@ export function getCommentEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
+    zIndex: 499,
+  };
+}
 
 //图书页评论编辑器
 export function getBookCommentEditorConfigs() {
@@ -232,8 +479,25 @@ export function getBookCommentEditorConfigs() {
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
         //'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+      ],
     ],
     maximumWords: 200, // 最大字符数
     initialFrameHeight: 100, // 编辑器高度
@@ -250,9 +514,9 @@ export function getBookCommentEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
+    zIndex: 499,
+  };
+}
 
 //专栏自定义页编辑器
 export function getColumnPageConfigs() {
@@ -260,8 +524,41 @@ export function getColumnPageConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
@@ -278,9 +575,9 @@ export function getColumnPageConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
+    zIndex: 499,
+  };
+}
 
 //专业基本信息配置
 export function getForumEditorConfigs() {
@@ -288,8 +585,41 @@ export function getForumEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 200, // 编辑器高度
@@ -306,9 +636,9 @@ export function getForumEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
-};
+    zIndex: 499,
+  };
+}
 
 //文档中心编辑器
 export function getDocumentEditorConfigs() {
@@ -316,8 +646,41 @@ export function getDocumentEditorConfigs() {
     toolbars: [
       [
         //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-      ]
+        'undo',
+        'redo',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        '|',
+        'blockquote',
+        'horizontal',
+        'superscript',
+        'subscript',
+        '|',
+        'fontfamily',
+        'fontsize',
+        'forecolor',
+        'backcolor',
+        '|',
+        'indent',
+        '|',
+        'link',
+        'unlink',
+        '|',
+        'inserttable',
+        '|',
+        'removeformat',
+        'pasteplain',
+        '|',
+        'justifyleft',
+        'justifycenter',
+        'justifyright',
+        '|',
+        'insertcode',
+        '|',
+      ],
     ],
     maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
@@ -334,7 +697,6 @@ export function getDocumentEditorConfigs() {
     contextMenu: [],
     imgTotal: 0,
     imgCount: 0,
-    zIndex: 499
-  }
+    zIndex: 499,
+  };
 }
-
