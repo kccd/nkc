@@ -1,4 +1,5 @@
 const Cookies = require('cookies-string-parse');
+const jwt = require('jsonwebtoken');
 const { isDevelopment } = require('../settings/env');
 const cookieConfig = require('../config/cookie');
 const KeyGrip = require('keygrip');
@@ -49,7 +50,12 @@ function getUserInfo(cookie = '') {
   return userInfo;
 }
 
+function generateJWTToken(payload) {
+  return jwt.sign(payload, cookieConfig.proxySecret);
+}
+
 module.exports = {
+  generateJWTToken,
   getCookieInfo,
   getCookieKeys,
   getUserInfo,
