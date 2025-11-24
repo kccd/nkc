@@ -1,6 +1,6 @@
 const languages = require('../languages');
 const { translate } = require('../nkcModules/translate');
-const { getUserInfo } = require('../nkcModules/cookie');
+const { getUserInfo, generateJWTToken } = require('../nkcModules/cookie');
 
 module.exports = async (ctx, next) => {
   const { data, db, state } = ctx;
@@ -52,6 +52,7 @@ module.exports = async (ctx, next) => {
   if (!user) {
     // 游客
     userRoles = await db.UserModel.getVisitorRoles();
+    ctx.clearCookie('ctx');
   } else {
     // 获取用户信息
     userGrade = await user.extendGrade();
@@ -61,6 +62,10 @@ module.exports = async (ctx, next) => {
       uid: user.uid,
       username: user.username,
       lastLogin,
+    });
+    const jwtToken = generateJWTToken({ uid: user.uid });
+    ctx.setCookie('ctx', {
+      token: jwtToken,
     });
   }
   // 根据用户语言设置加载语言对象
