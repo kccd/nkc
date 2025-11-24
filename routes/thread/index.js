@@ -950,9 +950,15 @@ threadRouter
     const sameLevelForums = await db.ForumModel.find(
       {
         fid: {
-          $in: fidOfCanGetThreads
-            .concat(visibilityForumsIdFromRedis)
-            .filter((fid) => !thread.mainForumsId.includes(fid)),
+          $in: fidOfCanGetThreads.filter((fid) => {
+            if (!visibilityForumsIdFromRedis.includes(fid)) {
+              return false;
+            }
+            if (thread.mainForumsId.includes(fid)) {
+              return false;
+            }
+            return true;
+          }),
         },
         parentsId: {
           $in: parentForumsId,
