@@ -130,6 +130,7 @@
                   | &nbsp;删除
 
   div(v-else)
+    resource-selector(ref="resourceSelector")
     .m-b-05.p-a-05.bg-warning.text-warning(v-if='libraryTip.tipUpload') {{libraryTip.tipUpload}}
     .lib-uploader
       .options-button

@@ -1,6 +1,7 @@
 import { getFileMD5 } from '../../lib/js/file';
 import { objToStr } from '../../lib/js/dataConversion';
 import { openDownloadPanel } from '../../global/methods';
+import ResourceSelector from '../../lib/vue/ResourceSelector.vue';
 
 NKC.modules.Library = class {
   constructor(options) {
@@ -8,6 +9,9 @@ NKC.modules.Library = class {
     const self = this;
     self.app = new Vue({
       el: '#moduleLibrary',
+      components: {
+        'resource-selector': ResourceSelector,
+      },
       data: {
         uid: NKC.configs.uid,
         uploadResourcesId,
@@ -602,20 +606,23 @@ NKC.modules.Library = class {
           });
         },
         selectOnlineFiles() {
-          SelectResource.open(
-            (data) => {
-              const { resources } = data;
-              resources.map((r) => {
-                self.app.selectedFiles.push(
-                  self.app.createFile('onlineFile', r),
-                );
-              });
-            },
-            {
-              allowedExt: ['attachment', 'video', 'audio'],
-              countLimit: 99,
-            },
-          );
+          if (this.$refs.resourceSelector) {
+            this.$refs.resourceSelector.open(
+              (data) => {
+                const { resources } = data;
+                resources.map((r) => {
+                  self.app.selectedFiles.push(
+                    self.app.createFile('onlineFile', r),
+                  );
+                });
+                this.$refs.resourceSelector.close();
+              },
+              {
+                allowedExt: ['attachment', 'video', 'audio'],
+                countLimit: 99,
+              },
+            );
+          }
         },
         // 选择完本地文件
         selectedLocalFiles() {
