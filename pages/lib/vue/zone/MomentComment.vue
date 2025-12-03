@@ -55,11 +55,11 @@
       .moment-status(v-else-if="commentData && commentData.status === 'disabled'")
         .disabled(v-if="hasReviewPermission") 内容已被屏蔽
         .hidden-content(v-else)
-      .moment-comment-item-content(v-html="commentData.content" v-if="type === 'comment'")
+      .moment-comment-item-content(v-html="commentDataContent" v-if="type === 'comment'" ref='momentDetailsContent')
       //- 图片视频
       .moment-comment-item-files(v-if="type === 'comment'")
         moment-files(:data="commentData.files")
-      .moment-comment-item-content.pointer(v-html="commentData.content" v-else @click="visitUrl(commentData.url, true)")
+      .moment-comment-item-content.pointer(v-html="commentDataContent" v-else @click="visitUrl(commentData.url, true)" ref='momentDetailsContent')
       .moment-comment-reply-editor(v-if="replyEditorStatus")
         .permission-checker
           publish-permission-checker(:type="publishPermissionTypes.moment")
@@ -133,6 +133,8 @@ import { debounce } from '../../js/execution';
 import { lazyLoadInit } from '../../js/lazyLoad';
 import { publishPermissionTypes } from '../../js/publish';
 import PublishPermissionCheck from '../PublishPermissionCheck.vue';
+import { replaceDocNumberToLink } from '../../js/nkcDocNumber';
+import { renderFormula } from '../../js/formula';
 const state = getState();
 const iconFill = {
   normal: '#555',
@@ -242,6 +244,9 @@ export default {
     commentData() {
       return this.comment;
     },
+    commentDataContent() {
+      return replaceDocNumberToLink(this.commentData.content);
+    },
     editorPlaceholder() {
       return `回复 ${this.commentData.username}`;
     },
@@ -263,6 +268,10 @@ export default {
   },
   mounted() {
     lazyLoadInit();
+
+    setTimeout(() => {
+      renderFormula(this.$refs.momentDetailsContent);
+    }, 100);
   },
   methods: {
     objToStr,

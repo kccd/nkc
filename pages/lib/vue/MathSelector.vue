@@ -60,6 +60,7 @@
 
 <script>
 import DraggableDialog from './DraggableDialog/DraggableDialog.vue';
+import { renderFormula } from '../js/formula';
 import { fixFormulaText, removeFormulaWrappers } from '../js/tools';
 export default {
   components: {
@@ -94,7 +95,7 @@ export default {
       this.close();
     },
     renderPreviewHTML() {
-      window.MathJax.typeset([this.$refs.mathContainer]);
+      renderFormula([this.$refs.mathContainer]);
     },
   },
   computed: {

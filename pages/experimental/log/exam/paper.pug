@@ -74,7 +74,7 @@ block eContent
           small &nbsp;绿色为正确答案
         hr
 
-        div
+        div.question-list
           div.m-b-2(v-for='(record, index) in paper.record')
             div.question-content.m-b-05(v-html="markdownToHTML(`${index + 1}、${record.content || '太久远，未导入'}`)")
             div.font-size-1rem.text-info.m-b-05(v-if='record.contentDesc') 题干说明：{{record.contentDesc}}

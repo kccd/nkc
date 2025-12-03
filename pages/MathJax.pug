@@ -1,36 +1,3 @@
-if !isIncluded('mathJax')
-  script.
-    window.MathJax = {
-      loader: {
-        // 追加 mhchem 拓展以支持化学方程式 \ce{H2O}
-        load: ["input/tex", "output/chtml", "[tex]/mhchem"],
-      },
-      startup: {
-        // elements: ".math-jax", // 指定渲染的dom或class
-        typeset: true,
-        ready: function() {
-          MathJax.startup.defaultReady();
-          MathJax.startup.promise.then(function() {
-            NKC.emit("mathJaxRendered");
-          });
-        }
-      },
-      options: {
-        // processHtmlClass: "", // 指定渲染元素
-        // ignoreHtmlClass: "", // 忽略的元素
-        ignoreHtmlClass:'type-tip',
-        processHtmlClass:"pre-view-formula|render-content",
-        renderActions: {
-          addMenu: [0, '', '']
-        },
-      },
-
-      tex: {
-        inlineMath: [["$", "$"], ["\\(", "\\)"]],
-        displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
-        processEscapes: false, // use \$ to produce a literal dollar sign
-        // 在已有包基础上追加 mhchem（无需列出默认包）
-        packages: { '[+]': ['mhchem'] }
-      },
-    }
-  +includeJS('/mathjax/es5/tex-mml-chtml.js')
+//- 当前文件已废弃
+//- 如果想要使用 MathJax，无需手动引入，因为在 bootstrap_base.pug 中已经引入并配置了
+//- 直接调用 /pages/lib/js/formula.js 中的 renderFormula 函数即可渲染公式

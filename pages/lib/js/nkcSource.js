@@ -11,6 +11,7 @@ import { screenTopAlert } from './topAlert';
 import { fixLanguage, highlightLanguagesObject } from './highlight';
 import { renderNKCDocNumber } from './nkcDocNumber';
 import { RNUpdateMusicListAndPlay } from './reactNative';
+import { renderFormula } from './formula';
 
 export function initNKCRenderImagesView() {
   const imageElements = window.$(
@@ -51,7 +52,7 @@ export function initNKCRenderImagesView() {
 export function renderingMathJax() {
   const dom = document.querySelectorAll('.render-content.math-jax');
   if (window.MathJax && dom) {
-    window.MathJax.typeset(dom);
+    renderFormula(dom);
   }
 }
 

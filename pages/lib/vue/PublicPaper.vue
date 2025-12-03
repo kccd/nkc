@@ -412,7 +412,7 @@ export default Vue.extend({
             this.paperTime = paperTime;
             this.paperQuestionCount = paperQuestionCount;
             setTimeout(() => {
-              renderFormula()
+              renderFormula(document.querySelectorAll('.question-box'));
             }, 500)
           }
         })

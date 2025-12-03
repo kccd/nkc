@@ -4,6 +4,7 @@ import { getUrl } from '../../../lib/js/tools';
 import { objToStr } from '../../../lib/js/dataConversion';
 import { detailedTime } from '../../../lib/js/time';
 import { markdownToHTML } from '../../../lib/js/dataConversion';
+import { renderFormula } from '../../../lib/js/formula';
 
 const data = getDataById('data');
 new Vue({
@@ -22,6 +23,11 @@ new Vue({
       }
       return obj;
     },
+  },
+  mounted() {
+    setTimeout(() => {
+      renderFormula(document.querySelectorAll('.question-list'));
+    }, 100);
   },
   methods: {
     detailedTime,

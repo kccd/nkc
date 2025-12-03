@@ -779,6 +779,8 @@ import { subUsers } from '../../js/subscribe';
 import { initNKCSource } from '../../js/nkcSource.js';
 import { lazyLoadInit } from '../../js/lazyLoad';
 import { copyTextToClipboard } from '../../js/clipboard';
+import { replaceDocNumberToLink } from '../../js/nkcDocNumber.js';
+import { renderFormula } from '../../js/formula.js';
 
 const state = getState();
 export default {
@@ -817,6 +819,8 @@ export default {
     },
     isShowPublicTag: false,
     expandContent: false,
+    // 控制公式渲染的节流/防抖
+    renderFormulaTimer: null,
   }),
   mounted() {
     this.initData();
@@ -829,6 +833,11 @@ export default {
         lazyLoadInit();
       }, 10);
     }
+
+    // 渲染公式
+    setTimeout(() => {
+      renderFormula(this.$refs.momentDetailsContent);
+    }, 10)
   },
   computed: {
     focusCommentId() {
@@ -838,11 +847,9 @@ export default {
       return this.type === 'details';
     },
     targetContent() {
-      if (this.inDetails) {
-        return this.momentData.content;
-      } else {
-        return this.momentData.plain;
-      }
+      return replaceDocNumberToLink(
+        this.inDetails ? this.momentData.content : this.momentData.plain,
+      );
     },
   },
   destroyed() {
@@ -909,7 +916,7 @@ export default {
     },
     clickDetail(url, e) {
       e.preventDefault();
-      if (state.isApp ||(this.$route && this.$route.name !== 'Zone')) {
+      if (state.isApp || (this.$route && this.$route.name !== 'Zone')) {
         this.visitUrl(url, true);
       } else {
         this.$router.push(url);
@@ -1066,10 +1073,13 @@ export default {
       // } else {
       //   this.$router.push(`${this.momentData.url}`);
       // }
-      if( this.$route &&
-      (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') && !state.isApp){
+      if (
+        this.$route &&
+        (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') &&
+        !state.isApp
+      ) {
         this.$router.push(`${this.momentData.url}`);
-      }else{
+      } else {
         this.visitUrl(this.momentData.url, true);
       }
     },

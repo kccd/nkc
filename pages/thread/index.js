@@ -12,6 +12,7 @@ import ThreadOrderModifier from '../lib/vue/ThreadOrderModifier.vue';
 import Vue from 'vue';
 import { publishPermissionTypes } from '../lib/js/publish';
 import PublishPermissionChecker from '../lib/vue/PublishPermissionCheck.vue';
+import { renderFormula } from '../lib/js/formula';
 
 const socket = getSocket();
 var surveyForms = [],
@@ -1652,7 +1653,7 @@ function insertRenderedPost(renderedPost) {
   JQDOM = JQDOM[0];
   // 公式渲染
   try {
-    MathJax.typesetPromise([JQDOM]);
+    renderFormula([JQDOM]);
   } catch (err) {
     console.log(err);
   }
