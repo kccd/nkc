@@ -779,6 +779,7 @@ import { subUsers } from '../../js/subscribe';
 import { initNKCSource } from '../../js/nkcSource.js';
 import { lazyLoadInit } from '../../js/lazyLoad';
 import { copyTextToClipboard } from '../../js/clipboard';
+import { replaceDocNumberToLink } from '../../js/nkcDocNumber.js';
 
 const state = getState();
 export default {
@@ -838,11 +839,9 @@ export default {
       return this.type === 'details';
     },
     targetContent() {
-      if (this.inDetails) {
-        return this.momentData.content;
-      } else {
-        return this.momentData.plain;
-      }
+      return replaceDocNumberToLink(
+        this.inDetails ? this.momentData.content : this.momentData.plain,
+      );
     },
   },
   destroyed() {
@@ -909,7 +908,7 @@ export default {
     },
     clickDetail(url, e) {
       e.preventDefault();
-      if (state.isApp ||(this.$route && this.$route.name !== 'Zone')) {
+      if (state.isApp || (this.$route && this.$route.name !== 'Zone')) {
         this.visitUrl(url, true);
       } else {
         this.$router.push(url);
@@ -1066,10 +1065,13 @@ export default {
       // } else {
       //   this.$router.push(`${this.momentData.url}`);
       // }
-      if( this.$route &&
-      (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') && !state.isApp){
+      if (
+        this.$route &&
+        (this.$route.name === 'MomentDetail' || this.$route.name === 'Zone') &&
+        !state.isApp
+      ) {
         this.$router.push(`${this.momentData.url}`);
-      }else{
+      } else {
         this.visitUrl(this.momentData.url, true);
       }
     },
