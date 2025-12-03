@@ -780,6 +780,7 @@ import { initNKCSource } from '../../js/nkcSource.js';
 import { lazyLoadInit } from '../../js/lazyLoad';
 import { copyTextToClipboard } from '../../js/clipboard';
 import { replaceDocNumberToLink } from '../../js/nkcDocNumber.js';
+import { renderFormula } from '../../js/formula.js';
 
 const state = getState();
 export default {
@@ -818,6 +819,8 @@ export default {
     },
     isShowPublicTag: false,
     expandContent: false,
+    // 控制公式渲染的节流/防抖
+    renderFormulaTimer: null,
   }),
   mounted() {
     this.initData();
@@ -830,6 +833,11 @@ export default {
         lazyLoadInit();
       }, 10);
     }
+
+    // 渲染公式
+    setTimeout(() => {
+      renderFormula(this.$refs.momentDetailsContent);
+    }, 10)
   },
   computed: {
     focusCommentId() {

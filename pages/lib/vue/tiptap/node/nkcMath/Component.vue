@@ -25,6 +25,7 @@
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
 import Delete from '@icon-park/vue/es/icons/Delete';
 import Write from '@icon-park/vue/es/icons/Write';
+import { renderFormula } from '../../../../js/formula';
 
 export default {
   components: {
@@ -74,7 +75,7 @@ export default {
       this.isFocused = false;
     },
     renderMathHTML() {
-      window.MathJax.typeset([this.$refs.mathContainer]);
+      renderFormula([this.$refs.mathContainer]);
     },
     openMathEditor() {
       this.editor.commands.openMathSelector(

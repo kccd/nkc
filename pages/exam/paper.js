@@ -1,6 +1,7 @@
 import { sweetConfirm } from '../lib/js/sweetAlert';
 import { nkcAPI } from '../lib/js/netAPI';
 import { screenTopWarning } from '../lib/js/topAlert';
+import { renderFormula } from '../lib/js/formula';
 
 var app = new window.Vue({
   el: '#app',
@@ -127,7 +128,7 @@ var app = new window.Vue({
           app.compute();
         }, 500);
         setTimeout(function () {
-          window.NKC.methods.renderFormula();
+          renderFormula(document.querySelectorAll('.question-content'));
         }, 500);
       })
       .catch(function (err) {

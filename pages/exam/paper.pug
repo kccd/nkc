@@ -37,7 +37,7 @@ block content
           | 重新参加考试。
 
       .col-xs-12.col-md-5.col-md-offset-1
-        .m-t-3
+        .m-t-3.question-list
           div.paper-panel(v-for='(q, index) in questions' :key='q._id')
             .question-content(v-html='q.content_')
             img.paper-img.m-b-1(v-if='q.hasImage' :src='"/exam/question/" + q._id + "/image"')

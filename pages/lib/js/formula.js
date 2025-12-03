@@ -1,5 +1,17 @@
-export function renderFormula() {
+import { logger } from './logger';
+export function renderFormula(elements) {
+  if (!elements) {
+    return;
+  }
+  if (!Array.isArray(elements)) {
+    elements = [elements];
+  }
   if (window.MathJax) {
-    window.MathJax.typeset();
+    logger.debug(`公式准备中...`);
+    window.MathJax.startup.promise.then(() => {
+      logger.debug(`公式渲染中...`);
+      window.MathJax.typesetPromise(elements ? elements : undefined);
+      logger.debug(`公式渲染完成`);
+    });
   }
 }

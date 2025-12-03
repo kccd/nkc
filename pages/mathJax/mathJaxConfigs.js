@@ -1,14 +1,20 @@
 window.MathJax = {
   loader: {
-    // 加载 mhchem 扩展以支持 \ce{H2O} 等化学式
-    load: ['input/tex', 'output/chtml'],
+    // 追加 mhchem 拓展以支持化学方程式 \ce{H2O}
+    load: ['[tex]/mhchem'],
   },
   startup: {
     typeset: false,
   },
   options: {
-    renderActions: {
-      addMenu: [0, '', ''],
+    menuOptions: {
+      settings: {
+        enrich: false, // true to enable semantic-enrichment
+        collapsible: true, // true to enable collapsible math
+        speech: true, // true to enable speech generation
+        braille: true, // true to enable Braille generation
+        assistiveMml: true, // true to enable assistive MathML
+      },
     },
   },
 
