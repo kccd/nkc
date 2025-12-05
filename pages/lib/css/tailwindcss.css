@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Bootstrap v3 breakpoint mapping for Tailwind v4 */
+@theme {
+  /* sm ≥ 768px */
+  --breakpoint-sm: 48rem;
+  /* md ≥ 992px */
+  --breakpoint-md: 62rem;
+  /* lg ≥ 1200px */
+  --breakpoint-lg: 75rem;
+}

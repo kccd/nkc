@@ -53,6 +53,10 @@ block head
 
   // 全局背景颜色设置
   style=`body{background-color: ${remoteState.serverSettings.backgroundColor}}`
+
+  // tailwindcss
+  +includeCSS('/tailwindcss.css')
+
   // 全局样式
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
