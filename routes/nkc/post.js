@@ -1,43 +1,88 @@
 const router = require('koa-router')();
+const nkcRender = require('../../nkcModules/nkcRender');
+const { renderHTMLByJSON } = require('../../nkcModules/nkcRender/json');
 const { OnlyOperation } = require('../../middlewares/permission');
+const { userInfoService } = require('../../services/user/userInfo.service');
 const { Operations } = require('../../settings/operations');
 router.get(
   '/',
   OnlyOperation(Operations.nkcManagementPost),
   async (ctx, next) => {
-    // 将最新的post直接渲染到页面上
     const { data, db, query, nkcModules } = ctx;
-    let { page = 0, t, c } = query;
-    if (c === undefined) {
-      c = Date.now();
-      let url = `/nkc/post?c=${c}`;
-      if (t) {
-        url += `&t=${t}`;
-      }
-      return ctx.redirect(url);
-    } else {
-      c = parseInt(c);
+    let {
+      page = 0,
+      perPage = 50,
+      timeStart,
+      timeStop = Date.now(),
+      source = ['thread', 'post', 'comment'].join(','),
+      text = '',
+      order = 'desc',
+    } = query;
+    text = text.trim();
+    page = parseInt(page);
+    if (isNaN(page) || page < 0) {
+      page = 0;
     }
+    perPage = parseInt(perPage);
+    if (isNaN(perPage) || perPage < 1) {
+      perPage = 50;
+    }
+    const sourceArr = source ? source.split(',') : [];
     const match = {
-      toc: { $lte: c },
+      toc: {
+        $lte: new Date(Number(timeStop)),
+        $gte: timeStart ? new Date(Number(timeStart)) : new Date(0),
+      },
     };
-    if (t === 'thread') {
-      match.type = 'thread';
-    } else if (t === 'post') {
-      match.type = 'post';
-    } else if (t === 'comment') {
-      match.type = 'post';
-      match.parentPostId = { $ne: '' };
-    } else {
-      //
+    const sourceOr = [];
+    // 数据来源
+    if (sourceArr.includes('thread')) {
+      sourceOr.push({
+        type: 'thread',
+      });
+    } else if (sourceArr.includes('post')) {
+      sourceOr.push({
+        type: 'post',
+        parentPostId: '',
+      });
+    } else if (sourceArr.includes('comment')) {
+      sourceOr.push({
+        type: 'post',
+        parentPostId: { $ne: '' },
+      });
+    }
+    match.$and = [
+      {
+        $or: sourceOr,
+      },
+    ];
+    // 关键词
+    if (text) {
+      const textOr = [];
+      textOr.push({
+        uid: text,
+      });
+      textOr.push({
+        pid: text,
+      });
+      textOr.push({
+        tid: text,
+      });
+      match.$and.push({
+        $or: textOr,
+      });
     }
 
     const recycleId = await db.SettingModel.getRecycleId();
 
     const count = await db.PostModel.countDocuments(match);
-    const paging = nkcModules.apiFunction.paging(page, count, 100);
+    const paging = nkcModules.apiFunction.paging(
+      page,
+      count,
+      parseInt(perPage),
+    );
     let posts = await db.PostModel.find(match)
-      .sort({ toc: -1 })
+      .sort({ toc: order === 'desc' ? -1 : 1 })
       .skip(paging.start)
       .limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, {
@@ -107,12 +152,10 @@ router.get(
           status = 'disabled';
         }
       } else {
-        if (post.disabled) {
-          if (post.toDraft) {
-            status = 'toDraft';
-          } else {
-            status = 'disabled';
-          }
+        if (post.toDraft) {
+          status = 'toDraft';
+        } else if (post.disabled) {
+          status = 'disabled';
         }
       }
 
@@ -167,8 +210,144 @@ router.get(
 
     data.posts = results;
     data.paging = paging;
-    data.t = t;
-    data.c = c;
+    data.queryData = {
+      timeStart: timeStart ? Number(timeStart) : null,
+      timeStop: timeStop ? Number(timeStop) : null,
+      source: sourceArr,
+      text,
+      page,
+      perPage,
+    };
+    data.nav = 'post';
+    ctx.template = 'nkc/post/post.pug';
+    await next();
+  },
+);
+router.get(
+  '/drafts',
+  OnlyOperation(Operations.nkcManagementPost),
+  async (ctx, next) => {
+    const { data, db, query, nkcModules } = ctx;
+    let {
+      page = 0,
+      perPage = 50,
+      timeStart,
+      timeStop = Date.now(),
+      text = '',
+      order = 'desc',
+    } = query;
+    text = text.trim();
+    page = parseInt(page);
+    if (isNaN(page) || page < 0) {
+      page = 0;
+    }
+    perPage = parseInt(perPage);
+    if (isNaN(perPage) || perPage < 1) {
+      perPage = 50;
+    }
+    const match = {
+      toc: {
+        $lte: new Date(Number(timeStop)),
+        $gte: timeStart ? new Date(Number(timeStart)) : new Date(0),
+      },
+    };
+
+    if (text) {
+      match.$or = [
+        {
+          uid: text,
+        },
+        {
+          desTypeId: text,
+        },
+      ];
+    }
+
+    const count = await db.DraftModel.countDocuments(match);
+    const paging = nkcModules.apiFunction.paging(page, count, perPage);
+    let drafts = await db.DraftModel.find(match)
+      .sort({ toc: order === 'desc' ? -1 : 1 })
+      .skip(paging.start)
+      .limit(paging.perpage);
+    let usersId = [];
+    const resourcesId = [];
+    const resourcesObj = {};
+    const draftResourcesId = {};
+    for (const draft of drafts) {
+      usersId.push(draft.uid);
+      if (draft.l === 'json') {
+        const rids = await db.ResourceModel.getResourcesIdByJson(draft.c);
+        resourcesId.push(...rids);
+        draftResourcesId[draft._id] = rids;
+      }
+    }
+    const usersObject = await userInfoService.getUsersBaseInfoObjectByUserIds(
+      usersId,
+    );
+    const resources = await db.ResourceModel.find({
+      rid: { $in: [...resourcesId] },
+    });
+    for (const resource of resources) {
+      await resource.setFileExist();
+      await resource.filenameFilter();
+      resourcesObj[resource.rid] = resource;
+    }
+
+    const results = [];
+    for (const draft of drafts) {
+      const user = usersObject[draft.uid];
+      if (!user) {
+        continue;
+      }
+      let c = '';
+      if (draft.l === 'json') {
+        const rids = draftResourcesId[draft._id] || [];
+        const draftResources = rids
+          .map((rid) => resourcesObj[rid] || [])
+          .flat();
+        c = renderHTMLByJSON({
+          json: draft.c,
+          resources: draftResources,
+          xsf: 99999,
+          atUsers: [],
+        });
+      } else {
+        c = nkcRender.renderHTML({
+          type: 'article',
+          post: {
+            c: draft.c,
+          },
+          user: { xsf: 9999 },
+        });
+      }
+      results.push({
+        toc: draft.toc,
+        type: 'draft',
+        draftType: draft.type,
+        abstractCn: draft.abstractCn,
+        abstractEn: draft.abstractEn,
+        keyWordsCn: draft.keyWordsCn,
+        keyWordsEn: draft.keyWordsEn,
+        c,
+        t: draft.t,
+        user: {
+          uid: user.uid,
+          avatar: user.avatar,
+          username: user.username,
+        },
+      });
+    }
+
+    data.posts = results;
+    data.paging = paging;
+    data.queryData = {
+      timeStart: timeStart ? Number(timeStart) : null,
+      timeStop: timeStop ? Number(timeStop) : null,
+      source: ['draft'],
+      text,
+      page,
+      perPage,
+    };
     data.nav = 'post';
     ctx.template = 'nkc/post/post.pug';
     await next();

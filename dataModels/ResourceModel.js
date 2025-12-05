@@ -603,16 +603,11 @@ resourceSchema.statics.toReferenceSource = async function (id, declare = '') {
     },
   );
 };
-// 检测json内容中的资源并将指定id存入resource.reference
-resourceSchema.statics.toReferenceSourceByJson = async function (
-  id,
-  jsonContent,
-) {
+
+resourceSchema.statics.getResourcesIdByJson = async function (jsonContent) {
   if (!jsonContent) {
-    return;
+    return [];
   }
-  const model = mongoose.model('resources');
-  const elasticSearch = require('../nkcModules/elasticSearch');
   const targetTypes = [
     'nkc-video-block',
     'nkc-audio-block',
@@ -635,12 +630,24 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
     return result;
   }
   // 提取特定类型的节点
-  const rids = extractNodes(
+  return extractNodes(
     typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent,
     targetTypes,
   );
+};
+
+// 检测json内容中的资源并将指定id存入resource.reference
+resourceSchema.statics.toReferenceSourceByJson = async function (
+  id,
+  jsonContent,
+) {
+  if (!jsonContent) {
+    return;
+  }
+  const ResourceModel = mongoose.model('resources');
+  const rids = await ResourceModel.getResourcesIdByJson(jsonContent);
   // 同步搜索数据库中的附件数据，先在resource中查一遍
-  const searchDBData = await model.find({
+  const searchDBData = await ResourceModel.find({
     rid: { $in: rids },
     mediaType: 'mediaAttachment',
     type: 'resource',
@@ -650,7 +657,7 @@ resourceSchema.statics.toReferenceSourceByJson = async function (
     // 后期可以完善：把多条数据同时更新到搜索数据库中
     await file.saveToElasticSearch();
   }
-  await model.updateMany(
+  await ResourceModel.updateMany(
     {
       rid: { $in: rids },
     },

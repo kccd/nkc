@@ -36,6 +36,9 @@ module.exports = {
   post: {
     GET: Operations.nkcManagementPost,
     POST: Operations.nkcManagementPost,
+    drafts: {
+      GET: Operations.nkcManagementPost,
+    },
   },
   document: {
     GET: Operations.nkcManagementDocument,

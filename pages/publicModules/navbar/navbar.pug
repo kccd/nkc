@@ -33,7 +33,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           a(onclick="RootApp.openLoginPanel('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
     //- 电脑屏幕
-    .collapse.navbar-collapse#bs-example-navbar-collapse-1
+    .navbar-collapse.hidden-xs
       ul.nav.navbar-nav.navbar-md
         li(class=navbar_highlight === 'zone' ? 'active' : '')
           a(href=`/z` onclick="return RootApp.visitZone()" ) 电波
