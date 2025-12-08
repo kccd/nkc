@@ -91,6 +91,8 @@ window.handleSearch = function () {
     .filter((checkbox) => checkbox.checked)
     .map((checkbox) => checkbox.value);
 
+  const allType = document.getElementById('includeAllType').checked;
+
   const tUid = document.getElementsByClassName('tUid')[0].value.trim();
   const documentStatus = {
     normal: 'normal',
@@ -114,6 +116,7 @@ window.handleSearch = function () {
       source: [],
       status: [],
       tUid,
+      allType,
     };
 
     if (
@@ -206,4 +209,12 @@ window.uncheckStatus = function () {
     .map((checkbox) => checkbox.value);
 
   updateCheckboxState(allContentDom, allValues, selectedStatus);
+};
+
+window.toggleIncludeAllType = function () {
+  const includeAllTypeDom = document.getElementById('includeAllType');
+  if (!includeAllTypeDom) {
+    return;
+  }
+  includeAllTypeDom.setAttribute('checked', !includeAllTypeDom.checked);
 };

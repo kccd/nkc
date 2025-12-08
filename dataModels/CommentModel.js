@@ -1243,7 +1243,7 @@ schema.statics.getCommentsInfo = async function (comments) {
     const { sid, _id, did } = comment;
     const articlePost = articlePostsObj[sid];
     const commentDocument = commentDocumentsObj[did] || null;
-    if (!articlePost) {
+    if (!articlePost || !commentDocument) {
       continue;
     }
     const articleDocument = articleDocumentObj[articlePost.sid] || null;
