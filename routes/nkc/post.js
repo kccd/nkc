@@ -78,8 +78,6 @@ router.get(
     const recycleId = await db.SettingModel.getRecycleId();
 
     const count = await db.PostModel.countDocuments(match);
-    console.log('Count of posts matching criteria:', count);
-    console.log('Match criteria:', JSON.stringify(match));
     const paging = nkcModules.apiFunction.paging(
       page,
       count,
