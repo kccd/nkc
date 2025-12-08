@@ -40,12 +40,14 @@ router.get(
       sourceOr.push({
         type: 'thread',
       });
-    } else if (sourceArr.includes('post')) {
+    }
+    if (sourceArr.includes('post')) {
       sourceOr.push({
         type: 'post',
         parentPostId: '',
       });
-    } else if (sourceArr.includes('comment')) {
+    }
+    if (sourceArr.includes('comment')) {
       sourceOr.push({
         type: 'post',
         parentPostId: { $ne: '' },
@@ -76,6 +78,8 @@ router.get(
     const recycleId = await db.SettingModel.getRecycleId();
 
     const count = await db.PostModel.countDocuments(match);
+    console.log('Count of posts matching criteria:', count);
+    console.log('Match criteria:', JSON.stringify(match));
     const paging = nkcModules.apiFunction.paging(
       page,
       count,
