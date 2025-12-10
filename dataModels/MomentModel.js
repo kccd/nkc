@@ -10,6 +10,8 @@ const {
   momentRenderService,
 } = require('../services/moment/render/momentRender.service');
 const { ThrowCommonError } = require('../nkcModules/error');
+const { reviewSources } = require('../settings/review');
+const reviewFinderService = require('../services/review/reviewFinder.service');
 
 const momentQuoteTypes = {
   article: 'article',
@@ -2002,7 +2004,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const ResourceModel = mongoose.model('resources');
   const localAddr = await IPModel.getLocalAddr();
   const { getUrl, timeFormat } = require('../nkcModules/tools');
-  const source = await ReviewModel.getDocumentSources();
   const usersId = [];
   const commentsId = [];
   // 拓展回复的上级评论
@@ -2113,13 +2114,11 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if (status === unknown) {
-      const review = await ReviewModel.findOne({
-        sid: stableDocument._id,
-        source: source.document,
-      });
-      if (review) {
-        data.reason = review.reason;
-      }
+      // TODO OK: 从新的审核表拿审核理由
+      data.reason = await reviewFinderService.getReviewReason(
+        reviewSources.document,
+        stableDocument._id,
+      );
     }
     commentsData.push(data);
   }

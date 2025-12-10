@@ -29,6 +29,7 @@ const {
   forumPermissionService,
 } = require('../../services/forum/forumPermission.service');
 const tools = require('../../nkcModules/tools');
+const reviewPostService = require('../../services/review/reviewPost.service');
 router
   .use('/', Public(), async (ctx, next) => {
     const { state, data, db } = ctx;
@@ -591,9 +592,9 @@ router
     }
 
     // 如果符合送审条件，自动内容送审
-    const needReview = await db.ReviewModel.getReviewStatusAndCreateLog(
-      singlePost,
-    );
+    // TODO OK：调用审核service上的方法
+    const needReview =
+      await reviewPostService.getReviewStatusAndCreateReviewLog(singlePost);
     if (needReview) {
       await singlePost.updateOne({
         reviewed: false,

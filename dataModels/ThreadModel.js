@@ -8,6 +8,7 @@ const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
+const reviewPostService = require('../services/review/reviewPost.service');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -1434,11 +1435,10 @@ threadSchema.statics.publishArticle = async (options) => {
     tid,
   });
   await thread.updateOne({ $set: { oc: post.pid, count: 1, hits: 1 } });
-  // // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
-  // const needReview = await UserModel.contentNeedReview(thread.uid, "thread");
-  // 自动送审
-  // const needReview = await db.ReviewModel.autoPushToReview(_post);
-  const needReview = await ReviewModel.getReviewStatusAndCreateLog(post);
+  // TODO OK：调用审核service上的方法
+  const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
+    post,
+  );
   if (!needReview) {
     await PostModel.updateOne({ pid: post.pid }, { $set: { reviewed: true } });
     await ThreadModel.updateOne(
@@ -2380,7 +2380,10 @@ threadSchema.statics.postNewThread = async (options) => {
   //     await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
   //   || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   // 自动送审
-  const needReview = await ReviewModel.getReviewStatusAndCreateLog(_post);
+  // TODO OK：调用审核service上的方法
+  const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
+    _post,
+  );
   if (!needReview) {
     _post.reviewed = true;
     thread.reviewed = true;

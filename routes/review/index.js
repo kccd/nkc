@@ -5,7 +5,11 @@ const { getMomentPublishType } = require('../../events/moment');
 const { getJsonStringTextSlice } = require('../../nkcModules/json');
 const { OnlyOperation } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
+const reviewModifierService = require('../../services/review/reviewModifier.service');
 router
+  // TODO 适配新的审核记录表
+  // 从审核记录表中加载待审记录
+  // 根据来源拓展待审核的内容
   .get('/', OnlyOperation(Operations.review), async (ctx, next) => {
     ctx.template = 'review/review.pug';
     const { nkcModules, data, db, query } = ctx;
@@ -118,6 +122,7 @@ router
         link = await db.PostModel.getUrl(post);
       }
       // 从reviews表中读出送审原因
+      // TODO：审核界面路由，需要完全重构。调用审核service上的方法
       const reviewRecord = await db.ReviewModel.findOne({
         sid: post.pid,
         source: source.post,
@@ -417,12 +422,13 @@ router
         }
         //将document状态改为已审核状态
         await document.setStatus(normalStatus);
-        //生成审核记录
-        await db.ReviewModel.reviewDocument({
+        // 生成审核记录
+        // TODO OK: 调整为调用service中的方法
+        await reviewModifierService.modifyReviewLogStatusToApproved({
+          source: reviewSources.document,
+          sid: document._id,
           handlerId: state.uid,
-          reason,
-          documentId: document._id,
-          type: 'passDocument',
+          handlerReason: reason,
         });
         const { source } = document;
         if (momentQuoteTypes[source] && source !== 'moment') {
@@ -566,13 +572,13 @@ router
           noticeType: remindUser,
         });
         await delLog.save();
-        // await db.ReviewModel.reviewDocument({
-        //   handlerId: state.uid,
-        //   reason,
-        //   documentId: document._id,
-        //   type: 'deleteDocument'
-        // });
-        // await db.ReviewModel.newReview('noPassDocument', '', data.user, reason, document);
+        // TODO OK: 调用service中的方法
+        /* await reviewModifierService.modifyReviewLogStatusToDeleted({
+          source: reviewSources.document,
+          sid: document._id,
+          handlerId: state.uid,
+          handlerReason: reason,
+        }); */
         //如果标记用户违规了就给该用户新增违规记录
         if (violation) {
           //新增违规记录

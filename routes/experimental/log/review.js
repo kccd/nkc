@@ -12,6 +12,7 @@ router.get(
     const paging = nkcModules.apiFunction.paging(page, count);
     const documentSources = await db.DocumentModel.getDocumentSources();
     const reviewSources = await db.ReviewModel.getDocumentSources();
+    // TODO：调用审核service上的方法
     const reviews = await db.ReviewModel.find()
       .sort({ toc: -1 })
       .skip(paging.start)
@@ -48,9 +49,6 @@ router.get(
     for (const noteContent of noteContents) {
       noteIdForNoteContentIdObj[noteContent._id] = noteContent.noteId;
     }
-    const documentsUrl = await db.DocumentModel.getDocumentsUrlByDocumentsId([
-      ...documentsId,
-    ]);
     const usersObj = {};
     const postsObj = {};
     const threadsObj = {};
@@ -86,32 +84,34 @@ router.get(
       review.typeInfo = '未知';
       if (source === reviewSources.post) {
         const post = postsObj[sid];
-        if (!post) continue;
+        if (!post) {
+          continue;
+        }
         if (post.type === 'thread') {
-          review.typeInfo = '社区文章';
+          review.typeInfo = '论坛文章';
         } else {
-          review.typeInfo = '社区回复/评论';
+          review.typeInfo = '论坛回复/评论';
         }
         review.link = await db.PostModel.getUrl(sid);
       } else if (source === reviewSources.document) {
         const document = documentsObj[sid];
         switch (document.source) {
           case documentSources.article: {
-            review.typeInfo = '独立文章';
+            review.typeInfo = '专栏文章';
             break;
           }
           case documentSources.moment: {
-            review.typeInfo = '动态/动态评论';
+            review.typeInfo = '电文/电文评论';
             break;
           }
           case documentSources.comment: {
-            review.typeInfo = '独立文章评论';
+            review.typeInfo = '专栏文章评论';
             break;
           }
           default:
             break;
         }
-        review.link = documentsUrl[document._id];
+        review.link = nkcModules.tools.getUrl('documentNumber', document.did);
       } else if (source === reviewSources.note) {
         review.typeInfo = '笔记';
         const noteId = noteIdForNoteContentIdObj[sid];
@@ -136,9 +136,13 @@ router.get(
 
       if (review.source === reviewSources.post) {
         const post = postsObj[pid];
-        if (!post) continue;
+        if (!post) {
+          continue;
+        }
         const thread = threadsObj[post.tid];
-        if (!thread) continue;
+        if (!thread) {
+          continue;
+        }
         if (post.type === 'thread') {
           review.thread = {
             tid: thread.tid,

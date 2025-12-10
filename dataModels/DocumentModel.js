@@ -9,6 +9,10 @@ const markNotes = require('../nkcModules/nkcRender/markNotes');
 const documentSettings = require('../settings/document');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringText } = require('../nkcModules/json');
+const keywordCheckerService = require('../services/keyword/keywordChecker.service');
+const { reviewTriggerType } = require('../settings/review');
+const reviewCreatorService = require('../services/review/reviewCreator.service');
+const reviewCheckerService = require('../services/review/reviewChecker.service');
 
 /*
  * document状态
@@ -1417,8 +1421,8 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   ) {
     return {
       needReview: true,
-      type: 'foreign',
-      reason: '海外手机号用户，审核通过的文章数量不足',
+      type: reviewTriggerType.foreign,
+      reason: '',
     };
   }
 
@@ -1430,8 +1434,8 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   ) {
     return {
       needReview: true,
-      type: 'notPassedAD',
-      reason: '用户没有通过入学培训，审核通过的文章数量不足',
+      type: reviewTriggerType.notPassedAD,
+      reason: '',
     };
   }
 
@@ -1443,8 +1447,8 @@ schema.methods.getGlobalPostReviewStatus = async function () {
   ) {
     return {
       needReview: true,
-      type: 'notPassedA',
-      reason: '用户没有通过A卷考试，审核通过的文章数量不足',
+      type: reviewTriggerType.notPassedA,
+      reason: '',
     };
   }
 
@@ -1456,8 +1460,8 @@ schema.methods.getGlobalPostReviewStatus = async function () {
     if (bl.type === 'all' || (bl.type === 'count' && passedCount < bl.count)) {
       return {
         needReview: true,
-        type: 'grade',
-        reason: '因用户等级限制，审核通过的文章数量不足',
+        type: reviewTriggerType.grade,
+        reason: '',
       };
     }
   }
@@ -1470,18 +1474,7 @@ schema.methods.getGlobalPostReviewStatus = async function () {
  * 获取用户关于复验手机号的审核状态
  * */
 schema.methods.getVerifyPhoneNumberReviewStatus = async function () {
-  const UsersPersonalModel = mongoose.model('usersPersonal');
-  if (await UsersPersonalModel.shouldVerifyPhoneNumber(this.uid)) {
-    return {
-      needReview: true,
-      type: 'unverifiedPhone',
-      reason: '用户未验证手机号',
-    };
-  } else {
-    return {
-      needReview: false,
-    };
-  }
+  return await reviewCheckerService.getVerifyPhoneNumberReviewStatus(this.uid);
 };
 
 /*
@@ -1489,7 +1482,6 @@ schema.methods.getVerifyPhoneNumberReviewStatus = async function () {
  * */
 schema.methods.getKeywordsReviewStatus = async function () {
   const SettingModel = mongoose.model('settings');
-  const ReviewModel = mongoose.model('reviews');
   const documentPostSettings = await SettingModel.getSettings(
     settingIds.publish,
   );
@@ -1503,15 +1495,16 @@ schema.methods.getKeywordsReviewStatus = async function () {
     abstract +
     abstractEN +
     keywords.concat(keywordsEN).join(' ');
-  const matchedKeywords = await ReviewModel.matchKeywordsByGroupsId(
+  // TODO OK: 执行审核相关service的方法，而不是执行旧审核日志表上的方法
+  const matchedKeywords = await keywordCheckerService.matchKeywordsByGroupIds(
     documentContent,
     keywordGroupId,
   );
   if (matchedKeywords.length > 0) {
     return {
       needReview: true,
-      type: 'includesKeyword',
-      reason: `内容中包含敏感词 ${matchedKeywords.join('、')}`,
+      type: reviewTriggerType.sensitiveWord,
+      reason: `${matchedKeywords.join(', ')}`,
     };
   } else {
     return {
@@ -1537,7 +1530,13 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function () {
 
   //如果需要审核，就生成审核记录
   if (needReview) {
-    await ReviewModel.newDocumentReview(type, this._id, this.uid, reason);
+    // TODO OK: 需要执行审核service上的方法
+    await reviewCreatorService.createDocumentReviewLog({
+      uid: this.uid,
+      documentId: this._id,
+      triggerReason: reason,
+      triggerType: type,
+    });
   }
   return needReview;
 };

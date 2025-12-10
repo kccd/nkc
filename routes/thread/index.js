@@ -18,6 +18,9 @@ const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 const {
   forumPermissionService,
 } = require('../../services/forum/forumPermission.service');
+const reviewPostService = require('../../services/review/reviewPost.service');
+const reviewFinderService = require('../../services/review/reviewFinder.service');
+const { reviewSources } = require('../../settings/review');
 threadRouter
   .use('/', Public(), async (ctx, next) => {
     const { db, state, data } = ctx;
@@ -307,7 +310,6 @@ threadRouter
         isAdmin: ctx.permission('modifyAllPostOrder'),
       });
     }
-    const source = await db.ReviewModel.getDocumentSources();
     // 拓展文章属性
     await thread.extendThreadCategories();
     const authorId = thread.uid;
@@ -402,11 +404,11 @@ threadRouter
     thread.firstPost = firstPost;
     // 加载文章待审原因
     if (!firstPost.reviewed) {
-      const reviewRecord = await db.ReviewModel.findOne({
-        sid: firstPost.tid,
-        source: source.post,
-      }).sort({ toc: -1 });
-      threadReviewReason = reviewRecord ? reviewRecord.reason : '';
+      // TODO OK：调用审核service上的方法
+      threadReviewReason = await reviewFinderService.getReviewReason(
+        reviewSources.post,
+        firstPost.pid,
+      );
     }
     // 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     anonymous = firstPost.anonymous;
@@ -553,22 +555,15 @@ threadRouter
       const _post = posts[i];
       _postsId.push(_post.pid);
     }
-    const reviewRecords = await db.ReviewModel.find({
-      sid: { $in: _postsId },
-    }).sort({ toc: -1 });
-    const reviewRecordsObj = {};
-    for (let i = 0; i < reviewRecords.length; i++) {
-      const reviewRecord = reviewRecords[i];
-      const { pid } = reviewRecord;
-      if (reviewRecordsObj[pid]) {
-        continue;
-      }
-      reviewRecordsObj[pid] = reviewRecord;
-    }
+    // TODO OK：调用审核service上的方法
+    const reviewReasons = await reviewFinderService.getReviewReasons(
+      reviewSources.post,
+      _postsId,
+    );
+
     for (let i = 0; i < posts.length; i++) {
       const _post = posts[i];
-      const reviewRecord = reviewRecordsObj[_post.pid];
-      _post.reviewReason = reviewRecord ? reviewRecord.reason : '';
+      _post.reviewReason = reviewReasons.get(_post.pid) || '';
     }
 
     // 获取置顶回复列表
@@ -1435,7 +1430,9 @@ threadRouter
     //   await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
     //   || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
     // 自动送审
-    const needReview = await db.ReviewModel.getReviewStatusAndCreateLog(_post);
+    // TODO OK：调用审核service上的方法
+    const needReview =
+      await reviewPostService.getReviewStatusAndCreateReviewLog(_post);
     if (!needReview) {
       await db.PostModel.updateOne(
         { pid: _post.pid },

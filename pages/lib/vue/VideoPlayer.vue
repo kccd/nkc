@@ -89,10 +89,6 @@
 }
 </style>
 <script>
-// TODO: 去掉动态引用，使用全局静态引入
-// import '../../../public/external_pkgs/plyr/plyr.css';
-// import '../../../public/external_pkgs/plyr/plyr.polyfilled.min.js';
-// import Plyr from '../../../public/external_pkgs/plyr/plyr.min.js';
 import { getState } from '../js/state';
 import DownloadPanel from '../vue/DownloadPanel';
 const state = getState();

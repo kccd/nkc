@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node install.js",
     "rebuild": "node install.js -r",
+    "dev": "cross-env NODE_ENV=development node server.js ",
     "start": "cross-env NODE_ENV=production node server.js ",
     "serve": "npm run init && node ./server.js",
     "test": "mocha -t 10000",

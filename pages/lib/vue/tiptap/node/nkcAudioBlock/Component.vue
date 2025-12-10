@@ -18,11 +18,6 @@
 
 <script>
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-2';
-import { nkcAPI } from '../../../../js/netAPI';
-// TODO: 去掉动态引用，使用全局静态引入
-// import '../../../../../../public/external_pkgs/plyr/plyr.css';
-// import '../../../../../../public/external_pkgs/plyr/plyr.polyfilled.min.js';
-// import Plyr from '../../../../../../public/external_pkgs/plyr/plyr.min.js';
 import { getSize } from '../../../../js/tools';
 export default {
   props: nodeViewProps,

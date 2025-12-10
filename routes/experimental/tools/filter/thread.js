@@ -1,5 +1,8 @@
 const { Eve, isMainThread, Thread } = require('node-threads-pool');
 const db = require('../../../../dataModels');
+const keywordCheckerService = require('../../../../services/keyword/keywordChecker.service');
+const reviewCreatorService = require('../../../../services/review/reviewCreator.service');
+const { reviewTriggerType } = require('../../../../settings/review');
 let tp;
 async function main(props) {
   const { id, groups, startingTime, endTime, markAsUnReviewed } = props;
@@ -72,7 +75,8 @@ function thread() {
       .limit(limit);
     const targetId = new Set();
     for (const post of posts) {
-      const matchedKeywords = await db.ReviewModel.matchKeywords(
+      // TODO OK：调用审核service上的方法
+      const matchedKeywords = await keywordCheckerService.matchKeywordsByGroups(
         post.t + post.c,
         groups,
       );
@@ -92,16 +96,13 @@ function thread() {
           { pid: post.pid },
           { $set: { reviewed: false } },
         );
-        const source = await db.ReviewModel.getDocumentSources();
-        await db.ReviewModel.newReview({
-          type: 'includesKeyword',
-          sid: post.pid,
+        // TODO OK：调用审核service上的方法
+        await reviewCreatorService.createPostReviewLog({
           uid: post.uid,
-          reason: `内容中包含敏感词 ${matchedKeywords.join('、')}`,
-          handlerId: '',
-          source: source.post,
+          postId: post.pid,
+          triggerType: reviewTriggerType.sensitiveWord,
+          triggerReason: `${matchedKeywords.join('、')}`,
         });
-        // 更改状态为 待审核
       }
     }
     await filterLog.updateResultCount(posts.length, [...targetId]);

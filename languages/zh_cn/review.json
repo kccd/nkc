@@ -1,0 +1,11 @@
+{
+  "required": "属于全局必审内容",
+  "blacklist": "用户处于审核黑名单",
+  "foreign": "海外手机号用户，审核通过的文章数量不足",
+  "notPassedA": "用户没有通过A卷考试，审核通过的文章数量不足",
+  "grade": "因用户等级限制，审核通过的文章数量不足",
+  "unverifiedPhone": "用户未验证手机号",
+  "sensitiveWord": "包含敏感词：{v1}",
+  "forumSettingReview": "属于专业必审内容",
+  "notPassedAD": "用户没有通过入学培训，审核通过的文章数量不足"
+}
