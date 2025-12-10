@@ -68,7 +68,7 @@
     "@tiptap/extension-horizontal-rule": "^2.8.0",
     "@tiptap/extension-image": "^2.9.1",
     "@tiptap/extension-italic": "^2.8.0",
-    "@tiptap/extension-link": "^2.8.0",
+    "@tiptap/extension-link": "^2.10.4",
     "@tiptap/extension-list-item": "^2.8.0",
     "@tiptap/extension-ordered-list": "^2.8.0",
     "@tiptap/extension-paragraph": "^2.8.0",
