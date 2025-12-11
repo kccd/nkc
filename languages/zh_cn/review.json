@@ -7,5 +7,11 @@
   "unverifiedPhone": "用户未验证手机号",
   "sensitiveWord": "包含敏感词：{v1}",
   "forumSettingReview": "属于专业必审内容",
-  "notPassedAD": "用户没有通过入学培训，审核通过的文章数量不足"
+  "notPassedAD": "用户没有通过入学培训，审核通过的文章数量不足",
+
+  "status_pending": "等待审核",
+  "status_approved": "已通过",
+  "status_revised": "未通过，已退修",
+  "status_deleted": "未通过，已删除",
+  "status_invalid": "无效记录"
 }

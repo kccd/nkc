@@ -2382,6 +2382,9 @@ threadSchema.statics.postNewThread = async (options) => {
   //   || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   // 自动送审
   // TODO OK：调用审核service上的方法
+  const {
+    reviewPostService,
+  } = require('../services/review/reviewPost.service');
   const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
     _post,
   );

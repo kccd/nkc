@@ -18,6 +18,7 @@ class ReviewModifierService {
         status: status,
         handlerId: handlerId,
         handlerReason: handlerReason,
+        tlm: new Date(),
       },
     });
   };

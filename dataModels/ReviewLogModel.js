@@ -47,13 +47,20 @@ const schema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // 创建时间
+    toc: {
+      type: Date,
+      default: Date.now,
+      index: 1,
+    },
+    // 最后修改时间
+    tlm: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     collection: 'reviewLogs',
-    timestamps: {
-      createdAt: 'toc',
-      updatedAt: 'tlm',
-    },
   },
 );
 

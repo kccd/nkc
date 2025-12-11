@@ -1,0 +1,45 @@
+extends ../../experimental
+block eTitle
+  title 审核记录
+block eContent
+  .container-fluid.max-width
+    .hidden#data=objToStr({reviewLogs: data.reviewLogs, paging: data.paging})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        div.m-t-1
+          table.table
+            thead
+              tr
+                th 时间
+                th 发表人
+                th 内容类型
+                th 内容摘要
+                th 触发原因
+                th 状态
+                th 审核时间
+                th 审核人
+                th 审核备注
+
+
+            tbody
+              tr(v-for="reviewLog in reviewLogs")
+                th {{detailedTime()}}
+                th
+                  a(:href="'/u/' + reviewLog.user.uid" target="_blank")
+                    span {{reviewLog.user.username}}
+                th {{reviewLog.contentType}}
+                th 
+                  a(:href="reviewLog.contentUrl" target="_blank") {{reviewLog.contentAbstract}}    
+                th {{reviewLog.triggerReason}}
+                
+                th {{reviewLog.statusDesc}}   
+                th 
+                  span(v-if='reviewLog.status !== "pending"') {{detailedTime(reviewLog.tlm)}}
+                th
+                  a(:href="'/u/' + reviewLog.handler.uid" target="_blank" v-if="reviewLog.handler")
+                    span {{reviewLog.handler.username}}
+                 
+                th {{reviewLog.handlerReason}}
+
+block scripts
+  +includeJS("/experimental/log/review/review.js")

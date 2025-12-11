@@ -1,9 +1,32 @@
 const Router = require('koa-router');
 const { OnlyOperation } = require('../../../middlewares/permission');
 const { Operations } = require('../../../settings/operations');
+const {
+  reviewFinderService,
+} = require('../../../services/review/reviewFinder.service');
 const router = new Router();
 router.get(
   '/',
+  OnlyOperation(Operations.experimentalReviewLog),
+  async (ctx, next) => {
+    const { data, query } = ctx;
+    let page = parseInt(query.page);
+    if (isNaN(page) || page < 0) {
+      page = 0;
+    }
+    const { reviewLogs, paging } =
+      await reviewFinderService.managerGetReviewLogs({
+        page,
+        perPage: 50,
+      });
+    data.reviewLogs = reviewLogs;
+    data.paging = paging;
+    ctx.template = 'experimental/log/review/review.pug';
+    await next();
+  },
+);
+router.get(
+  '/bk',
   OnlyOperation(Operations.experimentalReviewLog),
   async (ctx, next) => {
     const { nkcModules, data, db, query } = ctx;

@@ -17,7 +17,10 @@ class ReviewCreatorService {
         },
       },
     );
+    const time = new Date();
     const reviewLog = new ReviewLogModel({
+      toc: time,
+      tlm: time,
       uid: uid,
       source: source,
       sid: sid,
