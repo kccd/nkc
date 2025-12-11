@@ -5,7 +5,6 @@ const { subscribeSources } = require('../settings/subscribe');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { articleSources, articleStatus } = require('../settings/article');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
-const reviewFinderService = require('../services/review/reviewFinder.service');
 const { reviewSources } = require('../settings/review');
 
 const schema = new mongoose.Schema(
@@ -1881,6 +1880,9 @@ schema.statics.getArticlesInfo = async function (articles) {
       const { status } = document;
       if (status === unknownStatus) {
         // TODO OK: 需要从新的审核日志表拿触发审核的原因
+        const {
+          reviewFinderService,
+        } = require('../services/review/reviewFinder.service');
         reason = await reviewFinderService.getReviewReason(
           reviewSources.document,
           document._id,

@@ -3,7 +3,6 @@ const {
   getJsonStringText,
 } = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
-const reviewFinderService = require('../services/review/reviewFinder.service');
 const mongoose = require('../settings/database');
 const { reviewSources } = require('../settings/review');
 const commentSource = {
@@ -475,6 +474,9 @@ schema.statics.extendPostComments = async (props) => {
     //获取评论状态不正常的审核原因
     if (d.status === unknownStatus) {
       // TODO OK: 需要从新的审核日志表拿触发审核的原因
+      const {
+        reviewFinderService,
+      } = require('../services/review/reviewFinder.service');
       reason = await reviewFinderService.getReviewReason(
         reviewSources.document,
         d._id,
@@ -637,6 +639,9 @@ schema.statics.extendSingleComment = async (comment) => {
   //获取评论状态不正常的审核原因
   if (document.status === unknownStatus) {
     // TODO OK: 需要从新的审核日志表拿触发审核的原因
+    const {
+      reviewFinderService,
+    } = require('../services/review/reviewFinder.service');
     reason = await reviewFinderService.getReviewReason(
       reviewSources.document,
       document._id,

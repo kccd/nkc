@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const { getUrl, fromNow } = require('../nkcModules/tools');
-const videoSize = require('../settings/video');
+const { noteContentStatus, noteContentTypes } = require('../settings/note');
 const Schema = mongoose.Schema;
 const schema = new Schema(
   {
@@ -61,7 +60,7 @@ const schema = new Schema(
     },
     status: {
       type: String,
-      default: 'normal',
+      default: noteContentStatus.normal,
       index: 1,
     },
   },
@@ -69,13 +68,6 @@ const schema = new Schema(
     collection: 'noteContent',
   },
 );
-
-const noteContentStatus = {
-  disabled: 'disabled', //屏蔽
-  unknown: 'unknown', //未审核
-  normal: 'normal', //正常状态
-  deleted: 'deleted', //管理员只操作前面三种状态，最后一种仅限于提供给用户使用
-};
 
 /*
  * 拓展笔记的创建者、渲染内容。
@@ -120,7 +112,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
     c.html = plainEscape(c.content);
     if (extendNote) {
       c.note = notesObj[c.noteId];
-      if (c.note.type === 'post') {
+      if (c.note.type === noteContentTypes.post) {
         c.url = `/p/${c.note.targetId}`;
       }
     }

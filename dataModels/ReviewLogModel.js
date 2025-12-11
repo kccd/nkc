@@ -49,9 +49,11 @@ const schema = new mongoose.Schema(
     },
   },
   {
-    createAt: 'toc',
-    updateAt: 'tlm',
     collection: 'reviewLogs',
+    timestamps: {
+      createdAt: 'toc',
+      updatedAt: 'tlm',
+    },
   },
 );
 

@@ -1,16 +1,19 @@
 const SettingModel = require('../../dataModels/SettingModel');
+const ThreadModel = require('../../dataModels/ThreadModel');
+const ForumModel = require('../../dataModels/ForumModel');
 const { getJsonStringText } = require('../../nkcModules/json');
 const UserModel = require('../../dataModels/UserModel');
 const UsersPersonalModel = require('../../dataModels/UsersPersonalModel');
 const PostModel = require('../../dataModels/PostModel');
-const ThreadModel = require('../../dataModels/ThreadModel');
-const ForumModel = require('../../dataModels/ForumModel');
-const ReviewModel = require('../../dataModels/ReviewModel');
 const { settingIds } = require('../../settings/serverSettings');
-const { reviewTriggerType } = require('../../settings/review');
-const keywordCheckerService = require('../keyword/keywordChecker.service');
-const reviewCheckerService = require('./reviewChecker.service');
-const reviewCreatorService = require('./reviewCreator.service');
+const { reviewTriggerType, reviewSources } = require('../../settings/review');
+const { keywordCheckerService } = require('../keyword/keywordChecker.service');
+const { reviewCheckerService } = require('./reviewChecker.service');
+const { reviewCreatorService } = require('./reviewCreator.service');
+const apiFunction = require('../../nkcModules/apiFunction');
+const { userInfoService } = require('../user/userInfo.service');
+const { reviewFinderService } = require('./reviewFinder.service');
+const tools = require('../../nkcModules/tools');
 
 class ReviewPostService {
   getGlobalPostReviewStatus = async (post) => {
@@ -263,6 +266,83 @@ class ReviewPostService {
       });
     }
     return reviewStatus;
+  };
+
+  // 获取待审核的post
+  getPendingReviewPosts = async (props) => {
+    const { page, perPage, isSuperModerator, user } = props;
+    const match = {
+      reviewed: false,
+      disabled: false,
+    };
+    // 通过专业过滤
+    // 专家仅能审核自己专业的内容
+    // 超级专家则可以审核全站
+    if (!isSuperModerator) {
+      const forums = await ForumModel.find(
+        { moderators: user.uid },
+        { fid: 1 },
+      );
+      match.mainForumsId = forums.map((f) => f.fid);
+    }
+    const postCount = await PostModel.countDocuments(match);
+    const paging = await apiFunction.paging(page, postCount, perPage);
+    const posts = await PostModel.find(match)
+      .sort({ toc: -1 })
+      .skip(paging.start)
+      .limit(paging.perPage);
+    const postsId = new Set();
+    const threadsId = new Set();
+    const usersId = new Set();
+    for (const post of posts) {
+      postsId.add(post.pid);
+      threadsId.add(post.tid);
+      usersId.add(post.uid);
+    }
+    const threads = await ThreadModel.find({
+      tid: { $in: [...threadsId] },
+    });
+    const extendedThreads = await ThreadModel.extendThreads(threads, {
+      lastPost: false,
+      lastPostUser: false,
+      forum: true,
+      category: false,
+      firstPostResource: false,
+    });
+    const extendedThreadsMap = new Map();
+    for (const extendedThread of extendedThreads) {
+      extendedThreadsMap.set(extendedThread.tid, extendedThread);
+    }
+    const extendedPosts = await PostModel.extendPosts(posts, {
+      uid: user ? user.uid : '',
+      visitor: user,
+    });
+    const usersObject = await userInfoService.getUsersBaseInfoObjectByUserIds([
+      ...usersId,
+    ]);
+    const reviewReasonsMap = await reviewFinderService.getReviewReasonsMap(
+      reviewSources.post,
+      [...postsId],
+    );
+    const results = [];
+    for (const post of extendedPosts) {
+      const thread = extendedThreadsMap.get(post.tid);
+      const user = usersObject[post.uid];
+      const reviewReason = reviewReasonsMap.get(post.pid) || '';
+      results.push({
+        post,
+        thread,
+        user,
+        reviewReason,
+        type: post.type,
+        link: tools.getUrl('post', post.pid),
+      });
+    }
+
+    return {
+      data: results,
+      paging,
+    };
   };
 }
 

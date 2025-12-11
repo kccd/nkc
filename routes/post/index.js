@@ -29,7 +29,9 @@ const {
   forumPermissionService,
 } = require('../../services/forum/forumPermission.service');
 const tools = require('../../nkcModules/tools');
-const reviewPostService = require('../../services/review/reviewPost.service');
+const {
+  reviewPostService,
+} = require('../../services/review/reviewPost.service');
 router
   .use('/', Public(), async (ctx, next) => {
     const { state, data, db } = ctx;

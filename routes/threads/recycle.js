@@ -2,7 +2,9 @@ const Router = require('koa-router');
 const router = new Router();
 const { OnlyOperation } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
-const reviewModifierService = require('../../services/review/reviewModifier.service');
+const {
+  reviewModifierService,
+} = require('../../services/review/reviewModifier.service');
 const { reviewSources } = require('../../settings/review');
 router.post(
   '/',

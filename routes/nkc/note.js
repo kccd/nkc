@@ -1,6 +1,8 @@
 const router = require('koa-router')();
 const { OnlyOperation } = require('../../middlewares/permission');
-const reviewModifierService = require('../../services/review/reviewModifier.service');
+const {
+  reviewModifierService,
+} = require('../../services/review/reviewModifier.service');
 const { Operations } = require('../../settings/operations');
 const { reviewSources } = require('../../settings/review');
 router

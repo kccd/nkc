@@ -6,9 +6,7 @@ const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
 const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
-const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
-const reviewPostService = require('../services/review/reviewPost.service');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -1436,6 +1434,9 @@ threadSchema.statics.publishArticle = async (options) => {
   });
   await thread.updateOne({ $set: { oc: post.pid, count: 1, hits: 1 } });
   // TODO OK：调用审核service上的方法
+  const {
+    reviewPostService,
+  } = require('../services/review/reviewPost.service');
   const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
     post,
   );

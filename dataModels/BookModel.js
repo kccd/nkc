@@ -1,4 +1,6 @@
-const reviewFinderService = require('../services/review/reviewFinder.service');
+const {
+  reviewFinderService,
+} = require('../services/review/reviewFinder.service');
 const mongoose = require('../settings/database');
 const { reviewSources } = require('../settings/review');
 

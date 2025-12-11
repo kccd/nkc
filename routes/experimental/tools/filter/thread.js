@@ -1,7 +1,11 @@
 const { Eve, isMainThread, Thread } = require('node-threads-pool');
 const db = require('../../../../dataModels');
-const keywordCheckerService = require('../../../../services/keyword/keywordChecker.service');
-const reviewCreatorService = require('../../../../services/review/reviewCreator.service');
+const {
+  keywordCheckerService,
+} = require('../../../../services/keyword/keywordChecker.service');
+const {
+  reviewCreatorService,
+} = require('../../../../services/review/reviewCreator.service');
 const { reviewTriggerType } = require('../../../../settings/review');
 let tp;
 async function main(props) {

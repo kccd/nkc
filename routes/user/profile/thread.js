@@ -1,4 +1,6 @@
-const reviewFinderService = require('../../../services/review/reviewFinder.service');
+const {
+  reviewFinderService,
+} = require('../../../services/review/reviewFinder.service');
 const { reviewSources } = require('../../../settings/review');
 
 module.exports = async (ctx, next) => {

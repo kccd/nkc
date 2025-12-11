@@ -18,8 +18,12 @@ const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 const {
   forumPermissionService,
 } = require('../../services/forum/forumPermission.service');
-const reviewPostService = require('../../services/review/reviewPost.service');
-const reviewFinderService = require('../../services/review/reviewFinder.service');
+const {
+  reviewPostService,
+} = require('../../services/review/reviewPost.service');
+const {
+  reviewFinderService,
+} = require('../../services/review/reviewFinder.service');
 const { reviewSources } = require('../../settings/review');
 threadRouter
   .use('/', Public(), async (ctx, next) => {
@@ -556,7 +560,7 @@ threadRouter
       _postsId.push(_post.pid);
     }
     // TODO OK：调用审核service上的方法
-    const reviewReasons = await reviewFinderService.getReviewReasons(
+    const reviewReasons = await reviewFinderService.getReviewReasonsMap(
       reviewSources.post,
       _postsId,
     );

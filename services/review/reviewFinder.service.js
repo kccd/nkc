@@ -26,7 +26,7 @@ class ReviewFinderService {
     return reason;
   };
 
-  getReviewReasons = async (source, sourcesId) => {
+  getReviewReasonsMap = async (source, sourcesId) => {
     const reviewLogs = await ReviewLogModel.find(
       {
         source,

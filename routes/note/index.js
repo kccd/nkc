@@ -4,8 +4,12 @@ const {
   OnlyUnbannedUser,
   OnlyUser,
 } = require('../../middlewares/permission');
-const keywordCheckerService = require('../../services/keyword/keywordChecker.service');
-const reviewCreatorService = require('../../services/review/reviewCreator.service');
+const {
+  keywordCheckerService,
+} = require('../../services/keyword/keywordChecker.service');
+const {
+  reviewCreatorService,
+} = require('../../services/review/reviewCreator.service');
 const { reviewTriggerType } = require('../../settings/review');
 router
   .get('/', OnlyUser(), async (ctx, next) => {

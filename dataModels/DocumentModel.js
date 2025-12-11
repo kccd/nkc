@@ -9,10 +9,7 @@ const markNotes = require('../nkcModules/nkcRender/markNotes');
 const documentSettings = require('../settings/document');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringText } = require('../nkcModules/json');
-const keywordCheckerService = require('../services/keyword/keywordChecker.service');
 const { reviewTriggerType } = require('../settings/review');
-const reviewCreatorService = require('../services/review/reviewCreator.service');
-const reviewCheckerService = require('../services/review/reviewChecker.service');
 
 /*
  * document状态
@@ -1474,6 +1471,9 @@ schema.methods.getGlobalPostReviewStatus = async function () {
  * 获取用户关于复验手机号的审核状态
  * */
 schema.methods.getVerifyPhoneNumberReviewStatus = async function () {
+  const {
+    reviewCheckerService,
+  } = require('../services/review/reviewChecker.service');
   return await reviewCheckerService.getVerifyPhoneNumberReviewStatus(this.uid);
 };
 
@@ -1496,6 +1496,9 @@ schema.methods.getKeywordsReviewStatus = async function () {
     abstractEN +
     keywords.concat(keywordsEN).join(' ');
   // TODO OK: 执行审核相关service的方法，而不是执行旧审核日志表上的方法
+  const {
+    keywordCheckerService,
+  } = require('../services/keyword/keywordChecker.service');
   const matchedKeywords = await keywordCheckerService.matchKeywordsByGroupIds(
     documentContent,
     keywordGroupId,
@@ -1531,6 +1534,9 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function () {
   //如果需要审核，就生成审核记录
   if (needReview) {
     // TODO OK: 需要执行审核service上的方法
+    const {
+      reviewCreatorService,
+    } = require('../services/review/reviewCreator.service');
     await reviewCreatorService.createDocumentReviewLog({
       uid: this.uid,
       documentId: this._id,

@@ -3,13 +3,9 @@
   当前表已废弃，审核记录现存在 ReviewLogModel 中
 */
 
-const throwError = require('../nkcModules/throwError');
 const mongoose = require('../settings/database');
-const { settingIds } = require('../settings/serverSettings');
 const Mint = require('mint-filter').default;
 const Schema = mongoose.Schema;
-const { getJsonStringText } = require('../nkcModules/json.js');
-const keywordCheckerService = require('../services/keyword/keywordChecker.service.js');
 
 const schema = new Schema(
   {
