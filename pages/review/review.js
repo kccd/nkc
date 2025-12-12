@@ -40,7 +40,7 @@ for (var i = 0; i < data.results.length; i++) {
       did: d,
       pass: true,
       reason: '',
-      delType: source !== 'moment' ? 'faulty' : 'deleted',
+      delType: source !== 'moment' ? 'faulty' : 'disabled',
       noticeType: true,
       illegalType: false,
       articleId: aid,
