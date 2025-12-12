@@ -2,11 +2,11 @@ const DocumentModel = require('../../dataModels/DocumentModel');
 class DocumentFinderService {
   getDocumentsMapByIds = async (documentsIds) => {
     const documents = await DocumentModel.find({
-      did: { $in: documentsIds },
+      _id: { $in: documentsIds },
     });
     const documentsMap = new Map();
     for (const document of documents) {
-      documentsMap.set(document.did, document);
+      documentsMap.set(document._id, document);
     }
     return documentsMap;
   };

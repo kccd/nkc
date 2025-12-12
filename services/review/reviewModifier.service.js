@@ -25,7 +25,9 @@ class ReviewModifierService {
 
   modifyReviewLogStatusToApproved = async (props) => {
     const { source, sid, handlerId, handlerReason } = props;
-    await this.#modifyReviewLogStatus(source, sid, {
+    await this.#modifyReviewLogStatus({
+      source,
+      sid,
       handlerId: handlerId,
       status: reviewStatus.approved,
       handlerReason: handlerReason,
@@ -34,7 +36,9 @@ class ReviewModifierService {
 
   modifyReviewLogStatusToRevised = async (props) => {
     const { source, sid, handlerId, handlerReason } = props;
-    await this.#modifyReviewLogStatus(source, sid, {
+    await this.#modifyReviewLogStatus({
+      source,
+      sid,
       handlerId: handlerId,
       status: reviewStatus.revised,
       handlerReason: handlerReason,
@@ -43,7 +47,9 @@ class ReviewModifierService {
 
   modifyReviewLogStatusToDeleted = async (props) => {
     const { source, sid, handlerId, handlerReason } = props;
-    await this.#modifyReviewLogStatus(source, sid, {
+    await this.#modifyReviewLogStatus({
+      source,
+      sid,
       handlerId: handlerId,
       status: reviewStatus.deleted,
       handlerReason: handlerReason,

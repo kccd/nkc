@@ -10,8 +10,8 @@
   "notPassedAD": "用户没有通过入学培训，审核通过的文章数量不足",
 
   "status_pending": "等待审核",
-  "status_approved": "已通过",
-  "status_revised": "未通过，已退修",
-  "status_deleted": "未通过，已删除",
+  "status_approved": "已通过审核",
+  "status_revised": "未通过审核，已退修",
+  "status_deleted": "未通过审核，已屏蔽",
   "status_invalid": "无效记录"
 }

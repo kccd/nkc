@@ -71,7 +71,7 @@ class KeywordCheckerService {
   };
 
   // 根据敏感词组ID，匹配内容中的敏感词
-  matchKeywordsByGroupIds = async (content, groupsId) => {
+  matchKeywordsByGroupsId = async (content, groupsId) => {
     const reviewSettings = await SettingModel.getSettings('review');
     const keywordSettings = reviewSettings.keyword;
     if (!keywordSettings) {

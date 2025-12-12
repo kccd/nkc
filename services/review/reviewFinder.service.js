@@ -90,9 +90,9 @@ class ReviewFinderService {
       if (reviewLog.source === reviewSources.post) {
         postsId.add(reviewLog.sid);
       } else if (reviewLog.source === reviewSources.document) {
-        documentsId.add(reviewLog.sid);
+        documentsId.add(Number(reviewLog.sid));
       } else if (reviewLog.source === reviewSources.note) {
-        noteContentsId.add(reviewLog.sid);
+        noteContentsId.add(Number(reviewLog.sid));
       }
     }
     const usersObject = await userInfoService.getUsersBaseInfoObjectByUserIds([
@@ -139,20 +139,20 @@ class ReviewFinderService {
             const thread = threadsMap.get(post.tid);
             const firstPost = firstPostsMap.get(thread.oc);
             contentAbstract =
-              `${firstPost.t}` +
-              this.#extendContentAbstract(firstPost.l, firstPost.content);
+              `${firstPost.t} - ` +
+              this.#extendContentAbstract(firstPost.l, firstPost.c);
           } else if (post.parentPostId === '') {
             contentType = '论坛回复';
-            contentAbstract = this.#extendContentAbstract(post.l, post.content);
+            contentAbstract = this.#extendContentAbstract(post.l, post.c);
           } else {
             contentType = '论坛评论';
-            contentAbstract = this.#extendContentAbstract(post.l, post.content);
+            contentAbstract = this.#extendContentAbstract(post.l, post.c);
           }
           contentUrl = getUrl('post', post.pid);
           break;
         }
         case reviewSources.document: {
-          const document = documentsMap.get(reviewLog.sid);
+          const document = documentsMap.get(Number(reviewLog.sid));
           if (!document) {
             continue;
           }
@@ -162,7 +162,7 @@ class ReviewFinderService {
               break;
             }
             case documentSources.comment: {
-              contentType = '专栏评论';
+              contentType = '专栏回复';
               break;
             }
             case documentSources.moment: {
@@ -170,14 +170,14 @@ class ReviewFinderService {
               break;
             }
           }
-          contentAbstract = document.title
-            ? `${document.title}`
-            : `` + this.#extendContentAbstract(document.l, document.content);
+          contentAbstract =
+            (document.title ? `${document.title} - ` : ``) +
+            this.#extendContentAbstract(document.l, document.content);
           contentUrl = getUrl('documentNumber', document.did);
           break;
         }
         case reviewSources.note: {
-          const noteContent = notesMap.get(reviewLog.sid);
+          const noteContent = notesMap.get(Number(reviewLog.sid));
           if (!noteContent) {
             continue;
           }

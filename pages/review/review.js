@@ -137,31 +137,20 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      let d,
-        url,
-        method = 'PUT';
-      if (data.pass) {
-        d = {
-          pass: data.pass,
-          docId: data.documentId,
-          type: 'document',
-        };
-        url = '/review';
-      } else {
-        d = {
-          type: 'document',
-          pass: data.pass,
-          docId: data.documentId,
-          did: [data.did],
-          reason: data.reason,
-          delType: data.delType,
-          remindUser: data.noticeType,
-          violation: data.illegalType,
-        };
-        method = 'PUT';
-        url = '/review';
-      }
-      nkcAPI(url, method, d)
+      const url = '/review/document';
+      const method = 'PUT';
+
+      const d = {
+        docId: data.documentId,
+        operation: data.pass ? 'approve' : data.delType,
+        // 仅不通过时才传
+        reason: data.pass ? '' : data.reason,
+        remindUser: data.noticeType, // 是否提醒用户
+        violation: data.illegalType, // 是否标记违规
+      };
+      nkcAPI(url, method, {
+        document: d,
+      })
         .then(function () {
           screenTopAlert('DocumentId: ' + data.documentId + ' 处理成功!');
           app.document(arr, index + 1);
@@ -182,45 +171,35 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      let d,
-        url,
-        method = 'PUT';
+      let d = {};
+      let url = '';
+      let method = 'PUT';
       if (data.pass) {
-        // 通过
+        // 通过审核，走审核通过的接口
         d = {
-          pid: data.postId,
-          type: 'post',
+          postsId: [data.postId],
         };
-        url = '/review';
+        url = '/review/post';
       } else {
-        // 不通过
-        // 送回收站
+        // 未通过审核，走退修或删除接口
         if (data.delType === 'toRecycle') {
-          /*d = {
-            fid: "recycle",
-            para: data
-          };*/
+          // 送回收站
           d = {
             postsId: [data.postId],
             reason: data.reason,
-            remindUser: data.noticeType,
+            remindUser: data.noticeType, // 是否提醒用户
             violation: data.illegalType, //是否违规
           };
           method = 'POST';
-          // url = "/t/" + data.threadId + "/disabled";
           url = '/threads/recycle';
         } else {
-          //退修
-          /*d = {
-            para: data
-          };*/
+          // 退回修改
           d = {
             postsId: [data.postId],
             reason: data.reason,
-            remindUser: data.noticeType,
-            violation: data.illegalType,
+            remindUser: data.noticeType, // 是否提醒用户
+            violation: data.illegalType, // 是否违规
           };
-          // url = "/t/" + data.threadId + "/moveDraft";
           url = '/threads/draft';
           method = 'POST';
         }
@@ -235,7 +214,6 @@ var app = new window.Vue({
           screenTopWarning(
             'PID: ' + data.postId + ' 处理失败! error: ' + data.error || data,
           );
-          console.log(data);
           app.post(arr, index + 1);
         });
     },
@@ -246,30 +224,19 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      let d,
-        url,
-        method = 'PUT';
-      if (data.pass) {
-        d = {
-          pass: data.pass,
-          noteId: data.noteId,
-          type: 'note',
-        };
-        url = '/review';
-      } else {
-        d = {
-          type: 'note',
-          pass: data.pass,
-          noteId: data.noteId,
-          reason: data.reason,
-          delType: data.delType,
-          remindUser: data.noticeType,
-          violation: data.illegalType,
-        };
-        method = 'PUT';
-        url = '/review';
-      }
-      nkcAPI(url, method, d)
+      const d = {
+        operation: data.pass ? 'approve' : 'disabled',
+        noteContentId: data.noteId,
+        reason: data.reason,
+        remindUser: data.noticeType,
+        violation: data.illegalType,
+      };
+      const url = '/review/note';
+      const method = 'PUT';
+
+      nkcAPI(url, method, {
+        note: d,
+      })
         .then(function () {
           screenTopAlert('noteId: ' + data.noteId + '处理成功');
           app.note(arr, index + 1);
@@ -287,7 +254,6 @@ var app = new window.Vue({
         return;
       }
       const payload = {
-        type: 'userAudit',
         pass: data.pass,
         auditId: data.userAuditId,
         ...(data.pass
@@ -298,7 +264,9 @@ var app = new window.Vue({
               violation: data.illegalType,
             }),
       };
-      nkcAPI('/review', 'PUT', payload)
+      nkcAPI('/review/user', 'PUT', {
+        user: payload,
+      })
         .then(() => {
           screenTopAlert(`UserAudit ${data.userAuditId} 处理成功`);
           this.userAudit(arr, index + 1);

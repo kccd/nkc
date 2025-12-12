@@ -1499,7 +1499,7 @@ schema.methods.getKeywordsReviewStatus = async function () {
   const {
     keywordCheckerService,
   } = require('../services/keyword/keywordChecker.service');
-  const matchedKeywords = await keywordCheckerService.matchKeywordsByGroupIds(
+  const matchedKeywords = await keywordCheckerService.matchKeywordsByGroupsId(
     documentContent,
     keywordGroupId,
   );

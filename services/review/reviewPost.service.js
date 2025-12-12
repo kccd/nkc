@@ -1,4 +1,8 @@
 const SettingModel = require('../../dataModels/SettingModel');
+const socket = require('../../nkcModules/socket');
+const MessageModel = require('../../dataModels/MessageModel');
+const IPModel = require('../../dataModels/IPModel');
+const MomentModel = require('../../dataModels/MomentModel');
 const ThreadModel = require('../../dataModels/ThreadModel');
 const ForumModel = require('../../dataModels/ForumModel');
 const { getJsonStringText } = require('../../nkcModules/json');
@@ -14,6 +18,7 @@ const apiFunction = require('../../nkcModules/apiFunction');
 const { userInfoService } = require('../user/userInfo.service');
 const { reviewFinderService } = require('./reviewFinder.service');
 const tools = require('../../nkcModules/tools');
+const { reviewModifierService } = require('./reviewModifier.service');
 
 class ReviewPostService {
   getGlobalPostReviewStatus = async (post) => {
@@ -329,6 +334,11 @@ class ReviewPostService {
       const thread = extendedThreadsMap.get(post.tid);
       const user = usersObject[post.uid];
       const reviewReason = reviewReasonsMap.get(post.pid) || '';
+      if (post.type === 'thread') {
+        if (thread.recycleMark) {
+          continue;
+        }
+      }
       results.push({
         post,
         thread,
@@ -343,6 +353,62 @@ class ReviewPostService {
       data: results,
       paging,
     };
+  };
+
+  // 标记审核为通过
+  markPostReviewAsApproved = async (props) => {
+    const { uid, postsId, isSuperModerator } = props;
+    const match = {
+      pid: { $in: postsId },
+      reviewed: false,
+    };
+    if (!isSuperModerator) {
+      const forums = await ForumModel.find({ moderators: uid }, { fid: 1 });
+      match.mainForumsId = forums.map((f) => f.fid);
+    }
+    const momentQuoteTypes = await MomentModel.getMomentQuoteTypes();
+    const posts = await PostModel.find(match);
+    for (const post of posts) {
+      await post.updateOne({
+        reviewed: true,
+      });
+      const ip = await IPModel.getIpByIpId(post.ipoc);
+      // 创建引用内容的电文
+      MomentModel.createQuoteMomentAndPublish({
+        ip,
+        uid: post.uid,
+        quoteType: momentQuoteTypes.post,
+        quoteId: post.pid,
+      }).catch(console.error);
+      // 更新文章信息
+      const thread = await ThreadModel.findOne({ tid: post.tid });
+      if (thread.oc === post.pid) {
+        await thread.updateOne({ reviewed: true });
+      } else {
+        // 通知回复所在文章作者，文章有了新回复
+        await post.noticeAuthorReply();
+      }
+      await thread.updateThreadMessage(false);
+      // 修改审核记录状态为已通过
+      await reviewModifierService.modifyReviewLogStatusToApproved({
+        source: reviewSources.post,
+        sid: post.pid,
+        handlerId: uid,
+        handlerReason: '',
+      });
+      // 发送审核通过通知
+      const message = await MessageModel({
+        _id: await SettingModel.operateSystemID('messages', 1),
+        r: post.uid,
+        ty: 'STU',
+        c: {
+          type: 'passReview',
+          pid: post.pid,
+        },
+      });
+      await message.save();
+      await socket.sendMessageToUser(message._id);
+    }
   };
 }
 

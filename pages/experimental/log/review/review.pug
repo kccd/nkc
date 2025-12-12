@@ -6,8 +6,9 @@ block eContent
     .hidden#data=objToStr({reviewLogs: data.reviewLogs, paging: data.paging})
     .row#app(v-cloak)
       .col-xs-12.col-md-12
-        div.m-t-1
-          table.table
+        div.m-t-1.table-responsive
+          include ../../../publicModules/paging/paging.pug
+          table.table.table-bordered
             thead
               tr
                 th 时间
@@ -23,23 +24,33 @@ block eContent
 
             tbody
               tr(v-for="reviewLog in reviewLogs")
-                th {{detailedTime()}}
-                th
-                  a(:href="'/u/' + reviewLog.user.uid" target="_blank")
-                    span {{reviewLog.user.username}}
+                th 
+                  div {{timeFormat('YYYY-MM-DD', reviewLog.toc)}}
+                  div {{timeFormat('HH:mm:ss', reviewLog.toc)}}
+                th 
+                  div(class='flex items-center')
+                    img(:src="getUrl('userAvatar', reviewLog.user.avatar, 'sm')" height="24" width="24" class="mr-1")
+                    a(:href="getUrl('userHome', reviewLog.user.uid)" target="_blank")
+                      span {{reviewLog.user.username}}
                 th {{reviewLog.contentType}}
                 th 
-                  a(:href="reviewLog.contentUrl" target="_blank") {{reviewLog.contentAbstract}}    
+                  a(class="inline" :href="reviewLog.contentUrl" target="_blank") {{reviewLog.contentAbstract}}    
                 th {{reviewLog.triggerReason}}
                 
-                th {{reviewLog.statusDesc}}   
                 th 
-                  span(v-if='reviewLog.status !== "pending"') {{detailedTime(reviewLog.tlm)}}
+                  div(:class="{'text-warning': reviewLog.status === 'pending', 'text-success': reviewLog.status === 'approved', 'text-danger': ['deleted', 'revised', 'invalid'].includes(reviewLog.status)}") {{reviewLog.statusDesc}}
+                th 
+                  div(v-if='reviewLog.status !== "pending"') 
+                    div {{timeFormat('YYYY-MM-DD', reviewLog.tlm)}}
+                    div {{timeFormat('HH:mm:ss', reviewLog.tlm)}}
                 th
-                  a(:href="'/u/' + reviewLog.handler.uid" target="_blank" v-if="reviewLog.handler")
-                    span {{reviewLog.handler.username}}
+                  div(class='flex items-center')
+                    img(:src="getUrl('userAvatar', reviewLog.handler.avatar, 'sm')" height="24" width="24" class="mr-1" v-if="reviewLog.handler")
+                    a(:href="getUrl('userHome', reviewLog.handler.uid)" target="_blank" v-if="reviewLog.handler")
+                      span {{reviewLog.handler.username}}
                  
                 th {{reviewLog.handlerReason}}
+          include ../../../publicModules/paging/paging.pug
 
 block scripts
   +includeJS("/experimental/log/review/review.js")

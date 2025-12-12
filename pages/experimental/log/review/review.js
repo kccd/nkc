@@ -1,5 +1,6 @@
 import { getDataById } from '../../../lib/js/dataConversion';
-import { detailedTime } from '../../../lib/js/time';
+import { timeFormat } from '../../../lib/js/time';
+import { getUrl } from '../../../lib/js/tools';
 const data = getDataById('data');
 console.log(data);
 const app = new window.Vue({
@@ -10,6 +11,7 @@ const app = new window.Vue({
   },
 
   methods: {
-    detailedTime,
+    getUrl,
+    timeFormat,
   },
 });

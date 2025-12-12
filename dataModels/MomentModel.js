@@ -4,27 +4,13 @@ const {
   momentModes,
   momentStatus,
   momentVisibleType,
+  momentQuoteTypes,
+  momentCommentModes,
+  momentCommentPerPage,
 } = require('../settings/moment');
 const { documentSources } = require('../settings/document');
 const { ThrowCommonError } = require('../nkcModules/error');
 const { reviewSources } = require('../settings/review');
-
-const momentQuoteTypes = {
-  article: 'article',
-  post: 'post',
-  moment: 'moment',
-  comment: 'comment',
-};
-
-const momentCommentModes = {
-  simple: 'simple',
-  complete: 'complete',
-};
-
-const momentCommentPerPage = {
-  simple: 10,
-  complete: 50,
-};
 
 const visibleType = { ...momentVisibleType };
 

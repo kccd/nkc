@@ -20,6 +20,10 @@ const {
 const {
   reviewUserService,
 } = require('../../services/review/reviewUser.service');
+const documentRouter = require('./document');
+const postRouter = require('./post');
+const noteRouter = require('./note');
+const userRouter = require('./user');
 router
   // TODO 适配新的审核记录表
   // 从审核记录表中加载待审记录
@@ -891,5 +895,9 @@ router
       await ctx.nkcModules.socket.sendMessageToUser(message._id);
     }
     await next();
-  });
+  })
+  .use('/document', documentRouter.routes(), documentRouter.allowedMethods())
+  .use('/post', postRouter.routes(), postRouter.allowedMethods())
+  .use('/note', noteRouter.routes(), noteRouter.allowedMethods())
+  .use('/user', userRouter.routes(), userRouter.allowedMethods());
 module.exports = router;
