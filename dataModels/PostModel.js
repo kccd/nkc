@@ -2,9 +2,9 @@ const settings = require('../settings');
 const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
 const customCheerio = require('../nkcModules/nkcRender/customCheerio');
-const tools = require('../nkcModules/tools');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
+const { reviewSources } = require('../settings/review');
 const mongoose = settings.database;
 const { Schema } = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -2695,6 +2695,15 @@ postSchema.statics.disableToDraftPosts = async function () {
           toDraft: false,
           reviewed: true,
         },
+      });
+      const {
+        reviewModifierService,
+      } = require('../services/review/reviewModifier.service');
+      await reviewModifierService.modifyReviewLogStatusToDeleted({
+        source: reviewSources.post,
+        sid: post.pid,
+        handlerId: '',
+        handlerReason: '退修超时未修改，系统自动屏蔽。',
       });
       const user = await UserModel.findOnly({ uid: post.uid });
       //扣除用户科创币

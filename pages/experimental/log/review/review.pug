@@ -44,9 +44,9 @@ block eContent
                     div {{timeFormat('YYYY-MM-DD', reviewLog.tlm)}}
                     div {{timeFormat('HH:mm:ss', reviewLog.tlm)}}
                 th
-                  div(class='flex items-center')
-                    img(:src="getUrl('userAvatar', reviewLog.handler.avatar, 'sm')" height="24" width="24" class="mr-1" v-if="reviewLog.handler")
-                    a(:href="getUrl('userHome', reviewLog.handler.uid)" target="_blank" v-if="reviewLog.handler")
+                  div(class='flex items-center' v-if='reviewLog.handler')
+                    img(:src="getUrl('userAvatar', reviewLog.handler.avatar, 'sm')" height="24" width="24" class="mr-1")
+                    a(:href="getUrl('userHome', reviewLog.handler.uid)" target="_blank")
                       span {{reviewLog.handler.username}}
                  
                 th {{reviewLog.handlerReason}}

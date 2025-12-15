@@ -9,7 +9,7 @@ const markNotes = require('../nkcModules/nkcRender/markNotes');
 const documentSettings = require('../settings/document');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringText } = require('../nkcModules/json');
-const { reviewTriggerType } = require('../settings/review');
+const { reviewTriggerType, reviewSources } = require('../settings/review');
 
 /*
  * document状态
@@ -2026,6 +2026,15 @@ schema.statics.disabledToDraftDocuments = async function () {
     if (document && document.status === faultyStatus) {
       //将document的状态改变为封禁状态，函数同时去改变document上层的状态
       await document.setStatus(disabledStatus);
+      const {
+        reviewModifierService,
+      } = require('../services/review/reviewModifier.service');
+      await reviewModifierService.modifyReviewLogStatusToDeleted({
+        source: reviewSources.document,
+        sid: document._id,
+        handlerId: '',
+        handlerReason: '退修超时未修改，系统自动封禁。',
+      });
       const delLog = await DelPostLogModel({
         delUserId: document.uid,
         delPostTitle: document ? document.title : '',

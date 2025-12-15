@@ -7,6 +7,7 @@ const elasticSearch = require('../nkcModules/elasticSearch');
 const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
+const { reviewSources } = require('../settings/review');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -2311,6 +2312,15 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
       disabled: true,
       reviewed: true,
       categoriesId: [],
+    });
+    const {
+      reviewModifierService,
+    } = require('../services/review/reviewModifier.service');
+    await reviewModifierService.modifyReviewLogStatusToDeleted({
+      source: reviewSources.post,
+      sid: thread.oc,
+      handlerId: '',
+      handlerReason: '退修超时未修改，系统自动屏蔽。',
     });
     // 更新文章信息（将文章下所有post的mainForumsId改为["recycle"]）
     await thread.updateThreadMessage();
