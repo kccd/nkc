@@ -1,16 +1,16 @@
-import {nkcAPI} from "../netAPI";
-import {screenTopAlert, screenTopWarning} from "../topAlert";
-
-
+import { nkcAPI } from '../netAPI';
+import { screenTopAlert, screenTopWarning } from '../topAlert';
+import { reviewActions } from '../review';
 //post 审核通过
 export function reviewPost(pid) {
-  return nkcAPI("/review", "PUT", {
-    pid,
-  })
-    .then(function() {
-      screenTopAlert("执行操作成功！");
+  return reviewActions
+    .approvePostReview({
+      postsId: [pid],
     })
-    .catch(function(data) {
+    .then(function () {
+      screenTopAlert('执行操作成功！');
+    })
+    .catch(function (data) {
       screenTopWarning(data);
-    })
+    });
 }

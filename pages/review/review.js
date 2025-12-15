@@ -1,10 +1,10 @@
 import { sweetError } from '../lib/js/sweetAlert';
-import { nkcAPI } from '../lib/js/netAPI';
 import { screenTopAlert, screenTopWarning } from '../lib/js/topAlert';
 import { initNKCSource } from '../lib/js/nkcSource';
 import { getUrl } from '../lib/js/tools';
 import { markdownToHTML } from '../lib/js/dataConversion';
 import MomentFiles from '../lib/vue/zone/MomentFiles';
+import { reviewActions } from '../lib/js/review';
 
 var data = window.NKC.methods.getDataById('data');
 var pid = [];
@@ -137,20 +137,28 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      const url = '/review/document';
-      const method = 'PUT';
-
-      const d = {
-        docId: data.documentId,
-        operation: data.pass ? 'approve' : data.delType,
-        // 仅不通过时才传
-        reason: data.pass ? '' : data.reason,
-        remindUser: data.noticeType, // 是否提醒用户
-        violation: data.illegalType, // 是否标记违规
-      };
-      nkcAPI(url, method, {
-        document: d,
-      })
+      return Promise.resolve()
+        .then(() => {
+          if (data.pass) {
+            return reviewActions.approveDocumentReview({
+              docId: data.documentId,
+            });
+          } else if (data.delType === 'disabled') {
+            return reviewActions.rejectDocumentReviewAndDelete({
+              docId: data.documentId,
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType,
+            });
+          } else {
+            return reviewActions.rejectDocumentReviewAndReturn({
+              docId: data.documentId,
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType,
+            });
+          }
+        })
         .then(function () {
           screenTopAlert('DocumentId: ' + data.documentId + ' 处理成功!');
           app.document(arr, index + 1);
@@ -171,41 +179,27 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      let d = {};
-      let url = '';
-      let method = 'PUT';
-      if (data.pass) {
-        // 通过审核，走审核通过的接口
-        d = {
-          postsId: [data.postId],
-        };
-        url = '/review/post';
-      } else {
-        // 未通过审核，走退修或删除接口
-        if (data.delType === 'toRecycle') {
-          // 送回收站
-          d = {
-            postsId: [data.postId],
-            reason: data.reason,
-            remindUser: data.noticeType, // 是否提醒用户
-            violation: data.illegalType, //是否违规
-          };
-          method = 'POST';
-          url = '/threads/recycle';
-        } else {
-          // 退回修改
-          d = {
-            postsId: [data.postId],
-            reason: data.reason,
-            remindUser: data.noticeType, // 是否提醒用户
-            violation: data.illegalType, // 是否违规
-          };
-          url = '/threads/draft';
-          method = 'POST';
-        }
-      }
 
-      return nkcAPI(url, method, d)
+      return Promise.resolve()
+        .then(() => {
+          if (data.pass) {
+            return reviewActions.approvePostReview({ postsId: [data.postId] });
+          } else if (data.delType === 'toRecycle') {
+            return reviewActions.rejectPostReviewAndDelete({
+              postsId: [data.postId],
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType,
+            });
+          } else {
+            return reviewActions.rejectPostReviewAndReturn({
+              postsId: [data.postId],
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType,
+            });
+          }
+        })
         .then(function () {
           screenTopAlert('PID: ' + data.postId + ' 处理成功!');
           app.post(arr, index + 1);
@@ -224,19 +218,21 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      const d = {
-        operation: data.pass ? 'approve' : 'disabled',
-        noteContentId: data.noteId,
-        reason: data.reason,
-        remindUser: data.noticeType,
-        violation: data.illegalType,
-      };
-      const url = '/review/note';
-      const method = 'PUT';
-
-      nkcAPI(url, method, {
-        note: d,
-      })
+      return Promise.resolve()
+        .then(() => {
+          if (data.pass) {
+            return reviewActions.approveNoteReview({
+              noteContentId: data.noteId,
+            });
+          } else {
+            return reviewActions.rejectNoteReviewAndDelete({
+              noteContentId: data.noteId,
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType,
+            });
+          }
+        })
         .then(function () {
           screenTopAlert('noteId: ' + data.noteId + '处理成功');
           app.note(arr, index + 1);
@@ -253,20 +249,21 @@ var app = new window.Vue({
       if (!data) {
         return;
       }
-      const payload = {
-        pass: data.pass,
-        auditId: data.userAuditId,
-        ...(data.pass
-          ? {}
-          : {
+      return Promise.resolve()
+        .then(() => {
+          if (data.pass) {
+            return reviewActions.approveUserAudit({
+              userAuditId: data.userAuditId,
+            });
+          } else {
+            return reviewActions.rejectUserAudit({
+              userAuditId: data.userAuditId,
               reason: data.reason,
               remindUser: data.noticeType,
               violation: data.illegalType,
-            }),
-      };
-      nkcAPI('/review/user', 'PUT', {
-        user: payload,
-      })
+            });
+          }
+        })
         .then(() => {
           screenTopAlert(`UserAudit ${data.userAuditId} 处理成功`);
           this.userAudit(arr, index + 1);

@@ -42,7 +42,7 @@
 
 <script>
 import { nkcAPI } from '../../js/netAPI';
-
+import { reviewActions } from '../../js/review';
 export default {
   props: ['moment', 'permissions'],
   data: () => ({}),
@@ -51,11 +51,10 @@ export default {
     //动态审核通过
     reviewMoment() {
       const { docId } = this.moment;
-      nkcAPI('/review', 'PUT', {
-        pass: true,
-        docId,
-        type: 'document',
-      })
+      reviewActions
+        .approveDocumentReview({
+          docId: docId,
+        })
         .then((res) => {
           sweetSuccess('操作成功');
           setTimeout(() => {

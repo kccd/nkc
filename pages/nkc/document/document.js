@@ -1,4 +1,5 @@
 import { initNKCSource } from '../../lib/js/nkcSource';
+import { reviewActions } from '../../lib/js/review';
 
 $(function () {
   initNKCSource();
@@ -9,16 +10,25 @@ window.deleteArticle = function (_id) {
     window.DisabledPost = new NKC.modules.DisabledPost();
   }
   window.DisabledPost.open(function (data) {
-    var body = {
-      delType: data.type === 'toDraft' ? 'faulty' : 'disabled',
-      docId: _id,
-      type: 'document',
-      reason: data.reason,
-      remindUser: data.remindUser,
-      violation: data.violation,
-    };
     DisabledPost.lock();
-    nkcAPI('/review', 'PUT', body)
+    Promise.resolve()
+      .then(() => {
+        if (data.type === 'toDraft') {
+          return reviewActions.rejectDocumentReviewAndReturn({
+            docId: _id,
+            reason: data.reason,
+            remindUser: data.remindUser,
+            violation: data.violation,
+          });
+        } else {
+          return reviewActions.rejectDocumentReviewAndDelete({
+            docId: _id,
+            reason: data.reason,
+            remindUser: data.remindUser,
+            violation: data.violation,
+          });
+        }
+      })
       .then(function () {
         screenTopAlert('操作成功');
         DisabledPost.close();

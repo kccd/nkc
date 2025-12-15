@@ -6,9 +6,15 @@ const { Operations } = require('../../settings/operations');
 const router = require('koa-router')();
 router.put('/', OnlyOperation(Operations.review), async (ctx, next) => {
   const { body } = ctx;
-  const { note } = body;
+  const { noteContentId, operation, reason, remindUser, violation } = body;
   await reviewNoteService.markNoteReviewStatus({
-    noteContent: note,
+    noteContent: {
+      noteContentId,
+      operation,
+      reason,
+      remindUser,
+      violation,
+    },
     ctx,
   });
   await next();

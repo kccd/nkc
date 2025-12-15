@@ -140,6 +140,7 @@ import { getState } from '../../../js/state';
 import { copyTextToClipboard } from '../../../js/clipboard';
 import DisabledMoment from '../../DisabledMoment.vue';
 import ControlCommentVue from '../../ControlComment.vue';
+import { reviewActions } from '../../../js/review';
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -155,8 +156,8 @@ export default {
   mounted() {},
   components: {
     MomentVisible,
-    'disabled-moment':DisabledMoment,
-    'control-comment':ControlCommentVue
+    'disabled-moment': DisabledMoment,
+    'control-comment': ControlCommentVue,
   },
   methods: {
     objToStr: objToStr,
@@ -255,11 +256,10 @@ export default {
         // if(!this.moment) return;
         // docId = this.moment.momentCommentId?this.moment.momentCommentId:this.moment.momentId;
       }
-      nkcAPI('/review', 'PUT', {
-        pass: true,
-        docId,
-        reviewType: 'document',
-      })
+      reviewActions
+        .approveDocumentReview({
+          docId: docId,
+        })
         .then((res) => {
           sweetSuccess('操作成功');
           setTimeout(() => {
@@ -408,11 +408,10 @@ export default {
       e.stopPropagation();
       e.preventDefault();
       this.show = false;
-      this.$refs.disabledMoment.open(function (res) {
-      }, {
+      this.$refs.disabledMoment.open(function (res) {}, {
         momentId: _id,
-        typeName: !parentId?'电文':'评论'
-      })
+        typeName: !parentId ? '电文' : '评论',
+      });
       // sweetQuestion('确定要屏蔽吗？').then(() => {
       //   nkcAPI(`/moment/${_id}/disable`, 'POST', {})
       //     .then(() => {
@@ -473,14 +472,14 @@ export default {
       visitUrl(getUrl('zoneMomentHistory', this.moment.momentId), true);
     },
     toCommentControl() {
-      const { momentId, momentCommentId,did,commentControl} = this.moment;
+      const { momentId, momentCommentId, did, commentControl } = this.moment;
       if (!momentId) return;
       this.$refs.controlComment.open({
         momentId,
         did,
         commentControl,
       });
-    }
+    },
   },
 };
 </script>
