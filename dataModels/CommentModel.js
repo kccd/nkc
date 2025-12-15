@@ -484,7 +484,8 @@ schema.statics.extendPostComments = async (props) => {
     } else if (d.status === faultyStatus) {
       const delLog = await DelPostLogModel.findOne({
         postType: d.source,
-        delType: faultyStatus,
+        // TODO: 退修&屏蔽日志数据结构比较混乱，后续需要统一
+        delType: ['faulty', 'toDraft'],
         postId: d._id,
         delUserId: d.uid,
       }).sort({ toc: -1 });

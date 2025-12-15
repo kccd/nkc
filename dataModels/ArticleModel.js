@@ -1898,7 +1898,10 @@ schema.statics.getArticlesInfo = async function (articles) {
       } else if (status === faultyStatus) {
         const delLog = await DelPostLogModel.findOne({
           postType: document.source,
-          delType: faultyStatus,
+          // TODO: 退修&屏蔽日志数据结构比较混乱，后续需要统一
+          delType: {
+            $in: ['faulty', 'toDraft'],
+          },
           postId: document._id,
           delUserId: document.uid,
         }).sort({ toc: -1 });

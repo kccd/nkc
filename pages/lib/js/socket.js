@@ -79,14 +79,14 @@ export function getSocket() {
     });
 
     socket.on('connect', function () {
-      console.log('socket连接成功');
+      console.log('Socket connected');
     });
     socket.on('error', function () {
-      console.log('socket连接出错');
+      console.log('Socket error');
       socket.disconnect();
     });
     socket.on('disconnect', function () {
-      console.log('socket连接已断开');
+      console.log('Socket disconnected');
     });
     socket.on('connect_error', function (err) {
       console.log(err);
