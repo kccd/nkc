@@ -3,9 +3,23 @@ block eTitle
   title 审核记录
 block eContent
   .container-fluid.max-width
-    .hidden#data=objToStr({reviewLogs: data.reviewLogs, paging: data.paging})
+    .hidden#data=objToStr({reviewLogs: data.reviewLogs, paging: data.paging, type: data.t, content: data.c})
     .row#app(v-cloak)
       .col-xs-12.col-md-12
+        div 
+          h4.m-b-1 按条件查询记录
+          .form-inline(style='margin-bottom: 1rem;' v-cloak)#app
+            .form-group
+              select.form-control(v-model='form.type')
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='id') 文号
+            .form-group
+              input.form-control(placeholder='请输入内容' v-model='form.content' @keyup.enter='search')
+            .form-group
+              button.btn.btn-primary(type='submit' @click='search' :disabled="!form.content") 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/review') 全部
         div.m-t-1.table-responsive
           include ../../../publicModules/paging/paging.pug
           table.table.table-bordered
@@ -49,7 +63,8 @@ block eContent
                     a(:href="getUrl('userHome', reviewLog.handler.uid)" target="_blank")
                       span {{reviewLog.handler.username}}
                  
-                th {{reviewLog.handlerReason}}
+                th
+                  div.whitespace-pre-line {{reviewLog.handlerReason}}
           include ../../../publicModules/paging/paging.pug
 
 block scripts

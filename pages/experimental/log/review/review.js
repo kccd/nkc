@@ -8,10 +8,21 @@ const app = new window.Vue({
   data: {
     reviewLogs: data.reviewLogs,
     paging: data.paging,
+    form: {
+      type: data.type, // username, uid, id
+      content: data.content,
+    },
   },
 
   methods: {
     getUrl,
     timeFormat,
+    search() {
+      window.location.href =
+        '/e/log/review?t=' +
+        this.form.type +
+        '&c=' +
+        encodeURIComponent(this.form.content);
+    },
   },
 });

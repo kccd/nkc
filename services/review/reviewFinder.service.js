@@ -1,4 +1,6 @@
 const ReviewLogModel = require('../../dataModels/ReviewLogModel');
+const DocumentModel = require('../../dataModels/DocumentModel');
+const UserModel = require('../../dataModels/UserModel');
 const { getJsonStringTextSplit } = require('../../nkcModules/json');
 const { htmlToPlain } = require('../../nkcModules/nkcRender');
 const { threadFinderService } = require('../thread/threadFinder.service');
@@ -71,10 +73,55 @@ class ReviewFinderService {
 
   // 后台管理获取审核记录
   managerGetReviewLogs = async (props) => {
-    const { page, perPage } = props;
-    const count = await ReviewLogModel.countDocuments();
+    const { page, perPage, search } = props;
+    const match = {};
+    if (search) {
+      if (search.type === 'username') {
+        const user = await UserModel.findOne({
+          usernameLowerCase: search.content.toLowerCase(),
+        });
+        match.$or = [
+          {
+            uid: user ? user.uid : 'none',
+          },
+          {
+            handlerId: user ? user.uid : 'none',
+          },
+        ];
+      } else if (search.type === 'uid') {
+        match.$or = [
+          {
+            uid: search.content,
+          },
+          {
+            handlerId: search.content,
+          },
+        ];
+      } else if (search.type === 'id') {
+        if (/^[dD]\d+$/.test(search.content)) {
+          const documentDid = search.content.slice(1);
+          const documents = await DocumentModel.find(
+            {
+              did: Number(documentDid),
+            },
+            {
+              _id: 1,
+            },
+          );
+
+          match.source = reviewSources.document;
+          match.sid = {
+            $in: documents.map((doc) => doc._id),
+          };
+        } else {
+          match.sid = search.content;
+          match.source = reviewSources.post;
+        }
+      }
+    }
+    const count = await ReviewLogModel.countDocuments(match);
     const paging = apiFunction.paging(page, count, perPage);
-    const reviewLogs = await ReviewLogModel.find()
+    const reviewLogs = await ReviewLogModel.find(match)
       .sort({ toc: -1 })
       .skip(paging.start)
       .limit(paging.perpage);
