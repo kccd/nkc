@@ -1,7 +1,5 @@
 // 触发审核的原因
 const reviewTriggerType = {
-  required: 'required', // 系统强制要求审核
-  blacklist: 'blacklist', // 黑名单用户
   foreign: 'foreign', // 地区限制
   notPassedA: 'notPassedA', // 未通过A卷
   grade: 'grade', // 用户等级太低
@@ -9,6 +7,7 @@ const reviewTriggerType = {
   forumSettingReview: 'forumSettingReview', // 满足论坛专业设置要求审核的条件
   notPassedAD: 'notPassedAD',
   sensitiveWord: 'sensitiveWord', // 包含敏感词
+  unknown: 'unknown', // 未知
 };
 // 触发审核的内容的来源
 const reviewSources = {
@@ -24,6 +23,7 @@ const reviewStatus = {
   revised: 'revised', // 已退回
   deleted: 'deleted', // 删除
   invalid: 'invalid', // 无效（可能产生了新的审核记录）
+  unknown: 'unknown', // 未知状态
 };
 
 module.exports = {
