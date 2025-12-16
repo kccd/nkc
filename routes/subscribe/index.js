@@ -94,11 +94,8 @@ router
       let paging = nkcModules.apiFunction.getDefaultPaging();
       let posts;
       const pageSettings = await db.SettingModel.getSettings('page');
-      const {
-        thread: threadType,
-        article: articleType,
-        post: postType,
-      } = await db.ColumnPostModel.getColumnPostTypes();
+      const { thread: threadType, article: articleType } =
+        await db.ColumnPostModel.getColumnPostTypes();
 
       switch (type) {
         case 'column': {

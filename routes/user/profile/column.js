@@ -1,16 +1,16 @@
-const { getJsonStringTextSlice } = require("../../../nkcModules/json");
-const { renderHTMLByJSON } = require("../../../nkcModules/nkcRender/json");
+const { getJsonStringTextSlice } = require('../../../nkcModules/json');
+const { renderHTMLByJSON } = require('../../../nkcModules/nkcRender/json');
 
 module.exports = async (ctx, next) => {
   //获取用户在专栏下发表的文章
-  const {data, db, state, params, query, nkcModules, permission} = ctx;
-  const {user, targetUser} = data;
-  const {uid, column} = targetUser;
-  const {page=0} = query;
-  const {pageSettings} = state;
+  const { data, db, state, params, query, nkcModules, permission } = ctx;
+  const { user, targetUser } = data;
+  const { uid, column } = targetUser;
+  const { page = 0 } = query;
+  const { pageSettings } = state;
   data.threads = [];
   //当存在专栏时
-  if(column) {
+  if (column) {
     const match = {
       columnId: column._id,
       hidden: false,
@@ -21,60 +21,83 @@ module.exports = async (ctx, next) => {
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
-      user
+      user,
     );
     // 筛选出没有开启流控的专业
-    let forumInReduceVisits = await db.ForumModel.find({openReduceVisits: true});
-    forumInReduceVisits = forumInReduceVisits.map(forum => forum.fid);
-    fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !forumInReduceVisits.includes(fid));
-    const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
-    const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
-    const homeSettings = await db.SettingModel.getSettings("home");
+    let forumInReduceVisits = await db.ForumModel.find({
+      openReduceVisits: true,
+    });
+    forumInReduceVisits = forumInReduceVisits.map((forum) => forum.fid);
+    fidOfCanGetThreads = fidOfCanGetThreads.filter(
+      (fid) => !forumInReduceVisits.includes(fid),
+    );
+    const topicsId = await db.ForumModel.getForumsIdFromRedis('topic');
+    const disciplinesId = await db.ForumModel.getForumsIdFromRedis(
+      'discipline',
+    );
+    const homeSettings = await db.SettingModel.getSettings('home');
 
     // 排除话题下的文章
-    if(!homeSettings.list || !homeSettings.list.topic) {
-      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !topicsId.includes(fid));
+    if (!homeSettings.list || !homeSettings.list.topic) {
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(
+        (fid) => !topicsId.includes(fid),
+      );
     }
     // 排除学科下的文章
-    if(!homeSettings.list || !homeSettings.list.discipline) {
-      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
+    if (!homeSettings.list || !homeSettings.list.discipline) {
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(
+        (fid) => !disciplinesId.includes(fid),
+      );
     }
     //获取访问的用户在专栏下的文章引用
-    const columnPosts = await db.ColumnPostModel.find({tUid: targetUser.uid, hidden: false}, {pid: 1, columnId: 1, type: 1}).skip(paging.start).limit(paging.perpage).sort({toc: -1});
+    const columnPosts = await db.ColumnPostModel.find(
+      { tUid: targetUser.uid, hidden: false },
+      { pid: 1, columnId: 1, type: 1 },
+    )
+      .skip(paging.start)
+      .limit(paging.perpage)
+      .sort({ toc: -1 });
     const tidArr = [];
-    const pidArr = [];
-    const aidArr = [];//专栏
-    const {post, thread, article} = await db.ColumnPostModel.getColumnPostTypes();
-    for(const c of columnPosts) {
-      if(c.type === post) {
-        pidArr.push(c.pid);
-      } else if(c.type === thread) {
+    const aidArr = []; //专栏
+    const { thread, article } = await db.ColumnPostModel.getColumnPostTypes();
+    for (const c of columnPosts) {
+      if (c.type === thread) {
         tidArr.push(c.pid);
-      } else if(c.type === article) {
+      } else if (c.type === article) {
         aidArr.push(c.pid);
       }
     }
     const q = {
       mainForumsId: {
-        $in: fidOfCanGetThreads
+        $in: fidOfCanGetThreads,
       },
       recycleMark: {
-        $ne: true
+        $ne: true,
       },
       disabled: false,
       reviewed: true,
       inColumn: true,
-      oc: {$in: tidArr}
+      oc: { $in: tidArr },
     };
     //获取社区文章
     let columnThreads = await db.ThreadModel.find(q, {
-      uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
-      tlm: 1, fid: 1, hasCover: 1,
-      mainForumsId: 1, hits: 1, count: 1,
-      digest: 1, reviewed: 1,
+      uid: 1,
+      tid: 1,
+      toc: 1,
+      oc: 1,
+      lm: 1,
+      tlm: 1,
+      fid: 1,
+      hasCover: 1,
+      mainForumsId: 1,
+      hits: 1,
+      count: 1,
+      digest: 1,
+      reviewed: 1,
       columnsId: 1,
       categoriesId: 1,
-      disabled: 1, recycleMark: 1
+      disabled: 1,
+      recycleMark: 1,
     });
     //拓展专栏社区文章
     columnThreads = await db.ThreadModel.extendThreads(columnThreads, {
@@ -84,24 +107,27 @@ module.exports = async (ctx, next) => {
       extendColumns: true,
     });
     let threadObj = {};
-    for(const thread of columnThreads) {
+    for (const thread of columnThreads) {
       threadObj[thread.oc] = thread;
     }
-    let columnArticles = await db.ArticleModel.find({_id: {$in: aidArr}});
+    let columnArticles = await db.ArticleModel.find({ _id: { $in: aidArr } });
     //拓展专栏文章
-    columnArticles = await db.ColumnPostModel.extendColumnArticles(columnArticles);
+    columnArticles = await db.ColumnPostModel.extendColumnArticles(
+      columnArticles,
+    );
     const articleObj = {};
-    for(const ca of columnArticles) {
+    for (const ca of columnArticles) {
       articleObj[ca._id] = ca;
     }
-    const {thread: threadType, article: articleType} = await db.ColumnPostModel.getColumnPostTypes();
+    const { thread: threadType, article: articleType } =
+      await db.ColumnPostModel.getColumnPostTypes();
     const threads = [];
     for (const c of columnPosts) {
       let t;
       let need_t = {};
-      if(c.type === threadType) {
+      if (c.type === threadType) {
         t = threadObj[c.pid];
-        if(t) {
+        if (t) {
           const column = await c.extendColumnPost();
           t.type = 'thread';
           need_t.content = t.firstPost.c;
@@ -115,21 +141,19 @@ module.exports = async (ctx, next) => {
           need_t.voteDown = t.firstPost.voteDown;
           need_t.hits = t.hits;
         }
-      } else if(c.type === articleType){
+      } else if (c.type === articleType) {
         t = articleObj[c.pid];
-        if(t) {
+        if (t) {
           const column = await c.extendColumnPost();
           //获取当前引用的专栏
           t.type = 'article';
-          need_t.content =  t.document.l === 'json'
-          ? getJsonStringTextSlice(t.document.content ,200)
-          : nkcModules.nkcRender.htmlToPlain(
-           t.document.content,
-            200,
-          );
+          need_t.content =
+            t.document.l === 'json'
+              ? getJsonStringTextSlice(t.document.content, 200)
+              : nkcModules.nkcRender.htmlToPlain(t.document.content, 200);
           need_t.title = t.document.title;
           need_t.cover = t.document.cover;
-            //获取文章的专栏信息
+          //获取文章的专栏信息
           need_t.columnName = column.name;
           need_t.toc = t.toc;
           need_t.voteUp = t.voteUp;
@@ -139,7 +163,7 @@ module.exports = async (ctx, next) => {
           need_t.count = t.count;
         }
       }
-      if(t) {
+      if (t) {
         need_t.url = `/m/${c.columnId}/a/${c._id}`;
         need_t.homeUrl = `/m/${c.columnId}`;
         threads.push(need_t);

@@ -1,6 +1,28 @@
--var {column, from, type, post, thread, article, mainCategories, columnId, toc} = columnPost
-if thread
-  -var {firstPost} = thread;
+-
+  var {column, from, type, post, thread, article, mainCategories, columnId, toc} = columnPost
+  var coverUrl = '';
+  var firstPost = thread? thread.firstPost: null;
+  if(thread && thread.firstPost && thread.firstPost.cover) {
+    coverUrl = thread.firstPost.coverUrl;
+  } else if(article && article.document && article.document.cover) {
+    coverUrl = article.document.coverUrl;
+  }
+  var title = '';
+  var url = '';
+  if (post && post.url) {
+    title = firstPost.t;
+    url = post.url;
+  } else if (article) {
+    title = article.document? article.document.title: '';
+    url = article.url;
+  }
+  var abstract = '';
+  if (type === 'thread') {
+    abstract = post.c
+  } else if(type === 'article') {
+    abstract = article.document? article.document.content: '';
+  }
+
 .column-posts-post
   if type === 'thread'
     if thread.disabled
@@ -18,39 +40,18 @@ if thread
       .thread-draft-info 文章已被退修
     else if article.status === 'deleted'
       .thread-deleted-info 文章已被删除
-  .column-post-body(class=(thread && thread.firstPost.cover) || (article && article.document.cover)?"cover":"")
+  .column-post-body(class=coverUrl? "cover": "")
+    .column-post-title.mb-2(class='sm:!hidden')
+      a(href=url class="text-[1.4rem] sm:text-[1.6rem]")=title
     .column-post-cover
-      if thread && thread.firstPost.cover
-        div(style=`background-image:url(${thread.firstPost.coverUrl})`)
-      else if article && article.document.cover
-        div(style=`background-image:url(${article.document.coverUrl})`)
+      if coverUrl 
+        div(style=`background-image:url(${coverUrl})` class="w-[9rem] h-[6rem] sm:w-[14rem] sm:h-[10rem]")
     .column-post-abstract
-      if type === "post"
-        .column-post-content.post
-          if !post.anonymous
-            a.column-thread-author(href=`/u/${post.uid}` target="_blank"
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
-              data-global-data=objToStr({uid: post.uid})
-            )
-              span=post.user.username
-          else
-            span.anonymous-name=anonymousInfo.username
-          | ：
-          span=post.c
-      .column-post-title
-        if post && post.url
-          a(href=post.url)=firstPost.t
-        else if article
-          a(href=article.url)=article.document.title
-        //a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
-      if type === "thread"
-        .column-post-content= post.c
-      if type === "article"
-        .column-post-content= article.document.content
+      .column-post-title.mb-2(class='hidden sm:!block')
+        a(href=url class="text-[1.4rem] sm:text-[1.6rem]")=title
+      .column-post-content= abstract  
       .column-post-info
         if type === 'thread'
-          //if !data.column || data.column.uid !== post.uid
           if !thread.firstPost.anonymous
             a(href=`/u/${thread.firstPost.uid}` target="_blank"
               data-global-mouseover="showUserPanel"
