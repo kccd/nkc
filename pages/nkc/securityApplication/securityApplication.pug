@@ -51,6 +51,7 @@ block nkcContent
                 data-global-mouseover="showUserPanel"
                 data-global-mouseout="hideUserPanel"
                 :data-global-data="objToStr({uid: a.user.uid})"
+                target="_blank"
                 ) {{a.user.username}}
             th +{{a.newPhoneNumber.nationCode}} {{a.newPhoneNumber.number}}
             th +{{a.oldPhoneNumber.nationCode}} {{a.oldPhoneNumber.number}}
@@ -66,10 +67,10 @@ block nkcContent
               div(v-if='a.status === "pending"')
                 .radio
                   label.m-r-05
-                    input(type='radio' value="resolved" v-model='a._status')
+                    input(type='radio' name="group" value="resolved" v-model='a._status')
                     span 通过
                   label
-                    input(type='radio' value='rejected' v-model='a._status')
+                    input(type='radio' name="group" value='rejected' v-model='a._status')
                     span 驳回
                 div(v-if='a._status === "resolved"')
                   textarea.form-control(rows=3 placeholder='备注（用户不可见）' v-model='a.remarks')
