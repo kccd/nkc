@@ -1437,9 +1437,8 @@ threadSchema.statics.publishArticle = async (options) => {
   const {
     reviewPostService,
   } = require('../services/review/reviewPost.service');
-  const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
-    post,
-  );
+  const { needReview } =
+    await reviewPostService.getReviewStatusAndCreateReviewLog(post);
   if (!needReview) {
     await PostModel.updateOne({ pid: post.pid }, { $set: { reviewed: true } });
     await ThreadModel.updateOne(
@@ -2393,9 +2392,8 @@ threadSchema.statics.postNewThread = async (options) => {
   const {
     reviewPostService,
   } = require('../services/review/reviewPost.service');
-  const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
-    _post,
-  );
+  const { needReview } =
+    await reviewPostService.getReviewStatusAndCreateReviewLog(_post);
   if (!needReview) {
     _post.reviewed = true;
     thread.reviewed = true;

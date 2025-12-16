@@ -1432,7 +1432,7 @@ threadRouter
     //   await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
     //   || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
     // 自动送审
-    const needReview =
+    const { needReview } =
       await reviewPostService.getReviewStatusAndCreateReviewLog(_post);
     if (!needReview) {
       await db.PostModel.updateOne(
