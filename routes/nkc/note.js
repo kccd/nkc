@@ -62,7 +62,6 @@ router
       //更新笔记状态
       await noteContent.updateOne({ status: noteContentStatus.disabled });
       //更新笔记审核记录状态
-      // TODO OK：调用审核service上的方法
       await reviewModifierService.modifyReviewLogStatusToDeleted({
         source: reviewSources.note,
         sid: noteContentId,

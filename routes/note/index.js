@@ -104,7 +104,6 @@ router
     let appear = false; //是否出现了敏感词
     if (enabled) {
       const { keyWordGroup } = await db.SettingModel.getSettings('note'); //笔记勾选敏感词组id
-      // TODO OK：调用审核service上的方法
       const result = await keywordCheckerService.matchKeywordsByGroupsId(
         content,
         keyWordGroup,
@@ -151,7 +150,6 @@ router
     let appear = false; //是否出现了敏感词
     if (enabled) {
       const { keyWordGroup } = await db.SettingModel.getSettings('note'); //笔记勾选敏感词组id
-      // TODO OK：调用审核service上的方法
       const result = await keywordCheckerService.matchKeywordsByGroupsId(
         content,
         keyWordGroup,
@@ -234,7 +232,6 @@ router
     await noteContent.save(); //保存笔记内容
     //出现了敏感词，就创建审核记录
     if (appear) {
-      // TODO OK：调用审核service上的方法
       await reviewCreatorService.createNoteReviewLog({
         noteId: noteContent._id,
         uid: noteContent.uid,

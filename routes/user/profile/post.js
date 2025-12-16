@@ -212,7 +212,6 @@ module.exports = async (ctx, next) => {
       }).sort({ toc: -1 });
       postLogReason = postLogOne ? postLogOne.reason : '';
     } else {
-      // TODO OK：调用审核service上的方法
       postLogReason = await reviewFinderService.getReviewReason(
         reviewSources.post,
         post.pid,

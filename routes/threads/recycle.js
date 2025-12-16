@@ -129,7 +129,6 @@ router.post(
         });
         await delLog.save();
       }
-      // TODO OK: 处理post删除
       await reviewModifierService.modifyReviewLogStatusToDeleted({
         source: reviewSources.post,
         sid: post.pid,

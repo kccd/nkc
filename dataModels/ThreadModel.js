@@ -1434,7 +1434,6 @@ threadSchema.statics.publishArticle = async (options) => {
     tid,
   });
   await thread.updateOne({ $set: { oc: post.pid, count: 1, hits: 1 } });
-  // TODO OK：调用审核service上的方法
   const {
     reviewPostService,
   } = require('../services/review/reviewPost.service');
@@ -2391,7 +2390,6 @@ threadSchema.statics.postNewThread = async (options) => {
   //     await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
   //   || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   // 自动送审
-  // TODO OK：调用审核service上的方法
   const {
     reviewPostService,
   } = require('../services/review/reviewPost.service');

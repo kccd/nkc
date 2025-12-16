@@ -2102,7 +2102,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if (status === unknown) {
-      // TODO OK: 从新的审核表拿审核理由
       const {
         reviewFinderService,
       } = require('../services/review/reviewFinder.service');

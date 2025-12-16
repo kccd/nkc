@@ -1495,7 +1495,6 @@ schema.methods.getKeywordsReviewStatus = async function () {
     abstract +
     abstractEN +
     keywords.concat(keywordsEN).join(' ');
-  // TODO OK: 执行审核相关service的方法，而不是执行旧审核日志表上的方法
   const {
     keywordCheckerService,
   } = require('../services/keyword/keywordChecker.service');
@@ -1533,7 +1532,6 @@ schema.methods.getReviewStatusAndCreateReviewLog = async function () {
 
   //如果需要审核，就生成审核记录
   if (needReview) {
-    // TODO OK: 需要执行审核service上的方法
     const {
       reviewCreatorService,
     } = require('../services/review/reviewCreator.service');

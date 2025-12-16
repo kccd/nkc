@@ -79,7 +79,6 @@ function thread() {
       .limit(limit);
     const targetId = new Set();
     for (const post of posts) {
-      // TODO OK：调用审核service上的方法
       const matchedKeywords = await keywordCheckerService.matchKeywordsByGroups(
         post.t + post.c,
         groups,
@@ -100,7 +99,6 @@ function thread() {
           { pid: post.pid },
           { $set: { reviewed: false } },
         );
-        // TODO OK：调用审核service上的方法
         await reviewCreatorService.createPostReviewLog({
           uid: post.uid,
           postId: post.pid,

@@ -177,7 +177,6 @@ module.exports = async (ctx, next) => {
       }).sort({ toc: -1 });
       threadLogReason = threadLogOne ? threadLogOne.reason : '';
     } else {
-      // TODO OK：调用审核service上的方法
       threadLogReason = await reviewFinderService.getReviewReason(
         reviewSources.post,
         thread.firstPost.pid,

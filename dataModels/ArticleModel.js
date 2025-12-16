@@ -1879,7 +1879,6 @@ schema.statics.getArticlesInfo = async function (articles) {
     if (document) {
       const { status } = document;
       if (status === unknownStatus) {
-        // TODO OK: 需要从新的审核日志表拿触发审核的原因
         const {
           reviewFinderService,
         } = require('../services/review/reviewFinder.service');

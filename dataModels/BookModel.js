@@ -1,6 +1,3 @@
-const {
-  reviewFinderService,
-} = require('../services/review/reviewFinder.service');
 const mongoose = require('../settings/database');
 const { reviewSources } = require('../settings/review');
 
@@ -357,7 +354,9 @@ schema.methods.extendArticlesById = async function (articlesId) {
     const { title, status, _id: docId } = document;
     let reviewLogReason = '';
     if (status === 'faulty' || status === 'disabled') {
-      // TODO OK: 需要从新的审核日志表拿触发审核的原因
+      const {
+        reviewFinderService,
+      } = require('../services/review/reviewFinder.service');
       reviewLogReason = await reviewFinderService.getReviewReason(
         reviewSources.document,
         docId,

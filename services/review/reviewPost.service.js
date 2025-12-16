@@ -141,7 +141,6 @@ class ReviewPostService {
       if (currentPostType === 'post') {
         useKeywordGroupsId = forumKeywordSettings.rule.reply.useGroups;
       }
-      // TODO OK：调用审核service上的方法
       const matchedKeywords =
         await keywordCheckerService.matchKeywordsByGroupsId(
           post.t + (post.l === 'json' ? getJsonStringText(post.c) : post.c),
@@ -239,7 +238,6 @@ class ReviewPostService {
       abstractCn +
       abstractEn +
       keyWordsCn.concat(keyWordsEn).join(' ');
-    // TODO OK：调用审核service上的方法
     const matchedKeywords = await keywordCheckerService.matchKeywordsByGroupsId(
       Content,
       keywordGroupId,

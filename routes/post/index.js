@@ -594,7 +594,6 @@ router
     }
 
     // 如果符合送审条件，自动内容送审
-    // TODO OK：调用审核service上的方法
     const needReview =
       await reviewPostService.getReviewStatusAndCreateReviewLog(singlePost);
     if (needReview) {

@@ -465,7 +465,6 @@ schema.statics.extendPostComments = async (props) => {
     let reason;
     //获取评论状态不正常的审核原因
     if (d.status === unknownStatus) {
-      // TODO OK: 需要从新的审核日志表拿触发审核的原因
       const {
         reviewFinderService,
       } = require('../services/review/reviewFinder.service');
@@ -631,7 +630,6 @@ schema.statics.extendSingleComment = async (comment) => {
   let reason;
   //获取评论状态不正常的审核原因
   if (document.status === unknownStatus) {
-    // TODO OK: 需要从新的审核日志表拿触发审核的原因
     const {
       reviewFinderService,
     } = require('../services/review/reviewFinder.service');

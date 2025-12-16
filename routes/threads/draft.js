@@ -108,7 +108,6 @@ router.post(
         });
         await delLog.save();
       }
-      // TODO OK: 处理post退修
       await reviewModifierService.modifyReviewLogStatusToRevised({
         source: reviewSources.post,
         sid: post.pid,
