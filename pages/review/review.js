@@ -252,11 +252,11 @@ var app = new window.Vue({
       return Promise.resolve()
         .then(() => {
           if (data.pass) {
-            return reviewActions.approveUserAudit({
+            return reviewActions.approveUserAuditReview({
               userAuditId: data.userAuditId,
             });
           } else {
-            return reviewActions.rejectUserAudit({
+            return reviewActions.rejectUserAuditReview({
               userAuditId: data.userAuditId,
               reason: data.reason,
               remindUser: data.noticeType,
