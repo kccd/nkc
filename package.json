@@ -102,7 +102,7 @@
     "alipay-sdk": "3.1.5",
     "ansi-escapes": "^4.3.1",
     "awesome-static": "^1.4.3",
-    "axios": "^0.25.0",
+    "axios": "^0.30.2",
     "big.js": "^6.0.1",
     "bluebird": "^3.7.2",
     "canvas": "3.2.0",
