@@ -79,7 +79,7 @@ class ReviewActions {
     });
   };
   // 用户资料通过审核
-  approveUserReview = async (props) => {
+  approveUserAuditReview = async (props) => {
     const { userAuditId } = props;
     return nkcAPI('/review/user', 'PUT', {
       user: {
@@ -89,7 +89,7 @@ class ReviewActions {
     });
   };
   // user 未通过审核
-  rejectUserReview = async (props) => {
+  rejectUserAuditReview = async (props) => {
     const { userAuditId, reason, remindUser, violation } = props;
     return nkcAPI('/review/user', 'PUT', {
       user: {
