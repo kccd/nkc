@@ -1,9 +1,52 @@
 // 获取所有文本节点
 import { getUrl } from './tools';
-function getAllTextNodes(element) {
-  const textNodes = [];
 
-  function traverse(node) {
+const BLOCK_TAGS = new Set([
+  'ADDRESS',
+  'ARTICLE',
+  'ASIDE',
+  'DIV',
+  'DL',
+  'FIELDSET',
+  'FIGCAPTION',
+  'FIGURE',
+  'FOOTER',
+  'FORM',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'HEADER',
+  'HR',
+  'LI',
+  'MAIN',
+  'NAV',
+  'OL',
+  'P',
+  'PRE',
+  'SECTION',
+  'TABLE',
+  'TBODY',
+  'TD',
+  'TFOOT',
+  'TH',
+  'THEAD',
+  'TR',
+  'UL',
+]);
+
+function isBlockElement(node) {
+  return (
+    node && node.nodeType === Node.ELEMENT_NODE && BLOCK_TAGS.has(node.nodeName)
+  );
+}
+
+function getTextSegments(element) {
+  const segments = [];
+
+  function traverse(node, currentBlock) {
     if (
       node.nodeName === 'A' ||
       node.nodeName === 'BLOCKQUOTE' ||
@@ -12,15 +55,69 @@ function getAllTextNodes(element) {
     ) {
       return;
     }
+
+    if (node.nodeName === 'BR') {
+      segments.push({ type: 'break' });
+      return;
+    }
+
+    let nextBlock = currentBlock;
+    if (isBlockElement(node)) {
+      nextBlock = node;
+    }
+
     if (node.nodeType === Node.TEXT_NODE) {
-      textNodes.push(node);
+      if (node.textContent) {
+        segments.push({
+          type: 'text',
+          node,
+          text: node.textContent,
+          blockKey: nextBlock,
+        });
+      }
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      node.childNodes.forEach(traverse);
+      node.childNodes.forEach((child) => traverse(child, nextBlock));
     }
   }
 
-  traverse(element);
-  return textNodes;
+  traverse(element, element);
+  return segments;
+}
+
+function buildTextIndex(segments) {
+  let textString = '';
+  let offset = 0;
+  const nodeRanges = new Map();
+  const textNodes = [];
+
+  segments.forEach((seg, idx) => {
+    if (seg.type === 'break') {
+      textString += '\n';
+      offset += 1;
+      return;
+    }
+
+    const prev = idx > 0 ? segments[idx - 1] : null;
+    const needBlockBreak =
+      prev &&
+      prev.type === 'text' &&
+      prev.blockKey &&
+      seg.blockKey &&
+      prev.blockKey !== seg.blockKey;
+
+    if (needBlockBreak) {
+      textString += '\n';
+      offset += 1;
+    }
+
+    const start = offset;
+    textString += seg.text;
+    offset += seg.text.length;
+    nodeRanges.set(seg.node, { start, end: offset });
+    textNodes.push(seg.node);
+  });
+
+  return { textString, nodeRanges, textNodes };
 }
 
 export function renderNKCDocNumber() {
@@ -28,15 +125,13 @@ export function renderNKCDocNumber() {
     .querySelectorAll('.render-content.math-jax')
     .forEach((renderContent) => {
       const checkerRegex = /#(([Dd]|t)?\d+)/;
-      const renderContentText = renderContent.textContent;
-      if (!checkerRegex.test(renderContentText)) {
+      const segments = getTextSegments(renderContent);
+      const { textString, nodeRanges, textNodes } = buildTextIndex(segments);
+      if (!checkerRegex.test(textString)) {
         return;
       }
-      const textNodes = getAllTextNodes(renderContent); // 获取所有文本节点
       let tempArray = [];
 
-      // 拼接所有文本节点的内容
-      const textString = textNodes.map((node) => node.textContent).join('');
       let match;
       const regex = /#(([Dd]|t)?\d+)/g;
       while ((match = regex.exec(textString)) !== null) {
@@ -55,11 +150,13 @@ export function renderNKCDocNumber() {
         });
       }
 
-      let $index = 0;
-
-      textNodes.forEach((textNode, index) => {
-        const indexStart = $index;
-        const indexEnd = indexStart + textNode.textContent.length;
+      textNodes.forEach((textNode) => {
+        const range = nodeRanges.get(textNode);
+        if (!range) {
+          return;
+        }
+        const indexStart = range.start;
+        const indexEnd = range.end;
         // 使用安全的节点替换，避免通过 innerHTML 注入
         const frag = document.createDocumentFragment();
         let lastIndex = 0; // 用于跟踪已替换文本的结束位置
@@ -70,7 +167,7 @@ export function renderNKCDocNumber() {
           if (item.start >= indexStart && indexEnd >= item.end) {
             const plain = textNode.textContent.slice(
               lastIndex,
-              item.start - $index,
+              item.start - indexStart,
             );
             if (plain) {
               frag.appendChild(document.createTextNode(plain));
@@ -81,7 +178,7 @@ export function renderNKCDocNumber() {
             a.dataset.link = item.index;
             a.textContent = item.text;
             frag.appendChild(a);
-            lastIndex = item.end - $index; // 更新已替换文本的结束位置
+            lastIndex = item.end - indexStart; // 更新已替换文本的结束位置
           }
           // 处理第二种情况：开始在文本内，结束不在文本内
           else if (
@@ -91,14 +188,14 @@ export function renderNKCDocNumber() {
           ) {
             const plain = textNode.textContent.slice(
               lastIndex,
-              item.start - $index,
+              item.start - indexStart,
             );
             if (plain) {
               frag.appendChild(document.createTextNode(plain));
             }
             const textToLink = textNode.textContent.slice(
-              item.start - $index,
-              indexEnd - $index,
+              item.start - indexStart,
+              indexEnd - indexStart,
             );
             const a = document.createElement('a');
             a.setAttribute('href', item.href);
@@ -106,7 +203,7 @@ export function renderNKCDocNumber() {
             a.dataset.link = item.index;
             a.textContent = textToLink;
             frag.appendChild(a);
-            lastIndex = indexEnd - $index; // 更新结束位置到文本末尾
+            lastIndex = indexEnd - indexStart; // 更新结束位置到文本末尾
           }
           // 处理第三种情况：整个文本节点需要被链接包裹
           else if (indexStart > item.start && indexEnd <= item.end) {
@@ -117,7 +214,7 @@ export function renderNKCDocNumber() {
             a.textContent = textNode.textContent;
             // 直接替换为一个链接节点
             frag.appendChild(a);
-            lastIndex = indexEnd - $index; // 更新到文本末尾
+            lastIndex = indexEnd - indexStart; // 更新到文本末尾
           }
           // 处理第四种情况：后半段在文本节点开始部分
           else if (
@@ -127,7 +224,7 @@ export function renderNKCDocNumber() {
           ) {
             const textToLink = textNode.textContent.slice(
               lastIndex,
-              item.end - $index,
+              item.end - indexStart,
             );
             const a = document.createElement('a');
             a.setAttribute('href', item.href);
@@ -135,7 +232,7 @@ export function renderNKCDocNumber() {
             a.dataset.link = item.index;
             a.textContent = textToLink;
             frag.appendChild(a);
-            lastIndex = item.end - $index;
+            lastIndex = item.end - indexStart;
           }
         });
 
@@ -153,9 +250,6 @@ export function renderNKCDocNumber() {
           spanElement.appendChild(frag);
           textNode.parentNode.replaceChild(spanElement, textNode);
         }
-
-        // 更新当前索引
-        $index = indexEnd;
       });
       const links = renderContent.querySelectorAll('a[data-link]');
       links.forEach((link) => {
@@ -197,16 +291,13 @@ export function replaceDocNumberToLink(html) {
 
   // 仅在存在匹配时再进行处理，避免不必要的遍历
   const checkerRegex = /#(([Dd]|t)?\d+)/;
-  const containerText = container.textContent || '';
-  if (!checkerRegex.test(containerText)) {
+  const segments = getTextSegments(container);
+  const { textString, nodeRanges, textNodes } = buildTextIndex(segments);
+  if (!checkerRegex.test(textString)) {
     return html;
   }
 
-  // 对容器内的内容执行独立的替换流程
-  const textNodes = getAllTextNodes(container);
   const tempArray = [];
-
-  const textString = textNodes.map((node) => node.textContent).join('');
   const regex = /#(([Dd]|t)?\d+)/g;
   let match;
   while ((match = regex.exec(textString)) !== null) {
@@ -225,10 +316,13 @@ export function replaceDocNumberToLink(html) {
     });
   }
 
-  let $index = 0;
   textNodes.forEach((textNode) => {
-    const indexStart = $index;
-    const indexEnd = indexStart + textNode.textContent.length;
+    const range = nodeRanges.get(textNode);
+    if (!range) {
+      return;
+    }
+    const indexStart = range.start;
+    const indexEnd = range.end;
     // 使用安全的节点替换，避免通过 innerHTML 注入
     const frag = document.createDocumentFragment();
     let lastIndex = 0;
@@ -237,7 +331,7 @@ export function replaceDocNumberToLink(html) {
       if (item.start >= indexStart && indexEnd >= item.end) {
         const plain = textNode.textContent.slice(
           lastIndex,
-          item.start - $index,
+          item.start - indexStart,
         );
         if (plain) {
           frag.appendChild(document.createTextNode(plain));
@@ -248,7 +342,7 @@ export function replaceDocNumberToLink(html) {
         a.dataset.link = item.index;
         a.textContent = item.text;
         frag.appendChild(a);
-        lastIndex = item.end - $index;
+        lastIndex = item.end - indexStart;
       } else if (
         indexStart <= item.start &&
         item.start < indexEnd &&
@@ -256,14 +350,14 @@ export function replaceDocNumberToLink(html) {
       ) {
         const plain = textNode.textContent.slice(
           lastIndex,
-          item.start - $index,
+          item.start - indexStart,
         );
         if (plain) {
           frag.appendChild(document.createTextNode(plain));
         }
         const textToLink = textNode.textContent.slice(
-          item.start - $index,
-          indexEnd - $index,
+          item.start - indexStart,
+          indexEnd - indexStart,
         );
         const a = document.createElement('a');
         a.setAttribute('href', item.href);
@@ -271,7 +365,7 @@ export function replaceDocNumberToLink(html) {
         a.dataset.link = item.index;
         a.textContent = textToLink;
         frag.appendChild(a);
-        lastIndex = indexEnd - $index;
+        lastIndex = indexEnd - indexStart;
       } else if (indexStart > item.start && indexEnd <= item.end) {
         const a = document.createElement('a');
         a.setAttribute('href', item.href);
@@ -279,7 +373,7 @@ export function replaceDocNumberToLink(html) {
         a.dataset.link = item.index;
         a.textContent = textNode.textContent;
         frag.appendChild(a);
-        lastIndex = indexEnd - $index;
+        lastIndex = indexEnd - indexStart;
       } else if (
         indexStart > item.start &&
         indexEnd > item.end &&
@@ -287,7 +381,7 @@ export function replaceDocNumberToLink(html) {
       ) {
         const textToLink = textNode.textContent.slice(
           lastIndex,
-          item.end - $index,
+          item.end - indexStart,
         );
         const a = document.createElement('a');
         a.setAttribute('href', item.href);
@@ -295,7 +389,7 @@ export function replaceDocNumberToLink(html) {
         a.dataset.link = item.index;
         a.textContent = textToLink;
         frag.appendChild(a);
-        lastIndex = item.end - $index;
+        lastIndex = item.end - indexStart;
       }
     });
 
@@ -311,8 +405,6 @@ export function replaceDocNumberToLink(html) {
       spanElement.appendChild(frag);
       textNode.parentNode.replaceChild(spanElement, textNode);
     }
-
-    $index = indexEnd;
   });
 
   return container.innerHTML;

@@ -41,8 +41,9 @@
         @click='editor.chain().focus().clearNodes().unsetAllMarks().run()',
         title='清除格式'
       )
-        <clear-format theme="outline" :size="iconFontSize" />
+        <clear-format theme="outline" :size="iconFontSize" tabindex='-1' />
       select(
+        tabindex='-1'
         style='width: 4.5rem',
         :value='getFontFamily()',
         @click='setFontFamily',
@@ -57,6 +58,7 @@
         :value='getHeadline()',
         @click='setHeadline',
         @blur='isHeadlineSelectOpen = false'
+        tabindex='-1'
       )
         option(value='0') 正文
         option(value='1') 标题1
@@ -66,6 +68,7 @@
         option(value='5') 标题5
         option(value='6') 标题6
       select.m-r-05(
+        tabindex='-1'
         :value='getFontSize()',
         @click='setFontSize',
         @blur='isFontSizeSelectOpen = false'

@@ -2,6 +2,10 @@ const Router = require('koa-router');
 const router = new Router();
 const { OnlyOperation } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
+const {
+  reviewModifierService,
+} = require('../../services/review/reviewModifier.service');
+const { reviewSources } = require('../../settings/review');
 router.post(
   '/',
   OnlyOperation(Operations.movePostsToRecycle),
@@ -14,7 +18,6 @@ router.post(
     const threads = [],
       threadsId = [];
     const recycleId = await db.SettingModel.getRecycleId();
-    const source = await db.ReviewModel.getDocumentSources();
     // 验证用户权限、验证内容是否存在
     for (const postId of postsId) {
       const post = await db.PostModel.findOne({ pid: postId });
@@ -92,17 +95,6 @@ router.post(
           noticeType: remindUser,
         });
         await delLog.save();
-        // 如果文章之前未审核 则生成审核记录
-        if (!thread.reviewed) {
-          await db.ReviewModel.newReview({
-            type: 'disabledThread',
-            sid: post.pid,
-            uid: post.uid,
-            reason,
-            handlerId: user.uid,
-            source: source.post,
-          });
-        }
       } else {
         // 批量屏蔽回复
         if (post.disabled) {
@@ -136,17 +128,14 @@ router.post(
           noticeType: remindUser,
         });
         await delLog.save();
-        if (!post.reviewed) {
-          await db.ReviewModel.newReview({
-            type: 'disabledPost',
-            sid: post.pid,
-            uid: post.uid,
-            reason,
-            handlerId: targetUser.uid,
-            source: source.post,
-          });
-        }
       }
+      await reviewModifierService.modifyReviewLogStatusToDeleted({
+        source: reviewSources.post,
+        sid: post.pid,
+        handlerId: user.uid,
+        handlerReason: reason,
+      });
+
       // 标记为违规
       if (violation) {
         //新增违规记录

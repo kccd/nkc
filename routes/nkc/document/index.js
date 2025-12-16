@@ -10,16 +10,16 @@ router.get(
     const { db, data, query, state, nkcModules } = ctx;
     let { page = 0, t = '' } = query;
     const { getUrl } = nkcModules.tools;
-    const { stable: stableDocumentType } =
-      await db.DocumentModel.getDocumentTypes();
     const documentSourcesObj = await db.DocumentModel.getDocumentSources();
     const articleSourcesObj = await db.ArticleModel.getArticleSources();
     const commentSourcesObj = await db.CommentModel.getCommentSources();
+    const documentTypes = await db.DocumentModel.getDocumentTypes();
     const documentStatus = {
       normal: 'normal',
       deleted: 'deleted',
       faulty: 'faulty',
       disabled: 'disabled',
+      default: 'default',
     };
     delete documentSourcesObj.draft;
     const documentSources = Object.values(documentSourcesObj);
@@ -37,6 +37,7 @@ router.get(
       documentStatus.disabled,
     ];
     let tUid = '';
+    let allType = false;
 
     //配置数据库查询状态
     if (t && Array.isArray(source) && source.length > 0) {
@@ -53,13 +54,18 @@ router.get(
       source = parsedT.source;
       status = parsedT.status;
       tUid = parsedT.tUid;
+      allType = !!parsedT.allType;
     }
 
     const match = {
       source: { $in: source },
       status: { $in: status },
-      type: stableDocumentType,
     };
+    if (!allType) {
+      match.type = documentTypes.stable;
+    } else {
+      match.status.$in.push(documentStatus.default);
+    }
 
     if (tUid) {
       match.uid = tUid;
@@ -136,11 +142,24 @@ router.get(
         // keywords = [],
         // keywordsEN = [],
         status = '',
+        type,
         l,
       } = document;
       const keywords = document.keywords || [];
       const keywordsEN = document.keywordsEN || [];
       const user = usersObj[uid];
+      let typeStr = '';
+      if (
+        [
+          documentTypes.history,
+          documentTypes.stableHistory,
+          documentTypes.betaHistory,
+        ].includes(type)
+      ) {
+        typeStr = '(历史)';
+      } else if (type === documentTypes.beta) {
+        typeStr = '(草稿)';
+      }
 
       let from;
       let url;
@@ -240,7 +259,7 @@ router.get(
                 },
               }),
         // 类型相关
-        from, // string 来源
+        from: from + typeStr, // string 来源
         url,
         status,
         source,
@@ -259,6 +278,7 @@ router.get(
     data.status = status;
     data.tUid = tUid;
     data.paging = paging;
+    data.allType = allType;
     ctx.template = 'nkc/document/document.pug';
     data.nav = 'document';
     await next();

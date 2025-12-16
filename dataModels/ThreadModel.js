@@ -6,8 +6,8 @@ const apiFunction = require('../nkcModules/apiFunction');
 const elasticSearch = require('../nkcModules/elasticSearch');
 const { getUrl, getAnonymousInfo } = require('../nkcModules/tools');
 const { subscribeSources } = require('../settings/subscribe');
-const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
+const { reviewSources } = require('../settings/review');
 const { getQueryObj, obtainPureText } = apiFunction;
 const threadSchema = new Schema(
   {
@@ -1434,11 +1434,12 @@ threadSchema.statics.publishArticle = async (options) => {
     tid,
   });
   await thread.updateOne({ $set: { oc: post.pid, count: 1, hits: 1 } });
-  // // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
-  // const needReview = await UserModel.contentNeedReview(thread.uid, "thread");
-  // 自动送审
-  // const needReview = await db.ReviewModel.autoPushToReview(_post);
-  const needReview = await ReviewModel.getReviewStatusAndCreateLog(post);
+  const {
+    reviewPostService,
+  } = require('../services/review/reviewPost.service');
+  const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
+    post,
+  );
   if (!needReview) {
     await PostModel.updateOne({ pid: post.pid }, { $set: { reviewed: true } });
     await ThreadModel.updateOne(
@@ -2311,6 +2312,15 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
       reviewed: true,
       categoriesId: [],
     });
+    const {
+      reviewModifierService,
+    } = require('../services/review/reviewModifier.service');
+    await reviewModifierService.modifyReviewLogStatusToDeleted({
+      source: reviewSources.post,
+      sid: thread.oc,
+      handlerId: '',
+      handlerReason: '退修超时未修改，系统自动屏蔽。',
+    });
     // 更新文章信息（将文章下所有post的mainForumsId改为["recycle"]）
     await thread.updateThreadMessage();
     // 标记为已移动到回收站
@@ -2380,7 +2390,12 @@ threadSchema.statics.postNewThread = async (options) => {
   //     await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
   //   || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   // 自动送审
-  const needReview = await ReviewModel.getReviewStatusAndCreateLog(_post);
+  const {
+    reviewPostService,
+  } = require('../services/review/reviewPost.service');
+  const needReview = await reviewPostService.getReviewStatusAndCreateReviewLog(
+    _post,
+  );
   if (!needReview) {
     _post.reviewed = true;
     thread.reviewed = true;

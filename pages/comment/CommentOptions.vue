@@ -47,33 +47,33 @@
 
 <style lang="less">
 @import '../publicModules/base';
-#modulePostOptions{
+#modulePostOptions {
   position: absolute;
   z-index: 1000;
-  .loading{
+  .loading {
     text-align: center;
   }
-  .post-options-panel{
+  .post-options-panel {
     padding: 0.5rem 0;
     min-width: 12rem;
     background-color: #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-    border: 1px solid rgba(0, 0, 0, .23);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    border: 1px solid rgba(0, 0, 0, 0.23);
     border-radius: 4px;
     transition: height 1s;
     @optionHeight: 2rem;
-    .option{
+    .option {
       text-align: left;
-      &:hover{
+      &:hover {
         background-color: #eee;
       }
-      &.time{
+      &.time {
         padding-left: 0;
         text-align: center;
         border-top: 1px solid #eee;
         font-size: 1rem;
         padding-top: 0.25rem;
-        &:hover{
+        &:hover {
           background-color: inherit;
         }
       }
@@ -86,7 +86,7 @@
       cursor: pointer;
       font-size: 1.15rem;
       text-decoration: none;
-      .fa{
+      .fa {
         left: 1.4rem;
         top: 0;
         bottom: 0;
@@ -99,15 +99,14 @@
     }
   }
 }
-
-
 </style>
 
 <script>
-import {timeFormat} from "../lib/js/tools";
-import {nkcAPI} from "../lib/js/netAPI";
-import {screenTopAlert} from "../lib/js/topAlert";
-import {creditTypes, contentTypes} from "../lib/vue/Credit";
+import { timeFormat } from '../lib/js/tools';
+import { nkcAPI } from '../lib/js/netAPI';
+import { screenTopAlert } from '../lib/js/topAlert';
+import { creditTypes, contentTypes } from '../lib/vue/Credit';
+import { reviewActions } from '../lib/js/review';
 export default {
   data: () => ({
     show: false,
@@ -124,39 +123,41 @@ export default {
   }),
   computed: {
     position() {
-      const {jqDOM, domHeight, domWidth, direction} = this;
-      if(!jqDOM) return {
-        left: 0,
-        top: 0,
-      }
-      const {left, top} = jqDOM.offset();
-      if(direction === 'up') {
+      const { jqDOM, domHeight, domWidth, direction } = this;
+      if (!jqDOM)
+        return {
+          left: 0,
+          top: 0,
+        };
+      const { left, top } = jqDOM.offset();
+      if (direction === 'up') {
         const position = {
           top: top - domHeight,
           left: left - domWidth + jqDOM.width(),
-        }
+        };
         return position;
       } else {
         return {
           top: top + jqDOM.height(),
           left: left - domWidth + jqDOM.width(),
-        }
+        };
       }
-    }
+    },
   },
   mounted() {
     const self = this;
     document.addEventListener('click', () => {
       self.show = false;
-    })
+    });
   },
   updated() {
     const dom = $(this.$el);
     const content = $('#comment-content');
-    let top = 0,left = 0;
-    if(content) {
-      top = (content.offset()).top;
-      left = (content.offset()).left;
+    let top = 0,
+      left = 0;
+    if (content) {
+      top = content.offset().top;
+      left = content.offset().left;
     }
     this.domHeight = dom.height() + top;
     this.domWidth = dom.width() + left;
@@ -165,29 +166,32 @@ export default {
     timeFormat: timeFormat,
     getPermission() {
       const self = this;
-      return nkcAPI(`/comment/${self.comment._id}/options?aid=${self.comment.sid}`, 'GET', {})
-      .then(res => {
-        self.options = res.options;
-        self.toc = res.toc;
-        self.loading = false;
-        self.digestData = {
-          digestRewardScore: res.digestRewardScore,
-          redEnvelopeSettings: res.redEnvelopeSettings,
-        };
-      })
-      .catch(err => {
-        sweetError(err);
-      })
+      return nkcAPI(
+        `/comment/${self.comment._id}/options?aid=${self.comment.sid}`,
+        'GET',
+        {},
+      )
+        .then((res) => {
+          self.options = res.options;
+          self.toc = res.toc;
+          self.loading = false;
+          self.digestData = {
+            digestRewardScore: res.digestRewardScore,
+            redEnvelopeSettings: res.redEnvelopeSettings,
+          };
+        })
+        .catch((err) => {
+          sweetError(err);
+        });
     },
     open(props) {
       this.loading = true;
-      const {comment, DOM, direction} = props;
+      const { comment, DOM, direction } = props;
       this.toc = null;
       this.options = {};
       this.comment = comment;
       //获取菜单权限
-      this.getPermission()
-      .then(() => {
+      this.getPermission().then(() => {
         this.show = true;
       });
       this.direction = direction;
@@ -211,50 +215,55 @@ export default {
     //通过审核
     passReview(_id) {
       let docId;
-      if(_id) {
+      if (_id) {
         docId = _id;
       } else {
-        if(!this.comment) return;
+        if (!this.comment) return;
         docId = this.comment.docId;
       }
-      nkcAPI('/review' , 'PUT', {
-        pass: true,
-        docId,
-        type: 'document'
-      })
-        .then(res => {
+      reviewActions
+        .approveDocumentReview({
+          docId: docId,
+        })
+        .then(() => {
           sweetSuccess('操作成功');
         })
-        .catch(err => {
+        .catch((err) => {
           sweetError(err);
-        })
+        });
     },
     //查看IP
     displayIpInfo() {
-      if(!this.comment) return sweetWarning('未找到评论内容');
-      const {_id}= this.comment;
+      if (!this.comment) return sweetWarning('未找到评论内容');
+      const { _id } = this.comment;
       nkcAPI(`/comment/${_id}/ipInfo`, 'GET')
-      .then((res) => {
-        return res.ipInfo;
-      })
-      .then((info) => {
-        if(!info) return sweetError('获取ip地址失败');
-        return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.location +"</p>");
-      })
-      .catch((err) => {
-        sweetError(err);
-      })
+        .then((res) => {
+          return res.ipInfo;
+        })
+        .then((info) => {
+          if (!info) return sweetError('获取ip地址失败');
+          return asyncSweetCustom(
+            "<p style='font-weight: normal;'>ip: " +
+              info.ip +
+              '<br>位置: ' +
+              info.location +
+              '</p>',
+          );
+        })
+        .catch((err) => {
+          sweetError(err);
+        });
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {
-      const {uid: tUid, _id: cid} = this.comment;
-      const {blacklist} = this.options;
-      if(blacklist) {
+      const { uid: tUid, _id: cid } = this.comment;
+      const { blacklist } = this.options;
+      if (blacklist) {
         //移除黑名单
         this.removeUserToBlackList(tUid);
       } else {
         //加入黑名单
-        this.addUserToBlackList(tUid, 'comment', cid)
+        this.addUserToBlackList(tUid, 'comment', cid);
       }
     },
     //违规记录
@@ -264,11 +273,11 @@ export default {
     //用户移除黑名单 tUid 被拉黑的用户
     removeUserToBlackList(uid) {
       nkcAPI('/blacklist?tUid=' + uid, 'GET')
-        .then(data => {
-          if(!data.bl) throw "对方未在黑名单中";
+        .then((data) => {
+          if (!data.bl) throw '对方未在黑名单中';
           return nkcAPI('/blacklist?tUid=' + uid, 'DELETE');
         })
-        .then(data => {
+        .then((data) => {
           sweetSuccess('操作成功！');
           return data;
         })
@@ -276,42 +285,43 @@ export default {
     },
     //用户添加到黑名单 tUid 被拉黑的用户 form 拉黑来源 cid 被拉黑的comment
     addUserToBlackList(tUid, from, cid) {
-      var isFriend = false, subscribed = false;
+      var isFriend = false,
+        subscribed = false;
       return Promise.resolve()
-        .then(function() {
-          return nkcAPI('/blacklist?tUid=' + tUid,  'GET')
+        .then(function () {
+          return nkcAPI('/blacklist?tUid=' + tUid, 'GET');
         })
-        .then(function(data) {
+        .then(function (data) {
           isFriend = data.isFriend;
           subscribed = data.subscribed;
           var bl = data.bl;
-          if(bl) throw '对方已在黑名单中';
+          if (bl) throw '对方已在黑名单中';
           var info;
-          if(isFriend) {
+          if (isFriend) {
             info = '该会员在你的联系人列表中，确定放入黑名单吗？';
-          } else if(subscribed) {
+          } else if (subscribed) {
             info = '该会员在你的关注列表中，确定放入黑名单吗？';
           }
-          if(info) return sweetQuestion(info);
+          if (info) return sweetQuestion(info);
         })
-        .then(function() {
-          if(isFriend) {
-            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {})
+        .then(function () {
+          if (isFriend) {
+            return nkcAPI(`/message/friend?uid=` + tUid, 'DELETE', {});
           }
         })
-        .then(function() {
-          if(subscribed) {
+        .then(function () {
+          if (subscribed) {
             return SubscribeTypes.subscribeUserPromise(tUid, false);
           }
         })
-        .then(function() {
+        .then(function () {
           return nkcAPI('/blacklist', 'POST', {
             tUid: tUid,
             from: from,
-            cid
-          })
+            cid,
+          });
         })
-        .then(function(data) {
+        .then(function (data) {
           sweetSuccess('操作成功');
           return data;
         })
@@ -320,54 +330,56 @@ export default {
     //评论加精
     digestComment(kcb) {
       const self = this;
-      const {_id} = self.comment;
+      const { _id } = self.comment;
       return nkcAPI(`/comment/${_id}/digest`, 'POST', {
-        kcb
+        kcb,
       })
         .then(() => {
           screenTopAlert('操作成功');
           self.options.digest = true;
         })
-        .catch(console.error)
+        .catch(console.error);
     },
     unDigestComment() {
       const self = this;
-      const {_id} = self.comment;
+      const { _id } = self.comment;
       return nkcAPI(`/comment/${_id}/digest`, 'DELETE')
         .then(() => {
           screenTopAlert('已取消精选');
           self.options.digest = false;
         })
-        .catch(console.error)
+        .catch(console.error);
     },
     //评论加精控制
     commentDigest() {
-      const {digest} = this.options;
+      const { digest } = this.options;
       const self = this;
-      if(!digest) {
-        window.RootApp.openDigest((kcb) => {
-          self.digestComment(kcb)
-            .then(() => {
+      if (!digest) {
+        window.RootApp.openDigest(
+          (kcb) => {
+            self.digestComment(kcb).then(() => {
               window.RootApp.closeDigest();
             });
-        }, {
-          digestData: self.digestData,
-        })
+          },
+          {
+            digestData: self.digestData,
+          },
+        );
       } else {
         self.unDigestComment();
       }
     },
     //评学术分
     addXSF() {
-      const {_id} = this.comment;
+      const { _id } = this.comment;
       window.RootApp.openCredit(creditTypes.xsf, contentTypes.comment, _id);
     },
     //撤销学术分
     cancelXsf() {
-      const {_id} = this.comment;
+      const { _id } = this.comment;
       const reason = prompt('请输入原因：');
-      if(reason === null) return;
-      if(reason === '') return screenTopWarning('撤销原因不能为空');
+      if (reason === null) return;
+      if (reason === '') return screenTopWarning('撤销原因不能为空');
       nkcAPI(`/comment/${_id}/credit/xsf`)
         .then(() => {
           window.location.reload();
@@ -378,17 +390,22 @@ export default {
     },
     //鼓励
     creditKcbPanel() {
-      const {_id} = this.comment;
+      const { _id } = this.comment;
       window.RootApp.openCredit(creditTypes.kcb, contentTypes.comment, _id);
     },
-    collectionComment(){
+    collectionComment() {
       // const { pid, collection } = this;
-      const {collection} = this.options;
-      const {_id} = this.comment;
+      const { collection } = this.options;
+      const { _id } = this.comment;
       const self = this;
       if (!collection) {
         SubscribeTypes.open(function (cid) {
-          SubscribeTypes.collectionReplyPromise(_id, !collection, cid, 'comment')
+          SubscribeTypes.collectionReplyPromise(
+            _id,
+            !collection,
+            cid,
+            'comment',
+          )
             .then(function () {
               SubscribeTypes.close();
               self.options.collection = !collection;
@@ -409,8 +426,7 @@ export default {
             sweetError(data);
           });
       }
-      
-    }
-  }
-}
+    },
+  },
+};
 </script>

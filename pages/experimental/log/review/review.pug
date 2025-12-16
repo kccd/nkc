@@ -1,0 +1,71 @@
+extends ../../experimental
+block eTitle
+  title 审核记录
+block eContent
+  .container-fluid.max-width
+    .hidden#data=objToStr({reviewLogs: data.reviewLogs, paging: data.paging, type: data.t, content: data.c})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        div 
+          h4.m-b-1 按条件查询记录
+          .form-inline(style='margin-bottom: 1rem;' v-cloak)#app
+            .form-group
+              select.form-control(v-model='form.type')
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='id') 文号
+            .form-group
+              input.form-control(placeholder='请输入内容' v-model='form.content' @keyup.enter='search')
+            .form-group
+              button.btn.btn-primary(type='submit' @click='search' :disabled="!form.content") 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/review') 全部
+        div.m-t-1.table-responsive
+          include ../../../publicModules/paging/paging.pug
+          table.table.table-bordered
+            thead
+              tr
+                th 时间
+                th 发表人
+                th 内容类型
+                th 内容摘要
+                th 触发原因
+                th 状态
+                th 审核时间
+                th 审核人
+                th 审核备注
+
+
+            tbody
+              tr(v-for="reviewLog in reviewLogs")
+                th 
+                  div {{timeFormat('YYYY-MM-DD', reviewLog.toc)}}
+                  div {{timeFormat('HH:mm:ss', reviewLog.toc)}}
+                th 
+                  div(class='flex items-center')
+                    img(:src="getUrl('userAvatar', reviewLog.user.avatar, 'sm')" height="24" width="24" class="mr-1")
+                    a(:href="getUrl('userHome', reviewLog.user.uid)" target="_blank")
+                      span {{reviewLog.user.username}}
+                th {{reviewLog.contentType}}
+                th 
+                  a(class="inline" :href="reviewLog.contentUrl" target="_blank") {{reviewLog.contentAbstract}}    
+                th {{reviewLog.triggerReason}}
+                
+                th 
+                  div(:class="{'text-warning': reviewLog.status === 'pending', 'text-success': reviewLog.status === 'approved', 'text-danger': ['deleted', 'revised', 'invalid'].includes(reviewLog.status)}") {{reviewLog.statusDesc}}
+                th 
+                  div(v-if='reviewLog.status !== "pending"') 
+                    div {{timeFormat('YYYY-MM-DD', reviewLog.tlm)}}
+                    div {{timeFormat('HH:mm:ss', reviewLog.tlm)}}
+                th
+                  div(class='flex items-center' v-if='reviewLog.handler')
+                    img(:src="getUrl('userAvatar', reviewLog.handler.avatar, 'sm')" height="24" width="24" class="mr-1")
+                    a(:href="getUrl('userHome', reviewLog.handler.uid)" target="_blank")
+                      span {{reviewLog.handler.username}}
+                 
+                th
+                  div.whitespace-pre-line {{reviewLog.handlerReason}}
+          include ../../../publicModules/paging/paging.pug
+
+block scripts
+  +includeJS("/experimental/log/review/review.js")

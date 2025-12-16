@@ -3,6 +3,7 @@
 import { getDataById } from '../../lib/js/dataConversion';
 const data = getDataById('data');
 import { nkcAPI } from '../../lib/js/netAPI';
+import { reviewActions } from '../../lib/js/review';
 
 let author = {};
 $(document).ready(function () {
@@ -46,11 +47,10 @@ function reviewArticle() {
   if (!_id) {
     return sweetError('未找到文章，请刷新后重试');
   }
-  nkcAPI('/review', 'PUT', {
-    pass: true,
-    docId: _id,
-    type: 'document',
-  })
+  reviewActions
+    .approveDocumentReview({
+      docId: _id,
+    })
     .then((res) => {
       sweetSuccess('操作成功');
       setTimeout(() => {

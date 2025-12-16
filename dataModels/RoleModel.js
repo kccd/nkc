@@ -166,6 +166,7 @@ roleSchema.methods.extendUserCount = async function () {
   if (this._id === 'scholar') {
     q.xsf = { $gt: 0 };
   } else if (this._id === 'default') {
+    //
   } else {
     q.certs = this._id;
   }
@@ -180,6 +181,7 @@ roleSchema.methods.getUsers = async function (paging) {
   if (this._id === 'scholar') {
     q.xsf = { $gt: 0 };
   } else if (this._id === 'default') {
+    //
   } else {
     q.certs = this._id;
   }

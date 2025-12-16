@@ -1,15 +1,10 @@
 const { ThrowCommonError } = require('../nkcModules/error');
 const settings = require('../settings');
 const mongoose = require('../settings/database');
-
-// 审核状态枚举
+const { userAuditStatus } = require('../settings/audit');
 const auditStatus = {
-  pending: 'pending', // 待审核
-  approved: 'approved', // 审核通过
-  rejected: 'rejected', // 审核拒绝
-  revoked: 'revoked', // 撤销后可重新提交
+  ...userAuditStatus,
 };
-
 const schema = new mongoose.Schema(
   {
     _id: String,
@@ -117,7 +112,9 @@ schema.statics.approve = async function (id, reviewer) {
     updates.username = username;
     updates.usernameLowerCase = username.toLowerCase();
   }
-  if (description) updates.description = description;
+  if (description) {
+    updates.description = description;
+  }
 
   if (Object.keys(updates).length) {
     await UserModel.updateOne({ uid }, { $set: updates });
@@ -187,7 +184,9 @@ schema.statics.runAutoReview = async function () {
   const list = await this.getPendingAudits(50);
   for (const rec of list) {
     const audit = await this.findById(rec._id);
-    if (audit.status !== auditStatus.pending) continue;
+    if (audit.status !== auditStatus.pending) {
+      continue;
+    }
     let passed = true;
     let reason = '';
     ['username', 'description'].forEach((f) => {

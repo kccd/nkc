@@ -36,6 +36,11 @@ block nkcContent
           label.form-check-label.m-r-05(for="disabled")
             input.form-check-input.contentStatus(type="checkbox", value="disabled", id="disabled" checked=data.status.includes('disabled') onclick='uncheckStatus()')
             span 屏蔽
+      .m-b-05
+        .checkbox
+          label.form-check-label(for="includeDraft")
+            input.form-check-input(type="checkbox" id="includeAllType" checked=data.allType onclick='toggleIncludeAllType()')
+            span 包含草稿/历史      
       .form-group.form-inline
         label 作者筛选：
         input.form-control.tUid(type='text' placeholder='请输入用户uid' value=data.tUid)

@@ -4,29 +4,13 @@ const {
   momentModes,
   momentStatus,
   momentVisibleType,
+  momentQuoteTypes,
+  momentCommentModes,
+  momentCommentPerPage,
 } = require('../settings/moment');
 const { documentSources } = require('../settings/document');
-const {
-  momentRenderService,
-} = require('../services/moment/render/momentRender.service');
 const { ThrowCommonError } = require('../nkcModules/error');
-
-const momentQuoteTypes = {
-  article: 'article',
-  post: 'post',
-  moment: 'moment',
-  comment: 'comment',
-};
-
-const momentCommentModes = {
-  simple: 'simple',
-  complete: 'complete',
-};
-
-const momentCommentPerPage = {
-  simple: 10,
-  complete: 50,
-};
+const { reviewSources } = require('../settings/review');
 
 const visibleType = { ...momentVisibleType };
 
@@ -1582,6 +1566,9 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
     let content = '';
     let plain = '';
     let addr = localAddr;
+    const {
+      momentRenderService,
+    } = require('../services/moment/render/momentRender.service');
     if (stableDocument) {
       if (mode === momentModes.plain) {
         content = momentRenderService.renderingSimpleJson({
@@ -2002,7 +1989,6 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const ResourceModel = mongoose.model('resources');
   const localAddr = await IPModel.getLocalAddr();
   const { getUrl, timeFormat } = require('../nkcModules/tools');
-  const source = await ReviewModel.getDocumentSources();
   const usersId = [];
   const commentsId = [];
   // 拓展回复的上级评论
@@ -2052,6 +2038,9 @@ schema.statics.extendCommentsData = async function (comments, uid) {
       continue;
     }
     addr = stableDocument.addr;
+    const {
+      momentRenderService,
+    } = require('../services/moment/render/momentRender.service');
     const content = await momentRenderService.renderingSimpleJson({
       content: stableDocument.content,
       atUsers: stableDocument.atUsers,
@@ -2113,13 +2102,13 @@ schema.statics.extendCommentsData = async function (comments, uid) {
     };
     //如果动态的状态为为审核就获取动态的送审原因
     if (status === unknown) {
-      const review = await ReviewModel.findOne({
-        sid: stableDocument._id,
-        source: source.document,
-      });
-      if (review) {
-        data.reason = review.reason;
-      }
+      const {
+        reviewFinderService,
+      } = require('../services/review/reviewFinder.service');
+      data.reason = await reviewFinderService.getReviewReason(
+        reviewSources.document,
+        stableDocument._id,
+      );
     }
     commentsData.push(data);
   }

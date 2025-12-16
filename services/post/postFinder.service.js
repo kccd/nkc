@@ -38,6 +38,15 @@ class PostFinderService {
   getPostAsPost() {}
 
   getPostAsComment() {}
+
+  getPostsMapByIds = async (postsIds) => {
+    const posts = await PostModel.find({ pid: { $in: postsIds } });
+    const postsMap = new Map();
+    for (const post of posts) {
+      postsMap.set(post.pid, post);
+    }
+    return postsMap;
+  };
 }
 module.exports = {
   postFinderService: new PostFinderService(),

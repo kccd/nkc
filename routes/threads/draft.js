@@ -2,6 +2,10 @@ const Router = require('koa-router');
 const router = new Router();
 const { OnlyOperation } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
+const {
+  reviewModifierService,
+} = require('../../services/review/reviewModifier.service');
+const { reviewSources } = require('../../settings/review');
 router.post(
   '/',
   OnlyOperation(Operations.movePostsToDraft),
@@ -75,16 +79,6 @@ router.post(
           noticeType: remindUser,
         });
         await delLog.save();
-        if (!thread.reviewed) {
-          await db.ReviewModel.newReview({
-            type: 'returnThread',
-            sid: post.pid,
-            uid: post.uid,
-            reason,
-            handlerId: user.uid,
-            source: source.post,
-          });
-        }
       } else {
         // 退修回复
         if (post.disabled) {
@@ -100,16 +94,6 @@ router.post(
           disabled: false,
           reviewed: true,
         });
-        if (!post.reviewed) {
-          await db.ReviewModel.newReview({
-            type: 'returnPost',
-            sid: post.pid,
-            uid: post.uid,
-            reason,
-            handlerId: data.user.uid,
-            source: source.post,
-          });
-        }
         const firstPost = await db.PostModel.findOnly({ pid: thread.oc });
         const delLog = db.DelPostLogModel({
           delUserId: post.uid,
@@ -124,6 +108,13 @@ router.post(
         });
         await delLog.save();
       }
+      await reviewModifierService.modifyReviewLogStatusToRevised({
+        source: reviewSources.post,
+        sid: post.pid,
+        handlerId: user.uid,
+        handlerReason: reason,
+      });
+
       // 标记为违规
       if (violation) {
         await db.UsersScoreLogModel.insertLog({

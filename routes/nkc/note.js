@@ -1,6 +1,10 @@
 const router = require('koa-router')();
 const { OnlyOperation } = require('../../middlewares/permission');
+const {
+  reviewModifierService,
+} = require('../../services/review/reviewModifier.service');
 const { Operations } = require('../../settings/operations');
+const { reviewSources } = require('../../settings/review');
 router
   .get('/', OnlyOperation(Operations.nkcManagementNote), async (ctx, next) => {
     const { data, db, query, nkcModules } = ctx;
@@ -31,7 +35,6 @@ router
       _id: noteContentId,
     });
     const noteContentStatus = await db.NoteContentModel.getNoteContentStatus();
-    const reviewSources = await db.ReviewModel.getDocumentSources();
     const { status, uid } = noteContent;
     const noteUser = await db.UserModel.findOne({ uid });
     let message = {};
@@ -59,13 +62,11 @@ router
       //更新笔记状态
       await noteContent.updateOne({ status: noteContentStatus.disabled });
       //更新笔记审核记录状态
-      await db.ReviewModel.newReview({
-        type: 'disabledNote',
-        sid: noteContentId,
+      await reviewModifierService.modifyReviewLogStatusToDeleted({
         source: reviewSources.note,
-        reason: reason || '',
-        uid: noteContent.uid,
+        sid: noteContentId,
         handlerId: state.uid,
+        handlerReason: reason,
       });
       //如果标记用户违规就给该用户新增违规记录
       if (violation) {

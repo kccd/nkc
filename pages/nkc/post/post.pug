@@ -3,87 +3,82 @@ block nkcTitle
   title 最新发表
   +includeCSS("/nkc/post/post.css")
 block nkcContent
-  div
-    .m-b-05
-      h4 内容截止于：
-        span.m-r-05
-          +timeFormat(data.c)
-        a(href=`/nkc/post?${data.t?'t=' + data.t: ''}`).btn.btn-default.btn-xs 重置
-    .m-b-05
-      ul.nav.nav-tabs
-        li(class=!data.t?'active':"")
-          a(href=`/nkc/post?c=${data.c}`) 全部
-        li(class=data.t === 'thread'?'active':"")
-          a(href=`/nkc/post?c=${data.c}&t=thread`) 文章
-        li(class=data.t === 'post'?'active':"")
-          a(href=`/nkc/post?c=${data.c}&t=post`) 回复
-        li(class=data.t === 'comment'?'active':"")
-          a(href=`/nkc/post?c=${data.c}&t=comment`) 评论
-    include ../../publicModules/paging/paging_input
-    .management-posts
-      for post in data.posts
-        .management-post(class=post.status style=`border-right: 10px solid ${post.borderColor}`)
-          .post-header
-            .post-time=format("YYYY/MM/DD HH:mm:ss", post.toc)
+  -
+    var dataString = tools.objToStr({
+      paging: data.paging,
+      posts: data.posts,
+      queryData: data.queryData,
+    });
+  #data(class="hidden")=dataString
 
-            -var type = '';
-            if post.type === 'thread'
-              -type = '文章';
-            else if post.type === 'post'
-              -type = '回复';
-            else
-              -type = '评论';
-            .post-type(class=`post-type-` + post.type)=type
-            a(href=`/u/${post.user.uid}` target="_blank"
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
-              data-global-data=objToStr({uid: post.user.uid})
-              ).post-user
-              img(src=tools.getUrl("userAvatar", post.user.avatar))
-              span= post.user.username
-            a.post-url(href=post.url target="_blank") 原文链接
-            .post-forum
-              for f, index in post.forums
-                if index > 0
-                  span ，
-                a(href=`/f/${f.fid}` target='_blank'
-                  data-global-mouseover="showForumPanel"
-                  data-global-mouseout="hideForumPanel"
-                  data-global-data=objToStr({fid: f.fid})
-                )=f.displayName
+  #app(v-cloak)
+    .mb-2 
+      .checkbox 
+        label.mr-2
+          input(type="checkbox" value="thread" :checked="source.includes('thread')" @click="selectSource") 
+          span 文章
+        label.mr-2
+          input(type="checkbox" value="post" :checked="source.includes('post')" @click="selectSource") 
+          span 回复
+        label.mr-2
+          input(type="checkbox" value="comment" :checked="source.includes('comment')" @click="selectSource") 
+          span 评论
+        span.mx-2 |  
+        label.mr-2
+          input(type="checkbox" value="draft" :checked="source.includes('draft')" @click="selectSource" ) 
+          span 草稿
+    .mb-1
+      label.font-normal
+        div 起始时间：
+        input(type="datetime-local" :value="formatLocalDate(timeStart)" @change="onLocalDateChange('timeStart', $event.target.value)" class="form-control w-auto")
+      label.font-normal
+        div 终止时间：
+        input(type="datetime-local" :value="formatLocalDate(timeStop)" @change="onLocalDateChange('timeStop', $event.target.value)" class="form-control w-auto")
+    .mb-2
+      div 关键词：
+      input(type="text" v-model="text" class="form-control d-inline-block w-auto" placeholder="uid、tid、pid")
+    .mb-2 
+      div 每页显示数量：
+      input(type="text" v-model.number="perPage" class="form-control d-inline-block w-auto" min="1" )
+    .mb-2 
+      div 排序方式：
+      .radio.mt-2
+        label.mr-2
+          input(type="radio" value="desc" v-model="order")
+          span.font-normal 降序
+        label.mr-2
+          input(type="radio" value="asc" v-model="order")
+          span.font-normal 升序 
+    .mb-8
+      button.mr-2.btn.btn-primary(@click="redirect(0)") 应用筛选
+      a.btn.btn-default(href='/nkc/post') 重置
+    .mb-2 
+      paging(:pages="pageButtons" @click-button="redirect")  
+    .mb-2 
+      div(v-for="(post, index) in posts" :key="post.pid")
+        thread(
+          :post="post"
+          v-if="post.type === 'thread'"
+          @move-post="movePost"
+          @delete-post="deletePost"
+          )
+        post(
+          :post="post"
+          v-else-if="post.type === 'post'"
+          @delete-post="deletePost"
+        )  
+        comment(
+          :post="post"
+          v-else-if="post.type === 'comment'"
+          @delete-post="deletePost"
+        )
 
-            .post-options
-              .hidden(id=`data_${post.pid}`)=objToStr({tid: post.thread.tid, pid: post.pid, mainForumsId: post.mainForumsId, categoriesId: post.categoriesId, tcId: post.tcId})
-              if post.status === 'disabled'
-                span.status 已被屏蔽
-              else if post.status === 'toDraft'
-                span.status 已被退休
-              if permission("moveThreads") && post.type === 'thread'
-                button.btn-xs.btn.btn-primary(onclick=`moveThread('${post.pid}')`) 移动
-              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
-                button.btn-xs.btn.btn-danger(onclick=`deleteThread('${post.pid}')`) 退修/删除
-          .post-body
-            .row
-              .col-xs-12.col-md-6
-                .post-title=`中文摘要：${post.abstractCn || '无'}`
-              .col-xs-12.col-md-6
-                .post-title=`英文摘要：${post.abstractEn || '无'}`
-              .col-xs-12.col-md-6
-                .post-title=`中文关键词：${post.keyWordsCn.join(', ') || '无'}`
-              .col-xs-12.col-md-6
-                .post-title=`英文关键词：${post.keyWordsEn.join(', ') || '无'}`
-            .row
-              .col-xs-12
-                .bg-danger.p-a-05
-                  .row
-                    .col-xs-12.col-md-6
-                      .post-title=`文章标题：`
-                        a(href=`/t/${post.thread.tid}` target='_blank')=post.thread.t
-                    .col-xs-12.col-md-6
-                      .post-title=`内容标题：${post.t || '无'}`
-            .post-content.bg-danger.p-a-05!=post.c
-    include ../../publicModules/paging/paging_input
+        draft(
+          :post="post"
+          v-else-if="post.type === 'draft'"
+        )
 
+ 
 block nkcScripts
   include ../../publicModules/subscribeTypes/subscribeTypes
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

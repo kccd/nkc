@@ -23,8 +23,28 @@ const momentVisibleType = {
   everyone: 'everyone',
 };
 
+const momentQuoteTypes = {
+  article: 'article',
+  post: 'post',
+  moment: 'moment',
+  comment: 'comment',
+};
+
+const momentCommentModes = {
+  simple: 'simple',
+  complete: 'complete',
+};
+
+const momentCommentPerPage = {
+  simple: 10,
+  complete: 50,
+};
+
 module.exports = {
   momentModes,
   momentStatus,
   momentVisibleType,
+  momentQuoteTypes,
+  momentCommentModes,
+  momentCommentPerPage,
 };

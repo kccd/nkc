@@ -32,8 +32,8 @@
 </template>
 
 <style lang="less" scoped>
-@import "../../publicModules/base";
-.module-dialog-body{
+@import '../../publicModules/base';
+.module-dialog-body {
   text-align: left;
   display: none;
   position: fixed;
@@ -46,12 +46,12 @@
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   border: 1px solid #ddd;
   margin: 1rem;
-  .module-dialog-header{
+  .module-dialog-header {
     height: 3rem;
     line-height: 3rem;
     background-color: #f6f6f6;
     padding-right: 3rem;
-    .module-dialog-close{
+    .module-dialog-close {
       cursor: pointer;
       color: #aaa;
       width: 3rem;
@@ -61,27 +61,27 @@
       height: 3rem;
       line-height: 3rem;
       text-align: center;
-      &:hover{
-        background-color: rgba(0,0,0,0.08);
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.08);
         color: #777;
       }
     }
-    .module-dialog-title{
+    .module-dialog-title {
       cursor: move;
       font-weight: 700;
       margin-left: 1rem;
     }
   }
-  .module-dialog-content{
+  .module-dialog-content {
     padding: 0 1rem;
-    .moduleDisabledPostType{
+    .moduleDisabledPostType {
       margin-bottom: 0.3rem;
       overflow: hidden;
     }
-    .moduleDisabledPostType>div:first-child{
+    .moduleDisabledPostType > div:first-child {
       border-right: 1px solid #fff;
     }
-    .moduleDisabledPostType>div{
+    .moduleDisabledPostType > div {
       height: 3rem;
       cursor: pointer;
       line-height: 3rem;
@@ -89,7 +89,8 @@
       color: #aaa;
       background-color: #eee;
     }
-    .moduleDisabledPostType>div.active, .moduleDisabledPostType>div:hover{
+    .moduleDisabledPostType > div.active,
+    .moduleDisabledPostType > div:hover {
       background-color: #2b90d9;
       color: #fff;
     }
@@ -98,8 +99,9 @@
 </style>
 
 <script>
-import {DraggableElement} from "../js/draggable";
-import {nkcAPI} from "../js/netAPI";
+import { DraggableElement } from '../js/draggable';
+import { nkcAPI } from '../js/netAPI';
+import { reviewActions } from '../js/review';
 export default {
   data: () => ({
     submitting: false,
@@ -113,44 +115,56 @@ export default {
   mounted() {
     this.initDraggableElement();
   },
-  destroyed(){
+  destroyed() {
     this.draggableElement && this.draggableElement.destroy();
   },
   watch: {
-    type: function() {
-      if(this.type === 'toDisabled') {
+    type: function () {
+      if (this.type === 'toDisabled') {
         this.remindUser = true;
       }
-    }
+    },
   },
   methods: {
     initDraggableElement() {
-      this.draggableElement = new DraggableElement(this.$el, this.$refs.draggableHandle)
-      this.draggableElement.setPositionCenter()
-
+      this.draggableElement = new DraggableElement(
+        this.$el,
+        this.$refs.draggableHandle,
+      );
+      this.draggableElement.setPositionCenter();
     },
-    submit: function() {
-      if(!this.docId) return;
-      if(!this.reason) return screenTopWarning('请输入原因');
+    submit: function () {
+      if (!this.docId) return;
+      if (!this.reason) return screenTopWarning('请输入原因');
       const self = this;
-      nkcAPI('/review', 'PUT', {
-        delType: self.type,
-        docId: self.docId,
-        type: 'document',
-        remindUser: self.remindUser,
-        violation: self.violation,
-        reason: self.reason
-      })
-      .then(res => {
-        sweetSuccess('操作成功');
-        self.close();
-      })
-      .catch(err => {
-        sweetError(err);
-      })
+      Promise.resolve()
+        .then(() => {
+          if (self.type === 'disabled') {
+            return reviewActions.rejectDocumentReviewAndDelete({
+              docId: self.docId,
+              reason: self.reason,
+              remindUser: self.remindUser,
+              violation: self.violation,
+            });
+          } else {
+            return reviewActions.rejectDocumentReviewAndReturn({
+              docId: self.docId,
+              reason: self.reason,
+              remindUser: self.remindUser,
+              violation: self.violation,
+            });
+          }
+        })
+        .then((res) => {
+          sweetSuccess('操作成功');
+          self.close();
+        })
+        .catch((err) => {
+          sweetError(err);
+        });
     },
     open(callback, options) {
-      const {docId} = options;
+      const { docId } = options;
       this.docId = docId;
       this.callback = callback;
       this.draggableElement.show();
@@ -159,9 +173,8 @@ export default {
     close() {
       this.draggableElement.hide();
       this.show = false;
-      setTimeout(function() {
-      }, 500);
+      setTimeout(function () {}, 500);
     },
-  }
-}
+  },
+};
 </script>

@@ -4,6 +4,13 @@ const {
   OnlyUnbannedUser,
   OnlyUser,
 } = require('../../middlewares/permission');
+const {
+  keywordCheckerService,
+} = require('../../services/keyword/keywordChecker.service');
+const {
+  reviewCreatorService,
+} = require('../../services/review/reviewCreator.service');
+const { reviewTriggerType } = require('../../settings/review');
 router
   .get('/', OnlyUser(), async (ctx, next) => {
     const { data, query, nkcModules } = ctx;
@@ -97,10 +104,10 @@ router
     let appear = false; //是否出现了敏感词
     if (enabled) {
       const { keyWordGroup } = await db.SettingModel.getSettings('note'); //笔记勾选敏感词组id
-      const result = await db.ReviewModel.matchKeywordsByGroupsId(
+      const result = await keywordCheckerService.matchKeywordsByGroupsId(
         content,
         keyWordGroup,
-      ); //敏感词检测
+      );
       if (result.length !== 0) {
         appear = true;
       }
@@ -143,10 +150,10 @@ router
     let appear = false; //是否出现了敏感词
     if (enabled) {
       const { keyWordGroup } = await db.SettingModel.getSettings('note'); //笔记勾选敏感词组id
-      const result = await db.ReviewModel.matchKeywordsByGroupsId(
+      const result = await keywordCheckerService.matchKeywordsByGroupsId(
         content,
         keyWordGroup,
-      ); //敏感词检测
+      );
       if (result.length !== 0) {
         appear = true;
       }
@@ -225,13 +232,11 @@ router
     await noteContent.save(); //保存笔记内容
     //出现了敏感词，就创建审核记录
     if (appear) {
-      await db.ReviewModel.newReview({
-        type: 'sensitiveWord',
-        sid: noteContent._id,
+      await reviewCreatorService.createNoteReviewLog({
+        noteId: noteContent._id,
         uid: noteContent.uid,
-        reason: `出现了敏感词:${reason}`,
-        handlerId: '',
-        source: source.note,
+        triggerType: reviewTriggerType.sensitiveWord,
+        triggerReason: reason,
       });
     }
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);

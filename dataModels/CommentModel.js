@@ -4,18 +4,11 @@ const {
 } = require('../nkcModules/json');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const mongoose = require('../settings/database');
+const { reviewSources } = require('../settings/review');
 const commentSource = {
   article: 'article',
 };
-const commentStatus = {
-  normal: 'normal',
-  default: 'default',
-  deleted: 'deleted',
-  cancelled: 'cancelled',
-  disabled: 'disabled', //禁用
-  faulty: 'faulty', //退修
-  unknown: 'unknown', // 未审核
-};
+const { commentStatus } = require('../settings/comment');
 const schema = new mongoose.Schema(
   {
     _id: String,
@@ -380,7 +373,6 @@ schema.methods.isExistStableV = async function () {
  * }
  * */
 schema.statics.extendPostComments = async (props) => {
-  const ReviewModel = mongoose.model('reviews');
   const {
     comments,
     uid,
@@ -400,7 +392,6 @@ schema.statics.extendPostComments = async (props) => {
   const { htmlToPlain } = require('../nkcModules/nkcRender');
   const CommentModel = mongoose.model('comments');
   const { getUrl } = require('../nkcModules/tools');
-  const source = await ReviewModel.getDocumentSources();
   const didArr = [];
   const uidArr = [];
   const quoteIdArr = [];
@@ -471,31 +462,33 @@ schema.statics.extendPostComments = async (props) => {
         }
       }
     }
-    let delLog;
     let reason;
     //获取评论状态不正常的审核原因
     if (d.status === unknownStatus) {
-      delLog = await ReviewModel.findOne({
-        sid: d._id,
-        source: source.document,
-      }).sort({ toc: -1 });
+      const {
+        reviewFinderService,
+      } = require('../services/review/reviewFinder.service');
+      reason = await reviewFinderService.getReviewReason(
+        reviewSources.document,
+        d._id,
+      );
     } else if (d.status === disabledStatus) {
-      delLog = await DelPostLogModel.findOne({
+      const delLog = await DelPostLogModel.findOne({
         postType: d.source,
         delType: disabledStatus,
         postId: d._id,
         delUserId: d.uid,
       }).sort({ toc: -1 });
+      reason = delLog ? delLog.reason : '';
     } else if (d.status === faultyStatus) {
-      delLog = await DelPostLogModel.findOne({
+      const delLog = await DelPostLogModel.findOne({
         postType: d.source,
-        delType: faultyStatus,
+        // TODO: 退修&屏蔽日志数据结构比较混乱，后续需要统一
+        delType: ['faulty', 'toDraft'],
         postId: d._id,
         delUserId: d.uid,
       }).sort({ toc: -1 });
-    }
-    if (delLog) {
-      reason = delLog.reason;
+      reason = delLog ? delLog.reason : '';
     }
     if (d.quoteDid) {
       quoteIdArr.push(d.quoteDid);
@@ -507,7 +500,7 @@ schema.statics.extendPostComments = async (props) => {
       type,
       status,
       addr,
-      reason: reason ? reason : '',
+      reason,
       tlm,
     };
   }
@@ -619,7 +612,6 @@ schema.statics.extendSingleComment = async (comment) => {
   const { htmlToPlain } = require('../nkcModules/nkcRender');
   const CommentModel = mongoose.model('comments');
   const { getUrl } = require('../nkcModules/tools');
-  const source = await ReviewModel.getDocumentSources();
   const user = await UserModel.findOnly({ uid: comment.uid });
   const { comment: commentSource } = await DocumentModel.getDocumentSources();
   const { stable: stableType } = await DocumentModel.getDocumentTypes();
@@ -635,32 +627,34 @@ schema.statics.extendSingleComment = async (comment) => {
     source: commentSource,
     type: stableType,
   });
-  let delLog;
   let reason;
   //获取评论状态不正常的审核原因
   if (document.status === unknownStatus) {
-    delLog = await ReviewModel.findOne({
-      sid: document._id,
-      source: source.document,
-    }).sort({ toc: -1 });
+    const {
+      reviewFinderService,
+    } = require('../services/review/reviewFinder.service');
+    reason = await reviewFinderService.getReviewReason(
+      reviewSources.document,
+      document._id,
+    );
   } else if (document.status === disabledStatus) {
-    delLog = await DelPostLogModel.findOne({
+    const delLog = await DelPostLogModel.findOne({
       postType: document.source,
       delType: disabledStatus,
       postId: document._id,
       delUserId: document.uid,
     }).sort({ toc: -1 });
+    reason = delLog ? delLog.reason : '';
   } else if (document.status === faultyStatus) {
-    delLog = await DelPostLogModel.findOne({
+    const delLog = await DelPostLogModel.findOne({
       postType: document.source,
       delType: faultyStatus,
       postId: document._id,
       delUserId: document.uid,
     }).sort({ toc: -1 });
+    reason = delLog ? delLog.reason : '';
   }
-  if (delLog) {
-    reason = delLog.reason;
-  }
+
   let quoteDocument;
   if (document.quoteDid) {
     quoteDocument = await DocumentModel.findOne({ _id: document.quoteDid });
@@ -1243,7 +1237,7 @@ schema.statics.getCommentsInfo = async function (comments) {
     const { sid, _id, did } = comment;
     const articlePost = articlePostsObj[sid];
     const commentDocument = commentDocumentsObj[did] || null;
-    if (!articlePost) {
+    if (!articlePost || !commentDocument) {
       continue;
     }
     const articleDocument = articleDocumentObj[articlePost.sid] || null;

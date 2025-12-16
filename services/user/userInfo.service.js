@@ -15,16 +15,18 @@ class UserInfoService {
       uid: 1,
       username: 1,
       avatar: 1,
+      banner: 1,
       description: 1,
       certs: 1,
     });
     const usersObj = {};
     for (const user of users) {
-      const { uid, username, avatar, description } = user;
+      const { uid, username, avatar, banner, description } = user;
       usersObj[user.uid] = {
         uid,
         username,
         avatar,
+        banner,
         description: nkcRender.replaceLink(description),
       };
     }

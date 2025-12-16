@@ -27,6 +27,10 @@ function translateFundOperationType(languageName, value, args = []) {
   return translate(languageName, 'fundOperations', value, args);
 }
 
+function translateReview(languageName, value, args = []) {
+  return translate(languageName, 'review', value, args);
+}
+
 module.exports = {
   defaultLanguageName,
   translate,
@@ -34,4 +38,5 @@ module.exports = {
   translateSensitiveSettingName,
   translateSensitiveCheckerStatus,
   translateFundOperationType,
+  translateReview,
 };

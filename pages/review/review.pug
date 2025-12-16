@@ -152,8 +152,8 @@ block content
                     span 不通过
                   div(v-if=`!review['${r.document._id}'].pass`)
                     if r.document.source === 'moment'
-                      input(type="radio" value="deleted" v-model=`review['${r.document._id}'].delType`)
-                      span.m-r-1 删除
+                      input(type="radio" value="disabled" v-model=`review['${r.document._id}'].delType`)
+                      span.m-r-1 屏蔽
                     else
                       input(type="radio" value="faulty" v-model=`review['${r.document._id}'].delType`)
                       span.m-r-1 退修

@@ -4,6 +4,7 @@ import {
   resourceToHtml,
   strToObj,
 } from '../lib/js/dataConversion';
+import { reviewActions } from '../lib/js/review';
 import { getState } from '../lib/js/state';
 import {
   RNVisitUrlAndClose,
@@ -467,19 +468,24 @@ NKC.methods.disabledPosts = function (pid) {
     window.DisabledPost = new NKC.modules.DisabledPost();
   }
   window.DisabledPost.open(function (data) {
-    var body = {
-      postsId: postsId,
-      reason: data.reason,
-      remindUser: data.remindUser,
-      violation: data.violation,
-    };
-    var url;
-    if (data.type === 'toDraft') {
-      url = '/threads/draft';
-    } else {
-      url = '/threads/recycle';
-    }
-    nkcAPI(url, 'POST', body)
+    Promise.resolve()
+      .then(() => {
+        if (data.type === 'toDraft') {
+          return reviewActions.rejectPostReviewAndReturn({
+            postsId: postsId,
+            reason: data.reason,
+            remindUser: data.remindUser,
+            violation: data.violation,
+          });
+        } else {
+          return reviewActions.rejectPostReviewAndDelete({
+            postsId: postsId,
+            reason: data.reason,
+            remindUser: data.remindUser,
+            violation: data.violation,
+          });
+        }
+      })
       .then(function () {
         screenTopAlert('操作成功');
         DisabledPost.close();
@@ -533,7 +539,24 @@ NKC.methods.disabledDocuments = function (id) {
       if (!d) {
         return;
       }
-      return nkcAPI('/review', 'PUT', d)
+      return Promise.resolve()
+        .then(() => {
+          if (d.delType === 'disabled') {
+            return reviewActions.rejectDocumentReviewAndDelete({
+              docId: d.docId,
+              reason: d.reason,
+              remindUser: d.remindUser,
+              violation: d.violation,
+            });
+          } else {
+            return reviewActions.rejectDocumentReviewAndReturn({
+              docId: d.docId,
+              reason: d.reason,
+              remindUser: d.remindUser,
+              violation: d.violation,
+            });
+          }
+        })
         .then(function () {
           screenTopAlert('操作成功');
           submit(commentArr, index + 1);

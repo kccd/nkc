@@ -282,7 +282,7 @@ module.exports = {
     {
       parameters: ['reviewLink', 'title', 'reason'],
       content:
-        '您发布的内容[text=reviewLink(title)]由于[text=reason]等原因已被屏蔽，不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记违规。',
+        '您发布的内容[url=reviewLink(title)]由于[text=reason]等原因已被屏蔽，不可恢复。请您发布内容时确保符合规章，消除存在的问题，否则下次将您的内容标记违规。',
       type: 'documentDisabled',
     },
     {

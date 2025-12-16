@@ -3,9 +3,7 @@ import { replaceNKCUrl } from './nkcUrl';
 export function replaceNKCRender(selector) {
   return replaceNKCUrl(selector);
 }
-// TODO: 去掉动态引用，使用全局静态引入
-// const Plyr = require('../../../public/external_pkgs/plyr/plyr.polyfilled.min');
-const initPlyrMask = NKC.methods.initPlyrMask;
+const initPlyrMask = window.NKC.methods.initPlyrMask;
 export function initNKCVideo() {
   var players = [];
   var videoControls = [
@@ -52,7 +50,7 @@ export function initNKCVideo() {
       initPlyrMask(player);
     });
   };
-  var videos = $('span[data-tag="nkcsource"][data-type="video"]');
+  var videos = window.$('span[data-tag="nkcsource"][data-type="video"]');
   for (var i = 0; i < videos.length; i++) {
     var video = videos.eq(i);
     var title = video.attr('data-plyr-title');

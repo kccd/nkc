@@ -5,6 +5,7 @@ const { subscribeSources } = require('../settings/subscribe');
 const { renderHTMLByJSON } = require('../nkcModules/nkcRender/json');
 const { articleSources, articleStatus } = require('../settings/article');
 const { getJsonStringTextSlice } = require('../nkcModules/json');
+const { reviewSources } = require('../settings/review');
 
 const schema = new mongoose.Schema(
   {
@@ -1764,7 +1765,6 @@ schema.statics.getArticlesInfo = async function (articles) {
   const ColumnModel = mongoose.model('columns');
   const ArticleModel = mongoose.model('articles');
   const DocumentModel = mongoose.model('documents');
-  const ReviewModel = mongoose.model('reviews');
   const ArticlePostModel = mongoose.model('articlePosts');
   const DelPostLogModel = mongoose.model('delPostLog');
   const SettingModel = mongoose.model('settings');
@@ -1772,7 +1772,6 @@ schema.statics.getArticlesInfo = async function (articles) {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const { getOriginLevel } = require('../nkcModules/apiFunction');
-  const source = await ReviewModel.getDocumentSources();
   const columnArticlesId = [];
   const articlesDid = [];
   const articleId = [];
@@ -1879,29 +1878,33 @@ schema.statics.getArticlesInfo = async function (articles) {
     let documentResourceId;
     if (document) {
       const { status } = document;
-      let delLog;
       if (status === unknownStatus) {
-        delLog = await ReviewModel.findOne({
-          sid: document._id,
-          source: source.document,
-        }).sort({ toc: -1 });
+        const {
+          reviewFinderService,
+        } = require('../services/review/reviewFinder.service');
+        reason = await reviewFinderService.getReviewReason(
+          reviewSources.document,
+          document._id,
+        );
       } else if (status === disabledStatus) {
-        delLog = await DelPostLogModel.findOne({
+        const delLog = await DelPostLogModel.findOne({
           postType: document.source,
           delType: disabledStatus,
           postId: document._id,
           delUserId: document.uid,
         }).sort({ toc: -1 });
+        reason = delLog ? delLog.reason : '';
       } else if (status === faultyStatus) {
-        delLog = await DelPostLogModel.findOne({
+        const delLog = await DelPostLogModel.findOne({
           postType: document.source,
-          delType: faultyStatus,
+          // TODO: 退修&屏蔽日志数据结构比较混乱，后续需要统一
+          delType: {
+            $in: ['faulty', 'toDraft'],
+          },
           postId: document._id,
           delUserId: document.uid,
         }).sort({ toc: -1 });
-      }
-      if (delLog) {
-        reason = delLog.reason;
+        reason = delLog ? delLog.reason : '';
       }
       documentResourceId = await document.getResourceReferenceId();
     }
