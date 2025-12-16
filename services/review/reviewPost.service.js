@@ -341,7 +341,7 @@ class ReviewPostService {
         post,
         thread,
         user,
-        reviewReason,
+        reason: reviewReason,
         type: post.type,
         link: tools.getUrl('post', post.pid),
       });
