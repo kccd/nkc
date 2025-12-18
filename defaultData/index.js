@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const apiFunction = require('../nkcModules/apiFunction');
-const { registerService } = require('../services/account/register.service');
 const fsPromises = fs.promises;
 const defaultConfigPath = path.resolve(__dirname, './config');
 const configPath = path.resolve(__dirname, `../config`);
@@ -33,6 +32,7 @@ async function initAccount() {
   }
   console.log(`creating the admin account`);
   const { username, password } = accountConfig;
+  const { registerService } = require('../services/account/register.service');
   const user = await registerService.createUser({});
   await user.updateOne({
     certs: ['dev'],
