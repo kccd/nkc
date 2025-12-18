@@ -594,7 +594,7 @@ router
     }
 
     // 如果符合送审条件，自动内容送审
-    const needReview =
+    const { needReview } =
       await reviewPostService.getReviewStatusAndCreateReviewLog(singlePost);
     if (needReview) {
       await singlePost.updateOne({

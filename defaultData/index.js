@@ -32,7 +32,8 @@ async function initAccount() {
   }
   console.log(`creating the admin account`);
   const { username, password } = accountConfig;
-  const user = await db.UserModel.createUser({});
+  const { registerService } = require('../services/account/register.service');
+  const user = await registerService.createUser({});
   await user.updateOne({
     certs: ['dev'],
     username,

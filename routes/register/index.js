@@ -16,6 +16,9 @@ const {
   OnlyVisitor,
   OnlyUnbannedUser,
 } = require('../../middlewares/permission');
+const {
+  registerService,
+} = require('../../services/account/register.service.js');
 registerRouter
   .get(['/', '/mobile'], Public(), async (ctx, next) => {
     const { data, query } = ctx;
@@ -68,7 +71,12 @@ registerRouter
     option.regIP = ctx.address;
     option.regPort = ctx.port;
     delete option.type;
-    const user = await db.UserModel.createUser(option);
+    const user = await registerService.createUser({
+      nationCode,
+      mobile,
+      ip: ctx.address,
+      port: ctx.port,
+    });
     await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({
       uid: user.uid,

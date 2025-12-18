@@ -7,6 +7,7 @@ const {
 } = require('../../middlewares/permission');
 const { qrRecordService } = require('../../services/qrRecord/qrRecord.service');
 const { getUrl } = require('../../nkcModules/tools');
+const { registerService } = require('../../services/account/register.service');
 loginRouter
   .get('/', OnlyVisitor(), async (ctx, next) => {
     const { query, data, db } = ctx;
@@ -136,6 +137,18 @@ loginRouter
       await smsCode.updateOne({ used: true });
 
       userPersonal = await db.UsersPersonalModel.find({ mobile, nationCode });
+
+      if (userPersonal.length === 0) {
+        // 若手机号未注册则自动注册
+        await registerService.createUser({
+          nationCode,
+          mobile,
+          ip: ctx.address,
+          port: ctx.port,
+        });
+
+        userPersonal = await db.UsersPersonalModel.find({ mobile, nationCode });
+      }
 
       if (userPersonal.length === 0) {
         ctx.throw(400, '手机号不存在');

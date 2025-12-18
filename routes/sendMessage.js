@@ -27,13 +27,6 @@ sendMessageRouter
     if (!mobile) {
       ctx.throw(400, '手机号不能为空');
     }
-    const otherPersonal = await db.UsersPersonalModel.findOne({
-      nationCode,
-      mobile,
-    });
-    if (!otherPersonal) {
-      ctx.throw(400, '暂未有用户绑定该手机号');
-    }
     //从数据库里面取信息
     const { login } = await db.SettingModel.getSettings('verification');
     if (login.enabled) {

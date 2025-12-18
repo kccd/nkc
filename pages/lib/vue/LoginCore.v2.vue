@@ -57,7 +57,8 @@
         div(:class="$style.errorInfo" v-if="error")
           .fa.fa-exclamation-circle
           span {{error}}
-      .text-left.m-b-1(style="font-size:1rem" v-if="isRegister") 注册即代表同意
+      span(v-if="showAutoRegisterInfo" class="text-[1rem]") 若手机号未注册则自动注册
+      .text-left.m-b-1(style="font-size:1rem" v-if="showRegisterProtocol") 注册即代表同意
         a(:href=`getUrl('protocol', 'register')` target="_blank") 《{{websiteName}}统一服务协议（注册协议）》
       .text-right
         .pull-left(:class="$style.link" v-if="isLogin")
@@ -258,6 +259,15 @@ export default {
     },
     isRegister() {
       return this.mode === this.modes.register;
+    },
+    showRegisterProtocol() {
+      return (
+        (this.isLogin && this.loginType === this.loginTypes.sms) ||
+        this.isRegister
+      );
+    },
+    showAutoRegisterInfo() {
+      return this.isLogin && this.loginType === this.loginTypes.sms;
     },
   },
   methods: {
