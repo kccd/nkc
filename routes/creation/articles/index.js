@@ -254,11 +254,13 @@ router
             sid,
             selectCategory,
             reviewPermission: permission('review'),
+            writerUid: state.uid,
           });
         } else {
           data.articleUrl = await article.publishArticle({
             source,
             selectCategory,
+            writerUid: state.uid,
           });
         }
       } else if (type === 'save') {
