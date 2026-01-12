@@ -51,6 +51,8 @@
     "@babel/runtime": "^7.14.6",
     "@icon-park/vue": "^1.4.1",
     "@koa/cors": "^5.0.0",
+    "@mathjax/mathjax-mhchem-font-extension": "^4.0.0",
+    "@mathjax/mathjax-newcm-font": "^4.0.0",
     "@nkc/backup": "./microServices/backup",
     "@nkc/store": "./microServices/store",
     "@tiptap/extension-blockquote": "^2.8.0",
