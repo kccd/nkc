@@ -174,11 +174,33 @@ settingSchema.statics.checkMobile = async (nationCode, mobile, uid) => {
   const regSettings = await SettingModel.getSettings('register');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const SecretBehaviorModel = mongoose.model('secretBehaviors');
-  const { mobileCountLimit } = regSettings;
+  const { mobileCountLimit, minIntervalForDestroyToRegister } = regSettings;
   const used = await UsersPersonalModel.countDocuments({ nationCode, mobile });
   if (used) {
     throwErr(403, '此号码已被其他账号绑定');
   }
+  // 未满足注销重新注册的最小间隔的数据
+  const destoryLog = await SecretBehaviorModel.findOne(
+    {
+      type: 'destroy',
+      oldMobile: mobile,
+      oldNationCode: nationCode,
+      toc: {
+        $gt: Date.now() - minIntervalForDestroyToRegister * 24 * 60 * 60 * 1000,
+      },
+    },
+    {
+      _id: 1,
+    },
+  );
+
+  if (destoryLog) {
+    throwErr(
+      403,
+      `已注销账号的手机号需等待${minIntervalForDestroyToRegister}天后才能重新使用。`,
+    );
+  }
+
   const secretBehaviors = await SecretBehaviorModel.find(
     {
       $or: [

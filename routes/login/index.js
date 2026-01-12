@@ -140,6 +140,7 @@ loginRouter
 
       if (userPersonal.length === 0) {
         // 若手机号未注册则自动注册
+        await db.SettingModel.checkMobile(nationCode, mobile);
         await registerService.createUser({
           nationCode,
           mobile,

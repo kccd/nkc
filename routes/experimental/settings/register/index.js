@@ -44,6 +44,7 @@ router
         registerExamination,
         examSource,
         examNotice,
+        minIntervalForDestroyToRegister,
       } = regSettings;
       const { checkNumber, checkString } = nkcModules.checkData;
       const forums = await db.ForumModel.find({
@@ -74,6 +75,8 @@ router
         ctx.throw(400, '若选择开启考试，试卷不能为空');
       } else if (registerExamination && examSource.length > 1) {
         // ctx.throw(400, '若选择开启考试，只能选择一份试卷');
+      } else if (minIntervalForDestroyToRegister < 0) {
+        ctx.throw(400, '注销后再注册的最小间隔时间不能小于0天');
       }
 
       await Promise.all(
@@ -116,6 +119,8 @@ router
             'c.registerExamination': registerExamination,
             'c.examSource': examSource,
             'c.examNotice': examNotice,
+            'c.minIntervalForDestroyToRegister':
+              minIntervalForDestroyToRegister,
           },
         },
       );
