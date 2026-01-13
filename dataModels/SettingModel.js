@@ -195,10 +195,7 @@ settingSchema.statics.checkMobile = async (nationCode, mobile, uid) => {
   );
 
   if (destoryLog) {
-    throwErr(
-      403,
-      `已注销账号的手机号需等待${minIntervalForDestroyToRegister}天后才能重新使用。`,
-    );
+    throwErr(403, `手机号不可用`);
   }
 
   const secretBehaviors = await SecretBehaviorModel.find(
