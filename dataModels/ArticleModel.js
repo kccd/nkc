@@ -706,7 +706,7 @@ schema.methods.publishArticle = async function (options) {
   const { normal } = await ArticleModel.getArticleStatus();
   const { article: articleQuoteType } = await MomentModel.getMomentQuoteTypes();
   const { article: articleType } = await ColumnPostModel.getColumnPostTypes();
-  const { source, selectCategory } = options;
+  const { source, selectCategory, writerUid } = options;
   const DocumentModel = mongoose.model('documents');
   const { did, uid, _id: articleId } = this;
   const {
@@ -717,7 +717,7 @@ schema.methods.publishArticle = async function (options) {
   //检测当前用户的发表权限
   await publishPermissionService.checkPublishPermission(
     publishPermissionTypes.article,
-    this.uid,
+    writerUid,
   );
   let columnPost;
   let articleUrl;
@@ -785,7 +785,7 @@ schema.methods.submitArticle = async function (options) {
   const SettingModel = mongoose.model('settings');
   const { article: articleQuoteType } = await MomentModel.getMomentQuoteTypes();
   const { article: articleType } = await ColumnPostModel.getColumnPostTypes();
-  const { sid, selectCategory, reviewPermission } = options;
+  const { sid, selectCategory, reviewPermission, writerUid } = options;
   const DocumentModel = mongoose.model('documents');
   const { did, uid, _id: articleId } = this;
   const {
@@ -795,7 +795,7 @@ schema.methods.submitArticle = async function (options) {
   //检测当前用户的发表权限
   await publishPermissionService.checkPublishPermission(
     publishPermissionTypes.article,
-    this.uid,
+    writerUid,
   );
   let articleUrl;
   const { article: documentSource } = await DocumentModel.getDocumentSources();

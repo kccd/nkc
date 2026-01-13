@@ -6,7 +6,13 @@
 if !isIncluded('mathFormula')
   script.
     window.MathJax = {
+      output: {
+        fontPath: '/@mathjax/mathjax-newcm-font',
+      },
       loader: {
+        paths: {
+          "mathjax-mhchem-extension": "/@mathjax/mathjax-mhchem-font-extension"
+        },
         // 追加 mhchem 拓展以支持化学方程式 \ce{H2O}
         load: ["[tex]/mhchem"],
       },

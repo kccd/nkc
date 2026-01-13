@@ -2,7 +2,6 @@ const fs = require('fs');
 const fsPromise = fs.promises;
 const moment = require('moment');
 const PATH = require('path');
-const axios = require('axios');
 const Downloader = require('nodejs-file-downloader');
 
 const pictureExtensions = ['jpg', 'jpeg', 'png', 'bmp', 'svg', 'gif', 'webp'];
@@ -197,43 +196,62 @@ function replaceFileExtension(filename, newExtension) {
  *   @param {Object} info 文件信息 来自 store service tools.getFileInfo
  * */
 async function getStoreFilesInfo(storeUrl, files) {
-  return new Promise((resolve, reject) => {
-    axios({
-      url: storeUrl,
-      method: 'GET',
-      params: {
-        files: JSON.stringify(files),
-      },
-    })
-      .then((res) => {
-        resolve(res.data || res);
-      })
-      .catch((err) => {
-        reject(err);
-      });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
+  const url = new URL(storeUrl);
+  url.searchParams.set('files', JSON.stringify(files));
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
+  const contentType = res.headers.get('content-type') || '';
+  if (!res.ok) {
+    const errText = contentType.includes('application/json')
+      ? JSON.stringify(await res.json())
+      : await res.text();
+    throw new Error(
+      `storeFilesInfo 请求失败 ${res.status} ${res.statusText} - ${errText}`,
+    );
+  }
+  if (contentType.includes('application/json')) {
+    return await res.json();
+  }
+  return await res.text();
 }
 
 /*
  * 获取存储服务文件元信息
  * */
 async function getMetaInformation(storeUrl, files) {
-  return new Promise((resolve, reject) => {
-    axios({
-      url: storeUrl + '/metaInfo',
-      method: 'POST',
-      data: {
-        files,
-      },
-    })
-      .then((res) => {
-        resolve(res.data || res);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
+  const res = await fetch(storeUrl + '/metaInfo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ files }),
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
+  const contentType = res.headers.get('content-type') || '';
+  if (!res.ok) {
+    const errText = contentType.includes('application/json')
+      ? JSON.stringify(await res.json())
+      : await res.text();
+    throw new Error(
+      `metaInformation 请求失败 ${res.status} ${res.statusText} - ${errText}`,
+    );
+  }
+  if (contentType.includes('application/json')) {
+    return await res.json();
+  }
+  return await res.text();
 }
 
 /*
@@ -241,44 +259,62 @@ async function getMetaInformation(storeUrl, files) {
  * */
 async function removeResourceInfo(toc, files) {
   const storeUrl = (await getStoreUrl(toc)) + '/removeInfo';
-  return new Promise((resolve, reject) => {
-    axios({
-      url: storeUrl,
-      method: 'PUT',
-      params: {
-        files: JSON.stringify(files) || '',
-      },
-    })
-      .then((res) => {
-        resolve(res || res);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
+  const url = new URL(storeUrl);
+  url.searchParams.set('files', JSON.stringify(files) || '');
+  const res = await fetch(url.toString(), {
+    method: 'PUT',
+    headers: {
+      Accept: 'application/json',
+    },
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
+  const contentType = res.headers.get('content-type') || '';
+  if (!res.ok) {
+    const errText = contentType.includes('application/json')
+      ? JSON.stringify(await res.json())
+      : await res.text();
+    throw new Error(
+      `removeResourceInfo 请求失败 ${res.status} ${res.statusText} - ${errText}`,
+    );
+  }
+  if (contentType.includes('application/json')) {
+    return await res.json();
+  }
+  return await res.text();
 }
 
 /*
  * 获取文件真实路径
  * */
 async function getStorePath(storeUrl, files) {
-  return new Promise((resolve, reject) => {
-    axios({
-      url: storeUrl + '/storePath',
-      method: 'POST',
-      data: {
-        files,
-      },
-    })
-      .then((res) => {
-        resolve(res.data || res);
-      })
-      .catch((err) => {
-        console.log(err);
-        reject(err);
-      });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
+  const res = await fetch(storeUrl + '/storePath', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ files }),
+    signal: controller.signal,
   });
+  clearTimeout(timeoutId);
+  const contentType = res.headers.get('content-type') || '';
+  if (!res.ok) {
+    const errText = contentType.includes('application/json')
+      ? JSON.stringify(await res.json())
+      : await res.text();
+    throw new Error(
+      `getStorePath 请求失败 ${res.status} ${res.statusText} - ${errText}`,
+    );
+  }
+  if (contentType.includes('application/json')) {
+    return await res.json();
+  }
+  return await res.text();
 }
 
 /*
