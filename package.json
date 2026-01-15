@@ -122,7 +122,7 @@
     "cross-env": "^5.2.0",
     "dayjs": "^1.11.11",
     "destroy": "^1.0.4",
-    "diff": "^3.4.0",
+    "diff": "^8.0.3",
     "dompurify": "^2.3.8",
     "easyimage": "^3.1.1",
     "echarts": "^5.3.2",
