@@ -27,6 +27,7 @@ const sensitiveRouter = require('./sensitive');
 const disMomentRouter = require('./dismoment');
 const { OnlyOperation } = require('../../../middlewares/permission');
 const { Operations } = require('../../../settings/operations');
+const surveyRouter = require('./survey');
 logRouter
   .get('/', OnlyOperation(Operations.visitPublicLogs), async (ctx) => {
     return ctx.redirect(`/e/log/public`);
@@ -59,5 +60,6 @@ logRouter
   .use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
   .use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods())
   .use('/sensitive', sensitiveRouter.routes(), sensitiveRouter.allowedMethods())
+  .use('/survey', surveyRouter.routes(), surveyRouter.allowedMethods())
   .use('/filter', filterRouter.routes(), filterRouter.allowedMethods());
 module.exports = logRouter;

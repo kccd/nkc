@@ -794,6 +794,7 @@ const DynamicOperations = {
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
   disableResource: 'disabledResource',
   momentCommentControl: 'momentCommentControl',
+  visitExperimentalSurvey: 'visitExperimentalSurvey',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

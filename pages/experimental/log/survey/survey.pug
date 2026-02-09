@@ -1,0 +1,32 @@
+extends ../../experimental
+block eTitle
+  title 调查问卷记录
+block eContent
+  .hidden#data=objToStr({surveys: data.surveys})
+  .container-fluid.max-width
+    #app(v-cloak)
+      include ../../../publicModules/paging/paging_input
+      .table-responsive 
+
+        table.table.table-bordered
+          thead
+            tr 
+              th 时间
+              th 用户
+              th 类型
+              th 介绍
+              th 操作
+          tbody
+            tr(v-for='survey in surveys')
+              th {{timeFormat("YYYY/MM/DD HH:mm:ss", survey.toc)}}
+              th 
+                img(style='height: 1.3rem; width: 1.3rem;margin-right:0.5rem;' :src='getUrl("userAvatar", survey.user.avatar)')
+                a(:href="getUrl('userHome', survey.user.uid)" target="_blank") {{survey.user.username}}
+              th {{translateType(survey.type)}}  
+              th {{survey.description}}
+              th 
+                a.btn.btn-default.btn-xs.m-r-05(:href="survey.pid? getUrl('post', survey.pid): ''" target="_blank") 查看文章
+                a.btn.btn-default.btn-xs(:href="`/e/log/survey/${survey._id}`" target="_blank") 查看详情
+      include ../../../publicModules/paging/paging_input        
+block scripts
+  +includeJS('/experimental/log/survey/survey.js')    
