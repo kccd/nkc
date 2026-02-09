@@ -6,7 +6,6 @@ const http = require('http');
 const randomatic = require('randomatic');
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
-const axios = require('axios');
 let fn = {};
 
 fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
