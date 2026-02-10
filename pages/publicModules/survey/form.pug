@@ -51,7 +51,7 @@
                   .fa.fa-check-square-o(v-if="filterOptionsMap[o._id + '-' + a._id]")
                   .fa.fa-square-o(v-else)
                   span 筛选用户
-                .option-button(@click="selectOption(index, index_)" v-if="havePermission ")
+                .option-button(@click="selectOption(index, index_)" v-if="havePermission && status === 'beginning' && !posted")
                   .fa.fa-check-square-o(v-if="optionsObj[o._id + '-' + a._id] && optionsObj[o._id + '-' + a._id].selected")
                   .fa.fa-square-o(v-else-if="!posted")  
             .option-info
@@ -96,8 +96,6 @@
         .option-select-count(v-if="showResult") 总平均分：{{o.postScore?(o.postScore/(survey.postCount)).toFixed(2):0}}
     .survey-form-button
       .form-warning
-        p(v-if="canExport")
-          button.btn.btn-default.btn-sm(@click="exportExcel") 导出Excel
         //- 显示投票结果
         div(v-if="showResult")
           p {{postResult}}
@@ -144,6 +142,8 @@
             a(onclick="RootApp.openLoginPanel('register')") 注册
             | 。
 
-      .form-button(v-if="!posted")
-        button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
-        button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交
+      .form-button
+        template(v-if="!posted")
+          button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
+          button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交
+        button.btn.btn-default.btn-sm(v-if="canExport" @click="exportExcel") 导出数据
