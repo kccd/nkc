@@ -342,6 +342,7 @@ const FixedOperations = {
   survey_post: 'survey_post',
   survey_single_get: 'survey_single_get',
   survey_single_post: 'survey_single_post',
+  survey_export_get: 'survey_export_get',
   getThreadCategories: 'getThreadCategories',
   collectThread: 'collectThread',
   editThreadPostOrder: 'editThreadPostOrder',

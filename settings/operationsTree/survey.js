@@ -5,5 +5,8 @@ module.exports = {
   PARAMETER: {
     GET: Operations.survey_single_get,
     POST: Operations.survey_single_post,
+    export: {
+      GET: Operations.survey_export_get,
+    },
   },
 };

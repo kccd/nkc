@@ -54,6 +54,20 @@ router.get(
     const surveyPosts = await ctx.db.SurveyPostModel.find({
       surveyId: survey._id,
     }).lean();
+    const usersId = [
+      ...new Set(surveyPosts.map((post) => post.uid).filter((uid) => uid)),
+    ];
+    const users = await userInfoService.getUsersBaseInfoObjectByUserIds(
+      usersId,
+    );
+    for (const post of surveyPosts) {
+      if (!post.uid) {
+        continue;
+      }
+      const user = users[post.uid];
+      post.user = user || { uid: post.uid, username: post.uid };
+      post.username = post.user.username;
+    }
     ctx.data.surveyPosts = surveyPosts;
     ctx.data.survey = survey;
     ctx.template = 'experimental/log/survey/surveyDetails.pug';

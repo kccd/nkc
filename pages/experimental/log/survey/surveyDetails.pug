@@ -2,11 +2,19 @@ extends ../../experimental
 block eTitle
   title 调查问卷详情
   style.  
-    img{
+    .user-avatar-xs {
+      opacity: 1;
+      border: 2px solid transparent;
+      height:2rem;
+      width:2rem;
+      margin: 0rem 0.5rem 0.5rem 0rem;
+    }
+    .user-avatar-xs[data-mark-other="true"]{
       opacity: 0.3;
     }
-    img[data-mark="true"]{
+    .user-avatar-xs[data-mark="true"]{
       opacity: 1;
+      border-color: red;
     }
 block eContent
   .hidden#data=objToStr({survey: data.survey, surveyPosts: data.surveyPosts})
@@ -23,42 +31,12 @@ block eContent
         div 调查开始时间：{{timeFormat(`YYYY/MM/DD HH:mm:ss`, survey.st)}}
         div 调查结束时间：{{timeFormat(`YYYY/MM/DD HH:mm:ss`, survey.et)}} 
         div 介绍：{{survey.description}}
-        div 已选择用户：
-          img(
-              @click='selectUser(uid)'
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
-              :data-global-data="objToStr({uid: uid})"
-              v-for='uid in selectedUsersId' 
-              :src='getUrl("userAvatar", uid, "sm")'
-              data-mark="true"
-              style="height:1.3rem;width:1.3rem;margin:0rem 0.5rem 0.5rem 0rem;"
-              )
+        div 其他：
+          a(v-if="survey.pid" :href="getUrl('post', survey.pid)" target="_blank") 文章链接
         .m-t-2
-          div(v-for='option, index of survey.options')
-            div {{index+1}}. {{option.content}}
-            div
-              a(v-for='link in option.links' :href='link' target='_blank') {{link}}
-            div
-              img(v-for='rid in option.resourcesId' :src='getUrl("resource", rid)')
-            div 
-              div(v-for='answer, answerIndex in option.answers')  
-                div {{index+1}}-{{answerIndex+1}}. {{answer.content}}
-                div
-                  a(v-for='link in answer.links' :href='link' target='_blank') {{link}}
-                div
-                  img(v-for='rid in answer.resourcesId' :src='getUrl("resource", rid)')
-                div
-                  img(
-                    @click='selectUser(uid)'
-                    data-global-mouseover="showUserPanel"
-                    data-global-mouseout="hideUserPanel"
-                    :data-global-data="objToStr({uid: uid})"
-                    v-for='uid in usersSelected[`${option._id}-${answer._id}`]' 
-                    :src='getUrl("userAvatar", uid, "sm")'
-                    style="height:1.3rem;width:1.3rem;margin:0rem 0.5rem 0.5rem 0rem;"
-                    :data-mark="selectedUsersId.length === 0 || selectedUsersId.includes(uid)"
-                    )
+          survey-view(v-if='survey.type === "survey"' :survey='survey' :survey-posts='surveyPosts')
+          vote-view(v-else-if='survey.type === "vote"' :survey='survey' :survey-posts='surveyPosts')
+          score-view(v-else :survey='survey' :survey-posts='surveyPosts')
 
 block scripts
   +includeJS('/experimental/log/survey/surveyDetails.js')    

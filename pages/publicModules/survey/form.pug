@@ -46,9 +46,14 @@
         .option-answers(v-if="o.answers && o.answers.length")
           .option-answer(v-for="a,index_ in o.answers")
             .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
-              .option-button(@click="selectOption(index, index_)" v-if="havePermission")
-                .fa.fa-check-square-o(v-if="optionsObj[o._id + '-' + a._id] && optionsObj[o._id + '-' + a._id].selected")
-                .fa.fa-square-o(v-else-if="!posted")
+              .option-actions
+                .option-filter(@click="toggleFilterOption(o._id, a._id)" v-if="canFilterStats" title="勾选后，其余题目仅会显示选择了该选项的用户的统计数据")
+                  .fa.fa-check-square-o(v-if="filterOptionsMap[o._id + '-' + a._id]")
+                  .fa.fa-square-o(v-else)
+                  span 筛选用户
+                .option-button(@click="selectOption(index, index_)" v-if="havePermission ")
+                  .fa.fa-check-square-o(v-if="optionsObj[o._id + '-' + a._id] && optionsObj[o._id + '-' + a._id].selected")
+                  .fa.fa-square-o(v-else-if="!posted")  
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
@@ -91,9 +96,14 @@
         .option-select-count(v-if="showResult") 总平均分：{{o.postScore?(o.postScore/(survey.postCount)).toFixed(2):0}}
     .survey-form-button
       .form-warning
+        p(v-if="canExport")
+          button.btn.btn-default.btn-sm(@click="exportExcel") 导出Excel
         //- 显示投票结果
         div(v-if="showResult")
           p {{postResult}}
+          p(v-if="canFilterStats && filterActive")
+            span 当前统计已按筛选条件过滤（{{filterOptionsCount}}项）
+            a.pointer(@click="clearFilterOptions") 清除筛选
           .form-post-users(v-if='users && users.length')
             a(onclick="NKC.methods.visitUrl('/u/' + user.uid)"
               data-global-mouseover="showUserPanel"
