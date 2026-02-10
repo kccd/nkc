@@ -102,13 +102,13 @@
           p(v-if="canFilterStats && filterActive")
             span 当前统计已按筛选条件过滤（{{filterOptionsCount}}项）
             a.pointer(@click="clearFilterOptions") 清除筛选
-          .form-post-users(v-if='users && users.length')
-            a(onclick="NKC.methods.visitUrl('/u/' + user.uid)"
-              data-global-mouseover="showUserPanel"
-              data-global-mouseout="hideUserPanel"
-              :data-global-data="objToStr({uid: user.uid})"
-              v-for="user in users")
-              img(:src="getUrl('userAvatar', user.avatar)")
+          //- .form-post-users(v-if='users && users.length')
+          //-   a(onclick="NKC.methods.visitUrl('/u/' + user.uid)"
+          //-     data-global-mouseover="showUserPanel"
+          //-     data-global-mouseout="hideUserPanel"
+          //-     :data-global-data="objToStr({uid: user.uid})"
+          //-     v-for="user in users")
+          //-     img(:src="getUrl('userAvatar', user.avatar)")
         //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}
         //- 奖励
