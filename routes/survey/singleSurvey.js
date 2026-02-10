@@ -138,20 +138,34 @@ router
         surveyId: survey._id,
         originId: null,
       }).lean();
+      const filterGroupMap = {};
+      for (const filter of filterOptions) {
+        if (!filterGroupMap[filter.optionId]) {
+          filterGroupMap[filter.optionId] = new Set();
+        }
+        filterGroupMap[filter.optionId].add(filter.answerId);
+      }
+      const filterGroupKeys = Object.keys(filterGroupMap);
       const filteredPosts = posts.filter((post) => {
         const options = post.options || [];
-        for (const filter of filterOptions) {
+        for (const optionId of filterGroupKeys) {
+          const answerIdSet = filterGroupMap[optionId];
+          let matched = false;
           for (const o of options) {
             if (
-              o.optionId === filter.optionId &&
-              o.answerId === filter.answerId &&
+              o.optionId === Number(optionId) &&
+              answerIdSet.has(o.answerId) &&
               o.selected
             ) {
-              return true;
+              matched = true;
+              break;
             }
           }
+          if (!matched) {
+            return false;
+          }
         }
-        return false;
+        return true;
       });
       const optionMap = {};
       for (const option of surveyObj.options) {
