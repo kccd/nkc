@@ -4,4 +4,11 @@ module.exports = {
   md5: {
     POST: Operations.uploadResources,
   },
+  chunk: {
+    GET: Operations.getUploadedChunksInfo,
+    POST: Operations.uploadChunk,
+    merge: {
+      POST: Operations.mergeUploadedChunks,
+    },
+  },
 };

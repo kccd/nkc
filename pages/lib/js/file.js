@@ -16,7 +16,7 @@ export function fileToBase64(file) {
   });
 }
 
-export function getFileMD5(file) {
+export function getFileMD5(file, onProgress) {
   return new Promise(function (resolve, reject) {
     var blobSlice =
         File.prototype.slice ||
@@ -27,10 +27,25 @@ export function getFileMD5(file) {
       currentChunk = 0,
       spark = new SparkMD5.ArrayBuffer(),
       fileReader = new FileReader();
+
+    if (chunks === 0) {
+      if (typeof onProgress === 'function') {
+        onProgress(100);
+      }
+      resolve(spark.end());
+      return;
+    }
     fileReader.onload = function (e) {
-      console.log('read chunk nr', currentChunk + 1, 'of', chunks);
+      // console.log('read chunk nr', currentChunk + 1, 'of', chunks);
       spark.append(e.target.result); // Append array buffer
       currentChunk++;
+
+      if (typeof onProgress === 'function') {
+        const progress = Number(
+          Math.min(100, (currentChunk / chunks) * 100).toFixed(1),
+        );
+        onProgress(progress);
+      }
 
       if (currentChunk < chunks) {
         loadNext();

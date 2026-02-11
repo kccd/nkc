@@ -49,6 +49,7 @@
   "dependencies": {
     "@alicloud/pop-core": "^1.7.9",
     "@babel/runtime": "^7.14.6",
+    "@henrygd/queue": "^1.2.0",
     "@icon-park/vue": "^1.4.1",
     "@koa/cors": "^5.0.0",
     "@mathjax/mathjax-mhchem-font-extension": "^4.0.0",

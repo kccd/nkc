@@ -463,6 +463,9 @@ const FixedOperations = {
   momentRichEditorHistoryRollback: 'momentRichEditorHistoryRollback',
   weChat: 'weChat',
   appVideoPlayer: 'appVideoPlayer',
+  getUploadedChunksInfo: 'getUploadedChunksInfo',
+  uploadChunk: 'uploadChunk',
+  mergeUploadedChunks: 'mergeUploadedChunks',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

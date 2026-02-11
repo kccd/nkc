@@ -27,7 +27,7 @@ module.exports = async (url, props) => {
 
   // 超时控制
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60 * 1000);
+  const timeoutId = setTimeout(() => controller.abort(), 20 * 60 * 1000);
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -54,5 +54,7 @@ module.exports = async (url, props) => {
   } catch (err) {
     console.log(err);
     throw err;
+  } finally {
+    await fs.promises.rm(filePath, { force: true });
   }
 };

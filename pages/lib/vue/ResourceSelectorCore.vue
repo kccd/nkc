@@ -77,23 +77,27 @@
         .resource-info(v-if="!files.length") 空空如也~
         .resource-padding-container(v-else v-for="(f, index) in files")
           .resource(:class="watchType === 'select'?'resource-select':'resource-category'")
-            .resource-upload-body(v-if="f.status === 'uploading'")
+            .resource-upload-body(v-if='f.status === "preparing"')
+              .resource-picture.upload(:class="{'uploadSelect': watchType === 'select'}")
+                .fa.fa-spinner.fa-spin.fa-fw
+                span 准备中..{{f.progress.toFixed(1)}}%
+            .resource-upload-body(v-else-if="f.status === 'uploading'")
               .resource-picture.upload(v-if="f.progress !== 100" :class="{'uploadSelect': watchType === 'select'}")
-                span 上传中..{{f.progress}}%
                 .fa.fa-spinner.fa-spin.fa-fw
+                span 上传中..{{f.progress.toFixed(1)}}%
               .resource-picture.upload(v-else :class="{'uploadSelect': watchType === 'select'}")
-                span 处理中..
                 .fa.fa-spinner.fa-spin.fa-fw
-            .resource-upload-body(v-if="f.status === 'unUpload'")
+                span 处理中..
+            .resource-upload-body(v-else-if="f.status === 'unUpload'")
               .resource-picture.upload(v-if="f.error" :class="{'uploadSelect': watchType === 'select'}")
                 .remove-file
                   .fa.fa-remove(@click="removeFile(index)")
                 span.pointer(@click="startUpload(f)") 上传失败，点击重试
               .resource-picture.upload(v-else :class="{'uploadSelect': watchType === 'select'}")
-                span 等待中...
                 .fa.fa-spinner.fa-spin.fa-fw
+                span 等待中...
             .resource-name
-              span {{f.name}}
+              span(:title="f.name") {{f.name}}
       .resources-body(
         v-else
         :class="watchType === 'select'?'':'min-length'")
@@ -370,11 +374,15 @@ img.image {
   font-size: 1rem;
   position: relative;
   overflow: hidden;
-  padding-top: 50%;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding-top: 0;
 }
 .uploadSelect {
-  padding-top: 25% !important;
+  padding-top: 0 !important;
 }
 .resource-picture.upload .remove-file {
   position: absolute;
@@ -684,7 +692,7 @@ img.image {
   }*/
 </style>
 <script>
-import { getFileMD5, blobToFile } from '../js/file';
+import { blobToFile } from '../js/file';
 import { getSize, timeFormat, getUrl } from '../js/tools';
 import { debounce } from '../js/execution';
 import { visitUrl } from '../js/pageSwitch';
@@ -697,8 +705,8 @@ import ResourceInfo from './ResourceInfo';
 import CommonModal from './CommonModal';
 import SelectCategory from './SelectCategory';
 import { openImageViewer } from '../js/imageViewer';
-
-const { isApp, fileDomain, uid } = getState();
+import { uploadResourceAsChunks } from '../js/resource';
+const { isApp, uid } = getState();
 const isReactNative = isApp && getState().platform === 'reactNative';
 import {
   RNTakePictureAndUpload,
@@ -1191,67 +1199,60 @@ export default {
       this.getResourcesDebounce(paging.page + count);
     },
     clickInput: function () {
-      if (this.files.length >= 20)
+      if (this.files.length >= 20) {
         sweetInfo('最多仅允许20个文件同时上传，请稍后再试。');
+      }
       var input = this.$refs.inputElement;
       if (input) input.click();
     },
     removeFile: function (index) {
       this.files.splice(index, 1);
     },
-    startUpload: function (f) {
-      f.error = '';
-      this.selectCategory('upload');
-      const self = this;
-      return Promise.resolve()
-        .then(function () {
-          self.checkFileSize(f.data.name, f.data.size);
-          if (f.status === 'uploading') throw '文件正在上传...';
-          if (f.status === 'uploaded') throw '文件已上传成功！';
-          f.status = 'uploading';
-          // 获取文件md5
-          return getFileMD5(f.data);
-        })
-        .then(function (md5) {
-          // 将md5发送到后端检测文件是否已上传
-          return nkcAPI('/rs/md5', 'POST', {
-            md5,
-            filename: f.name,
-          });
-        })
-        .then(function (data) {
-          if (!data.uploaded) {
-            // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
-            var formData = new FormData();
-            formData.append('file', f.data, f.data.name || Date.now() + '.png');
-            formData.append('cid', self.resourceCategories);
-            formData.append('toc', f.toc);
-            let url = '/r';
-            /*if(fileDomain) {
-              url = fileDomain + url;
-            }*/
-            return nkcUploadFile(
-              url,
-              'POST',
-              formData,
-              function (e, progress) {
-                f.progress = progress;
-              },
-              60 * 60 * 1000,
-            );
-          }
-        })
-        .then(function () {
-          f.status = 'uploaded';
-          var index = self.files.indexOf(f);
-          self.files.splice(index, 1);
-        })
-        .catch(function (data) {
-          f.status = 'unUpload';
-          f.progress = 0;
-          f.error = data.error || data;
-          screenTopWarning(data.error || data);
+    startUpload: async function (f) {
+      try {
+        f.error = '';
+        this.selectCategory('upload');
+        const self = this;
+        self.checkFileSize(f.data.name, f.data.size);
+        if (f.status === 'uploading') throw new Error('文件正在上传...');
+        if (f.status === 'uploaded') throw new Error('文件已上传成功！');
+
+        f.status = '';
+        f.progress = 0;
+        await uploadResourceAsChunks({
+          file: f.data,
+          name: f.name,
+          cid: self.resourceCategories,
+          toc: f.toc,
+          type: 'resource',
+          onProgress: (props) => {
+            if (props.type === 'preparing') {
+              f.status = 'preparing';
+              f.progress = props.progress;
+            } else if (props.type === 'uploading') {
+              f.status = 'uploading';
+              f.progress = props.progress;
+            } else if (props.type === 'processing') {
+              f.status = 'uploading';
+              f.progress = props.progress;
+            } else {
+              //
+            }
+          },
         });
+
+        f.status = 'uploaded';
+        f.progress = 100;
+
+        var index = self.files.indexOf(f);
+        self.files.splice(index, 1);
+      } catch (err) {
+        f.status = 'unUpload';
+        f.progress = 0;
+        f.error = err.error || err.message || err;
+        console.log(err);
+        screenTopWarning(err.error || err.message || err);
+      }
     },
     newFile: function (file) {
       let toc = Date.now();
