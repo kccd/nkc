@@ -2,58 +2,37 @@ import { getFileMD5 } from './file';
 import { nkcAPI, nkcUploadFile } from './netAPI';
 import { newQueue } from '@henrygd/queue';
 
+// ueditor 编辑器在使用的文件上传
 export function UploadResource(props) {
   const { file, cid, defaultFileName = '', onProgress = () => {} } = props;
-  return getFileMD5(file)
-    .then((md5) => {
-      return nkcAPI('/rs/md5', 'POST', {
-        md5,
-        filename: file.name,
-      });
-    })
-    .then((data) => {
-      if (!data.uploaded) {
-        const formData = new FormData();
-        formData.append('file', file, file.name || defaultFileName);
-        if (cid) {
-          formData.append('cid', cid);
-        }
-        return nkcUploadFile('/r', 'POST', formData, onProgress);
-      }
-    });
+  return uploadResourceAsChunks({
+    file,
+    onProgress,
+    filename: defaultFileName,
+    cid,
+    type: 'resource',
+  });
 }
-
+// tiptap 编辑器在使用的文件上传
 export function UploadResourceV2(props) {
   const { file, cid, defaultFileName = '', onProgress = () => {} } = props;
-  return getFileMD5(file)
-    .then((md5) => {
-      return nkcAPI('/rs/md5', 'POST', {
-        md5,
-        filename: file.name,
-      });
-    })
-    .then((data) => {
-      if (!data.uploaded) {
-        const formData = new FormData();
-        formData.append('file', file, file.name || defaultFileName);
-        if (cid) {
-          formData.append('cid', cid);
-        }
-        return nkcUploadFile('/r', 'POST', formData, onProgress);
-      } else {
-        return Promise.resolve(data);
-      }
-    });
+  return uploadResourceAsChunks({
+    file,
+    onProgress,
+    filename: defaultFileName,
+    cid,
+    type: 'resource',
+  });
 }
 
+// props.file: File对象
+// props.onProgress: 上传进度回调，参数为 { type: 'preparing' | 'uploading' | 'processing' | 'done', progress: 0-100 }
+// props.filename: 上传后的文件名，默认为 file.name
 // props.type: resource, sticker
 // props.cid: 附件分类ID
 // props.toc: 从文件管理器选择附件的时间
 // props.share: 作为表情时，是否需要分享
 export async function uploadResourceAsChunks(props) {
-  // progress
-  // props.type: 'md5' | 'upload' | 'process' | 'done'
-  // props.progress: 0-100
   const { file, onProgress, filename, cid, type, toc, share } = props;
   onProgress({ type: 'preparing', progress: 0 });
   const md5 = await getFileMD5(file, (progress) => {
@@ -61,7 +40,7 @@ export async function uploadResourceAsChunks(props) {
   });
   const md5Res = await nkcAPI('/rs/md5', 'POST', {
     md5,
-    filename: file.name,
+    filename: filename || file.name,
   });
   // 如果文件已存在，直接返回
   if (md5Res.uploaded) {
@@ -138,7 +117,7 @@ export async function uploadResourceAsChunks(props) {
   });
   await queue.done();
   onProgress({ type: 'processing', progress: 100 });
-  await nkcAPI('/rs/chunk/merge', 'POST', {
+  const res = await nkcAPI('/rs/chunk/merge', 'POST', {
     hash: md5,
     size: file.size,
     name: filename || file.name,
@@ -148,4 +127,5 @@ export async function uploadResourceAsChunks(props) {
     type: type, // resource, sticker
   });
   onProgress({ type: 'done', progress: 100 });
+  return res;
 }
