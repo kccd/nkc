@@ -215,6 +215,7 @@ resourceRouter
     await next();
   })
   .post('/', OnlyUnbannedUser(), async (ctx, next) => {
+    //当前路由已废弃，仅作参考
     //用户上传文件
     const { db, data, nkcModules, state } = ctx;
     const { user } = data;

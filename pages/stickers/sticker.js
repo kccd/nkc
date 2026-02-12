@@ -1,27 +1,29 @@
-import {objToStr} from "../lib/js/tools";
+import { objToStr } from '../lib/js/tools';
+import { nkcAPI } from '../lib/js/netAPI';
+import { sweetError, sweetInfo, sweetQuestion } from '../lib/js/sweetAlert';
 
-const data = NKC.methods.getDataById("data");
-data.ownStickers.map(s => {
-  s.selected = false
+const data = window.NKC.methods.getDataById('data');
+data.ownStickers.map((s) => {
+  s.selected = false;
 });
-const app = new Vue({
-  el: "#app",
+const app = new window.Vue({
+  el: '#app',
   data: {
     ownStickers: data.ownStickers,
     hotStickers: data.hotStickers,
-    management: false
+    management: false,
   },
   computed: {
     selectedStickers() {
-      return this.ownStickers.filter(s => !!s.selected);
-    }
+      return this.ownStickers.filter((s) => !!s.selected);
+    },
   },
   mounted() {
-    // NKC.methods.initStickerViewer();
+    // window.NKC.methods.initStickerViewer();
   },
   methods: {
-    getUrl: NKC.methods.tools.getUrl,
-    visitUrl: NKC.methods.visitUrl,
+    getUrl: window.NKC.methods.tools.getUrl,
+    visitUrl: window.NKC.methods.visitUrl,
     objToStr: objToStr,
     switchManagement() {
       this.management = !this.management;
@@ -31,28 +33,32 @@ const app = new Vue({
       sweetInfo(s.reason);
     },
     moveSticker() {
-      const {selectedStickers} = this;
-      if(!selectedStickers.length) return;
+      const { selectedStickers } = this;
+      if (!selectedStickers.length) {
+        return;
+      }
       const body = {
-        type: "move",
-        stickersId: selectedStickers.map(s => s._id)
+        type: 'move',
+        stickersId: selectedStickers.map((s) => s._id),
       };
-      nkcAPI("/sticker", "POST", body)
+      nkcAPI('/sticker', 'POST', body)
         .then(() => {
           window.location.reload();
         })
         .catch(sweetError);
     },
     removeSticker() {
-      const {selectedStickers} = this;
-      if(!selectedStickers.length) return;
+      const { selectedStickers } = this;
+      if (!selectedStickers.length) {
+        return;
+      }
       sweetQuestion(`确定要删除已选中的${selectedStickers.length}个表情？`)
         .then(() => {
           const body = {
-            type: "delete",
-            stickersId: selectedStickers.map(s => s._id)
+            type: 'delete',
+            stickersId: selectedStickers.map((s) => s._id),
           };
-          return nkcAPI("/sticker", "POST", body);
+          return nkcAPI('/sticker', 'POST', body);
         })
         .then(() => {
           window.location.reload();
@@ -63,32 +69,37 @@ const app = new Vue({
       s.selected = !s.selected;
     },
     changeStickersStatus(select) {
-      this.ownStickers.map(s => s.selected = !!select);
+      this.ownStickers.map((s) => (s.selected = !!select));
     },
     selectAll() {
-      let count = 0, select = true;
-      for(const s of this.ownStickers) {
-        if(s.selected) count ++;
+      let count = 0,
+        select = true;
+      for (const s of this.ownStickers) {
+        if (s.selected) {
+          count++;
+        }
       }
-      if(count === this.ownStickers.length) {
+      if (count === this.ownStickers.length) {
         select = false;
       }
       this.changeStickersStatus(select);
     },
     shareSticker() {
-      const {selectedStickers} = this;
-      if(!selectedStickers.length) return;
+      const { selectedStickers } = this;
+      if (!selectedStickers.length) {
+        return;
+      }
       const body = {
-        type: "share",
-        stickersId: selectedStickers.map(s => s._id)
+        type: 'share',
+        stickersId: selectedStickers.map((s) => s._id),
       };
-      nkcAPI("/sticker", "POST", body)
+      nkcAPI('/sticker', 'POST', body)
         .then(() => {
           window.location.reload();
         })
         .catch(sweetError);
-    }
-  }
+    },
+  },
 });
 
 window.app = app;

@@ -49,11 +49,12 @@ export function UploadResourceV2(props) {
 // props.type: resource, sticker
 // props.cid: 附件分类ID
 // props.toc: 从文件管理器选择附件的时间
+// props.share: 作为表情时，是否需要分享
 export async function uploadResourceAsChunks(props) {
   // progress
   // props.type: 'md5' | 'upload' | 'process' | 'done'
   // props.progress: 0-100
-  const { file, onProgress, filename, cid, type, toc } = props;
+  const { file, onProgress, filename, cid, type, toc, share } = props;
   onProgress({ type: 'preparing', progress: 0 });
   const md5 = await getFileMD5(file, (progress) => {
     onProgress({ type: 'preparing', progress });
@@ -143,6 +144,7 @@ export async function uploadResourceAsChunks(props) {
     name: filename || file.name,
     cid: cid,
     toc: toc,
+    share: share,
     type: type, // resource, sticker
   });
   onProgress({ type: 'done', progress: 100 });

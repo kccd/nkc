@@ -257,7 +257,6 @@ const FixedOperations = {
   buyResource: 'buyResource',
   modifyResources: 'modifyResources',
   resourceCategory: 'resourceCategory',
-  uploadResources: 'uploadResources',
   getResources: 'getResources',
   search: 'search',
   getCreditSettings: 'getCreditSettings',
@@ -465,6 +464,7 @@ const FixedOperations = {
   appVideoPlayer: 'appVideoPlayer',
   getUploadedChunksInfo: 'getUploadedChunksInfo',
   uploadChunk: 'uploadChunk',
+  checkResourceHash: 'checkResourceHash',
   mergeUploadedChunks: 'mergeUploadedChunks',
 };
 
