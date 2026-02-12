@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 /*
  * 推送文件到媒体服务
@@ -17,7 +18,11 @@ module.exports = async (url, props) => {
   if (!filePath) {
     throw new Error(`mediaClient: path 不能为空`);
   }
-  formData.append('file', await fs.openAsBlob(filePath));
+  formData.append(
+    'file',
+    await fs.openAsBlob(filePath),
+    path.basename(filePath),
+  );
   if (coverPath) {
     formData.append('cover', await fs.openAsBlob(coverPath), 'cover.png');
   }
