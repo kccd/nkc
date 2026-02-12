@@ -48,7 +48,8 @@ block eContent
                   td= rec.nationCode
                   - let typeChineseName = lang("secretBehaviors", rec.type);
                   td= typeChineseName? (typeChineseName + "("+rec.type+")") : rec.type
-                  td= rec.ip
+                  td
+                    span.pointer.text-primary(onclick=`getAndShowIpDetail("${rec.ip}")`) #{rec.ip}
                   td
                     span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
         include ../../publicModules/paging/paging_input

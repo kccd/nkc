@@ -141,6 +141,7 @@ import { copyTextToClipboard } from '../../../js/clipboard';
 import DisabledMoment from '../../DisabledMoment.vue';
 import ControlCommentVue from '../../ControlComment.vue';
 import { reviewActions } from '../../../js/review';
+import { getAndShowMomentIpDetail } from '../../../js/ip';
 export default {
   data: () => ({
     uid: NKC.configs.uid,
@@ -274,26 +275,9 @@ export default {
     displayIpInfo() {
       if (!this.moment) return sweetWarning('未找到评论内容');
       const { momentId, momentCommentId } = this.moment;
-      nkcAPI(
-        `/moment/${momentCommentId ? momentCommentId : momentId}/ipInfo`,
-        'GET',
-      )
-        .then((res) => {
-          return res.ipInfo;
-        })
-        .then((info) => {
-          if (!info) return sweetError('获取ip地址失败');
-          return asyncSweetCustom(
-            "<p style='font-weight: normal;'>ip: " +
-              info.ip +
-              '<br>位置: ' +
-              info.location +
-              '</p>',
-          );
-        })
-        .catch((err) => {
-          sweetError(err);
-        });
+      getAndShowMomentIpDetail(
+        momentCommentId ? momentCommentId : momentId,
+      ).catch(sweetError);
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {
@@ -412,15 +396,6 @@ export default {
         momentId: _id,
         typeName: !parentId ? '电文' : '评论',
       });
-      // sweetQuestion('确定要屏蔽吗？').then(() => {
-      //   nkcAPI(`/moment/${_id}/disable`, 'POST', {})
-      //     .then(() => {
-      //       sweetSuccess('操作成功');
-      //     })
-      //     .catch((err) => {
-      //       sweetError(err);
-      //     });
-      // });
     },
     //解除屏蔽
     recoveryMoment() {

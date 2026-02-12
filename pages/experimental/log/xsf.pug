@@ -53,7 +53,7 @@ block eContent
                 th
                   a(:href="record.url" target="_blank") 查看详情
                 th
-                  a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.ip+'&action=2'") {{record.ip}}
+                  span.text-primary.pointer(@click="getAndShowIpDetail(record.ip)") {{record.ip}}
                 th
                   span(v-if='record.canceled').text-danger 是
                   span(v-else).text-success 否

@@ -1409,7 +1409,8 @@ postSchema.statics.newPost = async (options) => {
     rpid = quote[2];
   }
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const ipToken = await IPModel.saveIPAndGetToken(ip);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ipToken = await ipFinderService.saveIpAndGetToken(ip);
   const _post = await new PostModel({
     pid,
     c: content,

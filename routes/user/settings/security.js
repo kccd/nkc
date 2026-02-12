@@ -4,6 +4,7 @@ const {
   OnlyUnbannedUser,
   OnlyUser,
 } = require('../../../middlewares/permission');
+const { ipFinderService } = require('../../../services/ip/ipFinder.service');
 router.get('/', OnlyUser(), async (ctx, next) => {
   const { db, data, params, nkcModules } = ctx;
   data.selected = 'security';
@@ -36,10 +37,14 @@ router.get('/', OnlyUser(), async (ctx, next) => {
     .sort({ toc: -1 })
     .limit(20);
   data.loginRecordList = [];
+  const ipMap = await ipFinderService.getIPInfoMapByIPs(
+    loginRecordList.map((item) => item.ip),
+  );
   for (const item of loginRecordList) {
+    const ipInfo = ipMap.get(item.ip);
     data.loginRecordList.push({
       _id: item._id,
-      address: `${item.ip}(${await db.IPModel.getIpCity(item.ip)})`,
+      address: `${item.ip}(${ipInfo.country} ${ipInfo.region} ${ipInfo.city})`,
       userAgent: item.userAgent,
       toc: nkcModules.tools.timeFormat(item.toc),
       status: secret.includes(item._id),

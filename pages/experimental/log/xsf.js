@@ -1,10 +1,11 @@
-import {getDataById} from "../../lib/js/dataConversion";
-import {visitUrl} from "../../lib/js/pageSwitch";
+import { getDataById } from '../../lib/js/dataConversion';
+import { visitUrl } from '../../lib/js/pageSwitch';
+import { getAndShowIpDetail } from '../../lib/js/ip';
 
 const data = getDataById('data');
 let searchText = '';
 let searchType = '';
-if(data.t && data.content) {
+if (data.t && data.content) {
   searchText = data.content;
   searchType = data.t;
 }
@@ -16,9 +17,14 @@ var app = new Vue({
     xsfsRecords: data.xsfsRecords,
   },
   methods: {
-    searchUser: function() {
-      if(!this.searchText) return screenTopWarning('输入不能为空');
-      visitUrl('/e/log/xsf?t=' + this.searchType + '&content=' + this.searchText);
-    }
-  }
+    getAndShowIpDetail,
+    searchUser: function () {
+      if (!this.searchText) {
+        return screenTopWarning('输入不能为空');
+      }
+      visitUrl(
+        '/e/log/xsf?t=' + this.searchType + '&content=' + this.searchText,
+      );
+    },
+  },
 });

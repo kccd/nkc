@@ -667,7 +667,7 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumberOfIP = async function (
   const SettingModel = mongoose.model('settings');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const LoginRecordModel = mongoose.model('loginRecords');
-  const apiFunction = require('../nkcModules/apiFunction');
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
   const userPersonal = await UsersPersonalModel.findOne({ uid });
   const authSettings = await SettingModel.getSettings('auth');
   // 超过最大地址限制
@@ -679,16 +679,8 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumberOfIP = async function (
       .sort({ toc: -1 })
       .limit(1);
     if (loginRecords) {
-      const latestIpAddress = await apiFunction.getIpInfoFromLocalModule(ip);
-      const beforeIpAddress = await apiFunction.getIpInfoFromLocalModule(
-        loginRecords.ip,
-      );
-      // const beforeIpAddress = await apiFunction.getIpInfoFromLocalModule(
-      //   '110.184.0.1',
-      // );
-      // console.log('====================================');
-      // console.log(latestIpAddress,beforeIpAddress);
-      // console.log('====================================');
+      const latestIpAddress = await ipFinderService.getIpInfo(ip);
+      const beforeIpAddress = await ipFinderService.getIpInfo(loginRecords.ip);
       if (latestIpAddress && beforeIpAddress) {
         switch (address) {
           case 'null':
@@ -696,13 +688,13 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumberOfIP = async function (
           case 'city':
             overAddressLimit =
               latestIpAddress.country !== beforeIpAddress.country ||
-              latestIpAddress.province !== beforeIpAddress.province ||
+              latestIpAddress.region !== beforeIpAddress.region ||
               latestIpAddress.city !== beforeIpAddress.city;
             break;
           case 'province':
             overAddressLimit =
               latestIpAddress.country !== beforeIpAddress.country ||
-              latestIpAddress.province !== beforeIpAddress.province;
+              latestIpAddress.region !== beforeIpAddress.region;
             break;
           case 'country':
             overAddressLimit =

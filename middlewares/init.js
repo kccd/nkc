@@ -13,6 +13,7 @@ const { getErrorPage404, getErrorPage500 } = require('../nkcModules/errorPage');
 const { ErrorTypes } = require('../nkcModules/error');
 const { translateResponseType } = require('../nkcModules/translate');
 const apiRouteReg = /^\/api\/v[0-9]+/;
+const { isDevelopment } = require('../settings/env');
 
 const fsSync = {
   access: fsPromise.access,
@@ -35,7 +36,7 @@ module.exports = async (ctx, next) => {
     xForwardedFor: ctx.get('x-forwarded-for'),
     xForwardedRemotePort: ctx.get(`x-forwarded-remote-port`),
   });
-  ctx.address = ip;
+  ctx.address = (isDevelopment && process.env.NKC_DEV_CLIENT_IP) || ip;
   ctx.port = port;
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);

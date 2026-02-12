@@ -1,5 +1,5 @@
 import { objToStr } from '../../../lib/js/tools';
-import { showIpInfo } from '../../../lib/js/ip';
+import { getAndShowIpDetail } from '../../../lib/js/ip';
 import UserMemoEditor from '../../../lib/vue/UserMemoEditor.vue';
 import { getDataById } from '../../../lib/js/dataConversion';
 
@@ -34,7 +34,7 @@ const app = new Vue({
   },
   methods: {
     objToStr: objToStr,
-    showIpInfo,
+    getAndShowIpDetail,
     format: NKC.methods.format,
     getUrl: NKC.methods.tools.getUrl,
     getIpUrl: NKC.methods.tools.getIpUrl,

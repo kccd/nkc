@@ -68,7 +68,7 @@ block eContent
                   th=paper.passScore
                   th=paper.score
                   th
-                    .pointer.text-primary(onclick=`showIpInfo("${paper.ip}")`)=paper.ip
+                    .pointer.text-primary(onclick=`getAndShowIpDetail("${paper.ip}")`)=paper.ip
                   th
                     a(href=`/e/log/exam/paper/${paper._id}` target="_blank") 查看
         include ../../../publicModules/paging/paging_input

@@ -67,7 +67,7 @@ block eContent
             label.col-sm-5.control-label IP：
             h5.col-sm-7
               strong
-                .pointer.text-primary(@click=`showIpInfo(paper.ip)`) {{paper.ip}}
+                .pointer.text-primary(@click=`getAndShowIpDetail(paper.ip)`) {{paper.ip}}
       .col-xs-12.col-md-7
         h3.m-b-2
           strong 答题卡

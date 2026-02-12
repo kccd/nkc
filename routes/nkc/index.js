@@ -33,6 +33,40 @@ router
     const usersData = [];
     const postsData = [];
     const threadsData = [];
+    const momentsData = [];
+    const momentCommentsData = [];
+    const articlesData = [];
+    const articleCommentsData = [];
+    const getMomentMatch = (timeStart, timeEnd) => {
+      return {
+        status: 'normal',
+        parent: '',
+        quoteType: '',
+        quoteId: '',
+        toc: { $gt: timeStart, $lt: timeEnd },
+      };
+    };
+    const getMomentCommentMatch = (timeStart, timeEnd) => {
+      return {
+        status: 'normal',
+        quoteType: '',
+        quoteId: '',
+        parent: { $ne: '' },
+        toc: { $gt: timeStart, $lt: timeEnd },
+      };
+    };
+    const getArticleMatch = (timeStart, timeEnd) => {
+      return {
+        status: 'normal',
+        toc: { $gt: timeStart, $lt: timeEnd },
+      };
+    };
+    const articleCommentMatch = (timeStart, timeEnd) => {
+      return {
+        status: 'normal',
+        toc: { $gt: timeStart, $lt: timeEnd },
+      };
+    };
     let title;
     const oneDay = 24 * 60 * 60 * 1000;
     if (type === 'today') {
@@ -51,9 +85,25 @@ router
         const threadsCount = await db.ThreadModel.countDocuments({
           toc: { $gt: minTime, $lt: maxTime },
         });
+        const momentsCount = await db.MomentModel.countDocuments({
+          ...getMomentMatch(minTime, maxTime),
+        });
+        const momentCommentsCount = await db.MomentModel.countDocuments({
+          ...getMomentCommentMatch(minTime, maxTime),
+        });
+        const articlesCount = await db.ArticleModel.countDocuments({
+          ...getArticleMatch(minTime, maxTime),
+        });
+        const articleCommentsCount = await db.CommentModel.countDocuments({
+          ...articleCommentMatch(minTime, maxTime),
+        });
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
+        momentsData.push(momentsCount);
+        momentCommentsData.push(momentCommentsCount);
+        articlesData.push(articlesCount);
+        articleCommentsData.push(articleCommentsCount);
       }
       data.results = {
         usersData,
@@ -61,6 +111,10 @@ router
         threadsData,
         x,
         title,
+        momentsData,
+        momentCommentsData,
+        articlesData,
+        articleCommentsData,
       };
     } else if (type === 'month') {
       title = '本月';
@@ -90,9 +144,25 @@ router
         const threadsCount = await db.ThreadModel.countDocuments({
           toc: { $gt: minTime, $lt: maxTime },
         });
+        const momentsCount = await db.MomentModel.countDocuments({
+          ...getMomentMatch(minTime, maxTime),
+        });
+        const momentCommentsCount = await db.MomentModel.countDocuments({
+          ...getMomentCommentMatch(minTime, maxTime),
+        });
+        const articlesCount = await db.ArticleModel.countDocuments({
+          ...getArticleMatch(minTime, maxTime),
+        });
+        const articleCommentsCount = await db.CommentModel.countDocuments({
+          ...articleCommentMatch(minTime, maxTime),
+        });
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
+        momentsData.push(momentsCount);
+        momentCommentsData.push(momentCommentsCount);
+        articlesData.push(articlesCount);
+        articleCommentsData.push(articleCommentsCount);
       }
       data.results = {
         usersData,
@@ -100,6 +170,10 @@ router
         threadsData,
         x,
         title,
+        momentsData,
+        momentCommentsData,
+        articlesData,
+        articleCommentsData,
       };
     } else if (type === 'year') {
       title = '今年';
@@ -120,9 +194,25 @@ router
         const threadsCount = await db.ThreadModel.countDocuments({
           toc: { $gt: minTime, $lt: maxTime },
         });
+        const momentsCount = await db.MomentModel.countDocuments({
+          ...getMomentMatch(minTime, maxTime),
+        });
+        const momentCommentsCount = await db.MomentModel.countDocuments({
+          ...getMomentCommentMatch(minTime, maxTime),
+        });
+        const articlesCount = await db.ArticleModel.countDocuments({
+          ...getArticleMatch(minTime, maxTime),
+        });
+        const articleCommentsCount = await db.CommentModel.countDocuments({
+          ...articleCommentMatch(minTime, maxTime),
+        });
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
+        momentsData.push(momentsCount);
+        momentCommentsData.push(momentCommentsCount);
+        articlesData.push(articlesCount);
+        articleCommentsData.push(articleCommentsCount);
       }
       data.results = {
         usersData,
@@ -130,6 +220,10 @@ router
         threadsData,
         x,
         title,
+        momentsData,
+        momentCommentsData,
+        articlesData,
+        articleCommentsData,
       };
     } else if (type === 'all') {
       title = '全部';
@@ -137,20 +231,42 @@ router
       const lastUser = await db.UserModel.findOne().sort({ toc: -1 });
       const firstPost = await db.PostModel.findOne().sort({ toc: 1 });
       const lastPost = await db.PostModel.findOne().sort({ toc: -1 });
-      let firstTime, lastTime;
-      if (firstUser.toc < firstPost.toc) {
-        firstTime = firstUser.toc;
-      } else {
-        firstTime = firstPost.toc;
+      const firstMoment = await db.MomentModel.findOne().sort({ toc: 1 });
+      const lastMoment = await db.MomentModel.findOne().sort({ toc: -1 });
+      const firstMomentComment = await db.MomentModel.findOne({
+        sort: { toc: 1 },
+      });
+      const lastMomentComment = await db.MomentModel.findOne().sort({
+        toc: -1,
+      });
+      const firstTimes = [];
+      if (firstUser) {
+        firstTimes.push(firstUser.toc);
       }
-      if (lastUser.toc < lastPost.toc) {
-        lastTime = lastPost.toc;
-      } else {
-        lastTime = lastUser.toc;
+      if (firstPost) {
+        firstTimes.push(firstPost.toc);
       }
-
-      firstTime = firstTime.getTime();
-      lastTime = lastTime.getTime();
+      if (firstMoment) {
+        firstTimes.push(firstMoment.toc);
+      }
+      if (firstMomentComment) {
+        firstTimes.push(firstMomentComment.toc);
+      }
+      const lastTimes = [];
+      if (lastUser) {
+        lastTimes.push(lastUser.toc);
+      }
+      if (lastPost) {
+        lastTimes.push(lastPost.toc);
+      }
+      if (lastMoment) {
+        lastTimes.push(lastMoment.toc);
+      }
+      if (lastMomentComment) {
+        lastTimes.push(lastMomentComment.toc);
+      }
+      const firstTime = Math.min(...firstTimes.map((t) => t.getTime()));
+      const lastTime = Math.max(...lastTimes.map((t) => t.getTime()));
 
       const firstYear = new Date(firstTime).getFullYear();
       const lastYear = new Date(lastTime).getFullYear();
@@ -168,9 +284,25 @@ router
         const threadsCount = await db.ThreadModel.countDocuments({
           toc: { $gt: minTime, $lt: maxTime },
         });
+        const momentsCount = await db.MomentModel.countDocuments({
+          ...getMomentMatch(minTime, maxTime),
+        });
+        const momentCommentsCount = await db.MomentModel.countDocuments({
+          ...getMomentCommentMatch(minTime, maxTime),
+        });
+        const articlesCount = await db.ArticleModel.countDocuments({
+          ...getArticleMatch(minTime, maxTime),
+        });
+        const articleCommentsCount = await db.CommentModel.countDocuments({
+          ...articleCommentMatch(minTime, maxTime),
+        });
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
+        momentsData.push(momentsCount);
+        momentCommentsData.push(momentCommentsCount);
+        articlesData.push(articlesCount);
+        articleCommentsData.push(articleCommentsCount);
       }
       data.results = {
         usersData,
@@ -178,6 +310,10 @@ router
         threadsData,
         x,
         title,
+        momentsData,
+        momentCommentsData,
+        articlesData,
+        articleCommentsData,
       };
     } else if (type === 'custom') {
       let { time1, time2 } = query;
@@ -199,17 +335,37 @@ router
         const threadsCount = await db.ThreadModel.countDocuments({
           toc: { $gt: minTime, $lt: maxTime },
         });
+        const momentsCount = await db.MomentModel.countDocuments({
+          ...getMomentMatch(minTime, maxTime),
+        });
+        const momentCommentsCount = await db.MomentModel.countDocuments({
+          ...getMomentCommentMatch(minTime, maxTime),
+        });
+        const articlesCount = await db.ArticleModel.countDocuments({
+          ...getArticleMatch(minTime, maxTime),
+        });
+        const articleCommentsCount = await db.CommentModel.countDocuments({
+          ...articleCommentMatch(minTime, maxTime),
+        });
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
+        momentsData.push(momentsCount);
+        momentCommentsData.push(momentCommentsCount);
+        articlesData.push(articlesCount);
+        articleCommentsData.push(articleCommentsCount);
         firstTime += oneDay;
       }
       data.results = {
         usersData,
         postsData,
         threadsData,
+        momentsData,
+        momentCommentsData,
         x,
         title,
+        articlesData,
+        articleCommentsData,
       };
     } else {
       data.onlineUsers = [];

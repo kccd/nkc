@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const { OnlyOperation } = require('../../middlewares/permission');
+const { ipFinderService } = require('../../services/ip/ipFinder.service');
 const { Operations } = require('../../settings/operations');
 router
   .get(
@@ -31,7 +32,7 @@ router
         ipToken.push(a.ip);
       }
       const users = await db.UserModel.find({ uid: { $in: usersId } });
-      const ips = await db.IPModel.getIPByTokens(ipToken);
+      const ipMap = await ipFinderService.getIPMapByTokens(ipToken);
       for (const u of users) {
         usersObj[u.uid] = {
           avatar: u.avatar,
@@ -57,11 +58,7 @@ router
           description,
         } = a;
         const user = usersObj[uid];
-        let _ip = ips[ip];
-        if (_ip) {
-          const ipInfo = await db.IPModel.getIPInfoFromLocal(_ip);
-          _ip = `${_ip}(${ipInfo.location})`;
-        }
+        const _ip = ipMap.get(ip) || '';
         const application = {
           _id,
           status,
@@ -123,7 +120,7 @@ router
         // 修改用户的手机号并存修改记录
         await db.UsersPersonalModel.modifyUserPhoneNumber({
           uid: application.uid,
-          ip: await db.IPModel.getIPByToken(application.ip),
+          ip: await ipFinderService.getIPByToken(application.ip),
           port: application.port,
           phoneNumber: application.newPhoneNumber,
         });

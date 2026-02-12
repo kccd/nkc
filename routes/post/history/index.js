@@ -4,6 +4,7 @@ const rollback = require('./rollback');
 const { getJsonStringText } = require('../../../nkcModules/json');
 const { OnlyOperation } = require('../../../middlewares/permission');
 const { Operations } = require('../../../settings/operations');
+const { ipFinderService } = require('../../../services/ip/ipFinder.service');
 router
   .get('/', OnlyOperation(Operations.visitPostHistory), async (ctx, next) => {
     const { pid } = ctx.params;
@@ -50,7 +51,7 @@ router
         uidlm.push(h.uidlm);
       }
     });
-    const ipsObj = await db.IPModel.getIPByTokens(ipToken);
+    const ipMap = await ipFinderService.getIPMapByTokens(ipToken);
     histories = await db.PostModel.extendPosts(histories, extendOptions);
     for (let i = 0; i < histories.length; i++) {
       const history = histories[i];
@@ -60,8 +61,8 @@ router
             ? getJsonStringText(history.c)
             : nkcRender.htmlToPlain(history.c);
       }
-      history.ipoc = ipsObj[history.ipoc];
-      history.iplm = ipsObj[history.iplm];
+      history.ipoc = ipMap.get(history.ipoc);
+      history.iplm = ipMap.get(history.iplm);
       history.version = i + 1;
       data.histories.push(history);
     }

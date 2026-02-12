@@ -1,5 +1,6 @@
 const router = require('koa-router')();
 const { OnlyOperation } = require('../../middlewares/permission');
+const { ipFinderService } = require('../../services/ip/ipFinder.service');
 const { Operations } = require('../../settings/operations');
 router.get(
   '/',
@@ -28,12 +29,12 @@ router.get(
     // }
     let ip = document.ip;
     let address = document.address;
-    const realIp = await db.IPModel.getIPByToken(ip);
+    const realIp = await ipFinderService.getIPByToken(ip);
     if (realIp) {
       ip = realIp;
     }
     const targetIp = ip || address;
-    data.ipInfo = await db.IPModel.getIPInfoFromLocal(targetIp);
+    data.ipInfo = await ipFinderService.getIpInfo(targetIp);
     await next();
   },
 );

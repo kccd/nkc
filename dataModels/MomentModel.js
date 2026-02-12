@@ -1071,7 +1071,8 @@ schema.methods.publishMomentComment = async function (postType, alsoPost) {
   );
   let commentMomentId;
   let repostMomentId;
-  const ip = await IPModel.getIpByIpId(ipId);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ip = await ipFinderService.getIPByToken(ipId);
   // 是否生成评论
   const postComment = postType === 'comment' || alsoPost;
   // 是否生成转发
@@ -1486,8 +1487,9 @@ schema.statics.extendMomentsData = async (moments, uid = '', field = '_id') => {
   const DocumentModel = mongoose.model('documents');
   const PostsVoteModel = mongoose.model('postsVotes');
   const { getUrl, fromNow } = require('../nkcModules/tools');
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
   const IPModel = mongoose.model('ips');
-  const localAddr = await IPModel.getLocalAddr();
+  const localAddr = ipFinderService.localAddr;
   const { moment: momentSource } = await DocumentModel.getDocumentSources();
   const momentStatus = await MomentModel.getMomentStatus();
   const usersId = [];
@@ -1987,7 +1989,8 @@ schema.statics.extendCommentsData = async function (comments, uid) {
   const ReviewModel = mongoose.model('reviews');
   const IPModel = mongoose.model('ips');
   const ResourceModel = mongoose.model('resources');
-  const localAddr = await IPModel.getLocalAddr();
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const localAddr = ipFinderService.localAddr;
   const { getUrl, timeFormat } = require('../nkcModules/tools');
   const usersId = [];
   const commentsId = [];

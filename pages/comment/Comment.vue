@@ -290,6 +290,7 @@ import ViolationRecord from '../lib/vue/ViolationRecord';
 import Sticker from '../lib/vue/Sticker';
 import ImageViewer from '../lib/vue/ImageViewer';
 import { reviewActions } from '../lib/js/review';
+import { getAndShowIpDetail } from '../lib/js/ip';
 export default {
   props: ['source', 'sid'],
   data: () => ({
@@ -417,23 +418,7 @@ export default {
     //显示Ip信息
     displayIpInfo(ip) {
       if (!ip) return;
-      nkcAPI(`/ipinfo?ip=${ip}`, 'GET')
-        .then(function (res) {
-          return res.ipInfo;
-        })
-        .then(function (info) {
-          if (!info) return sweetError('获取ip信息失败！');
-          return asyncSweetCustom(
-            "<p style='font-weight: normal;'>ip: " +
-              info.ip +
-              '<br>位置: ' +
-              info.location +
-              '</p>',
-          );
-        })
-        .catch((err) => {
-          sweetError(err);
-        });
+      getAndShowIpDetail(ip).catch(sweetError);
     },
     //显示违规记录
     viewViolation(uid) {

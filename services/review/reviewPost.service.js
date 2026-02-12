@@ -355,6 +355,7 @@ class ReviewPostService {
 
   // 标记审核为通过
   markPostReviewAsApproved = async (props) => {
+    const { ipFinderService } = require('../ip/ipFinder.service');
     const { uid, postsId, isSuperModerator } = props;
     const match = {
       pid: { $in: postsId },
@@ -370,7 +371,7 @@ class ReviewPostService {
       await post.updateOne({
         reviewed: true,
       });
-      const ip = await IPModel.getIpByIpId(post.ipoc);
+      const ip = await ipFinderService.getIPByToken(post.ipoc);
       // 创建引用内容的电文
       MomentModel.createQuoteMomentAndPublish({
         ip,

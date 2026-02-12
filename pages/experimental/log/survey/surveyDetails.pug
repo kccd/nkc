@@ -1,0 +1,42 @@
+extends ../../experimental
+block eTitle
+  title 调查问卷详情
+  style.  
+    .user-avatar-xs {
+      opacity: 1;
+      border: 2px solid transparent;
+      height:2rem;
+      width:2rem;
+      margin: 0rem 0.5rem 0.5rem 0rem;
+    }
+    .user-avatar-xs[data-mark-other="true"]{
+      opacity: 0.3;
+    }
+    .user-avatar-xs[data-mark="true"]{
+      opacity: 1;
+      border-color: red;
+    }
+block eContent
+  .hidden#data=objToStr({survey: data.survey, surveyPosts: data.surveyPosts})
+  .container-fluid.max-width
+    #app(v-cloak)
+      div
+        a(href='/e/log/survey') 问卷调查列表
+        span.m-l-05.m-r-05 / 
+        span {{survey._id}}
+      .m-t-2
+        div ID: {{survey._id}} 
+        div 类型：{{translateType(survey.type)}}
+        div 创建时间：{{timeFormat(`YYYY/MM/DD HH:mm:ss`, survey.toc)}}
+        div 调查开始时间：{{timeFormat(`YYYY/MM/DD HH:mm:ss`, survey.st)}}
+        div 调查结束时间：{{timeFormat(`YYYY/MM/DD HH:mm:ss`, survey.et)}} 
+        div 介绍：{{survey.description}}
+        div 其他：
+          a(v-if="survey.pid" :href="getUrl('post', survey.pid)" target="_blank") 文章链接
+        .m-t-2
+          survey-view(v-if='survey.type === "survey"' :survey='survey' :survey-posts='surveyPosts')
+          vote-view(v-else-if='survey.type === "vote"' :survey='survey' :survey-posts='surveyPosts')
+          score-view(v-else :survey='survey' :survey-posts='surveyPosts')
+
+block scripts
+  +includeJS('/experimental/log/survey/surveyDetails.js')    

@@ -49,6 +49,7 @@
   "dependencies": {
     "@alicloud/pop-core": "^1.7.9",
     "@babel/runtime": "^7.14.6",
+    "@henrygd/queue": "^1.2.0",
     "@icon-park/vue": "^1.4.1",
     "@koa/cors": "^5.0.0",
     "@mathjax/mathjax-mhchem-font-extension": "^4.0.0",
@@ -165,6 +166,7 @@
     "marked": "^4.0.14",
     "mathjax": "^4.0.0",
     "mathjs": "^7.0.1",
+    "maxmind": "^5.0.1",
     "mime": "^2.2.0",
     "mint-filter": "^3.0.1",
     "mkdirp": "^1.0.4",

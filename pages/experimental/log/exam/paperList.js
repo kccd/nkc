@@ -1,7 +1,7 @@
 import { getDataById } from '../../../lib/js/dataConversion';
 import { sweetError } from '../../../lib/js/sweetAlert';
 import { visitUrl } from '../../../lib/js/pageSwitch';
-import { showIpInfo } from '../../../lib/js/ip';
+import { getAndShowIpDetail } from '../../../lib/js/ip';
 import Vue from 'vue';
 
 const data = getDataById('data');
@@ -22,4 +22,4 @@ new Vue({
   },
 });
 
-window.showIpInfo = showIpInfo;
+window.getAndShowIpDetail = getAndShowIpDetail;

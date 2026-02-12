@@ -96,6 +96,31 @@ router
       }
     }
 
+    const canFilterStats =
+      survey.type === 'survey' &&
+      ((data.user && data.user.uid === survey.uid) ||
+        ctx.permission('showSecretSurvey'));
+    data.canFilterStats = canFilterStats;
+    data.canExport =
+      (data.user && data.user.uid === survey.uid) ||
+      ctx.permission('showSecretSurvey');
+    const rawFilterOptions = ctx.query.filterOptions;
+    const filterOptions = [];
+    if (canFilterStats && rawFilterOptions) {
+      const items = String(rawFilterOptions).split(',');
+      for (const item of items) {
+        const parts = item.split('-');
+        if (parts.length !== 2) {
+          continue;
+        }
+        const optionId = Number(parts[0]);
+        const answerId = Number(parts[1]);
+        if (Number.isNaN(optionId) || Number.isNaN(answerId)) {
+          continue;
+        }
+        filterOptions.push({ optionId, answerId });
+      }
+    }
     // 如果无法查看结果，则去掉有关统计的字段
     if (!data.showResult) {
       for (const option of survey.options) {
@@ -107,6 +132,85 @@ router
           delete answer.postMaxScore;
         }
       }
+    } else if (canFilterStats && filterOptions.length) {
+      const surveyObj = survey.toObject();
+      const posts = await db.SurveyPostModel.find({
+        surveyId: survey._id,
+        originId: null,
+      }).lean();
+      const filterGroupMap = {};
+      for (const filter of filterOptions) {
+        if (!filterGroupMap[filter.optionId]) {
+          filterGroupMap[filter.optionId] = new Set();
+        }
+        filterGroupMap[filter.optionId].add(filter.answerId);
+      }
+      const filterGroupKeys = Object.keys(filterGroupMap);
+      const filteredPosts = posts.filter((post) => {
+        const options = post.options || [];
+        for (const optionId of filterGroupKeys) {
+          const answerIdSet = filterGroupMap[optionId];
+          let matched = false;
+          for (const o of options) {
+            if (
+              o.optionId === Number(optionId) &&
+              answerIdSet.has(o.answerId) &&
+              o.selected
+            ) {
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            return false;
+          }
+        }
+        return true;
+      });
+      const optionMap = {};
+      for (const option of surveyObj.options) {
+        option.postCount = 0;
+        optionMap[option._id] = option;
+        option.answersMap = {};
+        for (const answer of option.answers) {
+          answer.postCount = 0;
+          answer.postScore = 0;
+          answer.postMaxScore = null;
+          answer.postMinScore = null;
+          option.answersMap[answer._id] = answer;
+        }
+      }
+      for (const post of filteredPosts) {
+        const optionPostCount = {};
+        const options = post.options || [];
+        for (const o of options) {
+          const option = optionMap[o.optionId];
+          if (!option) {
+            continue;
+          }
+          const answer = option.answersMap[o.answerId];
+          if (!answer) {
+            continue;
+          }
+          if (!optionPostCount[option._id]) {
+            optionPostCount[option._id] = true;
+            option.postCount++;
+          }
+          if (!o.selected) {
+            continue;
+          }
+          answer.postCount++;
+        }
+      }
+      for (const option of surveyObj.options) {
+        delete option.answersMap;
+      }
+      surveyObj.postCount = filteredPosts.length;
+      data.filteredPostCount = filteredPosts.length;
+      data.filterOptions = filterOptions.map(
+        (filter) => `${filter.optionId}-${filter.answerId}`,
+      );
+      data.survey = surveyObj;
     }
 
     /*if(
@@ -129,6 +233,87 @@ router
       }
     }*/
 
+    await next();
+  })
+  .get('/export', OnlyUnbannedUser(), async (ctx, next) => {
+    const { db, data, nkcModules } = ctx;
+    const { survey, user } = data;
+    if (!user) {
+      ctx.throw(403, '无权限导出');
+    }
+    if (user.uid !== survey.uid && !ctx.permission('showSecretSurvey')) {
+      ctx.throw(403, '无权限导出');
+    }
+    const surveyPosts = await db.SurveyPostModel.find({
+      surveyId: survey._id,
+      originId: null,
+    }).lean();
+    const tools = nkcModules.tools;
+    const options = survey.options || [];
+    const optionCodes = [];
+    const codeByKey = {};
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      const answers = option.answers || [];
+      for (let j = 0; j < answers.length; j++) {
+        const answer = answers[j];
+        const code = `Q${i + 1}_A${j + 1}`;
+        const key = `${option._id}-${answer._id}`;
+        optionCodes.push({
+          code,
+          option,
+          answer,
+          optionIndex: i,
+          answerIndex: j,
+          key,
+        });
+        codeByKey[key] = code;
+      }
+    }
+
+    const detailRows = [];
+    for (const item of optionCodes) {
+      detailRows.push({
+        QuestionCode: `Q${item.optionIndex + 1}`,
+        Question: item.option.content,
+        OptionCode: item.code,
+        Option: item.answer.content,
+      });
+    }
+
+    const userRows = [];
+    for (let p = 0; p < surveyPosts.length; p++) {
+      const post = surveyPosts[p];
+      const row = {
+        用户: `用户${p + 1}`,
+      };
+      for (const optionCode of optionCodes) {
+        row[optionCode.code] = 0;
+      }
+      const postOptions = post.options || [];
+      for (const o of postOptions) {
+        const mapKey = `${o.optionId}-${o.answerId}`;
+        const codeKey = codeByKey[mapKey];
+        if (!codeKey) {
+          continue;
+        }
+        if (survey.type === 'score') {
+          row[codeKey] = o.score === undefined ? '' : o.score;
+        } else {
+          row[codeKey] = o.selected ? 1 : 0;
+        }
+      }
+      userRows.push(row);
+    }
+
+    const headers = ['用户', ...optionCodes.map((item) => item.code)];
+    const fileName = `survey_${survey._id}_${Date.now()}.xlsx`;
+    ctx.data = {
+      detailRows,
+      userRows,
+      headers,
+      fileName,
+    };
     await next();
   })
   .post('/', Public(), async (ctx, next) => {

@@ -2,6 +2,7 @@ import { getFileMD5 } from '../../lib/js/file';
 import { objToStr } from '../../lib/js/dataConversion';
 import { openDownloadPanel } from '../../global/methods';
 import ResourceSelector from '../../lib/vue/ResourceSelector.vue';
+import { uploadResourceAsChunks } from '../../lib/js/resource';
 
 NKC.modules.Library = class {
   constructor(options) {
@@ -446,11 +447,28 @@ NKC.modules.Library = class {
               if (!file.folder) {
                 throw '未选择目录';
               }
+            })
+            .then(() => {
               if (file.type === 'localFile') {
-                return getFileMD5(file.data);
+                let filename = '';
+                if (file.data && file.data.name) {
+                  filename = file.data.name;
+                } else {
+                  filename = file.name;
+                }
+                return uploadResourceAsChunks({
+                  file: file.data,
+                  type: 'resource',
+                  filename: filename,
+                  onProgress: (props) => {
+                    if (props.type === 'uploading') {
+                      file.progress = props.progress;
+                    }
+                  },
+                });
               }
             })
-            .then((data) => {
+            /* .then((data) => {
               // 上传本地文件
               if (file.type === 'localFile') {
                 let filename = '';
@@ -459,6 +477,7 @@ NKC.modules.Library = class {
                 } else {
                   filename = file.name;
                 }
+                // TODO: 这里需要替换为新的分片上传路由
                 return nkcAPI('/rs/md5', 'POST', {
                   md5: data,
                   filename,
@@ -475,7 +494,7 @@ NKC.modules.Library = class {
               } else {
                 return data;
               }
-            })
+            }) */
             .then((data) => {
               // 替换本地文件信息 统一为线上文件模式
               if (file.type === 'localFile') {

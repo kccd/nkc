@@ -471,7 +471,8 @@ router
           targetPost.cv ++;
         }*/
     targetPost.uidlm = user.uid;
-    targetPost.iplm = await db.IPModel.saveIPAndGetToken(ctx.address);
+    const { ipFinderService } = require('../../services/ip/ipFinder.service');
+    targetPost.iplm = await ipFinderService.saveIpAndGetToken(ctx.address);
     targetPost.t = t;
     targetPost.c = c;
     targetPost.cover = cover;

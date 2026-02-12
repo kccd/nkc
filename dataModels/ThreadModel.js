@@ -810,8 +810,9 @@ threadSchema.methods.newPost = async function (post, user, ip) {
   }
   // 创建post数据
   const IPModel = mongoose.model('ips');
-  const ipToken = await IPModel.saveIPAndGetToken(ip);
-  const ipAddr = await IPModel.getIpAddr(ip);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ipToken = await ipFinderService.saveIpAndGetToken(ip);
+  const ipAddr = await ipFinderService.getIpAddressAbbr(ip);
   const nowTime = Date.now();
   let _post = await new PostModel({
     toc: nowTime,
@@ -2484,8 +2485,9 @@ threadSchema.methods.createNewPost = async function (post) {
   if (quote && quote[2]) {
     rpid.push(quote[2]);
   }
-  const ipToken = await IPModel.saveIPAndGetToken(post.ip);
-  const ipAddr = await IPModel.getIpAddr(post.ip);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ipToken = await ipFinderService.saveIpAndGetToken(post.ip);
+  const ipAddr = await ipFinderService.getIpAddressAbbr(post.ip);
   let _post = await new PostModel({
     cover,
     pid,
@@ -3070,9 +3072,19 @@ threadSchema.statics.extendShopInfo = async function (props) {
   // 获取用户地址信息
   if (uid) {
     try {
-      // const ipInfo = await IPModel.getIPInfoByIP(address);
-      const city = await IPModel.getIpCity(address);
-      userAddress = city.replace(',', '/');
+      const { ipFinderService } = require('../services/ip/ipFinder.service');
+      const ipInfo = await ipFinderService.getIpInfo(address);
+      const ipInfoArr = [];
+      if (ipInfo.country) {
+        ipInfoArr.push(ipInfo.country);
+      }
+      if (ipInfo.region) {
+        ipInfoArr.push(ipInfo.region);
+      }
+      if (ipInfo.city) {
+        ipInfoArr.push(ipInfo.city);
+      }
+      userAddress = ipInfoArr.join('/');
     } catch (err) {
       //
     }

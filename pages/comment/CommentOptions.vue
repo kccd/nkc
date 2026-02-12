@@ -107,6 +107,7 @@ import { nkcAPI } from '../lib/js/netAPI';
 import { screenTopAlert } from '../lib/js/topAlert';
 import { creditTypes, contentTypes } from '../lib/vue/Credit';
 import { reviewActions } from '../lib/js/review';
+import { getAndShowCommentIpDetail } from '../lib/js/ip';
 export default {
   data: () => ({
     show: false,
@@ -236,23 +237,7 @@ export default {
     displayIpInfo() {
       if (!this.comment) return sweetWarning('未找到评论内容');
       const { _id } = this.comment;
-      nkcAPI(`/comment/${_id}/ipInfo`, 'GET')
-        .then((res) => {
-          return res.ipInfo;
-        })
-        .then((info) => {
-          if (!info) return sweetError('获取ip地址失败');
-          return asyncSweetCustom(
-            "<p style='font-weight: normal;'>ip: " +
-              info.ip +
-              '<br>位置: ' +
-              info.location +
-              '</p>',
-          );
-        })
-        .catch((err) => {
-          sweetError(err);
-        });
+      getAndShowCommentIpDetail(_id).catch(sweetError);
     },
     //加入黑名单 tUid 被拉黑的用户
     userBlacklist() {

@@ -4,8 +4,6 @@ const fs = require('fs');
 const moment = require('moment');
 const http = require('http');
 const randomatic = require('randomatic');
-const IP2Region = require('ip2region').default;
-const searchIp = new IP2Region();
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
@@ -130,8 +128,8 @@ fn.newPasswordObject = (plain) => {
   };
 };
 fn.contentLength = (content) => {
-  const zhCN = content.match(/[^\p{ASCII}]/gu);
-  const other = content.match(/\p{ASCII}/gu);
+  const zhCN = content.match(/[^\x00-\xff]/g);
+  const other = content.match(/[\x00-\xff]/g);
   const length1 = zhCN ? zhCN.length * 2 : 0;
   const length2 = other ? other.length : 0;
   return length1 + length2;
@@ -504,52 +502,6 @@ fn.doExchange = (arr) => {
   }
 };
 
-/**
- * 查询ip所在地地理位置(阿里云)
- * @param {String} ip ip地址
- * @return {JSON} data
- * @author Kris 2019-3-14
- */
-fn.getIpAddress = async (ip) => {
-  const aliAppCode = require('../config/aliAppCode');
-  const { appCode } = aliAppCode;
-  const url = `http://iploc.market.alicloudapi.com/v3/ip?ip=${encodeURIComponent(
-    ip,
-  )}`;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `APPCODE ${appCode}`,
-    },
-    signal: controller.signal,
-  });
-  clearTimeout(timeoutId);
-
-  const contentType = res.headers.get('content-type') || '';
-  if (!res.ok) {
-    const errText = contentType.includes('application/json')
-      ? JSON.stringify(await res.json())
-      : await res.text();
-    throw new Error(`请求失败 ${res.status} ${res.statusText} - ${errText}`);
-  }
-
-  if (contentType.includes('application/json')) {
-    return await res.json();
-  }
-  return await res.text();
-};
-/*
- * 从本地ip库(ip2region)中获取ip位置信息
- * @param {String} ip
- * @return {String}
- * @author pengxiguaa 2020-12-25
- * */
-fn.getIpInfoFromLocalModule = async (ip) => {
-  return searchIp.search(ip);
-};
-
 fn.getTrackInfo = async (trackNumber, trackName) => {
   const db = require('../dataModels');
   let objInfo;
@@ -613,9 +565,7 @@ fn.getTrackInfoData = (trackNumber, trackName) => {
         if (buffer) {
           try {
             data = JSON.parse(buffer);
-          } catch (err) {
-            data = { code: 1, data: '物流信息接口返回值解析错误' };
-          }
+          } catch (err) {}
         } else {
           data = { code: 1, data: '物流信息接口没有返回值' };
         }

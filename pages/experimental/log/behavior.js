@@ -1,4 +1,4 @@
-import { showIpInfo } from '../../lib/js/ip';
+import { getAndShowIpDetail } from '../../lib/js/ip';
 import { visitUrl } from '../../lib/js/pageSwitch';
 import { objToStr, strToObj } from '../../lib/js/dataConversion';
 
@@ -24,7 +24,7 @@ new window.Vue({
     ip: queryData.ip || '',
   },
   methods: {
-    showIpInfo,
+    getAndShowIpDetail: getAndShowIpDetail,
     searchUser: function () {
       const c = objToStr({
         userType: this.userType.trim(),

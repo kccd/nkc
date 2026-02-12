@@ -257,7 +257,6 @@ const FixedOperations = {
   buyResource: 'buyResource',
   modifyResources: 'modifyResources',
   resourceCategory: 'resourceCategory',
-  uploadResources: 'uploadResources',
   getResources: 'getResources',
   search: 'search',
   getCreditSettings: 'getCreditSettings',
@@ -342,6 +341,7 @@ const FixedOperations = {
   survey_post: 'survey_post',
   survey_single_get: 'survey_single_get',
   survey_single_post: 'survey_single_post',
+  survey_export_get: 'survey_export_get',
   getThreadCategories: 'getThreadCategories',
   collectThread: 'collectThread',
   editThreadPostOrder: 'editThreadPostOrder',
@@ -462,6 +462,10 @@ const FixedOperations = {
   momentRichEditorHistoryRollback: 'momentRichEditorHistoryRollback',
   weChat: 'weChat',
   appVideoPlayer: 'appVideoPlayer',
+  getUploadedChunksInfo: 'getUploadedChunksInfo',
+  uploadChunk: 'uploadChunk',
+  checkResourceHash: 'checkResourceHash',
+  mergeUploadedChunks: 'mergeUploadedChunks',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -794,6 +798,7 @@ const DynamicOperations = {
   visitOtherUserZoneMomentHistory: 'visitOtherUserZoneMomentHistory',
   disableResource: 'disabledResource',
   momentCommentControl: 'momentCommentControl',
+  visitExperimentalSurvey: 'visitExperimentalSurvey',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

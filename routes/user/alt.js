@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 const { OnlyOperation } = require('../../middlewares/permission');
 const { Operations } = require('../../settings/operations');
+const { ipFinderService } = require('../../services/ip/ipFinder.service');
 router.get(
   '/',
   OnlyOperation(Operations.getUserOtherAccount),
@@ -33,11 +34,11 @@ router.get(
     ]);
     const ips = [];
     for (const i of ipsData) {
-      const ipInfo = await db.IPModel.getIPInfoFromLocal(i._id);
+      const ipInfo = await ipFinderService.getIpInfo(i._id);
       ips.push(i._id);
       i.ip = i._id;
       delete i._id;
-      i.location = ipInfo.location;
+      i.location = `${ipInfo.country} ${ipInfo.region} ${ipInfo.city}`;
     }
     data.ips = ipsData;
     let otherUid = await db.UsersBehaviorModel.aggregate([
@@ -89,6 +90,9 @@ router.get(
             },
           },
         ]);
+        const ipMap = await ipFinderService.getIPInfoMapByIPs(
+          r.map((a) => a._id),
+        );
         return {
           user: {
             uid: user.uid,
@@ -98,10 +102,10 @@ router.get(
           },
           ips: await Promise.all(
             r.map(async (a) => {
-              const ipInfo = await db.IPModel.getIPInfoFromLocal(a._id);
+              const ipInfo = ipMap.get(a._id);
               return {
                 ip: a._id,
-                location: ipInfo.location,
+                location: `${ipInfo.country} ${ipInfo.region} ${ipInfo.city}`,
                 count: a.count,
               };
             }),

@@ -1015,7 +1015,8 @@ schema.methods.getIpAndPort = async function () {
     this._id,
   );
   const ipId = document.ip;
-  const ip = await IPModel.getIpByIpId(ipId);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ip = await ipFinderService.getIPByToken(ipId);
   return {
     ip,
     port: document.port,

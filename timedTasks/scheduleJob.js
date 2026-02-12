@@ -137,14 +137,16 @@ jobs.clearFileCache = () => {
       }
       const filePath = path.resolve(uploadDir, `./${d}`);
       const state = await fsPromise.stat(filePath);
-      if (!state.isFile()) {
-        continue;
-      }
       const fileTime = new Date(state.mtime).getTime();
       if (fileTime > time) {
         continue;
       }
-      await fsPromise.unlink(filePath);
+      if (!state.isFile()) {
+        await fsPromise.rm(filePath, { recursive: true, force: true });
+      } else {
+        await fsPromise.unlink(filePath);
+      }
+
       count++;
     }
     console.log(`文件缓存清理完成，共清理文件${count}个`);

@@ -250,7 +250,8 @@ class ReviewDocumentService {
         document.source !== documentSources.moment
       ) {
         // 生成引用电文
-        const ip = await IPModel.getIpByIpId(document.ip);
+        const { ipFinderService } = require('../ip/ipFinder.service');
+        const ip = await ipFinderService.getIPByToken(document.ip);
         MomentModel.createQuoteMomentAndPublish({
           ip,
           port: document.port,

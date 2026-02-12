@@ -486,6 +486,12 @@ module.exports = {
     payment: {
       GET: Operations.experimentalPayment,
     },
+    survey: {
+      GET: Operations.visitExperimentalSurvey,
+      PARAMETER: {
+        GET: Operations.visitExperimentalSurvey,
+      },
+    },
   },
   console: {
     GET: Operations.visitExperimentalConsole,

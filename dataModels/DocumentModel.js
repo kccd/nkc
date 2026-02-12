@@ -329,9 +329,9 @@ schema.statics.createStableDocumentByStableHistoryDocument = async (
   await DocumentModel.checkDocumentSource(source);
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
-  // const did = await DocumentModel.getDid();
-  const ipId = await IPModel.saveIPAndGetToken(ip);
-  const addr = await IPModel.getIpAddr(ip);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ipToken = await ipFinderService.saveIpAndGetToken(ip);
+  const addr = await ipFinderService.getIpAddressAbbr(ip);
   const document = await DocumentModel({
     _id,
     did,
@@ -353,7 +353,7 @@ schema.statics.createStableDocumentByStableHistoryDocument = async (
     type: (await DocumentModel.getDocumentTypes()).stable,
     source,
     sid,
-    ip: ipId,
+    ip: ipToken,
     port,
     addr,
     files,
@@ -416,8 +416,9 @@ schema.statics.createBetaDocument = async (props) => {
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
   const did = props.did ? props.did : await DocumentModel.getDid();
-  const ipId = await IPModel.saveIPAndGetToken(ip);
-  const addr = await IPModel.getIpAddr(ip);
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
+  const ipToken = await ipFinderService.saveIpAndGetToken(ip);
+  const addr = await ipFinderService.getIpAddressAbbr(ip);
   const document = await DocumentModel({
     _id,
     did,
@@ -438,7 +439,7 @@ schema.statics.createBetaDocument = async (props) => {
     type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
-    ip: ipId,
+    ip: ipToken,
     port,
     addr,
     files,

@@ -19,7 +19,8 @@ import {
 import { visitUrl } from '../lib/js/pageSwitch';
 import { logout, toLogin } from '../lib/js/account';
 import { toChat } from '../lib/js/chat';
-import { sweetAlert } from '../lib/js/sweetAlert';
+import { sweetAlert, sweetError } from '../lib/js/sweetAlert';
+import { getAndShowIpDetail } from '../lib/js/ip';
 
 var NKC = {
   methods: {},
@@ -612,23 +613,7 @@ NKC.methods.sendEmailCode = function (type) {
  * ajax获取ip信息
  */
 NKC.methods.getIpInfo = function (ip) {
-  return nkcAPI('/ipinfo?ip=' + ip, 'GET')
-    .then(function (res) {
-      return res.ipInfo;
-    })
-    .then(function (info) {
-      if (!info) {
-        return sweetError('获取ip信息失败');
-      }
-      return asyncSweetCustom(
-        "<p style='font-weight: normal;'>ip: " +
-          info.ip +
-          '<br>位置: ' +
-          info.location +
-          '</p>',
-      );
-    })
-    .catch(sweetError);
+  return getAndShowIpDetail(ip).catch(sweetError);
 };
 
 // 处理emoji 20200401

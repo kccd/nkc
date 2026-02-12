@@ -17,7 +17,7 @@ router.get('/', OnlyUser(), async (ctx, next) => {
   const count = await db.StickerModel.countDocuments(q);
   const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
   const stickers = await db.StickerModel.find(q)
-    .sort({ hits: -1 })
+    .sort({ hits: -1, toc: -1 })
     .skip(paging.start)
     .limit(paging.perpage);
   let arr = [];

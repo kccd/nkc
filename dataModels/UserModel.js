@@ -3425,7 +3425,7 @@ userSchema.statics.checkAccessControlPermissionWithThrowError = async (
 userSchema.statics.getAccountRegisterInfo = async (props) => {
   const { uid, ipId, ip } = props;
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const IPModel = mongoose.model('ips');
+  const { ipFinderService } = require('../services/ip/ipFinder.service');
   const up = await UsersPersonalModel.findOne(
     { uid },
     { email: 1, uid: 1, regIP: 1 },
@@ -3442,12 +3442,12 @@ userSchema.statics.getAccountRegisterInfo = async (props) => {
   let targetIp = up.regIP;
   if (!targetIp) {
     if (ipId) {
-      targetIp = await IPModel.getIpByIpId(ipId);
+      targetIp = await ipFinderService.getIPByToken(ipId);
     } else if (ip) {
       targetIp = ip;
     }
   }
-  const addr = await IPModel.getIpAddr(targetIp);
+  const addr = await ipFinderService.getIpAddressAbbr(targetIp);
   return {
     addr,
     authType,

@@ -5,6 +5,7 @@ const { getUrl } = require('../../../nkcModules/tools');
 const nkcRender = require('../../../nkcModules/nkcRender');
 const cheerio = require('cheerio');
 const { filterMessageContent } = require('../../../nkcModules/xssFilters');
+const { ipFinderService } = require('../../../services/ip/ipFinder.service');
 const router = new Router();
 router.get(
   '/',
@@ -30,8 +31,12 @@ router.get(
           ty: 'UTU',
         };
         const getUidByType = async (type, data) => {
-          if (!data) return;
-          if (type === 'uid') return data;
+          if (!data) {
+            return;
+          }
+          if (type === 'uid') {
+            return data;
+          }
           if (type === 'username') {
             const tUser = await db.UserModel.findOne({
               usernameLowerCase: data.toLowerCase(),
@@ -79,7 +84,12 @@ router.get(
         }
         // ip筛选
         if (ip) {
-          q.ip = await db.IPModel.getTokenByIP(ip);
+          // TODO: 这里的IP非常迷，有时候是IP，有时候是token，需要统一。
+          q.ip = [ip];
+          const realIP = await ipFinderService.getTokenByIP(ip);
+          if (realIP) {
+            q.ip = [realIP, ip];
+          }
         }
         // 内容筛选
         if (keyword) {
@@ -110,7 +120,6 @@ router.get(
             filesId.push(m.c.fileId);
           }
         });
-        const ipsObj = await db.IPModel.getIPByTokens(ipToken);
         const users = await db.UserModel.find({ uid: { $in: [...uids] } });
         const usersObj = {};
         users.map((u) => {
@@ -129,7 +138,7 @@ router.get(
             user: usersObj[s],
             targetUser: usersObj[r],
             toc: tc,
-            ip: ipsObj[ip],
+            ip: ip || '',
             withdrawn,
             c,
             content: '',
@@ -186,6 +195,7 @@ router.get(
         }
         data.paging = paging;
       } else {
+        //
       }
     }
     await next();

@@ -17,7 +17,6 @@ module.exports = {
   },
   r: {
     // 资源
-    POST: Operations.uploadResources,
     PARAMETER: {
       GET: Operations.getResources,
       PUT: Operations.disableResource,

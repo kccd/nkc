@@ -84,7 +84,7 @@ block content
                             | uid：
                             a(href=`/u/${behavior.toUid}` target="_blank")=behavior.toUid
                       th
-                        .pointer.text-primary(@click=`showIpInfo("${behavior.ip}")`)=`${behavior.ip}: ${behavior.port}`
+                        .pointer.text-primary(@click=`getAndShowIpDetail("${behavior.ip}")`)=`${behavior.ip}: ${behavior.port}`
                       th
                         if behavior.user
                           a(href=`/u/${behavior.user.uid}/alt` target="_blank") 查马甲

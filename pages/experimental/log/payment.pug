@@ -75,7 +75,8 @@ block eContent
                       span 支付失败
                     else if r.status === 'waiting'
                       span 等待支付
-                  th.table-th-sm=`${r.ip}:${r.port}`
+                  th.table-th-sm
+                    span.pointer.text-primary(onclick=`getAndShowIpDetail("${r.ip}")`)=`${r.ip}:${r.port}`
                   th
                     if r.fullData
                       button(onclick=`viewFullData("${objToStr({data: r.fullData})}")`) 查看回调
@@ -83,6 +84,7 @@ block eContent
         include ../../publicModules/paging/paging_input
 block scripts
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/experimental/log/payment.js')
   script.
     function viewFullData(data) {
       data = NKC.methods.strToObj(data).data;
