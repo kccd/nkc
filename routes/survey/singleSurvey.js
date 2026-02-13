@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const crypto = require('crypto');
 const router = new Router();
 const { Public, OnlyUnbannedUser } = require('../../middlewares/permission');
 router
@@ -244,11 +245,19 @@ router
     if (user.uid !== survey.uid && !ctx.permission('showSecretSurvey')) {
       ctx.throw(403, '无权限导出');
     }
+    const getScore = (input) => {
+      const hash = crypto.createHash('sha256').update(input).digest();
+      const num = hash.readBigUInt64BE(0);
+      return Number(num) / Number(2n ** 64n);
+    };
     const surveyPosts = await db.SurveyPostModel.find({
       surveyId: survey._id,
       originId: null,
     }).lean();
-    const tools = nkcModules.tools;
+    surveyPosts.sort((a, b) => {
+      return getScore(`${a.uid}:${a._id}`) - getScore(`${b.uid}:${b._id}`);
+    });
+
     const options = survey.options || [];
     const optionCodes = [];
     const codeByKey = {};
