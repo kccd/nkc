@@ -5,6 +5,7 @@ class AppsService {
     const apps = [];
     const fundSettings = await SettingModel.getSettings('fund');
     const toolsSettings = await SettingModel.getSettings('tools');
+    const radioSettings = await SettingModel.getSettings('radio');
     if (fundSettings.enableFund) {
       apps.push({
         name: `${fundSettings.fundName}`,
@@ -17,6 +18,13 @@ class AppsService {
         name: '计算工具',
         url: `/tools`,
         icon: getUrl('statics', 'apps/tools.png'),
+      });
+    }
+    if (radioSettings.enabled) {
+      apps.push({
+        name: radioSettings.name,
+        url: '/radio',
+        icon: getUrl('statics', 'apps/radio.png'),
       });
     }
     return apps;

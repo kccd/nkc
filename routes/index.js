@@ -111,6 +111,7 @@ const pageRouter = require('./page');
 const logoutRouter = require('./logout');
 const attachIconRouter = require('./attachIcon');
 const sendMessageRouter = require('./sendMessage');
+const radioRouter = require('./radio');
 
 router.use('/', async (ctx, next) => {
   const { db, state, data, settings } = ctx;
@@ -321,5 +322,6 @@ router.use(
   attachIconRouter.routes(),
   attachIconRouter.allowedMethods(),
 );
+router.use('/radio', radioRouter.routes(), radioRouter.allowedMethods());
 
 module.exports = router;

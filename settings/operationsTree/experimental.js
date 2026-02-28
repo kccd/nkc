@@ -372,6 +372,10 @@ module.exports = {
         },
       },
     },
+    radio: {
+      GET: Operations.experimentalRadioSettings,
+      PUT: Operations.experimentalRadioSettings,
+    },
   },
   systemInfo: {
     GET: Operations.visitSystemInfo,
