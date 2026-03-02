@@ -54,6 +54,7 @@ const complaintRouter = require('./complaint');
 const publishRouter = require('./publish');
 const oauth = require('./oauth');
 const noteRouter = require('./note');
+const radioRouter = require('./radio');
 settingRouter
   .use('/transfer', transferRouter.routes(), transferRouter.allowedMethods())
   .use('/hidePost', hidePostRouter.routes(), hidePostRouter.allowedMethods())
@@ -132,5 +133,6 @@ settingRouter
   )
   .use('/publish', publishRouter.routes(), publishRouter.allowedMethods())
   .use('/oauth', oauth.routes(), oauth.allowedMethods())
+  .use('/radio', radioRouter.routes(), radioRouter.allowedMethods())
   .use('/note', noteRouter.routes(), noteRouter.allowedMethods());
 module.exports = settingRouter;

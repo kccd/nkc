@@ -7,6 +7,17 @@ class IPFinderService {
   cityLookup = null;
   localAddr = '未同步';
 
+  // 判断IP是否为内网IP
+  isPrivateIP = (ip) => {
+    return (
+      /^10\./.test(ip) ||
+      /^192\.168\./.test(ip) ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(ip) ||
+      /^127\./.test(ip) ||
+      /^169\.254\./.test(ip)
+    );
+  };
+
   // 获取详细地址信息
   getIpInfo = async (ip) => {
     if (this.cityLookup === null) {

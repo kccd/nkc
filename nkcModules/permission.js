@@ -52,10 +52,27 @@ function getOperationId(url, method) {
     }
   };
   let obj = Object.assign({}, operationTree);
+  let useOperationId;
   for (let i = 0; i < urlArr.length; i++) {
+    if (obj && typeof obj === 'object' && obj.USE) {
+      useOperationId = obj.USE;
+      break;
+    }
     const key = urlArr[i];
+    if (!obj || typeof obj !== 'object') {
+      break;
+    }
     obj = fn(obj, key);
   }
+
+  if (!useOperationId && obj && typeof obj === 'object' && obj.USE) {
+    useOperationId = obj.USE;
+  }
+
+  if (useOperationId) {
+    return useOperationId;
+  }
+
   if (obj && typeof obj === 'object' && obj[method]) {
     return obj[method];
   } else {

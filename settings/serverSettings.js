@@ -44,6 +44,7 @@ const settingIds = {
   verification: 'verification',
   visit: 'visit',
   xsf: 'xsf',
+  radio: 'radio',
 };
 
 const publishPermissionTypes = {

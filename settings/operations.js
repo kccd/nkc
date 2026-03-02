@@ -466,6 +466,8 @@ const FixedOperations = {
   uploadChunk: 'uploadChunk',
   checkResourceHash: 'checkResourceHash',
   mergeUploadedChunks: 'mergeUploadedChunks',
+  getRadioPermission: 'getRadioPermission',
+  visitRadioHome: 'visitRadioHome',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断
@@ -799,6 +801,7 @@ const DynamicOperations = {
   disableResource: 'disabledResource',
   momentCommentControl: 'momentCommentControl',
   visitExperimentalSurvey: 'visitExperimentalSurvey',
+  experimentalRadioSettings: 'experimentalRadioSettings',
 };
 
 const Operations = { ...DynamicOperations, ...FixedOperations };

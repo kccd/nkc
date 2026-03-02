@@ -54,8 +54,12 @@ function getNodesTextFilter(nodes = [], filter = []) {
 function getNodesTextSlice(nodes = [], count = 500) {
   let text = '';
   for (const node of nodes) {
-    if( text.length > count ){
-        break; 
+    if (text.length > count) {
+      break;
+    }
+    // 排除学术分隐藏的文本
+    if (node.type === 'nkc-xsf-limit') {
+      break;
     }
     if (node.type === 'text') {
       text += node.text;
