@@ -98,7 +98,7 @@ const photo_small = require('./photo_small');
 const rm = require('./rm');
 const ro = require('./ro');
 const shopLogo = require('./shopLogo');
-const radio = require('./radio');
+const radios = require('./radios');
 const operationTree = {
   home: {
     GET: 'visitHome', // 首页
@@ -272,8 +272,7 @@ const operationTree = {
     apps, // 资源页
     wx: weChat,
     attachIcon,
-
-    radio, // 电台转发
+    radios, // 电台
   },
 };
 module.exports = {

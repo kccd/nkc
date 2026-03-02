@@ -1,5 +1,8 @@
 const SettingModel = require('../../dataModels/SettingModel');
+const { ThrowCommonError } = require('../../nkcModules/error');
+const UsersPersonalModel = require('../../dataModels/UsersPersonalModel');
 const { settingIds } = require('../../settings/serverSettings');
+const { ipFinderService } = require('../ip/ipFinder.service');
 
 class RadioService {
   getRadioStations = async () => {
@@ -43,6 +46,7 @@ class RadioService {
         clientType: s.client, // openwebrx
         name: s.name,
         disabled: s.disabled,
+        maxUsers: s.max_user,
         url: `/radio/${s.client}/${s.id}`,
       }));
     } catch (err) {
@@ -61,10 +65,12 @@ class RadioService {
     const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
     const payload = (Array.isArray(stations) ? stations : []).map(
       (station) => ({
+        id: station.id,
         name: station.name,
         client: station.clientType,
         conn: station.connection,
         disabled: !!station.disabled,
+        max_user: station.maxUsers,
       }),
     );
 
@@ -107,6 +113,98 @@ class RadioService {
     } finally {
       clearTimeout(timeoutId);
     }
+  };
+
+  // 获取用户的电台访问权限
+  /* 
+  type IRadioPermission = {
+    accessable: boolean; // 是否允许访问
+    reasonType: 
+      "adminAllowed" |
+      "userAllowed" |
+      "radioHasBeenDisabled" |
+      "visitorNotAllowed" |
+      "authLevelNotEnough" |
+      "onlyAllowChineseMobile" |
+      "onlyAllowChineseIP"; // 不允许访问时的原因类型
+    reasonMessage: string; // 不允许访问时的原因描述  
+  }
+  */
+  getUserRadioPermission = async (props) => {
+    const { uid, ip } = props;
+    const radioSettings = await SettingModel.getSettings(settingIds.radio);
+    // 检测电台功能是否被关闭
+    if (!radioSettings.enabled) {
+      return {
+        accessable: false,
+        reasonType: 'radioHasBeenDisabled',
+        reasonMessage: '电台功能已关闭',
+      };
+    }
+    // 检测用户是否为管理员
+    if (radioSettings.admin.includes(props.uid)) {
+      return {
+        accessable: true,
+        reasonType: 'adminAllowed',
+        reasonMessage: '允许管理员访问',
+      };
+    }
+    // 检测是否限制游客访问
+    if (!uid && !radioSettings.permission.allowVisitor) {
+      return {
+        accessable: false,
+        reasonType: 'visitorNotAllowed',
+        reasonMessage: '不允许游客访问',
+      };
+    }
+    // 检测最小身份认证等级
+    const usersPersonal = await UsersPersonalModel.findOne({ uid });
+    if (!usersPersonal) {
+      ThrowCommonError(500, `用户${uid}不存在`);
+    }
+    const authLevel = await usersPersonal.getAuthLevel();
+    if (authLevel < radioSettings.permission.getAuthLevel) {
+      return {
+        accessable: false,
+        reasonType: 'authLevelNotEnough',
+        reasonMessage: `身份认证等级不足，请最少完成身份认证${radioSettings.permission.getAuthLevel}`,
+      };
+    }
+    // 检测是否仅允许中国大陆手机号访问
+    if (
+      radioSettings.permission.authLevel > 0 &&
+      radioSettings.permission.onlyAllowChineseMobile &&
+      usersPersonal.nationCode !== '86'
+    ) {
+      return {
+        accessable: false,
+        reasonType: 'onlyAllowChineseMobile',
+        reasonMessage: '仅允许中国大陆手机号认证的用户访问',
+      };
+    }
+    // 检测是否仅允许国内IP访问
+    if (radioSettings.permission.onlyAllowChineseIP) {
+      const isPrivateIP = await ipFinderService.isPrivateIP(ip);
+      if (!isPrivateIP) {
+        // 排除内网IP
+        const ipInfo = await ipFinderService.getIpInfo(ip);
+        if (ipInfo.country !== '中国') {
+          return {
+            accessable: false,
+            reasonType: 'onlyAllowChineseIP',
+            reasonMessage: '仅允许国内IP访问',
+          };
+        }
+      }
+    }
+
+    // 放行
+    return {
+      accessable: true,
+      reasonType: 'userAllowed',
+      reasonMessage: '允许用户访问',
+      uid,
+    };
   };
 }
 

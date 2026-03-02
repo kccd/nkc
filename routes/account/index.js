@@ -5,6 +5,7 @@ const contributeRouter = require('./contribute');
 const subscribeReouter = require('./subscribes');
 const subTypesRouter = require('./subscribeTypes');
 const { OnlyUnbannedUser, OnlyUser } = require('../../middlewares/permission');
+const radioRouter = require('./radio');
 router
   .get('/subscribe_settings', OnlyUser(), async (ctx, next) => {
     const { db, data } = ctx;
@@ -35,5 +36,6 @@ router
     contributeRouter.routes(),
     contributeRouter.allowedMethods(),
   )
+  .use('/radio', radioRouter.routes(), radioRouter.allowedMethods())
   .use('/finance', financeRouter.routes(), financeRouter.allowedMethods());
 module.exports = router;

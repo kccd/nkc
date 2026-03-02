@@ -2,7 +2,7 @@ extends ../../experimental
 block eTitle
   title 电台设置
 block eContent
-  .hidden#data=tools.objToStr({radioSettings: data.radioSettings, adminUsers: data.adminUsers, radioStations: data.radioStations})
+  .hidden#data=tools.objToStr({radioSettings: data.radioSettings, adminUsers: data.adminUsers})
   .container-fluid.max-width#app(v-cloak)
     user-selector(ref='userSelector')
     <ul class="nav nav-tabs mb-4">
@@ -17,6 +17,7 @@ block eContent
               th 名称
               th 网页客户端类型
               th 连接地址
+              th 最大连接数
               th 状态
               th 操作
           tbody
@@ -27,6 +28,8 @@ block eContent
                 textarea.form-control(rows=2 v-model="s.clientType" :disabled="true")
               th 
                 textarea.form-control(rows=2 v-model='s.connection')
+              th 
+                input.form-control.w-24(type='text' v-model.number='s.maxUsers')  
               th 
                 .radio
                   label.mr-2
@@ -67,7 +70,7 @@ block eContent
         .form-group
           .col-sm-12.col-md-2.control-label 管理员
           .col-sm-12.col-md-6.mt-2
-            .text-warning.mb-2 管理员可绕过电台的最大连接数限制
+            .text-warning.mb-2 管理员可无视权限控制以及绕过最大用户连接数限制。
             div.flex.flex-wrap.gap-2
               div(v-for='user of adminUsers' :key='user.uid').inline-flex.items-center.gap-2.bg-gray-300.rounded-full.px-3.py-2
                 img(:src="getUrl('userAvatar', user.avatar, 'sm')").rounded-full(style='width: 24px; height: 24px;')

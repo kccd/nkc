@@ -1,0 +1,30 @@
+extends ../bootstrap_base
+block title
+  title 电台
+block content
+  -
+    var stringData = objToStr({
+      radioName: data.radioName,
+      radioDescription: data.radioDescription,
+    });
+  .hidden#data=stringData
+  .container-fluid.max-width#app.min-h-40(v-cloak)
+    .row
+      .col-xs-12.col-md-12
+        h3 {{radioName}}
+        div.pre-wrap {{radioDescription}}
+      .col-xs-12.col-md-12(style='min-height: 30rem')
+        .grid.grid-cols-1.gap-4.mt-4(class="md:grid-cols-2 lg:grid-cols-3")
+          div(
+            v-for='station of radioStations'
+            class='bg-white border border-gray-200 rounded-md p-4 h-30 flex flex-col justify-between'
+          )
+            a(
+              :href="station.url"
+              target="_blank"
+              class='block overflow-hidden text-ellipsis display:-webkit-box -webkit-line-clamp:2 -webkit-box-orient:vertical'
+            ) {{station.name}}
+            .mt-2 在线/上限：{{station.onlineUsers}} / {{station.maxUsers}}
+
+block scripts
+  +includeJS('/radios/radios.js')

@@ -29,7 +29,7 @@ const app = new window.Vue({
     radioSettings: data.radioSettings,
     adminUsers: data.adminUsers,
     page: 'settings', // settings, stations
-    radioStations: data.radioStations || [],
+    radioStations: [],
 
     radioStationsLoading: false,
   },
@@ -75,7 +75,7 @@ const app = new window.Vue({
 
     getRadioStations() {
       this.radioStationsLoading = true;
-      nkcAPI(`/e/settings/radio`, 'GET')
+      nkcAPI(`/e/settings/radio/stations`, 'GET')
         .then((res) => {
           this.radioStations = res.radioStations;
           console.log(this.radioStations);
@@ -96,10 +96,12 @@ const app = new window.Vue({
 
     addRadioStation() {
       this.radioStations.push({
+        id: `new-${Date.now()}`,
         name: '',
         clientType: 'openwebrx',
         connection: '',
         disabled: false,
+        maxUsers: 10,
       });
     },
 
@@ -128,8 +130,7 @@ const app = new window.Vue({
           return;
         }
       }
-      nkcAPI(`/e/settings/radio`, 'PUT', {
-        type: 'stations',
+      nkcAPI(`/e/settings/radio/stations`, 'PUT', {
         stations: this.radioStations,
       })
         .then(() => {

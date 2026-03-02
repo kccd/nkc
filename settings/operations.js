@@ -466,7 +466,8 @@ const FixedOperations = {
   uploadChunk: 'uploadChunk',
   checkResourceHash: 'checkResourceHash',
   mergeUploadedChunks: 'mergeUploadedChunks',
-  radioProxy: 'radioProxy',
+  getRadioPermission: 'getRadioPermission',
+  visitRadioHome: 'visitRadioHome',
 };
 
 // 需要在后台配置给相应证书的操作，会经过全局的权限判断

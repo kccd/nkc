@@ -27,9 +27,41 @@ router.get(
         });
       }
     }
+    ctx.template = 'experimental/settings/radio/radio.pug';
+    await next();
+  },
+);
+
+router.get(
+  '/stations',
+  OnlyOperation(Operations.experimentalRadioSettings),
+  async (ctx, next) => {
     const radioStations = await radioService.getRadioStations();
     ctx.data.radioStations = radioStations;
-    ctx.template = 'experimental/settings/radio/radio.pug';
+    await next();
+  },
+);
+
+router.put(
+  '/stations',
+  OnlyOperation(Operations.experimentalRadioSettings),
+  async (ctx, next) => {
+    const { stations } = ctx.request.body;
+    for (const station of stations) {
+      if (!station.name || !station.connection) {
+        ctx.throw(400, '请确保所有节点的名称和连接地址都已填写');
+      }
+    }
+    await radioService.updateRadioStations(
+      stations.map((s) => ({
+        id: s.id,
+        name: s.name,
+        connection: s.connection,
+        clientType: 'openwebrx',
+        disabled: !!s.disabled,
+        maxUsers: s.maxUsers,
+      })),
+    );
     await next();
   },
 );
@@ -39,32 +71,16 @@ router.put(
   OnlyOperation(Operations.experimentalRadioSettings),
   async (ctx, next) => {
     const { db } = ctx;
-    const { radioSettings, type, stations } = ctx.request.body;
-    if (type === 'settings') {
-      await db.SettingModel.updateOne(
-        { _id: settingIds.radio },
-        {
-          $set: {
-            c: radioSettings,
-          },
+    const { radioSettings } = ctx.request.body;
+    await db.SettingModel.updateOne(
+      { _id: settingIds.radio },
+      {
+        $set: {
+          c: radioSettings,
         },
-      );
-      await db.SettingModel.saveSettingsToRedis(settingIds.radio);
-    } else {
-      for (const station of stations) {
-        if (!station.name || !station.connection) {
-          ctx.throw(400, '请确保所有节点的名称和连接地址都已填写');
-        }
-      }
-      await radioService.updateRadioStations(
-        stations.map((s) => ({
-          name: s.name,
-          connection: s.connection,
-          clientType: 'openwebrx',
-          disabled: !!s.disabled,
-        })),
-      );
-    }
+      },
+    );
+    await db.SettingModel.saveSettingsToRedis(settingIds.radio);
 
     await next();
   },

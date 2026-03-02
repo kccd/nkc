@@ -35,4 +35,9 @@ module.exports = {
       PUT: Operations.account_subscribe,
     },
   },
+  radio: {
+    permission: {
+      GET: Operations.getRadioPermission,
+    },
+  },
 };
