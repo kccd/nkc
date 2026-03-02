@@ -23,8 +23,8 @@ class AppsService {
     if (radioSettings.enabled) {
       apps.push({
         name: radioSettings.name,
-        url: '/radio',
-        icon: getUrl('statics', 'apps/radio.png'),
+        url: '/radios',
+        icon: getUrl('statics', 'apps/radio.jpg'),
       });
     }
     return apps;
