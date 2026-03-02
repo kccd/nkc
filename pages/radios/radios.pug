@@ -24,7 +24,7 @@ block content
               target="_blank"
               class='block overflow-hidden text-ellipsis display:-webkit-box -webkit-line-clamp:2 -webkit-box-orient:vertical text-[1.4rem]'
             ) {{station.name}}
-            .mt-2 在线/上限：{{station.onlineUsers}} / {{station.maxUsers}}
+            .mt-2 在线/上限：{{Math.min(station.onlineUsers, station.maxUsers)}} / {{station.maxUsers}}
 
 block scripts
   +includeJS('/radios/radios.js')
