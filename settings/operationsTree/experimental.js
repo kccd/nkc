@@ -375,10 +375,6 @@ module.exports = {
     radio: {
       GET: Operations.experimentalRadioSettings,
       PUT: Operations.experimentalRadioSettings,
-      stations: {
-        GET: Operations.experimentalRadioSettings,
-        PUT: Operations.experimentalRadioSettings,
-      },
     },
   },
   systemInfo: {

@@ -31,7 +31,7 @@ router.get(
     await next();
   },
 );
-
+/* 
 router.get(
   '/stations',
   OnlyOperation(Operations.experimentalRadioSettings),
@@ -64,7 +64,7 @@ router.put(
     );
     await next();
   },
-);
+); */
 
 router.put(
   '/',
@@ -72,6 +72,11 @@ router.put(
   async (ctx, next) => {
     const { db } = ctx;
     const { radioSettings } = ctx.request.body;
+    for (const station of radioSettings.stations) {
+      if (!station.name || !station.connection) {
+        ctx.throw(400, '请确保所有节点的名称和连接地址都已填写');
+      }
+    }
     await db.SettingModel.updateOne(
       { _id: settingIds.radio },
       {
@@ -81,7 +86,16 @@ router.put(
       },
     );
     await db.SettingModel.saveSettingsToRedis(settingIds.radio);
-
+    await radioService.updateRadioStations(
+      radioSettings.stations.map((s) => ({
+        id: s.id,
+        name: s.name,
+        connection: s.connection,
+        clientType: 'openwebrx',
+        disabled: !!s.disabled,
+        maxUsers: s.maxUsers,
+      })),
+    );
     await next();
   },
 );

@@ -44,10 +44,6 @@ const app = new window.Vue({
   data: {
     radioSettings: data.radioSettings,
     adminUsers: data.adminUsers,
-    page: 'settings', // settings, stations
-    radioStations: [],
-
-    radioStationsLoading: false,
   },
   computed: {
     selectedUsersId() {
@@ -82,37 +78,15 @@ const app = new window.Vue({
       // 检测服务是否正常
     },
 
-    switchPage(page) {
-      if (page === 'stations') {
-        this.getRadioStations();
-      }
-      this.page = page;
-    },
-
-    getRadioStations() {
-      this.radioStationsLoading = true;
-      nkcAPI(`/e/settings/radio/stations`, 'GET')
-        .then((res) => {
-          this.radioStations = res.radioStations;
-          console.log(this.radioStations);
-        })
-        .catch((err) => {
-          sweetError(`获取节点列表失败: ${err.message}`);
-        })
-        .finally(() => {
-          this.radioStationsLoading = false;
-        });
-    },
-
     removeRadioStation(index) {
       sweetQuestion('确定移除当前节点吗？').then(() => {
-        this.radioStations.splice(index, 1);
+        this.radioSettings.stations.splice(index, 1);
       });
     },
 
     addRadioStation() {
-      this.radioStations.push({
-        id: createUniqueId(this.radioStations),
+      this.radioSettings.stations.push({
+        id: createUniqueId(this.radioSettings.stations),
         name: '',
         clientType: 'openwebrx',
         connection: '',
@@ -125,39 +99,35 @@ const app = new window.Vue({
       if (index <= 0) {
         return;
       }
-      const prev = this.radioStations[index - 1];
-      this.$set(this.radioStations, index - 1, this.radioStations[index]);
-      this.$set(this.radioStations, index, prev);
+      const prev = this.radioSettings.stations[index - 1];
+      this.$set(
+        this.radioSettings.stations,
+        index - 1,
+        this.radioSettings.stations[index],
+      );
+      this.$set(this.radioSettings.stations, index, prev);
     },
 
     moveRadioStationDown(index) {
-      if (index >= this.radioStations.length - 1) {
+      if (index >= this.radioSettings.stations.length - 1) {
         return;
       }
-      const next = this.radioStations[index + 1];
-      this.$set(this.radioStations, index + 1, this.radioStations[index]);
-      this.$set(this.radioStations, index, next);
+      const next = this.radioSettings.stations[index + 1];
+      this.$set(
+        this.radioSettings.stations,
+        index + 1,
+        this.radioSettings.stations[index],
+      );
+      this.$set(this.radioSettings.stations, index, next);
     },
 
-    saveRadioStations() {
-      for (const station of this.radioStations) {
+    submit() {
+      for (const station of this.radioSettings.stations) {
         if (!station.name || !station.connection) {
           sweetError('请确保所有节点的名称和连接地址都已填写');
           return;
         }
       }
-      nkcAPI(`/e/settings/radio/stations`, 'PUT', {
-        stations: this.radioStations,
-      })
-        .then(() => {
-          sweetSuccess('保存成功');
-        })
-        .catch((err) => {
-          sweetError(err.message);
-        });
-    },
-
-    submit() {
       const admin = this.selectedUsersId;
       nkcAPI(`/e/settings/radio`, 'PUT', {
         type: 'settings',

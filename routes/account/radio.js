@@ -4,9 +4,10 @@ const { radioService } = require('../../services/radio/radio.service');
 
 router.get('/permission', Public(), async (ctx, next) => {
   const uid = ctx.state.uid;
+  const clientIP = ctx.get('ClientIP');
   const radioPermission = await radioService.getUserRadioPermission({
     uid,
-    ip: ctx.address,
+    ip: clientIP,
   });
   ctx.apiData = {
     radioPermission,

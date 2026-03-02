@@ -5,126 +5,122 @@ block eContent
   .hidden#data=tools.objToStr({radioSettings: data.radioSettings, adminUsers: data.adminUsers})
   .container-fluid.max-width#app(v-cloak)
     user-selector(ref='userSelector')
-    <ul class="nav nav-tabs mb-4">
-      <li :class="page === 'settings'? 'active': ''" @click="switchPage('settings')"><a href="#">基本设置</a></li>
-      <li :class="page === 'stations'? 'active': ''" @click="switchPage('stations')"><a href="#">节点列表</a></li>
-    </ul>
-    template(v-if='page === "stations"')
-      .table-responsive 
-        table.table.table-bordered
-          thead
-            tr  
-              th 名称
-              th 网页客户端类型
-              th 连接地址
-              th 最大连接数
-              th 状态
-              th 操作
-          tbody
-            tr(v-for='s, index in radioStations')
-              th 
-                textarea.form-control(rows=2 v-model="s.name")
-              th 
-                textarea.form-control(rows=2 v-model="s.clientType" :disabled="true")
-              th 
-                textarea.form-control(rows=2 v-model='s.connection')
-              th 
-                input.form-control.w-24(type='text' v-model.number='s.maxUsers')  
-              th 
-                .radio
-                  label.mr-2
-                    input(type='radio' :value="true" v-model='s.disabled')  
-                    span.align-middle 禁用
-                  label
-                    input(type='radio' :value="false" v-model='s.disabled')  
-                    span.align-middle 启用
-              th
-                button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationUp(index)' :disabled='index === 0') 上移      
-                button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationDown(index)' :disabled='index === radioStations.length - 1') 下移       
-                button.btn.btn-xs.btn-danger(@click='removeRadioStation(index)') 删除      
-      div 
-        button.btn.btn-primary(@click='saveRadioStations') 保存
-        button.btn.btn-default(@click='getRadioStations' :disabled='radioStationsLoading') {{radioStationsLoading? '加载中': '刷新列表'}}
-        button.btn.btn-default(@click='addRadioStation') 添加节点
 
-    template(v-if='page === "settings"')
-      .form.form-horizontal
-        .form-group
-          .col-sm-12.col-md-2.control-label 功能状态
-          .col-sm-12.col-md-10
+    .form.form-horizontal
+      .form-group
+        .col-sm-12.col-md-2.control-label 功能状态
+        .col-sm-12.col-md-10
+          .radio
+            label.mr-2
+              input(type='radio' :value="true" v-model="radioSettings.enabled")
+              span 开启
+            label
+              input(type='radio' :value="false" v-model="radioSettings.enabled")
+              span 关闭
+      .form-group
+        .col-sm-12.col-md-2.control-label 名称
+        .col-sm-12.col-md-6
+          input.form-control(type='text' v-model='radioSettings.name')
+      .form-group
+        .col-sm-12.col-md-2.control-label 介绍
+        .col-sm-12.col-md-6.col-sm-10
+          textarea.form-control(rows=5 v-model='radioSettings.description')    
+      .form-group
+        .col-sm-12.col-md-2.control-label 管理员
+        .col-sm-12.col-md-6.mt-2
+          .text-warning.mb-2 管理员可无视权限控制以及绕过最大用户连接数限制。
+          div.flex.flex-wrap.gap-2
+            div(v-for='user of adminUsers' :key='user.uid').inline-flex.items-center.gap-2.bg-gray-300.rounded-full.px-3.py-2
+              img(:src="getUrl('userAvatar', user.avatar, 'sm')").rounded-full(style='width: 24px; height: 24px;')
+              span {{user.username}}
+              .fa.fa-times.cursor-pointer(class="hover:opacity-70" @click='removeAdmin(user.uid)')
+          button.btn.btn-sm.btn-default.mt-2(@click="addAdmin") 添加
+      .form-group
+        .col-sm-12.col-md-2.control-label 服务地址
+        .col-sm-12.col-md-6
+          .mb-2
+            textarea.form-control(rows=3 v-model='radioSettings.serviceUrl')  
+          div
+            button.btn.btn-sm.btn-default(@click='checkService' :disabled='!radioSettings.serviceUrl') 检测服务
+      .form-group
+        .col-sm-12.col-md-2 节点列表
+        .col-sm-12.col-md-10 
+          .table-responsive 
+            table.table.table-bordered
+              thead
+                tr  
+                  th 名称
+                  th 网页客户端类型
+                  th 连接地址
+                  th 最大连接数
+                  th 状态
+                  th 操作
+              tbody
+                tr(v-for='s, index in radioSettings.stations')
+                  th 
+                    textarea.form-control(rows=2 v-model="s.name")
+                  th 
+                    textarea.form-control(rows=2 v-model="s.clientType" :disabled="true")
+                  th 
+                    textarea.form-control(rows=2 v-model='s.connection')
+                  th 
+                    input.form-control.w-24(type='text' v-model.number='s.maxUsers')  
+                  th 
+                    .radio
+                      label.mr-2
+                        input(type='radio' :value="true" v-model='s.disabled')  
+                        span.align-middle 禁用
+                      label
+                        input(type='radio' :value="false" v-model='s.disabled')  
+                        span.align-middle 启用
+                  th
+                    button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationUp(index)' :disabled='index === 0') 上移      
+                    button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationDown(index)' :disabled='index === radioSettings.stations.length - 1') 下移       
+                    button.btn.btn-xs.btn-danger(@click='removeRadioStation(index)') 删除      
+          div 
+            button.btn.btn-default(@click='addRadioStation') 添加节点    
+      .form-group
+        .col-sm-12.col-md-2.control-label 权限控制
+        .col-sm-12.col-md-10    
+          .mb-4
             .radio
               label.mr-2
-                input(type='radio' :value="true" v-model="radioSettings.enabled")
-                span 开启
+                input(type="radio" :value="true" v-model='radioSettings.permission.allowVisitor')
+                span 完全公开
               label
-                input(type='radio' :value="false" v-model="radioSettings.enabled")
-                span 关闭
-        .form-group
-          .col-sm-12.col-md-2.control-label 名称
-          .col-sm-12.col-md-6
-            input.form-control(type='text' v-model='radioSettings.name')
-        .form-group
-          .col-sm-12.col-md-2.control-label 介绍
-          .col-sm-12.col-md-6.col-sm-10
-            textarea.form-control(rows=5 v-model='radioSettings.description')    
-        .form-group
-          .col-sm-12.col-md-2.control-label 管理员
-          .col-sm-12.col-md-6.mt-2
-            .text-warning.mb-2 管理员可无视权限控制以及绕过最大用户连接数限制。
-            div.flex.flex-wrap.gap-2
-              div(v-for='user of adminUsers' :key='user.uid').inline-flex.items-center.gap-2.bg-gray-300.rounded-full.px-3.py-2
-                img(:src="getUrl('userAvatar', user.avatar, 'sm')").rounded-full(style='width: 24px; height: 24px;')
-                span {{user.username}}
-                .fa.fa-times.cursor-pointer(class="hover:opacity-70" @click='removeAdmin(user.uid)')
-            button.btn.btn-sm.btn-default.mt-2(@click="addAdmin") 添加
-        .form-group
-          .col-sm-12.col-md-2.control-label 服务地址
-          .col-sm-12.col-md-6
-            .mb-2
-              textarea.form-control(rows=3 v-model='radioSettings.serviceUrl')  
-            div
-              button.btn.btn-sm.btn-default(@click='checkService' :disabled='!radioSettings.serviceUrl') 检测服务
-        .form-group
-          .col-sm-12.col-md-2.control-label 权限控制
-          .col-sm-12.col-md-10    
-            .mb-4
-              .radio
-                label.mr-2
-                  input(type="radio" :value="true" v-model='radioSettings.permission.allowVisitor')
-                  span 完全公开
-                label
-                  input(type='radio' :value="false" v-model='radioSettings.permission.allowVisitor') 
-                  span 仅会员可见
-            .mb-4.bg-info.p-2(v-if='!radioSettings.permission.allowVisitor')
-              .mb-4 
-                div 会员最小身份认证等级：
-                .radio
-                  label.mr-2(v-for='num in [0,1,2,3]')
-                    input(type="radio" :value="num" v-model='radioSettings.permission.authLevel')
-                    span {{num === 0? "未认证": `身份认证${num}`}}
-              div(v-if='radioSettings.permission.authLevel > 0')
-                div 仅允许中国手机号      
-                .radio 
-                  label.mr-2
-                    input(type='radio' :value="true" v-model='radioSettings.permission.onlyAllowChineseMobile')
-                    span 是
-                  label
-                    input(type="radio" :value="false" v-model='radioSettings.permission.onlyAllowChineseMobile')  
-                    span 否
+                input(type='radio' :value="false" v-model='radioSettings.permission.allowVisitor') 
+                span 仅会员可见
+          .mb-4.bg-info.p-2(v-if='!radioSettings.permission.allowVisitor')
             .mb-4 
-              div 仅允许中国IP
+              div 会员最小身份认证等级：
               .radio
+                label.mr-2(v-for='num in [0,1,2,3]')
+                  input(type="radio" :value="num" v-model='radioSettings.permission.authLevel')
+                  span {{num === 0? "未认证": `身份认证${num}`}}
+            div(v-if='radioSettings.permission.authLevel > 0')
+              div 仅允许中国手机号      
+              .radio 
                 label.mr-2
-                  input(type='radio' :value="true" v-model='radioSettings.permission.onlyAllowChineseIP')
+                  input(type='radio' :value="true" v-model='radioSettings.permission.onlyAllowChineseMobile')
                   span 是
                 label
-                  input(type="radio" :value="false" v-model='radioSettings.permission.onlyAllowChineseIP')  
+                  input(type="radio" :value="false" v-model='radioSettings.permission.onlyAllowChineseMobile')  
                   span 否
-        
-        .form-group
-          .col-sm-12.col-md-2
-          .col-sm-12.col-md-10
-            button.btn.btn-primary(@click='submit') 保存    
+          .mb-4 
+            div 仅允许中国IP
+            .radio
+              label.mr-2
+                input(type='radio' :value="true" v-model='radioSettings.permission.onlyAllowChineseIP')
+                span 是
+              label
+                input(type="radio" :value="false" v-model='radioSettings.permission.onlyAllowChineseIP')  
+                span 否
+      
+      .form-group
+        .col-sm-12.col-md-2
+        .col-sm-12.col-md-10
+          button.btn.btn-primary(@click='submit') 保存    
+      
 
 block scripts
   +includeJS('/experimental/settings/radio/radio.js')  

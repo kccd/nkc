@@ -13,5 +13,6 @@ module.exports = {
     },
     admin: [],
     serviceUrl: 'http://127.0.0.1:18080',
+    stations: [],
   },
 };
