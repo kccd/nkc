@@ -47,7 +47,7 @@ class RadioService {
         name: s.name,
         disabled: s.disabled,
         maxUsers: s.max_user,
-        url: `/radio/${s.client}/${s.id}`,
+        url: `/radio/${s.client}/${s.id}/`,
       }));
     } catch (err) {
       if (err.name === 'AbortError') {
