@@ -9,7 +9,23 @@ import UserSelector from '../../../lib/vue/UserSelector.vue';
 import { getUrl } from '../../../lib/js/tools';
 const data = getDataById('data');
 
-console.log(data);
+const createId = () => {
+  return `${Math.random().toString(16).slice(2)}`;
+};
+
+const createUniqueId = (list = []) => {
+  const idSet = new Set(list.map((item) => item && item.id).filter(Boolean));
+  let id = createId();
+  let retry = 0;
+  while (idSet.has(id)) {
+    id = createId();
+    retry += 1;
+    if (retry > 1000) {
+      throw new Error('无法生成唯一ID');
+    }
+  }
+  return id;
+};
 
 /* 
 type IRadioStation = {
@@ -96,7 +112,7 @@ const app = new window.Vue({
 
     addRadioStation() {
       this.radioStations.push({
-        id: `new-${Date.now()}`,
+        id: createUniqueId(this.radioStations),
         name: '',
         clientType: 'openwebrx',
         connection: '',
