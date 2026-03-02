@@ -28,7 +28,7 @@ block eContent
       .form-group
         .col-sm-12.col-md-2.control-label 管理员
         .col-sm-12.col-md-6.mt-2
-          .text-warning.mb-2 管理员可无视权限控制以及绕过最大用户连接数限制。
+          .text-warning.mb-2 管理员可无视权限控制以及绕过节点最大连接数限制。
           div.flex.flex-wrap.gap-2
             div(v-for='user of adminUsers' :key='user.uid').inline-flex.items-center.gap-2.bg-gray-300.rounded-full.px-3.py-2
               img(:src="getUrl('userAvatar', user.avatar, 'sm')").rounded-full(style='width: 24px; height: 24px;')
