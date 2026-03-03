@@ -1,23 +1,23 @@
-@import "../../publicModules/base";
-html{
+@import '../../publicModules/base';
+html {
   font-size: 10px;
 }
-body{
+body {
   background-color: #f4f4f4;
   position: relative;
 }
-.app-nav{
+.app-nav {
   min-height: 100%;
-  .nav-banner-mask{
+  .nav-banner-mask {
     position: fixed;
     top: 0;
     left: 0;
     z-index: 100;
     height: 16rem;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.4)
+    background-color: rgba(0, 0, 0, 0.4);
   }
-  .nav-user{
+  .nav-user {
     position: fixed;
     padding: 7rem 1rem 1rem 1rem;
     top: 0;
@@ -25,10 +25,10 @@ body{
     z-index: 110;
     height: 16rem;
     color: #fff;
-    .user-avatar{
+    .user-avatar {
       display: table-cell;
       vertical-align: top;
-      img{
+      img {
         height: 6rem;
         width: 6rem;
         border-radius: 50%;
@@ -37,36 +37,35 @@ body{
         margin-right: 1rem;
       }
     }
-    .user-info{
+    .user-info {
       display: table-cell;
       vertical-align: top;
-      .user-name{
+      .user-name {
         font-size: 2rem;
       }
-      .user-certs{
+      .user-certs {
         font-size: 1.2rem;
         color: #ff8498;
         margin-top: 0.3rem;
         font-style: oblique;
         height: 1.6rem;
         .hideText(@line: 1);
-        img{
+        img {
           vertical-align: text-top;
           height: 1.4rem;
           width: 1.4rem;
           margin-right: 0.5rem;
         }
       }
-      .user-description{
+      .user-description {
         margin-top: 0.8rem;
         max-height: 1.8rem;
         font-size: 1.2rem;
-        .hideText(@line: 1)
+        .hideText(@line: 1);
       }
     }
-
   }
-  .nav-banner{
+  .nav-banner {
     position: fixed;
     top: 0;
     left: 0;
@@ -74,16 +73,16 @@ body{
     z-index: 90;
     height: 16rem;
     background-size: cover;
-    img{
+    img {
       width: 100%;
     }
   }
-  .nav-content{
+  .nav-content {
     padding-top: 16rem;
   }
-  .nav-links{
+  .nav-links {
     @linkHeight: 5rem;
-    .nav-link-header{
+    .nav-link-header {
       height: 2rem;
       color: #aaa;
       line-height: 2rem;
@@ -91,33 +90,40 @@ body{
       background-color: #f9f9f9;
       font-size: 1.2rem;
     }
-    .nav-apps{
+    .nav-apps {
       background-color: #fff;
       padding: 1rem 0;
-      .nav-app{
+      .nav-app {
         width: 25%;
         overflow: hidden;
         display: inline-block;
         text-align: center;
         color: #555;
         padding: 0.5rem 0;
-        &:active, &:hover, &:focus{
+        &:active,
+        &:hover,
+        &:focus {
           text-decoration: none;
         }
-        &:active{
+        &:active {
           background-color: #f4f4f4;
         }
-        img{
+        img {
           height: 4rem;
           width: 4rem;
         }
-        .name{
+        .name {
           margin-top: 0.5rem;
           font-size: 1.2rem;
+          display: block;
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
         }
       }
     }
-    .nav-link{
+    .nav-link {
       padding: 0 @linkHeight;
       display: block;
       height: @linkHeight;
@@ -127,14 +133,16 @@ body{
       background-color: #fff;
       color: @dark;
       font-size: 1.5rem;
-      &:active, &:focus, &:hover{
+      &:active,
+      &:focus,
+      &:hover {
         text-decoration: none;
       }
-      &:active{
+      &:active {
         background-color: #f6f6f6;
       }
 
-      .icon-left{
+      .icon-left {
         height: 100%;
         width: @linkHeight;
         position: absolute;
@@ -144,7 +152,7 @@ body{
         color: #555;
         font-size: 1.6rem;
       }
-      .icon-right{
+      .icon-right {
         height: 100%;
         width: @linkHeight;
         text-align: center;
@@ -154,7 +162,7 @@ body{
         font-size: 1.6rem;
         color: #aaa;
       }
-      .icon-count{
+      .icon-count {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -170,7 +178,7 @@ body{
       }
     }
   }
-  .nav-logout{
+  .nav-logout {
     @logoutHeight: 6rem;
     border-top: 1px solid #f4f4f4;
     background-color: #fff;
@@ -178,11 +186,11 @@ body{
     text-align: center;
     color: #888;
     line-height: @logoutHeight;
-    &:active{
+    &:active {
       background-color: #eee;
     }
   }
-  .nav-header{
+  .nav-header {
     position: fixed;
     top: 2.5rem;
     width: 100%;
@@ -190,7 +198,7 @@ body{
     @headerHeight: 3rem;
     height: @headerHeight;
     z-index: 150;
-    .nav-header-icon{
+    .nav-header-icon {
       position: fixed;
       height: @headerHeight;
       width: @headerHeight;
@@ -204,36 +212,38 @@ body{
       border: 1px solid #ddd;
     }
   }
-  .nav-scores{
+  .nav-scores {
     background-color: #f6f6f6;
   }
-  .account-code{
+  .account-code {
     text-align: center;
     height: 3rem;
     line-height: 3rem;
     border-top: 1px solid #eee;
   }
-  .nav-numbers{
+  .nav-numbers {
     font-size: 0;
     background-color: #fff;
     border-bottom: 1px solid #f4f4f4;
-    .nav-number{
+    .nav-number {
       padding: 1rem 0 0.7rem 0;
       text-align: center;
       color: #000;
-      &:hover, &:active, &:focus{
+      &:hover,
+      &:active,
+      &:focus {
         text-decoration: none;
       }
-      &[href]:active{
+      &[href]:active {
         background-color: #eee;
       }
       width: 33.333333%;
       display: inline-block;
       font-size: 1.2rem;
-      .name{
+      .name {
         color: #555;
       }
-      .value{
+      .value {
         margin-top: 0.3rem;
         font-size: 1.5rem;
         font-weight: 700;

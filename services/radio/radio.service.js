@@ -5,13 +5,21 @@ const { settingIds } = require('../../settings/serverSettings');
 const { ipFinderService } = require('../ip/ipFinder.service');
 
 class RadioService {
-  getRadioStations = async () => {
-    const { serviceUrl } = await SettingModel.getSettings(settingIds.radio);
+  getRadioStations = async (serviceUrl) => {
+    const { serviceUrl: settingServiceUrl } = await SettingModel.getSettings(
+      settingIds.radio,
+    );
+    const targetServiceUrl = (serviceUrl || settingServiceUrl || '')
+      .trim()
+      .replace(/\/$/, '');
+    if (!targetServiceUrl) {
+      throw new Error('服务地址不能为空');
+    }
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10 * 1000);
 
     try {
-      const res = await fetch(`${serviceUrl}/sdr-link-api/list`, {
+      const res = await fetch(`${targetServiceUrl}/sdr-link-api/list`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -45,8 +53,11 @@ class RadioService {
         onlineUsers: s.user_cut,
         clientType: s.client, // openwebrx
         name: s.name,
-        disabled: s.disabled,
+        brief: s.brief,
+        description: s.description,
+        disabled: !!s.disabled,
         maxUsers: s.max_user,
+        ipMaxConnection: s.ip_max_conn,
         url: `/radio/${s.client}/${s.id}/`,
       }));
     } catch (err) {
@@ -67,10 +78,13 @@ class RadioService {
       (station) => ({
         id: station.id,
         name: station.name,
+        brief: station.brief,
+        description: station.description,
         client: station.clientType,
         conn: station.connection,
         disabled: !!station.disabled,
         max_user: station.maxUsers,
+        ip_max_conn: station.ipMaxConnection,
       }),
     );
 
@@ -205,6 +219,18 @@ class RadioService {
       reasonMessage: '允许用户访问',
       uid,
     };
+  };
+
+  checkService = async (serviceUrl) => {
+    if (!serviceUrl || typeof serviceUrl !== 'string') {
+      throw new Error('服务地址不能为空');
+    }
+    const stations = await this.getRadioStations(serviceUrl);
+    if (!Array.isArray(stations)) {
+      throw new Error('服务返回数据结构异常');
+    }
+
+    return true;
   };
 }
 

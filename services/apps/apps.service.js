@@ -24,7 +24,7 @@ class AppsService {
       apps.push({
         name: radioSettings.name,
         url: '/radios',
-        icon: getUrl('statics', 'apps/radio.jpg'),
+        icon: getUrl('statics', 'apps/radio.png'),
       });
     }
     return apps;

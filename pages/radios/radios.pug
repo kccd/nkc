@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title 电台
+  title=data.radioName
 block content
   -
     var stringData = objToStr({
@@ -19,12 +19,14 @@ block content
             v-for='station of radioStations'
             class='bg-white border border-gray-200 rounded-md p-4 h-30 flex flex-col justify-between'
           )
-            a(
+            a.mb-2(
               :href="station.url"
               target="_blank"
-              class='block overflow-hidden text-ellipsis display:-webkit-box -webkit-line-clamp:2 -webkit-box-orient:vertical text-[1.4rem]'
+              class='block overflow-hidden text-ellipsis display:-webkit-box -webkit-line-clamp:2 -webkit-box-orient:vertical text-[1.6rem]'
+              :title="station.name"
             ) {{station.name}}
-            .mt-2 在线/上限：{{Math.min(station.onlineUsers, station.maxUsers)}} / {{station.maxUsers}}
+            .mb-2.overflow-hidden.text-md(style='display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;' :title='station.brief') {{station.brief}}
+            div 在线用户：{{Math.min(station.onlineUsers, station.maxUsers)}}，容量：{{station.maxUsers}}
 
 block scripts
   +includeJS('/radios/radios.js')

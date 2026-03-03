@@ -1276,6 +1276,14 @@ settingSchema.statics.getAppsData = async () => {
       icon: getUrl('statics', 'apps/tools.png'),
     });
   }
+  const radioSettings = await SettingModel.getSettings('radio');
+  if (radioSettings.enabled) {
+    results.push({
+      name: radioSettings.name,
+      url: '/radios',
+      icon: getUrl('statics', 'apps/radio.png'),
+    });
+  }
   return results;
 };
 

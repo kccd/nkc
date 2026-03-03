@@ -44,6 +44,10 @@ const app = new window.Vue({
   data: {
     radioSettings: data.radioSettings,
     adminUsers: data.adminUsers,
+    stationNameMax: 64,
+    stationBriefMax: 140,
+    stationDescriptionMax: 500,
+    checkingService: false,
   },
   computed: {
     selectedUsersId() {
@@ -75,11 +79,37 @@ const app = new window.Vue({
 
     checkService() {
       const newServiceUrl = this.radioSettings.serviceUrl;
-      // 检测服务是否正常
+      if (this.checkingService || !newServiceUrl) {
+        return;
+      }
+      this.checkingService = true;
+      nkcAPI('/e/settings/radio/check-service', 'POST', {
+        serviceUrl: newServiceUrl,
+      })
+        .then((res) => {
+          const status = res && res.data && res.data.status;
+          const message =
+            (res && res.data && res.data.message) || '检测服务失败，请稍后再试';
+          if (status === 'ok') {
+            sweetSuccess('服务正常');
+            return;
+          }
+          if (status === 'error') {
+            sweetError(message);
+            return;
+          }
+          sweetError('检测服务返回异常');
+        })
+        .catch((err) => {
+          sweetError(err.message || err);
+        })
+        .finally(() => {
+          this.checkingService = false;
+        });
     },
 
     removeRadioStation(index) {
-      sweetQuestion('确定移除当前节点吗？').then(() => {
+      sweetQuestion('确定移除当前站点吗？').then(() => {
         this.radioSettings.stations.splice(index, 1);
       });
     },
@@ -88,10 +118,13 @@ const app = new window.Vue({
       this.radioSettings.stations.push({
         id: createUniqueId(this.radioSettings.stations),
         name: '',
+        brief: '',
+        description: '',
         clientType: 'openwebrx',
         connection: '',
         disabled: false,
         maxUsers: 10,
+        ipMaxConnection: 1,
       });
     },
 
@@ -123,8 +156,35 @@ const app = new window.Vue({
 
     submit() {
       for (const station of this.radioSettings.stations) {
-        if (!station.name || !station.connection) {
-          sweetError('请确保所有节点的名称和连接地址都已填写');
+        if (!station.name) {
+          sweetError('站点名称不能为空');
+          return;
+        }
+        if (station.name && station.name.length > this.stationNameMax) {
+          sweetError(`站点名称不能超过 ${this.stationNameMax} 字`);
+          return;
+        }
+        if (!station.connection) {
+          sweetError('连接地址不能为空');
+          return;
+        }
+        if (Number(station.maxUsers) < 0) {
+          sweetError('最大连接数不能小于0');
+          return;
+        }
+        if (Number(station.ipMaxConnection) < 1) {
+          sweetError('同一IP最大连接数不能小于1');
+          return;
+        }
+        if (station.brief && station.brief.length > this.stationBriefMax) {
+          sweetError(`站点简介不能超过 ${this.stationBriefMax} 字`);
+          return;
+        }
+        if (
+          station.description &&
+          station.description.length > this.stationDescriptionMax
+        ) {
+          sweetError(`站点说明不能超过 ${this.stationDescriptionMax} 字`);
           return;
         }
       }
