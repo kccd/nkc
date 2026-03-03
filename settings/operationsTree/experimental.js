@@ -375,6 +375,9 @@ module.exports = {
     radio: {
       GET: Operations.experimentalRadioSettings,
       PUT: Operations.experimentalRadioSettings,
+      'check-service': {
+        POST: Operations.experimentalRadioSettings,
+      },
     },
   },
   systemInfo: {

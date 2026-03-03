@@ -1,6 +1,6 @@
 extends ../../experimental
 block eTitle
-  title 电台设置
+  title=`${data.radioSettings.name}设置`
 block eContent
   .hidden#data=tools.objToStr({radioSettings: data.radioSettings, adminUsers: data.adminUsers})
   .container-fluid.max-width#app(v-cloak)
@@ -41,42 +41,41 @@ block eContent
           .mb-2
             textarea.form-control(rows=3 v-model='radioSettings.serviceUrl')  
           div
-            button.btn.btn-sm.btn-default(@click='checkService' :disabled='!radioSettings.serviceUrl') 检测服务
+            button.btn.btn-sm.btn-default(@click='checkService' :disabled='!radioSettings.serviceUrl || checkingService') {{ checkingService ? '检测中' : '检测服务' }}
       .form-group
-        .col-sm-12.col-md-2 节点列表
-        .col-sm-12.col-md-10 
-          .table-responsive 
-            table.table.table-bordered
-              thead
-                tr  
-                  th 名称
-                  th 网页客户端类型
-                  th 连接地址
-                  th 最大连接数
-                  th 状态
-                  th 操作
-              tbody
-                tr(v-for='s, index in radioSettings.stations')
-                  th 
-                    textarea.form-control(rows=2 v-model="s.name")
-                  th 
-                    textarea.form-control(rows=2 v-model="s.clientType" :disabled="true")
-                  th 
-                    textarea.form-control(rows=2 v-model='s.connection')
-                  th 
-                    input.form-control.w-24(type='text' v-model.number='s.maxUsers')  
-                  th 
-                    .radio
-                      label.mr-2
-                        input(type='radio' :value="true" v-model='s.disabled')  
-                        span.align-middle 禁用
-                      label
-                        input(type='radio' :value="false" v-model='s.disabled')  
-                        span.align-middle 启用
-                  th
-                    button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationUp(index)' :disabled='index === 0') 上移      
-                    button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationDown(index)' :disabled='index === radioSettings.stations.length - 1') 下移       
-                    button.btn.btn-xs.btn-danger(@click='removeRadioStation(index)') 删除      
+        .col-sm-12.col-md-2.control-label 站点列表
+        .col-sm-12.col-md-8
+          .mb-3(v-for='s, index in radioSettings.stations')
+            .panel(:class='s.disabled ? "panel-danger" : "panel-default"')
+              .panel-heading
+                .pull-left 节点 {{ index + 1 }}
+                .pull-right
+                  button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationUp(index)' :disabled='index === 0') 上移
+                  button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationDown(index)' :disabled='index === radioSettings.stations.length - 1') 下移
+                  button.btn.btn-xs.mr-1(:class="s.disabled? 'btn-success': 'btn-danger'" @click='s.disabled = !s.disabled') {{s.disabled? '解禁': '禁用'}}
+                  button.btn.btn-xs.btn-danger(@click='removeRadioStation(index)') 删除
+                .clearfix
+              .panel-body
+                .mb-3
+                  .mb-1 名称
+                  textarea.form-control(rows=2 v-model="s.name" :maxlength="stationNameMax")
+                  .text-muted(style='font-size:12px') {{ (s.name || '').length }} / {{ stationNameMax }}
+                .mb-3
+                  .mb-1 简介
+                  textarea.form-control(rows=2 v-model='s.brief' :maxlength="stationBriefMax")
+                  .text-muted(style='font-size:12px') {{ (s.brief || '').length }} / {{ stationBriefMax }}
+                .mb-3
+                  .mb-1 说明
+                  textarea.form-control(rows=4 v-model='s.description' :maxlength="stationDescriptionMax")
+                  .text-muted(style='font-size:12px') {{ (s.description || '').length }} / {{ stationDescriptionMax }}
+                .mb-3
+                  .mb-1 连接地址
+                  textarea.form-control(rows=4 v-model='s.connection')
+                div
+                  .mb-1 最大连接数
+                  input.form-control.w-24(type='text' v-model.number='s.maxUsers')
+                  .mb-1 同一IP最大连接数
+                  input.form-control.w-24(type='text' v-model.number='s.ipMaxConnection')
           div 
             button.btn.btn-default(@click='addRadioStation') 添加节点    
       .form-group

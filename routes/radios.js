@@ -30,9 +30,16 @@ router.get('/stations', Public(), async (ctx, next) => {
     ctx.throw(403, radioPermission.reasonMessage);
   }
   ctx.apiData = {
-    radioStations: (await radioService.getRadioStations()).filter(
-      (s) => !s.disabled,
-    ),
+    radioStations: (await radioService.getRadioStations())
+      .filter((s) => !s.disabled)
+      .map((s) => ({
+        id: s.id,
+        maxUsers: s.maxUsers,
+        onlineUsers: s.onlineUsers,
+        url: s.url,
+        name: s.name,
+        brief: s.brief,
+      })),
   };
   await next();
 });
