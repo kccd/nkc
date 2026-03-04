@@ -22,6 +22,10 @@ block eContent
         .col-sm-12.col-md-6
           input.form-control(type='text' v-model='radioSettings.name')
       .form-group
+        .col-sm-12.col-md-2.control-label 简称
+        .col-sm-12.col-md-6
+          input.form-control(type='text' v-model='radioSettings.abbr')    
+      .form-group
         .col-sm-12.col-md-2.control-label 介绍
         .col-sm-12.col-md-6.col-sm-10
           textarea.form-control(rows=5 v-model='radioSettings.description')    
@@ -48,7 +52,7 @@ block eContent
           .mb-3(v-for='s, index in radioSettings.stations')
             .panel(:class='s.disabled ? "panel-danger" : "panel-default"')
               .panel-heading
-                .pull-left 节点 {{ index + 1 }}
+                .pull-left 站点 {{ index + 1 }}
                 .pull-right
                   button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationUp(index)' :disabled='index === 0') 上移
                   button.btn.btn-xs.btn-default.mr-1(@click='moveRadioStationDown(index)' :disabled='index === radioSettings.stations.length - 1') 下移
@@ -77,7 +81,7 @@ block eContent
                   .mb-1 同一IP最大连接数
                   input.form-control.w-24(type='text' v-model.number='s.ipMaxConnection')
           div 
-            button.btn.btn-default(@click='addRadioStation') 添加节点    
+            button.btn.btn-default(@click='addRadioStation') 添加站点
       .form-group
         .col-sm-12.col-md-2.control-label 权限控制
         .col-sm-12.col-md-10    

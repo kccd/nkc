@@ -4,11 +4,7 @@
 
     a.module-app(v-for="app in apps" :href="app.url" :key="app.url" target="_blank" :title="app.name")
       img(:src=`app.icon`)
-      span {{app.name}}
-
-    a.module-app(v-if="permission.hasUser" href="/exam")
-      img(src=`/statics/apps/exam.png`)
-      span 考试系统
+      span {{app.abbr || app.name}}
 
 </template>
 

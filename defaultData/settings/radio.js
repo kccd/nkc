@@ -4,6 +4,7 @@ module.exports = {
   c: {
     enabled: false,
     name: '科创电台',
+    abbr: '电台',
     description: '科创电台介绍',
     permission: {
       allowVisitor: false,

@@ -24,7 +24,7 @@ const app = new window.Vue({
       });
     },
     getRadioStations() {
-      return nkcAPI(`/radios/stations`, 'GET')
+      return nkcAPI(`/receivers/stations`, 'GET')
         .then((res) => {
           this.radioStations = res.data.radioStations;
         })

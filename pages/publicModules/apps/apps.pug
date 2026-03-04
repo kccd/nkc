@@ -9,4 +9,4 @@ if !isIncluded("publicModules/apps/apps.pug")
         for app in appData
           a.module-app(href=app.url)
             img(src=app.icon)
-            span=app.name
+            span.block.truncate=app.abbr || app.name
