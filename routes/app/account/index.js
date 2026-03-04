@@ -1,5 +1,5 @@
 const { Public } = require('../../../middlewares/permission');
-
+const { appsService } = require('../../../services/apps/apps.service');
 const router = require('koa-router')();
 router.get('/', Public(), async (ctx, next) => {
   const { data, nkcModules, state, db } = ctx;
@@ -30,7 +30,12 @@ router.get('/', Public(), async (ctx, next) => {
     };
   }
 
-  data.apps = await db.SettingModel.getAppsData();
+  data.apps = (await appsService.getApps()).map((app) => {
+    return {
+      ...app,
+      name: app.abbr || app.name,
+    };
+  });
   data.management = await db.SettingModel.getManagementData(user);
   data.home = {
     name: '首页',

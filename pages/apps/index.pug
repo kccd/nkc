@@ -6,7 +6,7 @@ block content
   .container-fluid.max-width
     .row
       for app in data.appsData
-        .col-xs-12.col-md-3
+        .col-xs-12.col-md-3.m-b-2
           a.apps-item.box-shadow.text-center(href=app.url target="_blank")
             img(src=app.icon)
             .name=app.name

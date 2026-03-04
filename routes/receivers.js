@@ -5,7 +5,7 @@ const { settingIds } = require('../settings/serverSettings');
 
 router.get('/', Public(), async (ctx, next) => {
   const radioSettings = await ctx.db.SettingModel.getSettings(settingIds.radio);
-  const radioPermission = await radioService.getUserRadioPermission({
+  /* const radioPermission = await radioService.getUserRadioPermission({
     uid: ctx.state.uid,
     ip: ctx.address,
   });
@@ -14,7 +14,7 @@ router.get('/', Public(), async (ctx, next) => {
     ctx.data.error = `${radioPermission.reasonMessage}`;
     ctx.template = 'error/noPermissionToVisitRadios.pug';
     return await next();
-  }
+  } */
   ctx.data.radioName = radioSettings.name;
   ctx.data.radioDescription = radioSettings.description;
   ctx.template = 'radios/radios.pug';
@@ -22,13 +22,13 @@ router.get('/', Public(), async (ctx, next) => {
 });
 
 router.get('/stations', Public(), async (ctx, next) => {
-  const radioPermission = await radioService.getUserRadioPermission({
+  /* const radioPermission = await radioService.getUserRadioPermission({
     uid: ctx.state.uid,
     ip: ctx.address,
   });
   if (radioPermission.accessable === false) {
     ctx.throw(403, radioPermission.reasonMessage);
-  }
+  } */
   ctx.apiData = {
     radioStations: (await radioService.getRadioStations())
       .filter((s) => !s.disabled)

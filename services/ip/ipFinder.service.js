@@ -1,11 +1,25 @@
-const maxmind = require('maxmind');
 const SettingModel = require('../../dataModels/SettingModel');
 const IPModel = require('../../dataModels/IPModel');
 const path = require('path');
+const { IPv4, newWithFileOnly } = require('ip2region.js');
+const { countryMap } = require('../../settings/countryMapping');
 
 class IPFinderService {
   cityLookup = null;
   localAddr = '未同步';
+
+  searcher = null;
+
+  // 初始化
+  tryToInitSearcher = async () => {
+    if (this.searcher === null) {
+      this.searcher = await newWithFileOnly(
+        IPv4,
+        path.resolve(__dirname, '../../geo/ip2region_v4.xdb'),
+      );
+    }
+    return this.searcher;
+  };
 
   // 判断IP是否为内网IP
   isPrivateIP = (ip) => {
@@ -20,48 +34,19 @@ class IPFinderService {
 
   // 获取详细地址信息
   getIpInfo = async (ip) => {
-    if (this.cityLookup === null) {
-      this.cityLookup = await maxmind.open(
-        path.resolve(__dirname, '../../geo/GeoLite2-City.mmdb'),
-      );
-    }
-    const geo = ip ? this.cityLookup.get(ip) : null;
-    let country = '';
-    let region = '';
-    let city = '';
-    let googleMapUrl = '';
-    let gaodeMapUrl = '';
-    let ip138Url = '';
-    if (geo) {
-      if (geo.country && geo.country.names) {
-        country = geo.country.names['zh-CN'] || geo.country.names.en || country;
-      }
-      if (
-        geo.subdivisions &&
-        geo.subdivisions.length > 0 &&
-        geo.subdivisions[0].names
-      ) {
-        region =
-          geo.subdivisions[0].names['zh-CN'] ||
-          geo.subdivisions[0].names.en ||
-          region;
-      }
-      if (geo.city && geo.city.names) {
-        city = geo.city.names['zh-CN'] || geo.city.names.en || city;
-      }
-      if (geo.location && geo.location.latitude && geo.location.longitude) {
-        googleMapUrl = `https://www.google.com/maps?q=${geo.location.latitude},${geo.location.longitude}`;
-        gaodeMapUrl = `https://uri.amap.com/marker?position=${geo.location.longitude},${geo.location.latitude}`;
-        ip138Url = `https://site.ip138.com/${ip}`;
-      }
-    }
+    const searcher = await this.tryToInitSearcher();
+    const geo = await searcher.search(ip);
+    const [_c, region, city, _y, contryCode] = geo.split('|');
+    const country = countryMap[contryCode] || contryCode || '';
+    const ip138Url = `https://site.ip138.com/${ip}`;
+
     return {
       ip,
       country,
-      region,
-      city,
-      googleMapUrl,
-      gaodeMapUrl,
+      region: region === '0' ? '' : region,
+      city: city === '0' ? '' : city,
+      googleMapUrl: '',
+      gaodeMapUrl: '',
       ip138Url,
     };
   };

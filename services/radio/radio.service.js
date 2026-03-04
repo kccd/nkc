@@ -58,7 +58,7 @@ class RadioService {
         disabled: !!s.disabled,
         maxUsers: s.max_user,
         ipMaxConnection: s.ip_max_conn,
-        url: `/radio/${s.client}/${s.id}/`,
+        url: `/receiver/${s.id}/`,
       }));
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -171,31 +171,45 @@ class RadioService {
         reasonMessage: '不允许游客访问',
       };
     }
-    // 检测最小身份认证等级
-    const usersPersonal = await UsersPersonalModel.findOne({ uid });
-    if (!usersPersonal) {
-      ThrowCommonError(500, `用户${uid}不存在`);
+
+    if (!radioSettings.permission.allowVisitor) {
+      // 不允许游客访问
+      if (!uid) {
+        // 没有uid，为游客，直接拒绝访问
+        return {
+          accessable: false,
+          reasonType: 'visitorNotAllowed',
+          reasonMessage: '不允许游客访问',
+        };
+      }
+      // 有uid，为会员，继续检测用户身份认证等级和手机号归属地等信息
+      // 检测最小身份认证等级
+      const usersPersonal = await UsersPersonalModel.findOne({ uid });
+      if (!usersPersonal) {
+        ThrowCommonError(500, `用户${uid}不存在`);
+      }
+      const authLevel = await usersPersonal.getAuthLevel();
+      if (authLevel < radioSettings.permission.getAuthLevel) {
+        return {
+          accessable: false,
+          reasonType: 'authLevelNotEnough',
+          reasonMessage: `身份认证等级不足，请最少完成身份认证${radioSettings.permission.getAuthLevel}`,
+        };
+      }
+      // 检测是否仅允许中国大陆手机号访问
+      if (
+        radioSettings.permission.authLevel > 0 &&
+        radioSettings.permission.onlyAllowChineseMobile &&
+        usersPersonal.nationCode !== '86'
+      ) {
+        return {
+          accessable: false,
+          reasonType: 'onlyAllowChineseMobile',
+          reasonMessage: '仅允许中国大陆手机号认证的用户访问',
+        };
+      }
     }
-    const authLevel = await usersPersonal.getAuthLevel();
-    if (authLevel < radioSettings.permission.getAuthLevel) {
-      return {
-        accessable: false,
-        reasonType: 'authLevelNotEnough',
-        reasonMessage: `身份认证等级不足，请最少完成身份认证${radioSettings.permission.getAuthLevel}`,
-      };
-    }
-    // 检测是否仅允许中国大陆手机号访问
-    if (
-      radioSettings.permission.authLevel > 0 &&
-      radioSettings.permission.onlyAllowChineseMobile &&
-      usersPersonal.nationCode !== '86'
-    ) {
-      return {
-        accessable: false,
-        reasonType: 'onlyAllowChineseMobile',
-        reasonMessage: '仅允许中国大陆手机号认证的用户访问',
-      };
-    }
+
     // 检测是否仅允许国内IP访问
     if (radioSettings.permission.onlyAllowChineseIP) {
       const isPrivateIP = await ipFinderService.isPrivateIP(ip);

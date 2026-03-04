@@ -1244,7 +1244,9 @@ settingSchema.statics.getManagementData = async (user) => {
  *   @param {String} icon 引用图标链接
  * */
 settingSchema.statics.getAppsData = async () => {
-  const SettingModel = mongoose.model('settings');
+  const { appsService } = require('../services/apps/apps.service.js');
+  return await appsService.getApps();
+  /* const SettingModel = mongoose.model('settings');
   const { getUrl } = require('../nkcModules/tools');
   const results = [];
   const fundSettings = await SettingModel.getSettings('fund');
@@ -1284,7 +1286,7 @@ settingSchema.statics.getAppsData = async () => {
       icon: getUrl('statics', 'apps/radio.png'),
     });
   }
-  return results;
+  return results; */
 };
 
 /*
