@@ -499,6 +499,9 @@ module.exports = {
         GET: Operations.visitExperimentalSurvey,
       },
     },
+    radio: {
+      GET: Operations.visitExperimentalRadioLogs,
+    },
   },
   console: {
     GET: Operations.visitExperimentalConsole,

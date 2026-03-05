@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title=data.radioName
+  title=`${data.radioName} - ${state.serverSettings.websiteName}`
 block content
   -
     var stringData = objToStr({

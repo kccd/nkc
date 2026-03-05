@@ -1,0 +1,54 @@
+extends ../../experimental
+block eTitle
+  title 日志
+block eContent
+  .container-fluid.max-width
+    .hidden#data=objToStr({radioLogs: data.radioLogs, paging: data.paging, type: data.t, content: data.c})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        div 
+          h4.m-b-1 按条件查询记录
+          .form-inline(style='margin-bottom: 1rem;' v-cloak)#app
+            .form-group
+              select.form-control(v-model='form.type')
+                option(value='username') 用户名
+                option(value='uid') UID
+                option(value='ip') IP
+            .form-group
+              input.form-control(placeholder='请输入内容' v-model='form.content' @keyup.enter='search')
+            .form-group
+              button.btn.btn-primary(type='submit' @click='search' :disabled="!form.content") 搜索
+              span &nbsp;
+              a.btn.btn-default(type='submit' href='/e/log/radio') 全部
+        div.m-t-1.table-responsive
+          include ../../../publicModules/paging/paging.pug
+          table.table.table-bordered
+            thead
+              tr
+                th 时间
+                th 用户
+                th 站点
+                th ip
+            tbody
+              tr(v-for="radioLog in radioLogs")
+                th 
+                  div {{timeFormat('YYYY-MM-DD', radioLog.toc)}}
+                  div {{timeFormat('HH:mm:ss', radioLog.toc)}}
+                th 
+                  div(class='flex items-center' v-if='radioLog.user')
+                    img(:src="getUrl('userAvatar', radioLog.user.avatar, 'sm')" height="24" width="24" class="mr-1")
+                    a(:href="getUrl('userHome', radioLog.user.uid)" target="_blank")
+                      span {{radioLog.user.username}}
+                  div(v-else) 游客    
+                th
+                  div(v-if='radioLog.station') 
+                    a(:href="radioLog.station.url" target="_blank") {{radioLog.station.name}}
+                  div(v-else) 未知
+                th
+                  span {{radioLog.ip}}:{{radioLog.port}}
+                  button.btn.btn-default.btn-xs(@click='getAndShowIpDetail(radioLog.ip)') 详情
+
+          include ../../../publicModules/paging/paging.pug
+
+block scripts
+  +includeJS("/experimental/log/radio/radio.js")

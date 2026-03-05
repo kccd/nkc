@@ -801,6 +801,7 @@ const DynamicOperations = {
   disableResource: 'disabledResource',
   momentCommentControl: 'momentCommentControl',
   visitExperimentalSurvey: 'visitExperimentalSurvey',
+  visitExperimentalRadioLogs: 'visitExperimentalRadioLogs',
   experimentalRadioSettings: 'experimentalRadioSettings',
 };
 

@@ -5,12 +5,22 @@ const { radioService } = require('../../services/radio/radio.service');
 router.get('/permission', Public(), async (ctx, next) => {
   const uid = ctx.state.uid;
   const clientIP = ctx.get('ClientIP');
+  const clientPort = Number(ctx.get('ClientPort')) || 0;
+  const stationId = ctx.get('DeviceId');
   const radioPermission = await radioService.getUserRadioPermission({
     uid,
     ip: clientIP,
   });
+  await radioService.createAccessLog({
+    uid,
+    ip: clientIP,
+    port: clientPort,
+    stationId,
+  });
   ctx.apiData = {
-    radioPermission,
+    uid,
+    isAdmin: radioPermission.reasonType === 'adminAllowed',
+    permission: radioPermission,
   };
   await next();
 });
