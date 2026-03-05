@@ -1,4 +1,5 @@
 const SettingModel = require('../../dataModels/SettingModel');
+const RadioLogModel = require('../../dataModels/RadioLogModel');
 const { ThrowCommonError } = require('../../nkcModules/error');
 const UsersPersonalModel = require('../../dataModels/UsersPersonalModel');
 const { settingIds } = require('../../settings/serverSettings');
@@ -57,7 +58,7 @@ class RadioService {
         description: s.description,
         disabled: !!s.disabled,
         maxUsers: s.max_user,
-        ipMaxConnection: s.ip_max_conn,
+        userMaxConnection: s.user_max_conn,
         url: `/receiver/${s.id}/`,
       }));
     } catch (err) {
@@ -84,7 +85,7 @@ class RadioService {
         conn: station.connection,
         disabled: !!station.disabled,
         max_user: station.maxUsers,
-        ip_max_conn: station.ipMaxConnection,
+        user_max_conn: station.userMaxConnection,
       }),
     );
 
@@ -164,14 +165,6 @@ class RadioService {
       };
     }
     // 检测是否限制游客访问
-    if (!uid && !radioSettings.permission.allowVisitor) {
-      return {
-        accessable: false,
-        reasonType: 'visitorNotAllowed',
-        reasonMessage: '不允许游客访问',
-      };
-    }
-
     if (!radioSettings.permission.allowVisitor) {
       // 不允许游客访问
       if (!uid) {
@@ -231,10 +224,10 @@ class RadioService {
       accessable: true,
       reasonType: 'userAllowed',
       reasonMessage: '允许用户访问',
-      uid,
     };
   };
 
+  // 检查服务地址是否可用
   checkService = async (serviceUrl) => {
     if (!serviceUrl || typeof serviceUrl !== 'string') {
       throw new Error('服务地址不能为空');
@@ -245,6 +238,20 @@ class RadioService {
     }
 
     return true;
+  };
+
+  // 创建电台访问日志
+  createAccessLog = async (props) => {
+    const { uid, ip, port, stationId } = props;
+    const radioLog = await new RadioLogModel({
+      toc: new Date(),
+      uid,
+      ip,
+      port,
+      stationId,
+    });
+    radioLog.save();
+    return radioLog;
   };
 }
 

@@ -124,7 +124,7 @@ const app = new window.Vue({
         connection: '',
         disabled: false,
         maxUsers: 10,
-        ipMaxConnection: 1,
+        userMaxConnection: 1,
       });
     },
 
@@ -172,8 +172,8 @@ const app = new window.Vue({
           sweetError('最大连接数不能小于0');
           return;
         }
-        if (Number(station.ipMaxConnection) < 1) {
-          sweetError('同一IP最大连接数不能小于1');
+        if (Number(station.userMaxConnection) < 1) {
+          sweetError('同一用户最大连接数不能小于1');
           return;
         }
         if (station.brief && station.brief.length > this.stationBriefMax) {

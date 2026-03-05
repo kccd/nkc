@@ -72,8 +72,8 @@ router.put(
       if (Number(station.maxUsers) < 0) {
         ctx.throw(400, '最大连接数不能小于0');
       }
-      if (Number(station.ipMaxConnection) < 1) {
-        ctx.throw(400, '同一IP最大连接数不能小于1');
+      if (Number(station.userMaxConnection) < 1) {
+        ctx.throw(400, '同一用户最大连接数不能小于1');
       }
       if (station.name && station.name.length > STATION_NAME_MAX) {
         ctx.throw(400, `站点名称不能超过${STATION_NAME_MAX}字`);
@@ -107,7 +107,7 @@ router.put(
         clientType: 'openwebrx',
         disabled: !!s.disabled,
         maxUsers: s.maxUsers,
-        ipMaxConnection: s.ipMaxConnection,
+        userMaxConnection: s.userMaxConnection,
       })),
     );
     await next();
