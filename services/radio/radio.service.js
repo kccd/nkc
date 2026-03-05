@@ -58,7 +58,7 @@ class RadioService {
         description: s.description,
         disabled: !!s.disabled,
         maxUsers: s.max_user,
-        ipMaxConnection: s.ip_max_conn,
+        userMaxConnection: s.user_max_conn,
         url: `/receiver/${s.id}/`,
       }));
     } catch (err) {
@@ -85,7 +85,7 @@ class RadioService {
         conn: station.connection,
         disabled: !!station.disabled,
         max_user: station.maxUsers,
-        ip_max_conn: station.ipMaxConnection,
+        user_max_conn: station.userMaxConnection,
       }),
     );
 

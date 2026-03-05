@@ -78,8 +78,8 @@ block eContent
                 div
                   .mb-1 最大连接数
                   input.form-control.w-24(type='text' v-model.number='s.maxUsers')
-                  .mb-1 同一IP最大连接数
-                  input.form-control.w-24(type='text' v-model.number='s.ipMaxConnection')
+                  .mb-1 同一用户（会员：同UID，游客：同IP）最大连接数
+                  input.form-control.w-24(type='text' v-model.number='s.userMaxConnection')
           div 
             button.btn.btn-default(@click='addRadioStation') 添加站点
       .form-group
