@@ -35,7 +35,7 @@ block eContent
           .text-warning.mb-2 管理员可无视权限控制以及绕过节点最大连接数限制。
           div.flex.flex-wrap.gap-2
             div(v-for='user of adminUsers' :key='user.uid').inline-flex.items-center.gap-2.bg-gray-300.rounded-full.px-3.py-2
-              img(:src="getUrl('userAvatar', user.avatar, 'sm')").rounded-full(style='width: 24px; height: 24px;')
+              img(:src="getUrl('userAvatar', user.avatar, 'sm')" style='width: 24px; height: 24px;').rounded-full
               span {{user.username}}
               .fa.fa-times.cursor-pointer(class="hover:opacity-70" @click='removeAdmin(user.uid)')
           button.btn.btn-sm.btn-default.mt-2(@click="addAdmin") 添加
