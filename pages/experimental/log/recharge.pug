@@ -39,6 +39,7 @@ block content
                 th 用户
                 th 充值金额（元）
                 th IP
+                th 平台
                 th 验证
             tbody
               tr(v-for='(record, index) of records' :style="!record.verify?'background-color: #aaa;': ''")
@@ -52,7 +53,10 @@ block content
                   ) {{record.toUser.username}}
                 th {{record.num/100}}
                 th {{record.ip}}:{{record.port}}
+                th {{record.paymentType === 'aliPay'? '支付宝': '微信'}}
                 th {{record.verify?"是":"否"}}
+                  button.btn.btn-danger.btn-xs.m-l-05(@click="syncRecordStatus(record)" v-if='!record.verify && record.paymentType === "wechatPay"') 手动同步
+
           include ../../interface_navigation_paging
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes

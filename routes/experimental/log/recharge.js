@@ -1,4 +1,7 @@
 const Router = require('koa-router');
+const {
+  wechatPayService,
+} = require('../../../services/payment/wechatPay.service');
 const { OnlyOperation } = require('../../../middlewares/permission');
 const { Operations } = require('../../../settings/operations');
 const router = new Router();
@@ -42,6 +45,33 @@ router.get(
     data.t = t;
     data.paging = paging;
     data.content = content;
+    await next();
+  },
+);
+
+router.post(
+  '/:recordId',
+  OnlyOperation(Operations.visitExperimentalRecharge),
+  async (ctx, next) => {
+    const record = await ctx.db.KcbsRecordModel.findOne({
+      _id: ctx.body.recordId,
+    });
+    if (!record) {
+      ctx.throw(400, `账单ID（${ctx.body.recordId}）不正确`);
+    }
+    if (record.paymentType === 'aliPay') {
+      ctx.throw(403, '暂不支持支付宝');
+    }
+
+    await wechatPayService.syncRecordStatus(record.paymentId);
+
+    const newRecord = await ctx.db.KcbsRecordModel.findOnly({
+      _id: ctx.body.recordId,
+    });
+
+    ctx.apiData = {
+      record: newRecord,
+    };
     await next();
   },
 );
