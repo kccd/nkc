@@ -29,7 +29,8 @@
             a(href='/f/recycle') 回收站
           li
             a(href='/f/draft') 草稿箱
-
+      li
+        a(href='/e/settings/radio') 接收机
 
       li.dropdown(role='presentation')
         a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
@@ -37,12 +38,11 @@
           span.fa.fa-caret-down
         ul.dropdown-menu
           li
-            a(href='/fund/settings') 设置
+            a(href='/e/settings/fund') 设置
           li
             a(href='/fund/disabled') 被屏蔽的基金
           li
             a(href='/fund/unsubmit') 基金申请
-
 
 
       li.dropdown(role='presentation')
@@ -260,8 +260,6 @@
             a(href='/e/settings/sensitiveWords') 敏感词
           li
             a(href=`/e/settings/tools`) 网页工具
-          li  
-            a(href=`/e/settings/radio`) 电台  
       li.dropdown(role='presentation')
         a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
           span=`工具 `

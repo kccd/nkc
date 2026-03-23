@@ -463,6 +463,9 @@ module.exports = {
     },
     recharge: {
       GET: Operations.visitExperimentalRecharge,
+      sync: {
+        POST: Operations.visitExperimentalRecharge,
+      },
     },
     withdraw: {
       GET: Operations.visitExperimentalWithdraw,
