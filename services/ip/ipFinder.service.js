@@ -53,19 +53,28 @@ class IPFinderService {
 
   // 获取简略地址信息
   // 中国大陆返回省份，其他国家返回国家名
-  getIpAddressAbbr = async (ip) => {
-    const { country, region, city } = await this.getIpInfo(ip);
-    if (country === '中国') {
-      return `${region || city || country}`;
-    } else if (!country) {
-      return this.localAddr;
-    } else {
-      return `${country}`;
+  getIpAddressAbbr = async (ip = '') => {
+    try {
+      // 这里传入的ip后面可能包含了:port，所以需要先去掉端口部分
+      ip = ip.split(':')[0];
+      if (this.isPrivateIP(ip)) {
+        return this.localAddr;
+      }
+      const { country, region, city } = await this.getIpInfo(ip);
+      if (country === '中国') {
+        return `${region || city || country}`;
+      } else if (!country) {
+        return this.localAddr;
+      } else {
+        return `${country}`;
+      }
+    } catch (e) {
+      return '未知';
     }
   };
 
   // 保存ip并返回token
-  saveIpAndGetToken = async (ip) => {
+  saveIpAndGetToken = async (ip = '') => {
     let ipData = await IPModel.findOne({ ip }, { _id: 1 }).sort({ tlm: -1 });
     if (!ipData) {
       ipData = IPModel({
