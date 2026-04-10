@@ -1,4 +1,5 @@
 const SettingModel = require('../../dataModels/SettingModel');
+const logger = require('../../nkcModules/logger');
 const IPModel = require('../../dataModels/IPModel');
 const path = require('path');
 const { IPv4, newWithFileOnly } = require('ip2region.js');
@@ -33,22 +34,36 @@ class IPFinderService {
   };
 
   // 获取详细地址信息
-  getIpInfo = async (ip) => {
-    const searcher = await this.tryToInitSearcher();
-    const geo = await searcher.search(ip);
-    const [_c, region, city, _y, contryCode] = geo.split('|');
-    const country = countryMap[contryCode] || contryCode || '';
-    const ip138Url = `https://site.ip138.com/${ip}`;
+  getIpInfo = async (ip = '') => {
+    try {
+      ip = ip.split(':')[0].trim();
+      const searcher = await this.tryToInitSearcher();
+      const geo = await searcher.search(ip);
+      const [_c, region, city, _y, contryCode] = geo.split('|');
+      const country = countryMap[contryCode] || contryCode || '';
+      const ip138Url = `https://site.ip138.com/${ip}`;
 
-    return {
-      ip,
-      country,
-      region: region === '0' ? '' : region,
-      city: city === '0' ? '' : city,
-      googleMapUrl: '',
-      gaodeMapUrl: '',
-      ip138Url,
-    };
+      return {
+        ip,
+        country,
+        region: region === '0' ? '' : region,
+        city: city === '0' ? '' : city,
+        googleMapUrl: '',
+        gaodeMapUrl: '',
+        ip138Url,
+      };
+    } catch (err) {
+      logger.error(err);
+      return {
+        ip,
+        country: '未知',
+        region: '',
+        city: '',
+        googleMapUrl: '',
+        gaodeMapUrl: '',
+        ip138Url: `https://site.ip138.com/${ip}`,
+      };
+    }
   };
 
   // 获取简略地址信息
@@ -56,7 +71,7 @@ class IPFinderService {
   getIpAddressAbbr = async (ip = '') => {
     try {
       // 这里传入的ip后面可能包含了:port，所以需要先去掉端口部分
-      ip = ip.split(':')[0];
+      ip = ip.split(':')[0].trim();
       if (this.isPrivateIP(ip)) {
         return this.localAddr;
       }
